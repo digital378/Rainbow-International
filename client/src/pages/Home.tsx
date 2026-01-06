@@ -4,6 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { Features } from "@/components/home/Features";
 import { AboutPreview } from "@/components/home/AboutPreview";
 import { Events } from "@/components/home/Events";
+import { ContactForm } from "@/components/home/ContactForm";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         <Features />
         <AboutPreview />
         <Events />
+        <ContactForm />
         
         {/* Call to Action Section */}
         <section className="py-24 bg-secondary">
