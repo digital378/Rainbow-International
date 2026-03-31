@@ -4,9 +4,9 @@ import { Menu, X, Phone, Clock, MapPin, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 const aboutLinks = [
-  { href: "/about-rainbow-international-school#chairpersons-note", label: "Chairperson's Note" },
-  { href: "/about-rainbow-international-school#vision-mission", label: "RIS Vision & Mission" },
-  { href: "/about-rainbow-international-school#our-philosophy", label: "Our Philosophy" },
+  { href: "/about-rainbow-international-school", label: "About RIS" },
+  { href: "/global-brand-associations", label: "Brand Partners" },
+  { href: "/rainbow-preschool-international", label: "Rainbow Preschool International" },
 ];
 
 const academicsLinks = [
