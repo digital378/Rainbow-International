@@ -5,37 +5,274 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
+// ── Sports Wheel Diagram ──────────────────────────────────────────
+const sportsItems = [
+  { lines: ["Adventure", "Sports"], angle: 0,   color: "#f97316" },
+  { lines: ["Athletics"],           angle: 30,  color: "#f97316" },
+  { lines: ["Basketball"],          angle: 60,  color: "#16a34a" },
+  { lines: ["Carom"],               angle: 90,  color: "#2563eb" },
+  { lines: ["Chess"],               angle: 120, color: "#2563eb" },
+  { lines: ["Cricket"],             angle: 150, color: "#dc2626" },
+  { lines: ["Football"],            angle: 180, color: "#dc2626" },
+  { lines: ["Karate"],              angle: 210, color: "#f97316" },
+  { lines: ["Table", "Tennis"],     angle: 240, color: "#16a34a" },
+  { lines: ["Swimming"],            angle: 270, color: "#0ea5e9" },
+  { lines: ["Skating"],             angle: 300, color: "#1e3a8a" },
+  { lines: ["Volleyball"],          angle: 330, color: "#a855f7" },
+];
+
+function SportsWheel() {
+  const cx = 260, cy = 265;
+  const ringR = 150;
+  const textR  = 215;
+  const toRad  = (deg: number) => (deg - 90) * Math.PI / 180;
+
+  return (
+    <svg viewBox="0 0 520 530" className="w-full max-w-lg mx-auto" role="img" aria-label="Sports to Add Action">
+      <defs>
+        <clipPath id="sportCircleClip">
+          <circle cx={cx} cy={cy} r={112} />
+        </clipPath>
+      </defs>
+
+      {/* Yellow ring */}
+      <circle cx={cx} cy={cy} r={ringR} fill="#fffde7" stroke="#fbbf24" strokeWidth="10" />
+      {/* White inner fill */}
+      <circle cx={cx} cy={cy} r={112} fill="#fff" />
+      {/* Sports image */}
+      <image
+        href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-extra-curricular-activities-sports-1.jpg"
+        x={cx - 112} y={cy - 112} width={224} height={224}
+        clipPath="url(#sportCircleClip)"
+        preserveAspectRatio="xMidYMid slice"
+      />
+
+      {sportsItems.map((sport, i) => {
+        const rad   = toRad(sport.angle);
+        const dotX  = cx + ringR * Math.cos(rad);
+        const dotY  = cy + ringR * Math.sin(rad);
+        const tx    = cx + textR * Math.cos(rad);
+        const ty    = cy + textR * Math.sin(rad);
+        const anchor = tx < cx - 12 ? "end" : tx > cx + 12 ? "start" : "middle";
+        const lx1   = cx + (ringR + 10) * Math.cos(rad);
+        const ly1   = cy + (ringR + 10) * Math.sin(rad);
+        const lx2   = cx + (textR - 24) * Math.cos(rad);
+        const ly2   = cy + (textR - 24) * Math.sin(rad);
+
+        return (
+          <g key={i}>
+            <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={sport.color} strokeWidth="1.5" strokeOpacity="0.45" />
+            <circle cx={dotX} cy={dotY} r={7} fill={sport.color} />
+            {sport.lines.map((ln, li) => (
+              <text
+                key={li}
+                x={tx}
+                y={ty + li * 14 - (sport.lines.length - 1) * 7}
+                textAnchor={anchor}
+                fontSize="12"
+                fontWeight="700"
+                fill="#1f2937"
+                fontFamily="Poppins, sans-serif"
+              >
+                {ln}
+              </text>
+            ))}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Clubs Wheel Diagram ───────────────────────────────────────────
+// Pill labels: { label, lines[], angle, color, textColor }
+const clubItems1to5 = [
+  { lines: ["Science", "with fun"], angle: 277, color: "#16a34a", textColor: "#fff" },
+  { lines: ["Orators"],             angle: 316, color: "#1e3a8a", textColor: "#fff" },
+  { lines: ["Nature"],              angle: 0,   color: "#16a34a", textColor: "#fff" },
+  { lines: ["General Knowledge", "Sharing"], angle: 45, color: "#f97316", textColor: "#fff" },
+  { lines: ["Culinary only", "for Grade 3"], angle: 83, color: "#dc2626", textColor: "#fff" },
+];
+
+const clubItems6to8 = [
+  { lines: ["Entrepreneur"],           angle: 97,  color: "#dc2626", textColor: "#fff" },
+  { lines: ["Health &", "Wellness"],   angle: 126, color: "#f97316", textColor: "#fff" },
+  { lines: ["Heritage"],               angle: 157, color: "#ca8a04", textColor: "#fff" },
+  { lines: ["Nature"],                 angle: 183, color: "#16a34a", textColor: "#fff" },
+  { lines: ["Orators"],                angle: 208, color: "#0891b2", textColor: "#fff" },
+  { lines: ["Theatre"],                angle: 237, color: "#1e3a8a", textColor: "#fff" },
+  { lines: ["Dance &", "Music"],       angle: 263, color: "#7c3aed", textColor: "#fff" },
+];
+
+function Pill({ lines, x, y, anchor, color, textColor }: {
+  lines: string[]; x: number; y: number; anchor: "start" | "middle" | "end";
+  color: string; textColor: string;
+}) {
+  const maxLen = Math.max(...lines.map(l => l.length));
+  const pw = maxLen * 7.2 + 18;
+  const ph = lines.length * 16 + 10;
+  const rx = anchor === "end" ? x - pw : anchor === "start" ? x : x - pw / 2;
+  const ry = y - ph / 2;
+
+  return (
+    <g>
+      <rect x={rx} y={ry} width={pw} height={ph} rx={ph / 2} fill={color} />
+      {lines.map((ln, li) => (
+        <text
+          key={li}
+          x={rx + pw / 2}
+          y={ry + ph / 2 + li * 16 - (lines.length - 1) * 8 + 4}
+          textAnchor="middle"
+          fontSize="10"
+          fontWeight="700"
+          fill={textColor}
+          fontFamily="Poppins, sans-serif"
+        >
+          {ln}
+        </text>
+      ))}
+    </g>
+  );
+}
+
+function ClubsWheel() {
+  const cx = 380, cy = 300;
+  const innerR = 115;
+  const ringR  = 155;
+  const pillR  = 230;
+  const toRad  = (deg: number) => (deg - 90) * Math.PI / 180;
+
+  const allItems = [...clubItems1to5, ...clubItems6to8];
+
+  return (
+    <svg viewBox="0 0 760 600" className="w-full max-w-2xl mx-auto" role="img" aria-label="Clubs to Provide Intellectual Stimulation">
+      <defs>
+        <clipPath id="topHalf">
+          <rect x={cx - innerR - 10} y={cy - innerR - 10} width={(innerR + 10) * 2} height={innerR + 10} />
+        </clipPath>
+        <clipPath id="bottomHalf">
+          <rect x={cx - innerR - 10} y={cy} width={(innerR + 10) * 2} height={innerR + 10} />
+        </clipPath>
+      </defs>
+
+      {/* Outer thin ring */}
+      <circle cx={cx} cy={cy} r={ringR} fill="none" stroke="#a7f3d0" strokeWidth="2" strokeDasharray="6 4" />
+
+      {/* Top half — Clubs for 1–5 */}
+      <path
+        d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 1 ${cx + innerR} ${cy} Z`}
+        fill="#60a5fa"
+      />
+      {/* Bottom half — Clubs for 6–8 */}
+      <path
+        d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 0 ${cx + innerR} ${cy} Z`}
+        fill="#2563eb"
+      />
+
+      {/* Divider line */}
+      <line x1={cx - innerR} y1={cy} x2={cx + innerR} y2={cy} stroke="white" strokeWidth="2" />
+
+      {/* Labels inside */}
+      <text x={cx} y={cy - 30} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
+      <text x={cx} y={cy - 12} textAnchor="middle" fontSize="12" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
+      <text x={cx} y={cy - 0}  textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">1 to 5</text>
+
+      <text x={cx} y={cy + 22} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
+      <text x={cx} y={cy + 38} textAnchor="middle" fontSize="12" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
+      <text x={cx} y={cy + 52} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">6 to 8</text>
+
+      {/* Connecting dots and lines for each item */}
+      {allItems.map((item, i) => {
+        const rad   = toRad(item.angle);
+        const dotX  = cx + ringR * Math.cos(rad);
+        const dotY  = cy + ringR * Math.sin(rad);
+        const px    = cx + pillR * Math.cos(rad);
+        const py    = cy + pillR * Math.sin(rad);
+        const anchor: "start" | "middle" | "end" =
+          px < cx - 15 ? "end" : px > cx + 15 ? "start" : "middle";
+
+        const lx1 = cx + (ringR + 8) * Math.cos(rad);
+        const ly1 = cy + (ringR + 8) * Math.sin(rad);
+        const lx2 = cx + (pillR - 30) * Math.cos(rad);
+        const ly2 = cy + (pillR - 30) * Math.sin(rad);
+
+        return (
+          <g key={i}>
+            <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={item.color} strokeWidth="1.5" strokeOpacity="0.6" />
+            <circle cx={dotX} cy={dotY} r={6} fill={item.color} />
+            <Pill
+              lines={item.lines}
+              x={px} y={py}
+              anchor={anchor}
+              color={item.color}
+              textColor={item.textColor}
+            />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Teaching Methodology ──────────────────────────────────────────
 const activities = [
   {
     image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Exibhition.jpg",
     title: "Exhibitions",
-    description: "Annual Exhibitions for Science, Maths, Social Science, EVS & Language — showcasing student knowledge and creativity.",
+    description: "Annual Exhibitions for Science, Maths, Social Science, EVS & Language",
   },
   {
     image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Field-trip-1-1.jpg",
     title: "Tours & Visits",
-    description: "Exciting Recreational, Educational & Cultural Excursions that make learning joyful and hands-on.",
+    description: "Exciting Recreational, Educational & Cultural Excursions",
   },
   {
     image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg",
     title: "Special Assembly",
-    description: "Celebration of Fun & Educational U.N. days, Motivational Speeches & Meaningful Activities to broaden student horizons.",
+    description: "Celebration of Fun & Educational U.N. days, Motivational Speeches & Meaningful Activities",
   },
   {
     image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Cultural.jpg",
     title: "Cultural Activities",
-    description: "Annual Day, Sports Day, Indian Festivals & School Events celebrating the richness of our diverse heritage.",
+    description: "Annual Day, Sports Day, Indian Festivals & School Events",
+  },
+];
+
+// ── Parent Testimonials ───────────────────────────────────────────
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const testimonials = [
+  {
+    quote: "The study pattern in Rainbow is very well balanced between books & extra activity. I love to hear from my 8 yr son when he explains everything he learnt — this means he is enjoying, which was not the case one year back. Great going Rainbow teachers, keep it up.",
+    name: "Chandrasekhar Ella",
+    photo: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Chandrasekhar-Ella.jpg",
+  },
+  {
+    quote: "Rainbow International School has been a wonderful experience for my daughter. The teachers are dedicated and the holistic approach to education is commendable.",
+    name: "Priya Sharma",
+    photo: "",
+  },
+  {
+    quote: "My son loves coming to school every day. The extracurricular activities have helped him develop confidence and leadership skills.",
+    name: "Rajesh Kumar",
+    photo: "",
   },
 ];
 
 export default function Extracurriculars() {
+  const [current, setCurrent] = useState(0);
+  const prev = () => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
+  const next = () => setCurrent((c) => (c + 1) % testimonials.length);
+  const t = testimonials[current];
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
         title="Extracurricular Activities - Rainbow International School Thane"
-        description="Rainbow International School — a FIT INDIA School offering sports, clubs, exhibitions, cultural activities, and tours for holistic student development in Thane West."
-        keywords="extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane, cultural activities school Thane"
+        description="Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane West."
+        keywords="extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane"
         canonical="https://rainbowinternationalschool.in/extracurriculars/"
       />
       <Navbar />
@@ -46,69 +283,172 @@ export default function Extracurriculars() {
       />
 
       <main className="flex-grow">
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-3xl text-center">
-            <div className="rounded-3xl p-8 border border-gray-100 shadow-sm" style={{ background: "#f0f4ff" }}>
-              <h2 className="text-2xl font-black mb-3" style={{ color: "#0d3b86" }}>We are a FIT INDIA School</h2>
-              <p className="text-gray-600">
-                Our FIT INDIA declaration has been approved by the Ministry of Youth Affairs and Sports. Rainbow International School is an official FIT INDIA School!
-              </p>
-              <a
-                href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-4 font-semibold underline text-sm"
-                style={{ color: "#0d3b86" }}
-              >
-                View Certificate
-              </a>
-            </div>
-          </div>
-        </section>
 
-        <section className="py-20" style={{ background: "#f8faff" }}>
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <div>
-                <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-extra-curricular-activities-sports-1.jpg"
-                  alt="Sports activities"
-                  className="rounded-3xl shadow-sm w-full object-cover aspect-[4/3]"
-                />
-                <h3 className="font-black text-xl mt-4 mb-2" style={{ color: "#0d3b86" }}>Sports to Add Action</h3>
-                <p className="text-gray-600 text-sm">Cricket, Football, Swimming, Badminton, Skating, Basketball, Karate, Chess and more.</p>
-              </div>
-              <div>
-                <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Asset-4-8.png"
-                  alt="Clubs"
-                  className="rounded-3xl shadow-sm w-full object-cover aspect-[4/3] object-contain bg-gray-50"
-                />
-                <h3 className="font-black text-xl mt-4 mb-2" style={{ color: "#0d3b86" }}>Clubs to Provide Intellectual Stimulation</h3>
-                <p className="text-gray-600 text-sm">Literary, Heritage, Eco, Science, Culinary, Interact and Cultural Clubs.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        {/* ── FIT INDIA ─────────────────────────────────────────── */}
         <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Teaching Methodology & Activities</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {activities.map((item, i) => (
-                <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100" data-testid={`card-extracurricular-${i}`}>
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col md:flex-row items-center gap-8 p-8 md:p-12" style={{ background: "#f0f4ff" }}>
+              <div className="flex-1 space-y-4">
+                <h2 className="text-3xl font-black" style={{ color: "#0d3b86" }}>We are a FIT INDIA School</h2>
+                <p className="text-gray-600 leading-relaxed">
+                  Our declaration has been approved by the Ministry of Youth Affairs and Sports and we are a FIT INDIA School!
+                </p>
+                <a
+                  href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-white font-bold py-2.5 px-6 rounded-full transition-opacity hover:opacity-90"
+                  style={{ background: "#0d3b86" }}
+                  data-testid="link-fit-india-certificate"
+                >
+                  View Certificate →
+                </a>
+              </div>
+              <div className="flex-shrink-0">
+                <div className="w-36 h-36 rounded-2xl overflow-hidden flex items-center justify-center" style={{ background: "#e0edff" }}>
                   <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-48 object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                    alt="FIT INDIA School Certificate"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const el = e.target as HTMLImageElement;
+                      el.style.display = "none";
+                      el.parentElement!.innerHTML = `<div style="padding:16px;text-align:center;font-weight:900;font-size:24px;color:#0d3b86;line-height:1.1">FIT<br/>INDIA</div>`;
+                    }}
                   />
-                  <div className="p-5">
-                    <h3 className="font-black text-lg mb-2" style={{ color: "#0d3b86" }}>{item.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Sports Wheel ──────────────────────────────────────── */}
+        <section className="py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-3xl">
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Sports to Add Action</h2>
+            <SportsWheel />
+          </div>
+        </section>
+
+        {/* ── Clubs Wheel ───────────────────────────────────────── */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Clubs to Provide Intellectual Stimulation</h2>
+            <ClubsWheel />
+          </div>
+        </section>
+
+        {/* ── Teaching Methodology ──────────────────────────────── */}
+        <section className="py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-5xl">
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Teaching Methodology</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {activities.map((item, i) => (
+                <div key={i} className="flex flex-col gap-3" data-testid={`card-extracurricular-${i}`}>
+                  <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-sm leading-snug" style={{ color: "#0d3b86" }}>{item.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── SMC & Environment Info ─────────────────────────────── */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-3xl space-y-8 text-gray-700 text-sm leading-relaxed">
+            <div>
+              <h3 className="font-black text-base text-gray-900 mb-2">Important SMC Decisions</h3>
+              <p className="mb-2">The Important SMC decisions taken by the SMC were as follows:</p>
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>To apply for upgradation to CBSE.</li>
+                <li>To gain approval for shift system from CBSE.</li>
+                <li>Give approval for appointment of teaching staff as per requirement.</li>
+              </ol>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base text-gray-900 mb-2">Field of Environment Education</h3>
+              <p className="mb-2">The school's environment education programme aims to sensitize the students to the environment through hands on year long thought provoking activities. The vision of the School Management is to convert RIS into a Green School in the coming years.</p>
+              <p className="mb-2">The first step taken in this direction has been to conduct an audit of the existing biodiversity and to further enhance it by developing an academic garden based on syllabus, vegetable and medicinal patch along with composting.</p>
+              <p className="mb-2">Butterfly garden has been developed on a plot of 500 sq.ft, wherein different host plant and nectar producing plants have been nurtured to attract butterflies. As of now many species of butterflies can be spotted. The students are exposed to the lifecycle of a butterfly in reality.</p>
+              <p className="mb-2">Tree Plantation Drive was organized on Children's Day to sensitize the young minds on the importance of nurturing trees.</p>
+              <p>Swatch Bharat Abhiyan was conducted to instill in the minds the importance of keeping their surroundings clean for a healthy body and mind.</p>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base text-gray-900 mb-2">INNOVATIONS</h3>
+              <p className="mb-2">Inclusive teaching practice for Mathematics. On World Smile Day a very innovative method of teaching the concepts of area was adopted by the Maths teachers of Std VI & VII. The students were asked to measure their own smiles.</p>
+              <p className="mb-2">Experiential teaching practice in EVS: The students were taken to the Butterfly Garden created in their own school premises to impart the knowledge of the life of a butterfly.</p>
+              <p className="mb-2">To disseminate mitigation measures that can be taken by the community at large, students of Class IX and X are made to create innovative table top calendars on the topics related to several natural and man-made calamities.</p>
+              <p className="mb-2">To promote waste management programme that is initiated by the citizens of Thane, the school has joined the Plastic Revitalization Program.</p>
+              <p>Assembly programmes, workshops for parents and training session for teachers are designed and conducted on innovative topics like regard for senior citizens, fitness programme etc.</p>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base text-gray-900 mb-2">PTA Activities</h3>
+              <p className="mb-2">Members of the PTA actively involved themselves in the following activities:</p>
+              <ul className="space-y-1">
+                <li>A member arranged a talk for the students by the Ex Chairman of ISRO Shri A. S Kiran Kumar.</li>
+                <li>Help in resolving staff and parent related issues.</li>
+                <li>Involve themselves in the co-ordination and success of school programs like the School exhibition "IMPULSE", Annual Day Programme and all the other cultural programmes.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Parents Corner ─────────────────────────────────────── */}
+        <section className="py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-2xl text-center">
+            <h2 className="text-3xl font-black mb-2" style={{ color: "#0d3b86" }}>Parents Corner</h2>
+            <p className="text-gray-500 text-sm mb-10">Explore Parent's Response box down here.</p>
+
+            <div className="relative bg-white rounded-3xl shadow-sm border border-gray-100 px-10 py-10">
+              <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center border border-gray-200 hover:bg-gray-50 transition-colors" data-testid="button-prev-testimonial">
+                <ChevronLeft size={18} className="text-gray-500" />
+              </button>
+              <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center border border-gray-200 hover:bg-gray-50 transition-colors" data-testid="button-next-testimonial">
+                <ChevronRight size={18} className="text-gray-500" />
+              </button>
+
+              <p className="text-gray-700 italic leading-relaxed text-base mb-6">"{t.quote}"</p>
+
+              {t.photo && (
+                <img
+                  src={t.photo}
+                  alt={t.name}
+                  className="w-14 h-14 rounded-full mx-auto mb-3 object-cover border-2 border-gray-100"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              )}
+              {!t.photo && (
+                <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-white font-black text-xl" style={{ background: "#0d3b86" }}>
+                  {t.name[0]}
+                </div>
+              )}
+
+              <p className="font-bold text-sm" style={{ color: "#f97316" }}>{t.name}</p>
+
+              <div className="flex justify-center gap-1.5 mt-5">
+                {testimonials.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrent(idx)}
+                    className="w-2.5 h-2.5 rounded-full transition-all"
+                    style={{ background: idx === current ? "#f97316" : "#d1d5db" }}
+                    data-testid={`button-testimonial-dot-${idx}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
