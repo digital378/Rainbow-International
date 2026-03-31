@@ -22,54 +22,60 @@ const sportsItems = [
 ];
 
 function SportsWheel() {
-  const cx = 260, cy = 265;
-  const ringR = 150;
-  const textR  = 215;
+  // Centre shifted RIGHT so left-side labels (Swimming/Skating/Volleyball) don't clip
+  const cx = 340, cy = 290;
+  const ringR = 158;   // yellow ring radius
+  const innerR = 118;  // image circle radius
+  const textR  = 240;  // label radius – well outside the ring on all sides
   const toRad  = (deg: number) => (deg - 90) * Math.PI / 180;
 
   return (
-    <svg viewBox="0 0 520 530" className="w-full max-w-lg mx-auto" role="img" aria-label="Sports to Add Action">
+    // viewBox wide enough: left edge needs cx – textR – 80 ≈ 20px margin → start at 0
+    // right edge needs cx + textR + 80 ≈ 660 → width 680
+    <svg viewBox="0 0 680 580" className="w-full max-w-2xl mx-auto" role="img" aria-label="Sports to Add Action" style={{ overflow: "visible" }}>
       <defs>
-        <clipPath id="sportCircleClip">
-          <circle cx={cx} cy={cy} r={112} />
+        <clipPath id="sc1">
+          <circle cx={cx} cy={cy} r={innerR} />
         </clipPath>
       </defs>
 
-      {/* Yellow ring */}
-      <circle cx={cx} cy={cy} r={ringR} fill="#fffde7" stroke="#fbbf24" strokeWidth="10" />
-      {/* White inner fill */}
-      <circle cx={cx} cy={cy} r={112} fill="#fff" />
-      {/* Sports image */}
+      {/* Yellow filled ring */}
+      <circle cx={cx} cy={cy} r={ringR} fill="#fffde7" stroke="#fbbf24" strokeWidth="12" />
+      {/* White inner disc */}
+      <circle cx={cx} cy={cy} r={innerR} fill="#e0edff" />
+      {/* Sports image clipped to inner circle */}
       <image
-        href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-extra-curricular-activities-sports-1.jpg"
-        x={cx - 112} y={cy - 112} width={224} height={224}
-        clipPath="url(#sportCircleClip)"
+        href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg"
+        x={cx - innerR} y={cy - innerR} width={innerR * 2} height={innerR * 2}
+        clipPath="url(#sc1)"
         preserveAspectRatio="xMidYMid slice"
       />
 
       {sportsItems.map((sport, i) => {
-        const rad   = toRad(sport.angle);
-        const dotX  = cx + ringR * Math.cos(rad);
-        const dotY  = cy + ringR * Math.sin(rad);
-        const tx    = cx + textR * Math.cos(rad);
-        const ty    = cy + textR * Math.sin(rad);
-        const anchor = tx < cx - 12 ? "end" : tx > cx + 12 ? "start" : "middle";
-        const lx1   = cx + (ringR + 10) * Math.cos(rad);
-        const ly1   = cy + (ringR + 10) * Math.sin(rad);
-        const lx2   = cx + (textR - 24) * Math.cos(rad);
-        const ly2   = cy + (textR - 24) * Math.sin(rad);
+        const rad  = toRad(sport.angle);
+        const dotX = cx + ringR * Math.cos(rad);
+        const dotY = cy + ringR * Math.sin(rad);
+        const tx   = cx + textR * Math.cos(rad);
+        const ty   = cy + textR * Math.sin(rad);
+        const anchor: "start" | "middle" | "end" =
+          tx < cx - 15 ? "end" : tx > cx + 15 ? "start" : "middle";
+        // short connector line from ring edge to label
+        const lx1 = cx + (ringR + 12) * Math.cos(rad);
+        const ly1 = cy + (ringR + 12) * Math.sin(rad);
+        const lx2 = cx + (textR - 28) * Math.cos(rad);
+        const ly2 = cy + (textR - 28) * Math.sin(rad);
 
         return (
           <g key={i}>
-            <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={sport.color} strokeWidth="1.5" strokeOpacity="0.45" />
-            <circle cx={dotX} cy={dotY} r={7} fill={sport.color} />
+            <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={sport.color} strokeWidth="1.5" strokeOpacity="0.5" />
+            <circle cx={dotX} cy={dotY} r={8} fill={sport.color} />
             {sport.lines.map((ln, li) => (
               <text
                 key={li}
                 x={tx}
-                y={ty + li * 14 - (sport.lines.length - 1) * 7}
+                y={ty + li * 15 - (sport.lines.length - 1) * 7.5}
                 textAnchor={anchor}
-                fontSize="12"
+                fontSize="13"
                 fontWeight="700"
                 fill="#1f2937"
                 fontFamily="Poppins, sans-serif"
@@ -136,77 +142,62 @@ function Pill({ lines, x, y, anchor, color, textColor }: {
 }
 
 function ClubsWheel() {
-  const cx = 380, cy = 300;
-  const innerR = 115;
-  const ringR  = 155;
-  const pillR  = 230;
+  // Centre shifted so left pills don't clip (need ~180px left of cx for pills+lines)
+  const cx = 400, cy = 320;
+  const innerR = 120;
+  const ringR  = 160;
+  const pillR  = 255;  // centre of pill label
   const toRad  = (deg: number) => (deg - 90) * Math.PI / 180;
 
   const allItems = [...clubItems1to5, ...clubItems6to8];
 
+  // viewBox: left = cx - pillR - 160 = 400 - 255 - 160 = -15 → start at 0
+  //          right = cx + pillR + 160 = 815 → width 820
+  //          top = cy - pillR - 60 = 5 → start at 0
+  //          bottom = cy + pillR + 60 = 635 → height 640
   return (
-    <svg viewBox="0 0 760 600" className="w-full max-w-2xl mx-auto" role="img" aria-label="Clubs to Provide Intellectual Stimulation">
-      <defs>
-        <clipPath id="topHalf">
-          <rect x={cx - innerR - 10} y={cy - innerR - 10} width={(innerR + 10) * 2} height={innerR + 10} />
-        </clipPath>
-        <clipPath id="bottomHalf">
-          <rect x={cx - innerR - 10} y={cy} width={(innerR + 10) * 2} height={innerR + 10} />
-        </clipPath>
-      </defs>
+    <svg viewBox="0 0 820 640" className="w-full max-w-3xl mx-auto" role="img" aria-label="Clubs to Provide Intellectual Stimulation">
 
-      {/* Outer thin ring */}
-      <circle cx={cx} cy={cy} r={ringR} fill="none" stroke="#a7f3d0" strokeWidth="2" strokeDasharray="6 4" />
+      {/* Outer dashed ring */}
+      <circle cx={cx} cy={cy} r={ringR} fill="none" stroke="#6ee7b7" strokeWidth="2" strokeDasharray="6 4" />
 
       {/* Top half — Clubs for 1–5 */}
-      <path
-        d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 1 ${cx + innerR} ${cy} Z`}
-        fill="#60a5fa"
-      />
+      <path d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 1 ${cx + innerR} ${cy} Z`} fill="#60a5fa" />
       {/* Bottom half — Clubs for 6–8 */}
-      <path
-        d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 0 ${cx + innerR} ${cy} Z`}
-        fill="#2563eb"
-      />
+      <path d={`M ${cx - innerR} ${cy} A ${innerR} ${innerR} 0 0 0 ${cx + innerR} ${cy} Z`} fill="#2563eb" />
 
-      {/* Divider line */}
-      <line x1={cx - innerR} y1={cy} x2={cx + innerR} y2={cy} stroke="white" strokeWidth="2" />
+      {/* Dividing line */}
+      <line x1={cx - innerR} y1={cy} x2={cx + innerR} y2={cy} stroke="white" strokeWidth="3" />
 
-      {/* Labels inside */}
-      <text x={cx} y={cy - 30} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
-      <text x={cx} y={cy - 12} textAnchor="middle" fontSize="12" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
-      <text x={cx} y={cy - 0}  textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">1 to 5</text>
+      {/* Inner labels — top half */}
+      <text x={cx} y={cy - 36} textAnchor="middle" fontSize="14" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
+      <text x={cx} y={cy - 19} textAnchor="middle" fontSize="11" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
+      <text x={cx} y={cy - 4}  textAnchor="middle" fontSize="14" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">1 to 5</text>
+      {/* Inner labels — bottom half */}
+      <text x={cx} y={cy + 20} textAnchor="middle" fontSize="14" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
+      <text x={cx} y={cy + 36} textAnchor="middle" fontSize="11" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
+      <text x={cx} y={cy + 51} textAnchor="middle" fontSize="14" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">6 to 8</text>
 
-      <text x={cx} y={cy + 22} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">Clubs</text>
-      <text x={cx} y={cy + 38} textAnchor="middle" fontSize="12" fontWeight="600" fill="white" fontFamily="Poppins, sans-serif">for</text>
-      <text x={cx} y={cy + 52} textAnchor="middle" fontSize="15" fontWeight="800" fill="white" fontFamily="Poppins, sans-serif">6 to 8</text>
-
-      {/* Connecting dots and lines for each item */}
+      {/* Pills + connectors for every club item */}
       {allItems.map((item, i) => {
-        const rad   = toRad(item.angle);
-        const dotX  = cx + ringR * Math.cos(rad);
-        const dotY  = cy + ringR * Math.sin(rad);
-        const px    = cx + pillR * Math.cos(rad);
-        const py    = cy + pillR * Math.sin(rad);
+        const rad  = toRad(item.angle);
+        const dotX = cx + ringR * Math.cos(rad);
+        const dotY = cy + ringR * Math.sin(rad);
+        const px   = cx + pillR * Math.cos(rad);
+        const py   = cy + pillR * Math.sin(rad);
         const anchor: "start" | "middle" | "end" =
-          px < cx - 15 ? "end" : px > cx + 15 ? "start" : "middle";
+          px < cx - 20 ? "end" : px > cx + 20 ? "start" : "middle";
 
-        const lx1 = cx + (ringR + 8) * Math.cos(rad);
-        const ly1 = cy + (ringR + 8) * Math.sin(rad);
-        const lx2 = cx + (pillR - 30) * Math.cos(rad);
-        const ly2 = cy + (pillR - 30) * Math.sin(rad);
+        const lx1 = cx + (ringR + 10) * Math.cos(rad);
+        const ly1 = cy + (ringR + 10) * Math.sin(rad);
+        const lx2 = cx + (pillR - 36) * Math.cos(rad);
+        const ly2 = cy + (pillR - 36) * Math.sin(rad);
 
         return (
           <g key={i}>
             <line x1={lx1} y1={ly1} x2={lx2} y2={ly2} stroke={item.color} strokeWidth="1.5" strokeOpacity="0.6" />
-            <circle cx={dotX} cy={dotY} r={6} fill={item.color} />
-            <Pill
-              lines={item.lines}
-              x={px} y={py}
-              anchor={anchor}
-              color={item.color}
-              textColor={item.textColor}
-            />
+            <circle cx={dotX} cy={dotY} r={7} fill={item.color} />
+            <Pill lines={item.lines} x={px} y={py} anchor={anchor} color={item.color} textColor={item.textColor} />
           </g>
         );
       })}
