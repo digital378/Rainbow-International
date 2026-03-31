@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Send, MessageCircle } from "lucide-react";
+import { ChevronDown, Send, MessageCircle, LayoutGrid } from "lucide-react";
 
 const WA_URL = "https://wa.me/918291568972";
 
@@ -56,8 +56,10 @@ function getBotReply(input: string): string {
 }
 
 // ── Types ────────────────────────────────────────────────────────
+type MessageType = "bot" | "user" | "menu";
+
 interface Message {
-  from: "bot" | "user";
+  type: MessageType;
   text: string;
 }
 
@@ -82,7 +84,7 @@ export function ChatBot() {
     if (open) {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 50);
+      }, 60);
     }
   }, [messages, open]);
 
@@ -90,20 +92,31 @@ export function ChatBot() {
     setOpen(true);
     if (messages.length === 0) {
       setMessages([
-        {
-          from: "bot",
-          text: "Hi there! I'm Bhumika, your Rainbow International School assistant.\n\nHow can I help you today?",
-        },
+        { type: "bot", text: "Hi there! I'm Bhumika, your Rainbow International School assistant.\n\nHow can I help you today?" },
       ]);
       setChipsVisible(true);
     }
   };
 
+  const showMainMenu = () => {
+    setChipsVisible(true);
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 60);
+  };
+
   const pushReply = (userText: string) => {
     setChipsVisible(false);
-    setMessages(prev => [...prev, { from: "user", text: userText }]);
+    setMessages(prev => [
+      ...prev,
+      { type: "user", text: userText },
+    ]);
     setTimeout(() => {
-      setMessages(prev => [...prev, { from: "bot", text: getBotReply(userText) }]);
+      setMessages(prev => [
+        ...prev,
+        { type: "bot", text: getBotReply(userText) },
+        { type: "menu", text: "" },
+      ]);
     }, 500);
   };
 
@@ -120,26 +133,23 @@ export function ChatBot() {
       {open && (
         <div
           className="fixed bottom-24 right-5 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-          style={{ width: 340, maxHeight: 570, background: "#fff", border: "1px solid #e5e7eb" }}
+          style={{ width: 340, maxHeight: 580, background: "#fff", border: "1px solid #e5e7eb" }}
         >
           {/* Header */}
           <div
             className="flex items-center gap-3 px-4 py-3 flex-shrink-0"
             style={{ background: "#0d3b86" }}
           >
-            {/* Avatar */}
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
               style={{ background: "rgba(255,255,255,0.22)", color: "#fff" }}
             >
               B
             </div>
-            {/* Name + subtitle */}
             <div className="flex-grow min-w-0">
               <p className="text-white font-black text-sm leading-tight">Bhumika</p>
               <p className="text-white/65 text-[11px] leading-tight truncate">Rainbow International School Assistant</p>
             </div>
-            {/* WhatsApp button */}
             <a
               href={WA_URL}
               target="_blank"
@@ -151,7 +161,6 @@ export function ChatBot() {
             >
               <WaSvg />
             </a>
-            {/* Minimise */}
             <button
               onClick={() => setOpen(false)}
               className="text-white/60 hover:text-white transition-colors ml-1 flex-shrink-0"
@@ -167,28 +176,48 @@ export function ChatBot() {
             className="flex-grow overflow-y-auto px-4 py-4 space-y-3"
             style={{ minHeight: 0 }}
           >
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} gap-2`}>
-                {msg.from === "bot" && (
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs flex-shrink-0 mt-0.5"
-                    style={{ background: "#0d3b86", color: "#fff" }}
-                  >
-                    B
+            {messages.map((msg, i) => {
+              /* ── Main Menu button row ── */
+              if (msg.type === "menu") {
+                return (
+                  <div key={i} className="flex justify-start pl-9">
+                    <button
+                      onClick={showMainMenu}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full border transition-colors hover:bg-blue-50 active:scale-95"
+                      style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
+                      data-testid={`btn-main-menu-${i}`}
+                    >
+                      <LayoutGrid size={11} />
+                      Main Menu
+                    </button>
                   </div>
-                )}
-                <div
-                  className={`max-w-[76%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line ${
-                    msg.from === "bot"
-                      ? "bg-gray-100 text-gray-800 rounded-tl-none"
-                      : "text-white rounded-tr-none"
-                  }`}
-                  style={msg.from === "user" ? { background: "#0d3b86" } : {}}
-                >
-                  {msg.text}
+                );
+              }
+
+              /* ── Bot / User bubbles ── */
+              return (
+                <div key={i} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"} gap-2`}>
+                  {msg.type === "bot" && (
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs flex-shrink-0 mt-0.5"
+                      style={{ background: "#0d3b86", color: "#fff" }}
+                    >
+                      B
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[76%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line ${
+                      msg.type === "bot"
+                        ? "bg-gray-100 text-gray-800 rounded-tl-none"
+                        : "text-white rounded-tr-none"
+                    }`}
+                    style={msg.type === "user" ? { background: "#0d3b86" } : {}}
+                  >
+                    {msg.text}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={messagesEndRef} />
           </div>
 
