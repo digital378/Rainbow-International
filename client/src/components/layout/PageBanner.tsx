@@ -35,8 +35,8 @@ export function PageBanner({ title, subtitle, breadcrumb, bgImage }: PageBannerP
             ))}
           </nav>
         )}
-        <h1 className="text-4xl md:text-5xl font-serif font-bold mb-3">{title}</h1>
-        {subtitle && <p className="text-xl text-white/80 max-w-2xl">{subtitle}</p>}
+        <h1 className="text-4xl md:text-5xl font-serif font-black mb-3 text-white">{title}</h1>
+        {subtitle && <p className="text-xl text-white/80 max-w-2xl font-sans font-normal">{subtitle}</p>}
       </div>
     </div>
   );
