@@ -56,74 +56,91 @@ const testimonials = [
 
 export function Testimonials() {
   const [current, setCurrent] = useState(0);
+  const t = testimonials[current];
 
   const prev = () => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1));
   const next = () => setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1));
 
-  const t = testimonials[current];
-
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-2">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1">Parents Corner</h2>
-          <p className="text-gray-500 text-sm">Explore Parent's Response tab down here.</p>
+    <section className="py-20 relative overflow-hidden" style={{ background: "#f8faff" }}>
+      <div className="absolute top-10 left-10 text-9xl font-black opacity-5 select-none" style={{ color: "#0d3b86", lineHeight: 1 }}>"</div>
+      <div className="absolute bottom-10 right-10 text-9xl font-black opacity-5 select-none" style={{ color: "#0d3b86", lineHeight: 1, transform: "rotate(180deg)" }}>"</div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-14">
+          <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-4 py-1.5 rounded-full" style={{ background: "#e8f4fb", color: "#0d3b86" }}>
+            Parent Voices
+          </span>
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-3">Parents Corner</h2>
+          <p className="text-gray-500 text-base">Explore Parent's Response tab down here.</p>
         </div>
 
-        <div className="max-w-2xl mx-auto mt-10 text-center relative">
-          <button
-            onClick={prev}
-            data-testid="button-testimonial-prev"
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-12 w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft size={20} />
-          </button>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-xl p-10 md:p-14 relative border border-gray-100" data-testid={`card-testimonial-${current}`}>
+            <div className="text-6xl font-black leading-none mb-4" style={{ color: "#ffd600" }}>"</div>
 
-          <div data-testid={`card-testimonial-${current}`}>
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-8 italic">
+            <p className="text-gray-600 text-lg md:text-xl leading-relaxed mb-8 italic font-light">
               {t.review}
             </p>
-            <div className="flex justify-center mb-3">
+
+            <div className="flex items-center gap-4">
               <img
                 src={t.image}
                 alt={t.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                className="w-16 h-16 rounded-full object-cover border-4 border-yellow-300 shadow-md"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(t.name) + "&background=random";
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=0d3b86&color=fff`;
                 }}
                 data-testid={`img-testimonial-${current}`}
               />
+              <div>
+                <p className="font-black text-lg" style={{ color: "#e07020" }} data-testid={`text-testimonial-name-${current}`}>
+                  {t.name}
+                </p>
+                <p className="text-gray-400 text-sm">Parent, Rainbow International School</p>
+              </div>
+              <div className="ml-auto flex gap-1">
+                {[1,2,3,4,5].map((s) => (
+                  <span key={s} className="text-yellow-400 text-xl">★</span>
+                ))}
+              </div>
             </div>
-            <p
-              className="font-bold text-base"
-              style={{ color: "#e07020" }}
-              data-testid={`text-testimonial-name-${current}`}
-            >
-              {t.name}
-            </p>
           </div>
 
-          <button
-            onClick={next}
-            data-testid="button-testimonial-next"
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-12 w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-          >
-            <ChevronRight size={20} />
-          </button>
+          <div className="flex items-center justify-center gap-6 mt-8">
+            <button
+              onClick={prev}
+              data-testid="button-testimonial-prev"
+              className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110"
+              style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
+            >
+              <ChevronLeft size={20} />
+            </button>
 
-          <div className="flex justify-center gap-2 mt-6">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                data-testid={`button-testimonial-dot-${i}`}
-                className={`rounded-full transition-all duration-200 ${
-                  i === current
-                    ? "w-5 h-3 bg-orange-400"
-                    : "w-3 h-3 bg-gray-300"
-                }`}
-              />
-            ))}
+            <div className="flex gap-2">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  data-testid={`button-testimonial-dot-${i}`}
+                  className="rounded-full transition-all duration-300"
+                  style={{
+                    width: i === current ? "24px" : "10px",
+                    height: "10px",
+                    background: i === current ? "#0d3b86" : "#d1d5db",
+                  }}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={next}
+              data-testid="button-testimonial-next"
+              className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all duration-200 hover:scale-110"
+              style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
       </div>
