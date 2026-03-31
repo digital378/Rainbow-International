@@ -1,29 +1,29 @@
-import { BookOpen, Palette, Trophy, Globe } from "lucide-react";
+import { Monitor, Calendar, Heart, Sprout } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
   {
-    icon: BookOpen,
-    title: "Academic Excellence",
-    description: "Our rigorous curriculum challenges students to think critically and solve complex problems.",
+    icon: Monitor,
+    title: "Technology in Classrooms",
+    description: "E-learning resources for better learning & memory. State-of-the-art digital tools enhance every lesson.",
     color: "bg-blue-100 text-blue-700",
   },
   {
-    icon: Trophy,
-    title: "Sports Academy",
-    description: "State-of-the-art facilities and professional coaching in football, cricket, swimming, and more.",
+    icon: Calendar,
+    title: "Extracurricular Activities",
+    description: "Annual events, clubs, exhibitions, music, art & organic farming — a rich life beyond textbooks.",
     color: "bg-yellow-100 text-yellow-700",
   },
   {
-    icon: Palette,
-    title: "Arts & Culture",
-    description: "Fostering creativity through music, dance, visual arts, and drama programs.",
+    icon: Heart,
+    title: "Personality Development",
+    description: "Attention to etiquette, teamwork & self-confidence builds well-rounded, accountable human beings.",
     color: "bg-purple-100 text-purple-700",
   },
   {
-    icon: Globe,
-    title: "Global Perspective",
-    description: "International exchange programs and a diverse community preparing students for the world.",
+    icon: Sprout,
+    title: "Philosophy of Sensitivity",
+    description: "Incorporating social & environmental consciousness — empathy, compassion, and respect for all.",
     color: "bg-green-100 text-green-700",
   },
 ];
@@ -33,10 +33,12 @@ export function Features() {
     <section className="py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-secondary font-bold tracking-widest uppercase text-sm">Why Choose Us</span>
-          <h2 className="text-4xl font-serif font-bold text-primary mt-3 mb-4">Nurturing Potential,<br/>Achieving Excellence</h2>
+          <span className="text-secondary font-bold tracking-widest uppercase text-sm">Our Approach</span>
+          <h2 className="text-4xl font-serif font-bold text-primary mt-3 mb-4">
+            Welcome to Rainbow International School
+          </h2>
           <p className="text-muted-foreground text-lg">
-            At Rainbow International, we believe in a balanced approach to education that values academic achievement alongside personal growth.
+            Educating Students for Success in an Evolving World
           </p>
         </div>
 
