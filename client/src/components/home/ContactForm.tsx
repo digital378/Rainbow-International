@@ -213,7 +213,7 @@ export function ContactForm() {
                   <div>
                     <p className="font-black text-white text-xs mb-0.5">{card.label}</p>
                     {card.lines.map((line, j) => (
-                      <p key={j} className="text-white/80 text-[11px] leading-relaxed">{line}</p>
+                      <p key={j} className="text-white/80 text-[11px] leading-relaxed break-all">{line}</p>
                     ))}
                   </div>
                 </div>
