@@ -35,7 +35,8 @@ export function BeyondClassroomSection() {
               {activities.map((act, i) => (
                 <div
                   key={i}
-                  className="px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm text-sm font-semibold text-gray-700 hover:border-blue-300 hover:shadow-md transition-all"
+                  className="px-4 py-2 rounded-full text-sm font-semibold transition-all hover:scale-[1.03] cursor-default"
+                  style={{ background: "#eef5ff", color: "#0d3b86", border: "1.5px solid #c7dbf8" }}
                 >
                   {act}
                 </div>
@@ -56,17 +57,25 @@ export function BeyondClassroomSection() {
 
           <div className="flex-1 flex justify-center order-1 lg:order-2">
             <div className="relative">
+              {/* Main illustration card — deep navy so white artwork labels are fully visible */}
               <div
-                className="w-80 h-80 md:w-96 md:h-96 rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
-                style={{ background: "#eef5ff" }}
+                className="w-80 h-80 md:w-96 md:h-96 rounded-[40px] overflow-hidden shadow-2xl"
+                style={{
+                  background: "linear-gradient(145deg, #0a2763 0%, #0d3b86 45%, #1550b8 100%)",
+                  border: "4px solid rgba(255,255,255,0.18)",
+                  boxShadow: "0 30px 80px -10px rgba(13,59,134,0.45), 0 0 0 1px rgba(13,59,134,0.12)"
+                }}
               >
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
                   alt="Beyond The Classroom at Rainbow International School"
                   className="w-full h-full object-contain"
+                  style={{ mixBlendMode: "normal", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.18))" }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
+
+              {/* Top-right accent photo */}
               <div className="absolute -top-5 -right-5 w-28 h-28 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
@@ -75,6 +84,8 @@ export function BeyondClassroomSection() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
+
+              {/* Bottom-left accent photo */}
               <div className="absolute -bottom-5 -left-5 w-24 h-24 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png"
@@ -83,11 +94,14 @@ export function BeyondClassroomSection() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
+
+              {/* Stat pill — bottom right */}
               <div
-                className="absolute -bottom-8 right-8 px-5 py-3 rounded-2xl shadow-xl border border-white bg-white"
+                className="absolute -bottom-8 right-8 px-5 py-3 rounded-2xl shadow-xl"
+                style={{ background: "white", border: "1.5px solid #e8f0fe" }}
               >
-                <p className="text-xs font-medium text-gray-500 mb-0.5">Annual events</p>
-                <p className="text-lg font-black" style={{ color: "#0d3b86" }}>25+</p>
+                <p className="text-xs font-medium text-gray-400 mb-0.5">Annual events</p>
+                <p className="text-xl font-black" style={{ color: "#0d3b86" }}>25+</p>
               </div>
             </div>
           </div>

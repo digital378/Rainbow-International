@@ -1,0 +1,38 @@
+Fix the “Beyond The Classroom” section on the RIS homepage where the white text/icons inside the illustration are not visible against the light background.
+
+CONTEXT
+On the current RIS homepage, in the “Beyond The Classroom” / extracurricular illustration block, the inner white labels and supporting visual text/icons are getting lost on the pale background and are not readable/visible enough.
+
+PRIMARY GOAL
+Improve the visibility, contrast, and overall visual clarity of that section while keeping the creative concept intact.
+
+REQUIREMENTS
+1. Identify the exact UI elements in that illustration/card whose text or iconography is too low-contrast.
+2. Improve the contrast so the labels become clearly visible on desktop and mobile.
+3. Keep the design elegant and on-brand with the RIS homepage.
+4. Do not make it harsh, cluttered, or visually heavy.
+5. Preserve the overall composition and creative concept of the section.
+
+POSSIBLE FIXES TO CONSIDER
+Use the best combination of these if appropriate:
+- darken or slightly tint the background behind the white text
+- change the white labels/icons to a darker brand-consistent color
+- add subtle glow, shadow, stroke, or overlay for visibility
+- improve opacity and layering so the labels are readable
+- rebalance the illustration contrast without making it look crowded
+- slightly adjust background card tone if needed
+- ensure all decorative supporting labels remain visible but secondary to the main heading/content
+
+IMPORTANT
+Do not redesign the whole section.
+Do not change the content or layout structure unnecessarily.
+Only fix the visibility/readability issue and polish the section so it looks intentional and premium.
+
+ALSO CHECK
+After fixing this block, quickly review the homepage for any other low-contrast text or hidden decorative elements and correct similar issues if they exist, but keep the main focus on this section.
+
+OUTPUT EXPECTATION
+Apply the fix directly on the homepage and provide:
+1. what visibility issue was causing the problem
+2. what contrast/design adjustments were made
+3. confirmation that the section still matches the homepage design language
