@@ -289,6 +289,136 @@ export default function RainbowPreschool() {
           </div>
         </section>
 
+        {/* ── RPS Backlinks ────────────────────────────────────── */}
+        <section className="py-16" style={{ background: "#fafafa" }}>
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-10">
+                <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-4" style={{ background: "#fff1f2", color: "#dc2626" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  Rainbow Preschool Network
+                </span>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900">Explore Rainbow Preschools</h2>
+                <p className="text-gray-500 text-sm mt-2 max-w-xl mx-auto">
+                  Rainbow Preschool International is part of the wider <a href="https://www.rainbowpreschools.com/" target="_blank" rel="noopener noreferrer" className="font-bold underline underline-offset-2" style={{ color: "#dc2626" }}>Rainbow Preschools network</a> — serving families across Thane since 2007.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {/* Programmes */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Our Programmes</h3>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "All Programmes", href: "https://www.rainbowpreschools.com/programmes" },
+                      { label: "Playgroup (1.5–2.5 yrs)", href: "https://www.rainbowpreschools.com/playgroup" },
+                      { label: "Nursery (2.5–3.5 yrs)", href: "https://www.rainbowpreschools.com/nursery" },
+                      { label: "Kindergarten (Jr. & Sr. KG)", href: "https://www.rainbowpreschools.com/kindergarten" },
+                      { label: "Happy Times Programme", href: "https://www.rainbowpreschools.com/happy-times" },
+                    ].map((l, i) => (
+                      <li key={i}>
+                        <a href={l.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Admissions */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Admissions</h3>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "Preschool Admissions", href: "https://www.rainbowpreschools.com/preschool-admissions" },
+                      { label: "Admission Process Guide", href: "https://www.rainbowpreschools.com/preschool-admission-process-guide" },
+                      { label: "Documents Checklist", href: "https://www.rainbowpreschools.com/preschool-admission-documents-checklist" },
+                      { label: "When to Apply", href: "https://www.rainbowpreschools.com/when-apply-preschool-admission-timeline" },
+                      { label: "Playgroup Admission Guide", href: "https://www.rainbowpreschools.com/playgroup-admission-thane-complete-guide" },
+                      { label: "Preschool Fees in Thane", href: "https://www.rainbowpreschools.com/preschool-fees-thane-what-to-expect" },
+                    ].map((l, i) => (
+                      <li key={i}>
+                        <a href={l.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Branches */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Branches in Thane</h3>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "Best Preschool in Thane", href: "https://www.rainbowpreschools.com/best-preschool-in-thane" },
+                      { label: "Preschool Near Me", href: "https://www.rainbowpreschools.com/preschool-near-me" },
+                      { label: "Manpada", href: "https://www.rainbowpreschools.com/preschool-in-manpada-thane" },
+                      { label: "Hariniwas", href: "https://www.rainbowpreschools.com/preschool-in-hariniwas-thane" },
+                      { label: "Anand Nagar", href: "https://www.rainbowpreschools.com/preschool-in-anand-nagar-thane" },
+                      { label: "Kasarvadavali", href: "https://www.rainbowpreschools.com/preschool-in-kasarvadavali-thane" },
+                      { label: "Dhokali", href: "https://www.rainbowpreschools.com/preschool-in-dhokali-thane" },
+                      { label: "Kalwa", href: "https://www.rainbowpreschools.com/preschool-in-kalwa-thane" },
+                    ].map((l, i) => (
+                      <li key={i}>
+                        <a href={l.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Resources */}
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Guides & Resources</h3>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "Why Rainbow Preschool 2026", href: "https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" },
+                      { label: "Awards & Recognition", href: "https://www.rainbowpreschools.com/rainbow-preschool-awards-recognition" },
+                      { label: "Parent Testimonials", href: "https://www.rainbowpreschools.com/parent-testimonials-rainbow-preschool" },
+                      { label: "Play-Based Learning Benefits", href: "https://www.rainbowpreschools.com/blog/how-play-based-learning-shapes-young-minds" },
+                      { label: "First Day at Preschool", href: "https://www.rainbowpreschools.com/blog/preparing-your-child-for-first-day-preschool" },
+                      { label: "Role of Parents in Education", href: "https://www.rainbowpreschools.com/blog/role-of-parents-early-education" },
+                      { label: "FAQs", href: "https://www.rainbowpreschools.com/faqs" },
+                    ].map((l, i) => (
+                      <li key={i}>
+                        <a href={l.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+              </div>
+
+              {/* Visit RPS CTA */}
+              <div className="mt-8 text-center">
+                <a
+                  href="https://www.rainbowpreschools.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm text-white transition-all hover:scale-[1.03] hover:shadow-lg"
+                  style={{ background: "#dc2626" }}
+                >
+                  Visit rainbowpreschools.com
+                  <ArrowRight size={15} />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── Why Rainbow Preschool ─────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4">
