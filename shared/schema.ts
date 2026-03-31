@@ -6,7 +6,7 @@ import { z } from "zod";
 export const inquiries = pgTable("inquiries", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   parentName: text("parent_name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   phone: text("phone").notNull(),
   studentName: text("student_name").notNull(),
   grade: text("grade").notNull(),
@@ -18,6 +18,8 @@ export const inquiries = pgTable("inquiries", {
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
+}).extend({
+  email: z.string().email().optional().or(z.literal("")),
 });
 
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;

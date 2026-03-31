@@ -154,7 +154,7 @@ export function Hero() {
                     { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent" },
                     { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone" },
                     { name: "studentName", placeholder: "Child's Name *", type: "text", id: "input-hero-child" },
-                    { name: "email", placeholder: "Email Address", type: "email", id: "input-hero-email" },
+                    { name: "email", placeholder: "Email Address (optional)", type: "email", id: "input-hero-email" },
                   ].map((f) => (
                     <input
                       key={f.name}

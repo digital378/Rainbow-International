@@ -116,7 +116,7 @@ export function ContactForm() {
                     {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                   </div>
                   <div>
-                    <input {...register("email")} placeholder="Email Address *" type="email" data-testid="input-email" className={inputBase} />
+                    <input {...register("email")} placeholder="Email Address (optional)" type="email" data-testid="input-email" className={inputBase} />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                   </div>
                 </div>
