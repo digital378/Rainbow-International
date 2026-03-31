@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const testimonials = [
   {
@@ -49,82 +49,82 @@ const testimonials = [
   },
   {
     name: "Surabhi Trivedi",
-    review: "Rainbow International School nurtures each child's natural talents & intelligence to help them achieve their full potential, through Academic Excellence, Outstanding coaching for Sports, Best Infrastructure, Personal Attention and Holistic Development.",
+    review: "Hello...feeling privileged to share my view on this page. Just a word... Fantastic school. The teachers are Professional, caring and well organized.. infrastructure is outstanding. Children grow intellectually as well as in other co Curricular activities.. teachers really care & truly want the best for a child...",
     image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-reviews-surabhi-trivedi.jpg",
   },
 ];
 
 export function Testimonials() {
   const [current, setCurrent] = useState(0);
-  const perPage = 3;
-  const totalPages = Math.ceil(testimonials.length / perPage);
 
-  const prev = () => setCurrent((c) => (c === 0 ? totalPages - 1 : c - 1));
-  const next = () => setCurrent((c) => (c === totalPages - 1 ? 0 : c + 1));
+  const prev = () => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1));
+  const next = () => setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1));
 
-  const visible = testimonials.slice(current * perPage, current * perPage + perPage);
+  const t = testimonials[current];
 
   return (
-    <section className="py-24 bg-primary/5">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-secondary font-bold tracking-widest uppercase text-sm">Parents Corner</span>
-          <h2 className="text-4xl font-serif font-bold text-primary mt-3 mb-4">What Parents Say</h2>
-          <p className="text-muted-foreground text-lg">Explore Parent's Response — real voices from our Rainbow family.</p>
+        <div className="text-center mb-2">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-1">Parents Corner</h2>
+          <p className="text-gray-500 text-sm">Explore Parent's Response tab down here.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {visible.map((t, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-6 shadow-lg border border-border/50 flex flex-col"
-              data-testid={`card-testimonial-${current * perPage + i}`}
-            >
-              <Quote className="text-secondary/40 mb-4" size={32} />
-              <p className="text-muted-foreground leading-relaxed flex-grow mb-6 text-sm">{t.review}</p>
-              <div className="flex items-center gap-3 mt-auto">
-                <img
-                  src={t.image}
-                  alt={t.name}
-                  className="w-12 h-12 rounded-full object-cover border-2 border-secondary"
-                  data-testid={`img-testimonial-${current * perPage + i}`}
-                />
-                <div>
-                  <p className="font-bold text-primary text-sm" data-testid={`text-testimonial-name-${current * perPage + i}`}>
-                    {t.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Parent, Rainbow International School</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center items-center gap-4">
+        <div className="max-w-2xl mx-auto mt-10 text-center relative">
           <button
             onClick={prev}
             data-testid="button-testimonial-prev"
-            className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/80 transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 md:-translate-x-12 w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
-          <div className="flex gap-2">
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                data-testid={`button-testimonial-page-${i}`}
-                className={`w-2.5 h-2.5 rounded-full transition-colors ${i === current ? "bg-primary" : "bg-primary/30"}`}
+
+          <div data-testid={`card-testimonial-${current}`}>
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-8 italic">
+              {t.review}
+            </p>
+            <div className="flex justify-center mb-3">
+              <img
+                src={t.image}
+                alt={t.name}
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(t.name) + "&background=random";
+                }}
+                data-testid={`img-testimonial-${current}`}
               />
-            ))}
+            </div>
+            <p
+              className="font-bold text-base"
+              style={{ color: "#e07020" }}
+              data-testid={`text-testimonial-name-${current}`}
+            >
+              {t.name}
+            </p>
           </div>
+
           <button
             onClick={next}
             data-testid="button-testimonial-next"
-            className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/80 transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 md:translate-x-12 w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
           >
             <ChevronRight size={20} />
           </button>
+
+          <div className="flex justify-center gap-2 mt-6">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                data-testid={`button-testimonial-dot-${i}`}
+                className={`rounded-full transition-all duration-200 ${
+                  i === current
+                    ? "w-5 h-3 bg-orange-400"
+                    : "w-3 h-3 bg-gray-300"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
