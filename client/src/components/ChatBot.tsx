@@ -212,6 +212,7 @@ export function ChatBot() {
         { type: "user", text: userText },
         { type: "bot", text: "Sure! Please fill in your details below and our team will call you back." },
         { type: "callback-form", text: "" },
+        { type: "menu", text: "" },
       ]);
       return;
     }
@@ -235,7 +236,6 @@ export function ChatBot() {
           type: "callback-success",
           text: `Thank you, ${data.name}! We've received your request and will call you at ${data.phone} during ${data.preferredTime}. Talk soon!`,
         },
-        { type: "menu", text: "" },
       ];
     });
   };
