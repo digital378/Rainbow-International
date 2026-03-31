@@ -19,7 +19,7 @@ function getBotReply(input: string): string {
   const t = input.toLowerCase();
 
   if (t.includes("programme") || t.includes("program") || t.includes("class") || t.includes("grade") || t.includes("stream") || t.includes("curriculum")) {
-    return "Rainbow International School offers Nursery to Class 12 under CBSE (Affiliation No. 1130661). Our stages include Pre-Primary, Primary (Cl. 1–5), Middle School (Cl. 6–8), Secondary (Cl. 9–10), and Senior Secondary (Cl. 11–12) with Science, Commerce, and Humanities streams.";
+    return "We offer Nursery to Class 12 under CBSE (Affiliation No. 1130661).\n\nOur stages:\n• Pre-Primary (Nursery, Jr. KG, Sr. KG)\n• Primary (Class 1 – 5)\n• Middle School (Class 6 – 8)\n• Secondary (Class 9 – 10)\n• Senior Secondary (Class 11 – 12)\n\nClass 11–12 streams:\n• Science\n• Commerce\n• Humanities";
   }
   if (t.includes("timing") || t.includes("hour") || t.includes("time") || t.includes("schedule") || t.includes("batch")) {
     return "Our school office hours are Monday to Saturday, 9:00 AM – 6:00 PM.\n\nContact: +91 82915 68972";
