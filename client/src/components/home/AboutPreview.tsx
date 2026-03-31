@@ -5,7 +5,7 @@ const stats = [
   { num: "3,000+", sub: "Happy Students" },
   { num: "2009", sub: "Established" },
   { num: "3.5 Acres", sub: "Campus Area" },
-  { num: "50,000+", sub: "Lives Impacted" },
+  { num: "1 Lac+", sub: "Lives Impacted" },
 ];
 
 const highlights = [

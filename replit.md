@@ -99,7 +99,7 @@ Preferred communication style: Simple, everyday language.
 - **Email**: info@rainbowinternationalschool.in
 - **CBSE Affiliation**: 1130661
 - **Campus**: 3.5 acres
-- **Students**: 3,000+ current, 50,000+ impacted
+- **Students**: 3,000+ current, 1 Lac+ impacted
 - **Grades**: Nursery to Class 12
 - **Streams**: Science, Humanities, Commerce (Class 11–12)
 - **Working Hours**: Mon – Sat, 9:00 AM – 6:00 PM

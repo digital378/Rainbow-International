@@ -156,7 +156,7 @@ export default function RainbowPreschool() {
               </div>
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-xl">
                 <p className="text-xs text-gray-500 font-medium">Students Impacted</p>
-                <p className="text-xl font-black" style={{ color: "#ec4899" }}>50,000+</p>
+                <p className="text-xl font-black" style={{ color: "#ec4899" }}>1 Lac+</p>
               </div>
             </div>
           </div>

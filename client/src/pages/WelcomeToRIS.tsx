@@ -30,7 +30,7 @@ export default function WelcomeToRIS() {
               <div>
                 <h2 className="text-3xl font-black mb-6" style={{ color: "#0d3b86" }}>A Legacy of Excellence Since 2009</h2>
                 <div className="space-y-4 text-gray-600 leading-relaxed">
-                  <p>Founded in <strong>April 2009</strong>, Rainbow International School has touched the lives of more than <strong>50,000 students</strong> ever since.</p>
+                  <p>Founded in <strong>April 2009</strong>, Rainbow International School has touched the lives of more than <strong>1 lac students</strong> ever since.</p>
                   <p>Being one of the finest educational institutes in Thane, Rainbow International School is considered to have a campus that spans over <strong>3.5 acres</strong>. More than <strong>3,000 students</strong> are enrolled across two shifts.</p>
                   <p>In addition to being synonymous with quality education, we at Rainbow International School are committed to all-around growth in our students. Rainbow allows its students to explore human excellence through <strong>Competence, Conscience, and Compassion</strong>.</p>
                   <p>Our teaching methods integrate comfort, colors, and technology within classrooms, which enables our students not only to learn more effectively but also quickly.</p>
@@ -51,7 +51,7 @@ export default function WelcomeToRIS() {
                   className="rounded-3xl shadow-sm w-full object-cover"
                 />
                 <div className="grid grid-cols-2 gap-4">
-                  {[["2009", "Founded"], ["50,000+", "Students Impacted"], ["3.5 Acres", "Campus Size"], ["3,000+", "Current Students"]].map(([val, label], i) => (
+                  {[["2009", "Founded"], ["1 Lac+", "Students Impacted"], ["3.5 Acres", "Campus Size"], ["3,000+", "Current Students"]].map(([val, label], i) => (
                     <div key={i} className="rounded-3xl p-4 text-center border border-gray-100" style={{ background: "#f8faff" }}>
                       <div className="text-2xl font-black" style={{ color: "#0d3b86" }}>{val}</div>
                       <div className="text-xs text-gray-500 mt-1">{label}</div>

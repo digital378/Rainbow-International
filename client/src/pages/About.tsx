@@ -29,7 +29,7 @@ const sportsSpaces = [
 
 const stats = [
   { num: "2009", label: "Founded" },
-  { num: "50,000+", label: "Students Impacted" },
+  { num: "1 Lac+", label: "Students Impacted" },
   { num: "3.5 Acres", label: "Campus Area" },
   { num: "3,000+", label: "Current Students" },
 ];
@@ -98,7 +98,7 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-gray-600 text-[15px] leading-[1.8]">
                 <p>
-                  Founded in <strong>April 2009, Rainbow International School</strong> has touched the lives of more than 50,000 students ever since.
+                  Founded in <strong>April 2009, Rainbow International School</strong> has touched the lives of more than 1 lac students ever since.
                 </p>
                 <p>
                   Being one of the finest educational institutes in Thane, Rainbow International School has a campus that spans over <strong>3.5 acres</strong>. In addition to being a visible landmark, we are also enormous in terms of many other factors — more than <strong>3,000 students</strong> are enrolled across two shifts.
