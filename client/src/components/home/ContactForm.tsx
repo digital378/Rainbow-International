@@ -202,11 +202,11 @@ export function ContactForm() {
           </div>
 
           {/* Contact info pills */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 items-stretch">
             {contactCards.map((card, i) => {
               const Icon = card.icon;
               const content = (
-                <div className="rounded-2xl p-4 flex items-start gap-3 hover:bg-white/20 transition-colors" style={{ background: card.bg }}>
+                <div className="rounded-2xl p-4 flex items-start gap-3 hover:bg-white/20 transition-colors h-full" style={{ background: card.bg }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.2)" }}>
                     <Icon size={15} className="text-white" />
                   </div>
@@ -219,9 +219,9 @@ export function ContactForm() {
                 </div>
               );
               return card.href ? (
-                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer">{content}</a>
+                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>
               ) : (
-                <div key={i}>{content}</div>
+                <div key={i} className="h-full">{content}</div>
               );
             })}
           </div>
