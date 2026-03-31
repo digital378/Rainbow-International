@@ -63,6 +63,33 @@ interface Message {
   text: string;
 }
 
+// ── Render text with clickable phones & emails ───────────────────
+function renderRichText(text: string) {
+  // Matches: (022) 69105000 | +91 82915 68972 | +918291568972
+  const pattern = /(\+?[\d][\d\s\-().]{6,}[\d]|[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g;
+  const parts = text.split(pattern);
+
+  return parts.map((part, i) => {
+    if (/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(part)) {
+      return (
+        <a key={i} href={`mailto:${part}`} className="underline font-semibold" style={{ color: "#0d3b86" }}>
+          {part}
+        </a>
+      );
+    }
+    const digits = part.replace(/\D/g, "");
+    if (digits.length >= 7 && /[\d\s\-+().]{7,}/.test(part.trim())) {
+      const tel = digits.startsWith("91") && digits.length === 12 ? `+${digits}` : digits;
+      return (
+        <a key={i} href={`tel:${tel}`} className="underline font-semibold" style={{ color: "#0d3b86" }}>
+          {part}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 // ── WhatsApp SVG ─────────────────────────────────────────────────
 function WaSvg() {
   return (
@@ -213,7 +240,7 @@ export function ChatBot() {
                     }`}
                     style={msg.type === "user" ? { background: "#0d3b86" } : {}}
                   >
-                    {msg.text}
+                    {msg.type === "bot" ? renderRichText(msg.text) : msg.text}
                   </div>
                 </div>
               );
