@@ -37,6 +37,8 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfUse from "@/pages/TermsOfUse";
 import GlobalBrandAssociations from "@/pages/GlobalBrandAssociations";
 import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
+import Curriculum from "@/pages/Curriculum";
+import Circulars from "@/pages/Circulars";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -74,6 +76,8 @@ function Router() {
       <Route path="/term-of-use" component={TermsOfUse} />
       <Route path="/global-brand-associations" component={GlobalBrandAssociations} />
       <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
+      <Route path="/curriculum" component={Curriculum} />
+      <Route path="/circulars" component={Circulars} />
       <Route component={NotFound} />
     </Switch>
   );

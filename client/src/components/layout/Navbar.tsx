@@ -22,12 +22,12 @@ const academicsLinks = [
 ];
 
 const atRainbowLinks = [
-  { href: "/beyond-the-classroom", label: "Beyond The Classroom" },
   { href: "/safety-security", label: "Safety & Security" },
-  { href: "/academic-calendar", label: "Academic Calendar" },
-  { href: "/virtual-learning", label: "Virtual Learning" },
-  { href: "/academic-team", label: "Academic Team" },
+  { href: "/curriculum", label: "Curriculum" },
   { href: "/school-managing-committee", label: "School Managing Committee" },
+  { href: "/academic-team", label: "Academic Team" },
+  { href: "/academic-calendar", label: "Academic Calendar" },
+  { href: "/circulars", label: "Circulars" },
 ];
 
 const galleryLinks = [
