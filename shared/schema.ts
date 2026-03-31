@@ -41,3 +41,19 @@ export const insertEventSchema = createInsertSchema(events).omit({
 
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type Event = typeof events.$inferSelect;
+
+export const callbackRequests = pgTable("callback_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  preferredTime: text("preferred_time").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertCallbackRequestSchema = createInsertSchema(callbackRequests).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCallbackRequest = z.infer<typeof insertCallbackRequestSchema>;
+export type CallbackRequest = typeof callbackRequests.$inferSelect;
