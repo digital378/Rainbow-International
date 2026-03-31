@@ -11,6 +11,7 @@ export const inquiries = pgTable("inquiries", {
   studentName: text("student_name").notNull(),
   grade: text("grade").notNull(),
   preferredTime: text("preferred_time"),
+  source: text("source"),
   message: text("message"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
