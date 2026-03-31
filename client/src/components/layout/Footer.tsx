@@ -49,7 +49,7 @@ export function Footer() {
               <div className="flex gap-3">
                 {[
                   { Icon: Facebook, href: "https://www.facebook.com/RainbowInternationalSchoolThane/", label: "Facebook" },
-                  { Icon: Instagram, href: "https://www.instagram.com/rainbow_international_school/", label: "Instagram" },
+                  { Icon: Instagram, href: "https://www.instagram.com/rainbowinternationalschool/", label: "Instagram" },
                   { Icon: Youtube, href: "https://www.youtube.com/@rainbowinternationalschool", label: "YouTube" },
                 ].map(({ Icon, href, label }) => (
                   <a
