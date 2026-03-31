@@ -22,7 +22,7 @@ function getBotReply(input: string): string {
     return "Rainbow International School offers Nursery to Class 12 under CBSE (Affiliation No. 1130661). Our stages include Pre-Primary, Primary (Cl. 1–5), Middle School (Cl. 6–8), Secondary (Cl. 9–10), and Senior Secondary (Cl. 11–12) with Science, Commerce, and Humanities streams.";
   }
   if (t.includes("timing") || t.includes("hour") || t.includes("time") || t.includes("schedule") || t.includes("batch")) {
-    return "Our school office hours are Monday to Saturday, 9:00 AM – 6:00 PM.\n\nPhone: (022) 69105000\nMobile: +91 82915 68972";
+    return "Our school office hours are Monday to Saturday, 9:00 AM – 6:00 PM.\n\nContact: +91 82915 68972";
   }
   if (t.includes("campus") || t.includes("location") || t.includes("address") || t.includes("centre") || t.includes("center")) {
     return "We are located at:\nCosmos Arcade, Brahmand Phase 4,\nThane West, Maharashtra.\n\nOur campus spans 3.5 acres and serves 3,000+ students from Nursery to Class 12 — all under one roof.";
@@ -37,7 +37,7 @@ function getBotReply(input: string): string {
     return "Safety is our top priority. We have:\n• 160 CCTV cameras across campus\n• Metal detectors at all entry points\n• GPS-tracked buses with lady attendants\n• Trained nurse & equipped ambulance\n• First aid & self-defence training\n• 100% female staff for Preschool\n• Security personnel with walkie-talkies";
   }
   if (t.includes("talk") || t.includes("speak") || t.includes("call") || t.includes("contact") || t.includes("someone") || t.includes("human")) {
-    return "Reach our team directly:\n\nPhone: (022) 69105000\nMobile: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\nHours: Mon–Sat, 9:00 AM – 6:00 PM\n\nOr tap the WhatsApp button above to chat with us instantly!";
+    return "Reach our team directly:\n\nContact: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\nHours: Mon–Sat, 9:00 AM – 6:00 PM\n\nOr tap the WhatsApp button above to chat with us instantly!";
   }
   if (t.includes("transport") || t.includes("bus")) {
     return "Rainbow provides GPS-tracked, CCTV-enabled school buses with trained drivers, safety marshalls, and lady attendants on every route.\n\nCall +91 82915 68972 for route details.";
