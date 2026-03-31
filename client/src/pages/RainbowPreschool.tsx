@@ -10,7 +10,6 @@ const programs = [
   {
     name: "Playgroup",
     age: "1.5 – 2.5 years",
-    emoji: "🌱",
     color: "#10b981",
     bg: "#ecfdf5",
     border: "#6ee7b7",
@@ -20,7 +19,6 @@ const programs = [
   {
     name: "Nursery",
     age: "2.5 – 3.5 years",
-    emoji: "🌸",
     color: "#ec4899",
     bg: "#fdf2f8",
     border: "#f9a8d4",
@@ -30,7 +28,6 @@ const programs = [
   {
     name: "Jr. KG",
     age: "3.5 – 4.5 years",
-    emoji: "🚀",
     color: "#8b5cf6",
     bg: "#f5f3ff",
     border: "#c4b5fd",
@@ -40,7 +37,6 @@ const programs = [
   {
     name: "Sr. KG",
     age: "4.5 – 5.5 years",
-    emoji: "🎓",
     color: "#f59e0b",
     bg: "#fffbeb",
     border: "#fcd34d",
@@ -268,7 +264,6 @@ export default function RainbowPreschool() {
                 >
                   {/* Coloured header */}
                   <div className="px-6 pt-7 pb-5 text-center" style={{ background: prog.bg }}>
-                    <span className="text-4xl block mb-3">{prog.emoji}</span>
                     <h3 className="text-xl font-black mb-1" style={{ color: prog.color }}>{prog.name}</h3>
                     <span
                       className="inline-block px-3 py-1 rounded-full text-xs font-bold"
@@ -404,7 +399,6 @@ export default function RainbowPreschool() {
                 className="px-10 py-12 text-center"
                 style={{ background: "linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%)" }}
               >
-                <span className="text-4xl block mb-4">🌈</span>
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
                   One School. One Journey.<br />Nursery to Class 12.
                 </h2>
