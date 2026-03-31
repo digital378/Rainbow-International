@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import { Download } from "lucide-react";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const calendars = [
   {
@@ -25,7 +26,8 @@ const calendars = [
 
 export default function AcademicCalendar() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Academic Calendar - Rainbow International School Thane"
         description="View and download the academic calendar for Rainbow International School, Thane West. Stay updated with important dates, events, and school activities."
@@ -38,15 +40,15 @@ export default function AcademicCalendar() {
         breadcrumb={[{ label: "Academic Calendar" }]}
       />
 
-      <main className="flex-grow py-16 bg-background">
+      <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4">
-          <p className="text-center text-lg text-muted-foreground mb-12 max-w-xl mx-auto">
+          <p className="text-center text-lg text-gray-600 mb-12 max-w-xl mx-auto">
             Stay updated with our academic schedule. View and download the official Rainbow International School academic calendars.
           </p>
 
           <div className="space-y-12 max-w-4xl mx-auto">
             {calendars.map((cal, i) => (
-              <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-lg border">
+              <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
                 <img
                   src={cal.image}
                   alt={cal.label}
@@ -54,12 +56,13 @@ export default function AcademicCalendar() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <div className="p-5 flex items-center justify-between">
-                  <span className="font-semibold text-primary">{cal.label}</span>
+                  <span className="font-semibold" style={{ color: "#0d3b86" }}>{cal.label}</span>
                   <a
                     href={cal.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-primary/90 transition-colors"
+                    className="flex items-center gap-2 text-white font-semibold py-2 px-4 rounded-full text-sm hover:opacity-90 transition-opacity"
+                    style={{ background: "#0d3b86" }}
                     data-testid={`link-calendar-${i}`}
                   >
                     <Download size={16} />

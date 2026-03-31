@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import { Download } from "lucide-react";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const bookLists = [
   { grade: "Nursery", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
@@ -29,7 +30,8 @@ const bookLists = [
 
 export default function BookList() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Book List - Rainbow International School Thane"
         description="Rainbow International School provides a book list and study material to each student so they understand the syllabus from the start of the year. Download book lists for all classes."
@@ -43,9 +45,9 @@ export default function BookList() {
         breadcrumb={[{ label: "Book List" }]}
       />
 
-      <main className="flex-grow py-16 bg-background">
+      <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-10 text-amber-800 text-sm">
+          <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 mb-10 text-amber-800 text-sm">
             <strong>Note:</strong> The book lists below are for the academic year 2025–26. Please contact the school office or visit the school's official website for the downloadable PDFs. For queries, call <a href="tel:+918655003366" className="underline font-semibold">+91 86550 03366</a>.
           </div>
 
@@ -56,23 +58,23 @@ export default function BookList() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between bg-card border rounded-xl p-4 shadow hover:shadow-md hover:border-primary/30 transition-all"
+                className="group flex items-center justify-between bg-white border border-gray-100 rounded-3xl p-4 shadow-sm hover:shadow-md transition-all"
                 data-testid={`card-booklist-${i}`}
               >
                 <div>
-                  <span className="font-serif font-bold text-primary">{item.grade}</span>
-                  <span className="block text-xs text-muted-foreground mt-0.5">{item.year}</span>
+                  <span className="font-black" style={{ color: "#0d3b86" }}>{item.grade}</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">{item.year}</span>
                 </div>
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <Download size={16} className="text-primary" />
+                <div className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: "#f0f4ff" }}>
+                  <Download size={16} style={{ color: "#0d3b86" }} />
                 </div>
               </a>
             ))}
           </div>
 
-          <div className="mt-12 bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
-            <p className="text-muted-foreground mb-4">Can't find what you're looking for? Contact the school office directly.</p>
-            <a href="tel:+918655003366" className="inline-block bg-primary text-white font-bold py-2.5 px-8 rounded-lg hover:bg-primary/90 transition-colors text-sm">
+          <div className="mt-12 rounded-3xl p-6 border border-gray-100 text-center" style={{ background: "#f8faff" }}>
+            <p className="text-gray-600 mb-4">Can't find what you're looking for? Contact the school office directly.</p>
+            <a href="tel:+918655003366" className="inline-block text-white font-bold py-2.5 px-8 rounded-full hover:opacity-90 transition-opacity text-sm" style={{ background: "#0d3b86" }}>
               Call +91 86550 03366
             </a>
           </div>

@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
-import { ScrollProgress } from "@/components/home/ScrollProgress";
+import ScrollProgress from "@/components/home/ScrollProgress";
 import { Hero } from "@/components/home/Hero";
 import { AwardsStrip } from "@/components/home/AwardsStrip";
 import { Features } from "@/components/home/Features";

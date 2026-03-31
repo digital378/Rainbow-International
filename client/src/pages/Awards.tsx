@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const awards = [
   {
@@ -39,7 +40,8 @@ const awards = [
 
 export default function Awards() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Awards & Achievements - Rainbow International School Thane"
         description="Rainbow International School's awards and achievements — World Education Summit, Best Preschool & Secondary School in Thane, Excellence in CBSE Education, FIT INDIA School and more."
@@ -54,14 +56,14 @@ export default function Awards() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <p className="text-center text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+            <p className="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
               Accolades earned by Rainbow International School for being one of the best & most promising international schools in Thane for the decade in the educational sphere.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {awards.map((award, i) => (
-                <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-lg border flex flex-col" data-testid={`card-award-${i}`}>
+                <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col" data-testid={`card-award-${i}`}>
                   <img
                     src={award.image}
                     alt={award.title}
@@ -69,8 +71,8 @@ export default function Awards() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="p-6 flex-grow">
-                    <h3 className="font-serif font-bold text-xl text-primary mb-3">{award.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{award.description}</p>
+                    <h3 className="font-black text-xl mb-3" style={{ color: "#0d3b86" }}>{award.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{award.description}</p>
                   </div>
                 </div>
               ))}

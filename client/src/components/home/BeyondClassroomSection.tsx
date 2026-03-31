@@ -2,12 +2,12 @@ import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 
 const activities = [
-  { icon: "🏛️", label: "Tours & Visits" },
-  { icon: "🎭", label: "Exhibitions" },
-  { icon: "🎯", label: "Subject Clubs" },
-  { icon: "🌿", label: "Promoting Green" },
-  { icon: "🤲", label: "Dignity of Labour" },
-  { icon: "🎨", label: "Arts & Culture" },
+  "Tours & Visits",
+  "Exhibitions",
+  "Subject Clubs",
+  "Promoting Green",
+  "Dignity of Labour",
+  "Arts & Culture",
 ];
 
 export function BeyondClassroomSection() {
@@ -35,10 +35,9 @@ export function BeyondClassroomSection() {
               {activities.map((act, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm text-sm font-semibold text-gray-700 hover:border-blue-300 hover:shadow-md transition-all"
+                  className="px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm text-sm font-semibold text-gray-700 hover:border-blue-300 hover:shadow-md transition-all"
                 >
-                  <span className="text-base">{act.icon}</span>
-                  <span>{act.label}</span>
+                  {act}
                 </div>
               ))}
             </div>

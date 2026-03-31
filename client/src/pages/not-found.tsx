@@ -1,21 +1,31 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { Link } from "wouter";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
+      <Navbar />
+      <main className="flex-grow flex items-center justify-center py-20">
+        <div className="text-center px-4 max-w-lg">
+          <div className="text-8xl font-black mb-4" style={{ color: "#0d3b86" }}>404</div>
+          <h1 className="text-3xl font-black mb-4 text-gray-900">Page Not Found</h1>
+          <p className="text-gray-600 mb-8 leading-relaxed">
+            The page you're looking for doesn't exist or has been moved. Let's get you back on track.
           </p>
-        </CardContent>
-      </Card>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link href="/" className="inline-block text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity" style={{ background: "#0d3b86" }}>
+              Back to Home
+            </Link>
+            <Link href="/contact-us" className="inline-block font-bold py-3 px-8 rounded-full border-2 transition-colors" style={{ borderColor: "#0d3b86", color: "#0d3b86" }}>
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }

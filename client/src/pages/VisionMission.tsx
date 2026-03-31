@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 import { Eye, Target, Star, Heart, Globe, Lightbulb } from "lucide-react";
 
 const values = [
@@ -19,7 +20,8 @@ const coreValues = [
 
 export default function VisionMission() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="RIS Vision & Mission - Rainbow International School Thane"
         description="Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact."
@@ -33,34 +35,34 @@ export default function VisionMission() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="grid md:grid-cols-2 gap-8 mb-16">
               {values.map((v, i) => {
                 const Icon = v.icon;
                 return (
-                  <div key={i} className="bg-primary text-white rounded-2xl p-8 shadow-lg" data-testid={`card-vision-${i}`}>
+                  <div key={i} className="text-white rounded-3xl p-8 shadow-sm" style={{ background: "#0d3b86" }} data-testid={`card-vision-${i}`}>
                     <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-5">
                       <Icon size={28} />
                     </div>
-                    <h2 className="text-2xl font-serif font-bold mb-4">{v.title}</h2>
+                    <h2 className="text-2xl font-black mb-4">{v.title}</h2>
                     <p className="text-white/85 leading-relaxed">{v.description}</p>
                   </div>
                 );
               })}
             </div>
 
-            <h2 className="text-3xl font-serif font-bold text-primary text-center mb-10">Our Core Values</h2>
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Our Core Values</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {coreValues.map((v, i) => {
                 const Icon = v.icon;
                 return (
-                  <div key={i} className="bg-card rounded-xl p-6 shadow border text-center" data-testid={`card-value-${i}`}>
-                    <div className="w-12 h-12 bg-secondary/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon className="text-primary" size={22} />
+                  <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center" data-testid={`card-value-${i}`}>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "#fef3c7" }}>
+                      <Icon size={22} style={{ color: "#0d3b86" }} />
                     </div>
-                    <h3 className="font-serif font-bold text-lg text-primary mb-2">{v.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{v.description}</p>
+                    <h3 className="font-black text-lg mb-2" style={{ color: "#0d3b86" }}>{v.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{v.description}</p>
                   </div>
                 );
               })}
@@ -68,11 +70,11 @@ export default function VisionMission() {
           </div>
         </section>
 
-        <section className="py-12 bg-primary/5">
+        <section className="py-14" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-3xl text-center">
-            <h2 className="text-2xl font-serif font-bold text-primary mb-4">Our Motto</h2>
-            <p className="text-4xl font-serif font-bold text-primary mb-4">"Passion for Excellence"</p>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>Our Motto</h2>
+            <p className="text-4xl font-black mb-4" style={{ color: "#0d3b86" }}>"Passion for Excellence"</p>
+            <p className="text-gray-600 leading-relaxed">
               At Rainbow International School, every day is an opportunity to pursue excellence — in the classroom, on the field, and in life.
             </p>
           </div>

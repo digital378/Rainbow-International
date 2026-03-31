@@ -3,43 +3,45 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const departments = [
   {
     dept: "Languages",
     members: ["English Department", "Hindi Department", "Marathi Department", "French Department"],
-    color: "bg-blue-50 border-blue-200",
+    accent: "#3b82f6",
   },
   {
     dept: "STEM",
     members: ["Mathematics Department", "Physics Department", "Chemistry Department", "Biology Department", "Computer Science Department"],
-    color: "bg-green-50 border-green-200",
+    accent: "#22c55e",
   },
   {
     dept: "Social Studies",
     members: ["History & Civics", "Geography Department", "Economics Department", "Psychology Department"],
-    color: "bg-orange-50 border-orange-200",
+    accent: "#f97316",
   },
   {
     dept: "Co-Scholastic",
     members: ["Physical Education", "Music Department", "Art & Craft Department", "Dance Department"],
-    color: "bg-purple-50 border-purple-200",
+    accent: "#a855f7",
   },
   {
     dept: "Pre-Primary",
     members: ["Nursery Teachers", "Jr. KG Teachers", "Sr. KG Teachers", "Activity Co-ordinators"],
-    color: "bg-pink-50 border-pink-200",
+    accent: "#ec4899",
   },
   {
     dept: "Support Staff",
     members: ["Library Staff", "Counsellors", "Infirmary Staff", "Administrative Team"],
-    color: "bg-yellow-50 border-yellow-200",
+    accent: "#fbbf24",
   },
 ];
 
 export default function AcademicTeam() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Academic Team - Rainbow International School Thane"
         description="Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers and staff committed to student excellence in Thane West."
@@ -54,24 +56,24 @@ export default function AcademicTeam() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <p className="text-lg text-muted-foreground leading-relaxed mb-5 max-w-3xl">
+            <p className="text-lg text-gray-600 leading-relaxed mb-5 max-w-3xl">
               At Rainbow International School, our academic team comprises <strong>highly qualified, trained, and passionate educators</strong> who are dedicated to bringing out the best in every student. Our teachers are not just instructors — they are mentors, guides, and role models.
             </p>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-12 max-w-3xl">
+            <p className="text-lg text-gray-600 leading-relaxed mb-12 max-w-3xl">
               With regular professional development workshops, training sessions, and a collaborative work culture, Rainbow ensures that our teaching team stays at the forefront of modern pedagogy.
             </p>
 
-            <h2 className="text-2xl font-serif font-bold text-primary mb-8 text-center">Our Academic Departments</h2>
+            <h2 className="text-2xl font-black mb-8 text-center" style={{ color: "#0d3b86" }}>Our Academic Departments</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {departments.map((d, i) => (
-                <div key={i} className={`rounded-xl p-6 border ${d.color}`} data-testid={`card-dept-${i}`}>
-                  <h3 className="font-serif font-bold text-xl text-primary mb-4">{d.dept}</h3>
+                <div key={i} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm" style={{ borderLeft: `4px solid ${d.accent}` }} data-testid={`card-dept-${i}`}>
+                  <h3 className="font-black text-xl mb-4" style={{ color: "#0d3b86" }}>{d.dept}</h3>
                   <ul className="space-y-1.5">
                     {d.members.map((m, j) => (
-                      <li key={j} className="flex items-center gap-2 text-muted-foreground text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
+                      <li key={j} className="flex items-center gap-2 text-gray-600 text-sm">
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: d.accent }} />
                         {m}
                       </li>
                     ))}
@@ -82,11 +84,11 @@ export default function AcademicTeam() {
           </div>
         </section>
 
-        <section className="py-12 bg-primary/5">
+        <section className="py-14" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-3xl text-center">
-            <h2 className="text-2xl font-serif font-bold text-primary mb-4">Join Our Academic Team</h2>
-            <p className="text-muted-foreground mb-6">Passionate about education? We are always looking for talented educators to join the Rainbow family.</p>
-            <a href="/career" className="inline-block bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors">View Career Opportunities</a>
+            <h2 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>Join Our Academic Team</h2>
+            <p className="text-gray-600 mb-6">Passionate about education? We are always looking for talented educators to join the Rainbow family.</p>
+            <a href="/career" className="inline-block text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity" style={{ background: "#0d3b86" }}>View Career Opportunities</a>
           </div>
         </section>
 

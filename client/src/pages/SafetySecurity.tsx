@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const measures = [
   {
@@ -29,7 +30,8 @@ const measures = [
 
 export default function SafetySecurity() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Safety & Security - Rainbow International School Thane"
         description="Rainbow International School prioritizes student safety with CCTV surveillance, metal detectors, GPS-enabled transport, trained nurses, ambulance, and 100% female staff in the preschool."
@@ -46,23 +48,23 @@ export default function SafetySecurity() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <p className="text-lg text-muted-foreground leading-relaxed mb-5">
+            <p className="text-lg text-gray-600 leading-relaxed mb-5">
               At Rainbow International School, we believe it's too narrow-minded of a school to think only about academics. We take safety and security very seriously. Every child's physical wellbeing is our responsibility — it's crucial for their mental wellbeing too.
             </p>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-5">
+            <p className="text-lg text-gray-600 leading-relaxed mb-5">
               We use our human and technological resources in a variety of ways to ensure that the children are away from any kind of danger. We also ensure that the children are equipped with the knowledge of how to defend themselves when needed.
             </p>
           </div>
         </section>
 
-        <section className="py-10 bg-muted/30">
+        <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-serif font-bold text-primary text-center mb-12">Rainbow – Safety & Security Measures</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Rainbow – Safety & Security Measures</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {measures.map((measure, i) => (
-                <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-lg border" data-testid={`card-safety-${i}`}>
+                <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100" data-testid={`card-safety-${i}`}>
                   <img
                     src={measure.image}
                     alt={measure.title}
@@ -70,8 +72,8 @@ export default function SafetySecurity() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="p-6">
-                    <h3 className="font-serif font-bold text-xl text-primary mb-2">{measure.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{measure.description}</p>
+                    <h3 className="font-black text-xl mb-2" style={{ color: "#0d3b86" }}>{measure.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{measure.description}</p>
                   </div>
                 </div>
               ))}
@@ -79,12 +81,12 @@ export default function SafetySecurity() {
           </div>
         </section>
 
-        <section className="py-14 bg-background">
+        <section className="py-14 bg-white">
           <div className="container mx-auto px-4">
             <img
               src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/ss-desktop.png"
               alt="Safety and Security overview"
-              className="max-w-4xl mx-auto w-full rounded-2xl shadow-lg"
+              className="max-w-4xl mx-auto w-full rounded-3xl shadow-sm"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           </div>

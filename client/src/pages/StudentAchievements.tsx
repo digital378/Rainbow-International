@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const academicToppers = [
   { subject: "IT", name: "Master Aryan Gulhane", marks: "100 / 100" },
@@ -25,7 +26,8 @@ const sportsAchievements = [
 
 export default function StudentAchievements() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Student Achievements - Rainbow International School Thane"
         description="Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more."
@@ -40,22 +42,22 @@ export default function StudentAchievements() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-serif font-bold text-primary mb-4">Result of Class X AISSE — March 2019</h2>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
+            <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>Result of Class X AISSE — March 2019</h2>
+            <p className="text-gray-600 mb-6 leading-relaxed">
               We are extremely proud of the fact that our first batch of Class X students who appeared for the All India Secondary School Examination in March 2019 brought great laurels to their school by bringing cent percent results. In all <strong>43 students</strong> appeared for the examination.
             </p>
-            <div className="bg-muted/30 rounded-xl p-4 mb-6 text-sm text-muted-foreground">
+            <div className="rounded-3xl p-4 mb-6 text-sm text-gray-600 border border-gray-100" style={{ background: "#f8faff" }}>
               <strong>School Topper:</strong> Master Aryan Gulhane — 96.6% &nbsp;|&nbsp;
               <strong>2nd:</strong> Master Vidhu Agarwal — 96.4% &nbsp;|&nbsp;
               <strong>3rd:</strong> Miss Ariba Khan — 96.2%
             </div>
 
-            <h3 className="text-xl font-serif font-bold text-primary mb-4">Subject Wise Toppers</h3>
-            <div className="overflow-x-auto rounded-xl shadow border">
+            <h3 className="text-xl font-black mb-4" style={{ color: "#0d3b86" }}>Subject Wise Toppers</h3>
+            <div className="overflow-x-auto rounded-3xl shadow-sm border border-gray-100">
               <table className="w-full text-sm">
-                <thead className="bg-primary text-white">
+                <thead style={{ background: "#0d3b86" }} className="text-white">
                   <tr>
                     <th className="text-left py-3 px-4">Subject</th>
                     <th className="text-left py-3 px-4">Name of the Student</th>
@@ -64,10 +66,10 @@ export default function StudentAchievements() {
                 </thead>
                 <tbody>
                   {academicToppers.map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-muted/20"}>
-                      <td className="py-3 px-4 font-medium text-primary">{row.subject}</td>
-                      <td className="py-3 px-4 text-muted-foreground">{row.name}</td>
-                      <td className="py-3 px-4 font-bold text-secondary">{row.marks}</td>
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                      <td className="py-3 px-4 font-semibold" style={{ color: "#0d3b86" }}>{row.subject}</td>
+                      <td className="py-3 px-4 text-gray-600">{row.name}</td>
+                      <td className="py-3 px-4 font-bold text-amber-500">{row.marks}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -76,15 +78,15 @@ export default function StudentAchievements() {
           </div>
         </section>
 
-        <section className="py-16 bg-muted/30">
+        <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-serif font-bold text-primary mb-6">Sports Achievements</h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
+            <h2 className="text-3xl font-black mb-6" style={{ color: "#0d3b86" }}>Sports Achievements</h2>
+            <p className="text-gray-600 mb-8 leading-relaxed">
               Apart from the In-house Sports Games Competition and the Annual Sports Day, our students actively participated in different Sports Competitions at the National, State, Zonal and District Level in Swimming Championship, Badminton, Karate Championship, Athletics, Chess, Cycling and Skating.
             </p>
-            <div className="overflow-x-auto rounded-xl shadow border">
+            <div className="overflow-x-auto rounded-3xl shadow-sm border border-gray-100">
               <table className="w-full text-sm">
-                <thead className="bg-primary text-white">
+                <thead style={{ background: "#0d3b86" }} className="text-white">
                   <tr>
                     <th className="text-left py-3 px-4">Sport / Game</th>
                     <th className="text-left py-3 px-4">Name of the Participant</th>
@@ -93,10 +95,10 @@ export default function StudentAchievements() {
                 </thead>
                 <tbody>
                   {sportsAchievements.map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-muted/20"}>
-                      <td className="py-3 px-4 font-medium text-primary">{row.sport}</td>
-                      <td className="py-3 px-4 text-muted-foreground">{row.name}</td>
-                      <td className="py-3 px-4 font-bold text-secondary">{row.award}</td>
+                    <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                      <td className="py-3 px-4 font-semibold" style={{ color: "#0d3b86" }}>{row.sport}</td>
+                      <td className="py-3 px-4 text-gray-600">{row.name}</td>
+                      <td className="py-3 px-4 font-bold text-amber-500">{row.award}</td>
                     </tr>
                   ))}
                 </tbody>

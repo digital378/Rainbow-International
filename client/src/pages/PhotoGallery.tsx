@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { X } from "lucide-react";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/";
 
@@ -67,7 +68,8 @@ export default function PhotoGallery() {
       : galleryData.find((g) => g.category === activeCategory)?.images || [];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Photo Gallery - Rainbow International School Thane"
         description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, organic farming, cultural events and more from our campus in Thane West."
@@ -80,7 +82,7 @@ export default function PhotoGallery() {
         breadcrumb={[{ label: "Photo Gallery" }]}
       />
 
-      <main className="flex-grow py-16 bg-background">
+      <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center mb-10">
             {categories.map((cat) => (
@@ -90,9 +92,12 @@ export default function PhotoGallery() {
                 data-testid={`button-category-${cat}`}
                 className={`px-5 py-2 rounded-full font-semibold text-sm transition-all ${
                   activeCategory === cat
-                    ? "bg-primary text-white shadow-md"
-                    : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                    ? "text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:text-white"
                 }`}
+                style={activeCategory === cat ? { background: "#0d3b86" } : {}}
+                onMouseEnter={(e) => { if (activeCategory !== cat) (e.currentTarget as HTMLElement).style.background = "#0d3b86"; }}
+                onMouseLeave={(e) => { if (activeCategory !== cat) (e.currentTarget as HTMLElement).style.background = ""; }}
               >
                 {cat}
               </button>
@@ -103,7 +108,7 @@ export default function PhotoGallery() {
             {images.map((img, i) => (
               <div
                 key={i}
-                className="break-inside-avoid cursor-pointer overflow-hidden rounded-xl shadow hover:shadow-xl transition-shadow group"
+                className="break-inside-avoid cursor-pointer overflow-hidden rounded-3xl shadow-sm hover:shadow-md transition-shadow group border border-gray-100"
                 onClick={() => setLightbox(img)}
                 data-testid={`img-gallery-${i}`}
               >
@@ -134,7 +139,7 @@ export default function PhotoGallery() {
           <img
             src={lightbox.src}
             alt={lightbox.alt}
-            className="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain"
+            className="max-w-full max-h-[90vh] rounded-3xl shadow-2xl object-contain"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

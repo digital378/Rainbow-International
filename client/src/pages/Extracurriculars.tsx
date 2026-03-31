@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const activities = [
   {
@@ -29,7 +30,8 @@ const activities = [
 
 export default function Extracurriculars() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Extracurricular Activities - Rainbow International School Thane"
         description="Rainbow International School — a FIT INDIA School offering sports, clubs, exhibitions, cultural activities, and tours for holistic student development in Thane West."
@@ -44,18 +46,19 @@ export default function Extracurriculars() {
       />
 
       <main className="flex-grow">
-        <section className="py-14 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-3xl text-center">
-            <div className="bg-primary/10 rounded-2xl p-8 border border-primary/20">
-              <h2 className="text-2xl font-serif font-bold text-primary mb-3">We are a FIT INDIA School</h2>
-              <p className="text-muted-foreground">
+            <div className="rounded-3xl p-8 border border-gray-100 shadow-sm" style={{ background: "#f0f4ff" }}>
+              <h2 className="text-2xl font-black mb-3" style={{ color: "#0d3b86" }}>We are a FIT INDIA School</h2>
+              <p className="text-gray-600">
                 Our FIT INDIA declaration has been approved by the Ministry of Youth Affairs and Sports. Rainbow International School is an official FIT INDIA School!
               </p>
               <a
                 href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mt-4 text-primary font-semibold underline text-sm"
+                className="inline-block mt-4 font-semibold underline text-sm"
+                style={{ color: "#0d3b86" }}
               >
                 View Certificate
               </a>
@@ -63,37 +66,37 @@ export default function Extracurriculars() {
           </div>
         </section>
 
-        <section className="py-10 bg-muted/30">
+        <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               <div>
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-extra-curricular-activities-sports-1.jpg"
                   alt="Sports activities"
-                  className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3]"
+                  className="rounded-3xl shadow-sm w-full object-cover aspect-[4/3]"
                 />
-                <h3 className="font-serif font-bold text-xl text-primary mt-4 mb-2">Sports to Add Action</h3>
-                <p className="text-muted-foreground text-sm">Cricket, Football, Swimming, Badminton, Skating, Basketball, Karate, Chess and more.</p>
+                <h3 className="font-black text-xl mt-4 mb-2" style={{ color: "#0d3b86" }}>Sports to Add Action</h3>
+                <p className="text-gray-600 text-sm">Cricket, Football, Swimming, Badminton, Skating, Basketball, Karate, Chess and more.</p>
               </div>
               <div>
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Asset-4-8.png"
                   alt="Clubs"
-                  className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3] object-contain bg-muted/20"
+                  className="rounded-3xl shadow-sm w-full object-cover aspect-[4/3] object-contain bg-gray-50"
                 />
-                <h3 className="font-serif font-bold text-xl text-primary mt-4 mb-2">Clubs to Provide Intellectual Stimulation</h3>
-                <p className="text-muted-foreground text-sm">Literary, Heritage, Eco, Science, Culinary, Interact and Cultural Clubs.</p>
+                <h3 className="font-black text-xl mt-4 mb-2" style={{ color: "#0d3b86" }}>Clubs to Provide Intellectual Stimulation</h3>
+                <p className="text-gray-600 text-sm">Literary, Heritage, Eco, Science, Culinary, Interact and Cultural Clubs.</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-serif font-bold text-primary text-center mb-10">Teaching Methodology & Activities</h2>
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Teaching Methodology & Activities</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {activities.map((item, i) => (
-                <div key={i} className="bg-card rounded-2xl overflow-hidden shadow border" data-testid={`card-extracurricular-${i}`}>
+                <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100" data-testid={`card-extracurricular-${i}`}>
                   <img
                     src={item.image}
                     alt={item.title}
@@ -101,8 +104,8 @@ export default function Extracurriculars() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div className="p-5">
-                    <h3 className="font-serif font-bold text-lg text-primary mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                    <h3 className="font-black text-lg mb-2" style={{ color: "#0d3b86" }}>{item.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               ))}

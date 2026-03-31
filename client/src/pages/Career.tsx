@@ -5,6 +5,7 @@ import { SEO } from "@/components/SEO";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Briefcase, Users, Heart, TrendingUp } from "lucide-react";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const openings = [
   { title: "PRT – Primary Teacher", type: "Full-time", department: "Primary Section", exp: "1–3 years" },
@@ -26,13 +27,14 @@ export default function Career() {
   const [submitted, setSubmitted] = useState(false);
   const { register, handleSubmit, formState: { isSubmitting } } = useForm();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (_data: unknown) => {
     await new Promise(r => setTimeout(r, 800));
     setSubmitted(true);
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Career Opportunities - Rainbow International School Thane"
         description="Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution."
@@ -47,11 +49,11 @@ export default function Career() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-serif font-bold text-primary mb-4">Why Work at Rainbow?</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
+              <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>Why Work at Rainbow?</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
                 Rainbow International School offers a stimulating, student-centric work environment where educators are empowered to innovate and inspire.
               </p>
             </div>
@@ -59,77 +61,76 @@ export default function Career() {
               {benefits.map((benefit, i) => {
                 const Icon = benefit.icon;
                 return (
-                  <div key={i} className="bg-card rounded-xl p-6 shadow border text-center">
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon className="text-primary" size={22} />
+                  <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "#f0f4ff" }}>
+                      <Icon size={22} style={{ color: "#0d3b86" }} />
                     </div>
-                    <h3 className="font-serif font-bold text-base text-primary mb-2">{benefit.title}</h3>
-                    <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                    <h3 className="font-black text-base mb-2" style={{ color: "#0d3b86" }}>{benefit.title}</h3>
+                    <p className="text-sm text-gray-600">{benefit.description}</p>
                   </div>
                 );
               })}
             </div>
 
-            <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">Current Openings</h2>
+            <h2 className="text-3xl font-black mb-8 text-center" style={{ color: "#0d3b86" }}>Current Openings</h2>
             <div className="space-y-4 mb-16">
               {openings.map((job, i) => (
-                <div key={i} className="bg-card rounded-xl p-5 shadow border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" data-testid={`card-job-${i}`}>
+                <div key={i} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" data-testid={`card-job-${i}`}>
                   <div>
-                    <h3 className="font-serif font-bold text-lg text-primary">{job.title}</h3>
+                    <h3 className="font-black text-lg" style={{ color: "#0d3b86" }}>{job.title}</h3>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{job.type}</span>
-                      <span className="text-xs bg-secondary/30 text-primary px-2 py-0.5 rounded-full">{job.department}</span>
-                      <span className="text-xs text-muted-foreground">{job.exp} experience</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{job.type}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: "#fef3c7", color: "#92400e" }}>{job.department}</span>
+                      <span className="text-xs text-gray-500">{job.exp} experience</span>
                     </div>
                   </div>
-                  <a href="#apply" className="shrink-0 bg-primary text-white text-sm font-semibold px-5 py-2 rounded-lg hover:bg-primary/90 transition-colors">Apply Now</a>
+                  <a href="#apply" className="shrink-0 text-white text-sm font-semibold px-5 py-2 rounded-full hover:opacity-90 transition-opacity" style={{ background: "#0d3b86" }}>Apply Now</a>
                 </div>
               ))}
             </div>
 
-            <div id="apply" className="bg-muted/30 rounded-2xl p-8 border">
-              <h2 className="text-2xl font-serif font-bold text-primary mb-6">Apply for a Position</h2>
+            <div id="apply" className="rounded-3xl p-8 border border-gray-100" style={{ background: "#f8faff" }}>
+              <h2 className="text-2xl font-black mb-6" style={{ color: "#0d3b86" }}>Apply for a Position</h2>
               {submitted ? (
                 <div className="text-center py-8">
-                  <div className="text-4xl mb-4">✅</div>
-                  <h3 className="text-xl font-bold text-primary mb-2">Application Received!</h3>
-                  <p className="text-muted-foreground">Thank you for your interest. Our HR team will contact you within 3–5 working days.</p>
+                  <h3 className="text-xl font-black mb-2" style={{ color: "#0d3b86" }}>Application Received!</h3>
+                  <p className="text-gray-600">Thank you for your interest. Our HR team will contact you within 3–5 working days.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="grid md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Full Name *</label>
-                    <input {...register("name", { required: true })} type="text" className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Your full name" data-testid="input-career-name" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Full Name *</label>
+                    <input {...register("name", { required: true })} type="text" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Your full name" data-testid="input-career-name" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Email *</label>
-                    <input {...register("email", { required: true })} type="email" className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="your@email.com" data-testid="input-career-email" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Email *</label>
+                    <input {...register("email", { required: true })} type="email" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="your@email.com" data-testid="input-career-email" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Phone *</label>
-                    <input {...register("phone", { required: true })} type="tel" className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="+91 98765 43210" data-testid="input-career-phone" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Phone *</label>
+                    <input {...register("phone", { required: true })} type="tel" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="+91 98765 43210" data-testid="input-career-phone" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Position Applied For *</label>
-                    <select {...register("position", { required: true })} className="w-full border rounded-lg px-3 py-2 text-sm bg-background" data-testid="select-career-position">
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Position Applied For *</label>
+                    <select {...register("position", { required: true })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white" data-testid="select-career-position">
                       <option value="">Select Position</option>
                       {openings.map((job, i) => <option key={i} value={job.title}>{job.title}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Years of Experience</label>
-                    <input {...register("experience")} type="text" className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="e.g. 3 years" data-testid="input-career-experience" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Years of Experience</label>
+                    <input {...register("experience")} type="text" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="e.g. 3 years" data-testid="input-career-experience" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Qualification</label>
-                    <input {...register("qualification")} type="text" className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="e.g. B.Ed, M.Sc" data-testid="input-career-qualification" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Qualification</label>
+                    <input {...register("qualification")} type="text" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="e.g. B.Ed, M.Sc" data-testid="input-career-qualification" />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold mb-1 text-foreground">Message</label>
-                    <textarea {...register("message")} rows={3} className="w-full border rounded-lg px-3 py-2 text-sm" placeholder="Tell us about yourself..." data-testid="textarea-career-message" />
+                    <label className="block text-sm font-semibold mb-1 text-gray-700">Message</label>
+                    <textarea {...register("message")} rows={3} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Tell us about yourself..." data-testid="textarea-career-message" />
                   </div>
                   <div className="md:col-span-2">
-                    <button type="submit" disabled={isSubmitting} className="bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-70" data-testid="button-career-submit">
+                    <button type="submit" disabled={isSubmitting} className="text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity disabled:opacity-70" style={{ background: "#0d3b86" }} data-testid="button-career-submit">
                       {isSubmitting ? "Submitting..." : "Submit Application"}
                     </button>
                   </div>

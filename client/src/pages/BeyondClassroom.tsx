@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 const activities = [
   {
@@ -29,7 +30,8 @@ const activities = [
 
 export default function BeyondClassroom() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Beyond The Classroom - Rainbow International School Thane"
         description="Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students."
@@ -46,19 +48,19 @@ export default function BeyondClassroom() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <p className="text-lg text-muted-foreground leading-relaxed mb-5">
+            <p className="text-lg text-gray-600 leading-relaxed mb-5">
               The real aim of education is not only knowledge but also <strong>Action</strong>. We provide rigorous, comprehensive & cohesive learning programmes that are designed to meet the Social, Physical & Cultural needs of an International student body.
             </p>
           </div>
         </section>
 
-        <section className="py-10 bg-muted/30">
+        <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {activities.map((item, i) => (
-                <div key={i} className="bg-card rounded-2xl p-6 shadow border flex gap-5" data-testid={`card-activity-${i}`}>
+                <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex gap-5" data-testid={`card-activity-${i}`}>
                   <img
                     src={item.image}
                     alt={item.title}
@@ -66,8 +68,8 @@ export default function BeyondClassroom() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                   <div>
-                    <h3 className="font-serif font-bold text-xl text-primary mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                    <h3 className="font-black text-xl mb-2" style={{ color: "#0d3b86" }}>{item.title}</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -75,12 +77,12 @@ export default function BeyondClassroom() {
           </div>
         </section>
 
-        <section className="py-16 bg-background">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-2xl font-serif font-bold text-primary mb-8 text-center">Our Clubs</h2>
+            <h2 className="text-2xl font-black mb-8 text-center" style={{ color: "#0d3b86" }}>Our Clubs</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {["Health & Wellness Club", "Interact Club", "Culinary Club", "Literary Club", "Heritage Club", "Science & Maths Club", "Eco Club", "Cultural Club"].map((club, i) => (
-                <span key={i} className="bg-primary/10 text-primary font-semibold px-4 py-2 rounded-full text-sm">{club}</span>
+                <span key={i} className="font-semibold px-4 py-2 rounded-full text-sm border border-gray-200" style={{ color: "#0d3b86", background: "#f0f4ff" }}>{club}</span>
               ))}
             </div>
           </div>

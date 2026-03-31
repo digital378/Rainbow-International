@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ArrowRight, Calendar } from "lucide-react";
 import { useState } from "react";
+import ScrollProgress from "@/components/home/ScrollProgress";
 
 interface BlogPost {
   title: string;
@@ -34,7 +35,7 @@ const allBlogs: BlogPost[] = [
   { title: "Importance of Sports in Students' Life for Teamwork Skills", slug: "importance-of-sports-in-students-life-teamwork-skills", date: "02 Mar 2025", cat: "Sports", thumbUrl: null },
   { title: "Ideal Teacher Qualities: Important Traits of a Great Educator", slug: "ideal-teacher-qualities-traits-of-a-great-educator", date: "02 Mar 2025", cat: "Education", thumbUrl: null },
   { title: "10 Fun and Educational Republic Day Activities for Kids", slug: "10-fun-and-educational-republic-day-activities-for-kids", date: "19 Jan 2025", cat: "Student Life", thumbUrl: null },
-  { title: "Understanding the Effects of Mobile Phones on Children: Benefits, Risks, and Managing Screen Time", slug: "understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time", date: "19 Jan 2025", cat: "Parenting", thumbUrl: null },
+  { title: "Understanding the Effects of Mobile Phones on Children", slug: "understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time", date: "19 Jan 2025", cat: "Parenting", thumbUrl: null },
   { title: "5 Tips to Choose the Best CBSE Schools in Mumbai for Your Child", slug: "5-tips-to-choose-best-cbse-schools-in-mumbai", date: "02 Jan 2025", cat: "CBSE School", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/01/5-Tips-to-Choose-the-Best-CBSE-Schools-in-Mumbai-for-Your-Child-copy.webp" },
   { title: "5 Top Benefits of Choosing Rainbow International School for Your Child", slug: "benefits-of-rainbow-international-school", date: "02 Jan 2025", cat: "School", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/01/5-Top-Benefits-of-Choosing-Rainbow-International-School-for-Your-Child-copy.webp" },
   { title: "Christmas Celebration in School: 10 Fun and Festive Activity Ideas", slug: "christmas-celebration-in-school-10-fun-and-festive-activity-ideas", date: "01 Dec 2024", cat: "Student Life", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2024/12/Christmas-Celebration-in-School-10-Fun-and-Festive-Activity-Ideas-copy.webp" },
@@ -110,7 +111,8 @@ export default function Blogs() {
   const filtered = activeCategory === "All" ? allBlogs : allBlogs.filter(b => b.cat === activeCategory);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
+      <ScrollProgress />
       <SEO
         title="Blogs - Rainbow International School Thane"
         description="Read 86+ insightful articles from Rainbow International School on education, parenting, CBSE, student wellness, admissions, sports and more."
@@ -124,7 +126,7 @@ export default function Blogs() {
         breadcrumb={[{ label: "Blogs" }]}
       />
 
-      <main className="flex-grow py-16 bg-background">
+      <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap gap-2 justify-center mb-10">
             {categories.map((cat) => (
@@ -132,18 +134,21 @@ export default function Blogs() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 data-testid={`button-blog-cat-${cat}`}
-                className={`px-4 py-1.5 rounded-full font-semibold text-xs transition-all ${
+                className={`px-4 py-1.5 rounded-full font-semibold text-xs transition-all border ${
                   activeCategory === cat
-                    ? "bg-primary text-white shadow"
-                    : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                    ? "text-white border-transparent"
+                    : "bg-gray-50 text-gray-600 border-gray-200 hover:text-white hover:border-transparent"
                 }`}
+                style={activeCategory === cat ? { background: "#0d3b86", borderColor: "#0d3b86" } : {}}
+                onMouseEnter={(e) => { if (activeCategory !== cat) { (e.currentTarget as HTMLElement).style.background = "#0d3b86"; (e.currentTarget as HTMLElement).style.borderColor = "#0d3b86"; (e.currentTarget as HTMLElement).style.color = "white"; } }}
+                onMouseLeave={(e) => { if (activeCategory !== cat) { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.borderColor = ""; (e.currentTarget as HTMLElement).style.color = ""; } }}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          <p className="text-center text-sm text-muted-foreground mb-8">
+          <p className="text-center text-sm text-gray-500 mb-8">
             Showing {filtered.length} of {allBlogs.length} articles
           </p>
 
@@ -154,40 +159,37 @@ export default function Blogs() {
                 href={`https://rainbowinternationalschool.in/${blog.slug}/`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group bg-card rounded-2xl overflow-hidden shadow hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border flex flex-col"
+                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
                 data-testid={`card-blog-${i}`}
               >
-                <div className="aspect-video bg-primary/5 overflow-hidden">
-                  {blog.thumbUrl ? (
+                {blog.thumbUrl ? (
+                  <div className="aspect-[16/9] overflow-hidden bg-gray-100">
                     <img
                       src={blog.thumbUrl}
                       alt={blog.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        const parent = (e.target as HTMLImageElement).parentElement;
-                        if (parent) {
-                          parent.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-primary/5"><span class="text-primary/20 font-serif text-3xl font-bold">RIS</span></div>`;
-                        }
-                      }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-primary/20 font-serif text-3xl font-bold">RIS</span>
+                  </div>
+                ) : (
+                  <div className="aspect-[16/9] flex items-center justify-center" style={{ background: "#f0f4ff" }}>
+                    <div className="text-center p-4">
+                      <div className="font-black text-lg leading-snug" style={{ color: "#0d3b86" }}>Rainbow School Blog</div>
                     </div>
-                  )}
-                </div>
-                <div className="p-5 flex-grow flex flex-col">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-secondary uppercase tracking-wide">{blog.cat}</span>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar size={11} /> {blog.date}
+                  </div>
+                )}
+
+                <div className="p-5 flex flex-col flex-grow">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{blog.cat}</span>
+                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <Calendar size={11} />
+                      {blog.date}
                     </span>
                   </div>
-                  <h3 className="font-serif font-bold text-base text-foreground group-hover:text-primary transition-colors mb-3 flex-grow line-clamp-3">
-                    {blog.title}
-                  </h3>
-                  <span className="inline-flex items-center text-primary font-semibold text-sm gap-1 mt-auto">
-                    Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  <h3 className="font-black text-base leading-snug flex-grow group-hover:transition-colors mb-4" style={{ color: "#0d3b86" }}>{blog.title}</h3>
+                  <span className="flex items-center gap-1 text-xs font-bold text-amber-500 group-hover:gap-2 transition-all">
+                    Read More <ArrowRight size={12} />
                   </span>
                 </div>
               </a>
