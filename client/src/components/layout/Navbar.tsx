@@ -4,12 +4,9 @@ import { Menu, X, Phone, Clock, MapPin, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 const aboutLinks = [
-  { href: "/welcome-to-ris", label: "Welcome to RIS" },
-  { href: "/chairpersons-note", label: "Chairperson's Note" },
-  { href: "/ris-vision-mission", label: "RIS Vision & Mission" },
-  { href: "/our-philosophy", label: "Our Philosophy" },
-  { href: "/global-brand-associations", label: "Global Brand Associations" },
-  { href: "/rainbow-preschool-international", label: "Rainbow Preschool International" },
+  { href: "/about-rainbow-international-school#chairpersons-note", label: "Chairperson's Note" },
+  { href: "/about-rainbow-international-school#vision-mission", label: "RIS Vision & Mission" },
+  { href: "/about-rainbow-international-school#our-philosophy", label: "Our Philosophy" },
 ];
 
 const academicsLinks = [
