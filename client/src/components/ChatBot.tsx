@@ -65,8 +65,8 @@ interface Message {
 
 // ── Render text with clickable phones & emails ───────────────────
 function renderRichText(text: string) {
-  // Matches: (022) 69105000 | +91 82915 68972 | +918291568972
-  const pattern = /(\+?[\d][\d\s\-().]{6,}[\d]|[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g;
+  // Only match real phone patterns: +91 XXXXX XXXXX  or  10-digit numbers starting with 6-9
+  const pattern = /(\+91[\s\-]?\d{5}[\s\-]?\d{5}|[6-9]\d{9}|[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/g;
   const parts = text.split(pattern);
 
   return parts.map((part, i) => {
@@ -77,9 +77,9 @@ function renderRichText(text: string) {
         </a>
       );
     }
-    const digits = part.replace(/\D/g, "");
-    if (digits.length >= 7 && /[\d\s\-+().]{7,}/.test(part.trim())) {
-      const tel = digits.startsWith("91") && digits.length === 12 ? `+${digits}` : digits;
+    if (/^(\+91[\s\-]?\d{5}[\s\-]?\d{5}|[6-9]\d{9})$/.test(part)) {
+      const digits = part.replace(/\D/g, "");
+      const tel = digits.length === 12 ? `+${digits}` : `+91${digits}`;
       return (
         <a key={i} href={`tel:${tel}`} className="underline font-semibold" style={{ color: "#0d3b86" }}>
           {part}
