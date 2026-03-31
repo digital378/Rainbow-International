@@ -20,6 +20,11 @@ const exploreLinks = [
   { href: "/extracurriculars", label: "Extracurriculars" },
   { href: "/photo-gallery", label: "Photo Gallery" },
   { href: "/academic-calendar", label: "Academic Calendar" },
+  { href: "/virtual-learning", label: "Virtual Learning" },
+  { href: "/academic-team", label: "Academic Team" },
+  { href: "/book-list", label: "Book List" },
+  { href: "/school-managing-committee", label: "School Managing Committee" },
+  { href: "/global-brand-associations", label: "Global Brand Associations" },
   { href: "/blogs", label: "Blogs" },
 ];
 

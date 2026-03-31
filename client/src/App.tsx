@@ -21,6 +21,16 @@ import ContactUs from "@/pages/ContactUs";
 import AcademicCalendar from "@/pages/AcademicCalendar";
 import Blogs from "@/pages/Blogs";
 import CbseDisclosures from "@/pages/CbseDisclosures";
+import SchoolManagingCommittee from "@/pages/SchoolManagingCommittee";
+import Career from "@/pages/Career";
+import BookList from "@/pages/BookList";
+import VirtualLearning from "@/pages/VirtualLearning";
+import AcademicTeam from "@/pages/AcademicTeam";
+import RainbowPreschool from "@/pages/RainbowPreschool";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfUse from "@/pages/TermsOfUse";
+import GlobalBrandAssociations from "@/pages/GlobalBrandAssociations";
+import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -44,6 +54,16 @@ function Router() {
       <Route path="/academic-calendar" component={AcademicCalendar} />
       <Route path="/blogs" component={Blogs} />
       <Route path="/cbse-mandatory-public-disclosures" component={CbseDisclosures} />
+      <Route path="/school-managing-committee" component={SchoolManagingCommittee} />
+      <Route path="/career" component={Career} />
+      <Route path="/book-list" component={BookList} />
+      <Route path="/virtual-learning" component={VirtualLearning} />
+      <Route path="/academic-team" component={AcademicTeam} />
+      <Route path="/rainbow-preschool-international" component={RainbowPreschool} />
+      <Route path="/privacy-policy-and-cookie-policy" component={PrivacyPolicy} />
+      <Route path="/term-of-use" component={TermsOfUse} />
+      <Route path="/global-brand-associations" component={GlobalBrandAssociations} />
+      <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
       <Route component={NotFound} />
     </Switch>
   );
