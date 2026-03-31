@@ -77,6 +77,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Key Components
 
+- **ScrollProgress.tsx** — Rainbow-gradient fixed scroll progress bar (3px, top of page, fills as user scrolls)
 - **SEO.tsx** — Dynamic `<head>` meta tag manager for per-page SEO
 - **PageBanner.tsx** — Hero banner with title, subtitle, and breadcrumb for inner pages
 - **Navbar.tsx** — Sticky navbar with top bar (phone/email), dropdown menus for Academics and Explore, mobile menu

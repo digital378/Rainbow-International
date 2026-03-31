@@ -1,103 +1,155 @@
-import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
+
+const quickLinks = [
+  { label: "About Rainbow", href: "/about-rainbow-international-school" },
+  { label: "Pre-Primary Section", href: "/pre-primary-school-thane" },
+  { label: "Primary Section", href: "/primary-section" },
+  { label: "Middle School", href: "/middle-school-section" },
+  { label: "Secondary Section", href: "/secondary-section" },
+  { label: "Senior Secondary", href: "/senior-secondary-section" },
+  { label: "Academic Calendar", href: "/academic-calendar" },
+];
+
+const exploreLinks = [
+  { label: "Awards & Achievements", href: "/awards-achievements" },
+  { label: "Amenities & Facilities", href: "/amenities" },
+  { label: "Student Achievements", href: "/student-achievements" },
+  { label: "Safety & Security", href: "/safety-security" },
+  { label: "Beyond The Classroom", href: "/beyond-the-classroom" },
+  { label: "Extracurriculars", href: "/extracurriculars" },
+  { label: "Photo Gallery", href: "/photo-gallery" },
+  { label: "Blogs", href: "/blogs" },
+  { label: "CBSE Disclosures", href: "/cbse-mandatory-public-disclosures" },
+];
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-white pt-20 pb-10">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-200 rounded-lg flex items-center justify-center text-primary font-serif font-bold text-xl shadow-md">
-                R
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="font-serif font-bold text-xl tracking-tight">Rainbow</span>
-                <span className="text-xs uppercase tracking-widest text-white/70 font-semibold">International School</span>
-              </div>
-            </div>
-            <p className="text-white/70 leading-relaxed mb-2 text-sm font-medium">
-              World-Class Education, Indian Values
-            </p>
-            <p className="text-white/60 leading-relaxed mb-6 text-sm">
-              One of the top CBSE schools in Thane West — where every child dares to dream and becomes a lifelong learner.
-            </p>
-            <div className="flex gap-4">
-              <a href="https://www.facebook.com/RainbowInternationalSchoolThane/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-300">
-                <Facebook size={18} />
-              </a>
-              <a href="https://www.instagram.com/rainbow_international_school/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-300">
-                <Instagram size={18} />
-              </a>
-              <a href="https://www.youtube.com/@rainbowinternationalschool" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all duration-300">
-                <Youtube size={18} />
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-serif font-bold text-xl mb-6">Quick Links</h3>
-            <ul className="space-y-3">
-              <li><Link href="/about-rainbow-international-school" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">About Rainbow</Link></li>
-              <li><Link href="/pre-primary-school-thane" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Pre-Primary Section</Link></li>
-              <li><Link href="/primary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Primary Section</Link></li>
-              <li><Link href="/middle-school-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Middle Section</Link></li>
-              <li><Link href="/secondary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Secondary Section</Link></li>
-              <li><Link href="/senior-secondary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Senior Secondary</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-serif font-bold text-xl mb-6">Explore</h3>
-            <ul className="space-y-3">
-              <li><Link href="/awards-achievements" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Awards & Achievements</Link></li>
-              <li><Link href="/amenities" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Amenities & Facilities</Link></li>
-              <li><Link href="/student-achievements" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Student Achievements</Link></li>
-              <li><Link href="/safety-security" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Safety & Security</Link></li>
-              <li><Link href="/beyond-the-classroom" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Beyond The Classroom</Link></li>
-              <li><Link href="/extracurriculars" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Extracurriculars</Link></li>
-              <li><Link href="/photo-gallery" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Photo Gallery</Link></li>
-              <li><Link href="/blogs" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Blogs</Link></li>
-              <li><Link href="/cbse-mandatory-public-disclosures" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">CBSE Disclosures</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-serif font-bold text-xl mb-6">Get in Touch</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="mt-1 text-secondary shrink-0" size={18} />
-                <span className="text-white/70 text-sm">Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="text-secondary shrink-0" size={18} />
-                <div>
-                  <a href="tel:02269105000" className="block text-white/70 text-sm hover:text-secondary transition-colors">(022) 69105000</a>
-                  <a href="tel:+918291568972" className="block text-white/70 text-sm hover:text-secondary transition-colors">+91 82915 68972</a>
+    <footer style={{ background: "#091a4f" }} className="text-white">
+      <div className="border-b border-white/10">
+        <div className="container mx-auto px-4 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#091a4f] font-serif font-black text-xl shadow-md" style={{ background: "#fbbf24" }}>
+                  R
                 </div>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="text-secondary shrink-0" size={18} />
-                <a href="mailto:info@rainbowinternationalschool.in" className="text-white/70 text-sm hover:text-secondary transition-colors break-all">info@rainbowinternationalschool.in</a>
-              </li>
-            </ul>
-            <div className="mt-6">
-              <Link href="/contact-us">
-                <button className="w-full bg-secondary text-secondary-foreground font-bold py-2.5 rounded-md hover:bg-secondary/90 transition-colors text-sm">
-                  Book a Campus Tour
-                </button>
-              </Link>
+                <div className="flex flex-col leading-tight">
+                  <span className="font-black text-[17px] tracking-tight">Rainbow</span>
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-bold">International School</span>
+                </div>
+              </div>
+              <p className="text-white/60 leading-relaxed text-sm mb-2">
+                <strong className="text-white/80">World-Class Education, Indian Values.</strong>
+              </p>
+              <p className="text-white/50 leading-relaxed text-sm mb-8">
+                One of the top CBSE schools in Thane West — where every child dares to dream and becomes a lifelong learner.
+              </p>
+              <p className="text-white/40 text-xs mb-3 font-semibold uppercase tracking-wider">Follow Us</p>
+              <div className="flex gap-3">
+                {[
+                  { Icon: Facebook, href: "https://www.facebook.com/RainbowInternationalSchoolThane/", label: "Facebook" },
+                  { Icon: Instagram, href: "https://www.instagram.com/rainbow_international_school/", label: "Instagram" },
+                  { Icon: Youtube, href: "https://www.youtube.com/@rainbowinternationalschool", label: "YouTube" },
+                ].map(({ Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 transition-all duration-300 hover:border-yellow-400/60 hover:text-yellow-400"
+                    style={{ background: "rgba(255,255,255,0.05)" }}
+                  >
+                    <Icon size={17} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base mb-6 text-white">Quick Links</h3>
+              <ul className="space-y-2.5">
+                {quickLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-white/55 hover:text-white text-sm transition-colors duration-200 inline-flex items-center gap-1.5 hover:gap-2 group">
+                      <span className="w-1 h-1 rounded-full bg-current opacity-50 group-hover:opacity-100 flex-shrink-0" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base mb-6 text-white">Explore</h3>
+              <ul className="space-y-2.5">
+                {exploreLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-white/55 hover:text-white text-sm transition-colors duration-200 inline-flex items-center gap-1.5 hover:gap-2 group">
+                      <span className="w-1 h-1 rounded-full bg-current opacity-50 group-hover:opacity-100 flex-shrink-0" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base mb-6 text-white">Get In Touch</h3>
+              <ul className="space-y-5">
+                <li>
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                      <MapPin size={16} style={{ color: "#fbbf24" }} />
+                    </div>
+                    <span className="text-white/60 text-sm leading-relaxed">Cosmos Arcade, Brahmand Phase 4,<br />Thane West, Maharashtra</span>
+                  </div>
+                </li>
+                <li>
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                      <Phone size={16} style={{ color: "#fbbf24" }} />
+                    </div>
+                    <div>
+                      <a href="tel:02269105000" className="block text-white/60 text-sm hover:text-white transition-colors">(022) 69105000</a>
+                      <a href="tel:+918291568972" className="block text-white/60 text-sm hover:text-white transition-colors">+91 82915 68972</a>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                      <Mail size={16} style={{ color: "#fbbf24" }} />
+                    </div>
+                    <a href="mailto:info@rainbowinternationalschool.in" className="text-white/60 text-sm hover:text-white transition-colors break-all leading-relaxed">info@rainbowinternationalschool.in</a>
+                  </div>
+                </li>
+              </ul>
+              <div className="mt-7">
+                <Link href="/contact-us">
+                  <button
+                    className="w-full font-bold py-3 rounded-xl text-sm transition-all hover:opacity-90 hover:shadow-lg"
+                    style={{ background: "#fbbf24", color: "#091a4f" }}
+                  >
+                    Book a Campus Tour
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-white/50 text-sm">
-          <p>&copy; {new Date().getFullYear()} Rainbow International School. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link href="/privacy-policy-and-cookie-policy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
-            <Link href="/term-of-use" className="hover:text-secondary transition-colors">Terms of Use</Link>
-            <Link href="/cbse-mandatory-public-disclosures" className="hover:text-secondary transition-colors">CBSE Disclosures</Link>
-          </div>
+      <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p className="text-white/35 text-sm">
+          © {new Date().getFullYear()} Rainbow International School · CBSE Affiliation No. 1130661
+        </p>
+        <div className="flex gap-6">
+          <Link href="/cbse-mandatory-public-disclosures" className="text-white/35 hover:text-white/70 text-sm transition-colors">CBSE Disclosures</Link>
+          <a href="https://rainbowinternationalschool.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-white/35 hover:text-white/70 text-sm transition-colors">
+            Official Site <ExternalLink size={12} />
+          </a>
         </div>
       </div>
     </footer>
