@@ -67,11 +67,14 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-1 text-secondary shrink-0" size={18} />
-                <span className="text-white/70 text-sm">Anand Nagar, Thane West, Maharashtra, India</span>
+                <span className="text-white/70 text-sm">Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="text-secondary shrink-0" size={18} />
-                <a href="tel:+918655003366" className="text-white/70 text-sm hover:text-secondary transition-colors">+91 86550 03366</a>
+                <div>
+                  <a href="tel:02269105000" className="block text-white/70 text-sm hover:text-secondary transition-colors">(022) 69105000</a>
+                  <a href="tel:+918291568972" className="block text-white/70 text-sm hover:text-secondary transition-colors">+91 82915 68972</a>
+                </div>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="text-secondary shrink-0" size={18} />
@@ -91,8 +94,8 @@ export function Footer() {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-white/50 text-sm">
           <p>&copy; {new Date().getFullYear()} Rainbow International School. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="https://rainbowinternationalschool.in/privacy-policy-and-cookie-policy/" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">Privacy Policy</a>
-            <a href="https://rainbowinternationalschool.in/term-of-use/" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">Terms of Use</a>
+            <Link href="/privacy-policy-and-cookie-policy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
+            <Link href="/term-of-use" className="hover:text-secondary transition-colors">Terms of Use</Link>
             <Link href="/cbse-mandatory-public-disclosures" className="hover:text-secondary transition-colors">CBSE Disclosures</Link>
           </div>
         </div>

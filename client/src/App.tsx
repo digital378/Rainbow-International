@@ -3,8 +3,14 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ChatBot } from "@/components/ChatBot";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
+import WelcomeToRIS from "@/pages/WelcomeToRIS";
+import ChairpersonsNote from "@/pages/ChairpersonsNote";
+import VisionMission from "@/pages/VisionMission";
+import OurPhilosophy from "@/pages/OurPhilosophy";
 import PrePrimary from "@/pages/PrePrimary";
 import Primary from "@/pages/Primary";
 import MiddleSchool from "@/pages/MiddleSchool";
@@ -38,6 +44,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/about-rainbow-international-school" component={About} />
+      <Route path="/welcome-to-ris" component={WelcomeToRIS} />
+      <Route path="/chairpersons-note" component={ChairpersonsNote} />
+      <Route path="/ris-vision-mission" component={VisionMission} />
+      <Route path="/our-philosophy" component={OurPhilosophy} />
       <Route path="/pre-primary-school-thane" component={PrePrimary} />
       <Route path="/primary-section" component={Primary} />
       <Route path="/middle-school-section" component={MiddleSchool} />
@@ -75,6 +85,8 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <WhatsAppButton />
+        <ChatBot />
       </TooltipProvider>
     </QueryClientProvider>
   );

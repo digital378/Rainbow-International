@@ -93,14 +93,15 @@ Preferred communication style: Simple, everyday language.
 
 - **Name**: Rainbow International School
 - **Founded**: April 2009
-- **Location**: Anand Nagar, Thane West, Maharashtra, India
-- **Phone**: +91 86550 03366
+- **Location**: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra, India
+- **Phone**: (022) 69105000 / +91 82915 68972
 - **Email**: info@rainbowinternationalschool.in
 - **CBSE Affiliation**: 1130661
 - **Campus**: 3.5 acres
 - **Students**: 3,000+ current, 50,000+ impacted
 - **Grades**: Nursery to Class 12
 - **Streams**: Science, Humanities, Commerce (Class 11–12)
+- **Working Hours**: Mon – Sat, 9:00 AM – 6:00 PM
 
 ## External Dependencies
 
