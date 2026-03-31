@@ -10,6 +10,7 @@ const programs = [
   {
     name: "Playgroup",
     age: "1.5 – 2.5 years",
+    href: "https://www.rainbowpreschools.com/playgroup",
     color: "#10b981",
     bg: "#ecfdf5",
     border: "#6ee7b7",
@@ -19,6 +20,7 @@ const programs = [
   {
     name: "Nursery",
     age: "2.5 – 3.5 years",
+    href: "https://www.rainbowpreschools.com/nursery",
     color: "#ec4899",
     bg: "#fdf2f8",
     border: "#f9a8d4",
@@ -28,6 +30,7 @@ const programs = [
   {
     name: "Jr. KG",
     age: "3.5 – 4.5 years",
+    href: "https://www.rainbowpreschools.com/kindergarten",
     color: "#8b5cf6",
     bg: "#f5f3ff",
     border: "#c4b5fd",
@@ -37,6 +40,7 @@ const programs = [
   {
     name: "Sr. KG",
     age: "4.5 – 5.5 years",
+    href: "https://www.rainbowpreschools.com/kindergarten",
     color: "#f59e0b",
     bg: "#fffbeb",
     border: "#fcd34d",
@@ -256,9 +260,12 @@ export default function RainbowPreschool() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
               {programs.map((prog, i) => (
-                <div
+                <a
                   key={i}
-                  className="rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-2 border-2"
+                  href={prog.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-2 border-2 block"
                   style={{ borderColor: prog.border, background: "white" }}
                   data-testid={`card-preschool-${i}`}
                 >
@@ -274,7 +281,7 @@ export default function RainbowPreschool() {
                   </div>
                   <div className="px-6 py-5">
                     <p className="text-gray-600 text-sm leading-[1.75] mb-4">{prog.description}</p>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 mb-4">
                       {prog.highlights.map((h, j) => (
                         <li key={j} className="flex items-center gap-2 text-xs text-gray-500">
                           <CheckCircle2 size={12} style={{ color: prog.color }} className="flex-shrink-0" />
@@ -282,8 +289,11 @@ export default function RainbowPreschool() {
                         </li>
                       ))}
                     </ul>
+                    <span className="inline-flex items-center gap-1 text-xs font-bold" style={{ color: prog.color }}>
+                      Learn more on RPS <ArrowRight size={11} />
+                    </span>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
