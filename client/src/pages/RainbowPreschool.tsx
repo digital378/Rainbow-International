@@ -95,11 +95,11 @@ export default function RainbowPreschool() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-20 pb-24" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)" }}>
+      <section className="relative overflow-hidden pt-20 pb-24" style={{ background: "linear-gradient(135deg, #b91c1c 0%, #dc2626 45%, #ef4444 100%)" }}>
         {/* Floating decorative blobs */}
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full opacity-20" style={{ background: "#fbbf24", filter: "blur(30px)" }} />
-        <div className="absolute bottom-10 right-16 w-40 h-40 rounded-full opacity-20" style={{ background: "#34d399", filter: "blur(35px)" }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full opacity-15" style={{ background: "#f87171", filter: "blur(25px)" }} />
+        <div className="absolute bottom-10 right-16 w-40 h-40 rounded-full opacity-20" style={{ background: "#fb923c", filter: "blur(35px)" }} />
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full opacity-15" style={{ background: "#fca5a5", filter: "blur(25px)" }} />
 
         {/* Breadcrumb */}
         <div className="relative container mx-auto px-4 mb-8">
