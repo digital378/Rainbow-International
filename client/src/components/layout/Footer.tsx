@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Link } from "wouter";
 
 export function Footer() {
   return (
@@ -37,24 +38,27 @@ export function Footer() {
           <div>
             <h3 className="font-serif font-bold text-xl mb-6">Quick Links</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">About Rainbow</a></li>
-              <li><a href="#academics" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Pre-Primary Section</a></li>
-              <li><a href="#academics" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Primary Section</a></li>
-              <li><a href="#academics" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Middle Section</a></li>
-              <li><a href="#academics" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Secondary Section</a></li>
-              <li><a href="#academics" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Senior Secondary</a></li>
+              <li><Link href="/about-rainbow-international-school" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">About Rainbow</Link></li>
+              <li><Link href="/pre-primary-school-thane" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Pre-Primary Section</Link></li>
+              <li><Link href="/primary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Primary Section</Link></li>
+              <li><Link href="/middle-school-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Middle Section</Link></li>
+              <li><Link href="/secondary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Secondary Section</Link></li>
+              <li><Link href="/senior-secondary-section" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Senior Secondary</Link></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-serif font-bold text-xl mb-6">Explore</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Awards & Accomplishments</a></li>
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Amenities & Facilities</a></li>
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Student Achievements</a></li>
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Safety & Security</a></li>
-              <li><a href="#" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Beyond The Classroom</a></li>
-              <li><a href="#contact" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Admissions</a></li>
+              <li><Link href="/awards-achievements" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Awards & Achievements</Link></li>
+              <li><Link href="/amenities" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Amenities & Facilities</Link></li>
+              <li><Link href="/student-achievements" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Student Achievements</Link></li>
+              <li><Link href="/safety-security" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Safety & Security</Link></li>
+              <li><Link href="/beyond-the-classroom" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Beyond The Classroom</Link></li>
+              <li><Link href="/extracurriculars" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Extracurriculars</Link></li>
+              <li><Link href="/photo-gallery" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Photo Gallery</Link></li>
+              <li><Link href="/blogs" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">Blogs</Link></li>
+              <li><Link href="/cbse-mandatory-public-disclosures" className="text-white/70 hover:text-secondary transition-colors inline-block text-sm">CBSE Disclosures</Link></li>
             </ul>
           </div>
 
@@ -71,21 +75,26 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="text-secondary shrink-0" size={18} />
-                <a href="mailto:info@rainbowinternationalschool.in" className="text-white/70 text-sm hover:text-secondary transition-colors">info@rainbowinternationalschool.in</a>
+                <a href="mailto:info@rainbowinternationalschool.in" className="text-white/70 text-sm hover:text-secondary transition-colors break-all">info@rainbowinternationalschool.in</a>
               </li>
             </ul>
             <div className="mt-6">
-              <a href="#contact">
+              <Link href="/contact-us">
                 <button className="w-full bg-secondary text-secondary-foreground font-bold py-2.5 rounded-md hover:bg-secondary/90 transition-colors text-sm">
                   Book a Campus Tour
                 </button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-8 text-center text-white/50 text-sm">
-          <p>&copy; {new Date().getFullYear()} Rainbow International School. All rights reserved. | Thane West, Maharashtra</p>
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-white/50 text-sm">
+          <p>&copy; {new Date().getFullYear()} Rainbow International School. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="https://rainbowinternationalschool.in/privacy-policy-and-cookie-policy/" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">Privacy Policy</a>
+            <a href="https://rainbowinternationalschool.in/term-of-use/" target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">Terms of Use</a>
+            <Link href="/cbse-mandatory-public-disclosures" className="hover:text-secondary transition-colors">CBSE Disclosures</Link>
+          </div>
         </div>
       </div>
     </footer>

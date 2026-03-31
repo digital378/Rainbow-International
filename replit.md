@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a school website for Rainbow International School built with a modern full-stack TypeScript architecture. The application features a React frontend with Tailwind CSS styling and an Express.js backend with PostgreSQL database storage. It serves as a public-facing website showcasing the school's programs, events, and providing an inquiry form for prospective parents.
+A full-stack replication of the Rainbow International School website (rainbowinternationalschool.in) — a CBSE-affiliated school in Thane West, Maharashtra. Built with React frontend, Express.js backend, and PostgreSQL database.
 
 ## User Preferences
 
@@ -35,10 +35,13 @@ Preferred communication style: Simple, everyday language.
 ```
 ├── client/           # Frontend React application
 │   ├── src/
-│   │   ├── components/  # React components (ui/, home/, layout/)
-│   │   ├── pages/       # Page components
-│   │   ├── hooks/       # Custom React hooks
-│   │   └── lib/         # Utilities and query client
+│   │   ├── components/
+│   │   │   ├── ui/          # shadcn/ui base components
+│   │   │   ├── home/        # Home page sections (Hero, Features, ContactForm, etc.)
+│   │   │   └── layout/      # Navbar, Footer, PageBanner, SEO
+│   │   ├── pages/           # All page components (18 pages)
+│   │   ├── hooks/           # Custom React hooks
+│   │   └── lib/             # Utilities and query client
 ├── server/           # Backend Express application
 │   ├── index.ts      # Server entry point
 │   ├── routes.ts     # API route definitions
@@ -49,11 +52,55 @@ Preferred communication style: Simple, everyday language.
 └── migrations/       # Database migrations (Drizzle Kit)
 ```
 
-### Data Flow
-1. Frontend components use TanStack Query to fetch data from API endpoints
-2. Express routes handle requests, validate with Zod schemas
-3. Storage layer performs database operations via Drizzle ORM
-4. Shared schema ensures type consistency across frontend and backend
+## Pages (18 total)
+
+| Route | Page | File |
+|-------|------|------|
+| `/` | Home | `pages/Home.tsx` |
+| `/about-rainbow-international-school` | About | `pages/About.tsx` |
+| `/pre-primary-school-thane` | Pre-Primary | `pages/PrePrimary.tsx` |
+| `/primary-section` | Primary (Class 1–5) | `pages/Primary.tsx` |
+| `/middle-school-section` | Middle School (Class 6–10) | `pages/MiddleSchool.tsx` |
+| `/secondary-section` | Secondary (Class 9–10) | `pages/Secondary.tsx` |
+| `/senior-secondary-section` | Senior Secondary (Class 11–12) | `pages/SeniorSecondary.tsx` |
+| `/amenities` | Amenities & Facilities | `pages/Amenities.tsx` |
+| `/awards-achievements` | Awards | `pages/Awards.tsx` |
+| `/student-achievements` | Student Achievements | `pages/StudentAchievements.tsx` |
+| `/safety-security` | Safety & Security | `pages/SafetySecurity.tsx` |
+| `/beyond-the-classroom` | Beyond Classroom | `pages/BeyondClassroom.tsx` |
+| `/extracurriculars` | Extracurriculars | `pages/Extracurriculars.tsx` |
+| `/photo-gallery` | Photo Gallery | `pages/PhotoGallery.tsx` |
+| `/contact-us` | Contact Us | `pages/ContactUs.tsx` |
+| `/academic-calendar` | Academic Calendar | `pages/AcademicCalendar.tsx` |
+| `/blogs` | Blogs | `pages/Blogs.tsx` |
+| `/cbse-mandatory-public-disclosures` | CBSE Disclosures | `pages/CbseDisclosures.tsx` |
+
+## Key Components
+
+- **SEO.tsx** — Dynamic `<head>` meta tag manager for per-page SEO
+- **PageBanner.tsx** — Hero banner with title, subtitle, and breadcrumb for inner pages
+- **Navbar.tsx** — Sticky navbar with top bar (phone/email), dropdown menus for Academics and Explore, mobile menu
+- **Footer.tsx** — 4-column footer with logo, links, explore, and contact info
+
+## Content Design
+
+- **Design**: "Playful Academic" aesthetic — school blue (primary) + energetic yellow (secondary)
+- **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks
+- **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component
+- **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL
+
+## School Info (from real site)
+
+- **Name**: Rainbow International School
+- **Founded**: April 2009
+- **Location**: Anand Nagar, Thane West, Maharashtra, India
+- **Phone**: +91 86550 03366
+- **Email**: info@rainbowinternationalschool.in
+- **CBSE Affiliation**: 1130661
+- **Campus**: 3.5 acres
+- **Students**: 3,000+ current, 50,000+ impacted
+- **Grades**: Nursery to Class 12
+- **Streams**: Science, Humanities, Commerce (Class 11–12)
 
 ## External Dependencies
 
