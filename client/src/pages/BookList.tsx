@@ -7,25 +7,25 @@ import { Download } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
 const bookLists = [
-  { grade: "Nursery", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Jr. KG", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Sr. KG", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 1", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 2", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 3", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 4", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 5", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 6", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 7", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 8", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 9", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 10", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 11 – Science", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 11 – Commerce", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 11 – Humanities", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 12 – Science", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 12 – Commerce", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
-  { grade: "Class 12 – Humanities", year: "2025–26", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Nursery", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Jr. KG", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Sr. KG", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 1", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 2", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 3", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 4", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 5", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 6", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 7", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 8", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 9", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 10", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 11 – Science", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 11 – Commerce", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 11 – Humanities", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 12 – Science", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 12 – Commerce", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
+  { grade: "Class 12 – Humanities", year: "2026–27", href: "https://rainbowinternationalschool.in/book-list/" },
 ];
 
 export default function BookList() {
@@ -41,14 +41,14 @@ export default function BookList() {
       <Navbar />
       <PageBanner
         title="Book List"
-        subtitle="Study materials for all classes — Academic Year 2025–26."
+        subtitle="Study materials for all classes — Academic Year 2026–27."
         breadcrumb={[{ label: "Book List" }]}
       />
 
       <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 mb-10 text-amber-800 text-sm">
-            <strong>Note:</strong> The book lists below are for the academic year 2025–26. Please contact the school office or visit the school's official website for the downloadable PDFs. For queries, call <a href="tel:+918655003366" className="underline font-semibold">+91 86550 03366</a>.
+            <strong>Note:</strong> The book lists below are for the academic year 2026–27. Please contact the school office or visit the school's official website for the downloadable PDFs. For queries, call <a href="tel:+918655003366" className="underline font-semibold">+91 86550 03366</a>.
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -177,7 +177,7 @@ export default function PrePrimary() {
                 {/* Admission banner */}
                 <div className="rounded-3xl border-2 border-amber-400 p-6 text-center" style={{ background: "#fffbeb" }}>
                   <p className="text-sm font-black uppercase tracking-wide mb-3" style={{ color: "#b45309" }}>
-                    Admissions are Open for the Academic Year 2025–26
+                    Admissions are Open for the Academic Year 2026–27
                   </p>
                   <a
                     href="#contact"
@@ -285,7 +285,7 @@ export default function PrePrimary() {
 
         {/* ── Admissions CTA strip ──────────────────────────────── */}
         <div className="py-14 text-center" style={{ background: "#091a4f" }}>
-          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2025–26</p>
+          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2026–27</p>
           <a href="#contact" className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
             Enquire Now
           </a>
