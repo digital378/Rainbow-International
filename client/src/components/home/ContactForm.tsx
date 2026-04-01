@@ -35,32 +35,25 @@ const contactCards = [
     label: "Call Us",
     lines: ["(022) 69105000", "+91 82915 68972"],
     href: "tel:02269105000",
-    accent: "#fff",
-    bg: "rgba(255,255,255,0.15)",
   },
   {
     icon: Mail,
     label: "Email Us",
     lines: ["admin@rainbowinternationalschool.in"],
     href: "mailto:admin@rainbowinternationalschool.in",
-    accent: "#fff",
-    bg: "rgba(255,255,255,0.15)",
+    breakAll: true,
   },
   {
     icon: Clock,
     label: "Working Hours",
     lines: ["Monday – Saturday", "9:00 AM – 6:00 PM"],
     href: null,
-    accent: "#fff",
-    bg: "rgba(255,255,255,0.15)",
   },
   {
     icon: MapPin,
     label: "Our Address",
-    lines: ["Cosmos Arcade, Brahmand Phase 4,", "Thane West, Maharashtra"],
+    lines: ["Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra"],
     href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
-    accent: "#fff",
-    bg: "rgba(255,255,255,0.15)",
   },
 ];
 
@@ -204,27 +197,40 @@ export function ContactForm() {
         </div>
       </div>
 
-      {/* Contact info bar — full width, outside narrow container */}
+      {/* Contact info bar */}
       <div style={{ background: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)" }}>
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {contactCards.map((card, i) => {
               const Icon = card.icon;
               const content = (
-                <div className="rounded-2xl p-4 flex items-start gap-3 hover:bg-white/10 transition-colors h-full" style={{ background: "rgba(255,255,255,0.12)" }}>
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(255,255,255,0.2)" }}>
-                    <Icon size={16} className="text-white" />
+                <div
+                  className="rounded-2xl p-5 flex items-start gap-4 hover:bg-white/10 transition-colors h-full"
+                  style={{ background: "rgba(255,255,255,0.12)" }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: "rgba(255,255,255,0.2)" }}
+                  >
+                    <Icon size={18} className="text-white" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-black text-white text-sm mb-1">{card.label}</p>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="font-black text-white text-sm mb-1.5 whitespace-nowrap">{card.label}</p>
                     {card.lines.map((line, j) => (
-                      <p key={j} className="text-white/85 text-xs leading-snug" style={{ wordBreak: "normal", overflowWrap: "anywhere" }}>{line}</p>
+                      <p
+                        key={j}
+                        className={`text-white/90 text-xs leading-relaxed ${'breakAll' in card && card.breakAll ? 'break-all' : 'break-words'}`}
+                      >
+                        {line}
+                      </p>
                     ))}
                   </div>
                 </div>
               );
               return card.href ? (
-                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full">{content}</a>
+                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full">
+                  {content}
+                </a>
               ) : (
                 <div key={i} className="h-full">{content}</div>
               );
