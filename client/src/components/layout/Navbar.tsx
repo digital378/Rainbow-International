@@ -35,7 +35,7 @@ const galleryLinks = [
   { href: "/awards-achievements", label: "Awards & Achievements" },
   { href: "/student-achievements", label: "Student Achievements" },
   { href: "/photo-gallery", label: "Photo Gallery" },
-  { href: "/photo-gallery", label: "360 View" },
+  { href: "https://www.google.co.in/maps/@19.2410872,72.9834173,3a,75y,173.49h,78.89t/data=!3m7!1e1!3m5!1sCIHM0ogKEICAgICEoPa6nwE!2e10!6shttps:%2F%2Flh3.googleusercontent.com%2Fgpms-cs-s%2FAFfmt2aWGOsrPaLwSCl_hpv4b0782kWAfeFtnO6PY5ALsP7irCvkUkFM4Mj-PBqTjsMKjRbuIfgun0HJuqtMJMNBEuil-DTNGWYGhJdBl9PnQ5TYN9T192c28YY8tQXxUB9Pxfez7bYSrA%3Dw900-h600-k-no-pi11.106874019713445-ya67.45613033629051-ro0-fo100!7i13312!8i6656?entry=ttu&g_ep=EgoyMDI2MDMyOS4wIKXMDSoASAFQAw%3D%3D", label: "360 View", external: true },
 ];
 
 const parentLinks = [
@@ -43,7 +43,7 @@ const parentLinks = [
   { href: "/students-leaving-certificate", label: "Leaving Certificate" },
 ];
 
-function Dropdown({ label, links }: { label: string; links: { href: string; label: string }[] }) {
+function Dropdown({ label, links }: { label: string; links: { href: string; label: string; external?: boolean }[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const [location] = useLocation();
@@ -70,16 +70,29 @@ function Dropdown({ label, links }: { label: string; links: { href: string; labe
 
       {open && (
         <div className="absolute top-full left-0 mt-1 min-w-56 bg-white rounded-lg shadow-xl border border-gray-100 z-50 py-1">
-          {links.map((link, i) => (
-            <Link
-              key={i}
-              href={link.href}
-              className="block px-4 py-2.5 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {links.map((link, i) =>
+            link.external ? (
+              <a
+                key={i}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2.5 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={i}
+                href={link.href}
+                className="block px-4 py-2.5 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </div>
       )}
     </div>
