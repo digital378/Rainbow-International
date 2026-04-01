@@ -379,7 +379,7 @@ export default function PrePrimary() {
                   </div>
                   <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>Rainbow Preschool International</p>
                   <p className="text-xs text-gray-500 mb-4">Award-winning preschools across Thane</p>
-                  <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                  <a href="https://www.rainbowpreschools.com/best-preschool-near-me-in-thane" target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 font-bold py-2.5 px-6 rounded-full text-white transition-opacity hover:opacity-90"
                     style={{ background: "#f97316" }}
                     data-testid="link-rps-main">
