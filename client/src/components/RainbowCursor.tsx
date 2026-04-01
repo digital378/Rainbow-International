@@ -12,16 +12,16 @@ interface Particle {
 }
 
 const RAINBOW_COLORS = [
-  "#ef4444", // red
-  "#f97316", // orange
-  "#f59e0b", // amber
-  "#22c55e", // green
-  "#3b82f6", // blue
-  "#8b5cf6", // violet
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-  "#a3e635", // lime
-  "#f472b6", // rose
+  "#ff0000", // vivid red
+  "#ff6600", // vivid orange
+  "#ffcc00", // vivid yellow
+  "#00cc00", // vivid green
+  "#0066ff", // vivid blue
+  "#9900ff", // vivid violet
+  "#ff00cc", // vivid magenta
+  "#00ccff", // vivid cyan
+  "#66ff00", // vivid lime
+  "#ff3399", // vivid hot pink
 ];
 
 function randomColor() {
@@ -66,10 +66,10 @@ export default function RainbowCursor() {
           x,
           y,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 0.6, // slight upward drift
-          radius: 2.5 + Math.random() * 4,
-          alpha: 0.7 + Math.random() * 0.3,
-          decay: 0.012 + Math.random() * 0.018,
+          vy: Math.sin(angle) * speed - 0.6,
+          radius: 1.5 + Math.random() * 2.5,
+          alpha: 1,
+          decay: 0.016 + Math.random() * 0.02,
           color: randomColor(),
         });
       }
