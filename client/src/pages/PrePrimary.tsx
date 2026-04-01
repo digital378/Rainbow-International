@@ -4,6 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { ExternalLink } from "lucide-react";
 
 const curriculum = [
   {
@@ -279,6 +280,163 @@ export default function PrePrimary() {
               <p className="text-sm text-gray-600 mt-1">
                 Monthly assessment to understand ongoing progress
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Rainbow Preschool International ───────────────────── */}
+        <section className="py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+
+              {/* Main content */}
+              <div className="lg:col-span-2 space-y-6">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>Our Preschool Partner</p>
+                  <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>
+                    Rainbow Preschool International —{" "}
+                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                      className="underline underline-offset-4 hover:opacity-80 transition-opacity" style={{ color: "#f97316" }}>
+                      Where Every Journey Begins
+                    </a>
+                  </h2>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Before children step into the Pre-Primary section at Rainbow International School, many begin their educational journey at{" "}
+                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">Rainbow Preschool International (RPS)</a> — our award-winning, CBSE-aligned sister preschool brand with multiple branches across Thane.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    RPS follows the same play-based, activity-rich philosophy as our Pre-Primary section, ensuring a seamless and anxiety-free transition to formal schooling. Children nurtured at{" "}
+                    <a href="https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">Rainbow Preschool</a>{" "}
+                    arrive at Rainbow International School with strong foundational skills in literacy, numeracy, social interaction, and creative thinking.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Recognised among{" "}
+                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">India's 10 Best Preschools</a>{" "}
+                    by The Knowledge Review Magazine and honoured at the 15th World Education Summit for innovation in early childhood education, RPS brings world-class early learning to Thane's families.
+                  </p>
+                </div>
+
+                {/* Transition pathway */}
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
+                  <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-0">
+                    {[
+                      { stage: "Playgroup / Nursery", where: "Rainbow Preschool International", color: "#fff7e0", accent: "#b45309", href: "https://www.rainbowpreschools.com" },
+                      { stage: "Jr. KG / Sr. KG", where: "Rainbow Preschool International", color: "#e0f7f0", accent: "#047857", href: "https://www.rainbowpreschools.com" },
+                      { stage: "Class 1 onwards", where: "Rainbow International School", color: "#e0edff", accent: "#0d3b86", href: "/primary-section" },
+                    ].map((step, i) => (
+                      <div key={i} className="flex sm:flex-col items-center flex-1 w-full">
+                        <a href={step.href} target={step.href.startsWith("http") ? "_blank" : "_self"}
+                          rel="noopener noreferrer"
+                          className="w-full rounded-2xl p-4 text-center hover:opacity-90 transition-opacity"
+                          style={{ background: step.color }}>
+                          <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: step.accent + "99" }}>Step {i + 1}</p>
+                          <p className="font-black text-sm" style={{ color: step.accent }}>{step.stage}</p>
+                          <p className="text-[11px] mt-1" style={{ color: step.accent + "bb" }}>{step.where}</p>
+                        </a>
+                        {i < 2 && (
+                          <div className="flex-shrink-0 sm:rotate-90 text-gray-300 font-black px-2 sm:py-2">›</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* What makes RPS special */}
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
+                  <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>What Makes Rainbow Preschool Special</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      { title: "Play-Based Curriculum", desc: "Learning through structured play, arts, music, movement and storytelling — the way young minds are meant to grow." },
+                      { title: "Theme-Based Classrooms", desc: "Vibrant, print-rich environments that spark curiosity and make every school day an adventure." },
+                      { title: "Trained Early Childhood Educators", desc: "Every RPS teacher is specially trained in early childhood development and child psychology." },
+                      { title: "Parent Partnership Programme", desc: "Regular parent-teacher interactions, workshops and progress updates ensure families are always involved." },
+                      { title: "Safe & Nurturing Environment", desc: "CCTV-monitored, GPS-enabled transport, qualified first-aid staff and zero-tolerance bullying policy." },
+                      { title: "Seamless RIS Transition", desc: "Children graduating from RPS are academically and emotionally prepared for Class 1 at Rainbow International School." },
+                    ].map((f, i) => (
+                      <div key={i} className="flex gap-3">
+                        <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#f97316" }} />
+                        <div>
+                          <p className="font-black text-sm text-gray-800">{f.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{f.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-5">
+
+                {/* Visit RPS CTA */}
+                <div className="rounded-3xl p-6 text-center" style={{ background: "#fff7ed", border: "2px solid #fed7aa" }}>
+                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-black" style={{ background: "#fef3c7", color: "#b45309" }}>
+                    R
+                  </div>
+                  <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>Rainbow Preschool International</p>
+                  <p className="text-xs text-gray-500 mb-4">Award-winning preschools across Thane</p>
+                  <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 font-bold py-2.5 px-6 rounded-full text-white transition-opacity hover:opacity-90"
+                    style={{ background: "#f97316" }}
+                    data-testid="link-rps-main">
+                    <ExternalLink size={14} />
+                    Visit RPS Website
+                  </a>
+                </div>
+
+                {/* RPS Branches */}
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6">
+                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">RPS Branches in Thane</h4>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "Manpada", href: "https://www.rainbowpreschools.com/preschool-in-manpada-thane" },
+                      { label: "Hariniwas", href: "https://www.rainbowpreschools.com/preschool-in-hariniwas-thane" },
+                      { label: "Anand Nagar", href: "https://www.rainbowpreschools.com/preschool-in-anand-nagar-thane" },
+                      { label: "Kasarvadavali", href: "https://www.rainbowpreschools.com/preschool-in-kasarvadavali-thane" },
+                      { label: "Dhokali", href: "https://www.rainbowpreschools.com/preschool-in-dhokali-thane" },
+                      { label: "Kalwa", href: "https://www.rainbowpreschools.com/preschool-in-kalwa-thane" },
+                    ].map((b, i) => (
+                      <li key={i}>
+                        <a href={b.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors group"
+                          data-testid={`link-rps-branch-${i}`}>
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-orange-300 group-hover:bg-orange-500 transition-colors" />
+                          {b.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* RPS Quick Links */}
+                <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6">
+                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">Explore RPS</h4>
+                  <ul className="space-y-2.5">
+                    {[
+                      { label: "Why Rainbow Preschool", href: "https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" },
+                      { label: "Awards & Recognition", href: "https://www.rainbowpreschools.com/rainbow-preschool-awards-recognition" },
+                      { label: "Parent Testimonials", href: "https://www.rainbowpreschools.com/parent-testimonials-rainbow-preschool" },
+                      { label: "Play-Based Learning", href: "https://www.rainbowpreschools.com/blog/how-play-based-learning-shapes-young-minds" },
+                      { label: "First Day at Preschool", href: "https://www.rainbowpreschools.com/blog/preparing-your-child-for-first-day-preschool" },
+                      { label: "Admissions at RPS", href: "https://www.rainbowpreschools.com/admissions" },
+                    ].map((l, i) => (
+                      <li key={i}>
+                        <a href={l.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors group"
+                          data-testid={`link-rps-explore-${i}`}>
+                          <ExternalLink size={11} className="flex-shrink-0 text-gray-300 group-hover:text-orange-400 transition-colors" />
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+              </div>
             </div>
           </div>
         </section>
