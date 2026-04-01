@@ -6,53 +6,95 @@ import { SEO } from "@/components/SEO";
 import { X } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
-const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/";
+const CDN = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
 
 const galleryData = [
   {
     category: "Academics",
     images: [
-      { src: BASE + "Exhibition-1-1024x536-1.jpg", alt: "Project at the Exhibition" },
-      { src: BASE + "Exhibition-2-1024x536-1.jpg", alt: "Exhibition" },
-      { src: BASE + "Exhibition-3-1024x536-1.jpg", alt: "Exhibition" },
-      { src: BASE + "Exhibition-4-1024x536-1.jpg", alt: "Exhibition" },
-      { src: BASE + "Field-Trips-1-1024x536-1.jpg", alt: "Field Trips" },
-      { src: BASE + "Field-Trips-2-1024x536-1.jpg", alt: "Field Trips" },
-      { src: BASE + "Field-Trips-3-1024x536-1.jpg", alt: "Field Trips" },
-      { src: BASE + "Students-shots-1-1024x536-1.jpg", alt: "Students Learning" },
-      { src: BASE + "Students-shots-2-1024x536-1.jpg", alt: "Students in the Classroom" },
-      { src: BASE + "Students-shots-3-1024x536-1.jpg", alt: "Students with Library Teacher" },
+      { src: `${CDN}/Exhibition-1-1024x536-1.jpg`,    alt: "Science Exhibition – student projects" },
+      { src: `${CDN}/Exhibition-2-1024x536-1.jpg`,    alt: "Science Exhibition – space models" },
+      { src: `${CDN}/Exhibition-3-1024x536-1.jpg`,    alt: "Science Exhibition – display boards" },
+      { src: `${CDN}/Exhibition-4-1024x536-1.jpg`,    alt: "Science Exhibition – hands-on activity" },
+      { src: `${CDN}/Field-Trips-1-1024x536-1.jpg`,   alt: "Field Trip – classroom activity" },
+      { src: `${CDN}/Field-Trips-2-1024x536-1.jpg`,   alt: "Field Trip – outdoor learning" },
+      { src: `${CDN}/Field-Trips-3-1024x536-1.jpg`,   alt: "Field Trip – group activity" },
+      { src: `${CDN}/Students-shots-1-1024x536-1.jpg`, alt: "Students with laptops in class" },
+      { src: `${CDN}/Students-shots-2-1024x536-1.jpg`, alt: "Students working on computers" },
+      { src: `${CDN}/Students-shots-3-1024x536-1.jpg`, alt: "Students with library teacher" },
     ],
   },
   {
     category: "Extracurriculars",
     images: [
-      { src: BASE + "community-1024x536-1.jpg", alt: "Community" },
-      { src: BASE + "Extracurricular-1-1024x536-1.jpg", alt: "Extracurricular" },
-      { src: BASE + "Extracurricular-2-1024x536-1.jpg", alt: "Extracurricular" },
-      { src: BASE + "Extracurricular-3-1024x536-2.jpg", alt: "Extracurricular" },
-      { src: BASE + "Extracurricular-4-1024x536-1.jpg", alt: "Extracurricular" },
-      { src: BASE + "Organic-farming-1-1024x536-1.jpg", alt: "Organic Farming" },
-      { src: BASE + "Organic-Farming-2-1024x536-1.jpg", alt: "Organic Farming" },
-      { src: BASE + "Organic-Farming-3-1024x536-1.jpg", alt: "Organic Farming" },
-      { src: BASE + "Organic-Farming-4-1024x536-1.jpg", alt: "Organic Farming" },
+      { src: `${CDN}/community-1024x536-1.jpg`,          alt: "Community event" },
+      { src: `${CDN}/Extracurricular-1-1024x536-1.jpg`,  alt: "Annual day cultural performance" },
+      { src: `${CDN}/Extracurricular-2-1024x536-1.jpg`,  alt: "Dance performance on stage" },
+      { src: `${CDN}/Extracurricular-3-1024x536-2.jpg`,  alt: "Theatre and drama performance" },
+      { src: `${CDN}/Extracurricular-4-1024x536-1.jpg`,  alt: "Students at cultural activity" },
+      { src: `${CDN}/Organic-farming-1-1024x536-1.jpg`,  alt: "Students tending vegetable garden" },
+      { src: `${CDN}/Organic-Farming-2-1024x536-1.jpg`,  alt: "Organic farming – planting" },
+      { src: `${CDN}/Organic-Farming-3-1024x536-1.jpg`,  alt: "Organic farming – harvest" },
+      { src: `${CDN}/Organic-Farming-4-1024x536-1.jpg`,  alt: "Butterfly garden activity" },
     ],
   },
   {
     category: "Sports",
     images: [
-      { src: BASE + "Sports-1-1024x536-1.jpg", alt: "Sports" },
-      { src: BASE + "Sports-2-1024x536-1.jpg", alt: "Sports" },
-      { src: BASE + "Sports-3-1024x536-1.jpg", alt: "Sports" },
-      { src: BASE + "Sports-4-1024x536-1.jpg", alt: "Students Playing Chess" },
+      { src: `${CDN}/Sports-1-1024x536-1.jpg`,  alt: "Students playing chess" },
+      { src: `${CDN}/Sports-2-1024x536-1.jpg`,  alt: "Cricket on school ground" },
+      { src: `${CDN}/Sports-3-1024x536-1.jpg`,  alt: "Karate practice" },
+      { src: `${CDN}/Sports-4-1024x536-1.jpg`,  alt: "Skating on rink" },
+      { src: `${CDN}/Sports-5-1024x536-1.jpg`,  alt: "Track and field event" },
+      { src: `${CDN}/Sports-6-1024x536-1.jpg`,  alt: "Basketball practice" },
+      { src: `${CDN}/Sports-7-1024x536-1.jpg`,  alt: "Annual sports day march past" },
+      { src: `${CDN}/Sports-8-1024x536-1.jpg`,  alt: "Martial arts demonstration" },
+      { src: `${CDN}/Sports-9-1024x536-1.jpg`,  alt: "Pyramid formation sports day" },
+      { src: `${CDN}/Sports-10-1024x536-1.jpg`, alt: "Swimming competition" },
+      { src: `${CDN}/Sports-11-1024x536-1.jpg`, alt: "Sports day event" },
+      { src: `${CDN}/Sports-12-1024x536-1.jpg`, alt: "Outdoor games" },
+      { src: `${CDN}/Sports-13-1024x536-1.jpg`, alt: "Football on turf" },
     ],
   },
   {
-    category: "Events",
+    category: "Amenities",
     images: [
-      { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg", alt: "School Infrastructure" },
-      { src: "https://rainbowinternationalschool.in/wp-content/uploads/2023/04/picwish.webp", alt: "School Event" },
-      { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/HO-web-art-work-for-pranit-04.png", alt: "Exhibition" },
+      { src: `${CDN}/Infrastructure-1-1024x536-1.jpg`,   alt: "Rock climbing and rappelling wall" },
+      { src: `${CDN}/Infrastructure-2-1024x536-1.jpg`,   alt: "Basketball and sports court" },
+      { src: `${CDN}/Infrastructure-3-1024x536-2.jpg`,   alt: "Table tennis room" },
+      { src: `${CDN}/Infrastructure-4-1024x536-1.jpg`,   alt: "School corridor and notice boards" },
+      { src: `${CDN}/Infrastructure-5-1024x536-1.jpg`,   alt: "Amphitheatre and outdoor stage" },
+      { src: `${CDN}/Infrastructure-6-1024x536-1.jpg`,   alt: "Games and recreation room" },
+      { src: `${CDN}/Infrastructure-7-1024x536-1.jpg`,   alt: "Art classroom with murals" },
+      { src: `${CDN}/Infrastructure-8-1024x536-1.jpg`,   alt: "Science laboratory" },
+      { src: `${CDN}/Infrastructure-9-1024x536-1.jpg`,   alt: "Multipurpose hall" },
+      { src: `${CDN}/Infrastructure-10-1024x536-1.jpg`,  alt: "Swimming pool" },
+      { src: `${CDN}/Infrastructure-11-1024x536-1.jpg`,  alt: "School ambulance" },
+      { src: `${CDN}/Medical-facility-1-1024x536-1.jpg`, alt: "Infirmary – medical facility" },
+      { src: `${CDN}/Medical-fcaility-2-1024x536-1.jpg`, alt: "Music room" },
+      { src: `${CDN}/Music-1-1024x536-1.jpg`,            alt: "Music class in session" },
+      { src: `${CDN}/Safety-and-security-1-1024x536-1.jpg`, alt: "Security guard on duty" },
+      { src: `${CDN}/Safety-and-security-2-1024x536-1.jpg`, alt: "CCTV and safety measures" },
+      { src: `${CDN}/Safety-and-security-3-1024x536-1.jpg`, alt: "Campus safety infrastructure" },
+    ],
+  },
+  {
+    category: "Achievements",
+    images: [
+      { src: `${CDN}/Achievements-1-1024x536-1.jpg`, alt: "Student achievement – karate medals" },
+      { src: `${CDN}/Achievements-2-1024x536-1.jpg`, alt: "Student achievement – swimming medals" },
+      { src: `${CDN}/Achievements-3-1024x536-1.jpg`, alt: "Students receiving karate awards" },
+      { src: `${CDN}/rainbow-international-school-gallery-achievements-world-education-summit-2019.jpg`, alt: "World Education Summit 2019 award" },
+      { src: `${CDN}/rainbow-international-school-thane-best-Preschool-and-Secondary-school.jpg`,        alt: "Best Preschool and Secondary School in Thane" },
+      { src: `${CDN}/rainbow-international-school-thane-gallery-achievements-100-results.jpg`,           alt: "100% Class X result 2018-19" },
+      { src: `${CDN}/rainbow-international-school-thane-gallery-achievements-featured-in-knowledge-review-magazine.jpg`, alt: "Featured in Knowledge Review Magazine" },
+      { src: `${CDN}/rainbow-international-school-thane-gallery-achievements-fit-india-1.jpg`,           alt: "FIT INDIA School certificate" },
+      { src: `${CDN}/rainbow-international-school-thane-gallery-achievements-wins-excellence-awards.jpg`, alt: "Excellence in Education award – India Today" },
+      { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery-1.jpg`,             alt: "Student achievement – competition winners" },
+      { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery-2.jpg`,             alt: "Student achievement – awards ceremony" },
+      { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery-3.jpg`,             alt: "Student achievement – swimming championship" },
+      { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery-4.jpg`,             alt: "Student achievement – national competition" },
+      { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery.jpg`,               alt: "Student achievements gallery" },
     ],
   },
 ];
@@ -62,7 +104,7 @@ export default function PhotoGallery() {
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   const categories = ["All", ...galleryData.map((g) => g.category)];
-  const images =
+  const filtered =
     activeCategory === "All"
       ? galleryData.flatMap((g) => g.images)
       : galleryData.find((g) => g.category === activeCategory)?.images || [];
@@ -72,7 +114,7 @@ export default function PhotoGallery() {
       <ScrollProgress />
       <SEO
         title="Photo Gallery - Rainbow International School Thane"
-        description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, organic farming, cultural events and more from our campus in Thane West."
+        description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane West."
         keywords="Rainbow school photo gallery, school photos Thane West, school campus photos Rainbow International"
         canonical="https://rainbowinternationalschool.in/photo-gallery/"
       />
@@ -83,8 +125,8 @@ export default function PhotoGallery() {
       />
 
       <main className="flex-grow py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center mb-10">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex flex-wrap gap-3 justify-center mb-12">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -96,31 +138,32 @@ export default function PhotoGallery() {
                     : "bg-gray-100 text-gray-600 hover:text-white"
                 }`}
                 style={activeCategory === cat ? { background: "#0d3b86" } : {}}
-                onMouseEnter={(e) => { if (activeCategory !== cat) (e.currentTarget as HTMLElement).style.background = "#0d3b86"; }}
-                onMouseLeave={(e) => { if (activeCategory !== cat) (e.currentTarget as HTMLElement).style.background = ""; }}
+                onMouseEnter={(e) => { if (activeCategory !== cat) (e.currentTarget as HTMLElement).style.background = "#0d3b86"; (e.currentTarget as HTMLElement).style.color = "#fff"; }}
+                onMouseLeave={(e) => { if (activeCategory !== cat) { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.color = ""; } }}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
-            {images.map((img, i) => (
-              <div
-                key={i}
-                className="break-inside-avoid cursor-pointer overflow-hidden rounded-3xl shadow-sm hover:shadow-md transition-shadow group border border-gray-100"
-                onClick={() => setLightbox(img)}
-                data-testid={`img-gallery-${i}`}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
+          {activeCategory === "All" ? (
+            galleryData.map((group) => (
+              <div key={group.category} className="mb-14">
+                <h2 className="text-2xl font-black mb-6 text-center" style={{ color: "#0d3b86" }}>{group.category}</h2>
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
+                  {group.images.map((img, i) => (
+                    <GalleryCard key={i} img={img} index={i} onClick={() => setLightbox(img)} />
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
+              {filtered.map((img, i) => (
+                <GalleryCard key={i} img={img} index={i} onClick={() => setLightbox(img)} />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
@@ -139,13 +182,39 @@ export default function PhotoGallery() {
           <img
             src={lightbox.src}
             alt={lightbox.alt}
-            className="max-w-full max-h-[90vh] rounded-3xl shadow-2xl object-contain"
+            className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
             onClick={(e) => e.stopPropagation()}
           />
+          <p className="absolute bottom-6 text-white/80 text-sm">{lightbox.alt}</p>
         </div>
       )}
 
       <Footer />
+    </div>
+  );
+}
+
+function GalleryCard({ img, index, onClick }: { img: { src: string; alt: string }; index: number; onClick: () => void }) {
+  return (
+    <div
+      className="break-inside-avoid cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 group border border-gray-100 mb-3"
+      onClick={onClick}
+      data-testid={`img-gallery-${index}`}
+    >
+      <div className="relative overflow-hidden">
+        <img
+          src={img.src}
+          alt={img.alt}
+          className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          onError={(e) => { (e.target as HTMLImageElement).closest('div.break-inside-avoid')?.remove(); }}
+        />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-end">
+          <p className="w-full text-white text-xs px-3 py-2 font-medium translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent">
+            {img.alt}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
