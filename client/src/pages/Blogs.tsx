@@ -4,7 +4,11 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ArrowRight, Calendar } from "lucide-react";
 import { useState } from "react";
+import { Link } from "wouter";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { blogPosts } from "@/data/blogPosts";
+
+const publishedSlugs = new Set(blogPosts.map((p) => p.slug));
 
 interface BlogPost {
   title: string;
@@ -153,47 +157,63 @@ export default function Blogs() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {filtered.map((blog, i) => (
-              <a
-                key={i}
-                href={`https://rainbowinternationalschool.in/${blog.slug}/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
-                data-testid={`card-blog-${i}`}
-              >
-                {blog.thumbUrl ? (
-                  <div className="aspect-[16/9] overflow-hidden bg-gray-100">
-                    <img
-                      src={blog.thumbUrl}
-                      alt={blog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  </div>
-                ) : (
-                  <div className="aspect-[16/9] flex items-center justify-center" style={{ background: "#f0f4ff" }}>
-                    <div className="text-center p-4">
-                      <div className="font-black text-lg leading-snug" style={{ color: "#0d3b86" }}>Rainbow School Blog</div>
+            {filtered.map((blog, i) => {
+              const isInternal = publishedSlugs.has(blog.slug);
+              const cardContent = (
+                <>
+                  {blog.thumbUrl ? (
+                    <div className="aspect-[16/9] overflow-hidden bg-gray-100">
+                      <img
+                        src={blog.thumbUrl}
+                        alt={blog.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
                     </div>
-                  </div>
-                )}
-
-                <div className="p-5 flex flex-col flex-grow">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{blog.cat}</span>
-                    <span className="flex items-center gap-1 text-xs text-gray-400">
-                      <Calendar size={11} />
-                      {blog.date}
+                  ) : (
+                    <div className="aspect-[16/9] flex items-center justify-center" style={{ background: "#f0f4ff" }}>
+                      <div className="text-center p-4">
+                        <div className="font-black text-lg leading-snug" style={{ color: "#0d3b86" }}>Rainbow School Blog</div>
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-5 flex flex-col flex-grow">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{blog.cat}</span>
+                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <Calendar size={11} />
+                        {blog.date}
+                      </span>
+                    </div>
+                    <h3 className="font-black text-base leading-snug flex-grow group-hover:transition-colors mb-4" style={{ color: "#0d3b86" }}>{blog.title}</h3>
+                    <span className="flex items-center gap-1 text-xs font-bold text-amber-500 group-hover:gap-2 transition-all">
+                      Read More <ArrowRight size={12} />
                     </span>
                   </div>
-                  <h3 className="font-black text-base leading-snug flex-grow group-hover:transition-colors mb-4" style={{ color: "#0d3b86" }}>{blog.title}</h3>
-                  <span className="flex items-center gap-1 text-xs font-bold text-amber-500 group-hover:gap-2 transition-all">
-                    Read More <ArrowRight size={12} />
-                  </span>
-                </div>
-              </a>
-            ))}
+                </>
+              );
+              return isInternal ? (
+                <Link
+                  key={i}
+                  href={`/blog/${blog.slug}`}
+                  className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
+                  data-testid={`card-blog-${i}`}
+                >
+                  {cardContent}
+                </Link>
+              ) : (
+                <a
+                  key={i}
+                  href={`https://rainbowinternationalschool.in/${blog.slug}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
+                  data-testid={`card-blog-${i}`}
+                >
+                  {cardContent}
+                </a>
+              );
+            })}
           </div>
         </div>
       </main>

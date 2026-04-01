@@ -40,6 +40,7 @@ import GlobalBrandAssociations from "@/pages/GlobalBrandAssociations";
 import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
 import Curriculum from "@/pages/Curriculum";
 import Circulars from "@/pages/Circulars";
+import BlogPost from "@/pages/BlogPost";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
       <Route path="/curriculum" component={Curriculum} />
       <Route path="/circulars" component={Circulars} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route component={NotFound} />
     </Switch>
     </>
