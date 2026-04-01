@@ -39,9 +39,8 @@ const contactCards = [
   {
     icon: Mail,
     label: "Email Us",
-    lines: ["admin@rainbowinternationalschool.in"],
+    lines: ["admin@rainbow", "internationalschool.in"],
     href: "mailto:admin@rainbowinternationalschool.in",
-    breakAll: true,
   },
   {
     icon: Clock,
@@ -52,7 +51,7 @@ const contactCards = [
   {
     icon: MapPin,
     label: "Our Address",
-    lines: ["Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra"],
+    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra"],
     href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
   },
 ];
@@ -199,28 +198,25 @@ export function ContactForm() {
 
       {/* Contact info bar */}
       <div style={{ background: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)" }}>
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="max-w-5xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {contactCards.map((card, i) => {
               const Icon = card.icon;
               const content = (
                 <div
-                  className="rounded-2xl p-5 flex items-start gap-4 hover:bg-white/10 transition-colors h-full"
+                  className="rounded-2xl p-6 flex flex-col items-center text-center gap-3 hover:bg-white/10 transition-colors h-full"
                   style={{ background: "rgba(255,255,255,0.12)" }}
                 >
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(255,255,255,0.2)" }}
+                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: "rgba(255,255,255,0.25)" }}
                   >
-                    <Icon size={18} className="text-white" />
+                    <Icon size={20} className="text-white" />
                   </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="font-black text-white text-sm mb-1.5 whitespace-nowrap">{card.label}</p>
+                  <div>
+                    <p className="font-extrabold text-white text-sm mb-2">{card.label}</p>
                     {card.lines.map((line, j) => (
-                      <p
-                        key={j}
-                        className={`text-white/90 text-xs leading-relaxed ${'breakAll' in card && card.breakAll ? 'break-all' : 'break-words'}`}
-                      >
+                      <p key={j} className="text-white/90 text-xs leading-relaxed">
                         {line}
                       </p>
                     ))}
