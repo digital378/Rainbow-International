@@ -171,7 +171,9 @@ export default function BlogPost() {
 
               {/* RPS External Link */}
               <div className="rounded-2xl p-6 text-white" style={{ background: "#0d3b86" }}>
-                <img src="/rps-logo.png" alt="Rainbow Preschool International" className="h-10 mb-3 brightness-0 invert" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                <div className="bg-white rounded-lg px-3 py-2 inline-flex items-center mb-3">
+                  <img src="/rps-logo.png" alt="Rainbow Preschool International" className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+                </div>
                 <h3 className="font-black text-base mb-2">Rainbow Preschool International</h3>
                 <p className="text-white/80 text-xs leading-relaxed mb-4">
                   Explore our award-winning preschool chain — the perfect foundation before joining Rainbow International School.

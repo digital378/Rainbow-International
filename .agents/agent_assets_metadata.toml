@@ -186,3 +186,63 @@ id = "7L_ZG3CdkA4mPc3uXGY2q"
 uri = "file://client/public/amenities/organic-farming-3.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "fxtQzfHxLygu_IV6WqC_L"
+uri = "file://client/public/blog/cat-school.png"
+type = "image"
+title = "school building exterior"
+
+[[generated]]
+id = "VnjPKWYgLK06Pr6AV8RwH"
+uri = "file://client/public/blog/cat-education.png"
+type = "image"
+title = "classroom education scene"
+
+[[generated]]
+id = "yTPF3y95EAYPq2Dsv9v6n"
+uri = "file://client/public/blog/cat-parenting.png"
+type = "image"
+title = "parent child reading together"
+
+[[generated]]
+id = "Lqj8HVo4HWQ39TWTIs1C7"
+uri = "file://client/public/blog/cat-health.png"
+type = "image"
+title = "student meditating health"
+
+[[generated]]
+id = "f_ORPcJbMZXozzl3d8fX9"
+uri = "file://client/public/blog/cat-sports.png"
+type = "image"
+title = "kids playing football sport"
+
+[[generated]]
+id = "tjJEBOiiIHnavScKtTc7L"
+uri = "file://client/public/blog/cat-study.png"
+type = "image"
+title = "student focused studying desk"
+
+[[generated]]
+id = "HriPTF_jE4L_uvUliJklT"
+uri = "file://client/public/blog/cat-development.png"
+type = "image"
+title = "teen students group project"
+
+[[generated]]
+id = "d9U6wwXGZ0Gt6FZQAZL5p"
+uri = "file://client/public/blog/cat-early.png"
+type = "image"
+title = "toddlers early learning preschool"
+
+[[generated]]
+id = "71AfdjVCDz8khFrFaUk0O"
+uri = "file://client/public/blog/cat-awards.png"
+type = "image"
+title = "school award ceremony stage"
+
+[[generated]]
+id = "k5wQFDTqHDYyDs-Cc5tyG"
+uri = "file://client/public/blog/cat-events.png"
+type = "image"
+title = "school cultural event celebration"
