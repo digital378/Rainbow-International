@@ -95,7 +95,7 @@ export function Navbar() {
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      <div className="bg-[#4CAF50] text-white text-center py-2 text-xs font-bold tracking-widest uppercase">
+      <div className="bg-[#00a550] text-white text-center py-2 text-xs font-bold tracking-widest uppercase">
         ADMISSIONS ARE OPEN FOR THE ACADEMIC YEAR 26–27
       </div>
 
