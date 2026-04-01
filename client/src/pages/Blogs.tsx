@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ArrowRight, Calendar } from "lucide-react";
+import { BlogThumb } from "@/components/home/BlogThumb";
 import { useState } from "react";
 import { Link } from "wouter";
 import ScrollProgress from "@/components/home/ScrollProgress";
@@ -161,22 +162,9 @@ export default function Blogs() {
               const isInternal = publishedSlugs.has(blog.slug);
               const cardContent = (
                 <>
-                  {blog.thumbUrl ? (
-                    <div className="aspect-[16/9] overflow-hidden bg-gray-100">
-                      <img
-                        src={blog.thumbUrl}
-                        alt={blog.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-[16/9] flex items-center justify-center" style={{ background: "#f0f4ff" }}>
-                      <div className="text-center p-4">
-                        <div className="font-black text-lg leading-snug" style={{ color: "#0d3b86" }}>Rainbow School Blog</div>
-                      </div>
-                    </div>
-                  )}
+                  <div className="aspect-[16/9] overflow-hidden bg-gray-100">
+                    <BlogThumb src={blog.thumbUrl} alt={blog.title} cat={blog.cat} />
+                  </div>
                   <div className="p-5 flex flex-col flex-grow">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{blog.cat}</span>

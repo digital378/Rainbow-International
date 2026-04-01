@@ -6,6 +6,7 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 import { ContactForm } from "@/components/home/ContactForm";
 import { getBlogPost, blogPosts } from "@/data/blogPosts";
 import { Calendar, Tag, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import { BlogThumb } from "@/components/home/BlogThumb";
 
 export default function BlogPost() {
   const params = useParams<{ slug: string }>();
@@ -209,12 +210,7 @@ export default function BlogPost() {
                 {related.map((rel) => (
                   <Link key={rel.slug} href={`/blog/${rel.slug}`} className="group block rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow bg-white">
                     <div className="relative aspect-[16/9] overflow-hidden bg-gray-50">
-                      <img
-                        src={rel.thumbUrl}
-                        alt={rel.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
+                      <BlogThumb src={rel.thumbUrl} alt={rel.title} cat={rel.cat} />
                     </div>
                     <div className="p-4">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{rel.cat}</span>
