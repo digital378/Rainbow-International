@@ -366,8 +366,6 @@ export default function RainbowPreschool() {
                   <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Branches in Thane</h3>
                   <ul className="space-y-2.5">
                     {[
-                      { label: "Best Preschool in Thane", href: "https://www.rainbowpreschools.com/best-preschool-in-thane" },
-                      { label: "Preschool Near Me", href: "https://www.rainbowpreschools.com/preschool-near-me" },
                       { label: "Manpada", href: "https://www.rainbowpreschools.com/preschool-in-manpada-thane" },
                       { label: "Hariniwas", href: "https://www.rainbowpreschools.com/preschool-in-hariniwas-thane" },
                       { label: "Anand Nagar", href: "https://www.rainbowpreschools.com/preschool-in-anand-nagar-thane" },
