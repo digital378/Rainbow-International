@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ChatBot } from "@/components/ChatBot";
+import RainbowCursor from "@/components/RainbowCursor";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import WelcomeToRIS from "@/pages/WelcomeToRIS";
@@ -87,6 +88,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <RainbowCursor />
         <Router />
         <ChatBot />
       </TooltipProvider>
