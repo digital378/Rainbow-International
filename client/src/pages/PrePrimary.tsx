@@ -406,8 +406,8 @@ export default function PrePrimary() {
 
                 {/* Visit RPS CTA */}
                 <div className="rounded-3xl p-6 text-center" style={{ background: "#fff7ed", border: "2px solid #fed7aa" }}>
-                  <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center text-2xl font-black" style={{ background: "#fef3c7", color: "#b45309" }}>
-                    R
+                  <div className="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden flex items-center justify-center bg-white shadow-sm">
+                    <img src="/rps-logo.png" alt="Rainbow Preschool International" className="w-full h-full object-contain" />
                   </div>
                   <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>Rainbow Preschool International</p>
                   <p className="text-xs text-gray-500 mb-4">Award-winning preschools across Thane</p>
