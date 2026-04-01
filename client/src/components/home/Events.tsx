@@ -100,7 +100,7 @@ export function Events() {
             <span className="text-secondary font-bold tracking-widest uppercase text-sm">Happening Now</span>
             <h2 className="text-4xl font-serif font-bold text-primary mt-2">News & Events</h2>
           </div>
-          <a href="/events" className="hidden md:block text-primary font-bold hover:text-primary/80 transition-colors border-b-2 border-transparent hover:border-secondary">
+          <a href="/academic-calendar" className="hidden md:block text-primary font-bold hover:text-primary/80 transition-colors border-b-2 border-transparent hover:border-secondary">
             View All Events
           </a>
         </div>
@@ -147,7 +147,7 @@ export function Events() {
         </div>
         
         <div className="mt-8 text-center md:hidden">
-           <a href="/events" className="text-primary font-bold hover:text-primary/80 transition-colors" data-testid="link-view-all-events">
+           <a href="/academic-calendar" className="text-primary font-bold hover:text-primary/80 transition-colors" data-testid="link-view-all-events">
             View All Events
           </a>
         </div>

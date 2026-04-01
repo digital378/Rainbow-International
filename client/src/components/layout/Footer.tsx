@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, ExternalLink, Navigation } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Navigation } from "lucide-react";
 import { Link } from "wouter";
 
 const MAPS_LINK = "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA";
@@ -239,9 +239,7 @@ export function Footer() {
         </p>
         <div className="flex gap-6">
           <Link href="/cbse-mandatory-public-disclosures" className="text-white/35 hover:text-white/70 text-sm transition-colors">CBSE Disclosures</Link>
-          <a href="https://rainbowinternationalschool.in" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-white/35 hover:text-white/70 text-sm transition-colors">
-            Official Site <ExternalLink size={12} />
-          </a>
+          <Link href="/privacy-policy-and-cookie-policy" className="text-white/35 hover:text-white/70 text-sm transition-colors">Privacy Policy</Link>
         </div>
       </div>
     </footer>
