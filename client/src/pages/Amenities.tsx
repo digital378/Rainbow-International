@@ -6,48 +6,78 @@ import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
 const talentSpaces = [
-  { name: "Amphitheatre", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Amphitheatre--768x512.png" },
-  { name: "Music Room", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-music-600x400-1.jpg" },
-  { name: "Art and Craft Room", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-arts-crafts-600x400-1.jpg" },
-  { name: "Multipurpose Hall", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-multi-purpose-hall-600x400-1.jpg" },
+  { name: "Amphitheatre",       image: "/amenities/amphitheatre.png" },
+  { name: "Music Room",         image: "/amenities/music-room.png" },
+  { name: "Art and Craft Room", image: "/amenities/art-craft-room.png" },
+  { name: "Multipurpose Hall",  image: "/amenities/multipurpose-hall.png" },
 ];
 
 const sportsSpaces = [
-  { name: "Cricket Ground", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-cricket-ground-600x400-1.jpg" },
-  { name: "Football Turf", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-football-turf-600x400-1.jpg" },
-  { name: "Skating Rink", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-skating-rink-600x400-1.jpg" },
-  { name: "Swimming Pool", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-swimming-pool-600x400-1.jpg" },
-  { name: "Rock Climbing & Rappelling", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-rock-climbing-600x400-1.jpg" },
-  { name: "Badminton Court", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-badminton-court-600x400-1.jpg" },
+  { name: "Cricket Ground",              image: "/amenities/cricket-ground.png" },
+  { name: "Football Turf",               image: "/amenities/football-turf.png" },
+  { name: "Skating Rink",                image: "/amenities/skating-rink.png" },
+  { name: "Swimming Pool",               image: "/amenities/swimming-pool.png" },
+  { name: "Rock Climbing & Rappelling",  image: "/amenities/rock-climbing.png" },
+  { name: "Basket Ball",                 image: "/amenities/basketball.png" },
+  { name: "Table Tennis",                image: "/amenities/table-tennis.png" },
+  { name: "Chess",                       image: "/amenities/chess.png" },
+  { name: "Carrom",                      image: "/amenities/carrom.png" },
+  { name: "Karate",                      image: "/amenities/karate.png" },
 ];
 
-const academicSpaces = [
-  { name: "Science Laboratory", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-science-lab-600x400-1.jpg" },
-  { name: "Computer Laboratory", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-computer-lab-600x400-1.jpg" },
-  { name: "Library", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-library-600x400-1.jpg" },
-  { name: "Organic Farm", image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Organic-farming-1-1024x536-1.jpg" },
+const educationalResources = [
+  { name: "E-learning enabled Classrooms", image: "/amenities/elearning-classroom.png" },
+  { name: "Storage Facility – Bags & Books", image: "/amenities/storage-bags-books.png" },
+  { name: "Reading Room",                  image: "/amenities/reading-room.png" },
+  { name: "Maths & Science Lab",           image: "/amenities/maths-science-lab.png" },
+  { name: "School Library",                image: "/amenities/school-library.png" },
+  { name: "Bank",                          image: "/amenities/school-bank.png" },
 ];
+
+const supportEquipments = [
+  { name: "AC Classrooms",          image: "/amenities/ac-classrooms.png" },
+  { name: "Generator Backup",       image: "/amenities/generator-backup.png" },
+  { name: "Hygiene",                image: "/amenities/hygiene.png" },
+  { name: "Fire Compliance",        image: "/amenities/fire-compliance.png" },
+  { name: "Infirmary & Trained Nurse", image: "/amenities/infirmary.png" },
+  { name: "Ambulance",              image: "/amenities/ambulance.png" },
+  { name: "CCTV Surveillance",      image: "/amenities/cctv-surveillance.png" },
+  { name: "Metal Detectors",        image: "/amenities/metal-detectors.png" },
+];
+
+const organicFarmingImages = [
+  "/amenities/organic-farming-1.png",
+  "/amenities/organic-farming-2.png",
+  "/amenities/organic-farming-3.png",
+];
+
+function AmenityCard({ name, image }: { name: string; image: string }) {
+  return (
+    <div className="group overflow-hidden rounded-2xl shadow-sm border border-gray-100 bg-white hover:shadow-md transition-shadow">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
+        <img
+          src={image}
+          alt={name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => { (e.target as HTMLImageElement).src = '/amenities/amphitheatre.png'; }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
+      </div>
+      <div className="py-3 px-2 bg-white">
+        <p className="font-semibold text-sm text-center text-gray-800 leading-snug">{name}</p>
+      </div>
+    </div>
+  );
+}
 
 function SpaceGrid({ title, items, alt }: { title: string; items: { name: string; image: string }[]; alt?: boolean }) {
   return (
     <section className="py-14" style={alt ? { background: "#f8faff" } : { background: "#fff" }}>
-      <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-black text-center mb-8" style={{ color: "#0d3b86" }}>{title}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <h2 className="text-2xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>{title}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {items.map((item, i) => (
-            <div key={i} className="group overflow-hidden rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="aspect-[4/3] overflow-hidden bg-gray-50">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => { (e.target as HTMLImageElement).src = 'https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg'; }}
-                />
-              </div>
-              <div className="p-3 bg-white">
-                <p className="font-semibold text-sm text-center" style={{ color: "#0d3b86" }}>{item.name}</p>
-              </div>
-            </div>
+            <AmenityCard key={i} name={item.name} image={item.image} />
           ))}
         </div>
       </div>
@@ -72,15 +102,51 @@ export default function Amenities() {
       />
 
       <main className="flex-grow">
+
+        {/* Intro */}
         <div className="py-10" style={{ background: "#f8faff" }}>
           <p className="text-center text-lg text-gray-600 max-w-2xl mx-auto px-4">
             We offer globally recognized educational resources and state-of-the-art facilities that make Rainbow International School the best international school in Thane.
           </p>
         </div>
 
+        {/* Talent Spaces */}
         <SpaceGrid title="Talent Spaces" items={talentSpaces} />
+
+        {/* Sports Spaces */}
         <SpaceGrid title="Sports Spaces" items={sportsSpaces} alt />
-        <SpaceGrid title="Academic Spaces" items={academicSpaces} />
+
+        {/* Educational Resources */}
+        <SpaceGrid title="Educational Resources" items={educationalResources} />
+
+        {/* Support Equipments */}
+        <SpaceGrid title="Support Equipments" items={supportEquipments} alt />
+
+        {/* Organic Farming */}
+        <section className="py-14 bg-white">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <h2 className="text-2xl font-black text-center mb-4" style={{ color: "#0d3b86" }}>Organic Farming</h2>
+            <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10 text-sm leading-relaxed">
+              10,000 sq.ft. of Organic Vegetable Garden. Children grow seasonal vegetables with the help of a gardener every quarter
+              and are allowed to take the produce back home during harvest season. 5,000 sq.ft. of Butterfly Garden.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {organicFarmingImages.map((img, i) => (
+                <div key={i} className="overflow-hidden rounded-2xl shadow-sm border border-gray-100">
+                  <div className="relative aspect-[4/3]">
+                    <img
+                      src={img}
+                      alt={`Organic farming ${i + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/amenities/organic-farming-1.png'; }}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         <ContactForm />
       </main>
