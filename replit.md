@@ -52,6 +52,12 @@ Preferred communication style: Simple, everyday language.
 └── migrations/       # Database migrations (Drizzle Kit)
 ```
 
+## Blog Posts (86 total)
+
+All 86 blog posts from the live site are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
+
+Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier fallback: CDN image → category image (`/blog/cat-*.png`) → gradient placeholder. Category images stored in `client/public/blog/`.
+
 ## Pages (18 total)
 
 | Route | Page | File |
