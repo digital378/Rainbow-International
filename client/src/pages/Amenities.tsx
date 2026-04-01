@@ -5,53 +5,56 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
+const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
+const BASE2 = "https://rainbowinternationalschool.in/wp-content/uploads";
+
 const talentSpaces = [
-  { name: "Amphitheatre",       image: "/amenities/amphitheatre.png" },
-  { name: "Music Room",         image: "/amenities/music-room.png" },
-  { name: "Art and Craft Room", image: "/amenities/art-craft-room.png" },
-  { name: "Multipurpose Hall",  image: "/amenities/multipurpose-hall.png" },
+  { name: "Amphitheatre",       image: `${BASE}/Amphitheatre--768x512.png`,                                                                          fallback: "/amenities/amphitheatre.png" },
+  { name: "Music Room",         image: `${BASE}/rainbow-international-school-thane-student-aminities-music-600x400-1.jpg`,                            fallback: "/amenities/music-room.png" },
+  { name: "Art and Craft Room", image: `${BASE}/rainbow-international-school-thane-student-aminities-arts-crafts-600x400-1.jpg`,                      fallback: "/amenities/art-craft-room.png" },
+  { name: "Multipurpose Hall",  image: `${BASE}/rainbow-international-school-thane-student-aminities-multi-purpose-hall-600x400-1.jpg`,               fallback: "/amenities/multipurpose-hall.png" },
 ];
 
 const sportsSpaces = [
-  { name: "Cricket Ground",              image: "/amenities/cricket-ground.png" },
-  { name: "Football Turf",               image: "/amenities/football-turf.png" },
-  { name: "Skating Rink",                image: "/amenities/skating-rink.png" },
-  { name: "Swimming Pool",               image: "/amenities/swimming-pool.png" },
-  { name: "Rock Climbing & Rappelling",  image: "/amenities/rock-climbing.png" },
-  { name: "Basket Ball",                 image: "/amenities/basketball.png" },
-  { name: "Table Tennis",                image: "/amenities/table-tennis.png" },
-  { name: "Chess",                       image: "/amenities/chess.png" },
-  { name: "Carrom",                      image: "/amenities/carrom.png" },
-  { name: "Karate",                      image: "/amenities/karate.png" },
+  { name: "Cricket Ground",             image: `${BASE}/rainbow-international-school-thane-student-aminities-cricket-ground-600x400-1.jpg`,           fallback: "/amenities/cricket-ground.png" },
+  { name: "Football Turf",              image: `${BASE}/rainbow-international-school-thane-student-aminities-football-turf-600x400-1.jpg`,            fallback: "/amenities/football-turf.png" },
+  { name: "Skating Rink",               image: `${BASE}/rainbow-international-school-thane-student-aminities-skating-rink-600x400-1.jpg`,             fallback: "/amenities/skating-rink.png" },
+  { name: "Swimming Pool",              image: `${BASE}/rainbow-international-school-thane-student-aminities-swimming-pool-600x400-1.jpg`,            fallback: "/amenities/swimming-pool.png" },
+  { name: "Rock Climbing & Rappelling", image: `${BASE}/rainbow-international-school-thane-student-aminities-rock-climbing-600x400-1.jpg`,            fallback: "/amenities/rock-climbing.png" },
+  { name: "Basket Ball",                image: `${BASE}/rainbow-international-school-thane-student-aminities-basketball-600x400-1.jpg`,               fallback: "/amenities/basketball.png" },
+  { name: "Table Tennis",               image: `${BASE}/rainbow-international-school-thane-student-aminities-table-tennis-600x400-1.jpg`,             fallback: "/amenities/table-tennis.png" },
+  { name: "Chess",                      image: `${BASE}/rainbow-international-school-thane-student-aminities-chess-600x400-1.jpg`,                    fallback: "/amenities/chess.png" },
+  { name: "Carrom",                     image: `${BASE}/rainbow-international-school-thane-student-aminities-carrom-600x400-1.jpg`,                   fallback: "/amenities/carrom.png" },
+  { name: "Karate",                     image: `${BASE}/rainbow-international-school-thane-student-aminities-karate-600x400-1.jpg`,                   fallback: "/amenities/karate.png" },
 ];
 
 const educationalResources = [
-  { name: "E-learning enabled Classrooms", image: "/amenities/elearning-classroom.png" },
-  { name: "Storage Facility – Bags & Books", image: "/amenities/storage-bags-books.png" },
-  { name: "Reading Room",                  image: "/amenities/reading-room.png" },
-  { name: "Maths & Science Lab",           image: "/amenities/maths-science-lab.png" },
-  { name: "School Library",                image: "/amenities/school-library.png" },
-  { name: "Bank",                          image: "/amenities/school-bank.png" },
+  { name: "E-learning enabled Classrooms", image: `${BASE}/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg`, fallback: "/amenities/elearning-classroom.png" },
+  { name: "Storage Facility – Bags & Books", image: `${BASE}/rainbow-international-school-thane-student-aminities-storage-bags-books-600x400-1.jpg`, fallback: "/amenities/storage-bags-books.png" },
+  { name: "Reading Room",                  image: `${BASE}/rainbow-international-school-thane-student-aminities-reading-room-600x400-1.jpg`,          fallback: "/amenities/reading-room.png" },
+  { name: "Maths & Science Lab",           image: `${BASE}/rainbow-international-school-thane-student-aminities-science-lab-600x400-1.jpg`,           fallback: "/amenities/maths-science-lab.png" },
+  { name: "School Library",                image: `${BASE}/rainbow-international-school-thane-student-aminities-library-600x400-1.jpg`,               fallback: "/amenities/school-library.png" },
+  { name: "Bank",                          image: `${BASE}/rainbow-international-school-thane-student-aminities-bank-600x400-1.jpg`,                   fallback: "/amenities/school-bank.png" },
 ];
 
 const supportEquipments = [
-  { name: "AC Classrooms",          image: "/amenities/ac-classrooms.png" },
-  { name: "Generator Backup",       image: "/amenities/generator-backup.png" },
-  { name: "Hygiene",                image: "/amenities/hygiene.png" },
-  { name: "Fire Compliance",        image: "/amenities/fire-compliance.png" },
-  { name: "Infirmary & Trained Nurse", image: "/amenities/infirmary.png" },
-  { name: "Ambulance",              image: "/amenities/ambulance.png" },
-  { name: "CCTV Surveillance",      image: "/amenities/cctv-surveillance.png" },
-  { name: "Metal Detectors",        image: "/amenities/metal-detectors.png" },
+  { name: "AC Classrooms",             image: `${BASE}/rainbow-international-school-thane-student-aminities-ac-classrooms-600x400-1.jpg`,             fallback: "/amenities/ac-classrooms.png" },
+  { name: "Generator Backup",          image: `${BASE}/rainbow-international-school-thane-student-aminities-generator-backup-600x400-1.jpg`,          fallback: "/amenities/generator-backup.png" },
+  { name: "Hygiene",                   image: `${BASE}/rainbow-international-school-thane-student-aminities-hygiene-600x400-1.jpg`,                   fallback: "/amenities/hygiene.png" },
+  { name: "Fire Compliance",           image: `${BASE}/rainbow-international-school-thane-student-aminities-fire-compliance-600x400-1.jpg`,           fallback: "/amenities/fire-compliance.png" },
+  { name: "Infirmary & Trained Nurse", image: `${BASE}/rainbow-international-school-thane-student-aminities-infirmary-trained-nurse-600x400-1.jpg`,  fallback: "/amenities/infirmary.png" },
+  { name: "Ambulance",                 image: `${BASE}/rainbow-international-school-thane-student-aminities-ambulance-600x400-1.jpg`,                 fallback: "/amenities/ambulance.png" },
+  { name: "CCTV Surveillance",         image: `${BASE}/rainbow-international-school-thane-student-aminities-cctv-surveillance-600x400-1.jpg`,         fallback: "/amenities/cctv-surveillance.png" },
+  { name: "Metal Detectors",           image: `${BASE}/rainbow-international-school-thane-student-aminities-metal-detectors-600x400-1.jpg`,           fallback: "/amenities/metal-detectors.png" },
 ];
 
 const organicFarmingImages = [
-  "/amenities/organic-farming-1.png",
-  "/amenities/organic-farming-2.png",
-  "/amenities/organic-farming-3.png",
+  { src: `${BASE2}/2022/09/Organic-farming-1-1024x536-1.jpg`,   fallback: "/amenities/organic-farming-1.png" },
+  { src: `${BASE2}/2022/09/Organic-farming-2-1024x536-1.jpg`,   fallback: "/amenities/organic-farming-2.png" },
+  { src: `${BASE2}/2023/04/rainbow-international-school-beyond-the-classroom-organic-farming-1024x683.jpg`, fallback: "/amenities/organic-farming-3.png" },
 ];
 
-function AmenityCard({ name, image }: { name: string; image: string }) {
+function AmenityCard({ name, image, fallback }: { name: string; image: string; fallback: string }) {
   return (
     <div className="group overflow-hidden rounded-2xl shadow-sm border border-gray-100 bg-white hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-50">
@@ -59,7 +62,7 @@ function AmenityCard({ name, image }: { name: string; image: string }) {
           src={image}
           alt={name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => { (e.target as HTMLImageElement).src = '/amenities/amphitheatre.png'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = fallback; }}
         />
         <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
       </div>
@@ -70,14 +73,14 @@ function AmenityCard({ name, image }: { name: string; image: string }) {
   );
 }
 
-function SpaceGrid({ title, items, alt }: { title: string; items: { name: string; image: string }[]; alt?: boolean }) {
+function SpaceGrid({ title, items, alt }: { title: string; items: { name: string; image: string; fallback: string }[]; alt?: boolean }) {
   return (
     <section className="py-14" style={alt ? { background: "#f8faff" } : { background: "#fff" }}>
       <div className="container mx-auto px-4 max-w-5xl">
         <h2 className="text-2xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>{title}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {items.map((item, i) => (
-            <AmenityCard key={i} name={item.name} image={item.image} />
+            <AmenityCard key={i} name={item.name} image={item.image} fallback={item.fallback} />
           ))}
         </div>
       </div>
@@ -135,10 +138,10 @@ export default function Amenities() {
                 <div key={i} className="overflow-hidden rounded-2xl shadow-sm border border-gray-100">
                   <div className="relative aspect-[4/3]">
                     <img
-                      src={img}
+                      src={img.src}
                       alt={`Organic farming ${i + 1}`}
                       className="w-full h-full object-cover"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/amenities/organic-farming-1.png'; }}
+                      onError={(e) => { (e.target as HTMLImageElement).src = img.fallback; }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
                   </div>
