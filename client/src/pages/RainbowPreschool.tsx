@@ -389,7 +389,7 @@ export default function RainbowPreschool() {
                   <h3 className="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Guides & Resources</h3>
                   <ul className="space-y-2.5">
                     {[
-                      { label: "Why Rainbow Preschool 2026", href: "https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" },
+                      { label: "Why Rainbow Preschool", href: "https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" },
                       { label: "Awards & Recognition", href: "https://www.rainbowpreschools.com/rainbow-preschool-awards-recognition" },
                       { label: "Parent Testimonials", href: "https://www.rainbowpreschools.com/parent-testimonials-rainbow-preschool" },
                       { label: "Play-Based Learning Benefits", href: "https://www.rainbowpreschools.com/blog/how-play-based-learning-shapes-young-minds" },
