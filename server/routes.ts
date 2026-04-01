@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
+import { registerSSRRoutes } from "./ssrBlog";
 
 // ── Email helper ────────────────────────────────────────────────
 async function sendCallbackEmail(data: { name: string; phone: string; preferredTime: string }) {
@@ -159,6 +160,8 @@ export async function registerRoutes(
       res.status(500).json({ message: "Failed to delete event" });
     }
   });
+
+  registerSSRRoutes(app);
 
   return httpServer;
 }
