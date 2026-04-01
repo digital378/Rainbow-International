@@ -201,19 +201,24 @@ export function ContactForm() {
             </form>
           </div>
 
-          {/* Contact info pills */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 items-stretch">
+        </div>
+      </div>
+
+      {/* Contact info bar — full width, outside narrow container */}
+      <div style={{ background: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)" }}>
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {contactCards.map((card, i) => {
               const Icon = card.icon;
               const content = (
-                <div className="rounded-2xl p-4 flex items-start gap-3 hover:bg-white/20 transition-colors h-full" style={{ background: card.bg }}>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.2)" }}>
-                    <Icon size={15} className="text-white" />
+                <div className="rounded-2xl p-4 flex items-start gap-3 hover:bg-white/10 transition-colors h-full" style={{ background: "rgba(255,255,255,0.12)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(255,255,255,0.2)" }}>
+                    <Icon size={16} className="text-white" />
                   </div>
-                  <div>
-                    <p className="font-black text-white text-xs mb-0.5">{card.label}</p>
+                  <div className="min-w-0">
+                    <p className="font-black text-white text-sm mb-1">{card.label}</p>
                     {card.lines.map((line, j) => (
-                      <p key={j} className="text-white/80 text-[11px] leading-relaxed break-all">{line}</p>
+                      <p key={j} className="text-white/85 text-xs leading-snug" style={{ wordBreak: "normal", overflowWrap: "anywhere" }}>{line}</p>
                     ))}
                   </div>
                 </div>

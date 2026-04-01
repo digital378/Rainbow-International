@@ -48,22 +48,27 @@ export default function BlogPost() {
       <Navbar />
 
       {/* Hero */}
-      <div className="relative w-full" style={{ background: "#091a4f" }}>
-        <img
-          src={post.heroUrl}
-          alt={post.title}
-          className="w-full object-cover opacity-30"
-          style={{ maxHeight: "420px", minHeight: "220px" }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+      <div
+        className="relative w-full flex flex-col items-center justify-center text-center px-4 py-20 md:py-28"
+        style={{
+          background: `linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)`,
+          minHeight: "320px",
+        }}
+      >
+        {/* Background image overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-10"
+          style={{ backgroundImage: `url(${post.heroUrl})` }}
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest rounded-full px-3 py-1 mb-4" style={{ background: "#f97316", color: "#fff" }}>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest rounded-full px-4 py-1.5 mb-5" style={{ background: "#f97316", color: "#fff" }}>
             {post.cat}
           </span>
-          <h1 className="text-2xl md:text-4xl font-black text-white max-w-4xl leading-tight">{post.title}</h1>
-          <div className="flex items-center gap-4 mt-4 text-white/70 text-sm">
-            <span className="flex items-center gap-1"><Calendar size={14} />{post.date}</span>
-            <span className="flex items-center gap-1"><Tag size={14} />{post.cat}</span>
+          <h1 className="text-2xl md:text-4xl font-black text-white leading-tight mb-5">{post.title}</h1>
+          <div className="flex items-center justify-center flex-wrap gap-4 text-white/70 text-sm">
+            <span className="flex items-center gap-1.5"><Calendar size={14} />{post.date}</span>
+            <span className="w-1 h-1 rounded-full bg-white/30" />
+            <span className="flex items-center gap-1.5"><Tag size={14} />{post.cat}</span>
           </div>
         </div>
       </div>
