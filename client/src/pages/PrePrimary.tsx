@@ -325,7 +325,7 @@ export default function PrePrimary() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-0">
                     {[
                       { stage: "Playgroup / Nursery", where: "Rainbow Preschool International", color: "#fff7e0", accent: "#b45309", href: "https://www.rainbowpreschools.com/programmes" },
-                      { stage: "Jr. KG / Sr. KG", where: "Rainbow Preschool International", color: "#e0f7f0", accent: "#047857", href: "https://www.rainbowpreschools.com" },
+                      { stage: "Jr. KG / Sr. KG", where: "Rainbow Preschool International", color: "#e0f7f0", accent: "#047857", href: "https://www.rainbowpreschools.com/kindergarten" },
                       { stage: "Class 1 onwards", where: "Rainbow International School", color: "#e0edff", accent: "#0d3b86", href: "/primary-section" },
                     ].map((step, i) => (
                       <div key={i} className="flex sm:flex-col items-center flex-1 w-full">
