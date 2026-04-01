@@ -41,6 +41,11 @@ import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
 import Curriculum from "@/pages/Curriculum";
 import Circulars from "@/pages/Circulars";
 import BlogPost from "@/pages/BlogPost";
+import ApplicationForm from "@/pages/ApplicationForm";
+import GoogleSchool from "@/pages/GoogleSchool";
+import MetaSchool from "@/pages/MetaSchool";
+import ScheduleAppointment from "@/pages/ScheduleAppointment";
+import ThankYou from "@/pages/ThankYou";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -83,6 +88,11 @@ function Router() {
       <Route path="/curriculum" component={Curriculum} />
       <Route path="/circulars" component={Circulars} />
       <Route path="/blog/:slug" component={BlogPost} />
+      <Route path="/application-form" component={ApplicationForm} />
+      <Route path="/google-school-2025-26" component={GoogleSchool} />
+      <Route path="/meta-school-2025-26" component={MetaSchool} />
+      <Route path="/schedule-appointment" component={ScheduleAppointment} />
+      <Route path="/thank-you" component={ThankYou} />
       <Route component={NotFound} />
     </Switch>
     </>
