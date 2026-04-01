@@ -1,5 +1,9 @@
-import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, ExternalLink } from "lucide-react";
+import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, ExternalLink, Navigation } from "lucide-react";
 import { Link } from "wouter";
+
+const MAPS_LINK = "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA";
+const MAPS_EMBED =
+  "https://maps.google.com/maps?q=Rainbow+International+School,+Cosmos+Arcade,+Brahmand+Phase+4,+Thane+West,+Maharashtra&output=embed&t=k&z=18&hl=en";
 
 const quickLinks = [
   { label: "About Rainbow", href: "/about-rainbow-international-school" },
@@ -26,6 +30,94 @@ const exploreLinks = [
 export function Footer() {
   return (
     <footer style={{ background: "#091a4f" }} className="text-white">
+
+      {/* ── Campus Map ─────────────────────────────────────────── */}
+      <div className="border-b border-white/10">
+        <div className="container mx-auto px-4 pt-12 pb-0">
+          <h3 className="font-black text-lg mb-4 text-white">Find Our Campus</h3>
+          <a
+            href={MAPS_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block group relative rounded-2xl overflow-hidden"
+            style={{ height: 280 }}
+            data-testid="link-campus-map"
+          >
+            {/* Satellite map iframe */}
+            <iframe
+              src={MAPS_EMBED}
+              width="100%"
+              height="280"
+              style={{ border: 0, display: "block", filter: "saturate(1.1) brightness(0.92)" }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Rainbow International School Campus Map"
+            />
+
+            {/* Transparent click-through overlay (captures click → Google Maps) */}
+            <div className="absolute inset-0" />
+
+            {/* School info card – top-left */}
+            <div
+              className="absolute top-4 left-4 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3 pointer-events-none"
+              style={{ background: "#091a4f", border: "1px solid rgba(251,191,36,0.35)", maxWidth: 260 }}
+            >
+              {/* Isometric building icon */}
+              <div className="flex-shrink-0">
+                <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Ground shadow */}
+                  <ellipse cx="22" cy="45" rx="14" ry="3" fill="rgba(0,0,0,0.25)" />
+                  {/* Main building body – front face */}
+                  <polygon points="6,30 22,38 22,14 6,6" fill="#1e3a7a" />
+                  {/* Main building body – right face */}
+                  <polygon points="22,38 38,30 38,6 22,14" fill="#0d3b86" />
+                  {/* Roof face */}
+                  <polygon points="6,6 22,14 38,6 22,-2" fill="#1a56c4" />
+                  {/* Rainbow accent strip on roof */}
+                  <polygon points="6,6 22,14 38,6 22,-2" fill="url(#roofGrad)" opacity="0.7" />
+                  {/* Windows – front */}
+                  <rect x="9" y="14" width="5" height="5" rx="1" fill="#7dd3fc" opacity="0.85" />
+                  <rect x="9" y="22" width="5" height="5" rx="1" fill="#7dd3fc" opacity="0.85" />
+                  <rect x="16" y="17" width="4" height="4" rx="1" fill="#7dd3fc" opacity="0.7" />
+                  {/* Windows – right */}
+                  <rect x="25" y="14" width="5" height="5" rx="1" fill="#bae6fd" opacity="0.7" />
+                  <rect x="32" y="14" width="4" height="4" rx="1" fill="#bae6fd" opacity="0.55" />
+                  <rect x="25" y="22" width="5" height="5" rx="1" fill="#bae6fd" opacity="0.7" />
+                  {/* Door */}
+                  <rect x="12" y="28" width="5" height="7" rx="1" fill="#fbbf24" opacity="0.9" />
+                  {/* Flag pole */}
+                  <line x1="22" y1="-2" x2="22" y2="-10" stroke="#fbbf24" strokeWidth="1.5" />
+                  <polygon points="22,-10 29,-7 22,-4" fill="#fbbf24" />
+                  <defs>
+                    <linearGradient id="roofGrad" x1="6" y1="6" x2="38" y2="6" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#ef4444" />
+                      <stop offset="0.25" stopColor="#f97316" />
+                      <stop offset="0.5" stopColor="#22c55e" />
+                      <stop offset="0.75" stopColor="#3b82f6" />
+                      <stop offset="1" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div>
+                <p className="font-black text-xs text-white leading-tight">Rainbow International School</p>
+                <p className="text-white/50 text-[10px] mt-0.5 leading-tight">Cosmos Arcade, Brahmand Phase 4<br />Thane West, Maharashtra</p>
+              </div>
+            </div>
+
+            {/* "View in 3D" button – bottom-right */}
+            <div
+              className="absolute bottom-4 right-4 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl pointer-events-none transition-all group-hover:scale-105"
+              style={{ background: "#fbbf24", color: "#091a4f" }}
+            >
+              <Navigation size={12} />
+              Get Directions
+            </div>
+          </a>
+        </div>
+      </div>
+
       <div className="border-b border-white/10">
         <div className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
