@@ -324,7 +324,7 @@ export default function PrePrimary() {
                   <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-0">
                     {[
-                      { stage: "Playgroup / Nursery", where: "Rainbow Preschool International", color: "#fff7e0", accent: "#b45309", href: "https://www.rainbowpreschools.com" },
+                      { stage: "Playgroup / Nursery", where: "Rainbow Preschool International", color: "#fff7e0", accent: "#b45309", href: "https://www.rainbowpreschools.com/programmes" },
                       { stage: "Jr. KG / Sr. KG", where: "Rainbow Preschool International", color: "#e0f7f0", accent: "#047857", href: "https://www.rainbowpreschools.com" },
                       { stage: "Class 1 onwards", where: "Rainbow International School", color: "#e0edff", accent: "#0d3b86", href: "/primary-section" },
                     ].map((step, i) => (
