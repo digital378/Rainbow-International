@@ -64,7 +64,7 @@ function SafetyMindMap() {
 
   return (
     <svg
-      viewBox="0 0 840 620"
+      viewBox="0 100 840 430"
       className="w-full max-w-4xl mx-auto"
       role="img"
       aria-label="Safety and Security measures diagram"
@@ -257,7 +257,7 @@ export default function SafetySecurity() {
         </section>
 
         {/* ── Mind-map Diagram ──────────────────────────────────── */}
-        <section className="py-20 bg-white">
+        <section className="py-6 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
             <SafetyMindMap />
           </div>
