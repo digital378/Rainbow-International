@@ -38,12 +38,12 @@ const leftItems = [
 ];
 
 const rightItems = [
-  { label: "Trained Drivers &\nMarshalls in Buses",   color: "#374151" },
-  { label: "Lady Attendants\nin Buses",               color: "#b45309" },
-  { label: "100% Female\nStaff for Preschool",        color: "#374151" },
-  { label: "Escort Card Policy\nfor Parents",         color: "#374151" },
-  { label: "Alert Security Personnel\nwith Walkie talkies", color: "#374151" },
-  { label: "CCTV Enabled &\nGPS Tracked Transport",   color: "#374151" },
+  { label: "Trained Drivers &\nMarshalls in Buses",        color: "#0ea5e9" },
+  { label: "Lady Attendants\nin Buses",                    color: "#f97316" },
+  { label: "100% Female\nStaff for Preschool",             color: "#ec4899" },
+  { label: "Escort Card Policy\nfor Parents",              color: "#8b5cf6" },
+  { label: "Alert Security Personnel\nwith Walkie talkies", color: "#14b8a6" },
+  { label: "CCTV Enabled &\nGPS Tracked Transport",        color: "#be185d" },
 ];
 
 function SafetyMindMap() {
