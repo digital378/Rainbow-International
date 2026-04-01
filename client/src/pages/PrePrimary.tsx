@@ -319,29 +319,61 @@ export default function PrePrimary() {
                   </p>
                 </div>
 
-                {/* Transition pathway */}
+                {/* Transition pathway — pyramid */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
-                  <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-0 sm:gap-0">
-                    {[
-                      { stage: "Playgroup / Nursery", where: "Rainbow Preschool International", color: "#fff7e0", accent: "#b45309", href: "https://www.rainbowpreschools.com/programmes" },
-                      { stage: "Jr. KG / Sr. KG", where: "Rainbow Preschool International", color: "#e0f7f0", accent: "#047857", href: "https://www.rainbowpreschools.com/kindergarten" },
-                      { stage: "Class 1 onwards", where: "Rainbow International School", color: "#e0edff", accent: "#0d3b86", href: "/primary-section" },
-                    ].map((step, i) => (
-                      <div key={i} className="flex sm:flex-col items-center flex-1 w-full">
-                        <a href={step.href} target={step.href.startsWith("http") ? "_blank" : "_self"}
-                          rel="noopener noreferrer"
-                          className="w-full rounded-2xl p-4 text-center hover:opacity-90 transition-opacity"
-                          style={{ background: step.color }}>
-                          <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: step.accent + "99" }}>Step {i + 1}</p>
-                          <p className="font-black text-sm" style={{ color: step.accent }}>{step.stage}</p>
-                          <p className="text-[11px] mt-1" style={{ color: step.accent + "bb" }}>{step.where}</p>
-                        </a>
-                        {i < 2 && (
-                          <div className="flex-shrink-0 sm:rotate-90 text-gray-300 font-black px-2 sm:py-2">›</div>
-                        )}
-                      </div>
-                    ))}
+                  <h3 className="font-black text-lg mb-6" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
+                  <div className="flex items-end relative">
+                    {/* Step 1 — smallest */}
+                    <a
+                      href="https://www.rainbowpreschools.com/programmes"
+                      target="_blank" rel="noopener noreferrer"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-shrink-0 relative"
+                      style={{
+                        width: "30%", padding: "14px 12px 16px",
+                        background: "#fff7e0",
+                        zIndex: 1,
+                        marginRight: "-14px",
+                        boxShadow: "4px 0 12px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#b4530999" }}>Step 1</p>
+                      <p className="font-black text-sm leading-tight" style={{ color: "#b45309" }}>Playgroup / Nursery</p>
+                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#b45309bb" }}>Rainbow Preschool International</p>
+                    </a>
+
+                    {/* Step 2 — medium */}
+                    <a
+                      href="https://www.rainbowpreschools.com/kindergarten"
+                      target="_blank" rel="noopener noreferrer"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-shrink-0 relative"
+                      style={{
+                        width: "34%", padding: "20px 14px 22px",
+                        background: "#e0f7f0",
+                        zIndex: 2,
+                        marginRight: "-14px",
+                        boxShadow: "4px 0 12px rgba(0,0,0,0.10)",
+                      }}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#04785799" }}>Step 2</p>
+                      <p className="font-black text-base leading-tight" style={{ color: "#047857" }}>Jr. KG / Sr. KG</p>
+                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#047857bb" }}>Rainbow Preschool International</p>
+                    </a>
+
+                    {/* Step 3 — largest */}
+                    <a
+                      href="/primary-section"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-grow relative"
+                      style={{
+                        padding: "28px 16px 30px",
+                        background: "#e0edff",
+                        zIndex: 3,
+                        boxShadow: "0 4px 16px rgba(13,59,134,0.12)",
+                      }}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#0d3b8699" }}>Step 3</p>
+                      <p className="font-black text-lg leading-tight" style={{ color: "#0d3b86" }}>Class 1 onwards</p>
+                      <p className="text-[11px] mt-1.5 leading-snug" style={{ color: "#0d3b86bb" }}>Rainbow International School</p>
+                    </a>
                   </div>
                 </div>
 
