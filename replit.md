@@ -25,6 +25,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful JSON API endpoints under `/api/*`
 - **Database ORM**: Drizzle ORM with PostgreSQL dialect
 - **Schema Validation**: Zod schemas generated from Drizzle schemas via drizzle-zod
+- **Blog SSR**: All 86 blog posts at `/blog/:slug` are Server-Side Rendered via `server/ssrBlog.ts` — Express intercepts before Vite/React, returns complete pre-rendered HTML. Demo route with badge at `/ssr-demo/blog/:slug`.
 
 ### Build System
 - **Development**: Vite dev server with HMR for frontend, tsx for backend

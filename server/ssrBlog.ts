@@ -10,7 +10,7 @@ function e(str: string | undefined | null): string {
     .replace(/"/g, "&quot;");
 }
 
-function renderBlogSSR(slug: string): string | null {
+function renderBlogSSR(slug: string, showBadge = false): string | null {
   const post = blogPosts.find((p) => p.slug === slug);
   if (!post) return null;
 
@@ -232,7 +232,7 @@ function renderBlogSSR(slug: string): string | null {
     .footer-bottom-inner a:hover { color: rgba(255,255,255,0.70); }
 
     /* ── SSR demo badge (subtle, bottom-right) ── */
-    .ssr-badge { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 20px; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .ssr-badge { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 20px; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: ${showBadge ? "block" : "none"}; }
   </style>
 </head>
 <body>
@@ -485,9 +485,22 @@ function renderBlogSSR(slug: string): string | null {
 }
 
 export function registerSSRRoutes(app: Express) {
+  // Production SSR — replaces React blog pages, no demo badge
+  app.get("/blog/:slug", (req, res) => {
+    const { slug } = req.params;
+    const html = renderBlogSSR(slug, false);
+    if (!html) {
+      return res.status(404).send("<h1>Blog post not found</h1>");
+    }
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("X-Rendered-By", "Express SSR");
+    res.send(html);
+  });
+
+  // Demo route — same page with SSR badge visible
   app.get("/ssr-demo/blog/:slug", (req, res) => {
     const { slug } = req.params;
-    const html = renderBlogSSR(slug);
+    const html = renderBlogSSR(slug, true);
     if (!html) {
       return res.status(404).send("<h1>Blog post not found</h1>");
     }
