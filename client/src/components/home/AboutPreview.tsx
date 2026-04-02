@@ -1,11 +1,12 @@
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const stats = [
-  { num: "50K+", sub: "Happy Students" },
-  { num: "2009", sub: "Established" },
-  { num: "3.5 Acres", sub: "Campus Area" },
-  { num: "1 Lac+", sub: "Lives Impacted" },
+  { target: 50000, suffix: "+", label: "Happy Students", display: "50K+" },
+  { target: 2009, suffix: "", label: "Established", display: "2009" },
+  { target: 3.5, suffix: " Acres", label: "Campus Area", display: "3.5 Acres", decimals: 1 },
+  { target: 100000, suffix: "+", label: "Lives Impacted", display: "1 Lac+" },
 ];
 
 const highlights = [
@@ -14,6 +15,65 @@ const highlights = [
   "Multiple Intelligence methodology",
   "3.5-acre green campus in Thane West",
 ];
+
+function formatNum(val: number, decimals?: number, suffix?: string, target?: number): string {
+  if (target === 100000) {
+    const lac = val / 100000;
+    if (lac >= 1) return "1 Lac+";
+    return `${Math.floor(val / 1000)}K+`;
+  }
+  if (target === 50000) {
+    return `${Math.floor(val / 1000)}K+`;
+  }
+  if (decimals) {
+    return val.toFixed(decimals) + (suffix || "");
+  }
+  return Math.floor(val).toLocaleString() + (suffix || "");
+}
+
+function CountUp({ stat }: { stat: typeof stats[0] }) {
+  const [value, setValue] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const duration = 2000;
+          const startTime = performance.now();
+          const animate = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setValue(eased * stat.target);
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasAnimated, stat.target]);
+
+  return (
+    <div
+      ref={ref}
+      className="flex flex-col items-center justify-center text-center bg-white p-7 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all"
+      style={{ width: "165px", height: "165px", borderRadius: "16px" }}
+    >
+      <div className="text-[28px] font-extrabold leading-none mb-2" style={{ color: "#091a4f" }}>
+        {hasAnimated ? formatNum(value, stat.decimals, stat.suffix, stat.target) : stat.display}
+      </div>
+      <div className="text-xs font-semibold text-gray-500 leading-snug">{stat.label}</div>
+    </div>
+  );
+}
 
 export function AboutPreview() {
   return (
@@ -62,14 +122,7 @@ export function AboutPreview() {
           <div className="flex-shrink-0">
             <div className="grid grid-cols-2 gap-3">
               {stats.map((s, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center justify-center text-center bg-white p-7 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all"
-                  style={{ width: "165px", height: "165px", borderRadius: "16px" }}
-                >
-                  <div className="text-[28px] font-extrabold leading-none mb-2" style={{ color: "#091a4f" }}>{s.num}</div>
-                  <div className="text-xs font-semibold text-gray-500 leading-snug">{s.sub}</div>
-                </div>
+                <CountUp key={i} stat={s} />
               ))}
             </div>
           </div>

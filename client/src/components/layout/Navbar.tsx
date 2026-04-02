@@ -122,7 +122,7 @@ export function Navbar() {
     <div className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isTransparent ? "" : "bg-white shadow-md"}`}>
       <div
         className="text-center py-1.5 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-300 text-white"
-        style={{ background: isTransparent ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
+        style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
       >
         ADMISSIONS ARE OPEN FOR THE ACADEMIC YEAR 26–27
       </div>

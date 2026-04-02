@@ -17,21 +17,10 @@ export function AwardsStrip() {
   return (
     <section className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 60%, #091a4f 100%)" }}>
       <div className="container mx-auto px-4 py-20">
-        <div className="flex flex-col items-center text-center">
 
-          <div className="inline-block mb-5">
-            <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Recognised & Awarded</span>
-            <div className="w-8 h-0.5 bg-amber-400 mt-2 mx-auto" />
-          </div>
-          <h2 className="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-white leading-tight mb-5 tracking-tight">
-            Welcome To Rainbow<br />
-            <span className="text-amber-400">International School</span>
-          </h2>
-          <p className="text-blue-200/80 text-[15px] leading-[1.8] max-w-xl mb-10 mx-auto">
-            Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.
-          </p>
+        <div className="flex flex-col lg:flex-row gap-12 xl:gap-20 items-center justify-center">
 
-          <div className="flex gap-4 h-[320px] overflow-hidden mb-10">
+          <div className="hidden lg:flex gap-4 h-[320px] overflow-hidden flex-shrink-0 order-1">
             <div className="w-[140px] relative overflow-hidden">
               <div className="flex flex-col gap-4 animate-scroll-up">
                 {leftColumn.map((a, i) => (
@@ -74,17 +63,58 @@ export function AwardsStrip() {
             </div>
           </div>
 
-          <Link
-            href="/awards-achievements"
-            className="group inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg text-[#091a4f]"
-            style={{ background: "#fbbf24", borderRadius: "9999px" }}
-            data-testid="button-awards-cta"
-          >
-            View All Awards
-            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          <div className="flex-1 text-center lg:text-left order-2 max-w-xl">
+            <div className="inline-block mb-5">
+              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Recognised & Awarded</span>
+              <div className="w-8 h-0.5 bg-amber-400 mt-2 mx-auto lg:mx-0" />
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-white leading-tight mb-5 tracking-tight">
+              Welcome To Rainbow<br />
+              <span className="text-amber-400">International School</span>
+            </h2>
+            <p className="text-blue-200/80 text-[15px] leading-[1.8] max-w-lg mb-8 mx-auto lg:mx-0">
+              Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.
+            </p>
+            <Link
+              href="/awards-achievements"
+              className="group inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg text-[#091a4f]"
+              style={{ background: "#fbbf24", borderRadius: "9999px" }}
+              data-testid="button-awards-cta"
+            >
+              View All Awards
+              <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
 
         </div>
+
+        <div className="flex lg:hidden gap-4 h-[280px] overflow-hidden mt-10 justify-center">
+          <div className="w-[140px] relative overflow-hidden">
+            <div className="flex flex-col gap-4 animate-scroll-up">
+              {leftColumn.map((a, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg"
+                >
+                  <img src={a.src} alt={a.label} width={100} height={60} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="w-[140px] relative overflow-hidden">
+            <div className="flex flex-col gap-4 animate-scroll-down">
+              {rightColumn.map((a, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg"
+                >
+                  <img src={a.src} alt={a.label} width={100} height={60} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <style>{`
