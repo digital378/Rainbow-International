@@ -1,1 +1,2 @@
 attached_assets/rps_school_drone_upper_shot_1775101242123.png filter=lfs diff=lfs merge=lfs -text
+client/public/campus-aerial.jpg filter=lfs diff=lfs merge=lfs -text

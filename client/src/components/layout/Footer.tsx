@@ -2,8 +2,6 @@ import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Navigation } from "l
 import { Link } from "wouter";
 
 const MAPS_LINK = "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA";
-const MAPS_EMBED =
-  "https://maps.google.com/maps?q=Rainbow+International+School,+Cosmos+Arcade,+Brahmand+Phase+4,+Thane+West,+Maharashtra&output=embed&t=k&z=18&hl=en";
 
 const quickLinks = [
   { label: "About Rainbow", href: "/about-rainbow-international-school" },
@@ -43,62 +41,48 @@ export function Footer() {
             style={{ height: 280 }}
             data-testid="link-campus-map"
           >
-            {/* Satellite map iframe */}
-            <iframe
-              src={MAPS_EMBED}
-              width="100%"
-              height="280"
-              style={{ border: 0, display: "block", filter: "saturate(1.1) brightness(0.92)" }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Rainbow International School Campus Map"
+            <img
+              src="/campus-aerial.jpg"
+              alt="Rainbow International School Campus - Aerial View"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              style={{ filter: "brightness(0.85) saturate(1.1)" }}
             />
 
-            {/* Transparent click-through overlay (captures click → Google Maps) */}
-            <div className="absolute inset-0" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#091a4f]/60 via-transparent to-[#091a4f]/30" />
 
-            {/* School info card – top-left */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="relative flex flex-col items-center campus-pin">
+                <div
+                  className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, #ef4444, #f97316)",
+                    boxShadow: "0 0 0 4px rgba(255,255,255,0.9), 0 0 30px rgba(249,115,22,0.5), 0 8px 24px rgba(0,0,0,0.4)",
+                  }}
+                >
+                  <MapPin size={26} className="text-white drop-shadow-lg" strokeWidth={2.5} />
+                </div>
+                <div
+                  className="w-1 h-6 -mt-1 relative z-0"
+                  style={{
+                    background: "linear-gradient(to bottom, #ef4444, #b91c1c)",
+                    borderRadius: "0 0 2px 2px",
+                  }}
+                />
+                <div
+                  className="w-10 h-3 -mt-0.5 rounded-full"
+                  style={{
+                    background: "radial-gradient(ellipse, rgba(0,0,0,0.35), transparent 70%)",
+                  }}
+                />
+              </div>
+            </div>
+
             <div
-              className="absolute top-4 left-4 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3 pointer-events-none"
-              style={{ background: "#091a4f", border: "1px solid rgba(251,191,36,0.35)", maxWidth: 260 }}
+              className="absolute top-4 left-4 rounded-2xl px-4 py-3 shadow-xl flex items-center gap-3 pointer-events-none backdrop-blur-sm"
+              style={{ background: "rgba(9,26,79,0.85)", border: "1px solid rgba(251,191,36,0.35)", maxWidth: 260 }}
             >
-              {/* Isometric building icon */}
-              <div className="flex-shrink-0">
-                <svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  {/* Ground shadow */}
-                  <ellipse cx="22" cy="45" rx="14" ry="3" fill="rgba(0,0,0,0.25)" />
-                  {/* Main building body – front face */}
-                  <polygon points="6,30 22,38 22,14 6,6" fill="#1e3a7a" />
-                  {/* Main building body – right face */}
-                  <polygon points="22,38 38,30 38,6 22,14" fill="#0d3b86" />
-                  {/* Roof face */}
-                  <polygon points="6,6 22,14 38,6 22,-2" fill="#1a56c4" />
-                  {/* Rainbow accent strip on roof */}
-                  <polygon points="6,6 22,14 38,6 22,-2" fill="url(#roofGrad)" opacity="0.7" />
-                  {/* Windows – front */}
-                  <rect x="9" y="14" width="5" height="5" rx="1" fill="#7dd3fc" opacity="0.85" />
-                  <rect x="9" y="22" width="5" height="5" rx="1" fill="#7dd3fc" opacity="0.85" />
-                  <rect x="16" y="17" width="4" height="4" rx="1" fill="#7dd3fc" opacity="0.7" />
-                  {/* Windows – right */}
-                  <rect x="25" y="14" width="5" height="5" rx="1" fill="#bae6fd" opacity="0.7" />
-                  <rect x="32" y="14" width="4" height="4" rx="1" fill="#bae6fd" opacity="0.55" />
-                  <rect x="25" y="22" width="5" height="5" rx="1" fill="#bae6fd" opacity="0.7" />
-                  {/* Door */}
-                  <rect x="12" y="28" width="5" height="7" rx="1" fill="#fbbf24" opacity="0.9" />
-                  {/* Flag pole */}
-                  <line x1="22" y1="-2" x2="22" y2="-10" stroke="#fbbf24" strokeWidth="1.5" />
-                  <polygon points="22,-10 29,-7 22,-4" fill="#fbbf24" />
-                  <defs>
-                    <linearGradient id="roofGrad" x1="6" y1="6" x2="38" y2="6" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#ef4444" />
-                      <stop offset="0.25" stopColor="#f97316" />
-                      <stop offset="0.5" stopColor="#22c55e" />
-                      <stop offset="0.75" stopColor="#3b82f6" />
-                      <stop offset="1" stopColor="#a855f7" />
-                    </linearGradient>
-                  </defs>
-                </svg>
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(251,191,36,0.15)", border: "1px solid rgba(251,191,36,0.3)" }}>
+                <MapPin size={18} style={{ color: "#fbbf24" }} />
               </div>
               <div>
                 <p className="font-black text-xs text-white leading-tight">Rainbow International School</p>
@@ -106,15 +90,24 @@ export function Footer() {
               </div>
             </div>
 
-            {/* "View in 3D" button – bottom-right */}
             <div
-              className="absolute bottom-4 right-4 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl pointer-events-none transition-all group-hover:scale-105"
+              className="absolute bottom-4 right-4 flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl pointer-events-none transition-all group-hover:scale-105 shadow-lg"
               style={{ background: "#fbbf24", color: "#091a4f" }}
             >
               <Navigation size={12} />
               Get Directions
             </div>
           </a>
+
+          <style>{`
+            .campus-pin {
+              animation: pinBounce 2s ease-in-out infinite;
+            }
+            @keyframes pinBounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-8px); }
+            }
+          `}</style>
         </div>
       </div>
 
