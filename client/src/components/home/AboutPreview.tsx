@@ -68,7 +68,7 @@ function CountUp({ stat }: { stat: typeof stats[0] }) {
       style={{ width: "165px", height: "165px", borderRadius: "16px" }}
     >
       <div className="text-[28px] font-extrabold leading-none mb-2" style={{ color: "#091a4f" }}>
-        {hasAnimated ? formatNum(value, stat.decimals, stat.suffix, stat.target) : stat.display}
+        {hasAnimated ? formatNum(value, stat.decimals, stat.suffix, stat.target) : "0"}
       </div>
       <div className="text-xs font-semibold text-gray-500 leading-snug">{stat.label}</div>
     </div>
