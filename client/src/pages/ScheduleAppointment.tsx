@@ -5,10 +5,9 @@ import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
 
 const timeSlots = [
   "9:00 AM – 10:00 AM", "10:00 AM – 11:00 AM",
@@ -34,11 +33,12 @@ const contactDetails = [
 ];
 
 export default function ScheduleAppointment() {
-  const [, navigate] = useLocation();
   const { toast } = useToast();
   const [form, setForm] = useState({
     name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "",
   });
+
+  const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async (data: typeof form) =>
@@ -51,7 +51,7 @@ export default function ScheduleAppointment() {
         preferredTime: data.timeSlot,
         message: `Appointment Request | Purpose: ${data.purpose} | Date: ${data.date} | Time: ${data.timeSlot} | Notes: ${data.message}`,
       }),
-    onSuccess: () => navigate("/thank-you"),
+    onSuccess: () => setSubmitted(true),
     onError: () => toast({ title: "Submission failed", description: "Please call us directly.", variant: "destructive" }),
   });
 
@@ -119,55 +119,73 @@ export default function ScheduleAppointment() {
             </a>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-5">
-            <h3 className="text-lg font-bold text-[#091a4f] mb-2">Book Your Campus Visit</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className={labelCls}>Your Name *</label>
-                <input name="name" value={form.name} onChange={handleChange} required placeholder="Full name" className={inputCls} />
+          <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl shadow-sm p-8">
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center py-14 text-center">
+                <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-5">
+                  <CheckCircle size={40} className="text-green-500" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-[#091a4f] mb-2">Thank You!</h3>
+                <p className="text-gray-500 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
+                <button
+                  onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "" }); }}
+                  data-testid="button-schedule-another-request"
+                  className="px-7 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Submit Another Request
+                </button>
+              </div>
+            ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <h3 className="text-lg font-bold text-[#091a4f] mb-2">Book Your Campus Visit</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={labelCls}>Your Name *</label>
+                  <input name="name" value={form.name} onChange={handleChange} required placeholder="Full name" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Mobile Number *</label>
+                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Email Address</label>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Purpose of Visit *</label>
+                  <select name="purpose" value={form.purpose} onChange={handleChange} required className={inputCls}>
+                    <option value="">Select purpose</option>
+                    {purposes.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Preferred Date *</label>
+                  <input type="date" name="date" value={form.date} onChange={handleChange} required className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Preferred Time Slot *</label>
+                  <select name="timeSlot" value={form.timeSlot} onChange={handleChange} required className={inputCls}>
+                    <option value="">Select time</option>
+                    {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
-                <label className={labelCls}>Mobile Number *</label>
-                <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inputCls} />
+                <label className={labelCls}>Additional Notes</label>
+                <textarea name="message" value={form.message} onChange={handleChange} rows={3} placeholder="Any specific questions or topics you'd like to discuss..." className={inputCls + " resize-none"} />
               </div>
-              <div>
-                <label className={labelCls}>Email Address</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Purpose of Visit *</label>
-                <select name="purpose" value={form.purpose} onChange={handleChange} required className={inputCls}>
-                  <option value="">Select purpose</option>
-                  {purposes.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Preferred Date *</label>
-                <input type="date" name="date" value={form.date} onChange={handleChange} required className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Preferred Time Slot *</label>
-                <select name="timeSlot" value={form.timeSlot} onChange={handleChange} required className={inputCls}>
-                  <option value="">Select time</option>
-                  {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className={labelCls}>Additional Notes</label>
-              <textarea name="message" value={form.message} onChange={handleChange} rows={3} placeholder="Any specific questions or topics you'd like to discuss..." className={inputCls + " resize-none"} />
-            </div>
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              data-testid="button-schedule-appointment"
-              className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-4 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60"
-            >
-              {mutation.isPending ? "Booking..." : "Confirm Appointment Request"}
-            </button>
-            <p className="text-center text-xs text-gray-500">Mon – Sat, 9 AM – 6 PM. We confirm within one working day.</p>
-          </form>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                data-testid="button-schedule-appointment"
+                className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-4 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60"
+              >
+                {mutation.isPending ? "Booking..." : "Confirm Appointment Request"}
+              </button>
+              <p className="text-center text-xs text-gray-500">Mon – Sat, 9 AM – 6 PM. We confirm within one working day.</p>
+            </form>
+            )}
+          </div>
         </div>
       </main>
 

@@ -4,7 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { Briefcase, Users, Heart, TrendingUp } from "lucide-react";
+import { Briefcase, Users, Heart, TrendingUp, CheckCircle } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
 const openings = [
@@ -92,9 +92,19 @@ export default function Career() {
             <div id="apply" className="rounded-3xl p-8 border border-gray-100" style={{ background: "#f8faff" }}>
               <h2 className="text-2xl font-black mb-6" style={{ color: "#0d3b86" }}>Apply for a Position</h2>
               {submitted ? (
-                <div className="text-center py-8">
-                  <h3 className="text-xl font-black mb-2" style={{ color: "#0d3b86" }}>Application Received!</h3>
-                  <p className="text-gray-600">Thank you for your interest. Our HR team will contact you within 3–5 working days.</p>
+                <div className="flex flex-col items-center justify-center py-14 text-center">
+                  <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-5">
+                    <CheckCircle size={40} className="text-green-500" />
+                  </div>
+                  <h3 className="text-2xl font-extrabold mb-2" style={{ color: "#0d3b86" }}>Thank You!</h3>
+                  <p className="text-gray-500 text-sm mb-8 max-w-sm">We've received your application. Our HR team will contact you within 3–5 working days.</p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    data-testid="button-career-another-request"
+                    className="px-7 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Submit Another Application
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="grid md:grid-cols-2 gap-5">

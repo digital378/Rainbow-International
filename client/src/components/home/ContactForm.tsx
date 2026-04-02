@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
-import { Send, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Send, MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -49,6 +49,7 @@ const contactCards = [
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [agreed, setAgreed] = useState(false);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
@@ -64,7 +65,7 @@ export function ContactForm() {
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed");
-      toast.success("Thank you! Our Admission Counsellor will connect with you shortly.");
+      setSubmitted(true);
       reset();
       setAgreed(false);
     } catch {
@@ -95,6 +96,22 @@ export function ContactForm() {
           </div>
 
           <div className="p-8 border border-white/10 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)" }}>
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center py-14 text-center">
+                <div className="w-20 h-20 rounded-full bg-green-500/15 flex items-center justify-center mb-5">
+                  <CheckCircle size={40} className="text-green-400" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-white mb-2">Thank You!</h3>
+                <p className="text-blue-200/80 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  data-testid="button-contact-another-request"
+                  className="px-7 py-2.5 text-sm font-semibold border border-white/20 rounded-full text-white hover:bg-white/10 transition-colors"
+                >
+                  Submit Another Request
+                </button>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,6 +193,7 @@ export function ContactForm() {
                 {isSubmitting ? "Submitting..." : "Send Enquiry"}
               </button>
             </form>
+            )}
           </div>
 
         </div>

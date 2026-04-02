@@ -5,9 +5,9 @@ import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { CheckCircle } from "lucide-react";
 
 const grades = [
   "Playgroup", "Nursery", "Jr. KG", "Sr. KG",
@@ -26,8 +26,8 @@ const timeSlots = [
 ];
 
 export default function ApplicationForm() {
-  const [, navigate] = useLocation();
   const { toast } = useToast();
+  const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
     studentName: "",
     dateOfBirth: "",
@@ -55,7 +55,7 @@ export default function ApplicationForm() {
       });
     },
     onSuccess: () => {
-      navigate("/thank-you");
+      setSubmitted(true);
     },
     onError: () => {
       toast({ title: "Submission failed", description: "Please try again or call us directly.", variant: "destructive" });
@@ -119,82 +119,100 @@ export default function ApplicationForm() {
             ))}
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 space-y-6">
-            <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3">Student Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className={labelCls}>Student Full Name *</label>
-                <input name="studentName" value={form.studentName} onChange={handleChange} required placeholder="As per birth certificate" className={inputCls} />
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8">
+            {submitted ? (
+              <div className="flex flex-col items-center justify-center py-14 text-center">
+                <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-5">
+                  <CheckCircle size={40} className="text-green-500" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-[#091a4f] mb-2">Thank You!</h3>
+                <p className="text-gray-500 text-sm mb-8 max-w-sm">We've received your application and will contact you within 24 hours.</p>
+                <button
+                  onClick={() => { setSubmitted(false); setForm({ studentName: "", dateOfBirth: "", gradeApplying: "", parentName: "", email: "", phone: "", currentSchool: "", address: "", preferredDate: "", timeSlot: "", message: "" }); }}
+                  data-testid="button-application-another-request"
+                  className="px-7 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Submit Another Request
+                </button>
               </div>
-              <div>
-                <label className={labelCls}>Date of Birth *</label>
-                <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} required className={inputCls} />
+            ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3">Student Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={labelCls}>Student Full Name *</label>
+                  <input name="studentName" value={form.studentName} onChange={handleChange} required placeholder="As per birth certificate" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Date of Birth *</label>
+                  <input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={handleChange} required className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Grade Applying For *</label>
+                  <select name="gradeApplying" value={form.gradeApplying} onChange={handleChange} required className={inputCls}>
+                    <option value="">Select grade</option>
+                    {grades.map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Current School (if any)</label>
+                  <input name="currentSchool" value={form.currentSchool} onChange={handleChange} placeholder="Name of previous/current school" className={inputCls} />
+                </div>
               </div>
-              <div>
-                <label className={labelCls}>Grade Applying For *</label>
-                <select name="gradeApplying" value={form.gradeApplying} onChange={handleChange} required className={inputCls}>
-                  <option value="">Select grade</option>
-                  {grades.map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Current School (if any)</label>
-                <input name="currentSchool" value={form.currentSchool} onChange={handleChange} placeholder="Name of previous/current school" className={inputCls} />
-              </div>
-            </div>
 
-            <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3 pt-2">Parent / Guardian Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className={labelCls}>Parent / Guardian Name *</label>
-                <input name="parentName" value={form.parentName} onChange={handleChange} required placeholder="Full name" className={inputCls} />
+              <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3 pt-2">Parent / Guardian Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={labelCls}>Parent / Guardian Name *</label>
+                  <input name="parentName" value={form.parentName} onChange={handleChange} required placeholder="Full name" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Mobile Number *</label>
+                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Email Address *</label>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} required placeholder="your@email.com" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Residential Area</label>
+                  <input name="address" value={form.address} onChange={handleChange} placeholder="Locality / Sector / Area" className={inputCls} />
+                </div>
               </div>
-              <div>
-                <label className={labelCls}>Mobile Number *</label>
-                <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Email Address *</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} required placeholder="your@email.com" className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Residential Area</label>
-                <input name="address" value={form.address} onChange={handleChange} placeholder="Locality / Sector / Area" className={inputCls} />
-              </div>
-            </div>
 
-            <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3 pt-2">Schedule a Campus Visit</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className={labelCls}>Preferred Visit Date</label>
-                <input type="date" name="preferredDate" value={form.preferredDate} onChange={handleChange} className={inputCls} />
+              <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3 pt-2">Schedule a Campus Visit</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className={labelCls}>Preferred Visit Date</label>
+                  <input type="date" name="preferredDate" value={form.preferredDate} onChange={handleChange} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Preferred Time Slot</label>
+                  <select name="timeSlot" value={form.timeSlot} onChange={handleChange} className={inputCls}>
+                    <option value="">Select time</option>
+                    {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
-                <label className={labelCls}>Preferred Time Slot</label>
-                <select name="timeSlot" value={form.timeSlot} onChange={handleChange} className={inputCls}>
-                  <option value="">Select time</option>
-                  {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
+                <label className={labelCls}>Additional Message</label>
+                <textarea name="message" value={form.message} onChange={handleChange} rows={3} placeholder="Any specific questions or requirements..." className={inputCls + " resize-none"} />
               </div>
-            </div>
-            <div>
-              <label className={labelCls}>Additional Message</label>
-              <textarea name="message" value={form.message} onChange={handleChange} rows={3} placeholder="Any specific questions or requirements..." className={inputCls + " resize-none"} />
-            </div>
 
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              data-testid="button-submit-application"
-              className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-4 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60"
-            >
-              {mutation.isPending ? "Submitting..." : "Submit Application"}
-            </button>
-            <p className="text-center text-xs text-gray-500">
-              Our admissions team will call you within one working day. Mon–Sat, 9 AM–6 PM.
-            </p>
-          </form>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                data-testid="button-submit-application"
+                className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-4 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60"
+              >
+                {mutation.isPending ? "Submitting..." : "Submit Application"}
+              </button>
+              <p className="text-center text-xs text-gray-500">
+                Our admissions team will call you within one working day. Mon–Sat, 9 AM–6 PM.
+              </p>
+            </form>
+            )}
+          </div>
         </div>
       </main>
 

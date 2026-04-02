@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
-import { PhoneCall, ChevronRight, CheckCircle2 } from "lucide-react";
+import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle } from "lucide-react";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -23,6 +23,7 @@ const quickLinks = [
 
 export function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
   });
@@ -36,7 +37,7 @@ export function Hero() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error();
-      toast.success("Thank you! Our team will call you shortly.");
+      setSubmitted(true);
       reset();
     } catch {
       toast.error("Could not submit. Please try again.");
@@ -134,6 +135,22 @@ export function Hero() {
               </div>
 
               <div className="px-7 pb-6">
+                {submitted ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4">
+                      <CheckCircle size={32} className="text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-extrabold text-gray-900 mb-2">Thank You!</h3>
+                    <p className="text-gray-500 text-sm mb-6 max-w-[260px]">We've received your request and will contact you within 24 hours.</p>
+                    <button
+                      onClick={() => setSubmitted(false)}
+                      data-testid="button-hero-another-request"
+                      className="px-6 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Submit Another Request
+                    </button>
+                  </div>
+                ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
                   {[
                     { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent", label: "Parent Name" },
@@ -185,6 +202,7 @@ export function Hero() {
                     <p className="text-[11px] text-gray-400">No spam · One call only · Completely free</p>
                   </div>
                 </form>
+                )}
               </div>
             </div>
           </div>
