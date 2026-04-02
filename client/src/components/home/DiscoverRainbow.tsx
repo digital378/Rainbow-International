@@ -68,6 +68,10 @@ export function DiscoverRainbow() {
                 <img
                   src={item.image}
                   alt={item.title}
+                  width={300}
+                  height={360}
+                  loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
                 />

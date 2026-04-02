@@ -106,6 +106,10 @@ export function Testimonials() {
                   <img
                     src={t.image}
                     alt={t.name}
+                    width={44}
+                    height={44}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
@@ -131,7 +135,8 @@ export function Testimonials() {
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
             data-testid="button-testimonial-prev"
-            className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
+            aria-label="Previous testimonials"
+            className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
             style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
           >
             <ChevronLeft size={18} />
@@ -142,20 +147,24 @@ export function Testimonials() {
                 key={i}
                 onClick={() => setPage(i)}
                 data-testid={`button-testimonial-dot-${i}`}
-                className="rounded-full transition-all duration-300"
-                style={{
+                aria-label={`Go to testimonials page ${i + 1}`}
+                className="rounded-full transition-all duration-300 min-h-[44px] flex items-center"
+                style={{ padding: "17px 0" }}
+              >
+                <span className="rounded-full block" style={{
                   width: i === page ? "28px" : "10px",
                   height: "10px",
-                  background: i === page ? "#0d3b86" : "#d1d5db",
-                }}
-              />
+                  background: i === page ? "#0d3b86" : "#9ca3af",
+                }} />
+              </button>
             ))}
           </div>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page === totalPages - 1}
             data-testid="button-testimonial-next"
-            className="w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
+            aria-label="Next testimonials"
+            className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
             style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
           >
             <ChevronRight size={18} />

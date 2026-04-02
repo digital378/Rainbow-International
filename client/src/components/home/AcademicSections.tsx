@@ -78,6 +78,10 @@ export function AcademicSections() {
                   <img
                     src={p.image}
                     alt={p.label}
+                    width={400}
+                    height={210}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
                       const el = e.target as HTMLImageElement;
@@ -112,6 +116,10 @@ export function AcademicSections() {
                   <img
                     src={p.image}
                     alt={p.label}
+                    width={400}
+                    height={210}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => {
                       const el = e.target as HTMLImageElement;

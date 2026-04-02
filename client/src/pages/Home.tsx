@@ -1,17 +1,23 @@
+import { lazy, Suspense } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { Hero } from "@/components/home/Hero";
 import { AwardsStrip } from "@/components/home/AwardsStrip";
-import { Features } from "@/components/home/Features";
-import { AboutPreview } from "@/components/home/AboutPreview";
-import { AcademicSections } from "@/components/home/AcademicSections";
-import { Pedagogy } from "@/components/home/Pedagogy";
-import { DiscoverRainbow } from "@/components/home/DiscoverRainbow";
-import { BeyondClassroomSection } from "@/components/home/BeyondClassroomSection";
-import { Testimonials } from "@/components/home/Testimonials";
-import { ContactForm } from "@/components/home/ContactForm";
+
+const Features = lazy(() => import("@/components/home/Features").then(m => ({ default: m.Features })));
+const AboutPreview = lazy(() => import("@/components/home/AboutPreview").then(m => ({ default: m.AboutPreview })));
+const AcademicSections = lazy(() => import("@/components/home/AcademicSections").then(m => ({ default: m.AcademicSections })));
+const Pedagogy = lazy(() => import("@/components/home/Pedagogy").then(m => ({ default: m.Pedagogy })));
+const DiscoverRainbow = lazy(() => import("@/components/home/DiscoverRainbow").then(m => ({ default: m.DiscoverRainbow })));
+const BeyondClassroomSection = lazy(() => import("@/components/home/BeyondClassroomSection").then(m => ({ default: m.BeyondClassroomSection })));
+const Testimonials = lazy(() => import("@/components/home/Testimonials").then(m => ({ default: m.Testimonials })));
+const ContactForm = lazy(() => import("@/components/home/ContactForm").then(m => ({ default: m.ContactForm })));
+
+function SectionFallback() {
+  return <div style={{ minHeight: "200px" }} />;
+}
 
 export default function Home() {
   return (
@@ -28,14 +34,30 @@ export default function Home() {
       <main className="flex-grow">
         <Hero />
         <AwardsStrip />
-        <Features />
-        <AboutPreview />
-        <AcademicSections />
-        <Pedagogy />
-        <DiscoverRainbow />
-        <BeyondClassroomSection />
-        <Testimonials />
-        <ContactForm />
+        <Suspense fallback={<SectionFallback />}>
+          <Features />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <AboutPreview />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <AcademicSections />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <Pedagogy />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <DiscoverRainbow />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <BeyondClassroomSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <Testimonials />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <ContactForm />
+        </Suspense>
       </main>
       <Footer />
     </div>

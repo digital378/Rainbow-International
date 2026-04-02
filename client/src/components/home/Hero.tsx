@@ -89,7 +89,7 @@ export function Hero() {
               <span className="text-white">School</span>
             </h1>
 
-            <p className="text-blue-100/90 text-lg md:text-xl leading-relaxed mb-8 max-w-lg font-light">
+            <p className="text-blue-100 text-lg md:text-xl leading-relaxed mb-8 max-w-lg font-light">
               Thane West's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.
             </p>
 
@@ -107,19 +107,12 @@ export function Hero() {
             </div>
 
             <div className="flex flex-wrap gap-3 mb-9">
-              <a href="#contact" data-testid="button-hero-know-more">
-                <button
-                  className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95"
-                  style={{ background: "#fbbf24", color: "#0d3b86" }}
-                >
+              <a href="#contact" data-testid="button-hero-know-more" aria-label="Enquire now about admissions" className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95" style={{ background: "#fbbf24", color: "#0d3b86" }}>
                   Enquire Now
                   <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-                </button>
               </a>
-              <Link href="/about-rainbow-international-school">
-                <button className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300">
+              <Link href="/about-rainbow-international-school" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300" aria-label="Learn about Rainbow International School">
                   About Us
-                </button>
               </Link>
             </div>
 
@@ -151,24 +144,30 @@ export function Hero() {
               <div className="px-7 py-6">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
                   {[
-                    { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent" },
-                    { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone" },
-                    { name: "studentName", placeholder: "Child's Name *", type: "text", id: "input-hero-child" },
-                    { name: "email", placeholder: "Email Address (optional)", type: "email", id: "input-hero-email" },
+                    { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent", label: "Parent Name" },
+                    { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone", label: "Phone Number" },
+                    { name: "studentName", placeholder: "Child's Name *", type: "text", id: "input-hero-child", label: "Child's Name" },
+                    { name: "email", placeholder: "Email Address (optional)", type: "email", id: "input-hero-email", label: "Email Address" },
                   ].map((f) => (
-                    <input
-                      key={f.name}
-                      {...register(f.name as keyof InsertInquiry)}
-                      placeholder={f.placeholder}
-                      type={f.type}
-                      data-testid={f.id}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white"
-                    />
+                    <div key={f.name}>
+                      <label htmlFor={f.id} className="sr-only">{f.label}</label>
+                      <input
+                        {...register(f.name as keyof InsertInquiry)}
+                        id={f.id}
+                        placeholder={f.placeholder}
+                        type={f.type}
+                        data-testid={f.id}
+                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white"
+                      />
+                    </div>
                   ))}
 
+                  <label htmlFor="hero-grade" className="sr-only">Select Class</label>
                   <select
                     {...register("grade")}
+                    id="hero-grade"
                     data-testid="select-hero-grade"
+                    aria-label="Select Class"
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white appearance-none"
                   >
                     <option value="">Select Class *</option>

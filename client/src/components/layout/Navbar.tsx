@@ -163,9 +163,11 @@ export function Navbar() {
           </div>
 
           <button
-            className="lg:hidden p-2 text-gray-600"
+            className="lg:hidden p-2.5 text-gray-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setIsOpen(!isOpen)}
             data-testid="button-mobile-menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>

@@ -69,6 +69,10 @@ export function BeyondClassroomSection() {
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
                   alt="Beyond The Classroom at Rainbow International School"
+                  width={384}
+                  height={384}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-contain"
                   style={{ mixBlendMode: "normal", filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.18))" }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -80,16 +84,23 @@ export function BeyondClassroomSection() {
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
                   alt="Pre-primary activities"
+                  width={112}
+                  height={112}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
 
-              {/* Bottom-left accent photo */}
               <div className="absolute -bottom-5 -left-5 w-24 h-24 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png"
                   alt="Campus amenities"
+                  width={96}
+                  height={96}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />

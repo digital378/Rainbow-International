@@ -29,6 +29,10 @@ export function AwardsStrip() {
               <img
                 src={a.src}
                 alt={a.label}
+                width={110}
+                height={44}
+                loading="lazy"
+                decoding="async"
                 className="max-h-full max-w-full object-contain"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
