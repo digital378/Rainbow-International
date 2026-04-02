@@ -25,6 +25,15 @@ const exploreLinks = [
   { label: "CBSE Disclosures", href: "/cbse-mandatory-public-disclosures" },
 ];
 
+const preschoolLinks = [
+  { label: "Playgroup", href: "https://www.rainbowpreschools.com/playgroup" },
+  { label: "Nursery", href: "https://www.rainbowpreschools.com/nursery" },
+  { label: "Kindergarten", href: "https://www.rainbowpreschools.com/kindergarten" },
+  { label: "Our Centres", href: "https://www.rainbowpreschools.com/our-centres" },
+  { label: "Gallery", href: "https://www.rainbowpreschools.com/gallery" },
+  { label: "Contact", href: "https://www.rainbowpreschools.com/contact" },
+];
+
 export function Footer() {
   return (
     <footer style={{ background: "#091a4f" }} className="text-white">
@@ -104,12 +113,14 @@ export function Footer() {
 
       <div className="border-b border-white/10">
         <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[#091a4f] font-serif font-black text-xl shadow-md" style={{ background: "#fbbf24" }}>
-                  R
-                </div>
+                <img
+                  src="/rps-logo.png"
+                  alt="Rainbow International School Logo"
+                  className="w-14 h-14 object-contain"
+                />
                 <div className="flex flex-col leading-tight">
                   <span className="font-black text-[17px] tracking-tight">Rainbow</span>
                   <span className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-bold">International School</span>
@@ -169,6 +180,28 @@ export function Footer() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div>
+              <h3 className="font-black text-base mb-6 text-white">Rainbow Preschools</h3>
+              <ul className="space-y-2.5">
+                {preschoolLinks.map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-white/55 hover:text-white text-sm transition-colors duration-200 inline-flex items-center gap-1.5 hover:gap-2 group">
+                      <span className="w-1 h-1 rounded-full bg-current opacity-50 group-hover:opacity-100 flex-shrink-0" />
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="https://www.rainbowpreschools.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-5 text-xs font-semibold uppercase tracking-wider text-yellow-400/80 hover:text-yellow-400 transition-colors"
+              >
+                Visit Website &rarr;
+              </a>
             </div>
 
             <div>
