@@ -67,41 +67,42 @@ export function Testimonials() {
   const visible = testimonials.slice(page * perPage, page * perPage + perPage);
 
   return (
-    <section className="py-24" style={{ background: "#f8faff" }}>
+    <section className="py-24" style={{ background: "#f8fafc" }}>
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
           <div>
-            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-current" />
-              Testimonials
-            </span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-1">Parents' Corner</h2>
+            <div className="inline-block mb-4">
+              <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Testimonials</span>
+              <div className="w-8 h-0.5 bg-amber-400 mt-2" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">Parents' Corner</h2>
             <p className="text-gray-500 text-[15px]">What parents say about us.</p>
           </div>
-          <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 bg-white px-5 py-3 border border-gray-100 shadow-sm" style={{ borderRadius: "3px" }}>
             <div className="flex">
-              {[1,2,3,4,5].map((s) => <Star key={s} size={15} className="fill-yellow-400 text-yellow-400" />)}
+              {[1,2,3,4,5].map((s) => <Star key={s} size={15} className="fill-amber-400 text-amber-400" />)}
             </div>
-            <span className="font-black text-gray-900 text-lg">4.8</span>
+            <span className="font-extrabold text-gray-900 text-lg">4.8</span>
             <span className="text-gray-400 text-sm">· Google Reviews</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           {visible.map((t, i) => (
             <div
               key={i}
-              className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+              className="bg-white p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-amber-200 transition-all flex flex-col"
+              style={{ borderRadius: "4px" }}
               data-testid={`card-testimonial-${page * perPage + i}`}
             >
-              <Quote size={28} className="mb-3 flex-shrink-0" style={{ color: "#e8f0ff" }} />
+              <Quote size={28} className="mb-3 flex-shrink-0 text-amber-200" />
               <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow italic">
                 "{t.review}"
               </p>
               <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
                 <div
-                  className="w-11 h-11 rounded-full overflow-hidden border-2 border-gray-100 flex-shrink-0 flex items-center justify-center text-sm font-black"
-                  style={{ background: "#eef5ff", color: "#0d3b86" }}
+                  className="w-11 h-11 overflow-hidden border-2 border-amber-100 flex-shrink-0 flex items-center justify-center text-sm font-extrabold"
+                  style={{ background: "#fef3c7", color: "#091a4f", borderRadius: "3px" }}
                 >
                   <img
                     src={t.image}
@@ -118,11 +119,11 @@ export function Testimonials() {
                   />
                 </div>
                 <div>
-                  <p className="font-black text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${page * perPage + i}`}>
+                  <p className="font-extrabold text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${page * perPage + i}`}>
                     {t.name}
                   </p>
                   <div className="flex">
-                    {[1,2,3,4,5].map((s) => <Star key={s} size={11} className="fill-yellow-400 text-yellow-400" />)}
+                    {[1,2,3,4,5].map((s) => <Star key={s} size={11} className="fill-amber-400 text-amber-400" />)}
                   </div>
                 </div>
               </div>
@@ -136,8 +137,8 @@ export function Testimonials() {
             disabled={page === 0}
             data-testid="button-testimonial-prev"
             aria-label="Previous testimonials"
-            className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
-            style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
+            className="w-11 h-11 border-2 flex items-center justify-center transition-all hover:bg-gray-50 disabled:opacity-30"
+            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "3px" }}
           >
             <ChevronLeft size={18} />
           </button>
@@ -148,13 +149,15 @@ export function Testimonials() {
                 onClick={() => setPage(i)}
                 data-testid={`button-testimonial-dot-${i}`}
                 aria-label={`Go to testimonials page ${i + 1}`}
-                className="rounded-full transition-all duration-300 min-h-[44px] flex items-center"
+                className="transition-all duration-300 min-h-[44px] flex items-center"
                 style={{ padding: "17px 0" }}
               >
-                <span className="rounded-full block" style={{
+                <span className="block" style={{
                   width: i === page ? "28px" : "10px",
-                  height: "10px",
-                  background: i === page ? "#0d3b86" : "#9ca3af",
+                  height: "4px",
+                  background: i === page ? "#091a4f" : "#d1d5db",
+                  borderRadius: "1px",
+                  transition: "all 0.3s",
                 }} />
               </button>
             ))}
@@ -164,8 +167,8 @@ export function Testimonials() {
             disabled={page === totalPages - 1}
             data-testid="button-testimonial-next"
             aria-label="Next testimonials"
-            className="w-11 h-11 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110 disabled:opacity-30"
-            style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
+            className="w-11 h-11 border-2 flex items-center justify-center transition-all hover:bg-gray-50 disabled:opacity-30"
+            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "3px" }}
           >
             <ChevronRight size={18} />
           </button>

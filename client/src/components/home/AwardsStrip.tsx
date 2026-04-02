@@ -11,8 +11,8 @@ const doubled = [...awards, ...awards];
 
 export function AwardsStrip() {
   return (
-    <section className="py-10 bg-white border-b border-gray-100">
-      <p className="text-center text-xs font-bold tracking-[0.15em] uppercase text-gray-400 mb-7">
+    <section className="py-8 bg-white border-b border-gray-100">
+      <p className="text-center text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-6">
         Recognised & Awarded By
       </p>
       <div className="overflow-hidden relative">
@@ -23,7 +23,7 @@ export function AwardsStrip() {
           {doubled.map((a, i) => (
             <div
               key={i}
-              className="flex-shrink-0 flex items-center justify-center grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all duration-300"
+              className="flex-shrink-0 flex items-center justify-center grayscale hover:grayscale-0 opacity-40 hover:opacity-100 transition-all duration-300"
               style={{ height: "44px", width: "110px" }}
             >
               <img

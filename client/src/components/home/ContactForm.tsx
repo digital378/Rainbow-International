@@ -83,88 +83,90 @@ export function ContactForm() {
     }
   };
 
-  const inputBase = "w-full border-0 rounded-full px-5 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/60 transition-all bg-white";
-  const selectBase = inputBase + " appearance-none";
+  const inputBase = "w-full border border-white/20 px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm";
 
   return (
     <section id="contact" className="py-0">
       <div
         className="w-full px-4 py-16"
-        style={{ background: "linear-gradient(135deg, #f97316 0%, #ea580c 100%)" }}
+        style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 60%, #091a4f 100%)" }}
       >
         <div className="max-w-3xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">Send Inquiries</h2>
-            <p className="text-white/90 text-sm leading-relaxed max-w-xl mx-auto">
-              <strong>Thank You for Contacting Rainbow International School.</strong> Kindly fill the inquiry form to enrol your child. Once received, our Admission Counsellor will connect with you shortly.
+            <div className="inline-block mb-4">
+              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Get in Touch</span>
+              <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">Send Inquiries</h2>
+            <p className="text-blue-200/80 text-sm leading-relaxed max-w-xl mx-auto">
+              <strong className="text-white">Thank You for Contacting Rainbow International School.</strong> Kindly fill the inquiry form to enrol your child. Once received, our Admission Counsellor will connect with you shortly.
             </p>
           </div>
 
-          {/* Form */}
-          <div className="rounded-3xl p-8" style={{ background: "rgba(255,255,255,0.08)", backdropFilter: "blur(4px)" }}>
+          <div className="p-8 border border-white/10" style={{ background: "rgba(255,255,255,0.05)", borderRadius: "4px" }}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Parent's Name</label>
-                  <input {...register("parentName")} placeholder="Parent's Name" data-testid="input-parent-name" className={inputBase} />
-                  {errors.parentName && <p className="text-white/80 text-xs mt-1 ml-1">{errors.parentName.message}</p>}
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Parent's Name</label>
+                  <input {...register("parentName")} placeholder="Parent's Name" data-testid="input-parent-name" className={inputBase} style={{ borderRadius: "3px" }} />
+                  {errors.parentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.parentName.message}</p>}
                 </div>
                 <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Child's Name</label>
-                  <input {...register("studentName")} placeholder="Child's Name" data-testid="input-student-name" className={inputBase} />
-                  {errors.studentName && <p className="text-white/80 text-xs mt-1 ml-1">{errors.studentName.message}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Phone Number</label>
-                  <input {...register("phone")} placeholder="Phone Number" type="tel" data-testid="input-phone" className={inputBase} />
-                  {errors.phone && <p className="text-white/80 text-xs mt-1 ml-1">{errors.phone.message}</p>}
-                </div>
-                <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Email</label>
-                  <input {...register("email")} placeholder="Email (optional)" type="email" data-testid="input-email" className={inputBase} />
-                  {errors.email && <p className="text-white/80 text-xs mt-1 ml-1">{errors.email.message}</p>}
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Child's Name</label>
+                  <input {...register("studentName")} placeholder="Child's Name" data-testid="input-student-name" className={inputBase} style={{ borderRadius: "3px" }} />
+                  {errors.studentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.studentName.message}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Preferred time to connect with you</label>
-                  <select {...register("preferredTime")} data-testid="select-time" className={selectBase}>
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Phone Number</label>
+                  <input {...register("phone")} placeholder="Phone Number" type="tel" data-testid="input-phone" className={inputBase} style={{ borderRadius: "3px" }} />
+                  {errors.phone && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.phone.message}</p>}
+                </div>
+                <div>
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Email</label>
+                  <input {...register("email")} placeholder="Email (optional)" type="email" data-testid="input-email" className={inputBase} style={{ borderRadius: "3px" }} />
+                  {errors.email && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.email.message}</p>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Preferred time to connect with you</label>
+                  <select {...register("preferredTime")} data-testid="select-time" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
                     <option value="">Select Time Slot</option>
-                    {timeSlots.map((t) => <option key={t} value={t}>{t}</option>)}
+                    {timeSlots.map((t) => <option key={t} value={t} className="text-gray-800">{t}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-white text-xs font-bold mb-1.5 ml-1">Select Class</label>
-                  <select {...register("grade")} data-testid="select-grade" className={selectBase}>
+                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Select Class</label>
+                  <select {...register("grade")} data-testid="select-grade" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
                     <option value="">Select Class *</option>
-                    {classOptions.map((cls) => <option key={cls} value={cls}>{cls}</option>)}
+                    {classOptions.map((cls) => <option key={cls} value={cls} className="text-gray-800">{cls}</option>)}
                   </select>
-                  {errors.grade && <p className="text-white/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
+                  {errors.grade && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
                 </div>
               </div>
 
               <div>
-                <label className="block text-white text-xs font-bold mb-1.5 ml-1">How did you hear about us?</label>
-                <select {...register("source")} data-testid="select-source" className={selectBase}>
+                <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">How did you hear about us?</label>
+                <select {...register("source")} data-testid="select-source" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
                   <option value="">Select an option</option>
-                  {sourceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
+                  {sourceOptions.map((s) => <option key={s} value={s} className="text-gray-800">{s}</option>)}
                 </select>
               </div>
 
               <div>
-                <label className="block text-white text-xs font-bold mb-1.5 ml-1">Message</label>
+                <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Message</label>
                 <textarea
                   {...register("message")}
                   placeholder="Message (optional)"
                   rows={3}
                   data-testid="textarea-message"
-                  className="w-full border-0 rounded-2xl px-5 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/60 transition-all bg-white resize-none"
+                  className="w-full border border-white/20 px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm resize-none"
+                  style={{ borderRadius: "3px" }}
                 />
               </div>
 
@@ -174,10 +176,10 @@ export function ContactForm() {
                   id="consent"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded flex-shrink-0 accent-white"
+                  className="mt-0.5 w-4 h-4 flex-shrink-0 accent-amber-400"
                   data-testid="checkbox-consent"
                 />
-                <label htmlFor="consent" className="text-white/80 text-xs leading-relaxed cursor-pointer">
+                <label htmlFor="consent" className="text-blue-200/70 text-xs leading-relaxed cursor-pointer">
                   I authorize Rainbow International School and its representatives to contact me with updates via Email, SMS, WhatsApp and Call. This will override DND/NDNC registry.
                 </label>
               </div>
@@ -186,9 +188,10 @@ export function ContactForm() {
                 type="submit"
                 disabled={isSubmitting}
                 data-testid="button-submit-inquiry"
-                className="w-full font-black py-3.5 rounded-full text-orange-600 bg-white text-sm transition-all hover:bg-orange-50 active:scale-[0.99] disabled:opacity-60"
+                className="w-full font-bold py-3.5 text-[#091a4f] text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", borderRadius: "3px" }}
               >
-                {isSubmitting ? "Submitting..." : "Send"}
+                {isSubmitting ? "Submitting..." : "Send Enquiry"}
               </button>
             </form>
           </div>
@@ -196,27 +199,26 @@ export function ContactForm() {
         </div>
       </div>
 
-      {/* Contact info bar */}
-      <div style={{ background: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)" }}>
+      <div style={{ background: "#071640" }}>
         <div className="max-w-5xl mx-auto px-6 py-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {contactCards.map((card, i) => {
               const Icon = card.icon;
               const content = (
                 <div
-                  className="rounded-2xl p-6 flex flex-col items-center text-center gap-3 hover:bg-white/10 transition-colors h-full"
-                  style={{ background: "rgba(255,255,255,0.12)" }}
+                  className="p-6 flex flex-col items-center text-center gap-3 hover:bg-white/5 transition-colors h-full"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "4px" }}
                 >
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(255,255,255,0.25)" }}
+                    className="w-12 h-12 flex items-center justify-center flex-shrink-0"
+                    style={{ background: "rgba(251,191,36,0.15)", borderRadius: "3px" }}
                   >
-                    <Icon size={20} className="text-white" />
+                    <Icon size={20} className="text-amber-400" />
                   </div>
                   <div>
-                    <p className="font-extrabold text-white text-sm mb-2">{card.label}</p>
+                    <p className="font-bold text-white text-sm mb-2">{card.label}</p>
                     {card.lines.map((line, j) => (
-                      <p key={j} className="text-white/90 text-xs leading-relaxed">
+                      <p key={j} className="text-blue-200/70 text-xs leading-relaxed">
                         {line}
                       </p>
                     ))}
@@ -224,11 +226,11 @@ export function ContactForm() {
                 </div>
               );
               return card.href ? (
-                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full">
+                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full" data-testid={`link-contact-${card.label.toLowerCase().replace(/\s+/g, "-")}`}>
                   {content}
                 </a>
               ) : (
-                <div key={i} className="h-full">{content}</div>
+                <div key={i} className="h-full" data-testid={`info-contact-${card.label.toLowerCase().replace(/\s+/g, "-")}`}>{content}</div>
               );
             })}
           </div>

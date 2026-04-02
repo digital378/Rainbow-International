@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **UI Components**: shadcn/ui component library (New York style) built on Radix UI primitives
 - **State Management**: TanStack React Query for server state management
 - **Form Handling**: React Hook Form with Zod validation via @hookform/resolvers
-- **Fonts**: Open Sans (sans-serif) and Merriweather (serif) from Google Fonts
+- **Fonts**: Inter (body/UI) and DM Sans (headings) from Google Fonts — JIS-inspired redesign
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
@@ -96,7 +96,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 
 ## Content Design
 
-- **Design**: "Playful Academic" aesthetic — school blue (primary) + energetic yellow (secondary)
+- **Design**: JIS-inspired "Premium International School" aesthetic — deep navy (#091a4f) primary + amber/yellow (#fbbf24) accent; sharp corners (3px/4px border-radius); Inter + DM Sans typography; editorial layout with generous whitespace
 - **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
 - **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component
 - **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL

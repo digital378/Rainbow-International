@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
-import { PhoneCall, ChevronRight, ShieldCheck } from "lucide-react";
+import { PhoneCall, ChevronRight, ArrowRight } from "lucide-react";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -13,19 +13,47 @@ const classOptions = [
   "Class IX", "Class X", "Class XI", "Class XII",
 ];
 
-const stats = [
-  { num: "50K+", label: "Happy Students" },
-  { num: "Since 2009", label: "Established" },
-  { num: "3.5 Acres", label: "Campus" },
-  { num: "CBSE #1130661", label: "Affiliation" },
-];
-
-const quickLinks = [
-  { label: "CBSE Disclosures", href: "/cbse-mandatory-public-disclosures" },
-  { label: "Pre-Primary", href: "/pre-primary-school-thane" },
-  { label: "Middle School", href: "/middle-school-section" },
-  { label: "Senior Secondary", href: "/senior-secondary-section" },
-  { label: "Career", href: "/career" },
+const gridPanels = [
+  {
+    title: "About Us",
+    sub: "Our story, values & vision",
+    href: "/about-rainbow-international-school",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/12-300x200.jpg",
+    span: "col-span-2 row-span-2",
+    size: "h-full",
+  },
+  {
+    title: "Admissions 2026–27",
+    sub: "Now open for all grades",
+    href: "#contact",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
+    span: "col-span-1 row-span-1",
+    size: "h-full",
+  },
+  {
+    title: "Academics",
+    sub: "Nursery to Class XII",
+    href: "/primary-section",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    span: "col-span-1 row-span-1",
+    size: "h-full",
+  },
+  {
+    title: "Campus & Facilities",
+    sub: "3.5-acre modern campus",
+    href: "/amenities",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png",
+    span: "col-span-1 row-span-1",
+    size: "h-full",
+  },
+  {
+    title: "Beyond Classroom",
+    sub: "Sports, arts & culture",
+    href: "/beyond-the-classroom",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png",
+    span: "col-span-1 row-span-1",
+    size: "h-full",
+  },
 ];
 
 export function Hero() {
@@ -53,96 +81,103 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(https://rainbowinternationalschool.in/wp-content/uploads/2023/04/picwish.webp)` }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(115deg, rgba(9,26,79,0.95) 0%, rgba(13,59,134,0.88) 55%, rgba(9,26,79,0.65) 100%)" }}
-      />
+    <section className="relative overflow-hidden" style={{ background: "#091a4f" }}>
+      <div className="container mx-auto px-4 lg:px-8 py-6 lg:py-8">
+        <div className="flex flex-col lg:flex-row gap-6 xl:gap-8">
 
-      <div className="relative z-10 container mx-auto px-4 lg:px-10 py-28 lg:py-0 lg:min-h-screen flex items-center">
-        <div className="flex flex-col lg:flex-row items-center gap-12 xl:gap-20 w-full">
+          <div className="flex-1 flex flex-col">
+            <div className="mb-6 pt-4 lg:pt-6">
+              <div className="inline-flex items-center gap-2.5 mb-5 px-4 py-2 border border-amber-400/25 bg-amber-400/10 backdrop-blur-sm" style={{ borderRadius: "3px" }}>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+                </span>
+                <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">
+                  Admissions Open · 2026–27
+                </span>
+              </div>
 
-          <div className="flex-1 text-white max-w-2xl">
-            <div className="inline-flex items-center gap-2.5 mb-6 px-4 py-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 backdrop-blur-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-400" />
-              </span>
-              <span className="text-yellow-300 text-xs font-bold tracking-[0.12em] uppercase">
-                Admissions Open · Academic Year 2026–27
-              </span>
+              <h1 className="text-4xl md:text-5xl xl:text-6xl font-extrabold leading-[1.08] text-white mb-4 tracking-tight">
+                Rainbow{" "}
+                <span className="text-amber-400">International</span>
+                <br />School
+              </h1>
+
+              <p className="text-blue-200/80 text-base md:text-lg leading-relaxed max-w-lg font-light">
+                Thane West's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.
+              </p>
             </div>
 
-            <h1 className="text-5xl md:text-6xl xl:text-7xl font-black leading-[1.05] mb-5">
-              <span className="text-white">Rainbow </span>
-              <span
-                className="relative inline-block"
-                style={{ color: "#fbbf24" }}
-              >
-                International
-              </span>
-              <br />
-              <span className="text-white">School</span>
-            </h1>
-
-            <p className="text-blue-100 text-lg md:text-xl leading-relaxed mb-8 max-w-lg font-light">
-              Thane West's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.
-            </p>
-
-            <div className="flex flex-wrap gap-3 mb-9">
-              {stats.map((s, i) => (
-                <div
-                  key={i}
-                  className="px-5 py-3 rounded-2xl border border-white/15 bg-white/8 backdrop-blur-sm text-center"
-                  style={{ background: "rgba(255,255,255,0.07)" }}
-                >
-                  <div className="text-lg font-black text-yellow-300 leading-none mb-0.5">{s.num}</div>
-                  <div className="text-[11px] text-blue-200/80 font-medium tracking-wide">{s.label}</div>
-                </div>
+            <div className="hidden lg:grid grid-cols-4 grid-rows-2 gap-2.5 flex-1" style={{ minHeight: "320px" }}>
+              {gridPanels.map((panel, i) => (
+                <Link key={i} href={panel.href}>
+                  <div
+                    className={`group relative overflow-hidden cursor-pointer ${panel.span} h-full`}
+                    style={{ borderRadius: "4px" }}
+                    data-testid={`hero-panel-${i}`}
+                  >
+                    <img
+                      src={panel.image}
+                      alt={panel.title}
+                      width={400}
+                      height={300}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-amber-600/80 group-hover:via-amber-600/20 transition-all duration-500" />
+                    <div className="absolute inset-0 flex flex-col justify-end p-4">
+                      <h3 className="text-white font-bold text-sm md:text-base leading-tight mb-0.5">{panel.title}</h3>
+                      <p className="text-white/70 text-xs group-hover:text-white/90 transition-colors">{panel.sub}</p>
+                    </div>
+                    <div className="absolute top-3 right-3 w-7 h-7 bg-white/10 border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300" style={{ borderRadius: "3px" }}>
+                      <ArrowRight size={13} className="text-white" />
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3 mb-9">
-              <a href="#contact" data-testid="button-hero-know-more" aria-label="Enquire now about admissions" className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95" style={{ background: "#fbbf24", color: "#0d3b86" }}>
-                  Enquire Now
-                  <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            <div className="lg:hidden flex flex-wrap gap-3 mt-2 mb-6">
+              <a href="#contact" data-testid="button-hero-know-more" className="inline-flex items-center gap-2 px-6 py-3 font-bold text-sm text-[#091a4f] transition-all hover:opacity-90" style={{ background: "#fbbf24", borderRadius: "3px" }}>
+                Enquire Now <ChevronRight size={15} />
               </a>
-              <Link href="/about-rainbow-international-school" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300" aria-label="Learn about Rainbow International School">
-                  About Us
+              <Link href="/about-rainbow-international-school" className="inline-flex items-center gap-2 px-6 py-3 font-bold text-sm border border-white/30 text-white hover:bg-white/10 transition-all" style={{ borderRadius: "3px" }} data-testid="link-hero-about">
+                About Us
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {quickLinks.map((l, i) => (
-                <Link key={i} href={l.href}>
-                  <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-white/10 border border-white/15 text-white/80 text-xs font-medium hover:bg-white/20 hover:text-white cursor-pointer transition-all backdrop-blur-sm">
-                    {l.label}
-                  </span>
-                </Link>
+            <div className="flex flex-wrap gap-5 mt-4 lg:mt-6 py-4 border-t border-white/10">
+              {[
+                { num: "50K+", label: "Happy Students" },
+                { num: "Since 2009", label: "Established" },
+                { num: "3.5 Acres", label: "Campus" },
+                { num: "CBSE", label: "#1130661" },
+              ].map((s, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-amber-400 text-lg font-extrabold leading-none mb-1">{s.num}</div>
+                  <div className="text-blue-200/60 text-[11px] font-medium tracking-wide uppercase">{s.label}</div>
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="w-full lg:w-[360px] flex-shrink-0">
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-              <div className="px-7 py-5 border-b border-gray-100" style={{ background: "#f8faff" }}>
+          <div className="w-full lg:w-[370px] flex-shrink-0">
+            <div className="bg-white overflow-hidden shadow-2xl" style={{ borderRadius: "4px" }}>
+              <div className="px-7 py-5 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: "#e8f4fb" }}>
-                    <PhoneCall size={18} style={{ color: "#0d3b86" }} />
+                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0 bg-white/25" style={{ borderRadius: "4px" }}>
+                    <PhoneCall size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="font-black text-gray-900 text-sm leading-tight">Quick Enquiry</p>
-                    <p className="text-gray-400 text-xs">Our counsellor will call you back</p>
+                    <p className="font-extrabold text-[#091a4f] text-sm leading-tight">Quick Enquiry</p>
+                    <p className="text-[#091a4f]/60 text-xs">Our counsellor will call you back</p>
                   </div>
                 </div>
               </div>
 
               <div className="px-7 py-6">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                   {[
                     { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent", label: "Parent Name" },
                     { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone", label: "Phone Number" },
@@ -157,7 +192,8 @@ export function Hero() {
                         placeholder={f.placeholder}
                         type={f.type}
                         data-testid={f.id}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white"
+                        className="w-full border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white"
+                        style={{ borderRadius: "3px" }}
                       />
                     </div>
                   ))}
@@ -168,7 +204,8 @@ export function Hero() {
                     id="hero-grade"
                     data-testid="select-hero-grade"
                     aria-label="Select Class"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white appearance-none"
+                    className="w-full border border-gray-200 px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white appearance-none"
+                    style={{ borderRadius: "3px" }}
                   >
                     <option value="">Select Class *</option>
                     {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -178,28 +215,19 @@ export function Hero() {
                     type="submit"
                     disabled={isSubmitting}
                     data-testid="button-hero-submit"
-                    className="w-full py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] disabled:opacity-60"
-                    style={{ background: "linear-gradient(135deg, #0d3b86 0%, #1565c0 100%)" }}
+                    className="w-full py-3.5 font-bold text-white text-sm transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] disabled:opacity-60"
+                    style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)", borderRadius: "3px" }}
                   >
                     {isSubmitting ? "Submitting..." : "Get a Free Callback"}
                   </button>
 
-                  <div className="flex items-center gap-2 justify-center">
-                    <ShieldCheck size={13} className="text-green-500 flex-shrink-0" />
-                    <p className="text-center text-[11px] text-gray-400">No spam · One call only · Completely free</p>
-                  </div>
+                  <p className="text-center text-[11px] text-gray-400">No spam · One call only · Completely free</p>
                 </form>
               </div>
             </div>
           </div>
 
         </div>
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-        <svg viewBox="0 0 1440 90" preserveAspectRatio="none" className="w-full" style={{ height: "90px", display: "block" }} xmlns="http://www.w3.org/2000/svg">
-          <path d="M0,55 C240,90 480,20 720,55 C960,90 1200,25 1440,55 L1440,90 L0,90 Z" fill="white" />
-        </svg>
       </div>
     </section>
   );
