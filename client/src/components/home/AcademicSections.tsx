@@ -103,11 +103,10 @@ export function AcademicSections() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-none mx-auto mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto mb-10">
           {programs.slice(3).map((p, i) => (
             <ProgramCard key={i + 3} p={p} index={i + 3} />
           ))}
-          <div className="hidden sm:flex lg:hidden" />
         </div>
       </div>
     </section>
