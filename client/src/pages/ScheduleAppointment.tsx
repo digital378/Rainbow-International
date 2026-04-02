@@ -27,7 +27,7 @@ const purposes = [
 ];
 
 const contactDetails = [
-  { icon: Phone, label: "Phone", value: "(022) 69105000 / +91 82915 68972", href: "tel:+918291568972" },
+  { icon: Phone, label: "Phone", value: "+91 82915 68972", href: "tel:+918291568972" },
   { icon: Mail, label: "Email", value: "info@rainbowinternationalschool.in", href: "mailto:info@rainbowinternationalschool.in" },
   { icon: MapPin, label: "Address", value: "Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra" },
   { icon: Clock, label: "Hours", value: "Monday – Saturday: 9:00 AM – 6:00 PM" },

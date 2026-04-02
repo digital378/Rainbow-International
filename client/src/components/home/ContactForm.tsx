@@ -33,8 +33,8 @@ const contactCards = [
   {
     icon: Phone,
     label: "Call Us",
-    lines: ["(022) 69105000", "+91 82915 68972"],
-    href: "tel:02269105000",
+    lines: ["+91 82915 68972"],
+    href: "tel:+918291568972",
   },
   {
     icon: Mail,

@@ -223,7 +223,6 @@ export function Footer() {
                       <Phone size={16} style={{ color: "#fbbf24" }} />
                     </div>
                     <div>
-                      <a href="tel:02269105000" className="block text-white/60 text-sm hover:text-white transition-colors">(022) 69105000</a>
                       <a href="tel:+918291568972" className="block text-white/60 text-sm hover:text-white transition-colors">+91 82915 68972</a>
                     </div>
                   </div>
