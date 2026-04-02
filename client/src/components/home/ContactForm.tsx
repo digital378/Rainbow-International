@@ -13,14 +13,6 @@ const classOptions = [
   "Class IX", "Class X", "Class XI", "Class XII",
 ];
 
-const timeSlots = [
-  "9:00AM – 11:00AM",
-  "11:00AM – 1:00PM",
-  "1:00PM – 3:00PM",
-  "3:00PM – 5:00PM",
-  "5:00PM – 6:00PM",
-];
-
 const contactCards = [
   {
     icon: Phone,
@@ -149,22 +141,13 @@ export function ContactForm() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Preferred time to connect with you</label>
-                  <select {...register("preferredTime")} data-testid="select-time" className={inputBase + " appearance-none"}>
-                    <option value="">Select Time Slot</option>
-                    {timeSlots.map((t) => <option key={t} value={t} className="text-gray-800">{t}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Select Class</label>
-                  <select {...register("grade")} data-testid="select-grade" className={inputBase + " appearance-none"}>
-                    <option value="">Select Class *</option>
-                    {classOptions.map((cls) => <option key={cls} value={cls} className="text-gray-800">{cls}</option>)}
-                  </select>
-                  {errors.grade && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
-                </div>
+              <div>
+                <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Select Class</label>
+                <select {...register("grade")} data-testid="select-grade" className={inputBase + " appearance-none"}>
+                  <option value="">Select Class *</option>
+                  {classOptions.map((cls) => <option key={cls} value={cls} className="text-gray-800">{cls}</option>)}
+                </select>
+                {errors.grade && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
               </div>
 
               <div>
