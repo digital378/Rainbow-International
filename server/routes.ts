@@ -86,9 +86,7 @@ async function sendInquiryEmail(data: {
   const isPaid = leadSource !== "Organic / Direct";
 
   const formLocationLabel = data.formLocation || (data.pagePath === "/" ? "Homepage" : data.pagePath || "Unknown");
-  const pageLabel = data.pageTitle
-    ? `${data.pageTitle} (${data.pagePath || "/"})`
-    : data.pagePath || "/";
+  const pageLabel = data.pagePath || "/";
 
   await mailer.transport.sendMail({
     from: mailer.from,

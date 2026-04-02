@@ -160,7 +160,7 @@ export function getUTMParams(): Record<string, string> {
 export function getFormTrackingData(formLocation: string) {
   const utm = getUTMParams();
   return {
-    pagePath: window.location.pathname,
+    pagePath: window.location.href,
     pageTitle: document.title,
     formLocation,
     utmSource: utm.utm_source,
