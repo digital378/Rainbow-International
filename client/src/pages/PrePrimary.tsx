@@ -292,7 +292,7 @@ export default function PrePrimary() {
               {/* Main content */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>Our Preschool Partner</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>About Rainbow Preschools</p>
                   <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>
                     Rainbow Preschool International —{" "}
                     <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
