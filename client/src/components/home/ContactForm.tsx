@@ -74,7 +74,7 @@ export function ContactForm() {
     }
   };
 
-  const inputBase = "w-full border border-white/20 px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm";
+  const inputBase = "w-full border border-white/20 rounded-xl px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm";
 
   return (
     <section id="contact" className="py-0">
@@ -94,18 +94,18 @@ export function ContactForm() {
             </p>
           </div>
 
-          <div className="p-8 border border-white/10" style={{ background: "rgba(255,255,255,0.05)", borderRadius: "4px" }}>
+          <div className="p-8 border border-white/10 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)" }}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Parent's Name</label>
-                  <input {...register("parentName")} placeholder="Parent's Name" data-testid="input-parent-name" className={inputBase} style={{ borderRadius: "3px" }} />
+                  <input {...register("parentName")} placeholder="Parent's Name" data-testid="input-parent-name" className={inputBase} />
                   {errors.parentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.parentName.message}</p>}
                 </div>
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Child's Name</label>
-                  <input {...register("studentName")} placeholder="Child's Name" data-testid="input-student-name" className={inputBase} style={{ borderRadius: "3px" }} />
+                  <input {...register("studentName")} placeholder="Child's Name" data-testid="input-student-name" className={inputBase} />
                   {errors.studentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.studentName.message}</p>}
                 </div>
               </div>
@@ -113,12 +113,12 @@ export function ContactForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Phone Number</label>
-                  <input {...register("phone")} placeholder="Phone Number" type="tel" data-testid="input-phone" className={inputBase} style={{ borderRadius: "3px" }} />
+                  <input {...register("phone")} placeholder="Phone Number" type="tel" data-testid="input-phone" className={inputBase} />
                   {errors.phone && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.phone.message}</p>}
                 </div>
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Email</label>
-                  <input {...register("email")} placeholder="Email (optional)" type="email" data-testid="input-email" className={inputBase} style={{ borderRadius: "3px" }} />
+                  <input {...register("email")} placeholder="Email (optional)" type="email" data-testid="input-email" className={inputBase} />
                   {errors.email && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.email.message}</p>}
                 </div>
               </div>
@@ -126,14 +126,14 @@ export function ContactForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Preferred time to connect with you</label>
-                  <select {...register("preferredTime")} data-testid="select-time" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
+                  <select {...register("preferredTime")} data-testid="select-time" className={inputBase + " appearance-none"}>
                     <option value="">Select Time Slot</option>
                     {timeSlots.map((t) => <option key={t} value={t} className="text-gray-800">{t}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Select Class</label>
-                  <select {...register("grade")} data-testid="select-grade" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
+                  <select {...register("grade")} data-testid="select-grade" className={inputBase + " appearance-none"}>
                     <option value="">Select Class *</option>
                     {classOptions.map((cls) => <option key={cls} value={cls} className="text-gray-800">{cls}</option>)}
                   </select>
@@ -148,8 +148,7 @@ export function ContactForm() {
                   placeholder="Message (optional)"
                   rows={3}
                   data-testid="textarea-message"
-                  className="w-full border border-white/20 px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm resize-none"
-                  style={{ borderRadius: "3px" }}
+                  className="w-full border border-white/20 rounded-xl px-5 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-amber-400 transition-all bg-white/10 backdrop-blur-sm resize-none"
                 />
               </div>
 
@@ -172,7 +171,7 @@ export function ContactForm() {
                 disabled={isSubmitting}
                 data-testid="button-submit-inquiry"
                 className="w-full font-bold py-3.5 text-[#091a4f] text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", borderRadius: "3px" }}
+                style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", borderRadius: "9999px" }}
               >
                 {isSubmitting ? "Submitting..." : "Send Enquiry"}
               </button>
@@ -190,11 +189,11 @@ export function ContactForm() {
               const content = (
                 <div
                   className="p-6 flex flex-col items-center text-center gap-3 hover:bg-white/5 transition-colors h-full"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "4px" }}
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px" }}
                 >
                   <div
                     className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                    style={{ background: "rgba(251,191,36,0.15)", borderRadius: "3px" }}
+                    style={{ background: "rgba(251,191,36,0.15)", borderRadius: "12px" }}
                   >
                     <Icon size={20} className="text-amber-400" />
                   </div>

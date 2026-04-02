@@ -51,7 +51,7 @@ export function AboutPreview() {
             <Link
               href="/about-rainbow-international-school"
               className="group inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-white text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg"
-              style={{ background: "#091a4f", borderRadius: "3px" }}
+              style={{ background: "#091a4f", borderRadius: "9999px" }}
               data-testid="button-about-us"
             >
               Learn More About Us
@@ -65,7 +65,7 @@ export function AboutPreview() {
                 <div
                   key={i}
                   className="flex flex-col items-center justify-center text-center bg-white p-7 shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all"
-                  style={{ width: "165px", height: "165px", borderRadius: "4px" }}
+                  style={{ width: "165px", height: "165px", borderRadius: "16px" }}
                 >
                   <div className="text-[28px] font-extrabold leading-none mb-2" style={{ color: "#091a4f" }}>{s.num}</div>
                   <div className="text-xs font-semibold text-gray-500 leading-snug">{s.sub}</div>

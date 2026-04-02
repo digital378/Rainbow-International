@@ -78,7 +78,7 @@ export function Testimonials() {
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">Parents' Corner</h2>
             <p className="text-gray-500 text-[15px]">What parents say about us.</p>
           </div>
-          <div className="flex items-center gap-3 bg-white px-5 py-3 border border-gray-100 shadow-sm" style={{ borderRadius: "3px" }}>
+          <div className="flex items-center gap-3 bg-white px-5 py-3 border border-gray-100 shadow-sm rounded-full">
             <div className="flex">
               {[1,2,3,4,5].map((s) => <Star key={s} size={15} className="fill-amber-400 text-amber-400" />)}
             </div>
@@ -92,7 +92,7 @@ export function Testimonials() {
             <div
               key={i}
               className="bg-white p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-amber-200 transition-all flex flex-col"
-              style={{ borderRadius: "4px" }}
+              style={{ borderRadius: "16px" }}
               data-testid={`card-testimonial-${page * perPage + i}`}
             >
               <Quote size={28} className="mb-3 flex-shrink-0 text-amber-200" />
@@ -102,7 +102,7 @@ export function Testimonials() {
               <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
                 <div
                   className="w-11 h-11 overflow-hidden border-2 border-amber-100 flex-shrink-0 flex items-center justify-center text-sm font-extrabold"
-                  style={{ background: "#fef3c7", color: "#091a4f", borderRadius: "3px" }}
+                  style={{ background: "#fef3c7", color: "#091a4f", borderRadius: "12px" }}
                 >
                   <img
                     src={t.image}
@@ -138,7 +138,7 @@ export function Testimonials() {
             data-testid="button-testimonial-prev"
             aria-label="Previous testimonials"
             className="w-11 h-11 border-2 flex items-center justify-center transition-all hover:bg-gray-50 disabled:opacity-30"
-            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "3px" }}
+            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "12px" }}
           >
             <ChevronLeft size={18} />
           </button>
@@ -156,7 +156,7 @@ export function Testimonials() {
                   width: i === page ? "28px" : "10px",
                   height: "4px",
                   background: i === page ? "#091a4f" : "#d1d5db",
-                  borderRadius: "1px",
+                  borderRadius: "2px",
                   transition: "all 0.3s",
                 }} />
               </button>
@@ -168,7 +168,7 @@ export function Testimonials() {
             data-testid="button-testimonial-next"
             aria-label="Next testimonials"
             className="w-11 h-11 border-2 flex items-center justify-center transition-all hover:bg-gray-50 disabled:opacity-30"
-            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "3px" }}
+            style={{ borderColor: "#091a4f", color: "#091a4f", borderRadius: "12px" }}
           >
             <ChevronRight size={18} />
           </button>

@@ -90,7 +90,7 @@ export function Pedagogy() {
                   background: active === tab.id ? "#091a4f" : "white",
                   color: active === tab.id ? "white" : "#6b7280",
                   border: `1.5px solid ${active === tab.id ? "#091a4f" : "#e5e7eb"}`,
-                  borderRadius: "3px",
+                  borderRadius: "9999px",
                 }}
               >
                 <tab.icon size={15} />
@@ -101,13 +101,13 @@ export function Pedagogy() {
 
           <div
             className="p-8 md:p-12 bg-white border border-gray-100 shadow-sm"
-            style={{ borderRadius: "4px" }}
+            style={{ borderRadius: "16px" }}
             data-testid={`panel-pedagogy-${active}`}
           >
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <div
                 className="w-16 h-16 flex items-center justify-center flex-shrink-0 transition-all duration-300"
-                style={{ background: "#fef3c7", borderRadius: "4px" }}
+                style={{ background: "#fef3c7", borderRadius: "12px" }}
               >
                 <current.icon size={28} style={{ color: current.accent }} />
               </div>

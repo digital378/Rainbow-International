@@ -67,7 +67,7 @@ export function AcademicSections() {
             <Link key={i} href={p.href}>
               <div
                 className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer"
-                style={{ borderRadius: "4px" }}
+                style={{ borderRadius: "16px" }}
                 data-testid={`card-section-${i}`}
               >
                 <div className="relative overflow-hidden" style={{ height: "220px" }}>
@@ -86,7 +86,7 @@ export function AcademicSections() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
                 <div className="p-6">
-                  <span className="inline-block px-3 py-1 text-[11px] font-bold mb-3 text-amber-600 bg-amber-50" style={{ borderRadius: "3px" }}>
+                  <span className="inline-block px-3 py-1 text-[11px] font-bold mb-3 text-amber-600 bg-amber-50 rounded-full">
                     {p.grade}
                   </span>
                   <h3 className="font-extrabold text-gray-900 text-xl mb-2">{p.label}</h3>
@@ -105,7 +105,7 @@ export function AcademicSections() {
             <Link key={i + 3} href={p.href}>
               <div
                 className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer"
-                style={{ borderRadius: "4px" }}
+                style={{ borderRadius: "16px" }}
                 data-testid={`card-section-${i + 3}`}
               >
                 <div className="relative overflow-hidden" style={{ height: "220px" }}>
@@ -123,7 +123,7 @@ export function AcademicSections() {
                   />
                 </div>
                 <div className="p-6">
-                  <span className="inline-block px-3 py-1 text-[11px] font-bold mb-3 text-amber-600 bg-amber-50" style={{ borderRadius: "3px" }}>
+                  <span className="inline-block px-3 py-1 text-[11px] font-bold mb-3 text-amber-600 bg-amber-50 rounded-full">
                     {p.grade}
                   </span>
                   <h3 className="font-extrabold text-gray-900 text-xl mb-2">{p.label}</h3>

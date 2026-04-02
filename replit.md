@@ -96,7 +96,9 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 
 ## Content Design
 
-- **Design**: JIS-inspired "Premium International School" aesthetic — deep navy (#091a4f) primary + amber/yellow (#fbbf24) accent; sharp corners (3px/4px border-radius); Inter + DM Sans typography; editorial layout with generous whitespace
+- **Design**: JIS-inspired "Premium International School" aesthetic — deep navy (#091a4f) primary + amber/yellow (#fbbf24) accent; rounded/curved corners (16px cards, 12px icons, full-round buttons/pills); Inter + DM Sans typography; editorial layout with generous whitespace
+- **Navbar**: Fixed position, transparent with white text on homepage (Oberoi-style overlay on hero), solid white on inner pages. Transitions to solid white on scroll. Includes admissions bar, logo+contact row, and nav links row
+- **Hero**: Full-width background image (picwish.webp) with navy gradient overlay; title + stats + CTA on left, Quick Enquiry form card on right; quick-link pills at bottom
 - **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
 - **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component
 - **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL

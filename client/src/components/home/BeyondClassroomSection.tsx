@@ -36,7 +36,7 @@ export function BeyondClassroomSection() {
                 <div
                   key={i}
                   className="px-4 py-2 text-sm font-semibold transition-all hover:bg-amber-50 cursor-default"
-                  style={{ background: "#f8fafc", color: "#091a4f", border: "1.5px solid #e2e8f0", borderRadius: "3px" }}
+                  style={{ background: "#f8fafc", color: "#091a4f", border: "1.5px solid #e2e8f0", borderRadius: "9999px" }}
                 >
                   {act}
                 </div>
@@ -46,7 +46,7 @@ export function BeyondClassroomSection() {
             <Link
               href="/beyond-the-classroom"
               className="group inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-white text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg"
-              style={{ background: "#091a4f", borderRadius: "3px" }}
+              style={{ background: "#091a4f", borderRadius: "9999px" }}
               data-testid="button-beyond-classroom"
             >
               Know More
@@ -61,7 +61,7 @@ export function BeyondClassroomSection() {
                 style={{
                   background: "linear-gradient(145deg, #091a4f 0%, #0d3b86 45%, #1550b8 100%)",
                   border: "3px solid rgba(251,191,36,0.3)",
-                  borderRadius: "4px",
+                  borderRadius: "20px",
                 }}
               >
                 <img
@@ -77,7 +77,7 @@ export function BeyondClassroomSection() {
                 />
               </div>
 
-              <div className="absolute -top-4 -right-4 w-28 h-28 overflow-hidden shadow-xl border-4 border-white" style={{ borderRadius: "4px" }}>
+              <div className="absolute -top-4 -right-4 w-28 h-28 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
                   alt="Pre-primary activities"
@@ -90,7 +90,7 @@ export function BeyondClassroomSection() {
                 />
               </div>
 
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 overflow-hidden shadow-xl border-4 border-white" style={{ borderRadius: "4px" }}>
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png"
                   alt="Campus amenities"
@@ -105,7 +105,7 @@ export function BeyondClassroomSection() {
 
               <div
                 className="absolute -bottom-6 right-8 px-5 py-3 shadow-xl bg-white"
-                style={{ border: "1.5px solid #fbbf24", borderRadius: "3px" }}
+                style={{ border: "1.5px solid #fbbf24", borderRadius: "12px" }}
               >
                 <p className="text-xs font-medium text-gray-400 mb-0.5">Annual events</p>
                 <p className="text-xl font-extrabold" style={{ color: "#091a4f" }}>25+</p>

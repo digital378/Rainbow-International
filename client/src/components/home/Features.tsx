@@ -31,7 +31,7 @@ export function Features() {
             <div
               key={i}
               className="flex-shrink-0 overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
-              style={{ width: img.w, height: img.h, borderRadius: "4px" }}
+              style={{ width: img.w, height: img.h, borderRadius: "16px" }}
             >
               <img
                 src={img.src}

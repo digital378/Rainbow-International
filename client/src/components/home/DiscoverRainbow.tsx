@@ -54,7 +54,7 @@ export function DiscoverRainbow() {
             <Link key={index} href={item.href}>
               <div
                 className="group relative overflow-hidden cursor-pointer"
-                style={{ height: "360px", borderRadius: "4px" }}
+                style={{ height: "360px", borderRadius: "16px" }}
                 data-testid={`card-highlight-${index}`}
               >
                 <img
@@ -70,12 +70,12 @@ export function DiscoverRainbow() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#091a4f]/90 via-[#091a4f]/30 to-transparent group-hover:from-amber-600/85 group-hover:via-amber-600/20 transition-all duration-500" />
 
                 <div className="absolute top-4 left-4">
-                  <span className="text-xs font-bold px-3 py-1.5 bg-amber-400 text-[#091a4f]" style={{ borderRadius: "3px" }}>
+                  <span className="text-xs font-bold px-3 py-1.5 bg-amber-400 text-[#091a4f] rounded-full">
                     {item.tag}
                   </span>
                 </div>
 
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/10 border border-white/25 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300" style={{ borderRadius: "3px" }}>
+                <div className="absolute top-4 right-4 w-8 h-8 bg-white/10 border border-white/25 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                   <ArrowUpRight size={14} className="text-white" />
                 </div>
 
