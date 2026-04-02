@@ -45,12 +45,13 @@ export default function ApplicationForm() {
   const mutation = useMutation({
     mutationFn: async (data: typeof form) => {
       return apiRequest("POST", "/api/inquiries", {
-        name: data.parentName,
+        parentName: data.parentName,
+        studentName: data.studentName,
         email: data.email,
         phone: data.phone,
-        message: `Application for: ${data.studentName} | DOB: ${data.dateOfBirth} | Grade: ${data.gradeApplying} | Current School: ${data.currentSchool} | Preferred Visit: ${data.preferredDate} ${data.timeSlot} | Address: ${data.address} | Notes: ${data.message}`,
-        classApplying: data.gradeApplying,
-        timeSlot: data.timeSlot,
+        grade: data.gradeApplying,
+        preferredTime: data.timeSlot,
+        message: `Application Form | DOB: ${data.dateOfBirth} | Current School: ${data.currentSchool} | Preferred Visit: ${data.preferredDate} ${data.timeSlot} | Address: ${data.address} | Notes: ${data.message}`,
       });
     },
     onSuccess: () => {

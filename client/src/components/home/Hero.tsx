@@ -58,7 +58,7 @@ const gridPanels = [
 
 export function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, reset } = useForm<InsertInquiry>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
   });
 
@@ -179,10 +179,10 @@ export function Hero() {
               <div className="px-7 py-6">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
                   {[
-                    { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent", label: "Parent Name" },
-                    { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone", label: "Phone Number" },
-                    { name: "studentName", placeholder: "Child's Name *", type: "text", id: "input-hero-child", label: "Child's Name" },
-                    { name: "email", placeholder: "Email Address (optional)", type: "email", id: "input-hero-email", label: "Email Address" },
+                    { name: "parentName", placeholder: "Parent Name *", type: "text", id: "input-hero-parent", label: "Parent Name", req: true },
+                    { name: "phone", placeholder: "Phone Number *", type: "tel", id: "input-hero-phone", label: "Phone Number", req: true },
+                    { name: "studentName", placeholder: "Child's Name *", type: "text", id: "input-hero-child", label: "Child's Name", req: true },
+                    { name: "email", placeholder: "Email Address (optional)", type: "email", id: "input-hero-email", label: "Email Address", req: false },
                   ].map((f) => (
                     <div key={f.name}>
                       <label htmlFor={f.id} className="sr-only">{f.label}</label>
@@ -192,24 +192,28 @@ export function Hero() {
                         placeholder={f.placeholder}
                         type={f.type}
                         data-testid={f.id}
-                        className="w-full border border-gray-200 px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white"
+                        className={`w-full border px-4 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white ${errors[f.name as keyof InsertInquiry] ? "border-red-400" : "border-gray-200"}`}
                         style={{ borderRadius: "3px" }}
                       />
+                      {errors[f.name as keyof InsertInquiry] && <p className="text-red-500 text-[11px] mt-1">{errors[f.name as keyof InsertInquiry]?.message}</p>}
                     </div>
                   ))}
 
-                  <label htmlFor="hero-grade" className="sr-only">Select Class</label>
-                  <select
-                    {...register("grade")}
-                    id="hero-grade"
-                    data-testid="select-hero-grade"
-                    aria-label="Select Class"
-                    className="w-full border border-gray-200 px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white appearance-none"
-                    style={{ borderRadius: "3px" }}
-                  >
-                    <option value="">Select Class *</option>
-                    {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <div>
+                    <label htmlFor="hero-grade" className="sr-only">Select Class</label>
+                    <select
+                      {...register("grade")}
+                      id="hero-grade"
+                      data-testid="select-hero-grade"
+                      aria-label="Select Class"
+                      className={`w-full border px-4 py-3 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400 transition-all bg-white appearance-none ${errors.grade ? "border-red-400" : "border-gray-200"}`}
+                      style={{ borderRadius: "3px" }}
+                    >
+                      <option value="">Select Class *</option>
+                      {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    {errors.grade && <p className="text-red-500 text-[11px] mt-1">{errors.grade.message}</p>}
+                  </div>
 
                   <button
                     type="submit"

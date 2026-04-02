@@ -20,15 +20,6 @@ const timeSlots = [
   "5:00PM – 6:00PM",
 ];
 
-const sourceOptions = [
-  "Reference (Family, Friends, Siblings)",
-  "Google Search",
-  "Social Media (Facebook / Instagram)",
-  "School Banner / Hoarding",
-  "Newspaper / Magazine",
-  "Other",
-];
-
 const contactCards = [
   {
     icon: Phone,
@@ -148,14 +139,6 @@ export function ContactForm() {
                   </select>
                   {errors.grade && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">How did you hear about us?</label>
-                <select {...register("source")} data-testid="select-source" className={inputBase + " appearance-none"} style={{ borderRadius: "3px" }}>
-                  <option value="">Select an option</option>
-                  {sourceOptions.map((s) => <option key={s} value={s} className="text-gray-800">{s}</option>)}
-                </select>
               </div>
 
               <div>

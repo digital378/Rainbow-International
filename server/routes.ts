@@ -40,7 +40,6 @@ async function sendInquiryEmail(data: {
   studentName: string;
   grade: string;
   preferredTime?: string | null;
-  source?: string | null;
   message?: string | null;
 }) {
   const mailer = getTransporter();
@@ -67,7 +66,6 @@ async function sendInquiryEmail(data: {
           ${tableRow("Phone", data.phone)}
           ${tableRow("Email", data.email)}
           ${tableRow("Preferred Time", data.preferredTime)}
-          ${tableRow("How They Found Us", data.source)}
           ${tableRow("Message", data.message)}
         </table>
         <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the school website enquiry form.</p>

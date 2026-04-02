@@ -43,9 +43,13 @@ export default function ScheduleAppointment() {
   const mutation = useMutation({
     mutationFn: async (data: typeof form) =>
       apiRequest("POST", "/api/inquiries", {
-        name: data.name, phone: data.phone, email: data.email,
+        parentName: data.name,
+        studentName: "N/A",
+        phone: data.phone,
+        email: data.email,
+        grade: "Appointment",
+        preferredTime: data.timeSlot,
         message: `Appointment Request | Purpose: ${data.purpose} | Date: ${data.date} | Time: ${data.timeSlot} | Notes: ${data.message}`,
-        classApplying: "Appointment", timeSlot: data.timeSlot,
       }),
     onSuccess: () => navigate("/thank-you"),
     onError: () => toast({ title: "Submission failed", description: "Please call us directly.", variant: "destructive" }),

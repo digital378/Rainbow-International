@@ -19,8 +19,15 @@ export const inquiries = pgTable("inquiries", {
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
+  source: true,
 }).extend({
-  email: z.string().email().optional().or(z.literal("")),
+  parentName: z.string().min(1, "Parent name is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  studentName: z.string().min(1, "Child's name is required"),
+  grade: z.string().min(1, "Please select a class"),
+  preferredTime: z.string().optional().or(z.literal("")),
+  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
+  message: z.string().optional().or(z.literal("")),
 });
 
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;
