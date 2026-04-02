@@ -2,14 +2,16 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
-import { ArrowRight, Calendar } from "lucide-react";
-import { BlogThumb } from "@/components/home/BlogThumb";
+import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { blogPosts } from "@/data/blogPosts";
 
 const publishedSlugs = new Set(blogPosts.map((p) => p.slug));
+
+const blogIntros: Record<string, string> = {};
+blogPosts.forEach((p) => { blogIntros[p.slug] = p.intro; });
 
 interface BlogPost {
   title: string;
