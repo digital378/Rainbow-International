@@ -26,6 +26,7 @@ Preferred communication style: Simple, everyday language.
 - **Database ORM**: Drizzle ORM with PostgreSQL dialect
 - **Schema Validation**: Zod schemas generated from Drizzle schemas via drizzle-zod
 - **Blog SSR**: All 86 blog posts at `/blog/:slug` are Server-Side Rendered via `server/ssrBlog.ts` — Express intercepts before Vite/React, returns complete pre-rendered HTML. Demo route with badge at `/ssr-demo/blog/:slug`.
+- **Home SSR**: Home page (`/`) is Server-Side Rendered for search-engine bots via `server/ssrHome.ts`. Bot user-agents (Googlebot, Bingbot, etc.) receive a fully pre-rendered ~58KB HTML page with all content (Hero, Awards, Features, About, Academics, Pedagogy, Discover, Beyond Classroom, Testimonials, Contact), structured data (Schema.org School), OG/Twitter meta tags, and inline CSS. Regular browser visitors still get the React SPA with full interactivity.
 
 ### Build System
 - **Development**: Vite dev server with HMR for frontend, tsx for backend
@@ -46,6 +47,7 @@ Preferred communication style: Simple, everyday language.
 ├── server/           # Backend Express application
 │   ├── index.ts      # Server entry point
 │   ├── routes.ts     # API route definitions
+│   ├── ssrHome.ts    # Home page SSR for bots (SEO)
 │   ├── storage.ts    # Database operations
 │   └── db.ts         # Database connection
 ├── shared/           # Shared code between frontend and backend

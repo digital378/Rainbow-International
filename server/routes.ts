@@ -5,6 +5,7 @@ import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema } f
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import { registerSSRRoutes } from "./ssrBlog";
+import { registerHomeSSR } from "./ssrHome";
 
 // ── Email helper ────────────────────────────────────────────────
 async function sendCallbackEmail(data: { name: string; phone: string; preferredTime: string }) {
@@ -161,6 +162,7 @@ export async function registerRoutes(
     }
   });
 
+  registerHomeSSR(app);
   registerSSRRoutes(app);
 
   return httpServer;
