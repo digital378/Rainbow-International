@@ -59,7 +59,7 @@ export function Hero() {
       />
       <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
 
-      <div className="relative container mx-auto px-4 lg:px-8 pt-40 pb-16 lg:pt-36 lg:pb-16">
+      <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-16 lg:pt-44 lg:pb-16">
         <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 items-center">
 
           <div className="flex-1">
@@ -119,13 +119,8 @@ export function Hero() {
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <div className="px-7 pt-6 pb-4">
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="flex items-center -space-x-1">
-                    <div className="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center">
-                      <PhoneCall size={12} className="text-white" />
-                    </div>
-                    <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center">
-                      <PhoneCall size={12} className="text-white" />
-                    </div>
+                  <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
+                    <PhoneCall size={16} className="text-white" />
                   </div>
                   <div>
                     <p className="font-extrabold text-gray-900 text-[15px] leading-tight">Quick Enquiry</p>

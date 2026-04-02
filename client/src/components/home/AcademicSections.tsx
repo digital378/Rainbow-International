@@ -62,20 +62,20 @@ export function AcademicSections() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
           {programs.slice(0, 3).map((p, i) => (
             <Link key={i} href={p.href}>
               <div
-                className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer"
+                className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer h-full"
                 style={{ borderRadius: "16px" }}
                 data-testid={`card-section-${i}`}
               >
-                <div className="relative overflow-hidden" style={{ height: "220px" }}>
+                <div className="relative overflow-hidden aspect-[4/3]">
                   <img
                     src={p.image}
                     alt={p.label}
                     width={400}
-                    height={220}
+                    height={300}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -100,20 +100,20 @@ export function AcademicSections() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto mb-10">
           {programs.slice(3).map((p, i) => (
             <Link key={i + 3} href={p.href}>
               <div
-                className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer"
+                className="group bg-white overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer h-full"
                 style={{ borderRadius: "16px" }}
                 data-testid={`card-section-${i + 3}`}
               >
-                <div className="relative overflow-hidden" style={{ height: "220px" }}>
+                <div className="relative overflow-hidden aspect-[4/3]">
                   <img
                     src={p.image}
                     alt={p.label}
                     width={400}
-                    height={220}
+                    height={300}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

@@ -1,3 +1,6 @@
+import { ArrowRight } from "lucide-react";
+import { Link } from "wouter";
+
 const awards = [
   { label: "India Today Award", src: "https://www.rainbowpreschools.com/images/optimized/india-today.webp" },
   { label: "National School Awards", src: "https://www.rainbowpreschools.com/images/optimized/nsa-award.webp" },
@@ -7,43 +10,100 @@ const awards = [
   { label: "Thane Municipal Corp", src: "https://www.rainbowpreschools.com/images/optimized/tmc-logo.webp" },
 ];
 
-const doubled = [...awards, ...awards];
+const leftColumn = [...awards.slice(0, 3), ...awards.slice(0, 3), ...awards.slice(0, 3)];
+const rightColumn = [...awards.slice(3), ...awards.slice(3), ...awards.slice(3)];
 
 export function AwardsStrip() {
   return (
-    <section className="py-8 bg-white border-b border-gray-100">
-      <p className="text-center text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-6">
-        Recognised & Awarded By
-      </p>
-      <div className="overflow-hidden relative">
-        <div
-          className="flex gap-14 items-center"
-          style={{ animation: "strip-scroll 24s linear infinite", width: "max-content" }}
-        >
-          {doubled.map((a, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 flex items-center justify-center grayscale hover:grayscale-0 opacity-40 hover:opacity-100 transition-all duration-300"
-              style={{ height: "44px", width: "110px" }}
-            >
-              <img
-                src={a.src}
-                alt={a.label}
-                width={110}
-                height={44}
-                loading="lazy"
-                decoding="async"
-                className="max-h-full max-w-full object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-              />
+    <section className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 60%, #091a4f 100%)" }}>
+      <div className="container mx-auto px-4 py-20">
+        <div className="flex flex-col lg:flex-row gap-12 xl:gap-20 items-center">
+
+          <div className="flex gap-4 h-[320px] overflow-hidden flex-shrink-0">
+            <div className="w-[140px] relative overflow-hidden">
+              <div className="flex flex-col gap-4 animate-scroll-up">
+                {leftColumn.map((a, i) => (
+                  <div
+                    key={i}
+                    className="flex-shrink-0 w-[140px] h-[100px] bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center p-4 border border-white/10 hover:bg-white/15 transition-colors"
+                  >
+                    <img
+                      src={a.src}
+                      alt={a.label}
+                      width={100}
+                      height={60}
+                      loading="lazy"
+                      decoding="async"
+                      className="max-h-full max-w-full object-contain brightness-0 invert opacity-70"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+            <div className="w-[140px] relative overflow-hidden">
+              <div className="flex flex-col gap-4 animate-scroll-down">
+                {rightColumn.map((a, i) => (
+                  <div
+                    key={i}
+                    className="flex-shrink-0 w-[140px] h-[100px] bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center p-4 border border-white/10 hover:bg-white/15 transition-colors"
+                  >
+                    <img
+                      src={a.src}
+                      alt={a.label}
+                      width={100}
+                      height={60}
+                      loading="lazy"
+                      decoding="async"
+                      className="max-h-full max-w-full object-contain brightness-0 invert opacity-70"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-block mb-5">
+              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Recognised & Awarded</span>
+              <div className="w-8 h-0.5 bg-amber-400 mt-2 mx-auto lg:mx-0" />
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-white leading-tight mb-5 tracking-tight">
+              Welcome To Rainbow<br />
+              <span className="text-amber-400">International School</span>
+            </h2>
+            <p className="text-blue-200/80 text-[15px] leading-[1.8] max-w-lg mb-8 mx-auto lg:mx-0">
+              Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.
+            </p>
+            <Link
+              href="/awards-achievements"
+              className="group inline-flex items-center gap-2.5 px-7 py-3.5 font-bold text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg text-[#091a4f]"
+              style={{ background: "#fbbf24", borderRadius: "9999px" }}
+              data-testid="button-awards-cta"
+            >
+              View All Awards
+              <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
         </div>
       </div>
+
       <style>{`
-        @keyframes strip-scroll {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
+        @keyframes scroll-up {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-33.33%); }
+        }
+        @keyframes scroll-down {
+          0% { transform: translateY(-33.33%); }
+          100% { transform: translateY(0); }
+        }
+        .animate-scroll-up {
+          animation: scroll-up 12s linear infinite;
+        }
+        .animate-scroll-down {
+          animation: scroll-down 12s linear infinite;
         }
       `}</style>
     </section>
