@@ -51,7 +51,7 @@ export function Footer() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#091a4f]/60 via-transparent to-[#091a4f]/30" />
 
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="relative flex flex-col items-center campus-pin">
+              <div className="relative flex flex-col items-center">
                 <div
                   className="relative z-10 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl"
                   style={{
@@ -99,15 +99,6 @@ export function Footer() {
             </div>
           </a>
 
-          <style>{`
-            .campus-pin {
-              animation: pinBounce 2s ease-in-out infinite;
-            }
-            @keyframes pinBounce {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-8px); }
-            }
-          `}</style>
         </div>
       </div>
 
