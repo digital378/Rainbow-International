@@ -65,41 +65,38 @@ export function BeyondClassroomSection() {
                 }}
               >
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
+                  src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=500&h=500&fit=crop&q=80"
                   alt="Beyond The Classroom at Rainbow International School"
                   width={384}
                   height={384}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.18))" }}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
 
               <div className="absolute -top-4 -right-4 w-28 h-28 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
+                  src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=150&h=150&fit=crop&q=80"
                   alt="Pre-primary activities"
                   width={112}
                   height={112}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
 
               <div className="absolute -bottom-4 -left-4 w-24 h-24 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png"
+                  src="https://images.unsplash.com/photo-1562774053-701939374585?w=150&h=150&fit=crop&q=80"
                   alt="Campus amenities"
                   width={96}
                   height={96}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
 

@@ -7,58 +7,52 @@ const testimonials = [
     location: "Parent · Rainbow International School",
     review: "It's a great educational establishment to entrust your kids to, with an excellent infrastructure and warm-hearted, friendly and cooperative staff. I will recommend Rainbow International School for your kids.",
     initials: "MD",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-reviews-mark-dsouza.jpg",
   },
   {
     name: "Mohan Ramaswamy",
     location: "Parent · Rainbow International School",
     review: "Good school, caring teachers, extremely supportive staff who put in a lot of effort. It's always a partnership between institutions and parents to give the best to children, and it has worked well for us. Keep up the good work!",
     initials: "MR",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-mohan-ramaswamy.jpg",
   },
   {
     name: "Ruchi Verma",
     location: "Parent · Rainbow International School",
     review: "I will recommend this school. It gave us so much in terms of values and it is very well organized. Teachers communicate wonderfully and the picnic was beyond expectations — so well organized!",
     initials: "RV",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-ruchi-verma.jpg",
   },
   {
     name: "Ratish Pradhan",
     location: "Parent · Rainbow International School",
     review: "We are very happy with the school, authorities and the management. Teachers are nice and ensure all kids get the required attention. Extracurricular activities are also well looked after.",
     initials: "RP",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-ratish-pradhan.jpg",
   },
   {
     name: "Alok Srivastava",
     location: "Parent · Rainbow International School",
     review: "A progressive school with very supportive management. Teachers and support staff are very cooperative. Most importantly, if there are any issues, the school always puts forward an issue-resolving approach.",
     initials: "AS",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-alok-shrivastava.jpg",
   },
   {
     name: "Anuja Pradhan",
     location: "Parent · Rainbow International School",
     review: "Highly recommended. Most lively atmosphere. The warmth makes every child comfortable. Practical activities, great hygiene — undoubtedly the best school in Thane.",
     initials: "AP",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-homepage-testimonials-anuja-pradhan.jpg",
   },
   {
     name: "Surabhi Trivedi",
     location: "Parent · Rainbow International School",
     review: "Feeling privileged to share my view. Just one word — Fantastic! The teachers are professional, caring and well organized. Infrastructure is outstanding. Children grow intellectually and in co-curricular activities.",
     initials: "ST",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-reviews-surabhi-trivedi.jpg",
   },
   {
     name: "Dhaval Lodaya",
     location: "Parent · Rainbow International School",
     review: "I would highly recommend Rainbow International School without hesitation. RIS gave my child a stellar foundation and a nurturing environment that made the school an extension of our family.",
     initials: "DL",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-reviews-dhaval-lodaya.jpg",
   },
 ];
+
+const colors = ["#091a4f", "#0d3b86", "#f59e0b", "#1550b8", "#d97706", "#164e63", "#7c3aed", "#059669"];
 
 export function Testimonials() {
   const [page, setPage] = useState(0);
@@ -88,47 +82,38 @@ export function Testimonials() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          {visible.map((t, i) => (
-            <div
-              key={i}
-              className="bg-white p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-amber-200 transition-all flex flex-col"
-              style={{ borderRadius: "16px" }}
-              data-testid={`card-testimonial-${page * perPage + i}`}
-            >
-              <Quote size={28} className="mb-3 flex-shrink-0 text-amber-200" />
-              <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow italic">
-                "{t.review}"
-              </p>
-              <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
-                <div
-                  className="w-11 h-11 overflow-hidden border-2 border-amber-100 flex-shrink-0 flex items-center justify-center text-sm font-extrabold"
-                  style={{ background: "#fef3c7", color: "#091a4f", borderRadius: "12px" }}
-                >
-                  <img
-                    src={t.image}
-                    alt={t.name}
-                    width={44}
-                    height={44}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                    data-testid={`img-testimonial-${page * perPage + i}`}
-                  />
-                </div>
-                <div>
-                  <p className="font-extrabold text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${page * perPage + i}`}>
-                    {t.name}
-                  </p>
-                  <div className="flex">
-                    {[1,2,3,4,5].map((s) => <Star key={s} size={11} className="fill-amber-400 text-amber-400" />)}
+          {visible.map((t, i) => {
+            const globalIndex = page * perPage + i;
+            return (
+              <div
+                key={i}
+                className="bg-white p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-amber-200 transition-all flex flex-col"
+                style={{ borderRadius: "16px" }}
+                data-testid={`card-testimonial-${globalIndex}`}
+              >
+                <Quote size={28} className="mb-3 flex-shrink-0 text-amber-200" />
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow italic">
+                  "{t.review}"
+                </p>
+                <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
+                  <div
+                    className="w-11 h-11 overflow-hidden border-2 border-amber-100 flex-shrink-0 flex items-center justify-center text-sm font-extrabold text-white"
+                    style={{ background: colors[globalIndex % colors.length], borderRadius: "12px" }}
+                  >
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="font-extrabold text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${globalIndex}`}>
+                      {t.name}
+                    </p>
+                    <div className="flex">
+                      {[1,2,3,4,5].map((s) => <Star key={s} size={11} className="fill-amber-400 text-amber-400" />)}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="flex items-center justify-center gap-4">

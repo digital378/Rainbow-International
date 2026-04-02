@@ -6,7 +6,6 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 import { Hero } from "@/components/home/Hero";
 import { AwardsStrip } from "@/components/home/AwardsStrip";
 
-const Features = lazy(() => import("@/components/home/Features").then(m => ({ default: m.Features })));
 const AboutPreview = lazy(() => import("@/components/home/AboutPreview").then(m => ({ default: m.AboutPreview })));
 const AcademicSections = lazy(() => import("@/components/home/AcademicSections").then(m => ({ default: m.AcademicSections })));
 const Pedagogy = lazy(() => import("@/components/home/Pedagogy").then(m => ({ default: m.Pedagogy })));
@@ -34,9 +33,6 @@ export default function Home() {
       <main className="flex-grow">
         <Hero />
         <AwardsStrip />
-        <Suspense fallback={<SectionFallback />}>
-          <Features />
-        </Suspense>
         <Suspense fallback={<SectionFallback />}>
           <AboutPreview />
         </Suspense>

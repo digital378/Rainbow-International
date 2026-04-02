@@ -96,7 +96,7 @@ img{max-width:100%;display:block}
 
 /* Hero */
 .hero{position:relative;min-height:90vh;display:flex;align-items:center;overflow:hidden;background:#091a4f}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url(https://rainbowinternationalschool.in/wp-content/uploads/2023/04/picwish.webp)}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url(https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920&h=1080&fit=crop&q=80)}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(9,26,79,.95) 0%,rgba(13,59,134,.88) 55%,rgba(9,26,79,.65) 100%)}
 .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:60px;padding:80px 0;flex-wrap:wrap}
 .hero-text{flex:1;min-width:320px;color:#fff}
@@ -131,10 +131,15 @@ img{max-width:100%;display:block}
 @media(max-width:960px){.hero-form{width:100%}.hero-inner{flex-direction:column}}
 
 /* Awards strip */
-.awards-strip{padding:40px 0;border-bottom:1px solid #f3f4f6;background:#fff;text-align:center}
-.awards-strip p{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#9ca3af;margin-bottom:24px}
-.awards-logos{display:flex;gap:48px;justify-content:center;align-items:center;flex-wrap:wrap;opacity:.5}
-.awards-logos img{height:40px;width:auto;object-fit:contain;filter:grayscale(1)}
+.awards-strip{padding:60px 0;background:linear-gradient(135deg,#091a4f 0%,#0d3b86 60%,#091a4f 100%);text-align:center}
+.awards-strip .awards-tag{color:#fbbf24;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px}
+.awards-strip h2{font-family:'Merriweather',serif;font-size:clamp(28px,4vw,42px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:16px}
+.awards-strip h2 span{color:#fbbf24}
+.awards-strip .awards-desc{color:rgba(191,219,254,.8);font-size:15px;max-width:520px;margin:0 auto 32px;line-height:1.8}
+.awards-logos{display:flex;gap:16px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:32px}
+.awards-logos div{width:120px;height:80px;background:#fff;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.awards-logos img{max-height:100%;max-width:100%;object-fit:contain}
+.awards-strip .btn-gold{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:9999px;font-weight:700;font-size:14px;background:#fbbf24;color:#091a4f;border:none;text-decoration:none}
 
 /* Section header helper */
 .section-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:8px 16px;border-radius:9999px;margin-bottom:20px}
@@ -383,35 +388,20 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   </div>
 </section>
 
-<!-- Awards Strip -->
+<!-- Awards / Welcome Strip -->
 <section class="awards-strip">
-  <p>Recognised &amp; Awarded By</p>
+  <p class="awards-tag">Recognised &amp; Awarded</p>
+  <h2>Welcome To Rainbow<br/><span>International School</span></h2>
+  <p class="awards-desc">Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.</p>
   <div class="awards-logos">
-    <img src="https://www.rainbowpreschools.com/images/optimized/india-today.webp" alt="India Today Award" />
-    <img src="https://www.rainbowpreschools.com/images/optimized/nsa-award.webp" alt="National School Awards" />
-    <img src="https://www.rainbowpreschools.com/images/optimized/wes-mumbai.webp" alt="World Education Summit" />
-    <img src="https://www.rainbowpreschools.com/images/optimized/economic-times.webp" alt="Economic Times" />
-    <img src="https://www.rainbowpreschools.com/images/optimized/scoonews-light.webp" alt="Scoo News" />
-    <img src="https://www.rainbowpreschools.com/images/optimized/tmc-logo.webp" alt="Thane Municipal Corp" />
+    <div><img src="/images/awards/india-today.webp" alt="India Today Award" /></div>
+    <div><img src="/images/awards/nsa-award.webp" alt="National School Awards" /></div>
+    <div><img src="/images/awards/wes-mumbai.webp" alt="World Education Summit" /></div>
+    <div><img src="/images/awards/economic-times.webp" alt="Economic Times" /></div>
+    <div><img src="/images/awards/scoonews.webp" alt="Scoo News" /></div>
+    <div><img src="/images/awards/tmc-logo.webp" alt="Thane Municipal Corp" /></div>
   </div>
-</section>
-
-<!-- Features / Welcome -->
-<section class="features">
-  <div class="container" style="text-align:center">
-    <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Our School</span>
-    <h2 class="section-title">Welcome to Rainbow<br/><span style="color:#0d3b86">International School</span></h2>
-    <p class="section-sub" style="margin:0 auto">Educating Students for Success in an Evolving World</p>
-    <div class="feature-images">
-      <div class="feature-img" style="width:190px;height:210px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/12-300x200.jpg" alt="Child aspiring to be a doctor" /></div>
-      <div class="feature-img" style="width:160px;height:180px;margin-top:24px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/05-1-150x150.jpg" alt="Child aspiring to be a pilot" /></div>
-      <div class="feature-img" style="width:130px;height:150px;margin-top:8px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/03-150x150.jpg" alt="Child aspiring to be a scientist" /></div>
-      <div class="feature-img" style="width:140px;height:165px;margin-top:16px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/09-150x150.jpg" alt="Child with art palette" /></div>
-      <div class="feature-img" style="width:160px;height:185px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-homepage-testimonials-anuja-pradhan.jpg" alt="School students" /></div>
-      <div class="feature-img" style="width:130px;height:150px;margin-top:28px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad-2.png" alt="Student achievement" /></div>
-      <div class="feature-img" style="width:150px;height:175px;margin-top:10px"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security-768x610.png" alt="School security" /></div>
-    </div>
-  </div>
+  <a href="/awards-achievements" class="btn-gold">View All Awards &rarr;</a>
 </section>
 
 <!-- About Preview / Why Choose Us -->
@@ -453,7 +443,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="container">
     <div class="programs-grid">
       <a href="/pre-primary-school-thane" class="program-card">
-        <div class="program-card-img"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg" alt="Pre-Primary" /></div>
+        <div class="program-card-img"><img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=450&fit=crop&q=80" alt="Pre-Primary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#fff7ed;color:#f97316">Nursery &middot; Jr. KG &middot; Sr. KG</span>
           <h3>Pre-Primary</h3>
@@ -462,7 +452,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/primary-section" class="program-card">
-        <div class="program-card-img"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png" alt="Primary" /></div>
+        <div class="program-card-img"><img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=450&fit=crop&q=80" alt="Primary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#eef5ff;color:#0d3b86">Class I – V</span>
           <h3>Primary</h3>
@@ -471,7 +461,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/middle-school-section" class="program-card">
-        <div class="program-card-img"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-section-768x513.png" alt="Middle School" /></div>
+        <div class="program-card-img"><img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=600&h=450&fit=crop&q=80" alt="Middle School" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#ecfdf5;color:#10b981">Class VI – VIII</span>
           <h3>Middle School</h3>
@@ -482,7 +472,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     </div>
     <div class="programs-grid-2">
       <a href="/secondary-section" class="program-card">
-        <div class="program-card-img"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-school-class-6-class-8-international-school-admission-ad-2.jpg" alt="Secondary" /></div>
+        <div class="program-card-img"><img src="https://images.unsplash.com/photo-1523050854058-8df90110c476?w=600&h=450&fit=crop&q=80" alt="Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#f5f3ff;color:#8b5cf6">Class IX – X</span>
           <h3>Secondary</h3>
@@ -491,7 +481,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/senior-secondary-section" class="program-card">
-        <div class="program-card-img"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/senior-secondary-768x513.png" alt="Senior Secondary" /></div>
+        <div class="program-card-img"><img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=450&fit=crop&q=80" alt="Senior Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#fff1f2;color:#ef4444">Class XI – XII</span>
           <h3>Senior Secondary</h3>
@@ -532,25 +522,25 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="container">
     <div class="discover-grid">
       <a href="/awards-achievements" class="discover-card">
-        <img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" alt="Awards & Accomplishments" />
+        <img src="https://images.unsplash.com/photo-1567168544230-6b5e27a1bde0?w=400&h=500&fit=crop&q=80" alt="Awards & Accomplishments" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#fef3c7;color:#f59e0b">Recognition</span>
         <div class="discover-card-text"><h3>Awards &amp; Accomplishments</h3><p>Accolades earned for being one of the best and most promising international schools in Thane for over a decade.</p></div>
       </a>
       <a href="/amenities" class="discover-card">
-        <img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png" alt="Amenities & Facilities" />
+        <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=500&fit=crop&q=80" alt="Amenities & Facilities" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#d1fae5;color:#10b981">Campus</span>
         <div class="discover-card-text"><h3>Amenities &amp; Facilities</h3><p>Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.</p></div>
       </a>
       <a href="/student-achievements" class="discover-card">
-        <img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad-2.png" alt="Student Achievements" />
+        <img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=400&h=500&fit=crop&q=80" alt="Student Achievements" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#ede9fe;color:#8b5cf6">Excellence</span>
         <div class="discover-card-text"><h3>Student Achievements</h3><p>Student accomplishments are acknowledged and honored. Here you can view our best achievers.</p></div>
       </a>
       <a href="/safety-security" class="discover-card">
-        <img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security-768x610.png" alt="Safety & Security" />
+        <img src="https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=400&h=500&fit=crop&q=80" alt="Safety & Security" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#dbeafe;color:#0d3b86">Wellbeing</span>
         <div class="discover-card-text"><h3>Safety &amp; Security</h3><p>Student safety and well-being is our top priority, safeguarded through stringent modern security measures.</p></div>
@@ -580,7 +570,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       </div>
       <div class="beyond-img">
         <div class="beyond-card">
-          <img src="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png" alt="Beyond The Classroom at Rainbow International School" />
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=500&h=500&fit=crop&q=80" alt="Beyond The Classroom at Rainbow International School" />
         </div>
       </div>
     </div>
@@ -613,7 +603,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
         <p class="review">"It's a great educational establishment to entrust your kids to, with an excellent infrastructure and warm-hearted, friendly and cooperative staff."</p>
         <div class="author">
-          <div class="avatar"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-reviews-mark-dsouza.jpg" alt="Mark D'Souza" /></div>
+          <div class="avatar" style="background:#091a4f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">MD</div>
           <div><p class="author-name">Mark D'Souza</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
         </div>
       </div>
@@ -621,7 +611,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
         <p class="review">"Good school, caring teachers, extremely supportive staff who put in a lot of effort. It's always a partnership between institutions and parents to give the best to children."</p>
         <div class="author">
-          <div class="avatar"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-mohan-ramaswamy.jpg" alt="Mohan Ramaswamy" /></div>
+          <div class="avatar" style="background:#0d3b86;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">MR</div>
           <div><p class="author-name">Mohan Ramaswamy</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
         </div>
       </div>
@@ -629,7 +619,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
         <p class="review">"I will recommend this school. It gave us so much in terms of values and it is very well organized. Teachers communicate wonderfully and the picnic was beyond expectations!"</p>
         <div class="author">
-          <div class="avatar"><img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-testimonials-ruchi-verma.jpg" alt="Ruchi Verma" /></div>
+          <div class="avatar" style="background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">RV</div>
           <div><p class="author-name">Ruchi Verma</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
         </div>
       </div>

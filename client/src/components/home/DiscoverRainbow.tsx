@@ -5,28 +5,28 @@ const highlights = [
   {
     title: "Awards & Accomplishments",
     description: "Accolades earned for being one of the best and most promising international schools in Thane for over a decade.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+    image: "https://images.unsplash.com/photo-1567168544230-6b5e27a1bde0?w=400&h=500&fit=crop&q=80",
     href: "/awards-achievements",
     tag: "Recognition",
   },
   {
     title: "Amenities & Facilities",
     description: "Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png",
+    image: "https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=500&fit=crop&q=80",
     href: "/amenities",
     tag: "Campus",
   },
   {
     title: "Student Achievements",
     description: "Student accomplishments are acknowledged and honored. Here you can view our best achievers.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad-2.png",
+    image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=400&h=500&fit=crop&q=80",
     href: "/student-achievements",
     tag: "Excellence",
   },
   {
     title: "Safety & Security",
     description: "Student safety and well-being is our top priority, safeguarded through stringent modern security measures.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security-768x610.png",
+    image: "https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=400&h=500&fit=crop&q=80",
     href: "/safety-security",
     tag: "Wellbeing",
   },
@@ -65,7 +65,6 @@ export function DiscoverRainbow() {
                   loading="lazy"
                   decoding="async"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#091a4f]/90 via-[#091a4f]/30 to-transparent group-hover:from-amber-600/85 group-hover:via-amber-600/20 transition-all duration-500" />
 

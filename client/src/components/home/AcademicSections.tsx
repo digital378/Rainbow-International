@@ -6,7 +6,7 @@ const programs = [
     label: "Pre-Primary",
     grade: "Nursery · Jr. KG · Sr. KG",
     description: "Play-based learning that nurtures curiosity, creativity, and foundational skills in a safe and joyful environment.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=450&fit=crop&q=80",
     href: "/pre-primary-school-thane",
     accent: "#f59e0b",
   },
@@ -14,7 +14,7 @@ const programs = [
     label: "Primary",
     grade: "Class I – V",
     description: "Building strong literacy, numeracy, and social skills through structured experiential learning.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=450&fit=crop&q=80",
     href: "/primary-section",
     accent: "#091a4f",
   },
@@ -22,7 +22,7 @@ const programs = [
     label: "Middle School",
     grade: "Class VI – VIII",
     description: "Critical thinking, digital literacy, and leadership skills for the evolving modern learner.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-section-768x513.png",
+    image: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=600&h=450&fit=crop&q=80",
     href: "/middle-school-section",
     accent: "#0d3b86",
   },
@@ -30,7 +30,7 @@ const programs = [
     label: "Secondary",
     grade: "Class IX – X",
     description: "CBSE board preparation with strong academics and holistic co-curricular engagement.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-school-class-6-class-8-international-school-admission-ad-2.jpg",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c476?w=600&h=450&fit=crop&q=80",
     href: "/secondary-section",
     accent: "#091a4f",
   },
@@ -38,7 +38,7 @@ const programs = [
     label: "Senior Secondary",
     grade: "Class XI – XII",
     description: "Science, Commerce & Humanities streams to launch your child's next chapter.",
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/senior-secondary-768x513.png",
+    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=450&fit=crop&q=80",
     href: "/senior-secondary-section",
     accent: "#f59e0b",
   },
@@ -79,9 +79,6 @@ export function AcademicSections() {
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).parentElement!.style.background = "#f1f5f9";
-                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
@@ -117,9 +114,6 @@ export function AcademicSections() {
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).parentElement!.style.background = "#f1f5f9";
-                    }}
                   />
                 </div>
                 <div className="p-6">
