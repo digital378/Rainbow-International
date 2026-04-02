@@ -114,8 +114,13 @@ const categories = ["All", "CBSE School", "School", "Education", "Parenting", "S
 
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const filtered = activeCategory === "All" ? allBlogs : allBlogs.filter(b => b.cat === activeCategory);
+  const filtered = allBlogs.filter(b => {
+    const matchesCat = activeCategory === "All" || b.cat === activeCategory;
+    const matchesSearch = !searchQuery || b.title.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -133,60 +138,64 @@ export default function Blogs() {
         breadcrumb={[{ label: "Blogs" }]}
       />
 
-      <main className="flex-grow py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
+      <main className="flex-grow py-16 bg-gray-50">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                data-testid="input-blog-search"
+                className="pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm w-32 focus:w-48 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/30 focus:border-red-400"
+              />
+            </div>
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 data-testid={`button-blog-cat-${cat}`}
-                className={`px-4 py-1.5 rounded-full font-semibold text-xs transition-all border ${
+                className={`px-4 py-1.5 rounded-full font-semibold text-sm transition-all border ${
                   activeCategory === cat
-                    ? "text-white border-transparent"
-                    : "bg-gray-50 text-gray-600 border-gray-200 hover:text-white hover:border-transparent"
+                    ? "text-white border-transparent bg-red-500"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-red-400 hover:text-red-500"
                 }`}
-                style={activeCategory === cat ? { background: "#0d3b86", borderColor: "#0d3b86" } : {}}
-                onMouseEnter={(e) => { if (activeCategory !== cat) { (e.currentTarget as HTMLElement).style.background = "#0d3b86"; (e.currentTarget as HTMLElement).style.borderColor = "#0d3b86"; (e.currentTarget as HTMLElement).style.color = "white"; } }}
-                onMouseLeave={(e) => { if (activeCategory !== cat) { (e.currentTarget as HTMLElement).style.background = ""; (e.currentTarget as HTMLElement).style.borderColor = ""; (e.currentTarget as HTMLElement).style.color = ""; } }}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          <p className="text-center text-sm text-gray-500 mb-8">
-            Showing {filtered.length} of {allBlogs.length} articles
+          <p className="text-sm text-gray-500 mb-8">
+            Showing {filtered.length} article{filtered.length !== 1 ? "s" : ""}
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((blog, i) => {
               const isInternal = publishedSlugs.has(blog.slug);
+              const excerpt = blogIntros[blog.slug] || "";
+              const truncatedExcerpt = excerpt.length > 120 ? excerpt.slice(0, 120) + "..." : excerpt;
               const cardContent = (
-                <>
-                  <div className="aspect-[16/9] overflow-hidden bg-gray-100">
-                    <BlogThumb src={blog.thumbUrl} alt={blog.title} cat={blog.cat} />
-                  </div>
-                  <div className="p-5 flex flex-col flex-grow">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "#f0f4ff", color: "#0d3b86" }}>{blog.cat}</span>
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
-                        <Calendar size={11} />
-                        {blog.date}
-                      </span>
-                    </div>
-                    <h3 className="font-black text-base leading-snug flex-grow group-hover:transition-colors mb-4" style={{ color: "#0d3b86" }}>{blog.title}</h3>
-                    <span className="flex items-center gap-1 text-xs font-bold text-amber-500 group-hover:gap-2 transition-all">
-                      Read More <ArrowRight size={12} />
-                    </span>
-                  </div>
-                </>
+                <div className="p-6 flex flex-col h-full">
+                  <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full border border-green-400 text-green-600 mb-4 self-start">
+                    {blog.cat}
+                  </span>
+                  <h3 className="font-bold text-lg leading-snug text-gray-900 mb-3">{blog.title}</h3>
+                  {truncatedExcerpt && (
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4 flex-grow">{truncatedExcerpt}</p>
+                  )}
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-red-500 group-hover:gap-2.5 transition-all mt-auto">
+                    Read Article <ArrowRight size={14} />
+                  </span>
+                </div>
               );
               return isInternal ? (
                 <Link
                   key={i}
                   href={`/blog/${blog.slug}`}
-                  className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
+                  className="group bg-white rounded-xl overflow-hidden border-l-4 border-l-red-500 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
                   data-testid={`card-blog-${i}`}
                 >
                   {cardContent}
@@ -197,7 +206,7 @@ export default function Blogs() {
                   href={`https://rainbowinternationalschool.in/${blog.slug}/`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col"
+                  className="group bg-white rounded-xl overflow-hidden border-l-4 border-l-red-500 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col"
                   data-testid={`card-blog-${i}`}
                 >
                   {cardContent}
