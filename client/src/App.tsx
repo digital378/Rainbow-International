@@ -31,6 +31,7 @@ import CbseDisclosures from "@/pages/CbseDisclosures";
 import SchoolManagingCommittee from "@/pages/SchoolManagingCommittee";
 import Career from "@/pages/Career";
 import BookList from "@/pages/BookList";
+import Declaration from "@/pages/Declaration";
 import VirtualLearning from "@/pages/VirtualLearning";
 import AcademicTeam from "@/pages/AcademicTeam";
 import RainbowPreschool from "@/pages/RainbowPreschool";
@@ -77,6 +78,7 @@ function Router() {
       <Route path="/school-managing-committee" component={SchoolManagingCommittee} />
       <Route path="/career" component={Career} />
       <Route path="/book-list" component={BookList} />
+      <Route path="/declaration" component={Declaration} />
       <Route path="/virtual-learning" component={VirtualLearning} />
       <Route path="/academic-team" component={AcademicTeam} />
       <Route path="/rainbow-preschool-international" component={RainbowPreschool} />

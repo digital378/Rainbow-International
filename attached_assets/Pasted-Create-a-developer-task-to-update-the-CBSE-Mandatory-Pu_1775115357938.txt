@@ -1,0 +1,64 @@
+Create a developer task to update the CBSE Mandatory Public Disclosure section and related PDF pages on the website.
+
+TASK OVERVIEW
+Update the following pages and files exactly as instructed:
+- `/cbse-mandatory-public-disclosures/`
+- Declaration page
+- Book List page
+
+PRIMARY SOURCE DOCUMENT
+Use the Google Doc below as the source of truth for updating the CBSE Mandatory Public Disclosure page:
+https://docs.google.com/document/d/160Wa91_QgcqoLEwndYmmY9xBIvgWni7ybaDqFJ9c00A/edit?usp=sharing
+
+MAIN REQUIREMENT
+On the `/cbse-mandatory-public-disclosures/` page:
+1. Go through the Google Doc carefully.
+2. Update the documents and video on the page exactly as per the categories mentioned in the document.
+3. Ensure each file/video is placed under the correct category/heading.
+4. Preserve the page structure unless a cleaner presentation is needed.
+5. Keep the page neat, easy to scan, and fully functional.
+
+DECLARATION PAGE UPDATE
+Update the Declaration page with the PDF from this Google Drive link:
+Declaration PDF:
+https://drive.google.com/file/d/1RQf1Ccf9cQhan2kQrPe_87Pp2Czd4lt5/view?usp=drive_link
+
+Requirements:
+1. Replace the existing Declaration PDF with this new file.
+2. When the Declaration page is clicked/opened, the PDF should appear properly on the page.
+3. Use an embedded PDF viewer if already supported, otherwise implement a clean in-page PDF display.
+4. Also provide a fallback download/open link in case browser embedding fails.
+
+BOOK LIST PAGE UPDATE
+Update the Book List page with the PDF from this Google Drive link:
+Book List PDF:
+https://drive.google.com/file/d/1qYTNQn4sS00jFaHUjm83Uc_pcRz4vUcZ/view?usp=drive_link
+
+Requirements:
+1. Replace the existing Book List PDF with this new file.
+2. When the Book List page is clicked/opened, the PDF should appear properly on the page.
+3. Use an embedded PDF viewer if already supported, otherwise implement a clean in-page PDF display.
+4. Also provide a fallback download/open link in case browser embedding fails.
+
+IMPLEMENTATION REQUIREMENTS
+1. Make sure all Google Drive file links are converted and used in a way that works properly on the live website.
+2. Do not leave raw share links if they do not render correctly.
+3. Ensure all embedded documents/videos load correctly on desktop and mobile.
+4. Keep spacing, headings, and category structure clear and user-friendly.
+5. Do not break the current styling of the rest of the website.
+6. Maintain a clean and professional school-website look.
+
+QUALITY CHECKS
+After making the updates, verify:
+1. `/cbse-mandatory-public-disclosures/` reflects the latest documents and video exactly as per the Google Doc.
+2. Declaration page shows the correct updated PDF inside the page.
+3. Book List page shows the correct updated PDF inside the page.
+4. All file links and embeds work correctly.
+5. Mobile and desktop views are both usable.
+
+OUTPUT EXPECTATION
+Apply the changes directly in the project and then provide:
+1. what was updated on the CBSE Mandatory Public Disclosure page
+2. confirmation that the Declaration PDF was replaced and embedded
+3. confirmation that the Book List PDF was replaced and embedded
+4. any implementation notes if Google Drive link conversion was required

@@ -3,11 +3,11 @@ import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { ExternalLink, FileText } from "lucide-react";
+import { ExternalLink, FileText, Download, Play } from "lucide-react";
+import { Link } from "wouter";
 
-const RIS_CBSE_URL = "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures/";
+const GDRIVE_VIEW = (id: string) => `https://drive.google.com/file/d/${id}/view`;
 
-// ── A. General Information ─────────────────────────────────────────
 const generalInfo = [
   { label: "Name of the School", value: "Rainbow International School" },
   { label: "Affiliation Number (if applicable)", value: "1130661" },
@@ -18,25 +18,23 @@ const generalInfo = [
   { label: "Contact Details (Mobile)", value: "+91 82915 68972" },
 ];
 
-// ── B. Documents and Information ──────────────────────────────────
-const documents = [
-  { label: "Copies of Affiliation / Upgradation Letter and Recent Extension of Affiliation if any" },
-  { label: "Copies of Societies / Trust / Company / Registration, Renewal Certificate as Applicable" },
-  { label: "Copies of Land Certificate as Applicable" },
-  { label: "Copy of No Objection Certificate (NOC) issued if applicable by the State Govt. / UT" },
-  { label: "Copies of Recognition Certificate under RTE Act 2009 and its Renewal if Applicable" },
-  { label: "Copy of Valid Building Safety Certificate as per the National Building Code" },
-  { label: "Copy of Valid Fire Safety Certificate issued by the Competent Authority" },
-  { label: "Copy of the DEO Certificate submitted by the School for Affiliation / Upgradation / Extension of Affiliation or Self Certification by the School" },
-  { label: "Copies of Valid Water, Health, Sanitation Certificates" },
+const documents: { label: string; href: string; fileName: string }[] = [
+  { label: "Copies of Affiliation / Upgradation Letter and Recent Extension of Affiliation if any", href: GDRIVE_VIEW("1nFeA3ELa4VYZngXGjIc7UNiMlJ1Z6Umk"), fileName: "Affiliation-Letter-of-Senior-Secondary.pdf" },
+  { label: "Copies of Societies / Trust / Company / Registration, Renewal Certificate as Applicable", href: GDRIVE_VIEW("1oyUgxoO3C3zR4fNrTQnBGaXHikjk0Hnp"), fileName: "Trust-Certificate-merged.pdf" },
+  { label: "Copies of Land Certificate as Applicable", href: GDRIVE_VIEW("1n1_tMa-gPDedmbT0nVVexXO7oQuo577s"), fileName: "Certificate-of-Land.webp" },
+  { label: "Copy of No Objection Certificate (NOC) issued if applicable by the State Govt. / UT", href: GDRIVE_VIEW("1g1EGFW1-bxxHvTgF0c_L2LPCOF3301_U"), fileName: "NOC-Merged.pdf" },
+  { label: "Copies of Recognition Certificate under RTE Act 2009 and its Renewal if Applicable", href: GDRIVE_VIEW("1cR1Yz_uVyZXqQozEW4gdg9h__Egbhp1S"), fileName: "RTE-combinepdf.pdf" },
+  { label: "Copy of Valid Building Safety Certificate as per the National Building Code", href: GDRIVE_VIEW("1zXyfAyhgAJpiSPsACdNqjsIayGpB9x33"), fileName: "Building-Safety-Certificate-2025-26.pdf" },
+  { label: "Copy of Valid Fire Safety Certificate issued by the Competent Authority", href: GDRIVE_VIEW("1IOW3kcrgbbTZJCXQI_nUrhi1PBuajxN6"), fileName: "Fire-Safety-Certificate-2024-25.pdf" },
+  { label: "Copy of the DEO Certificate submitted by the School for Affiliation / Upgradation / Extension of Affiliation or Self Certification by the School", href: GDRIVE_VIEW("1efCCqNiaqg1Imx3bWePzmjYm9Qi2i2h8"), fileName: "Self-Certification-Proforma.pdf" },
+  { label: "Copies of Valid Water, Health, Sanitation Certificates", href: GDRIVE_VIEW("166xkM9t8olMO5pX0a8wPHRGXi4va46pI"), fileName: "Water-Sanitation-Certificate-2025-26.pdf" },
 ];
 
-// ── C. Results & Academics ─────────────────────────────────────────
-const academicDocs = [
-  { label: "Annual Academic Calendar" },
-  { label: "List of School Management Committee (SMC)" },
-  { label: "List of Parents Teachers Association (PTA) Members" },
-  { label: "Last Three Year Result of the Board Examination as per Applicability" },
+const academicDocs: { label: string; href: string; fileName: string }[] = [
+  { label: "Annual Academic Calendar", href: GDRIVE_VIEW("1TEcAUNV7Um6_1iSaGxcybOCJRPEaenFq"), fileName: "Academic-Calendar-25-26.pdf" },
+  { label: "List of School Management Committee (SMC)", href: GDRIVE_VIEW("1oh_2PLZVLaO9OBXI65t0GZIOhPyimZSQ"), fileName: "School-Managing-Committee-Members-AY-2024-25.pdf" },
+  { label: "List of Parents Teachers Association (PTA) Members", href: GDRIVE_VIEW("1h4wYsy2htv3JdTaDPCGgAESbFuTgtuSJ"), fileName: "PTA-List-AY-2024-25.pdf" },
+  { label: "Last Three Year Result of the Board Examination as per Applicability", href: GDRIVE_VIEW("1Jlbx_DNtPZVLb2uyaQStwMYKm926i3iM"), fileName: "Results-of-Last-Three-Years.pdf" },
 ];
 
 const classXResults = [
@@ -55,7 +53,6 @@ const classXIIResults = [
   { year: "2024-25", registered: 337, passed: 336, pct: "73.43%", remarks: "—" },
 ];
 
-// ── D. Staff (Teaching) ────────────────────────────────────────────
 const staffInfo = [
   { label: "Principal", value: "1" },
   { label: "Total Number of Teachers", value: "81" },
@@ -67,8 +64,7 @@ const staffInfo = [
   { label: "Details of Counsellor and Wellness Teacher", value: "Ms. Nazneen Thawali" },
 ];
 
-// ── E. School Infrastructure ───────────────────────────────────────
-const infrastructure = [
+const infrastructure: { label: string; value: string; href?: string }[] = [
   { label: "Total Campus Area of the School (in square metres)", value: "4960 sq m" },
   { label: "No. and Size of the Classrooms in sq. mtr", value: "36 Classrooms — 553 sq ft each" },
   {
@@ -80,17 +76,15 @@ const infrastructure = [
   { label: "No. of Boys Toilet", value: "15" },
   {
     label: "Link of YouTube Video of Inspection of School covering the Infrastructure",
-    value: "watch",
-    href: "https://www.youtube.com/@RainbowInternationalSchool",
+    value: "Watch Video",
+    href: "https://youtu.be/Xz_t149modg?si=p0y4aPrPYuGr2vy4",
   },
 ];
 
-// ── F. Mandatory Public Disclosure ────────────────────────────────
-const disclosureAppendix = [
-  { label: "Mandatory Public Disclosure (Appendix – II)" },
+const disclosureAppendix: { label: string; href: string; fileName: string }[] = [
+  { label: "Mandatory Public Disclosure (Appendix – IX)", href: GDRIVE_VIEW("1kvwzSBk1AnPVAyIOgVwGDHSveUX2zU4v"), fileName: "SARAS-MANDATORY-DISCLOSURE.pdf" },
 ];
 
-// Shared table header style
 const thBase = "px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-50";
 const tdBase = "px-4 py-3 text-sm text-gray-700 border-t border-gray-100";
 
@@ -107,8 +101,8 @@ function SectionTitle({ letter, title }: { letter: string; title: string }) {
 
 function InfoTable({ rows }: { rows: { label: string; value: string; href?: string }[] }) {
   return (
-    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-4">
-      <table className="w-full">
+    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-4 overflow-x-auto">
+      <table className="w-full min-w-[540px]">
         <thead>
           <tr>
             <th className={`${thBase} w-1/2`}>Information</th>
@@ -122,8 +116,11 @@ function InfoTable({ rows }: { rows: { label: string; value: string; href?: stri
               <td className={tdBase}>
                 {row.href ? (
                   <a href={row.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold hover:underline" style={{ color: "#0d3b86" }}>
-                    {row.value === "watch" ? "Watch Video" : row.value}
-                    <ExternalLink size={12} />
+                    {row.value === "Watch Video" ? (
+                      <><Play size={12} fill="#0d3b86" /> Watch Video</>
+                    ) : (
+                      <>{row.value} <ExternalLink size={12} /></>
+                    )}
                   </a>
                 ) : (
                   row.value
@@ -137,29 +134,32 @@ function InfoTable({ rows }: { rows: { label: string; value: string; href?: stri
   );
 }
 
-function DocumentTable({ rows }: { rows: { label: string; href?: string }[] }) {
+function DocumentTable({ rows }: { rows: { label: string; href: string; fileName: string }[] }) {
   return (
-    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-4">
-      <table className="w-full">
+    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-4 overflow-x-auto">
+      <table className="w-full min-w-[640px]">
         <thead>
           <tr>
-            <th className={`${thBase} w-3/4`}>Document Information</th>
-            <th className={`${thBase} text-center`}>Document</th>
+            <th className={`${thBase} w-2/5`}>Document Information</th>
+            <th className={`${thBase}`}>File Name</th>
+            <th className={`${thBase} text-center`}>View</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
               <td className={`${tdBase} font-medium text-gray-700`}>{row.label}</td>
+              <td className={`${tdBase} text-gray-500 text-xs`}>{row.fileName}</td>
               <td className={`${tdBase} text-center`}>
                 <a
-                  href={row.href || RIS_CBSE_URL}
+                  href={row.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm font-semibold hover:underline"
-                  style={{ color: "#0d3b86" }}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold hover:underline px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ color: "#0d3b86", background: "#f0f4ff" }}
+                  data-testid={`link-doc-${i}`}
                 >
-                  View <ExternalLink size={11} />
+                  <Download size={13} /> View
                 </a>
               </td>
             </tr>
@@ -172,8 +172,8 @@ function DocumentTable({ rows }: { rows: { label: string; href?: string }[] }) {
 
 function ResultTable({ rows }: { rows: typeof classXResults }) {
   return (
-    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-8">
-      <table className="w-full">
+    <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm mb-8 overflow-x-auto">
+      <table className="w-full min-w-[720px]">
         <thead>
           <tr>
             <th className={thBase}>Year</th>
@@ -223,19 +223,16 @@ export default function CbseDisclosures() {
       <main className="flex-grow py-16 bg-white">
         <div className="container mx-auto px-4 max-w-5xl space-y-14">
 
-          {/* ── A. General Information ────────────────────────────── */}
           <div>
             <SectionTitle letter="A" title="General Information" />
             <InfoTable rows={generalInfo} />
           </div>
 
-          {/* ── B. Documents and Information ─────────────────────── */}
           <div>
             <SectionTitle letter="B" title="Documents and Information" />
             <DocumentTable rows={documents} />
           </div>
 
-          {/* ── C. Results and Academics ──────────────────────────── */}
           <div>
             <SectionTitle letter="C" title="Results and Academics" />
             <DocumentTable rows={academicDocs} />
@@ -247,25 +244,50 @@ export default function CbseDisclosures() {
             <ResultTable rows={classXIIResults} />
           </div>
 
-          {/* ── D. Staff (Teaching) ───────────────────────────────── */}
           <div>
             <SectionTitle letter="D" title="Staff (Teaching)" />
             <InfoTable rows={staffInfo} />
           </div>
 
-          {/* ── E. School Infrastructure ──────────────────────────── */}
           <div>
             <SectionTitle letter="E" title="School Infrastructure" />
             <InfoTable rows={infrastructure} />
           </div>
 
-          {/* ── F. Mandatory Public Disclosure ───────────────────── */}
           <div>
             <SectionTitle letter="F" title="Mandatory Public Disclosure" />
             <DocumentTable rows={disclosureAppendix} />
           </div>
 
-          {/* Footer note */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link
+              href="/declaration"
+              className="flex items-center gap-3 p-5 rounded-2xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
+              data-testid="link-declaration"
+            >
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#f0f4ff" }}>
+                <FileText size={20} style={{ color: "#0d3b86" }} />
+              </div>
+              <div>
+                <p className="font-black text-sm" style={{ color: "#0d3b86" }}>Declaration</p>
+                <p className="text-xs text-gray-500 mt-0.5">View the school's official declaration document</p>
+              </div>
+            </Link>
+            <Link
+              href="/book-list"
+              className="flex items-center gap-3 p-5 rounded-2xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
+              data-testid="link-booklist"
+            >
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#fff7ed" }}>
+                <FileText size={20} style={{ color: "#b45309" }} />
+              </div>
+              <div>
+                <p className="font-black text-sm" style={{ color: "#b45309" }}>Book List 2026–27</p>
+                <p className="text-xs text-gray-500 mt-0.5">View the complete book list for all classes</p>
+              </div>
+            </Link>
+          </div>
+
           <div className="p-6 rounded-2xl border border-gray-100 flex items-start gap-3" style={{ background: "#f8faff" }}>
             <FileText size={18} className="mt-0.5 flex-shrink-0" style={{ color: "#0d3b86" }} />
             <p className="text-sm text-gray-600 leading-relaxed">

@@ -61,7 +61,7 @@ All 86 blog posts from the live site are built as individual SEO-optimised pages
 
 Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier fallback: CDN image → category image (`/blog/cat-*.png`) → gradient placeholder. Category images stored in `client/public/blog/`.
 
-## Pages (18 total)
+## Pages (20 total)
 
 | Route | Page | File |
 |-------|------|------|
@@ -83,6 +83,8 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/academic-calendar` | Academic Calendar | `pages/AcademicCalendar.tsx` |
 | `/blogs` | Blogs | `pages/Blogs.tsx` |
 | `/cbse-mandatory-public-disclosures` | CBSE Disclosures | `pages/CbseDisclosures.tsx` |
+| `/declaration` | Declaration (PDF embed) | `pages/Declaration.tsx` |
+| `/book-list` | Book List (PDF embed) | `pages/BookList.tsx` |
 
 ## Key Components
 

@@ -17,7 +17,7 @@ const academicsLinks = [
   { href: "/secondary-section", label: "Secondary Section" },
   { href: "/senior-secondary-section", label: "Senior Secondary Section" },
   { href: "/extracurriculars", label: "Extracurriculars" },
-  { href: "/cbse-mandatory-public-disclosures", label: "Declaration" },
+  { href: "/declaration", label: "Declaration" },
   { href: "/book-list", label: "Book List" },
 ];
 
