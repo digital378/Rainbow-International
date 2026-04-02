@@ -188,13 +188,13 @@ export function ContactForm() {
                   data-testid="checkbox-consent"
                 />
                 <label htmlFor="consent" className="text-blue-200/70 text-xs leading-relaxed cursor-pointer">
-                  I authorize Rainbow International School and its representatives to contact me with updates via Email, SMS, WhatsApp and Call. This will override DND/NDNC registry.
+                  I confirm the details above are correct and authorize Rainbow International School and its representatives to contact me with updates via Email, SMS, WhatsApp and Call. This will override DND/NDNC registry.
                 </label>
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !agreed}
                 data-testid="button-submit-inquiry"
                 className="w-full font-bold py-3.5 text-[#091a4f] text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
                 style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)", borderRadius: "9999px" }}

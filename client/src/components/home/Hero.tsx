@@ -25,6 +25,7 @@ const quickLinks = [
 export function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
   });
@@ -49,6 +50,7 @@ export function Hero() {
       });
       setSubmitted(true);
       reset();
+      setConfirmed(false);
     } catch {
       toast.error("Could not submit. Please try again.");
     } finally {
@@ -192,9 +194,23 @@ export function Hero() {
                     {errors.grade && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.grade.message}</p>}
                   </div>
 
+                  <div className="flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id="hero-confirm"
+                      checked={confirmed}
+                      onChange={(e) => setConfirmed(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 flex-shrink-0 accent-blue-600"
+                      data-testid="checkbox-hero-confirm"
+                    />
+                    <label htmlFor="hero-confirm" className="text-gray-500 text-[11px] leading-relaxed cursor-pointer">
+                      I confirm the details above are correct
+                    </label>
+                  </div>
+
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !confirmed}
                     data-testid="button-hero-submit"
                     className="w-full py-4 font-bold text-white text-sm rounded-xl transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] disabled:opacity-60"
                     style={{ background: "linear-gradient(135deg, #091a4f 0%, #1a56db 100%)" }}
