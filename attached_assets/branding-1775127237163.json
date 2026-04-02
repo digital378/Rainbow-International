@@ -1,0 +1,142 @@
+{
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Neue Haas Grotesk Text",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#014694",
+    "secondary": "#1F78D8",
+    "accent": "#149BC7",
+    "background": "#666666",
+    "textPrimary": "#666666",
+    "link": "#149BC7"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Neue Haas Grotesk Text",
+      "heading": "Neue Haas Grotesk Text"
+    },
+    "fontStacks": {
+      "heading": [
+        "neue-haas-grotesk-text",
+        "sans-serif"
+      ],
+      "body": [
+        "neue-haas-grotesk-text",
+        "sans-serif"
+      ],
+      "paragraph": [
+        "neue-haas-grotesk-text",
+        "sans-serif"
+      ]
+    },
+    "fontSizes": {
+      "h1": "48px",
+      "h2": "30px",
+      "body": "16px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "3px"
+  },
+  "components": {
+    "input": {
+      "background": "transparent",
+      "textColor": "#FFFFFF",
+      "borderColor": "#FFFFFF",
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonPrimary": {
+      "background": "#000000",
+      "textColor": "#014694",
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "transparent",
+      "textColor": "#000000",
+      "borderColor": "#014694",
+      "borderRadius": "0px",
+      "borderRadiusCorners": {
+        "topLeft": "0px",
+        "topRight": "0px",
+        "bottomRight": "0px",
+        "bottomLeft": "0px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "https://www.jisedu.or.id/uploaded/favicon_jiseduorg.ico",
+    "ogImage": null,
+    "logoHref": "https://www.jisedu.or.id",
+    "logoAlt": "Jakarta Intercultural School"
+  },
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is located in the header, matches the brand name 'Jakarta Intercultural School', and links to the homepage, making it the primary brand logo.",
+    "confidence": 0.95,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "Search",
+      "reasoning": "Button #0 with text 'Search' has a dark background (#000000) and a text color that matches the primary brand color (#014694), making it stand out as a primary action button."
+    },
+    "secondary": {
+      "index": 4,
+      "text": "Next",
+      "reasoning": "Button #4 with text 'Next' has a transparent background and a border color matching the primary brand color (#014694), making it a suitable secondary action button."
+    },
+    "confidence": 0.9
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "international students and parents"
+  },
+  "designSystem": {
+    "framework": "custom",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.9,
+    "colors": 0.9,
+    "overall": 0.9
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is located in the header, matches the brand name 'Jakarta Intercultural School', and links to the homepage, making it the primary brand logo.",
+        "confidence": 0.95
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}
