@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { Send, MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
-import { trackFormSubmit, trackCallClick, trackDirectionsClick } from "@/lib/analytics";
+import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingData } from "@/lib/analytics";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -60,10 +60,11 @@ export function ContactForm() {
   const onSubmit = async (data: InsertInquiry) => {
     setIsSubmitting(true);
     try {
+      const trackingData = getFormTrackingData("Contact Section Form");
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, ...trackingData }),
       });
       if (!response.ok) throw new Error("Failed");
       trackFormSubmit({

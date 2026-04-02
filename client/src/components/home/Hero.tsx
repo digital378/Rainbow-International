@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle } from "lucide-react";
-import { trackFormSubmit } from "@/lib/analytics";
+import { trackFormSubmit, getFormTrackingData } from "@/lib/analytics";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -32,10 +32,11 @@ export function Hero() {
   const onSubmit = async (data: InsertInquiry) => {
     setIsSubmitting(true);
     try {
+      const trackingData = getFormTrackingData("Hero Quick Enquiry");
       const res = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, ...trackingData }),
       });
       if (!res.ok) throw new Error();
       trackFormSubmit({

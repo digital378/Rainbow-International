@@ -33,6 +33,31 @@ function tableRow(label: string, value: string | undefined | null) {
   return `<tr><td style="padding:8px 14px;font-weight:bold;border-bottom:1px solid #eee;color:#091a4f;">${label}</td><td style="padding:8px 14px;border-bottom:1px solid #eee;">${value}</td></tr>`;
 }
 
+function getLeadSourceLabel(utmSource?: string | null, utmMedium?: string | null): string {
+  if (!utmSource && !utmMedium) return "Organic / Direct";
+  const src = (utmSource || "").toLowerCase();
+  const med = (utmMedium || "").toLowerCase();
+  if (src === "google" && (med === "cpc" || med === "paid" || med.includes("paid"))) return "Google Ads";
+  if (src === "facebook" || src === "instagram" || src === "meta") return "Meta Ads (Facebook/Instagram)";
+  if (med === "cpc" || med === "ppc" || med.includes("paid")) return `Paid Ads (${utmSource || "Unknown"})`;
+  if (med === "email") return "Email Campaign";
+  if (med === "social" || med === "organic_social") return `Social Media (${utmSource || "Unknown"})`;
+  if (med === "referral") return `Referral (${utmSource || "Unknown"})`;
+  return utmSource || "Organic / Direct";
+}
+
+function getMediumLabel(utmMedium?: string | null): string {
+  if (!utmMedium) return "Direct";
+  const med = utmMedium.toLowerCase();
+  if (med === "cpc" || med === "ppc") return "Paid Search";
+  if (med === "display") return "Display Ads";
+  if (med === "social" || med === "paid_social") return "Social";
+  if (med === "email") return "Email";
+  if (med === "referral") return "Referral";
+  if (med === "organic") return "Organic Search";
+  return utmMedium;
+}
+
 async function sendInquiryEmail(data: {
   parentName: string;
   email?: string | null;
@@ -41,12 +66,29 @@ async function sendInquiryEmail(data: {
   grade: string;
   preferredTime?: string | null;
   message?: string | null;
+  pagePath?: string | null;
+  pageTitle?: string | null;
+  formLocation?: string | null;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  utmTerm?: string | null;
+  utmContent?: string | null;
 }) {
   const mailer = getTransporter();
   if (!mailer) {
     console.log("[inquiry] SMTP not configured — skipping email. Inquiry saved to DB.");
     return;
   }
+
+  const leadSource = getLeadSourceLabel(data.utmSource, data.utmMedium);
+  const leadMedium = getMediumLabel(data.utmMedium);
+  const isPaid = leadSource !== "Organic / Direct";
+
+  const formLocationLabel = data.formLocation || (data.pagePath === "/" ? "Homepage" : data.pagePath || "Unknown");
+  const pageLabel = data.pageTitle
+    ? `${data.pageTitle} (${data.pagePath || "/"})`
+    : data.pagePath || "/";
 
   await mailer.transport.sendMail({
     from: mailer.from,
@@ -68,6 +110,21 @@ async function sendInquiryEmail(data: {
           ${tableRow("Preferred Time", data.preferredTime)}
           ${tableRow("Message", data.message)}
         </table>
+
+        <div style="margin-top:16px;background:#f0f4ff;border:1px solid #d1daf0;border-radius:8px;padding:16px;">
+          <h3 style="margin:0 0 10px;font-size:14px;color:#091a4f;">📍 Submission Details</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            ${tableRow("Submitted From Page", pageLabel)}
+            ${tableRow("Form Location", formLocationLabel)}
+            ${tableRow("Lead Source", leadSource)}
+            ${tableRow("Lead Medium", leadMedium)}
+            ${isPaid ? tableRow("Campaign", data.utmCampaign) : ""}
+            ${isPaid ? tableRow("Ad Keyword / Term", data.utmTerm) : ""}
+            ${isPaid ? tableRow("Ad Content / Variant", data.utmContent) : ""}
+            ${isPaid ? tableRow("Platform", data.utmSource) : ""}
+          </table>
+        </div>
+
         <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the school website enquiry form.</p>
       </div>
     `,

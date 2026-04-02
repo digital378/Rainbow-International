@@ -13,6 +13,14 @@ export const inquiries = pgTable("inquiries", {
   preferredTime: text("preferred_time"),
   source: text("source"),
   message: text("message"),
+  pagePath: text("page_path"),
+  pageTitle: text("page_title"),
+  formLocation: text("form_location"),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  utmTerm: text("utm_term"),
+  utmContent: text("utm_content"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -28,6 +36,14 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({
   preferredTime: z.string().optional().or(z.literal("")),
   email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
   message: z.string().optional().or(z.literal("")),
+  pagePath: z.string().optional().or(z.literal("")),
+  pageTitle: z.string().optional().or(z.literal("")),
+  formLocation: z.string().optional().or(z.literal("")),
+  utmSource: z.string().optional().or(z.literal("")),
+  utmMedium: z.string().optional().or(z.literal("")),
+  utmCampaign: z.string().optional().or(z.literal("")),
+  utmTerm: z.string().optional().or(z.literal("")),
+  utmContent: z.string().optional().or(z.literal("")),
 });
 
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;

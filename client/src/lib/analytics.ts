@@ -157,6 +157,20 @@ export function getUTMParams(): Record<string, string> {
   };
 }
 
+export function getFormTrackingData(formLocation: string) {
+  const utm = getUTMParams();
+  return {
+    pagePath: window.location.pathname,
+    pageTitle: document.title,
+    formLocation,
+    utmSource: utm.utm_source,
+    utmMedium: utm.utm_medium,
+    utmCampaign: utm.utm_campaign,
+    utmTerm: utm.utm_term,
+    utmContent: utm.utm_content,
+  };
+}
+
 export function resetFormTracking(): void {
   lastFormSubmitTime = 0;
 }
