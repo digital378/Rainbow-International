@@ -120,7 +120,10 @@ export function Navbar() {
     <>
     {!isHome && <div className="h-[140px]" />}
     <div className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isTransparent ? "" : "bg-white shadow-md"}`}>
-      <div className={`text-center py-1.5 text-[11px] font-bold tracking-[0.15em] uppercase transition-colors duration-300 ${isTransparent ? "bg-white/10 backdrop-blur-sm text-white/90" : "bg-[#00a550] text-white"}`}>
+      <div
+        className="text-center py-1.5 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-300 text-white"
+        style={{ background: isTransparent ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
+      >
         ADMISSIONS ARE OPEN FOR THE ACADEMIC YEAR 26–27
       </div>
 
@@ -128,21 +131,14 @@ export function Navbar() {
         <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img
-              src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png"
+              src="/ris-logo.png"
               alt="Rainbow International School"
               className={`w-auto object-contain transition-all duration-300 ${scrolled ? "h-12" : "h-14"}`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const next = target.nextElementSibling as HTMLElement;
-                if (next) next.style.display = 'flex';
+                target.src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png";
               }}
             />
-            <div
-              className="w-14 h-14 bg-gradient-to-br from-primary to-blue-700 rounded-xl items-center justify-center text-white font-serif font-bold text-2xl shadow hidden"
-            >
-              R
-            </div>
           </Link>
 
           <div className="hidden lg:flex items-center gap-8 ml-auto">
@@ -195,14 +191,14 @@ export function Navbar() {
               { label: "At Rainbow", links: atRainbowLinks },
               { label: "Gallery", links: galleryLinks },
             ].map(({ label, links }) => (
-              <div key={label} className={`px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400`}>
+              <div key={label} className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
                 <Dropdown label={label} links={links} isTransparent={isTransparent} />
               </div>
             ))}
             <Link href="/blogs" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>
               Blogs
             </Link>
-            <div className={`px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400`}>
+            <div className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
               <Dropdown label="Parent's Corner" links={parentLinks} isTransparent={isTransparent} />
             </div>
             <Link href="/contact-us" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>
