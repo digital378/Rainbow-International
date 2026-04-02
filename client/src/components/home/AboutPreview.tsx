@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 const stats = [
-  { num: "3,000+", sub: "Happy Students" },
+  { num: "50K+", sub: "Happy Students" },
   { num: "2009", sub: "Established" },
   { num: "3.5 Acres", sub: "Campus Area" },
   { num: "1 Lac+", sub: "Lives Impacted" },

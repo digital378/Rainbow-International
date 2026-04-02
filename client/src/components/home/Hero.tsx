@@ -14,7 +14,7 @@ const classOptions = [
 ];
 
 const stats = [
-  { num: "3,000+", label: "Happy Students" },
+  { num: "50K+", label: "Happy Students" },
   { num: "Since 2009", label: "Established" },
   { num: "3.5 Acres", label: "Campus" },
   { num: "CBSE #1130661", label: "Affiliation" },

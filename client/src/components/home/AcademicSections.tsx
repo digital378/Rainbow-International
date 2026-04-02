@@ -134,16 +134,6 @@ export function AcademicSections() {
           ))}
         </div>
 
-        <div className="text-center">
-          <Link href="/pre-primary-school-thane">
-            <button
-              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm border-2 transition-all duration-300 hover:scale-[1.03] hover:shadow-lg"
-              style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
-            >
-              View All Programmes <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </Link>
-        </div>
       </div>
     </section>
   );
