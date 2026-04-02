@@ -95,7 +95,7 @@ const methodology = [
   {
     title: "Digital Tools",
     desc: "E-learning amenities make abstract concepts concrete & assist in greater retention of data & processes",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-03-1024x683.jpg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01.jpeg",
   },
 ];
 

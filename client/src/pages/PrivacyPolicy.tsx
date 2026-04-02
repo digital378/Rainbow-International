@@ -11,6 +11,7 @@ export default function PrivacyPolicy() {
       <SEO
         title="Privacy Policy & Cookie Policy - Rainbow International School"
         description="Rainbow International School's Privacy Policy and Cookie Policy. Learn how we collect, use, and protect your personal information."
+        keywords="privacy policy, cookie policy, Rainbow International School, data protection, school website policy"
         canonical="https://rainbowinternationalschool.in/privacy-policy-and-cookie-policy/"
       />
       <Navbar />

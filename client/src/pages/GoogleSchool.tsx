@@ -39,7 +39,7 @@ export default function GoogleSchool() {
         title="Google School 2025–26"
         subtitle="Rainbow International School — Certified Google for Education Partner"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Google School 2025–26" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-smart-classroom.jpg"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg"
       />
 
       <main className="flex-1">

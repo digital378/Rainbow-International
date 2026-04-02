@@ -79,7 +79,7 @@ function renderBlogSSR(slug: string): string | null {
   <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />
-  <meta property="og:image" content="${e(post.heroUrl)}" />
+  <meta property="og:image" content="${e(post.heroUrl || 'https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg')}" />
   <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />

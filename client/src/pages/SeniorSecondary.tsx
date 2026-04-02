@@ -109,7 +109,7 @@ const methodology = [
   {
     title: "Experiential Learning Programmes",
     desc: "Unique International Experiential Learning Certificate Programs, integrated throughout year-round coursework & offered exclusively to our Grade 11 students.",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-01-1024x683.jpeg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg",
     color: "#e0edff", accent: "#0d3b86",
   },
   {
@@ -274,7 +274,7 @@ export default function SeniorSecondary() {
                       alt={m.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-01-1024x683.jpeg";
+                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg";
                       }}
                     />
                   </div>

@@ -237,7 +237,7 @@ const testimonials = [
   {
     quote: "The study pattern in Rainbow is very well balanced between books & extra activity. I love to hear from my 8 yr son when he explains everything he learnt — this means he is enjoying, which was not the case one year back. Great going Rainbow teachers, keep it up.",
     name: "Chandrasekhar Ella",
-    photo: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Chandrasekhar-Ella.jpg",
+    photo: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg",
   },
   {
     quote: "Rainbow International School has been a wonderful experience for my daughter. The teachers are dedicated and the holistic approach to education is commendable.",

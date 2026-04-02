@@ -75,7 +75,7 @@ const methodology = [
   {
     title: "Hands-on Activities",
     desc: "Annual exhibitions for many subjects & always active clubs help students apply what they learn",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-01-1024x683.jpeg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02.jpeg",
   },
   {
     title: "Tours & Visits",
@@ -230,7 +230,7 @@ export default function Secondary() {
                       alt={m.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-01-1024x683.jpeg";
+                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02.jpeg";
                       }}
                     />
                   </div>

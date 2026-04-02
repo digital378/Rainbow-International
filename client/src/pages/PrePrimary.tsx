@@ -98,26 +98,26 @@ const methodology = [
   {
     title: "Books",
     desc: "Activity books, E-learning, Flash cards, Memory books",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-books.jpg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Books.jpg",
     fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg",
   },
   {
     title: "Spaces",
     desc: "Theme Based Classrooms, Picnics and Field Trips",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-spaces.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Pre-Primary-Section-2.jpg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Space.jpg",
+    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
   },
   {
     title: "Action",
     desc: "Enactment, Puppet Shows, Muppet Shows, Celebrations",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-action.jpg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Action.jpg",
     fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg",
   },
   {
     title: "Sound",
     desc: "Audio Visual Aids for Phonics, Rhymes and Stories",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-sound.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Pre-Primary-Section-2.jpg",
+    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Sound.jpg",
+    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
   },
 ];
 

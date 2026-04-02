@@ -224,14 +224,14 @@ export default function Curriculum() {
         description="Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology."
         keywords="CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane West"
         canonical="https://rainbowinternationalschool.in/curriculum/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/primary-section-768x513.png"
+        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
       />
       <Navbar />
       <PageBanner
         title="Curriculum"
         subtitle="A balanced, future-ready CBSE curriculum from Nursery to Class 12."
         breadcrumb={[{ label: "Curriculum" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/primary-section-768x513.png"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
       />
 
       <main className="flex-grow">
@@ -265,7 +265,7 @@ export default function Curriculum() {
               </div>
               <div className="rounded-3xl overflow-hidden shadow-sm">
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/primary-section-768x513.png"
+                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
                   alt="Rainbow International School curriculum"
                   className="w-full h-72 object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
