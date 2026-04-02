@@ -28,7 +28,7 @@ function formatNum(val: number, decimals?: number, suffix?: string, target?: num
   if (decimals) {
     return val.toFixed(decimals) + (suffix || "");
   }
-  return Math.floor(val).toLocaleString() + (suffix || "");
+  return Math.floor(val).toString() + (suffix || "");
 }
 
 function CountUp({ stat }: { stat: typeof stats[0] }) {
