@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Clock, MapPin, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { trackCallClick } from "@/lib/analytics";
 
 const aboutLinks = [
   { href: "/about-rainbow-international-school", label: "About RIS" },
@@ -145,8 +146,8 @@ export function Navbar() {
             <div className="flex items-start gap-2">
               <Phone className={`mt-0.5 shrink-0 transition-colors ${isTransparent ? "text-amber-300" : "text-primary"}`} size={16} />
               <div>
-                <a href="tel:02269105000" className={`block text-xs transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-600 hover:text-primary"}`}>(022) 69105000</a>
-                <a href="tel:+918291568972" className={`block text-xs transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-600 hover:text-primary"}`}>+91 82915 68972</a>
+                <a href="tel:02269105000" onClick={() => trackCallClick({ phone: "(022) 69105000" })} className={`block text-xs transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-600 hover:text-primary"}`}>(022) 69105000</a>
+                <a href="tel:+918291568972" onClick={() => trackCallClick({ phone: "+91 82915 68972" })} className={`block text-xs transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-600 hover:text-primary"}`}>+91 82915 68972</a>
               </div>
             </div>
             <div className={`h-8 w-px transition-colors ${isTransparent ? "bg-white/20" : "bg-gray-200"}`} />

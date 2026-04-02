@@ -4,12 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-DN4GB6MVJJ');
+      function gtag(){ dataLayer.push(arguments); }
+      var gs = document.createElement('script');
+      gs.async = true;
+      gs.src = 'https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ';
+      document.head.appendChild(gs);
+      gs.onload = function() {
+        gtag('js', new Date());
+        gtag('config', 'G-DN4GB6MVJJ', { send_page_view: false });
+      };
     </script>
 
     <title>Rainbow International School - Best CBSE School in Thane West</title>

@@ -1,5 +1,6 @@
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Navigation } from "lucide-react";
 import { Link } from "wouter";
+import { trackCallClick, trackDirectionsClick } from "@/lib/analytics";
 
 const MAPS_LINK = "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA";
 
@@ -51,6 +52,7 @@ export function Footer() {
             className="block group relative rounded-2xl overflow-hidden"
             style={{ height: 280 }}
             data-testid="link-campus-map"
+            onClick={() => trackDirectionsClick()}
           >
             <img
               src="/campus-aerial.jpg"
@@ -223,7 +225,7 @@ export function Footer() {
                       <Phone size={16} style={{ color: "#fbbf24" }} />
                     </div>
                     <div>
-                      <a href="tel:+918291568972" className="block text-white/60 text-sm hover:text-white transition-colors">+91 82915 68972</a>
+                      <a href="tel:+918291568972" onClick={() => trackCallClick({ phone: "+91 82915 68972" })} className="block text-white/60 text-sm hover:text-white transition-colors">+91 82915 68972</a>
                     </div>
                   </div>
                 </li>

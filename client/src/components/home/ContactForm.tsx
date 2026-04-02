@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { Send, MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
+import { trackFormSubmit, trackCallClick, trackDirectionsClick } from "@/lib/analytics";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -65,6 +66,13 @@ export function ContactForm() {
         body: JSON.stringify(data),
       });
       if (!response.ok) throw new Error("Failed");
+      trackFormSubmit({
+        formType: "inquiry",
+        parentName: data.parentName,
+        studentName: data.studentName,
+        phone: data.phone,
+        grade: data.grade,
+      });
       setSubmitted(true);
       reset();
       setAgreed(false);
@@ -226,7 +234,18 @@ export function ContactForm() {
                 </div>
               );
               return card.href ? (
-                <a key={i} href={card.href} target="_blank" rel="noopener noreferrer" className="block h-full" data-testid={`link-contact-${card.label.toLowerCase().replace(/\s+/g, "-")}`}>
+                <a
+                  key={i}
+                  href={card.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-full"
+                  data-testid={`link-contact-${card.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  onClick={() => {
+                    if (card.href?.startsWith("tel:")) trackCallClick({ phone: card.lines[0] });
+                    if (card.href?.includes("maps.google")) trackDirectionsClick();
+                  }}
+                >
                   {content}
                 </a>
               ) : (

@@ -265,6 +265,7 @@ export function ChatBot() {
               <p className="text-white/65 text-[11px] leading-tight truncate">Rainbow International School Assistant</p>
             </div>
             <a href={WA_URL} target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" data-testid="link-whatsapp-chat"
+              onClick={() => { import("@/lib/analytics").then(m => m.trackWhatsAppClick()); }}
               className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-opacity" style={{ background: "#25D366" }}>
               <WaSvg />
             </a>

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle } from "lucide-react";
+import { trackFormSubmit } from "@/lib/analytics";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -37,6 +38,14 @@ export function Hero() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error();
+      trackFormSubmit({
+        formType: "hero_inquiry",
+        parentName: data.parentName,
+        studentName: data.studentName,
+        phone: data.phone,
+        grade: data.grade,
+        isHeroForm: true,
+      });
       setSubmitted(true);
       reset();
     } catch {
