@@ -27,7 +27,7 @@ const atRainbowLinks = [
   { href: "/school-managing-committee", label: "School Managing Committee" },
   { href: "/academic-team", label: "Academic Team" },
   { href: "/academic-calendar", label: "Academic Calendar" },
-  { href: "/circulars", label: "Circulars" },
+  { href: "https://www.cbse.gov.in/", label: "Circulars", external: true },
 ];
 
 const galleryLinks = [

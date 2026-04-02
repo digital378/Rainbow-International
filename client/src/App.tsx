@@ -39,7 +39,6 @@ import TermsOfUse from "@/pages/TermsOfUse";
 import GlobalBrandAssociations from "@/pages/GlobalBrandAssociations";
 import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
 import Curriculum from "@/pages/Curriculum";
-import Circulars from "@/pages/Circulars";
 import BlogPost from "@/pages/BlogPost";
 import ApplicationForm from "@/pages/ApplicationForm";
 import GoogleSchool from "@/pages/GoogleSchool";
@@ -86,7 +85,6 @@ function Router() {
       <Route path="/global-brand-associations" component={GlobalBrandAssociations} />
       <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
       <Route path="/curriculum" component={Curriculum} />
-      <Route path="/circulars" component={Circulars} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/application-form" component={ApplicationForm} />
       <Route path="/google-school-2025-26" component={GoogleSchool} />
