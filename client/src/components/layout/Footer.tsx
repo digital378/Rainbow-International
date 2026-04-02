@@ -29,7 +29,7 @@ const preschoolLinks = [
   { label: "Playgroup", href: "https://www.rainbowpreschools.com/playgroup" },
   { label: "Nursery", href: "https://www.rainbowpreschools.com/nursery" },
   { label: "Kindergarten", href: "https://www.rainbowpreschools.com/kindergarten" },
-  { label: "Our Centres", href: "https://www.rainbowpreschools.com/our-centres" },
+  { label: "Our Centres", href: "https://www.rainbowpreschools.com/preschool-near-me" },
   { label: "Gallery", href: "https://www.rainbowpreschools.com/gallery" },
   { label: "Contact", href: "https://www.rainbowpreschools.com/contact" },
 ];
