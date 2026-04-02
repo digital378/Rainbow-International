@@ -31,7 +31,7 @@ const preschoolLinks = [
   { label: "Kindergarten", href: "https://www.rainbowpreschools.com/kindergarten" },
   { label: "Our Centres", href: "https://www.rainbowpreschools.com/preschool-near-me" },
   { label: "Gallery", href: "https://www.rainbowpreschools.com/gallery" },
-  { label: "Contact", href: "https://www.rainbowpreschools.com/contact" },
+  { label: "Best Playschool in Thane", href: "https://www.rainbowpreschools.com/play-school-near-me" },
 ];
 
 export function Footer() {
