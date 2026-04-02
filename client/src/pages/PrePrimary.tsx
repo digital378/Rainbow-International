@@ -322,18 +322,15 @@ export default function PrePrimary() {
                 {/* Transition pathway — pyramid */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
                   <h3 className="font-black text-lg mb-6" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
-                  <div className="flex items-end relative">
-                    {/* Step 1 — smallest */}
+                  <div className="grid grid-cols-3 gap-3 sm:gap-0 sm:flex sm:items-end relative">
                     <a
                       href="https://www.rainbowpreschools.com/programmes"
                       target="_blank" rel="noopener noreferrer"
-                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-shrink-0 relative"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
-                        width: "30%", padding: "14px 12px 16px",
+                        padding: "14px 10px 16px",
                         background: "#fff7e0",
                         zIndex: 1,
-                        marginRight: "-14px",
-                        boxShadow: "4px 0 12px rgba(0,0,0,0.08)",
                       }}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#b4530999" }}>Step 1</p>
@@ -341,37 +338,33 @@ export default function PrePrimary() {
                       <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#b45309bb" }}>Rainbow Preschool International</p>
                     </a>
 
-                    {/* Step 2 — medium */}
                     <a
                       href="https://www.rainbowpreschools.com/kindergarten"
                       target="_blank" rel="noopener noreferrer"
-                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-shrink-0 relative"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
-                        width: "34%", padding: "20px 14px 22px",
+                        padding: "20px 10px 22px",
                         background: "#e0f7f0",
                         zIndex: 2,
-                        marginRight: "-14px",
-                        boxShadow: "4px 0 12px rgba(0,0,0,0.10)",
                       }}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#04785799" }}>Step 2</p>
-                      <p className="font-black text-base leading-tight" style={{ color: "#047857" }}>Jr. KG / Sr. KG</p>
+                      <p className="font-black text-sm sm:text-base leading-tight" style={{ color: "#047857" }}>Jr. KG / Sr. KG</p>
                       <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#047857bb" }}>Rainbow Preschool International</p>
                     </a>
 
-                    {/* Step 3 — largest */}
                     <a
                       href="/primary-section"
-                      className="rounded-2xl text-center hover:opacity-90 transition-opacity flex-grow relative"
+                      className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
-                        padding: "28px 16px 30px",
+                        padding: "28px 10px 30px",
                         background: "#e0edff",
                         zIndex: 3,
                         boxShadow: "0 4px 16px rgba(13,59,134,0.12)",
                       }}
                     >
                       <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#0d3b8699" }}>Step 3</p>
-                      <p className="font-black text-lg leading-tight" style={{ color: "#0d3b86" }}>Class 1 onwards</p>
+                      <p className="font-black text-sm sm:text-lg leading-tight" style={{ color: "#0d3b86" }}>Class 1 onwards</p>
                       <p className="text-[11px] mt-1.5 leading-snug" style={{ color: "#0d3b86bb" }}>Rainbow International School</p>
                     </a>
                   </div>
