@@ -74,6 +74,8 @@ function renderBlogSSR(slug: string): string | null {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
   <title>${e(post.metaTitle)} | Rainbow International School</title>
   <meta name="description" content="${e(post.metaDescription)}" />
   <meta name="keywords" content="${e(post.keywords)}" />

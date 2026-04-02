@@ -17,6 +17,8 @@ function renderHomeSSR(): string {
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
 <title>Best CBSE School in Thane West — Admissions 2026–27 Open | Rainbow International School</title>
 <meta name="description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra. Offering world-class education from Nursery to Class 12 with Science, Commerce &amp; Humanities streams. Admissions open for 2026–27." />
 <meta name="keywords" content="Rainbow International School Thane, CBSE school Thane, best international school Thane West, K-12 school Thane, school admissions Thane 2026, CBSE admissions Thane, top school Thane West Maharashtra" />
