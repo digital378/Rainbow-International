@@ -7,40 +7,103 @@ import nodemailer from "nodemailer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 
-// ── Email helper ────────────────────────────────────────────────
-async function sendCallbackEmail(data: { name: string; phone: string; preferredTime: string }) {
+// ── Email helpers ───────────────────────────────────────────────
+function getTransporter() {
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = Number(process.env.SMTP_PORT) || 587;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-  const mailTo   = process.env.CALLBACK_MAIL_TO || "info@rainbowinternationalschool.in";
 
-  if (!smtpHost || !smtpUser || !smtpPass) {
+  if (!smtpHost || !smtpUser || !smtpPass) return null;
+
+  return {
+    transport: nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: { user: smtpUser, pass: smtpPass },
+    }),
+    from: `"Rainbow International School" <${smtpUser}>`,
+    to: process.env.ENQUIRY_MAIL_TO || "digital@rainbowinternationalschool.in",
+  };
+}
+
+function tableRow(label: string, value: string | undefined | null) {
+  if (!value) return "";
+  return `<tr><td style="padding:8px 14px;font-weight:bold;border-bottom:1px solid #eee;color:#091a4f;">${label}</td><td style="padding:8px 14px;border-bottom:1px solid #eee;">${value}</td></tr>`;
+}
+
+async function sendInquiryEmail(data: {
+  parentName: string;
+  email?: string | null;
+  phone: string;
+  studentName: string;
+  grade: string;
+  preferredTime?: string | null;
+  source?: string | null;
+  message?: string | null;
+}) {
+  const mailer = getTransporter();
+  if (!mailer) {
+    console.log("[inquiry] SMTP not configured — skipping email. Inquiry saved to DB.");
+    return;
+  }
+
+  await mailer.transport.sendMail({
+    from: mailer.from,
+    to: mailer.to,
+    replyTo: data.email || undefined,
+    subject: `New Admission Enquiry – ${data.studentName} (${data.grade})`,
+    html: `
+      <div style="font-family:'Segoe UI',sans-serif;max-width:600px;">
+        <div style="background:#091a4f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
+          <h2 style="margin:0;font-size:20px;">🌈 New Admission Enquiry</h2>
+          <p style="margin:4px 0 0;opacity:0.85;font-size:13px;">Rainbow International School Website</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;border-top:none;">
+          ${tableRow("Parent Name", data.parentName)}
+          ${tableRow("Student Name", data.studentName)}
+          ${tableRow("Grade / Class", data.grade)}
+          ${tableRow("Phone", data.phone)}
+          ${tableRow("Email", data.email)}
+          ${tableRow("Preferred Time", data.preferredTime)}
+          ${tableRow("How They Found Us", data.source)}
+          ${tableRow("Message", data.message)}
+        </table>
+        <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the school website enquiry form.</p>
+      </div>
+    `,
+  });
+  console.log("[inquiry] Email sent to", mailer.to);
+}
+
+async function sendCallbackEmail(data: { name: string; phone: string; preferredTime: string }) {
+  const mailer = getTransporter();
+  if (!mailer) {
     console.log("[callback] SMTP not configured — skipping email. Request saved to DB.");
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: { user: smtpUser, pass: smtpPass },
-  });
-
-  await transporter.sendMail({
-    from: `"Rainbow School Website" <${smtpUser}>`,
-    to: mailTo,
-    subject: "New Callback Request – Rainbow International School",
+  await mailer.transport.sendMail({
+    from: mailer.from,
+    to: mailer.to,
+    subject: `Callback Request – ${data.name}`,
     html: `
-      <h2>New Callback Request</h2>
-      <table style="border-collapse:collapse;font-family:sans-serif;">
-        <tr><td style="padding:6px 12px;font-weight:bold;">Name</td><td style="padding:6px 12px;">${data.name}</td></tr>
-        <tr><td style="padding:6px 12px;font-weight:bold;">Phone</td><td style="padding:6px 12px;">${data.phone}</td></tr>
-        <tr><td style="padding:6px 12px;font-weight:bold;">Preferred Time</td><td style="padding:6px 12px;">${data.preferredTime}</td></tr>
-      </table>
-      <p style="color:#888;font-size:12px;margin-top:16px;">Submitted via the website chatbot.</p>
+      <div style="font-family:'Segoe UI',sans-serif;max-width:600px;">
+        <div style="background:#091a4f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
+          <h2 style="margin:0;font-size:20px;">📞 New Callback Request</h2>
+          <p style="margin:4px 0 0;opacity:0.85;font-size:13px;">Rainbow International School Website</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;border-top:none;">
+          ${tableRow("Name", data.name)}
+          ${tableRow("Phone", data.phone)}
+          ${tableRow("Preferred Time", data.preferredTime)}
+        </table>
+        <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the website chatbot.</p>
+      </div>
     `,
   });
+  console.log("[callback] Email sent to", mailer.to);
 }
 
 export async function registerRoutes(
@@ -53,6 +116,9 @@ export async function registerRoutes(
     try {
       const validatedData = insertInquirySchema.parse(req.body);
       const inquiry = await storage.createInquiry(validatedData);
+      sendInquiryEmail(validatedData).catch((err) =>
+        console.error("[inquiry] Email error:", err)
+      );
       res.status(201).json(inquiry);
     } catch (error: any) {
       if (error.name === "ZodError") {

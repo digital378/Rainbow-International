@@ -40,3 +40,10 @@ waitForPort = 5000
 
 [agent]
 mockupState = "FULLSTACK"
+
+[userenv]
+
+[userenv.shared]
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "587"
+ENQUIRY_MAIL_TO = "digital@rainbowinternationalschool.in"
