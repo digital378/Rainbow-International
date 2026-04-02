@@ -53,6 +53,8 @@ export default function AcademicCalendar() {
                   src={cal.image}
                   alt={cal.label}
                   className="w-full object-contain bg-gray-50"
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <div className="p-5 flex items-center justify-between">

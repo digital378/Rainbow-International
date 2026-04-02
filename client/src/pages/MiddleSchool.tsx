@@ -187,6 +187,10 @@ export default function MiddleSchool() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-02-1024x559.jpeg"
                   alt="Middle school students"
                   className="rounded-3xl w-full object-cover max-h-64"
+                  width={1024}
+                  height={559}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -279,6 +283,10 @@ export default function MiddleSchool() {
                       src={m.img}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-01-1024x545.jpeg";
                       }}

@@ -169,6 +169,10 @@ export default function PrePrimary() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg"
                   alt="Pre-Primary kids activity"
                   className="rounded-3xl w-full object-cover max-h-72 mt-4"
+                  width={800}
+                  height={400}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -199,6 +203,7 @@ export default function PrePrimary() {
                       <div key={i} className="flex items-start gap-3 px-5 py-4 bg-white">
                         <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.color }}>
                           <img src={c.icon} alt={c.subject} className="w-6 h-6 object-contain"
+                            width={24} height={24} loading="lazy" decoding="async"
                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                         </div>
                         <div>
@@ -250,6 +255,10 @@ export default function PrePrimary() {
                       src={m.img}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = m.fallback;
                       }}
@@ -400,7 +409,7 @@ export default function PrePrimary() {
                 {/* Visit RPS CTA */}
                 <div className="rounded-3xl p-6 text-center" style={{ background: "#fff7ed", border: "2px solid #fed7aa" }}>
                   <div className="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden flex items-center justify-center bg-white shadow-sm">
-                    <img src="/rps-logo.png" alt="Rainbow Preschool International" className="w-full h-full object-contain" />
+                    <img src="/rps-logo.png" alt="Rainbow Preschool International" className="w-full h-full object-contain" width={80} height={80} loading="lazy" decoding="async" />
                   </div>
                   <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>Rainbow Preschool International</p>
                   <p className="text-xs text-gray-500 mb-4">Award-winning preschools across Thane</p>

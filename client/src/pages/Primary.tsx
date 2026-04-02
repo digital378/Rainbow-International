@@ -189,6 +189,10 @@ export default function Primary() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-02-1024x546.jpeg"
                   alt="Primary section students"
                   className="rounded-3xl w-full object-cover max-h-64"
+                  width={1024}
+                  height={546}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -298,6 +302,10 @@ export default function Primary() {
                       src={m.img}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01-1024x548.jpeg";
                       }}

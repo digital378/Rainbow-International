@@ -144,6 +144,10 @@ export default function Secondary() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02-1024x554.jpeg"
                   alt="Secondary section students"
                   className="rounded-3xl w-full object-cover max-h-64"
+                  width={1024}
+                  height={554}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -229,6 +233,10 @@ export default function Secondary() {
                       src={m.img}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02.jpeg";
                       }}

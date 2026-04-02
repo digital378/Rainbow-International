@@ -49,6 +49,10 @@ export default function WelcomeToRIS() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
                   alt="Rainbow International School"
                   className="rounded-3xl shadow-sm w-full object-cover"
+                  width={1024}
+                  height={536}
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   {[["2009", "Founded"], ["1 Lac+", "Students Impacted"], ["3.5 Acres", "Campus Size"], ["3,000+", "Current Students"]].map(([val, label], i) => (

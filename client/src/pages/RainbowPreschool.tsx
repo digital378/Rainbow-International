@@ -146,6 +146,10 @@ export default function RainbowPreschool() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
                   alt="Rainbow Preschool children"
                   className="w-full h-full object-cover"
+                  width={320}
+                  height={320}
+                  loading="eager"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -208,6 +212,7 @@ export default function RainbowPreschool() {
                   ].map((src, i) => (
                     <div key={i} className={`rounded-2xl overflow-hidden shadow-md ${i === 0 ? "col-span-2 h-44" : "h-32"}`}>
                       <img src={src} alt="Rainbow Preschool" className="w-full h-full object-cover"
+                        loading="lazy" decoding="async"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                     </div>
                   ))}
@@ -460,6 +465,10 @@ export default function RainbowPreschool() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-preschool-playgroup-banner-1.jpg"
                   alt="Rainbow Preschool classroom"
                   className="rounded-3xl shadow-xl w-full object-cover h-80"
+                  width={384}
+                  height={320}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>

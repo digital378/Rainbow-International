@@ -301,6 +301,10 @@ export default function Extracurriculars() {
                     src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                     alt="FIT INDIA School Certificate"
                     className="w-full h-full object-cover"
+                    width={144}
+                    height={144}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       const el = e.target as HTMLImageElement;
                       el.style.display = "none";
@@ -341,6 +345,10 @@ export default function Extracurriculars() {
                       src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
                   </div>
@@ -418,6 +426,10 @@ export default function Extracurriculars() {
                   src={t.photo}
                   alt={t.name}
                   className="w-14 h-14 rounded-full mx-auto mb-3 object-cover border-2 border-gray-100"
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               )}

@@ -201,6 +201,10 @@ export default function SafetySecurity() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Screenshot--768x415.jpeg"
                   alt="Security control room"
                   className="w-full h-72 object-cover"
+                  width={768}
+                  height={415}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
@@ -246,6 +250,10 @@ export default function SafetySecurity() {
                       src={h.image}
                       alt={h.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
                   </div>
@@ -309,6 +317,10 @@ export default function SafetySecurity() {
                 src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security.png"
                 alt="Safety video thumbnail"
                 className="w-full h-72 object-cover opacity-40"
+                width={800}
+                height={288}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">

@@ -172,7 +172,7 @@ export default function BlogPost() {
               {/* RPS External Link */}
               <div className="rounded-2xl p-6 text-white" style={{ background: "#0d3b86" }}>
                 <div className="bg-white rounded-lg px-3 py-2 inline-flex items-center mb-3">
-                  <img src="/rps-logo.png" alt="Rainbow Preschool International" className="h-8 w-auto object-contain" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+                  <img src="/rps-logo.png" alt="Rainbow Preschool International" className="h-8 w-auto object-contain" width={100} height={32} loading="lazy" decoding="async" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
                 </div>
                 <h3 className="font-black text-base mb-2">Rainbow Preschool International</h3>
                 <p className="text-white/80 text-xs leading-relaxed mb-4">

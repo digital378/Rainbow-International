@@ -183,6 +183,7 @@ export default function PhotoGallery() {
             src={lightbox.src}
             alt={lightbox.alt}
             className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
+            decoding="async"
             onClick={(e) => e.stopPropagation()}
           />
           <p className="absolute bottom-6 text-white/80 text-sm">{lightbox.alt}</p>
@@ -207,6 +208,7 @@ function GalleryCard({ img, index, onClick }: { img: { src: string; alt: string 
           alt={img.alt}
           className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          decoding="async"
           onError={(e) => { (e.target as HTMLImageElement).closest('div.break-inside-avoid')?.remove(); }}
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-end">

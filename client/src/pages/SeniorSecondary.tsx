@@ -273,6 +273,10 @@ export default function SeniorSecondary() {
                       src={m.img}
                       alt={m.title}
                       className="w-full h-full object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg";
                       }}

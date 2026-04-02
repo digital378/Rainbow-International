@@ -62,6 +62,10 @@ function AmenityCard({ name, image, fallback }: { name: string; image: string; f
           src={image}
           alt={name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          width={600}
+          height={400}
+          loading="lazy"
+          decoding="async"
           onError={(e) => { (e.target as HTMLImageElement).src = fallback; }}
         />
         <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
@@ -141,6 +145,10 @@ export default function Amenities() {
                       src={img.src}
                       alt={`Organic farming ${i + 1}`}
                       className="w-full h-full object-cover"
+                      width={1024}
+                      height={536}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).src = img.fallback; }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />

@@ -95,7 +95,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 ## Content Design
 
 - **Design**: "Playful Academic" aesthetic — school blue (primary) + energetic yellow (secondary)
-- **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks
+- **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
 - **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component
 - **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL
 

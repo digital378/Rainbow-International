@@ -75,6 +75,8 @@ export function BlogThumb({ src, alt, cat }: BlogThumbProps) {
       src={primary}
       alt={alt}
       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+      decoding="async"
       onError={handleError}
     />
   );

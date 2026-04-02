@@ -106,6 +106,10 @@ export default function Awards() {
                       src={award.image}
                       alt={award.title}
                       className="w-full h-52 object-cover"
+                      width={600}
+                      height={208}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />

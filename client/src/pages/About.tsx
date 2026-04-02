@@ -122,12 +122,20 @@ export default function About() {
                 src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
                 alt="Rainbow International School Infrastructure"
                 className="rounded-3xl shadow-sm w-full object-cover"
+                width={1024}
+                height={536}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
               <img
                 src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/01.jpeg"
                 alt="Rainbow International School Campus"
                 className="rounded-3xl shadow-sm w-full object-cover"
+                width={1024}
+                height={536}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             </div>
@@ -202,6 +210,10 @@ export default function About() {
                       src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
                       alt="Chairperson, Rainbow International School"
                       className="w-full h-full object-cover object-top"
+                      width={208}
+                      height={256}
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => {
                         const el = e.target as HTMLImageElement;
                         el.src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png";

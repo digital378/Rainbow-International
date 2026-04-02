@@ -268,6 +268,10 @@ export default function Curriculum() {
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
                   alt="Rainbow International School curriculum"
                   className="w-full h-72 object-cover"
+                  width={800}
+                  height={288}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>

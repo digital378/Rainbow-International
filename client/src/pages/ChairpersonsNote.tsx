@@ -31,6 +31,10 @@ export default function ChairpersonsNote() {
                     src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png"
                     alt="Rainbow International School"
                     className="w-full h-full object-cover"
+                    width={176}
+                    height={176}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>
