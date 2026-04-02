@@ -561,7 +561,7 @@ export default function RainbowPreschool() {
                 {[
                   { num: "1.5–5.5", label: "Age Group" },
                   { num: "100%", label: "Female Staff" },
-                  { num: "4", label: "Programmes" },
+                  { num: "18+", label: "Years of Legacy" },
                 ].map((s, i) => (
                   <div key={i} className={`px-6 py-5 text-center ${i < 2 ? "border-r border-pink-100" : ""}`}>
                     <p className="text-2xl font-black mb-1" style={{ color: "#f5576c" }}>{s.num}</p>
