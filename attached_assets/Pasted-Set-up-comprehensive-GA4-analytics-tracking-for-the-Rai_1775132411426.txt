@@ -1,0 +1,83 @@
+Set up comprehensive GA4 analytics tracking for the Rainbow International School website. The GA4 Measurement ID is G-DN4GB6MVJJ and the secret VITE_GA_MEASUREMENT_ID is already configured.
+
+STEP 1 — index.html gtag loader (non-blocking, deferred):
+Add this in the <head> of client/index.html. It must NOT block page rendering:
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  var gs = document.createElement('script');
+  gs.async = true;
+  gs.src = 'https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ';
+  document.head.appendChild(gs);
+  gs.onload = function() {
+    gtag('js', new Date());
+    gtag('config', 'G-DN4GB6MVJJ', { send_page_view: false });
+  };
+</script>
+send_page_view: false is critical — React will fire page views manually with correct titles.
+
+STEP 2 — Create client/src/lib/analytics.ts:
+This file handles all GA4 tracking. Implement these functions:
+
+initGA() — Ensures window.gtag and window.dataLayer exist immediately so tracking calls don't fail while the async script loads. Uses import.meta.env.VITE_GA_MEASUREMENT_ID.
+
+trackPageView(url) — Fires a manual page_view event. Important: wait for React's SEO/Head component to set document.title before firing (retry up to 5 times, 200ms apart). Also call resetFormTracking() on each navigation. Example:
+
+window.gtag('event', 'page_view', {
+  page_path: url,
+  page_title: document.title,
+  page_location: window.location.href
+});
+trackFormSubmit(params) — Fires after server confirms a successful form submission (NEVER on button click). Event naming convention based on current URL:
+
+Homepage / → Home_Form_Submit
+Homepage instant/hero form → Home_Instant_Form_Submit
+/admissions → Admissions_Form_Submit
+/grade-11-science → Grade_11_Science_Form_Submit
+Any page → take the URL slug, replace hyphens with underscores, capitalize each word, append _Form_Submit
+Include a 3-second dedup timing lock to prevent double-firing from rapid clicks or multiple handlers. Parameters to include:
+
+page_path, page_title, form_type, parent_name, student_name, phone,
+child_age, grade, programme, centre, lead_source, lead_medium,
+utm_campaign, utm_term, utm_content, send_to: measurementId
+trackCallClick(params) — Fires call_click event when a phone number is tapped. Include centre, phone, source_page.
+
+trackWhatsAppClick(params) — Fires whatsapp_click event for WhatsApp CTA clicks.
+
+trackDirectionsClick(params) — Fires directions_click event for Google Maps links.
+
+trackEvent(action, category, label, value) — Generic custom event tracker via gtag.
+
+pushToDataLayer(event) — Pushes any custom event object to window.dataLayer.
+
+getUTMParams() — Reads utm_source, utm_medium, utm_campaign, utm_term, utm_content from window.location.search.
+
+resetFormTracking() — Clears the dedup lock (called on SPA navigation).
+
+All functions must: log with [GA4] prefix for debugging, use send_to: measurementId when firing via gtag, fall back to dataLayer push if gtag isn't ready yet.
+
+STEP 3 — Wire into React App:
+
+Call initGA() once in root App component's useEffect
+Call trackPageView(url) on every route change using your router's location/pathname hook
+Call trackFormSubmit({ formType, parentName, phone, ... }) inside every form's success handler (after API returns success)
+Add trackCallClick() to all phone number <a href="tel:..."> links
+Add trackWhatsAppClick() to all WhatsApp <a> links
+Add trackDirectionsClick() to all Google Maps direction links
+STEP 4 — Declare TypeScript types:
+Add to a .d.ts or at the top of analytics.ts:
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
+}
+KEY RULES:
+
+Form events fire ONLY after server confirms success — never on click
+One event per submission (3-second dedup lock)
+Page views fired manually by React with correct titles — never by gtag auto
+All console logs prefixed with [GA4] for easy debugging
+Graceful fallback if gtag script hasn't loaded yet
