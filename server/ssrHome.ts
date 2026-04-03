@@ -463,7 +463,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/middle-school-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/middle-section.jpg" alt="Middle School" /></div>
+        <div class="program-card-img"><img src="/images/students/secondary-students.png" alt="Middle School" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#ecfdf5;color:#10b981">Class VI – VIII</span>
           <h3>Middle School</h3>
@@ -474,7 +474,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     </div>
     <div class="programs-grid-2">
       <a href="/secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/secondary-students.png" alt="Secondary" /></div>
+        <div class="program-card-img"><img src="/images/students/middle-section.jpg" alt="Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#f5f3ff;color:#8b5cf6">Class IX – X</span>
           <h3>Secondary</h3>
