@@ -67,7 +67,7 @@ export default function ThankYou() {
 
           {/* Contact strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-            <a href="tel:+918291568972" className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+            <a href="tel:+918291568972" onClick={() => { import("@/lib/analytics").then(m => m.trackCallClick({ phone: "+91 82915 68972" })); }} className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
               <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                 <Phone className="text-[#0d3b86]" size={18} />
               </div>

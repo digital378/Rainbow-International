@@ -102,7 +102,13 @@ export function trackCallClick(params: {
     source_page: params.sourcePage || window.location.pathname,
     send_to: MEASUREMENT_ID,
   });
-  console.log("[GA4] Call click:", params.phone);
+  window.gtag("event", "conversion", {
+    send_to: MEASUREMENT_ID,
+    event_category: "engagement",
+    event_label: params.phone,
+    conversion_name: "call_click",
+  });
+  console.log("[GA4] Call click (key event):", params.phone);
 }
 
 export function trackWhatsAppClick(params?: {

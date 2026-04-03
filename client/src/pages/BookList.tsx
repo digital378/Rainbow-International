@@ -74,6 +74,7 @@ export default function BookList() {
               </a>
               <a
                 href="tel:+918291568972"
+                onClick={() => { import("@/lib/analytics").then(m => m.trackCallClick({ phone: "+91 82915 68972" })); }}
                 className="inline-flex items-center gap-2 text-sm font-bold px-6 py-2.5 rounded-full border-2 transition-colors hover:bg-gray-50"
                 style={{ borderColor: "#0d3b86", color: "#0d3b86" }}
               >
