@@ -57,22 +57,19 @@ export function BeyondClassroomSection() {
           <div className="flex-1 flex justify-center order-1 lg:order-2">
             <div className="relative">
               <div
-                className="w-80 h-80 md:w-96 md:h-96 overflow-hidden shadow-2xl"
+                className="w-80 h-80 md:w-96 md:h-96 overflow-hidden"
                 style={{
-                  background: "linear-gradient(145deg, #091a4f 0%, #0d3b86 45%, #1550b8 100%)",
-                  border: "3px solid rgba(251,191,36,0.3)",
                   borderRadius: "20px",
                 }}
               >
                 <img
-                  src="/images/students/pre-primary-running-2.jpg"
-                  alt="Beyond The Classroom at Rainbow International School"
+                  src="/images/beyond-classroom-rocket.png"
+                  alt="Beyond The Classroom at Rainbow International School — Tours, Exhibitions, Clubs, Promoting Green, Dignity of Labour"
                   width={384}
                   height={384}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover"
-                  style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.18))" }}
+                  className="w-full h-full object-contain"
                 />
               </div>
 
