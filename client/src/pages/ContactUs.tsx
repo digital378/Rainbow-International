@@ -252,22 +252,6 @@ export default function ContactUs() {
           </div>
         </section>
 
-        <section className="bg-white">
-          <div className="max-w-6xl mx-auto px-4 py-12">
-            <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-              <iframe
-                title="Rainbow International School Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.1631567591!2d72.96988!3d19.2183!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b9b9b9b9b9b9%3A0x9b9b9b9b9b9b9b9b!2sRainbow+International+School%2C+Thane!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
-                width="100%"
-                height="350"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </section>
-
         <ContactForm />
       </main>
       <Footer />
