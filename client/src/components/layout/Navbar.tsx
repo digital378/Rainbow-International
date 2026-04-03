@@ -190,13 +190,14 @@ export function Navbar() {
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppClick()}
               data-testid="link-navbar-whatsapp-mobile"
-              className="flex items-center justify-center w-10 h-10 rounded-full"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-white text-[10px] font-bold"
               style={{ background: "#25D366" }}
-              aria-label="Chat on WhatsApp"
+              aria-label="Admission Enquiry on WhatsApp"
             >
-              <svg viewBox="0 0 32 32" width="20" height="20" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 32 32" width="16" height="16" fill="white" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.504 1.128 6.752 3.052 9.388L1.056 30.74l5.516-1.972A15.903 15.903 0 0 0 16.004 32C24.828 32 32 24.824 32 16S24.828 0 16.004 0zm9.22 22.596c-.38 1.072-1.888 1.964-3.096 2.224-.824.176-1.9.316-5.52-1.188-4.628-1.916-7.608-6.616-7.84-6.924-.224-.308-1.88-2.504-1.88-4.776 0-2.272 1.188-3.38 1.608-3.808.38-.388.824-.56 1.1-.56.276 0 .548.004.788.016.252.012.59-.096.924.704.348.82 1.18 2.896 1.284 3.108.104.212.172.46.032.744-.14.284-.208.46-.416.708-.208.248-.436.556-.624.748-.208.208-.424.432-.184.848.24.416 1.068 1.76 2.292 2.852 1.576 1.404 2.904 1.836 3.316 2.044.412.208.648.176.888-.104.24-.28 1.028-1.2 1.3-1.612.272-.412.548-.344.924-.208.376.136 2.392 1.128 2.8 1.336.412.208.684.308.784.48.1.172.1.992-.28 2.068z"/>
               </svg>
+              Enquiry
             </a>
             <button
               className={`p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors ${isTransparent ? "text-white" : "text-gray-600"}`}
