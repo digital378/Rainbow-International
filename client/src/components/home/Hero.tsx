@@ -81,7 +81,7 @@ export function Hero() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
               </span>
               <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">
-                Admissions Open · Academic Year 2026–27
+                Admissions Open · AY 2026–27
               </span>
             </div>
 

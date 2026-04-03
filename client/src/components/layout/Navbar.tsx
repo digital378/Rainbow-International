@@ -122,10 +122,10 @@ export function Navbar() {
     {!isHome && <div className="h-[140px]" />}
     <div className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isTransparent ? "" : "bg-white shadow-md"}`}>
       <div
-        className="text-center py-1.5 text-[11px] font-bold tracking-[0.15em] uppercase transition-all duration-300 text-white"
+        className="text-center py-1.5 text-[10px] sm:text-[11px] font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase transition-all duration-300 text-white whitespace-nowrap"
         style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
       >
-        ADMISSIONS ARE OPEN FOR THE ACADEMIC YEAR 26–27
+        ADMISSIONS OPEN · ACADEMIC YEAR 2026–27
       </div>
 
       <div className={`transition-all duration-300 ${isTransparent ? "border-b border-white/10" : "border-b border-gray-100"}`}>
