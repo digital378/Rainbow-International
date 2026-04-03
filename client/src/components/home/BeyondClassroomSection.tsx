@@ -63,7 +63,7 @@ export function BeyondClassroomSection() {
                 }}
               >
                 <img
-                  src="/images/home/beyond-classroom/beyond.jpg"
+                  src="/images/home/beyond-classroom-rocket.jpg"
                   alt="Beyond The Classroom at Rainbow International School — Tours, Exhibitions, Clubs, Promoting Green, Dignity of Labour"
                   width={384}
                   height={384}

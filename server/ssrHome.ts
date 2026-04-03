@@ -572,7 +572,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       </div>
       <div class="beyond-img">
         <div class="beyond-card">
-          <img src="/images/home/beyond-classroom/beyond.jpg" alt="Beyond The Classroom at Rainbow International School" />
+          <img src="/images/home/beyond-classroom-rocket.jpg" alt="Beyond The Classroom at Rainbow International School" />
         </div>
       </div>
     </div>
