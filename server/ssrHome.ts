@@ -524,7 +524,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="container">
     <div class="discover-grid">
       <a href="/awards-achievements" class="discover-card">
-        <img src="/images/home/discover/drone-shot.jpg" alt="Awards & Accomplishments" />
+        <img src="/images/home/discover/awards.jpg" alt="Awards & Accomplishments" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#fef3c7;color:#f59e0b">Recognition</span>
         <div class="discover-card-text"><h3>Awards &amp; Accomplishments</h3><p>Accolades earned for being one of the best and most promising international schools in Thane for over a decade.</p></div>
@@ -536,13 +536,13 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         <div class="discover-card-text"><h3>Amenities &amp; Facilities</h3><p>Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.</p></div>
       </a>
       <a href="/student-achievements" class="discover-card">
-        <img src="/images/home/discover/achievements.jpg" alt="Student Achievements" />
+        <img src="/images/home/discover/student-achievements.jpg" alt="Student Achievements" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#ede9fe;color:#8b5cf6">Excellence</span>
         <div class="discover-card-text"><h3>Student Achievements</h3><p>Student accomplishments are acknowledged and honored. Here you can view our best achievers.</p></div>
       </a>
       <a href="/safety-security" class="discover-card">
-        <img src="/images/home/safety/safety.jpg" alt="Safety & Security" />
+        <img src="/images/home/discover/safety-security.jpg" alt="Safety & Security" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#dbeafe;color:#0d3b86">Wellbeing</span>
         <div class="discover-card-text"><h3>Safety &amp; Security</h3><p>Student safety and well-being is our top priority, safeguarded through stringent modern security measures.</p></div>

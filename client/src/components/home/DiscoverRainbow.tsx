@@ -5,7 +5,7 @@ const highlights = [
   {
     title: "Awards & Accomplishments",
     description: "Accolades earned for being one of the best and most promising international schools in Thane for over a decade.",
-    image: "/images/home/discover/drone-shot.jpg",
+    image: "/images/home/discover/awards.jpg",
     href: "/awards-achievements",
     tag: "Recognition",
   },
@@ -19,14 +19,14 @@ const highlights = [
   {
     title: "Student Achievements",
     description: "Student accomplishments are acknowledged and honored. Here you can view our best achievers.",
-    image: "/images/home/discover/achievements.jpg",
+    image: "/images/home/discover/student-achievements.jpg",
     href: "/student-achievements",
     tag: "Excellence",
   },
   {
     title: "Safety & Security",
     description: "Student safety and well-being is our top priority, safeguarded through stringent modern security measures.",
-    image: "/images/home/safety/safety.jpg",
+    image: "/images/home/discover/safety-security.jpg",
     href: "/safety-security",
     tag: "Wellbeing",
   },
