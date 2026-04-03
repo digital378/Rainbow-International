@@ -161,28 +161,6 @@ export default function RainbowPreschool() {
               </div>
             </div>
 
-            <div className="flex-shrink-0 relative hidden lg:block">
-              <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/20">
-                <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
-                  alt="Rainbow Preschool children"
-                  className="w-full h-full object-cover"
-                  width={320}
-                  height={320}
-                  loading="eager"
-                  decoding="async"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
-              </div>
-              <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/20">
-                <p className="text-xs text-white/60 font-medium">Est.</p>
-                <p className="text-xl font-black text-white">2009</p>
-              </div>
-              <div className="absolute -bottom-4 -left-4 bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/20">
-                <p className="text-xs text-white/60 font-medium">Students Impacted</p>
-                <p className="text-xl font-black text-white">1 Lac+</p>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -222,19 +200,18 @@ export default function RainbowPreschool() {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 grid grid-cols-2 gap-4 w-full lg:w-80">
-                  {[
-                    "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg",
-                    "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
-                    "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-preschool-playgroup-banner-1.jpg",
-                    "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png",
-                  ].map((src, i) => (
-                    <div key={i} className={`rounded-2xl overflow-hidden shadow-md ${i === 0 ? "col-span-2 h-44" : "h-32"}`}>
-                      <img src={src} alt="Rainbow Preschool" className="w-full h-full object-cover"
-                        loading="lazy" decoding="async"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                    </div>
-                  ))}
+                <div className="flex-shrink-0 w-full lg:w-[400px]">
+                  <div className="rounded-3xl overflow-hidden shadow-xl">
+                    <img
+                      src="/images/preschool/hero.jpg"
+                      alt="Rainbow Preschool children walking with school bags"
+                      className="w-full h-auto object-cover"
+                      width={400}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
