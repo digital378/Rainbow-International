@@ -203,14 +203,13 @@ export default function RainbowPreschool() {
                 <div className="flex-shrink-0 relative w-full lg:w-[340px]">
                   <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-gray-100 mx-auto">
                     <img
-                      src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
-                      alt="Rainbow Preschool girl in school uniform"
+                      src="/images/preschool/nursery-kids.jpg"
+                      alt="Rainbow Preschool nursery children smiling on colorful mat"
                       className="w-full h-full object-cover"
                       width={320}
                       height={320}
                       loading="lazy"
                       decoding="async"
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/preschool/hero.jpg"; }}
                     />
                   </div>
                   <div className="absolute -top-4 -right-2 bg-white rounded-2xl px-4 py-3 shadow-xl border border-gray-100">
