@@ -184,8 +184,8 @@ export default function MiddleSchool() {
 
                 {/* Photo */}
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-02-1024x559.jpeg"
-                  alt="Middle school students"
+                  src="/images/students/middle-section.jpg"
+                  alt="Middle school students in classroom at Rainbow International School"
                   className="rounded-3xl w-full object-cover max-h-64"
                   width={1024}
                   height={559}

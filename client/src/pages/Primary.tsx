@@ -185,9 +185,31 @@ export default function Primary() {
                 </div>
 
                 {/* Photo */}
+                <div className="grid grid-cols-2 gap-4">
+                  <img
+                    src="/images/students/primary-section.jpg"
+                    alt="Primary section student raising hand in classroom"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <img
+                    src="/images/students/primary-classroom-hand.jpg"
+                    alt="Primary students in classroom at Rainbow International School"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-02-1024x546.jpeg"
-                  alt="Primary section students"
+                  src="/images/students/primary-group-work.jpg"
+                  alt="Primary students working together in classroom"
                   className="rounded-3xl w-full object-cover max-h-64"
                   width={1024}
                   height={546}

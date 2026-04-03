@@ -166,8 +166,18 @@ export default function PrePrimary() {
 
                 {/* Photo */}
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg"
-                  alt="Pre-Primary kids activity"
+                  src="/images/students/pre-primary-running.jpg"
+                  alt="Pre-Primary kids running in colorful uniforms at Rainbow International School"
+                  className="rounded-3xl w-full object-cover max-h-72 mt-4"
+                  width={800}
+                  height={400}
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+                <img
+                  src="/images/students/pre-primary-teacher.jpg"
+                  alt="Pre-Primary teacher engaging with young students at Rainbow International School"
                   className="rounded-3xl w-full object-cover max-h-72 mt-4"
                   width={800}
                   height={400}

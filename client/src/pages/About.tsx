@@ -139,6 +139,32 @@ export default function About() {
                 onError={(e) => { (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/01.jpeg"; }}
               />
             </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
+              <img
+                src="/images/students/physics-lab.png"
+                alt="Student in physics lab at Rainbow International School"
+                className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
+                width={400} height={300} loading="lazy" decoding="async"
+              />
+              <img
+                src="/images/students/chemistry-lab.png"
+                alt="Student in chemistry lab at Rainbow International School"
+                className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
+                width={400} height={300} loading="lazy" decoding="async"
+              />
+              <img
+                src="/images/students/primary-walking.png"
+                alt="Primary students walking with school bags"
+                className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
+                width={400} height={300} loading="lazy" decoding="async"
+              />
+              <img
+                src="/images/students/actor.png"
+                alt="Student achiever at Rainbow International School"
+                className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
+                width={400} height={300} loading="lazy" decoding="async"
+              />
+            </div>
           </div>
         </section>
 

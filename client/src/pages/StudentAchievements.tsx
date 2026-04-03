@@ -84,6 +84,25 @@ export default function StudentAchievements() {
             <p className="text-gray-600 mb-8 leading-relaxed">
               Apart from the In-house Sports Games Competition and the Annual Sports Day, our students actively participated in different Sports Competitions at the National, State, Zonal and District Level in Swimming Championship, Badminton, Karate Championship, Athletics, Chess, Cycling and Skating.
             </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+              <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-sm bg-white">
+                <img src="/images/students/swimmer.png" alt="Rainbow International School swimmer with medals" className="w-full aspect-square object-cover" width={300} height={300} loading="lazy" decoding="async" />
+                <p className="text-xs font-bold text-center py-2 px-2" style={{ color: "#0d3b86" }}>Swimming Champion</p>
+              </div>
+              <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-sm bg-white">
+                <img src="/images/students/cyclist.png" alt="Rainbow International School cyclist representing Maharashtra" className="w-full aspect-square object-cover" width={300} height={300} loading="lazy" decoding="async" />
+                <p className="text-xs font-bold text-center py-2 px-2" style={{ color: "#0d3b86" }}>Cycling Champion</p>
+              </div>
+              <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-sm bg-white">
+                <img src="/images/students/kickboxer.png" alt="Rainbow International School kickboxer" className="w-full aspect-square object-cover" width={300} height={300} loading="lazy" decoding="async" />
+                <p className="text-xs font-bold text-center py-2 px-2" style={{ color: "#0d3b86" }}>Kickboxing</p>
+              </div>
+              <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-sm bg-white">
+                <img src="/images/students/doctor-student.png" alt="Rainbow International School student achiever" className="w-full aspect-square object-cover" width={300} height={300} loading="lazy" decoding="async" />
+                <p className="text-xs font-bold text-center py-2 px-2" style={{ color: "#0d3b86" }}>Student Achiever</p>
+              </div>
+            </div>
             <div className="overflow-x-auto rounded-3xl shadow-sm border border-gray-100">
               <table className="w-full text-sm">
                 <thead style={{ background: "#0d3b86" }} className="text-white">

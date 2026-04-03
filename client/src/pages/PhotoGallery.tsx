@@ -100,6 +100,30 @@ const galleryData = [
       { src: `${CDN}/rainbow-international-school-thane-student-achievements-gallery.jpg`,               alt: "Student achievements gallery" },
     ],
   },
+  {
+    category: "Students",
+    images: [
+      { src: "/images/students/pre-primary-running.jpg",      alt: "Pre-Primary kids running in colorful uniforms" },
+      { src: "/images/students/pre-primary-teacher.jpg",      alt: "Pre-Primary teacher engaging with young students" },
+      { src: "/images/students/pre-primary-running-2.jpg",    alt: "Pre-Primary kids outdoor activity" },
+      { src: "/images/students/primary-section.jpg",          alt: "Primary student raising hand in classroom" },
+      { src: "/images/students/primary-classroom-hand.jpg",   alt: "Primary students in classroom" },
+      { src: "/images/students/primary-group-work.jpg",       alt: "Primary students working together" },
+      { src: "/images/students/primary-walking.png",          alt: "Primary students walking with school bags" },
+      { src: "/images/students/middle-section.jpg",           alt: "Middle school students in classroom" },
+      { src: "/images/students/secondary-students.png",       alt: "Secondary students in navy blazers" },
+      { src: "/images/students/secondary-students-2.png",     alt: "Secondary students group photo" },
+      { src: "/images/students/senior-secondary-girls.jpg",   alt: "Senior Secondary girls reading together" },
+      { src: "/images/students/senior-secondary-group.jpg",   alt: "Senior Secondary students in blazers" },
+      { src: "/images/students/physics-lab.png",              alt: "Student in physics lab" },
+      { src: "/images/students/chemistry-lab.png",            alt: "Student in chemistry lab" },
+      { src: "/images/students/swimmer.png",                  alt: "Swimming champion with medals" },
+      { src: "/images/students/cyclist.png",                  alt: "Cycling champion – Team Maharashtra" },
+      { src: "/images/students/kickboxer.png",                alt: "Kickboxing student" },
+      { src: "/images/students/actor.png",                    alt: "Student achiever" },
+      { src: "/images/students/doctor-student.png",           alt: "Student in doctor coat" },
+    ],
+  },
 ];
 
 export default function PhotoGallery() {

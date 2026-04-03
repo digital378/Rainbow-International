@@ -140,16 +140,28 @@ export default function Secondary() {
                 </p>
 
                 {/* Photo */}
-                <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02-1024x554.jpeg"
-                  alt="Secondary section students"
-                  className="rounded-3xl w-full object-cover max-h-64"
-                  width={1024}
-                  height={554}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <img
+                    src="/images/students/secondary-students.png"
+                    alt="Secondary section students in navy blazers at Rainbow International School"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <img
+                    src="/images/students/secondary-students-2.png"
+                    alt="Secondary students at Rainbow International School"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
               </div>
 
               {/* Right — admission CTA + curriculum card */}

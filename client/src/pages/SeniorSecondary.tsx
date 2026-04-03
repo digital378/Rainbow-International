@@ -171,6 +171,29 @@ export default function SeniorSecondary() {
                   Details of our affiliation can be found through our affiliation number: <strong>1130661</strong>. We offer a slew of subject options for our students to choose from, to ensure their education is customised around what their exact career plans are, and to provide the flexibility to explore alternatives that are rarely offered elsewhere.
                 </p>
 
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <img
+                    src="/images/students/senior-secondary-girls.jpg"
+                    alt="Senior Secondary girls studying together at Rainbow International School"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <img
+                    src="/images/students/senior-secondary-group.jpg"
+                    alt="Senior Secondary students in blazers at Rainbow International School"
+                    className="rounded-3xl w-full object-cover h-48"
+                    width={512}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                </div>
+
                 {/* Curriculum box — 3 streams */}
                 <div className="rounded-3xl border-2 border-amber-300 overflow-hidden mt-6">
                   <div className="px-6 py-4" style={{ background: "#fffbeb" }}>
