@@ -9,6 +9,17 @@ const httpServer = createServer(app);
 
 app.use(compression());
 
+if (process.env.NODE_ENV === "production") {
+  app.use((req, res, next) => {
+    const host = req.hostname;
+    if (host && host.startsWith("www.")) {
+      const newHost = host.slice(4);
+      return res.redirect(301, `https://${newHost}${req.originalUrl}`);
+    }
+    next();
+  });
+}
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
