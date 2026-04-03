@@ -1,18 +1,68 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
+import { toast } from "sonner";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingData } from "@/lib/analytics";
+
+const classOptions = [
+  "Nursery", "Jr. KG", "Sr. KG",
+  "Class I", "Class II", "Class III", "Class IV", "Class V",
+  "Class VI", "Class VII", "Class VIII",
+  "Class IX", "Class X", "Class XI", "Class XII",
+];
 
 export default function ContactUs() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
+    resolver: zodResolver(insertInquirySchema),
+  });
+
+  const onSubmit = async (data: InsertInquiry) => {
+    setIsSubmitting(true);
+    try {
+      const trackingData = getFormTrackingData("Contact Page Form");
+      const response = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, ...trackingData }),
+      });
+      if (!response.ok) throw new Error("Failed");
+      trackFormSubmit({
+        formType: "inquiry",
+        parentName: data.parentName,
+        studentName: data.studentName,
+        phone: data.phone,
+        grade: data.grade,
+      });
+      setSubmitted(true);
+      reset();
+      setAgreed(false);
+    } catch {
+      toast.error("Submission failed. Please try again or call us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const inputBase = "w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400/40 focus:border-red-400 transition-all bg-white";
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
         title="Contact Us - Rainbow International School Thane"
-        description="Connect with Rainbow International School, Thane West. Call +91 86550 03366, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 11."
+        description="Connect with Rainbow International School, Thane West. Call +91 82915 68972, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 12."
         keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane West"
         canonical="https://rainbowinternationalschool.in/contact-us/"
       />
@@ -24,69 +74,200 @@ export default function ContactUs() {
       />
 
       <main className="flex-grow">
-        <section className="py-20 bg-white">
+        <section className="py-16 md:py-20 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-              <div className="space-y-8">
-                <div>
-                  <h2 className="text-3xl font-black mb-6" style={{ color: "#0d3b86" }}>Get in Touch</h2>
-                  <p className="text-gray-600 leading-relaxed mb-8">
-                    At Rainbow International School, we make our best efforts to provide excellent services. Feel free to reach out — our admissions team will be happy to assist you.
-                  </p>
-                </div>
+            <div className="grid lg:grid-cols-5 gap-10 max-w-6xl mx-auto">
 
-                <div className="space-y-5">
-                  {[
-                    { icon: MapPin, label: "Address", content: "Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra, India" },
-                    { icon: Phone, label: "Phone", content: "+91 86550 03366", href: "tel:+918655003366" },
-                    { icon: Mail, label: "Email", content: "info@rainbowinternationalschool.in", href: "mailto:info@rainbowinternationalschool.in" },
-                    { icon: Clock, label: "Office Hours", content: "Monday – Saturday: 9:00 AM – 6:00 PM" },
-                  ].map(({ icon: Icon, label, content, href }, i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: "#f0f4ff" }}>
-                        <Icon size={20} style={{ color: "#0d3b86" }} />
+              <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-10">
+                <h2 className="text-2xl md:text-3xl font-black mb-2" style={{ color: "#091a4f" }}>Request A Callback</h2>
+                <p className="text-gray-500 text-sm mb-8">Fill out the form and we'll get back to you shortly.</p>
+
+                {submitted ? (
+                  <div className="flex flex-col items-center justify-center py-14 text-center">
+                    <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-5">
+                      <CheckCircle size={40} className="text-green-500" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold mb-2" style={{ color: "#091a4f" }}>Thank You!</h3>
+                    <p className="text-gray-500 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
+                    <button
+                      onClick={() => setSubmitted(false)}
+                      data-testid="button-contact-another-request"
+                      className="px-7 py-2.5 text-sm font-semibold border border-gray-200 rounded-full text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Submit Another Request
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-gray-700 text-xs font-semibold mb-1.5">Parent Name *</label>
+                        <input {...register("parentName")} placeholder="Enter your name" data-testid="input-contact-parent-name" className={inputBase} />
+                        {errors.parentName && <p className="text-red-500 text-xs mt-1">{errors.parentName.message}</p>}
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1" style={{ color: "#0d3b86" }}>{label}</h3>
-                        {href ? (
-                          <a href={href} className="text-gray-600 text-sm hover:underline transition-colors">{content}</a>
-                        ) : (
-                          <p className="text-gray-600 text-sm">{content}</p>
-                        )}
+                        <label className="block text-gray-700 text-xs font-semibold mb-1.5">Phone Number *</label>
+                        <input {...register("phone")} placeholder="Enter phone number" type="tel" data-testid="input-contact-phone" className={inputBase} />
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                       </div>
                     </div>
-                  ))}
-                </div>
 
-                <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-                  <iframe
-                    title="Rainbow International School Location"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.1631567591!2d72.96988!3d19.2183!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b9b9b9b9b9b9%3A0x9b9b9b9b9b9b9b9b!2sRainbow+International+School%2C+Thane!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
-                    width="100%"
-                    height="250"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                  />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-gray-700 text-xs font-semibold mb-1.5">Email</label>
+                        <input {...register("email")} placeholder="Enter email address" type="email" data-testid="input-contact-email" className={inputBase} />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-gray-700 text-xs font-semibold mb-1.5">Child's Name</label>
+                        <input {...register("studentName")} placeholder="Enter child's name" data-testid="input-contact-student-name" className={inputBase} />
+                        {errors.studentName && <p className="text-red-500 text-xs mt-1">{errors.studentName.message}</p>}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-xs font-semibold mb-1.5">Programme *</label>
+                      <select {...register("grade")} data-testid="select-contact-grade" className={inputBase + " appearance-none"}>
+                        <option value="">Select programme</option>
+                        {classOptions.map((cls) => <option key={cls} value={cls}>{cls}</option>)}
+                      </select>
+                      {errors.grade && <p className="text-red-500 text-xs mt-1">{errors.grade.message}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 text-xs font-semibold mb-1.5">Message (Optional)</label>
+                      <textarea
+                        {...register("message")}
+                        placeholder="Any questions or specific requirements?"
+                        rows={3}
+                        data-testid="textarea-contact-message"
+                        className={inputBase + " resize-none"}
+                      />
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="contact-consent"
+                        checked={agreed}
+                        onChange={(e) => setAgreed(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 flex-shrink-0 accent-red-500"
+                        data-testid="checkbox-contact-consent"
+                      />
+                      <label htmlFor="contact-consent" className="text-gray-500 text-xs leading-relaxed cursor-pointer">
+                        I confirm the details above are correct and authorize Rainbow International School and its representatives to contact me with updates via Email, SMS, WhatsApp and Call. This will override DND/NDNC registry.
+                      </label>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !agreed}
+                      data-testid="button-contact-submit"
+                      className="w-full font-bold py-3.5 text-white text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60 rounded-full"
+                      style={{ background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" }}
+                    >
+                      {isSubmitting ? "Submitting..." : "Request Callback"}
+                    </button>
+                  </form>
+                )}
+              </div>
+
+              <div className="lg:col-span-2 space-y-6">
+                {[
+                  {
+                    icon: Phone,
+                    label: "Phone",
+                    lines: ["+91 82915 68972"],
+                    href: "tel:+918291568972",
+                    color: "#ef4444",
+                  },
+                  {
+                    icon: Mail,
+                    label: "Email",
+                    lines: ["info@rainbowinternationalschool.in"],
+                    href: "mailto:info@rainbowinternationalschool.in",
+                    color: "#ef4444",
+                  },
+                  {
+                    icon: Clock,
+                    label: "Working Hours",
+                    lines: ["Monday - Saturday", "9AM - 6PM"],
+                    href: null as string | null,
+                    color: "#ef4444",
+                  },
+                  {
+                    icon: MapPin,
+                    label: "Locations",
+                    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra"],
+                    href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
+                    color: "#ef4444",
+                  },
+                ].map((item, i) => {
+                  const Icon = item.icon;
+                  const inner = (
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: `${item.color}15` }}
+                      >
+                        <Icon size={22} style={{ color: item.color }} />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-sm mb-1">{item.label}</h3>
+                        {item.lines.map((line, j) => (
+                          <p key={j} className="text-gray-500 text-sm leading-relaxed">{line}</p>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                  return item.href ? (
+                    <a
+                      key={i}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block hover:opacity-80 transition-opacity"
+                      data-testid={`link-contact-${item.label.toLowerCase()}`}
+                      onClick={() => {
+                        if (item.href?.startsWith("tel:")) trackCallClick({ phone: item.lines[0] });
+                        if (item.href?.includes("maps.google")) trackDirectionsClick();
+                      }}
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    <div key={i} data-testid={`info-contact-${item.label.toLowerCase()}`}>{inner}</div>
+                  );
+                })}
+
+                <div className="mt-8 pl-4 border-l-4 border-red-400">
+                  <p className="text-gray-600 text-sm italic leading-relaxed">
+                    "The secret of getting ahead is getting started."
+                  </p>
+                  <p className="text-gray-800 text-sm font-semibold mt-2">— Mark Twain</p>
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-3xl font-black mb-6" style={{ color: "#0d3b86" }}>Send Inquiries</h2>
-                <p className="text-gray-600 text-sm mb-6">
-                  Kindly fill the inquiry form to enroll your child at Rainbow International School. Once received, our Admission Counsellor will connect with you shortly.
-                </p>
-                <a
-                  href="#contact"
-                  className="inline-block text-white font-bold py-3 px-8 rounded-full shadow-md hover:opacity-90 transition-opacity"
-                  style={{ background: "#0d3b86" }}
-                >
-                  Fill Inquiry Form Below
-                </a>
-              </div>
             </div>
           </div>
         </section>
+
+        <section className="bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-12">
+            <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+              <iframe
+                title="Rainbow International School Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.1631567591!2d72.96988!3d19.2183!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b9b9b9b9b9b9%3A0x9b9b9b9b9b9b9b9b!2sRainbow+International+School%2C+Thane!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+                width="100%"
+                height="350"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
+
         <ContactForm />
       </main>
       <Footer />
