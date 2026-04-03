@@ -87,12 +87,12 @@ export function ContactForm() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <div className="inline-block mb-4">
-              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Get in Touch</span>
+              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Visit Us</span>
               <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">Send Inquiries</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">Book a Campus Tour</h2>
             <p className="text-blue-200/80 text-sm leading-relaxed max-w-xl mx-auto">
-              <strong className="text-white">Thank You for Contacting Rainbow International School.</strong> Kindly fill the inquiry form to enrol your child. Once received, our Admission Counsellor will connect with you shortly.
+              <strong className="text-white">We'd love to welcome you to Rainbow International School!</strong> Please call us at <a href="tel:+918291568972" className="text-amber-400 font-semibold hover:underline">+91 82915 68972</a> to schedule your visit before arriving on campus. Alternatively, fill the form below and our Admission Counsellor will connect with you to arrange a tour.
             </p>
           </div>
 
