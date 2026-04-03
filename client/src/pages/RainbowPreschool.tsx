@@ -95,37 +95,46 @@ export default function RainbowPreschool() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-20 pb-24" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 45%, #091a4f 100%)" }}>
-        {/* Floating decorative blobs */}
-        <div className="absolute top-10 left-10 w-32 h-32 rounded-full opacity-20" style={{ background: "#fbbf24", filter: "blur(30px)" }} />
-        <div className="absolute bottom-10 right-16 w-40 h-40 rounded-full opacity-20" style={{ background: "#fbbf24", filter: "blur(35px)" }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full opacity-15" style={{ background: "#3b82f6", filter: "blur(25px)" }} />
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]" style={{ zIndex: 1 }}>
+        <img
+          src="/images/preschool/hero.jpg"
+          alt="Rainbow Preschool children with school bags"
+          width={1920}
+          height={1080}
+          loading="eager"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
+        <div className="absolute bottom-0 left-0 right-0 h-40" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 40%, #091a4f 100%)" }} />
 
-        {/* Breadcrumb */}
-        <div className="relative container mx-auto px-4 mb-8">
-          <p className="text-white/60 text-sm">
-            <Link href="/" className="hover:text-white transition-colors">Rainbow International</Link>
-            <span className="mx-2">›</span>
-            <span className="text-white">Rainbow Preschool International</span>
-          </p>
-        </div>
+        <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-16 lg:pt-44 lg:pb-16">
+          <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 items-center">
 
-        <div className="relative container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="flex-1 text-white">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-sm font-bold mb-6">
-                <Star size={14} className="text-yellow-300 fill-yellow-300" />
-                <span>Recognised Among India's 10 Best Preschools</span>
+            <div className="flex-1">
+              <div className="mb-6">
+                <p className="text-white/60 text-sm mb-4">
+                  <Link href="/" className="hover:text-white transition-colors">Rainbow International</Link>
+                  <span className="mx-2">›</span>
+                  <span className="text-white">Rainbow Preschool International</span>
+                </p>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-400/30 bg-amber-400/10 backdrop-blur-sm text-sm font-bold">
+                  <Star size={14} className="text-yellow-300 fill-yellow-300" />
+                  <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">Recognised Among India's 10 Best Preschools</span>
+                </div>
               </div>
-              <h1 className="text-5xl md:text-6xl font-black leading-tight mb-5 text-white">
+
+              <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold leading-[1.05] text-white mb-5 tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                 Where Little<br />
-                <span className="relative inline-block" style={{ color: "#fbbf24" }}>Dreamers</span>
+                <span style={{ color: "#fbbf24" }}>Dreamers</span>
                 <br />Begin
               </h1>
-              <p className="text-white/85 text-lg leading-relaxed mb-8 max-w-lg">
-                Rainbow Preschool International is a warm, award-winning preschool for children aged <strong>1.5 to 5.5 years</strong> — where play, curiosity, and creativity come together to build the very best start in life.
+
+              <p className="text-blue-200/80 text-base md:text-lg leading-relaxed max-w-lg font-light mb-8">
+                Rainbow Preschool International is a warm, award-winning preschool for children aged <strong className="text-white">1.5 to 5.5 years</strong> — where play, curiosity, and creativity come together to build the very best start in life.
               </p>
-              <div className="flex flex-wrap gap-4">
+
+              <div className="flex flex-wrap gap-3 mb-8">
                 <a href="#programmes">
                   <button className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.03]" style={{ background: "#fbbf24", color: "#0d3b86" }}>
                     Explore Programmes
@@ -138,10 +147,22 @@ export default function RainbowPreschool() {
                   </button>
                 </a>
               </div>
+
+              <div className="flex items-center gap-6 text-white/70 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>2009</span>
+                  <span className="text-xs leading-tight">Year<br />Established</span>
+                </div>
+                <div className="w-px h-8 bg-white/20" />
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>1 Lac+</span>
+                  <span className="text-xs leading-tight">Students<br />Impacted</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex-shrink-0 relative">
-              <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/30">
+            <div className="flex-shrink-0 relative hidden lg:block">
+              <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/20">
                 <img
                   src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
                   alt="Rainbow Preschool children"
@@ -153,20 +174,18 @@ export default function RainbowPreschool() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
               </div>
-              {/* Floating stat badges */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-2xl px-4 py-3 shadow-xl">
-                <p className="text-xs text-gray-500 font-medium">Est.</p>
-                <p className="text-xl font-black" style={{ color: "#0d3b86" }}>2009</p>
+              <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/20">
+                <p className="text-xs text-white/60 font-medium">Est.</p>
+                <p className="text-xl font-black text-white">2009</p>
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-xl">
-                <p className="text-xs text-gray-500 font-medium">Students Impacted</p>
-                <p className="text-xl font-black" style={{ color: "#0d3b86" }}>1 Lac+</p>
+              <div className="absolute -bottom-4 -left-4 bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 border border-white/20">
+                <p className="text-xs text-white/60 font-medium">Students Impacted</p>
+                <p className="text-xl font-black text-white">1 Lac+</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Wave bottom */}
         <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
           <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ height: "60px", display: "block" }} xmlns="http://www.w3.org/2000/svg">
             <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="white" />
