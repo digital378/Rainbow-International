@@ -270,7 +270,7 @@ export default function SeniorSecondary() {
         {/* ── Curriculum Philosophy ──────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Curriculum Philosophy</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Curriculum Philosophy</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {philosophy.map((p, i) => (
                 <div key={i} className="rounded-3xl p-6 border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow flex flex-col gap-4">
@@ -290,7 +290,7 @@ export default function SeniorSecondary() {
         {/* ── Teaching Methodology ───────────────────────────────── */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Teaching Methodology</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Teaching Methodology</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {methodology.map((m, i) => (

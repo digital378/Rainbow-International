@@ -245,7 +245,7 @@ export default function SafetySecurity() {
         {/* ── 4 Image Cards ─────────────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Rainbow – Safety &amp; Security</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Rainbow – Safety &amp; Security</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {highlights.map((h, i) => (
                 <div key={i} className="flex flex-col gap-3" data-testid={`card-safety-${i}`}>
@@ -278,7 +278,7 @@ export default function SafetySecurity() {
         {/* ── Safety Measures Grid ──────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Our Safety Commitments</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Our Safety Commitments</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { title: "Infirmary & Trained Nurse", desc: "A fully equipped infirmary on campus staffed by a trained nurse to attend to any medical needs immediately.", color: "#e0edff", accent: "#0d3b86" },

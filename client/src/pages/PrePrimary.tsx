@@ -236,7 +236,7 @@ export default function PrePrimary() {
         {/* ── Curriculum Philosophy ─────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Curriculum Philosophy</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Curriculum Philosophy</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {philosophy.map((p, i) => (
                 <div
@@ -259,7 +259,7 @@ export default function PrePrimary() {
         {/* ── Kindergarten Methodology ──────────────────────────── */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Kindergarten Methodology</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Kindergarten Methodology</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {methodology.map((m, i) => (
@@ -316,7 +316,7 @@ export default function PrePrimary() {
               <div className="lg:col-span-2 space-y-6">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>About Rainbow Preschools</p>
-                  <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>
+                  <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>
                     Rainbow Preschool International —{" "}
                     <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
                       className="underline underline-offset-4 hover:opacity-80 transition-opacity" style={{ color: "#f97316" }}>
