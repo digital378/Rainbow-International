@@ -39,7 +39,7 @@ const preschoolLinks = [
 
 export function Footer() {
   return (
-    <footer style={{ background: "#091a4f" }} className="text-white">
+    <footer style={{ background: "#091a4f" }} className="text-white" role="contentinfo">
 
       {/* ── Campus Map ─────────────────────────────────────────── */}
       <div className="border-b border-white/10">

@@ -212,7 +212,7 @@ export function Navbar() {
         </div>
       </div>
 
-      <nav className={`transition-all duration-300 ${isTransparent ? "" : "bg-white border-b border-gray-100"}`}>
+      <nav className={`transition-all duration-300 ${isTransparent ? "" : "bg-white border-b border-gray-100"}`} role="navigation" aria-label="Main navigation">
         <div className="container mx-auto px-4">
           <div className="hidden lg:flex items-center gap-1">
             <Link href="/" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>

@@ -19,19 +19,19 @@ function renderHomeSSR(): string {
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
-<title>Best CBSE School in Thane West — Admissions 2026–27 Open | Rainbow International School</title>
-<meta name="description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra. Offering world-class education from Nursery to Class 12 with Science, Commerce &amp; Humanities streams. Admissions open for 2026–27." />
+<title>Best CBSE School in Thane West | Rainbow International School</title>
+<meta name="description" content="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities. Admissions 2026-27 open." />
 <meta name="keywords" content="Rainbow International School Thane, CBSE school Thane, best international school Thane West, K-12 school Thane, school admissions Thane 2026, CBSE admissions Thane, top school Thane West Maharashtra" />
 <link rel="canonical" href="https://rainbowinternationalschool.in/" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Best CBSE School in Thane West — Admissions 2026–27 Open" />
+<meta property="og:title" content="Best CBSE School in Thane West | Rainbow International School" />
 <meta property="og:description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra. World-class education from Nursery to Class 12." />
 <meta property="og:url" content="https://rainbowinternationalschool.in/" />
 <meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Best CBSE School in Thane West — Admissions 2026–27 Open" />
-<meta name="twitter:description" content="Rainbow International School — top CBSE K–12 school in Thane West, Maharashtra. Admissions open for 2026–27." />
+<meta name="twitter:title" content="Best CBSE School in Thane West | Rainbow International School" />
+<meta name="twitter:description" content="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open." />
 <meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -289,6 +289,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
 
 <div id="progress-bar"></div>
 
+<header role="banner">
 <!-- Top Bar -->
 <div class="topbar">
   <a href="tel:02269105000">
@@ -303,7 +304,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
 </div>
 
 <!-- Navbar -->
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main navigation">
   <a class="nav-brand" href="/">
     <img src="/rps-logo.png" alt="Rainbow International School" class="nav-brand-logo" onerror="this.style.display='none'" />
     Rainbow International School
@@ -317,6 +318,16 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     <li><a href="/contact-us">Contact</a></li>
   </ul>
 </nav>
+</header>
+
+<main role="main">
+<article itemscope itemtype="https://schema.org/School">
+<meta itemprop="name" content="Rainbow International School" />
+<meta itemprop="description" content="One of the top CBSE-affiliated K-12 schools in Thane West, Maharashtra. Offering world-class education from Nursery to Class 12." />
+<meta itemprop="address" content="Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607" />
+<meta itemprop="telephone" content="+91 82915 68972" />
+<meta itemprop="url" content="https://rainbowinternationalschool.in" />
+<meta itemprop="foundingDate" content="2009-04" />
 
 <!-- Hero Section -->
 <section class="hero">
@@ -662,8 +673,11 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   </div>
 </section>
 
+</article>
+</main>
+
 <!-- Footer -->
-<footer>
+<footer role="contentinfo">
   <div class="footer-inner">
     <div>
       <p class="footer-brand">Rainbow International School</p>
