@@ -131,7 +131,7 @@ export default function RainbowPreschool() {
               </h1>
 
               <p className="text-blue-200/80 text-base md:text-lg leading-relaxed max-w-lg font-light mb-8">
-                Rainbow Preschool International is a warm, award-winning preschool for children aged <strong className="text-white">1.5 to 5.5 years</strong> — where play, curiosity, and creativity come together to build the very best start in life.
+                <strong className="text-white">Rainbow Preschool International</strong> is a warm, award-winning preschool for children aged <strong className="text-white">1.5 to 5.5 years</strong> — where play, curiosity, and creativity come together to build the very best start in life.
               </p>
 
               <div className="flex flex-wrap gap-3 mb-8">
