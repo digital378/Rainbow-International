@@ -59,7 +59,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]" style={{ zIndex: 1 }}>
+    <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]">
       <img
         src="/images/students/hero-senior-secondary.jpg"
         alt="Rainbow International School senior secondary students in blazers"
@@ -68,11 +68,12 @@ export function Hero() {
         loading="eager"
         decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-top"
+        style={{ zIndex: 0 }}
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
-      <div className="absolute bottom-0 left-0 right-0 h-40" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 40%, #091a4f 100%)" }} />
+      <div className="absolute inset-0" style={{ zIndex: 1, background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-40" style={{ zIndex: 1, background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 40%, #091a4f 100%)" }} />
 
-      <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-16 lg:pt-44 lg:pb-16">
+      <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-16 lg:pt-44 lg:pb-16" style={{ zIndex: 2 }}>
         <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 items-center">
 
           <div className="flex-1">

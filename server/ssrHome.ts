@@ -113,8 +113,8 @@ img{max-width:100%;display:block}
 
 /* Hero */
 .hero{position:relative;min-height:90vh;display:flex;align-items:center;overflow:hidden;background:#091a4f}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center top;background-image:url(/images/students/hero-senior-secondary.jpg);}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(9,26,79,.95) 0%,rgba(13,59,134,.88) 55%,rgba(9,26,79,.65) 100%)}
+.hero-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center top;background-image:url(/images/students/hero-senior-secondary.jpg);}
+.hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(115deg,rgba(9,26,79,.95) 0%,rgba(13,59,134,.88) 55%,rgba(9,26,79,.65) 100%)}
 .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:60px;padding:80px 0;flex-wrap:wrap}
 .hero-text{flex:1;min-width:320px;color:#fff}
 .hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:9999px;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.1);margin-bottom:20px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fde68a}
