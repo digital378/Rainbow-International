@@ -9,32 +9,32 @@ const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
 const BASE2 = "https://rainbowinternationalschool.in/wp-content/uploads";
 
 const talentSpaces = [
-  { name: "Amphitheatre",       image: `${BASE}/Amphitheatre--768x512.png`,                                                                          fallback: "/amenities/amphitheatre.png" },
-  { name: "Music Room",         image: `${BASE}/rainbow-international-school-thane-student-aminities-music-600x400-1.jpg`,                            fallback: "/amenities/music-room.png" },
-  { name: "Art and Craft Room", image: `${BASE}/rainbow-international-school-thane-student-aminities-arts-crafts-600x400-1.jpg`,                      fallback: "/amenities/art-craft-room.png" },
-  { name: "Multipurpose Hall",  image: `${BASE}/rainbow-international-school-thane-student-aminities-multi-purpose-hall-600x400-1.jpg`,               fallback: "/amenities/multipurpose-hall.png" },
+  { name: "Amphitheatre",       image: "/images/gallery/talent/amphitheatre.png",       fallback: `${BASE}/Amphitheatre--768x512.png` },
+  { name: "Music Room",         image: "/images/gallery/talent/music-room.png",         fallback: `${BASE}/rainbow-international-school-thane-student-aminities-music-600x400-1.jpg` },
+  { name: "Art and Craft Room", image: "/images/gallery/talent/art-craft-room.png",     fallback: `${BASE}/rainbow-international-school-thane-student-aminities-arts-crafts-600x400-1.jpg` },
+  { name: "Multipurpose Hall",  image: "/images/gallery/talent/multipurpose-hall.png",  fallback: `${BASE}/rainbow-international-school-thane-student-aminities-multi-purpose-hall-600x400-1.jpg` },
 ];
 
 const sportsSpaces = [
-  { name: "Cricket Ground",             image: `${BASE}/rainbow-international-school-thane-student-aminities-cricket-ground-600x400-1.jpg`,           fallback: "/amenities/cricket-ground.png" },
-  { name: "Football Turf",              image: `${BASE}/rainbow-international-school-thane-student-aminities-football-turf-600x400-1.jpg`,            fallback: "/amenities/football-turf.png" },
-  { name: "Skating Rink",               image: `${BASE}/rainbow-international-school-thane-student-aminities-skating-rink-600x400-1.jpg`,             fallback: "/amenities/skating-rink.png" },
-  { name: "Swimming Pool",              image: `${BASE}/rainbow-international-school-thane-student-aminities-swimming-pool-600x400-1.jpg`,            fallback: "/amenities/swimming-pool.png" },
-  { name: "Rock Climbing & Rappelling", image: `${BASE}/rainbow-international-school-thane-student-aminities-rock-climbing-600x400-1.jpg`,            fallback: "/amenities/rock-climbing.png" },
-  { name: "Basket Ball",                image: `${BASE}/rainbow-international-school-thane-student-aminities-basketball-600x400-1.jpg`,               fallback: "/amenities/basketball.png" },
-  { name: "Table Tennis",               image: `${BASE}/rainbow-international-school-thane-student-aminities-table-tennis-600x400-1.jpg`,             fallback: "/amenities/table-tennis.png" },
-  { name: "Chess",                      image: `${BASE}/rainbow-international-school-thane-student-aminities-chess-600x400-1.jpg`,                    fallback: "/amenities/chess.png" },
-  { name: "Carrom",                     image: `${BASE}/rainbow-international-school-thane-student-aminities-carrom-600x400-1.jpg`,                   fallback: "/amenities/carrom.png" },
-  { name: "Karate",                     image: `${BASE}/rainbow-international-school-thane-student-aminities-karate-600x400-1.jpg`,                   fallback: "/amenities/karate.png" },
+  { name: "Cricket Ground",             image: "/images/gallery/sports/cricket-ground.png",  fallback: `${BASE}/rainbow-international-school-thane-student-aminities-cricket-ground-600x400-1.jpg` },
+  { name: "Football Turf",              image: "/images/gallery/sports/football-turf.png",   fallback: `${BASE}/rainbow-international-school-thane-student-aminities-football-turf-600x400-1.jpg` },
+  { name: "Skating Rink",               image: "/images/gallery/sports/skating-rink.png",    fallback: `${BASE}/rainbow-international-school-thane-student-aminities-skating-rink-600x400-1.jpg` },
+  { name: "Swimming Pool",              image: "/images/gallery/sports/swimming-pool.png",   fallback: `${BASE}/rainbow-international-school-thane-student-aminities-swimming-pool-600x400-1.jpg` },
+  { name: "Rock Climbing & Rappelling", image: `${BASE}/rainbow-international-school-thane-student-aminities-rock-climbing-600x400-1.jpg`, fallback: "/amenities/rock-climbing.png" },
+  { name: "Basket Ball",                image: "/images/gallery/sports/basketball.png",      fallback: `${BASE}/rainbow-international-school-thane-student-aminities-basketball-600x400-1.jpg` },
+  { name: "Table Tennis",               image: `${BASE}/rainbow-international-school-thane-student-aminities-table-tennis-600x400-1.jpg`, fallback: "/amenities/table-tennis.png" },
+  { name: "Chess",                      image: "/images/gallery/sports/chess.png",           fallback: `${BASE}/rainbow-international-school-thane-student-aminities-chess-600x400-1.jpg` },
+  { name: "Carrom",                     image: "/images/gallery/sports/carrom.png",          fallback: `${BASE}/rainbow-international-school-thane-student-aminities-carrom-600x400-1.jpg` },
+  { name: "Karate",                     image: "/images/gallery/sports/karate.png",          fallback: `${BASE}/rainbow-international-school-thane-student-aminities-karate-600x400-1.jpg` },
 ];
 
 const educationalResources = [
-  { name: "E-learning enabled Classrooms", image: `${BASE}/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg`, fallback: "/amenities/elearning-classroom.png" },
-  { name: "Storage Facility – Bags & Books", image: `${BASE}/rainbow-international-school-thane-student-aminities-storage-bags-books-600x400-1.jpg`, fallback: "/amenities/storage-bags-books.png" },
-  { name: "Reading Room",                  image: `${BASE}/rainbow-international-school-thane-student-aminities-reading-room-600x400-1.jpg`,          fallback: "/amenities/reading-room.png" },
-  { name: "Maths & Science Lab",           image: `${BASE}/rainbow-international-school-thane-student-aminities-science-lab-600x400-1.jpg`,           fallback: "/amenities/maths-science-lab.png" },
-  { name: "School Library",                image: `${BASE}/rainbow-international-school-thane-student-aminities-library-600x400-1.jpg`,               fallback: "/amenities/school-library.png" },
-  { name: "Bank",                          image: `${BASE}/rainbow-international-school-thane-student-aminities-bank-600x400-1.jpg`,                   fallback: "/amenities/school-bank.png" },
+  { name: "E-learning enabled Classrooms", image: "/images/gallery/educational/e-learning-classrooms.png",  fallback: `${BASE}/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg` },
+  { name: "Storage Facility – Bags & Books", image: "/images/gallery/educational/storage-facility.jpg",    fallback: `${BASE}/rainbow-international-school-thane-student-aminities-storage-bags-books-600x400-1.jpg` },
+  { name: "Reading Room",                  image: "/images/gallery/educational/reading-room.png",           fallback: `${BASE}/rainbow-international-school-thane-student-aminities-reading-room-600x400-1.jpg` },
+  { name: "Maths & Science Lab",           image: "/images/gallery/educational/maths-science-lab.png",      fallback: `${BASE}/rainbow-international-school-thane-student-aminities-science-lab-600x400-1.jpg` },
+  { name: "School Library",                image: "/images/gallery/educational/school-library.png",         fallback: `${BASE}/rainbow-international-school-thane-student-aminities-library-600x400-1.jpg` },
+  { name: "Bank",                          image: `${BASE}/rainbow-international-school-thane-student-aminities-bank-600x400-1.jpg`, fallback: "/amenities/school-bank.png" },
 ];
 
 const supportEquipments = [
@@ -49,8 +49,8 @@ const supportEquipments = [
 ];
 
 const organicFarmingImages = [
-  { src: `${BASE2}/2022/09/Organic-farming-1-1024x536-1.jpg`,   fallback: "/amenities/organic-farming-1.png" },
-  { src: `${BASE2}/2022/09/Organic-farming-2-1024x536-1.jpg`,   fallback: "/amenities/organic-farming-2.png" },
+  { src: "/images/gallery/organic-farming/organic-farming-1.webp",  fallback: `${BASE2}/2022/09/Organic-farming-1-1024x536-1.jpg` },
+  { src: "/images/gallery/organic-farming/organic-farming-2.webp",  fallback: `${BASE2}/2022/09/Organic-farming-2-1024x536-1.jpg` },
   { src: `${BASE2}/2023/04/rainbow-international-school-beyond-the-classroom-organic-farming-1024x683.jpg`, fallback: "/amenities/organic-farming-3.png" },
 ];
 

@@ -119,24 +119,24 @@ export default function About() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <img
-                src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
-                alt="Rainbow International School Infrastructure"
+                src="/images/gallery/about/welcome-to-ris.jpg"
+                alt="Welcome to Rainbow International School"
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={1024}
                 height={536}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"; }}
               />
               <img
-                src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/01.jpeg"
-                alt="Rainbow International School Campus"
+                src="/images/gallery/talent/amphitheatre.png"
+                alt="Rainbow International School Amphitheatre"
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={1024}
                 height={536}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                onError={(e) => { (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/01.jpeg"; }}
               />
             </div>
           </div>
