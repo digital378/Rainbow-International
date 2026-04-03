@@ -279,7 +279,8 @@ export default function About() {
                       </p>
                       <p className="font-bold text-gray-800">
                         With warm regards,<br />
-                        <span style={{ color: "#0d3b86" }}>Chairperson, Rainbow International School</span>
+                        <span style={{ color: "#0d3b86" }}>Mrs. Akila Balbale</span><br />
+                        <span style={{ color: "#0d3b86" }}>Chairperson</span>
                       </p>
                     </div>
                   </div>
