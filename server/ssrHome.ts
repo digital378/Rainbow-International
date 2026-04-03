@@ -474,7 +474,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     </div>
     <div class="programs-grid-2">
       <a href="/secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/secondary-section.jpg" alt="Secondary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/secondary.jpg" alt="Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#f5f3ff;color:#8b5cf6">Class IX – X</span>
           <h3>Secondary</h3>
@@ -483,7 +483,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/senior-secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/senior-section.jpg" alt="Senior Secondary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/senior-secondary.jpg" alt="Senior Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#fff1f2;color:#ef4444">Class XI – XII</span>
           <h3>Senior Secondary</h3>
