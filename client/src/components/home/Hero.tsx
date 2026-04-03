@@ -135,7 +135,7 @@ export function Hero() {
                     <PhoneCall size={16} className="text-white" />
                   </div>
                   <div>
-                    <p className="font-extrabold text-gray-900 text-[15px] leading-tight">Quick Enquiry</p>
+                    <p className="font-extrabold text-gray-900 text-[15px] leading-tight">Quick Admission Enquiry</p>
                     <p className="text-gray-400 text-xs">Our counsellor will call you back</p>
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export function Hero() {
                   </button>
 
                   <a
-                    href="https://wa.me/918655003366?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20admissions."
+                    href="https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20admissions."
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackWhatsAppClick()}
