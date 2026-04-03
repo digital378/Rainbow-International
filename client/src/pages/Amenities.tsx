@@ -68,7 +68,7 @@ function AmenityCard({ name, image, fallback }: { name: string; image: string; f
           decoding="async"
           onError={(e) => { (e.target as HTMLImageElement).src = fallback; }}
         />
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
+        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#fbbf24" }} />
       </div>
       <div className="py-3 px-2 bg-white">
         <p className="font-semibold text-sm text-center text-gray-800 leading-snug">{name}</p>
@@ -81,7 +81,7 @@ function SpaceGrid({ title, items, alt }: { title: string; items: { name: string
   return (
     <section className="py-14" style={alt ? { background: "#f8faff" } : { background: "#fff" }}>
       <div className="container mx-auto px-4 max-w-5xl">
-        <h2 className="text-2xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>{title}</h2>
+        <h2 className="text-2xl font-black text-center mb-10" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>{title}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {items.map((item, i) => (
             <AmenityCard key={i} name={item.name} image={item.image} fallback={item.fallback} />
@@ -111,10 +111,16 @@ export default function Amenities() {
       <main className="flex-grow">
 
         {/* Intro */}
-        <div className="py-10" style={{ background: "#f8faff" }}>
-          <p className="text-center text-lg text-gray-600 max-w-2xl mx-auto px-4">
-            We offer globally recognized educational resources and state-of-the-art facilities that make Rainbow International School the best international school in Thane.
-          </p>
+        <div className="py-14" style={{ background: "#f8faff" }}>
+          <div className="text-center max-w-2xl mx-auto px-4">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              World-Class Facilities
+            </span>
+            <p className="text-lg text-gray-600">
+              We offer globally recognized educational resources and state-of-the-art facilities that make Rainbow International School the best international school in Thane.
+            </p>
+          </div>
         </div>
 
         {/* Talent Spaces */}
@@ -132,7 +138,7 @@ export default function Amenities() {
         {/* Organic Farming */}
         <section className="py-14 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-2xl font-black text-center mb-4" style={{ color: "#0d3b86" }}>Organic Farming</h2>
+            <h2 className="text-2xl font-black text-center mb-4" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Organic Farming</h2>
             <p className="text-center text-gray-600 max-w-2xl mx-auto mb-10 text-sm leading-relaxed">
               10,000 sq.ft. of Organic Vegetable Garden. Children grow seasonal vegetables with the help of a gardener every quarter
               and are allowed to take the produce back home during harvest season. 5,000 sq.ft. of Butterfly Garden.
@@ -151,7 +157,7 @@ export default function Amenities() {
                       decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).src = img.fallback; }}
                     />
-                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
+                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#fbbf24" }} />
                   </div>
                 </div>
               ))}

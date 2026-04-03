@@ -50,6 +50,10 @@ export default function BeyondClassroom() {
       <main className="flex-grow">
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              Holistic Development
+            </span>
             <p className="text-lg text-gray-600 leading-relaxed mb-5">
               The real aim of education is not only knowledge but also <strong>Action</strong>. We provide rigorous, comprehensive & cohesive learning programmes that are designed to meet the Social, Physical & Cultural needs of an International student body.
             </p>
@@ -83,7 +87,7 @@ export default function BeyondClassroom() {
 
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-2xl font-black mb-8 text-center" style={{ color: "#0d3b86" }}>Our Clubs</h2>
+            <h2 className="text-2xl font-black mb-8 text-center" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Our Clubs</h2>
             <div className="flex flex-wrap gap-3 justify-center">
               {["Health & Wellness Club", "Interact Club", "Culinary Club", "Literary Club", "Heritage Club", "Science & Maths Club", "Eco Club", "Cultural Club"].map((club, i) => (
                 <span key={i} className="font-semibold px-4 py-2 rounded-full text-sm border border-gray-200" style={{ color: "#0d3b86", background: "#f0f4ff" }}>{club}</span>

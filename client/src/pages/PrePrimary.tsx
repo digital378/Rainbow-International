@@ -149,7 +149,11 @@ export default function PrePrimary() {
 
               {/* Left — intro text */}
               <div className="lg:col-span-2 space-y-5">
-                <h2 className="text-3xl font-black" style={{ color: "#0d3b86" }}>Pre-Primary Section</h2>
+                <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  Early Learning
+                </span>
+                <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Pre-Primary Section</h2>
                 <p className="text-base text-gray-500 font-semibold -mt-3">(Nursery | Jr KG | Sr KG)</p>
                 <p className="text-gray-600 leading-relaxed">
                   The urgency of catching up has increased in a world that is continuously expanding and changing. We introduce our kids into academia in a way that ensures they are constantly one step ahead — learning, growing, and being nurtured without having to worry about the pace.

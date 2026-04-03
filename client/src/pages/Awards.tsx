@@ -95,9 +95,15 @@ export default function Awards() {
       <main className="flex-grow">
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <p className="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-              Accolades earned by Rainbow International School for being one of the best & most promising international schools in Thane for the decade in the educational sphere.
-            </p>
+            <div className="text-center mb-12">
+              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                Our Achievements
+              </span>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Accolades earned by Rainbow International School for being one of the best & most promising international schools in Thane for the decade in the educational sphere.
+              </p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {awards.map((award, i) => (
                 <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex flex-col" data-testid={`card-award-${i}`}>
@@ -112,7 +118,7 @@ export default function Awards() {
                       decoding="async"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
-                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#f97316" }} />
+                    <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: "#fbbf24" }} />
                   </div>
                   <div className="p-6 flex-grow">
                     <h3 className="font-black text-lg mb-3 text-center" style={{ color: "#0d3b86" }}>{award.title}</h3>

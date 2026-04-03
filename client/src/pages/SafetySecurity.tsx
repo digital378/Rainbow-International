@@ -209,6 +209,10 @@ export default function SafetySecurity() {
                 />
               </div>
               <div className="space-y-4">
+                <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-2" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  Student Safety First
+                </span>
                 <p className="text-gray-600 leading-relaxed">
                   At Rainbow International School, we believe it's too narrow-minded of a school to think only about academics.
                 </p>

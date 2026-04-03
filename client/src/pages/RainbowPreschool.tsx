@@ -95,11 +95,11 @@ export default function RainbowPreschool() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-20 pb-24" style={{ background: "linear-gradient(135deg, #b91c1c 0%, #dc2626 45%, #ef4444 100%)" }}>
+      <section className="relative overflow-hidden pt-20 pb-24" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 45%, #091a4f 100%)" }}>
         {/* Floating decorative blobs */}
         <div className="absolute top-10 left-10 w-32 h-32 rounded-full opacity-20" style={{ background: "#fbbf24", filter: "blur(30px)" }} />
-        <div className="absolute bottom-10 right-16 w-40 h-40 rounded-full opacity-20" style={{ background: "#fb923c", filter: "blur(35px)" }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full opacity-15" style={{ background: "#fca5a5", filter: "blur(25px)" }} />
+        <div className="absolute bottom-10 right-16 w-40 h-40 rounded-full opacity-20" style={{ background: "#fbbf24", filter: "blur(35px)" }} />
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 rounded-full opacity-15" style={{ background: "#3b82f6", filter: "blur(25px)" }} />
 
         {/* Breadcrumb */}
         <div className="relative container mx-auto px-4 mb-8">
@@ -156,11 +156,11 @@ export default function RainbowPreschool() {
               {/* Floating stat badges */}
               <div className="absolute -top-4 -right-4 bg-white rounded-2xl px-4 py-3 shadow-xl">
                 <p className="text-xs text-gray-500 font-medium">Est.</p>
-                <p className="text-xl font-black" style={{ color: "#8b5cf6" }}>2009</p>
+                <p className="text-xl font-black" style={{ color: "#0d3b86" }}>2009</p>
               </div>
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl px-4 py-3 shadow-xl">
                 <p className="text-xs text-gray-500 font-medium">Students Impacted</p>
-                <p className="text-xl font-black" style={{ color: "#ec4899" }}>1 Lac+</p>
+                <p className="text-xl font-black" style={{ color: "#0d3b86" }}>1 Lac+</p>
               </div>
             </div>
           </div>
@@ -182,13 +182,13 @@ export default function RainbowPreschool() {
             <div className="max-w-5xl mx-auto">
               <div className="flex flex-col lg:flex-row gap-12 items-center">
                 <div className="flex-1">
-                  <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-6" style={{ background: "#fdf2f8", color: "#ec4899" }}>
+                  <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-6" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                     <span className="w-1.5 h-1.5 rounded-full bg-current" />
                     About the Preschool
                   </span>
-                  <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 leading-tight">
+                  <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-5 leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     The Most Joyful<br />
-                    <span style={{ color: "#8b5cf6" }}>Start in Life</span>
+                    <span style={{ color: "#0d3b86" }}>Start in Life</span>
                   </h2>
                   <div className="space-y-4 text-gray-600 text-[15px] leading-[1.85]">
                     <p>
@@ -226,11 +226,11 @@ export default function RainbowPreschool() {
         <section className="py-20" style={{ background: "#fafafa" }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#f5f3ff", color: "#8b5cf6" }}>
+              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 Our Foundation
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900">Built on 4 Strong Pillars</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Built on 4 Strong Pillars</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
               {pillars.map((p, i) => (
@@ -257,11 +257,11 @@ export default function RainbowPreschool() {
         <section id="programmes" className="py-20 bg-white scroll-mt-32">
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
-              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#fffbeb", color: "#f59e0b" }}>
+              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 Age-Wise Programmes
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900">A Programme for<br />Every Little Learner</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>A Programme for<br />Every Little Learner</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
               {programs.map((prog, i) => (
@@ -309,13 +309,13 @@ export default function RainbowPreschool() {
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-10">
-                <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-4" style={{ background: "#fff1f2", color: "#dc2626" }}>
+                <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-4" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   Rainbow Preschool Network
                 </span>
-                <h2 className="text-2xl md:text-3xl font-black text-gray-900">Explore Rainbow Preschools</h2>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Explore Rainbow Preschools</h2>
                 <p className="text-gray-500 text-sm mt-2 max-w-xl mx-auto">
-                  Rainbow Preschool International is part of the wider <a href="https://www.rainbowpreschools.com/" target="_blank" rel="noopener noreferrer" className="font-bold underline underline-offset-2" style={{ color: "#dc2626" }}>Rainbow Preschools network</a> — serving families across Thane since 2007.
+                  Rainbow Preschool International is part of the wider <a href="https://www.rainbowpreschools.com/" target="_blank" rel="noopener noreferrer" className="font-bold underline underline-offset-2" style={{ color: "#0d3b86" }}>Rainbow Preschools network</a> — serving families across Thane since 2007.
                 </p>
               </div>
 
@@ -334,8 +334,8 @@ export default function RainbowPreschool() {
                     ].map((l, i) => (
                       <li key={i}>
                         <a href={l.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
-                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-800 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-blue-600 transition-colors" />
                           {l.label}
                         </a>
                       </li>
@@ -357,8 +357,8 @@ export default function RainbowPreschool() {
                     ].map((l, i) => (
                       <li key={i}>
                         <a href={l.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
-                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-800 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-blue-600 transition-colors" />
                           {l.label}
                         </a>
                       </li>
@@ -380,8 +380,8 @@ export default function RainbowPreschool() {
                     ].map((l, i) => (
                       <li key={i}>
                         <a href={l.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
-                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-800 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-blue-600 transition-colors" />
                           {l.label}
                         </a>
                       </li>
@@ -404,8 +404,8 @@ export default function RainbowPreschool() {
                     ].map((l, i) => (
                       <li key={i}>
                         <a href={l.href} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors group">
-                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-red-400 transition-colors" />
+                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-800 transition-colors group">
+                          <ArrowRight size={12} className="flex-shrink-0 text-gray-300 group-hover:text-blue-600 transition-colors" />
                           {l.label}
                         </a>
                       </li>
@@ -422,7 +422,7 @@ export default function RainbowPreschool() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm text-white transition-all hover:scale-[1.03] hover:shadow-lg"
-                  style={{ background: "#dc2626" }}
+                  style={{ background: "#0d3b86" }}
                 >
                   Visit rainbowpreschools.com
                   <ArrowRight size={15} />
@@ -480,11 +480,11 @@ export default function RainbowPreschool() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
-              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#ecfdf5", color: "#10b981" }}>
+              <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
                 Our Approach
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900">What Makes Our Preschool Special</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>What Makes Our Preschool Special</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {features.map((feat, i) => {
@@ -511,14 +511,14 @@ export default function RainbowPreschool() {
         </section>
 
         {/* ── Awards ───────────────────────────────────────────── */}
-        <section className="py-20" style={{ background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)" }}>
+        <section className="py-20" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 50%, #091a4f 100%)" }}>
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5 bg-white/10 text-yellow-300 border border-white/15">
                 <Star size={12} className="fill-current" />
                 Recognition & Awards
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-white">Nationally & Globally Recognised</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>Nationally & Globally Recognised</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
               {awards.map((aw, i) => (
@@ -544,9 +544,9 @@ export default function RainbowPreschool() {
             <div className="max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-xl">
               <div
                 className="px-10 py-12 text-center"
-                style={{ background: "linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%)" }}
+                style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 50%, #091a4f 100%)" }}
               >
-                <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
+                <h2 className="text-3xl md:text-4xl font-black text-white mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                   One School. One Journey.<br />Nursery to Class 12.
                 </h2>
                 <p className="text-white/85 text-lg leading-relaxed mb-8 max-w-2xl mx-auto">
@@ -554,7 +554,7 @@ export default function RainbowPreschool() {
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center">
                   <Link href="/pre-primary-school-thane">
-                    <button className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.03]" style={{ background: "white", color: "#f5576c" }}>
+                    <button className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm transition-all hover:scale-[1.03]" style={{ background: "#fbbf24", color: "#091a4f" }}>
                       View Pre-Primary Section
                       <ArrowRight size={15} />
                     </button>
@@ -566,14 +566,14 @@ export default function RainbowPreschool() {
                   </a>
                 </div>
               </div>
-              <div className="grid grid-cols-3" style={{ background: "#fff9f9" }}>
+              <div className="grid grid-cols-3" style={{ background: "#f8faff" }}>
                 {[
                   { num: "1.5–5.5", label: "Age Group" },
                   { num: "100%", label: "Female Staff" },
                   { num: "18+", label: "Years of Legacy" },
                 ].map((s, i) => (
-                  <div key={i} className={`px-6 py-5 text-center ${i < 2 ? "border-r border-pink-100" : ""}`}>
-                    <p className="text-2xl font-black mb-1" style={{ color: "#f5576c" }}>{s.num}</p>
+                  <div key={i} className={`px-6 py-5 text-center ${i < 2 ? "border-r border-blue-100" : ""}`}>
+                    <p className="text-2xl font-black mb-1" style={{ color: "#0d3b86" }}>{s.num}</p>
                     <p className="text-gray-500 text-xs font-medium">{s.label}</p>
                   </div>
                 ))}

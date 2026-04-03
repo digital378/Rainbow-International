@@ -161,7 +161,11 @@ export default function SeniorSecondary() {
               {/* Left — intro text */}
               <div className="lg:col-span-2 space-y-5">
                 <div>
-                  <h2 className="text-3xl font-black" style={{ color: "#0d3b86" }}>Senior Secondary Section</h2>
+                  <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-3" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    Career Pathways
+                  </span>
+                  <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Senior Secondary Section</h2>
                   <p className="text-base text-gray-500 font-semibold mt-1">(Class 11 – 12)</p>
                 </div>
                 <p className="text-gray-600 leading-relaxed">

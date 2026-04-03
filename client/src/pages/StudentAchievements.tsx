@@ -44,7 +44,11 @@ export default function StudentAchievements() {
       <main className="flex-grow">
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86" }}>Result of Class X AISSE — March 2019</h2>
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+              Academic Excellence
+            </span>
+            <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Result of Class X AISSE — March 2019</h2>
             <p className="text-gray-600 mb-6 leading-relaxed">
               We are extremely proud of the fact that our first batch of Class X students who appeared for the All India Secondary School Examination in March 2019 brought great laurels to their school by bringing cent percent results. In all <strong>43 students</strong> appeared for the examination.
             </p>

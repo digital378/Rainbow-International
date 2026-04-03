@@ -280,7 +280,7 @@ export default function Extracurriculars() {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col md:flex-row items-center gap-8 p-8 md:p-12" style={{ background: "#f0f4ff" }}>
               <div className="flex-1 space-y-4">
-                <h2 className="text-3xl font-black" style={{ color: "#0d3b86" }}>We are a FIT INDIA School</h2>
+                <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>We are a FIT INDIA School</h2>
                 <p className="text-gray-600 leading-relaxed">
                   Our declaration has been approved by the Ministry of Youth Affairs and Sports and we are a FIT INDIA School!
                 </p>
@@ -320,7 +320,7 @@ export default function Extracurriculars() {
         {/* ── Sports Wheel ──────────────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-3xl">
-            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Sports to Add Action</h2>
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Sports to Add Action</h2>
             <SportsWheel />
           </div>
         </section>
@@ -328,7 +328,7 @@ export default function Extracurriculars() {
         {/* ── Clubs Wheel ───────────────────────────────────────── */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86" }}>Clubs to Provide Intellectual Stimulation</h2>
+            <h2 className="text-3xl font-black text-center mb-10" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Clubs to Provide Intellectual Stimulation</h2>
             <ClubsWheel />
           </div>
         </section>
@@ -336,7 +336,7 @@ export default function Extracurriculars() {
         {/* ── Teaching Methodology ──────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86" }}>Teaching Methodology</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Teaching Methodology</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {activities.map((item, i) => (
                 <div key={i} className="flex flex-col gap-3" data-testid={`card-extracurricular-${i}`}>
