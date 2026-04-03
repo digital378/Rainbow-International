@@ -61,8 +61,8 @@ export function Hero() {
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]" style={{ zIndex: 1 }}>
       <img
-        src="/images/students/pre-primary-running.jpg"
-        alt="Rainbow International School campus — Pre-Primary kids running"
+        src="/images/students/hero-senior-secondary.jpg"
+        alt="Rainbow International School senior secondary students in blazers"
         width={1920}
         height={1080}
         loading="eager"
