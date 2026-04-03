@@ -119,14 +119,13 @@ export default function About() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <img
-                src="/images/gallery/about/welcome-to-ris.jpg"
-                alt="Welcome to Rainbow International School"
+                src="/images/about/welcome-to-ris.jpg"
+                alt="Welcome to Rainbow International School — Campus building and grounds"
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={1024}
                 height={536}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"; }}
               />
               <img
                 src="/images/gallery/talent/amphitheatre.png"
