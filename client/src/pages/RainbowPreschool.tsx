@@ -95,7 +95,7 @@ export default function RainbowPreschool() {
       <Navbar />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]" style={{ zIndex: 1 }}>
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden" style={{ zIndex: 1, marginBottom: "-1px" }}>
         <img
           src="/images/preschool/hero.jpg"
           alt="Rainbow Preschool children with school bags"
@@ -106,9 +106,8 @@ export default function RainbowPreschool() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
-        <div className="absolute bottom-0 left-0 right-0 h-40" style={{ background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 40%, #091a4f 100%)" }} />
 
-        <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-16 lg:pt-44 lg:pb-16">
+        <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-28 lg:pt-44 lg:pb-32">
           <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 items-center">
 
             <div className="flex-1">
@@ -164,9 +163,9 @@ export default function RainbowPreschool() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ height: "60px", display: "block" }} xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="white" />
+        <div className="absolute bottom-[-1px] left-0 right-0 pointer-events-none">
+          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="block w-full" style={{ height: "80px" }} xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="white" />
           </svg>
         </div>
       </section>
