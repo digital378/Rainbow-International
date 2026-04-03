@@ -128,7 +128,7 @@ export default function About() {
                 decoding="async"
               />
               <img
-                src="/images/gallery/talent/amphitheatre.png"
+                src="/images/gallery/talent/amphitheatre.jpg"
                 alt="Rainbow International School Amphitheatre"
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={1024}
