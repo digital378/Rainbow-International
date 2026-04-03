@@ -55,7 +55,7 @@ export default function ContactUs() {
     }
   };
 
-  const inputBase = "w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400/40 focus:border-red-400 transition-all bg-white";
+  const inputBase = "w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#091a4f]/30 focus:border-[#091a4f] transition-all bg-white";
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -74,7 +74,7 @@ export default function ContactUs() {
       />
 
       <main className="flex-grow">
-        <section className="py-16 md:py-20 bg-gray-50">
+        <section className="py-16 md:py-20" style={{ background: "#f0f4fa" }}>
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-5 gap-10 max-w-6xl mx-auto">
 
@@ -151,7 +151,7 @@ export default function ContactUs() {
                         id="contact-consent"
                         checked={agreed}
                         onChange={(e) => setAgreed(e.target.checked)}
-                        className="mt-0.5 w-4 h-4 flex-shrink-0 accent-red-500"
+                        className="mt-0.5 w-4 h-4 flex-shrink-0 accent-[#091a4f]"
                         data-testid="checkbox-contact-consent"
                       />
                       <label htmlFor="contact-consent" className="text-gray-500 text-xs leading-relaxed cursor-pointer">
@@ -164,7 +164,7 @@ export default function ContactUs() {
                       disabled={isSubmitting || !agreed}
                       data-testid="button-contact-submit"
                       className="w-full font-bold py-3.5 text-white text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60 rounded-full"
-                      style={{ background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" }}
+                      style={{ background: "linear-gradient(135deg, #0d3b86 0%, #091a4f 100%)" }}
                     >
                       {isSubmitting ? "Submitting..." : "Request Callback"}
                     </button>
@@ -179,28 +179,28 @@ export default function ContactUs() {
                     label: "Phone",
                     lines: ["+91 82915 68972"],
                     href: "tel:+918291568972",
-                    color: "#ef4444",
+                    color: "#0d3b86",
                   },
                   {
                     icon: Mail,
                     label: "Email",
                     lines: ["info@rainbowinternationalschool.in"],
                     href: "mailto:info@rainbowinternationalschool.in",
-                    color: "#ef4444",
+                    color: "#0d3b86",
                   },
                   {
                     icon: Clock,
                     label: "Working Hours",
                     lines: ["Monday - Saturday", "9AM - 6PM"],
                     href: null as string | null,
-                    color: "#ef4444",
+                    color: "#0d3b86",
                   },
                   {
                     icon: MapPin,
                     label: "Locations",
                     lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra"],
                     href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
-                    color: "#ef4444",
+                    color: "#0d3b86",
                   },
                 ].map((item, i) => {
                   const Icon = item.icon;
@@ -240,7 +240,7 @@ export default function ContactUs() {
                   );
                 })}
 
-                <div className="mt-8 pl-4 border-l-4 border-red-400">
+                <div className="mt-8 pl-4 border-l-4 border-[#0d3b86]">
                   <p className="text-gray-600 text-sm italic leading-relaxed">
                     "The secret of getting ahead is getting started."
                   </p>
