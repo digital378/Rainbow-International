@@ -61,8 +61,8 @@ export function Hero() {
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden">
       <img
-        src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1920&h=1080&fit=crop&q=80"
-        alt="Rainbow International School campus"
+        src="/images/students/pre-primary-running.jpg"
+        alt="Rainbow International School campus — Pre-Primary kids running"
         width={1920}
         height={1080}
         loading="eager"

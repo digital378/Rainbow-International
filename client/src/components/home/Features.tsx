@@ -1,11 +1,11 @@
 const images = [
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/12-300x200.jpg", alt: "Child aspiring to be a doctor", w: 200, h: 240 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/05-1-150x150.jpg", alt: "Child aspiring to be a pilot", w: 170, h: 200 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/03-150x150.jpg", alt: "Child aspiring to be a scientist", w: 140, h: 170 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/09-150x150.jpg", alt: "Child with art palette", w: 150, h: 185 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-homepage-testimonials-anuja-pradhan.jpg", alt: "School students", w: 170, h: 210 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad-2.png", alt: "Student achievement", w: 140, h: 170 },
-  { src: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security-768x610.png", alt: "School security", w: 160, h: 195 },
+  { src: "/images/students/pre-primary-running.jpg", alt: "Pre-Primary kids running at Rainbow campus", w: 200, h: 240 },
+  { src: "/images/students/primary-classroom-hand.jpg", alt: "Primary student raising hand in classroom", w: 170, h: 200 },
+  { src: "/images/students/primary-group-work.jpg", alt: "Students collaborating in classroom", w: 140, h: 170 },
+  { src: "/images/students/pre-primary-teacher.jpg", alt: "Teacher engaging with pre-primary students", w: 150, h: 185 },
+  { src: "/images/students/secondary-students.png", alt: "Secondary students in navy blazers", w: 170, h: 210 },
+  { src: "/images/students/senior-secondary-group.jpg", alt: "Senior Secondary students group", w: 140, h: 170 },
+  { src: "/images/students/middle-section.jpg", alt: "Middle school students in classroom", w: 160, h: 195 },
 ];
 
 export function Features() {
