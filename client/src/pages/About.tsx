@@ -232,22 +232,9 @@ export default function About() {
               <div className="flex flex-col lg:flex-row gap-12 items-start">
                 <div className="flex-shrink-0 flex flex-col items-center gap-4">
                   <div
-                    className="w-52 h-64 rounded-3xl overflow-hidden shadow-xl border-4 border-white"
-                    style={{ boxShadow: "0 20px 60px -10px rgba(13,59,134,0.25)" }}
+                    className="w-52 h-64 rounded-3xl overflow-hidden shadow-xl border-4 border-white flex items-center justify-center"
+                    style={{ boxShadow: "0 20px 60px -10px rgba(13,59,134,0.25)", background: "#f1f5f9" }}
                   >
-                    <img
-                      src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
-                      alt="Chairperson, Rainbow International School"
-                      className="w-full h-full object-cover object-top"
-                      width={208}
-                      height={256}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        const el = e.target as HTMLImageElement;
-                        el.src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/amenities-facilities01-768x610.png";
-                      }}
-                    />
                   </div>
                   <div className="text-center">
                     <p className="font-black text-gray-900 text-base">Chairperson</p>
