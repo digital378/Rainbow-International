@@ -120,7 +120,7 @@ export function Navbar() {
   return (
     <>
     {!isHome && <div className="h-[140px]" />}
-    <div className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isTransparent ? "" : "bg-white shadow-md"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${isTransparent ? "" : "bg-white shadow-md"}`} role="banner">
       <div
         className="text-center py-1.5 text-[10px] sm:text-[11px] font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase transition-all duration-300 text-white whitespace-nowrap"
         style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
@@ -287,7 +287,7 @@ export function Navbar() {
           </div>
         </div>
       )}
-    </div>
+    </header>
     </>
   );
 }

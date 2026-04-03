@@ -30,30 +30,37 @@ export default function Home() {
       />
       <ScrollProgress />
       <Navbar />
-      <main className="flex-grow">
-        <Hero />
-        <AwardsStrip />
-        <Suspense fallback={<SectionFallback />}>
-          <AboutPreview />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <AcademicSections />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <Pedagogy />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <DiscoverRainbow />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <BeyondClassroomSection />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <Testimonials />
-        </Suspense>
-        <Suspense fallback={<SectionFallback />}>
-          <ContactForm />
-        </Suspense>
+      <main className="flex-grow" role="main">
+        <article itemScope itemType="https://schema.org/School">
+          <meta itemProp="name" content="Rainbow International School" />
+          <meta itemProp="description" content="One of the top CBSE-affiliated K-12 schools in Thane West, Maharashtra. Offering world-class education from Nursery to Class 12 with Science, Commerce & Humanities streams." />
+          <meta itemProp="address" content="Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607" />
+          <meta itemProp="telephone" content="+91 82915 68972" />
+          <meta itemProp="url" content="https://rainbowinternationalschool.in" />
+          <Hero />
+          <AwardsStrip />
+          <Suspense fallback={<SectionFallback />}>
+            <AboutPreview />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <AcademicSections />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <Pedagogy />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <DiscoverRainbow />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <BeyondClassroomSection />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <Testimonials />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <ContactForm />
+          </Suspense>
+        </article>
       </main>
       <Footer />
     </div>
