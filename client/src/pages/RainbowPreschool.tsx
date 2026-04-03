@@ -200,17 +200,25 @@ export default function RainbowPreschool() {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 w-full lg:w-[400px]">
-                  <div className="rounded-3xl overflow-hidden shadow-xl">
+                <div className="flex-shrink-0 relative w-full lg:w-[340px]">
+                  <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-gray-100 mx-auto">
                     <img
                       src="/images/preschool/hero.jpg"
                       alt="Rainbow Preschool children walking with school bags"
-                      className="w-full h-auto object-cover"
-                      width={400}
-                      height={300}
+                      className="w-full h-full object-cover"
+                      width={320}
+                      height={320}
                       loading="lazy"
                       decoding="async"
                     />
+                  </div>
+                  <div className="absolute -top-4 -right-2 bg-white rounded-2xl px-4 py-3 shadow-xl border border-gray-100">
+                    <p className="text-xs text-gray-500 font-medium">Est.</p>
+                    <p className="text-xl font-black" style={{ color: "#0d3b86" }}>2009</p>
+                  </div>
+                  <div className="absolute -bottom-4 -left-2 bg-white rounded-2xl px-4 py-3 shadow-xl border border-gray-100">
+                    <p className="text-xs text-gray-500 font-medium">Students Impacted</p>
+                    <p className="text-xl font-black" style={{ color: "#0d3b86" }}>1 Lac+</p>
                   </div>
                 </div>
               </div>
