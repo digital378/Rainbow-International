@@ -217,7 +217,7 @@ export default function ContactUs() {
                       rel="noopener noreferrer"
                       data-testid="button-contact-whatsapp"
                       className="w-full flex items-center justify-center gap-2 font-bold py-3.5 text-white text-sm transition-all hover:opacity-90 active:scale-[0.99] rounded-full"
-                      style={{ background: "#25D366" }}
+                      style={{ background: "#128C7E" }}
                     >
                       <MessageCircle size={18} />
                       Chat on WhatsApp
@@ -272,18 +272,6 @@ export default function ContactUs() {
                   <p className="text-white text-sm font-semibold mt-2">— Mark Twain</p>
                 </div>
 
-                <div className="mt-6 rounded-2xl overflow-hidden border border-white/10" style={{ height: "220px" }}>
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3767.7!2d72.9685!3d19.2283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b91d6cf84c65%3A0x7c7e0e1234567890!2sRainbow+International+School!5e0!3m2!1sen!2sin!4v1700000000000"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Rainbow International School Location"
-                  />
-                </div>
               </div>
 
             </div>
