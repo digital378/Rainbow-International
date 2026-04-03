@@ -41,10 +41,13 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom"],
-          ui: ["@radix-ui/react-slot", "@radix-ui/react-tooltip", "@radix-ui/react-dialog"],
-          forms: ["react-hook-form", "@hookform/resolvers", "zod"],
+        manualChunks(id) {
+          if (id.includes("node_modules/react-dom")) return "vendor";
+          if (id.includes("node_modules/react/")) return "vendor";
+          if (id.includes("node_modules/@radix-ui")) return "ui";
+          if (id.includes("node_modules/react-hook-form") || id.includes("node_modules/@hookform") || id.includes("node_modules/zod")) return "forms";
+          if (id.includes("data/blogPosts")) return "blog-data";
+          if (id.includes("node_modules/@tanstack")) return "query";
         },
       },
     },

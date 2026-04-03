@@ -134,6 +134,8 @@ export function Navbar() {
             <img
               src="/ris-logo.png"
               alt="Rainbow International School"
+              width={56}
+              height={56}
               className={`w-auto object-contain transition-all duration-300 ${scrolled ? "h-12" : "h-14"}`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;

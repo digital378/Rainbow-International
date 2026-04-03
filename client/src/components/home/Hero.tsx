@@ -60,16 +60,20 @@ export function Hero() {
 
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]">
-      <img
-        src="/images/students/hero-senior-secondary.jpg"
-        alt="Rainbow International School senior secondary students in blazers"
-        width={1920}
-        height={1080}
-        loading="eager"
-        decoding="async"
-        className="absolute inset-0 w-full h-full object-cover object-top"
-        style={{ zIndex: 0 }}
-      />
+      <picture>
+        <source srcSet="/images/students/hero-senior-secondary.webp" type="image/webp" />
+        <img
+          src="/images/students/hero-senior-secondary.jpg"
+          alt="Rainbow International School senior secondary students in blazers"
+          width={1920}
+          height={1080}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          className="absolute inset-0 w-full h-full object-cover object-top"
+          style={{ zIndex: 0 }}
+        />
+      </picture>
       <div className="absolute inset-0" style={{ zIndex: 1, background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
       <div className="absolute bottom-0 left-0 right-0 h-40" style={{ zIndex: 1, background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 40%, #091a4f 100%)" }} />
 

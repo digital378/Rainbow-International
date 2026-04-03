@@ -1,59 +1,65 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ChatBot } from "@/components/ChatBot";
-import RainbowCursor from "@/components/RainbowCursor";
 import ScrollToTop from "@/components/ScrollToTop";
 import { initGA, trackPageView } from "@/lib/analytics";
 import Home from "@/pages/Home";
-import About from "@/pages/About";
-import WelcomeToRIS from "@/pages/WelcomeToRIS";
-import ChairpersonsNote from "@/pages/ChairpersonsNote";
-import VisionMission from "@/pages/VisionMission";
-import OurPhilosophy from "@/pages/OurPhilosophy";
-import PrePrimary from "@/pages/PrePrimary";
-import Primary from "@/pages/Primary";
-import MiddleSchool from "@/pages/MiddleSchool";
-import Secondary from "@/pages/Secondary";
-import SeniorSecondary from "@/pages/SeniorSecondary";
-import Amenities from "@/pages/Amenities";
-import Awards from "@/pages/Awards";
-import StudentAchievements from "@/pages/StudentAchievements";
-import SafetySecurity from "@/pages/SafetySecurity";
-import BeyondClassroom from "@/pages/BeyondClassroom";
-import Extracurriculars from "@/pages/Extracurriculars";
-import PhotoGallery from "@/pages/PhotoGallery";
-import ContactUs from "@/pages/ContactUs";
-import AcademicCalendar from "@/pages/AcademicCalendar";
-import Blogs from "@/pages/Blogs";
-import CbseDisclosures from "@/pages/CbseDisclosures";
-import SchoolManagingCommittee from "@/pages/SchoolManagingCommittee";
-import Career from "@/pages/Career";
-import BookList from "@/pages/BookList";
-import Declaration from "@/pages/Declaration";
-import VirtualLearning from "@/pages/VirtualLearning";
-import AcademicTeam from "@/pages/AcademicTeam";
-import RainbowPreschool from "@/pages/RainbowPreschool";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import TermsOfUse from "@/pages/TermsOfUse";
-import GlobalBrandAssociations from "@/pages/GlobalBrandAssociations";
-import StudentsLeavingCertificate from "@/pages/StudentsLeavingCertificate";
-import Curriculum from "@/pages/Curriculum";
-import BlogPost from "@/pages/BlogPost";
-import ApplicationForm from "@/pages/ApplicationForm";
-import GoogleSchool from "@/pages/GoogleSchool";
-import MetaSchool from "@/pages/MetaSchool";
-import ScheduleAppointment from "@/pages/ScheduleAppointment";
-import ThankYou from "@/pages/ThankYou";
-import NotFound from "@/pages/not-found";
+
+const About = lazy(() => import("@/pages/About"));
+const WelcomeToRIS = lazy(() => import("@/pages/WelcomeToRIS"));
+const ChairpersonsNote = lazy(() => import("@/pages/ChairpersonsNote"));
+const VisionMission = lazy(() => import("@/pages/VisionMission"));
+const OurPhilosophy = lazy(() => import("@/pages/OurPhilosophy"));
+const PrePrimary = lazy(() => import("@/pages/PrePrimary"));
+const Primary = lazy(() => import("@/pages/Primary"));
+const MiddleSchool = lazy(() => import("@/pages/MiddleSchool"));
+const Secondary = lazy(() => import("@/pages/Secondary"));
+const SeniorSecondary = lazy(() => import("@/pages/SeniorSecondary"));
+const Amenities = lazy(() => import("@/pages/Amenities"));
+const Awards = lazy(() => import("@/pages/Awards"));
+const StudentAchievements = lazy(() => import("@/pages/StudentAchievements"));
+const SafetySecurity = lazy(() => import("@/pages/SafetySecurity"));
+const BeyondClassroom = lazy(() => import("@/pages/BeyondClassroom"));
+const Extracurriculars = lazy(() => import("@/pages/Extracurriculars"));
+const PhotoGallery = lazy(() => import("@/pages/PhotoGallery"));
+const ContactUs = lazy(() => import("@/pages/ContactUs"));
+const AcademicCalendar = lazy(() => import("@/pages/AcademicCalendar"));
+const Blogs = lazy(() => import("@/pages/Blogs"));
+const CbseDisclosures = lazy(() => import("@/pages/CbseDisclosures"));
+const SchoolManagingCommittee = lazy(() => import("@/pages/SchoolManagingCommittee"));
+const Career = lazy(() => import("@/pages/Career"));
+const BookList = lazy(() => import("@/pages/BookList"));
+const Declaration = lazy(() => import("@/pages/Declaration"));
+const VirtualLearning = lazy(() => import("@/pages/VirtualLearning"));
+const AcademicTeam = lazy(() => import("@/pages/AcademicTeam"));
+const RainbowPreschool = lazy(() => import("@/pages/RainbowPreschool"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
+const GlobalBrandAssociations = lazy(() => import("@/pages/GlobalBrandAssociations"));
+const StudentsLeavingCertificate = lazy(() => import("@/pages/StudentsLeavingCertificate"));
+const Curriculum = lazy(() => import("@/pages/Curriculum"));
+const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const ApplicationForm = lazy(() => import("@/pages/ApplicationForm"));
+const GoogleSchool = lazy(() => import("@/pages/GoogleSchool"));
+const MetaSchool = lazy(() => import("@/pages/MetaSchool"));
+const ScheduleAppointment = lazy(() => import("@/pages/ScheduleAppointment"));
+const ThankYou = lazy(() => import("@/pages/ThankYou"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
+const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
+
+function PageFallback() {
+  return <div style={{ minHeight: "100vh" }} />;
+}
 
 function Router() {
   return (
     <>
     <ScrollToTop />
+    <Suspense fallback={<PageFallback />}>
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/about-rainbow-international-school" component={About} />
@@ -97,6 +103,7 @@ function Router() {
       <Route path="/thank-you" component={ThankYou} />
       <Route component={NotFound} />
     </Switch>
+    </Suspense>
     </>
   );
 }
@@ -120,15 +127,34 @@ function PageViewTracker() {
   return null;
 }
 
+function DeferredExtras() {
+  const [ready, setReady] = useState(false);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(true);
+
+  useEffect(() => {
+    setIsCoarsePointer(window.matchMedia("(pointer: coarse)").matches);
+    const idle = typeof requestIdleCallback === "function"
+      ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 3000);
+    idle(() => setReady(true));
+  }, []);
+
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      {!isCoarsePointer && <RainbowCursor />}
+      <ChatBot />
+    </Suspense>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <RainbowCursor />
         <PageViewTracker />
         <Router />
-        <ChatBot />
+        <DeferredExtras />
       </TooltipProvider>
     </QueryClientProvider>
   );
