@@ -203,13 +203,14 @@ export default function RainbowPreschool() {
                 <div className="flex-shrink-0 relative w-full lg:w-[340px]">
                   <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-gray-100 mx-auto">
                     <img
-                      src="/images/preschool/hero.jpg"
-                      alt="Rainbow Preschool children walking with school bags"
+                      src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
+                      alt="Rainbow Preschool girl in school uniform"
                       className="w-full h-full object-cover"
                       width={320}
                       height={320}
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/images/preschool/hero.jpg"; }}
                     />
                   </div>
                   <div className="absolute -top-4 -right-2 bg-white rounded-2xl px-4 py-3 shadow-xl border border-gray-100">
@@ -464,17 +465,37 @@ export default function RainbowPreschool() {
                 </ul>
               </div>
 
-              <div className="flex-shrink-0 w-full lg:w-96">
-                <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-preschool-playgroup-banner-1.jpg"
-                  alt="Rainbow Preschool classroom"
-                  className="rounded-3xl shadow-xl w-full object-cover h-80"
-                  width={384}
-                  height={320}
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
+              <div className="flex-shrink-0 w-full lg:w-[420px]">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-2xl p-5 border border-gray-100 shadow-sm" style={{ background: "#fff5f5" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "#fee2e2" }}>
+                      <Users size={20} style={{ color: "#ef4444" }} />
+                    </div>
+                    <p className="text-2xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>1 Lac+</p>
+                    <p className="text-gray-500 text-xs font-medium mt-1">Happy Students</p>
+                  </div>
+                  <div className="rounded-2xl p-5 border border-gray-100 shadow-sm" style={{ background: "#fffbeb" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "#fef3c7" }}>
+                      <Star size={20} style={{ color: "#f59e0b" }} className="fill-current" />
+                    </div>
+                    <p className="text-2xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>18+</p>
+                    <p className="text-gray-500 text-xs font-medium mt-1">Years of Excellence</p>
+                  </div>
+                  <div className="rounded-2xl p-5 border border-gray-100 shadow-sm" style={{ background: "#eff6ff" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "#dbeafe" }}>
+                      <Globe size={20} style={{ color: "#3b82f6" }} />
+                    </div>
+                    <p className="text-2xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>06</p>
+                    <p className="text-gray-500 text-xs font-medium mt-1">Centres in Thane</p>
+                  </div>
+                  <div className="rounded-2xl p-5 border border-gray-100 shadow-sm" style={{ background: "#ecfdf5" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "#d1fae5" }}>
+                      <Shield size={20} style={{ color: "#10b981" }} />
+                    </div>
+                    <p className="text-2xl font-black text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>100%</p>
+                    <p className="text-gray-500 text-xs font-medium mt-1">Female Staff</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
