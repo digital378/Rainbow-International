@@ -5,3 +5,6 @@ Disallow: /api/
 Host: https://rainbowinternationalschool.in
 
 Sitemap: https://rainbowinternationalschool.in/sitemap.xml
+
+# AI/LLM discovery
+LLMs.txt: https://rainbowinternationalschool.in/llms.txt
