@@ -142,6 +142,11 @@ export default function SeniorSecondary() {
         keywords="senior secondary school Thane, Class 11 12 CBSE Thane West, science commerce humanities Thane school"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/senior-secondary-768x513.png"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
+          { name: "Senior Secondary (Class 11-12)", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
+        ]}
       />
       <Navbar />
       <PageBanner

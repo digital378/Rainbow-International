@@ -38,6 +38,10 @@ export default function BeyondClassroom() {
         keywords="beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane"
         canonical="https://rainbowinternationalschool.in/beyond-the-classroom/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Beyond the Classroom", href: "https://rainbowinternationalschool.in/beyond-the-classroom" },
+        ]}
       />
       <Navbar />
       <PageBanner

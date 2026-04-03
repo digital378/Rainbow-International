@@ -128,6 +128,11 @@ export default function Primary() {
         keywords="primary school Thane West, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
         canonical="https://rainbowinternationalschool.in/primary-section/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/primary-section" },
+          { name: "Primary (Class 1-5)", href: "https://rainbowinternationalschool.in/primary-section" },
+        ]}
       />
       <Navbar />
       <PageBanner

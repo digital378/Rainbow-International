@@ -85,6 +85,10 @@ export default function Awards() {
         keywords="Rainbow International School awards, best school Thane West, CBSE school awards Thane, school achievements Thane"
         canonical="https://rainbowinternationalschool.in/awards-achievements/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Awards & Achievements", href: "https://rainbowinternationalschool.in/awards-achievements" },
+        ]}
       />
       <Navbar />
       <PageBanner

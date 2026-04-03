@@ -104,6 +104,11 @@ export default function Secondary() {
         keywords="secondary school Thane, Class 9 10 CBSE Thane West, Rainbow school secondary section admission"
         canonical="https://rainbowinternationalschool.in/secondary-section/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-school-class-6-class-8-international-school-admission-ad-2.jpg"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/secondary-section" },
+          { name: "Secondary (Class 9-10)", href: "https://rainbowinternationalschool.in/secondary-section" },
+        ]}
       />
       <Navbar />
       <PageBanner

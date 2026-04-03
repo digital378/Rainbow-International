@@ -44,9 +44,11 @@ function renderHomeSSR(): string {
   "name": "Rainbow International School",
   "alternateName": "RIS Thane",
   "url": "https://rainbowinternationalschool.in/",
-  "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-logo.png",
-  "description": "Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra, offering world-class education from Nursery to Class 12.",
-  "foundingDate": "2009-04",
+  "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
+  "image": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane West, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
+  "foundingDate": "2009-04-01",
+  "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
@@ -55,13 +57,26 @@ function renderHomeSSR(): string {
     "postalCode": "400607",
     "addressCountry": "IN"
   },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 19.2287,
+    "longitude": 72.9637
+  },
   "telephone": "+918291568972",
   "email": "info@rainbowinternationalschool.in",
   "sameAs": [
     "https://www.facebook.com/RainbowInternationalSchoolThane/",
     "https://www.instagram.com/rainbowinternationalschool/",
-    "https://www.youtube.com/@rainbowinternationalschool"
+    "https://www.youtube.com/@RainbowInternationalSchool"
   ],
+  "areaServed": { "@type": "City", "name": "Thane" },
+  "priceRange": "$$",
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    "opens": "09:00",
+    "closes": "18:00"
+  },
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "4.8",

@@ -91,6 +91,10 @@ export default function ContactUs() {
         description="Connect with Rainbow International School, Thane West. Call +91 82915 68972, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 12."
         keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane West"
         canonical="https://rainbowinternationalschool.in/contact-us/"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Contact Us", href: "https://rainbowinternationalschool.in/contact-us" },
+        ]}
       />
       <Navbar />
       <PageBanner

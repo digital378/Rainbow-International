@@ -265,6 +265,10 @@ export default function Extracurriculars() {
         description="Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane West."
         keywords="extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane"
         canonical="https://rainbowinternationalschool.in/extracurriculars/"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Extracurriculars", href: "https://rainbowinternationalschool.in/extracurriculars" },
+        ]}
       />
       <Navbar />
       <PageBanner

@@ -142,6 +142,10 @@ export default function PhotoGallery() {
         description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane West."
         keywords="Rainbow school photo gallery, school photos Thane West, school campus photos Rainbow International"
         canonical="https://rainbowinternationalschool.in/photo-gallery/"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Photo Gallery", href: "https://rainbowinternationalschool.in/photo-gallery" },
+        ]}
       />
       <Navbar />
       <PageBanner

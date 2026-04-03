@@ -10,6 +10,12 @@ function e(str: string | undefined | null): string {
     .replace(/"/g, "&quot;");
 }
 
+function toISODate(dateStr: string): string {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "2025-01-01";
+  return d.toISOString().split("T")[0];
+}
+
 function renderBlogSSR(slug: string): string | null {
   const post = blogPosts.find((p) => p.slug === slug);
   if (!post) return null;
@@ -86,6 +92,48 @@ function renderBlogSSR(slug: string): string | null {
   <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta property="og:locale" content="en_IN" />
+  <script type="application/ld+json">
+  ${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.metaTitle || post.title,
+    "description": post.metaDescription,
+    "image": post.heroUrl || "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+    "datePublished": toISODate(post.date),
+    "dateModified": toISODate(post.date),
+    "author": {
+      "@type": "Organization",
+      "name": "Rainbow International School",
+      "url": "https://rainbowinternationalschool.in"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Rainbow International School",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://rainbowinternationalschool.in/blog/${post.slug}/`
+    },
+    "keywords": post.keywords,
+    "articleSection": post.cat
+  })}
+  </script>
+  <script type="application/ld+json">
+  ${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://rainbowinternationalschool.in/" },
+      { "@type": "ListItem", "position": 2, "name": "Blogs", "item": "https://rainbowinternationalschool.in/blogs" },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://rainbowinternationalschool.in/blog/${post.slug}/` }
+    ]
+  })}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />

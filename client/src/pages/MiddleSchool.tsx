@@ -129,6 +129,11 @@ export default function MiddleSchool() {
         keywords="middle school Thane West, Class 6 to 10 CBSE Thane, Rainbow International School middle section"
         canonical="https://rainbowinternationalschool.in/middle-school-section/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-section-768x513.png"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/middle-school-section" },
+          { name: "Middle School (Class 6-10)", href: "https://rainbowinternationalschool.in/middle-school-section" },
+        ]}
       />
       <Navbar />
       <PageBanner

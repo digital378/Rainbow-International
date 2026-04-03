@@ -89,7 +89,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 ## Key Components
 
 - **ScrollProgress.tsx** — Rainbow-gradient fixed scroll progress bar (3px, top of page, fills as user scrolls)
-- **SEO.tsx** — Dynamic `<head>` meta tag manager for per-page SEO
+- **SEO.tsx** — Dynamic `<head>` meta tag manager for per-page SEO with JSON-LD structured data and BreadcrumbList support
 - **PageBanner.tsx** — Hero banner with title, subtitle, and breadcrumb for inner pages
 - **Navbar.tsx** — Sticky navbar with top bar (phone/email), dropdown menus for Academics and Explore, mobile menu
 - **Footer.tsx** — 4-column footer with logo, links, explore, and contact info
@@ -100,7 +100,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 - **Navbar**: Fixed position, transparent with white text on homepage (Oberoi-style overlay on hero), solid white on inner pages. Transitions to solid white on scroll. Includes admissions bar, logo+contact row, and nav links row
 - **Hero**: Full-width background image (picwish.webp) with navy gradient overlay; title + stats + CTA on left, Quick Enquiry form card on right; quick-link pills at bottom
 - **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
-- **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component
+- **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component; JSON-LD structured data (School on home, BlogPosting on blog SSR, BreadcrumbList on all inner pages); llms.txt for AI visibility; sitemap.xml with `lastmod` dates; semantic HTML landmarks (`<header>`, `<nav>`, `<main>`, `<footer>` with ARIA roles)
 - **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL
 
 ## School Info (from real site)

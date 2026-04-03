@@ -181,6 +181,10 @@ export default function SafetySecurity() {
         keywords="school safety Thane, Rainbow school security, safe school Thane West, CCTV school Thane, GPS school bus Thane"
         canonical="https://rainbowinternationalschool.in/safety-security/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security.png"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Safety & Security", href: "https://rainbowinternationalschool.in/safety-security" },
+        ]}
       />
       <Navbar />
       <PageBanner

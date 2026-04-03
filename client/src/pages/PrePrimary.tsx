@@ -131,6 +131,11 @@ export default function PrePrimary() {
         keywords="pre-primary school Thane, nursery admission Thane West, Jr KG Sr KG admission, Rainbow preschool Thane"
         canonical="https://rainbowinternationalschool.in/pre-primary-school-thane/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
+          { name: "Pre-Primary", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
+        ]}
       />
       <Navbar />
       <PageBanner
