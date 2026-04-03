@@ -2,12 +2,12 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
 const awards = [
-  { label: "India Today Award", src: "/images/awards/india-today.webp" },
-  { label: "National School Awards", src: "/images/awards/nsa-award.webp" },
-  { label: "World Education Summit", src: "/images/awards/wes-mumbai.webp" },
-  { label: "Economic Times", src: "/images/awards/economic-times.webp" },
-  { label: "Scoo News", src: "/images/awards/scoonews.webp" },
-  { label: "Thane Municipal Corp", src: "/images/awards/tmc-logo.webp" },
+  { label: "India Today Award", src: "/images/awards/india-today.webp", url: "https://www.indiatoday.in/" },
+  { label: "National School Awards", src: "/images/awards/nsa-award.webp", url: "https://nationalschoolawards.in/" },
+  { label: "World Education Summit", src: "/images/awards/wes-mumbai.webp", url: "https://wes.eletsonline.com/" },
+  { label: "Economic Times", src: "/images/awards/economic-times.webp", url: "https://economictimes.indiatimes.com/" },
+  { label: "Scoo News", src: "/images/awards/scoonews.webp", url: "https://scoonews.com/" },
+  { label: "Thane Municipal Corp", src: "/images/awards/tmc-logo.webp", url: "https://thanecity.gov.in/tmc/" },
 ];
 
 const leftColumn = [...awards.slice(0, 3), ...awards.slice(0, 3), ...awards.slice(0, 3)];
@@ -24,8 +24,11 @@ export function AwardsStrip() {
             <div className="w-[140px] relative overflow-hidden">
               <div className="flex flex-col gap-4 animate-scroll-up">
                 {leftColumn.map((a, i) => (
-                  <div
+                  <a
                     key={i}
+                    href={a.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg hover:shadow-xl transition-shadow"
                   >
                     <img
@@ -37,15 +40,18 @@ export function AwardsStrip() {
                       decoding="async"
                       className="max-h-full max-w-full object-contain"
                     />
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
             <div className="w-[140px] relative overflow-hidden">
               <div className="flex flex-col gap-4 animate-scroll-down">
                 {rightColumn.map((a, i) => (
-                  <div
+                  <a
                     key={i}
+                    href={a.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg hover:shadow-xl transition-shadow"
                   >
                     <img
@@ -57,7 +63,7 @@ export function AwardsStrip() {
                       decoding="async"
                       className="max-h-full max-w-full object-contain"
                     />
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
@@ -92,24 +98,30 @@ export function AwardsStrip() {
           <div className="w-[140px] relative overflow-hidden">
             <div className="flex flex-col gap-4 animate-scroll-up">
               {leftColumn.map((a, i) => (
-                <div
+                <a
                   key={i}
+                  href={a.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg"
                 >
                   <img src={a.src} alt={a.label} width={100} height={60} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
-                </div>
+                </a>
               ))}
             </div>
           </div>
           <div className="w-[140px] relative overflow-hidden">
             <div className="flex flex-col gap-4 animate-scroll-down">
               {rightColumn.map((a, i) => (
-                <div
+                <a
                   key={i}
+                  href={a.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-shrink-0 w-[140px] h-[100px] bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg"
                 >
                   <img src={a.src} alt={a.label} width={100} height={60} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain" />
-                </div>
+                </a>
               ))}
             </div>
           </div>

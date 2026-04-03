@@ -234,7 +234,7 @@ export function Footer() {
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)" }}>
                       <Mail size={16} style={{ color: "#fbbf24" }} />
                     </div>
-                    <a href="mailto:info@rainbowinternationalschool.in" className="text-white/60 text-sm hover:text-white transition-colors break-all leading-relaxed">info@rainbowinternationalschool.in</a>
+                    <a href="mailto:admin@rainbowinternationalschool.in" className="text-white/60 text-sm hover:text-white transition-colors break-all leading-relaxed">admin@rainbowinternationalschool.in</a>
                   </div>
                 </li>
               </ul>
