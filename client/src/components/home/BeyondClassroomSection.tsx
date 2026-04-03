@@ -63,7 +63,7 @@ export function BeyondClassroomSection() {
                 }}
               >
                 <img
-                  src="/images/beyond-classroom-rocket.png"
+                  src="/images/home/beyond-classroom/beyond.jpg"
                   alt="Beyond The Classroom at Rainbow International School — Tours, Exhibitions, Clubs, Promoting Green, Dignity of Labour"
                   width={384}
                   height={384}
@@ -75,7 +75,7 @@ export function BeyondClassroomSection() {
 
               <div className="absolute -top-4 -right-4 w-28 h-28 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
-                  src="/images/students/pre-primary-teacher.jpg"
+                  src="/images/home/academic/pre-primary.jpg"
                   alt="Pre-primary activities"
                   width={112}
                   height={112}
@@ -87,7 +87,7 @@ export function BeyondClassroomSection() {
 
               <div className="absolute -bottom-4 -left-4 w-24 h-24 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
                 <img
-                  src="/images/students/primary-group-work.jpg"
+                  src="/images/home/academic/primary-section.jpg"
                   alt="Campus amenities"
                   width={96}
                   height={96}

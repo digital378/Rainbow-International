@@ -1,11 +1,11 @@
 const images = [
-  { src: "/images/students/pre-primary-running.jpg", alt: "Pre-Primary kids running at Rainbow campus", w: 200, h: 240 },
-  { src: "/images/students/primary-classroom-hand.jpg", alt: "Primary student raising hand in classroom", w: 170, h: 200 },
-  { src: "/images/students/primary-group-work.jpg", alt: "Students collaborating in classroom", w: 140, h: 170 },
-  { src: "/images/students/pre-primary-teacher.jpg", alt: "Teacher engaging with pre-primary students", w: 150, h: 185 },
-  { src: "/images/students/secondary-students.png", alt: "Secondary students in navy blazers", w: 170, h: 210 },
-  { src: "/images/students/senior-secondary-group.jpg", alt: "Senior Secondary students group", w: 140, h: 170 },
-  { src: "/images/students/middle-section.jpg", alt: "Middle school students in classroom", w: 160, h: 195 },
+  { src: "/images/home/welcome/doctor.png", alt: "Student aspiring to be a doctor at Rainbow International School", w: 200, h: 240 },
+  { src: "/images/home/welcome/physics.png", alt: "Student exploring physics and science at Rainbow", w: 170, h: 200 },
+  { src: "/images/home/welcome/actor.png", alt: "Student performing in drama and theatre at Rainbow", w: 140, h: 170 },
+  { src: "/images/home/welcome/swimmer.png", alt: "Student swimmer training at Rainbow International School", w: 150, h: 185 },
+  { src: "/images/home/welcome/skater.png", alt: "Student skater at Rainbow International School", w: 170, h: 210 },
+  { src: "/images/home/welcome/kickboxing.png", alt: "Student practising kickboxing at Rainbow", w: 140, h: 170 },
+  { src: "/images/home/welcome/scientist.png", alt: "Student aspiring to be a scientist at Rainbow", w: 160, h: 195 },
 ];
 
 export function Features() {

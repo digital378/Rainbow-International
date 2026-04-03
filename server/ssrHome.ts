@@ -98,7 +98,7 @@ img{max-width:100%;display:block}
 
 /* Hero */
 .hero{position:relative;min-height:90vh;display:flex;align-items:center;overflow:hidden;background:#091a4f}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url(/images/students/pre-primary-running.jpg)}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;background-image:url(/images/students/pre-primary-running.jpg);}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(9,26,79,.95) 0%,rgba(13,59,134,.88) 55%,rgba(9,26,79,.65) 100%)}
 .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:60px;padding:80px 0;flex-wrap:wrap}
 .hero-text{flex:1;min-width:320px;color:#fff}
@@ -445,7 +445,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="container">
     <div class="programs-grid">
       <a href="/pre-primary-school-thane" class="program-card">
-        <div class="program-card-img"><img src="/images/students/pre-primary-teacher.jpg" alt="Pre-Primary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/pre-primary.jpg" alt="Pre-Primary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#fff7ed;color:#f97316">Nursery &middot; Jr. KG &middot; Sr. KG</span>
           <h3>Pre-Primary</h3>
@@ -454,7 +454,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/primary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/primary-section.jpg" alt="Primary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/primary-section.jpg" alt="Primary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#eef5ff;color:#0d3b86">Class I – V</span>
           <h3>Primary</h3>
@@ -463,7 +463,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/middle-school-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/secondary-students.png" alt="Middle School" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/middle-section.jpg" alt="Middle School" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#ecfdf5;color:#10b981">Class VI – VIII</span>
           <h3>Middle School</h3>
@@ -474,7 +474,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     </div>
     <div class="programs-grid-2">
       <a href="/secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/middle-section.jpg" alt="Secondary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/secondary-section.jpg" alt="Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#f5f3ff;color:#8b5cf6">Class IX – X</span>
           <h3>Secondary</h3>
@@ -483,7 +483,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
       </a>
       <a href="/senior-secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/students/senior-secondary-group.jpg" alt="Senior Secondary" /></div>
+        <div class="program-card-img"><img src="/images/home/academic/senior-section.jpg" alt="Senior Secondary" /></div>
         <div class="program-card-body">
           <span class="program-tag" style="background:#fff1f2;color:#ef4444">Class XI – XII</span>
           <h3>Senior Secondary</h3>
@@ -524,25 +524,25 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="container">
     <div class="discover-grid">
       <a href="/awards-achievements" class="discover-card">
-        <img src="/images/students/primary-walking.png" alt="Awards & Accomplishments" />
+        <img src="/images/home/discover/drone-shot.jpg" alt="Awards & Accomplishments" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#fef3c7;color:#f59e0b">Recognition</span>
         <div class="discover-card-text"><h3>Awards &amp; Accomplishments</h3><p>Accolades earned for being one of the best and most promising international schools in Thane for over a decade.</p></div>
       </a>
       <a href="/amenities" class="discover-card">
-        <img src="/images/gallery/about/welcome-to-ris.jpg" alt="Amenities & Facilities" />
+        <img src="/images/home/discover/amenities.jpg" alt="Amenities & Facilities" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#d1fae5;color:#10b981">Campus</span>
         <div class="discover-card-text"><h3>Amenities &amp; Facilities</h3><p>Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.</p></div>
       </a>
       <a href="/student-achievements" class="discover-card">
-        <img src="/images/students/senior-secondary-girls.jpg" alt="Student Achievements" />
+        <img src="/images/home/discover/achievements.jpg" alt="Student Achievements" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#ede9fe;color:#8b5cf6">Excellence</span>
         <div class="discover-card-text"><h3>Student Achievements</h3><p>Student accomplishments are acknowledged and honored. Here you can view our best achievers.</p></div>
       </a>
       <a href="/safety-security" class="discover-card">
-        <img src="/images/students/primary-classroom-hand.jpg" alt="Safety & Security" />
+        <img src="/images/home/safety/safety.jpg" alt="Safety & Security" />
         <div class="discover-card-overlay"></div>
         <span class="discover-card-tag" style="background:#dbeafe;color:#0d3b86">Wellbeing</span>
         <div class="discover-card-text"><h3>Safety &amp; Security</h3><p>Student safety and well-being is our top priority, safeguarded through stringent modern security measures.</p></div>
@@ -572,7 +572,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       </div>
       <div class="beyond-img">
         <div class="beyond-card">
-          <img src="/images/beyond-classroom-rocket.png" alt="Beyond The Classroom at Rainbow International School" />
+          <img src="/images/home/beyond-classroom/beyond.jpg" alt="Beyond The Classroom at Rainbow International School" />
         </div>
       </div>
     </div>
