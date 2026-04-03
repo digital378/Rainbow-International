@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle } from "lucide-react";
-import { trackFormSubmit, getFormTrackingData } from "@/lib/analytics";
+import { trackFormSubmit, getFormTrackingData, trackWhatsAppClick } from "@/lib/analytics";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -217,6 +217,21 @@ export function Hero() {
                   >
                     {isSubmitting ? "Submitting..." : "Get a Free Callback"}
                   </button>
+
+                  <a
+                    href="https://wa.me/918655003366?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20admissions."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick()}
+                    data-testid="button-hero-whatsapp"
+                    className="w-full py-3.5 font-bold text-white text-sm rounded-xl transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2"
+                    style={{ background: "#25D366" }}
+                  >
+                    <svg viewBox="0 0 32 32" width="18" height="18" fill="white" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.504 1.128 6.752 3.052 9.388L1.056 30.74l5.516-1.972A15.903 15.903 0 0 0 16.004 32C24.828 32 32 24.824 32 16S24.828 0 16.004 0zm9.22 22.596c-.38 1.072-1.888 1.964-3.096 2.224-.824.176-1.9.316-5.52-1.188-4.628-1.916-7.608-6.616-7.84-6.924-.224-.308-1.88-2.504-1.88-4.776 0-2.272 1.188-3.38 1.608-3.808.38-.388.824-.56 1.1-.56.276 0 .548.004.788.016.252.012.59-.096.924.704.348.82 1.18 2.896 1.284 3.108.104.212.172.46.032.744-.14.284-.208.46-.416.708-.208.248-.436.556-.624.748-.208.208-.424.432-.184.848.24.416 1.068 1.76 2.292 2.852 1.576 1.404 2.904 1.836 3.316 2.044.412.208.648.176.888-.104.24-.28 1.028-1.2 1.3-1.612.272-.412.548-.344.924-.208.376.136 2.392 1.128 2.8 1.336.412.208.684.308.784.48.1.172.1.992-.28 2.068z"/>
+                    </svg>
+                    Chat on WhatsApp
+                  </a>
 
                   <div className="flex items-center justify-center gap-1.5 pt-1">
                     <CheckCircle2 size={13} className="text-green-500" />
