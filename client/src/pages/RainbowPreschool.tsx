@@ -86,7 +86,7 @@ export default function RainbowPreschool() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Rainbow Preschool International - Playful Early Learning in Thane West"
+        title="Preschool (Age 1.5–5.5) Thane"
         description="Rainbow Preschool International — award-winning preschool for children aged 1.5 to 5.5 years. Playgroup, Nursery, Jr KG, and Sr KG. 100% female staff. Recognised among India's best preschools."
         keywords="Rainbow Preschool International, best preschool Thane West, playgroup Thane, nursery admission Thane, Rainbow pre-primary school, early childhood education Thane"
         canonical="https://rainbowinternationalschool.in/rainbow-preschool-international/"

@@ -29,7 +29,7 @@ export default function StudentAchievements() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Student Achievements - Rainbow International School Thane"
+        title="Student Achievements"
         description="Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more."
         keywords="Rainbow school student achievements, CBSE school results Thane, school sports achievements Thane West"
         canonical="https://rainbowinternationalschool.in/student-achievements/"

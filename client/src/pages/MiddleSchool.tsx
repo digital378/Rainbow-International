@@ -124,7 +124,7 @@ export default function MiddleSchool() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Middle School Section (Class 6-10) - Rainbow International School Thane"
+        title="Middle School (Class 6–10)"
         description="Rainbow International School's Middle School Section (Class 6 to 10). Multi-dimensional curriculum to develop creativity, intellectual curiosity and maturity. CBSE affiliated."
         keywords="middle school Thane West, Class 6 to 10 CBSE Thane, Rainbow International School middle section"
         canonical="https://rainbowinternationalschool.in/middle-school-section/"

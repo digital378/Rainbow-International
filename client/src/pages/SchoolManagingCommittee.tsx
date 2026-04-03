@@ -164,7 +164,7 @@ export default function SchoolManagingCommittee() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="School Managing Committee - Rainbow International School"
+        title="School Managing Committee"
         description="Meet the School Managing Committee of Rainbow International School, Thane — 16 members including the Chairperson, Principal, parent & teacher representatives."
         keywords="Rainbow school managing committee, Rainbow International School leadership, school management Thane West, CBSE school committee"
         canonical="https://rainbowinternationalschool.in/school-managing-committee/"

@@ -80,7 +80,7 @@ export default function Awards() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Awards & Achievements - Rainbow International School Thane"
+        title="Awards & Achievements"
         description="Rainbow International School's awards and achievements — World Education Summit, Best Preschool & Secondary School in Thane, Excellence in CBSE Education, FIT INDIA School and more."
         keywords="Rainbow International School awards, best school Thane West, CBSE school awards Thane, school achievements Thane"
         canonical="https://rainbowinternationalschool.in/awards-achievements/"

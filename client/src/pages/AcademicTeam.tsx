@@ -185,7 +185,7 @@ export default function AcademicTeam() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Academic Team - Rainbow International School Thane"
+        title="Academic Team"
         description="Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers, coaches, counsellors and support staff committed to student excellence."
         keywords="Rainbow school teachers, academic team Rainbow International School, school faculty Thane West, CBSE school staff"
         canonical="https://rainbowinternationalschool.in/academic-team/"

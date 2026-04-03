@@ -36,7 +36,7 @@ export default function Career() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Career Opportunities - Rainbow International School Thane"
+        title="Career Opportunities"
         description="Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution."
         keywords="Rainbow school career, teacher jobs Thane West, school jobs Thane, educator jobs Rainbow International School"
         canonical="https://rainbowinternationalschool.in/career/"

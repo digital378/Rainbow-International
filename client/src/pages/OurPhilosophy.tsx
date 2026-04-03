@@ -37,7 +37,7 @@ export default function OurPhilosophy() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Our Philosophy - Rainbow International School Thane"
+        title="Our Philosophy"
         description="Rainbow International School's educational philosophy — built on four pillars: Competence, Conscience, Compassion, and Courage. Holistic development for every Rainbow student."
         keywords="Rainbow school philosophy, Rainbow International School education approach, school philosophy Thane West CBSE"
         canonical="https://rainbowinternationalschool.in/our-philosophy/"

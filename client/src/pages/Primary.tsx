@@ -123,7 +123,7 @@ export default function Primary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Primary Section (Class 1-5) - Rainbow International School Thane"
+        title="Primary Section (Class 1–5)"
         description="Rainbow International School's Primary Section (Class 1 to 5) in Thane West. Language, Math, Science, Creative & Interpersonal skills via CBSE curriculum. Admissions open."
         keywords="primary school Thane West, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
         canonical="https://rainbowinternationalschool.in/primary-section/"

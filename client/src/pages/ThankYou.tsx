@@ -24,7 +24,7 @@ export default function ThankYou() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Thank You – We've Received Your Enquiry | Rainbow International School"
+        title="Thank You for Your Enquiry"
         description="Thank you for reaching out to Rainbow International School. Our admissions team will contact you within one working day."
         keywords="Rainbow International School enquiry received, thank you admissions"
         canonical="/thank-you"

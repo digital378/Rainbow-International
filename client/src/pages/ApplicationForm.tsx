@@ -77,7 +77,7 @@ export default function ApplicationForm() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Application Form – Admissions 2026–27 | Rainbow International School Thane"
+        title="Application Form 2026–27"
         description="Apply for admission to Rainbow International School, Thane West. Fill out the online application form for Nursery to Class 12. CBSE Affiliation No. 1130661."
         keywords="Rainbow International School application form, CBSE school admission Thane 2026-27, apply Rainbow school online"
         canonical="/application-form"

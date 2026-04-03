@@ -29,7 +29,7 @@ export default function AcademicCalendar() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Academic Calendar - Rainbow International School Thane"
+        title="Academic Calendar 2026–27"
         description="View and download the academic calendar for Rainbow International School, Thane West. Stay updated with important dates, events, and school activities."
         keywords="Rainbow school academic calendar, school calendar Thane West, Rainbow International School events schedule"
         canonical="https://rainbowinternationalschool.in/academic-calendar/"

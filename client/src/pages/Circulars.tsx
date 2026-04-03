@@ -45,7 +45,7 @@ export default function Circulars() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Circulars - Rainbow International School Thane"
+        title="Circulars & Notices"
         description="School circulars and notices from Rainbow International School, Thane West. Examination schedules, event notices, PTM dates, and general announcements."
         keywords="Rainbow school circulars Thane, school notices Thane, Rainbow International School announcements"
         canonical="https://rainbowinternationalschool.in/circulars/"

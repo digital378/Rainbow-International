@@ -208,7 +208,7 @@ export default function CbseDisclosures() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="CBSE Mandatory Public Disclosures - Rainbow International School"
+        title="CBSE Public Disclosures | Rainbow International School"
         description="CBSE mandatory public disclosures for Rainbow International School, Thane West. Affiliation number 1130661. Full details including staff, infrastructure, results and documents."
         keywords="Rainbow school CBSE disclosure, CBSE affiliation number 1130661, public disclosure school Thane"
         canonical="https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures/"

@@ -137,7 +137,7 @@ export default function SeniorSecondary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Senior Secondary Section (Class 11-12) - Rainbow International School"
+        title="Senior Secondary (Class 11–12)"
         description="Rainbow International School's Senior Secondary Section (Class 11 & 12). Science, Humanities, and Commerce streams. CBSE affiliation number 1130661."
         keywords="senior secondary school Thane, Class 11 12 CBSE Thane West, science commerce humanities Thane school"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section/"

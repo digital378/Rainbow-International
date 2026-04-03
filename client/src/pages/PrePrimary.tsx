@@ -126,7 +126,7 @@ export default function PrePrimary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Pre-Primary School Thane - Nursery, Jr KG, Sr KG Admissions"
+        title="Pre-Primary (Nursery–Sr KG) Thane"
         description="Rainbow International School's Pre-Primary Section (Nursery, Jr KG, Sr KG) in Thane West. Activity-based, game-based learning for holistic development. Admissions open."
         keywords="pre-primary school Thane, nursery admission Thane West, Jr KG Sr KG admission, Rainbow preschool Thane"
         canonical="https://rainbowinternationalschool.in/pre-primary-school-thane/"

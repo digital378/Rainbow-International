@@ -28,7 +28,7 @@ export default function MetaSchool() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Meta School 2025–26 | Rainbow International School Thane"
+        title="Meta School 2025–26"
         description="Rainbow International School is a Meta for Education partner school — integrating digital citizenship, online safety, creative thinking, and future-ready digital skills into the student learning experience."
         keywords="Meta for Education school Thane, digital citizenship CBSE school, online safety school programme, Rainbow International School Meta school"
         canonical="/meta-school-2025-26"

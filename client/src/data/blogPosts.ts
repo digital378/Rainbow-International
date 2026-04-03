@@ -26,7 +26,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-cbse-schools-can-foster-entrepreneurship-and-innovation",
     title: "How CBSE Schools Can Foster Entrepreneurship and Innovation Among Students",
-    metaTitle: "How CBSE Schools Foster Entrepreneurship & Innovation | Rainbow International School",
+    metaTitle: "CBSE Schools & Entrepreneurship",
     metaDescription: "Discover how CBSE schools in Thane build entrepreneurial mindsets through hands-on learning, modern skills, and a culture of curiosity. Learn how Rainbow International School leads the way.",
     keywords: "CBSE entrepreneurship education, innovation in schools, entrepreneurial mindset students, CBSE school Thane, Rainbow International School",
     date: "16 Dec 2025",
@@ -91,7 +91,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "why-rainbow-international-school-is-among-the-top-schools-in-thane",
     title: "Why Rainbow International School Is Among the Top Schools in Thane",
-    metaTitle: "Why Rainbow International School Is a Top School in Thane | RIS",
+    metaTitle: "Why Rainbow International School Is a Top School in Thane",
     metaDescription: "Find out what makes Rainbow International School one of the top CBSE schools in Thane — from its 3.5-acre campus and world-class facilities to caring teachers and a holistic curriculum.",
     keywords: "top schools in Thane, best CBSE school Thane West, Rainbow International School Thane, top school Brahmand",
     date: "24 Nov 2025",
@@ -169,7 +169,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents",
     title: "The Growing Popularity of CBSE Schools in Thane West Among Parents",
-    metaTitle: "Why CBSE Schools in Thane West Are Growing in Popularity | Rainbow International",
+    metaTitle: "Why CBSE Schools in Thane Thrive",
     metaDescription: "Explore why more and more parents in Thane West are choosing CBSE schools for their children. Understand the key factors — curriculum clarity, campus safety, teacher quality, and community trust.",
     keywords: "CBSE schools Thane West, CBSE school popularity Thane, best school Thane West parents, Rainbow International School Thane West",
     date: "19 Nov 2025",
@@ -235,7 +235,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "key-facilities-every-good-cbse-school-should-have",
     title: "Key Facilities Every Good CBSE School Should Have",
-    metaTitle: "Key Facilities Every Good CBSE School Should Have | Rainbow International School",
+    metaTitle: "Key Facilities in a CBSE School",
     metaDescription: "What should you look for in a CBSE school beyond academics? This guide covers 10 essential facilities — from smart classrooms and science labs to safety systems and holistic growth programmes.",
     keywords: "CBSE school facilities checklist, what to look for in a school, best CBSE school Thane West facilities, school amenities India",
     date: "31 Oct 2025",
@@ -323,7 +323,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "why-choose-a-cbse-school-for-your-childs-education",
     title: "Why Choose a CBSE School for Your Child's Education?",
-    metaTitle: "Why Choose a CBSE School? Key Reasons for Parents | Rainbow International",
+    metaTitle: "Why Choose a CBSE School?",
     metaDescription: "Wondering why so many Indian parents prefer CBSE schools? Explore the key reasons — practical curriculum, national consistency, exam readiness, holistic development, and more.",
     keywords: "why choose CBSE school, CBSE school benefits, CBSE vs other boards India, CBSE school admission Thane",
     date: "31 Oct 2025",
@@ -389,7 +389,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "riddles-for-kids",
     title: "100 Fun Riddles for Kids to Sharpen Their Minds",
-    metaTitle: "100 Fun Riddles for Kids – Easy, Tricky & Educational | Rainbow International School",
+    metaTitle: "100 Fun Riddles for Kids",
     metaDescription: "Explore 100 fun riddles for kids across 10 categories — easy, tricky, animal, math, nature, and more. Discover why riddles boost critical thinking, creativity, and problem-solving in children.",
     keywords: "fun riddles for kids, riddles for children, brain teasers for kids, educational riddles, riddles to improve thinking",
     date: "22 Mar 2025",
@@ -518,7 +518,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "problem-solving-activities-life-skills-students",
     title: "Problem-Solving Activities & Life Skills for Students: Why They Matter",
-    metaTitle: "Problem-Solving Activities & Life Skills for Students | Rainbow International School",
+    metaTitle: "Problem-Solving for Students",
     metaDescription: "Discover how problem-solving activities build critical life skills in students — from critical thinking and resilience to creativity and communication. Practical ideas for teachers and parents.",
     keywords: "problem solving activities students, life skills education, critical thinking school, hands-on learning India, student problem solving CBSE",
     date: "18 Mar 2025",
@@ -585,7 +585,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "role-of-parents-in-education-orientation-importance",
     title: "The Role of Parents in Education: Why School Orientation Programmes Matter",
-    metaTitle: "Role of Parents in Education & Why School Orientations Matter | Rainbow International",
+    metaTitle: "Role of Parents in Education",
     metaDescription: "Understand how parents shape their child's academic journey and why Parent Orientation Programmes at CBSE schools like Rainbow International School are key to student success.",
     keywords: "role of parents in education, parent orientation programme school, parent involvement student success, CBSE school parent involvement Thane",
     date: "20 Feb 2025",
@@ -651,7 +651,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "importance-of-foundational-literacy-and-numeracy-in-schools",
     title: "The Importance of Foundational Literacy and Numeracy in Schools",
-    metaTitle: "Foundational Literacy & Numeracy in CBSE Schools | Rainbow International School Thane",
+    metaTitle: "Literacy & Numeracy in CBSE",
     metaDescription: "Why is Foundational Literacy and Numeracy (FLN) so critical in early childhood education? Explore how CBSE schools like Rainbow International School prioritise FLN for lifelong learning.",
     keywords: "foundational literacy numeracy schools India, FLN CBSE school, early literacy education, numeracy skills primary school Thane, foundational learning CBSE",
     date: "14 Feb 2025",
@@ -730,7 +730,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "co-curricular-activities",
     title: "Co-Curricular Activities: The Key to Holistic Student Development",
-    metaTitle: "Co-Curricular Activities & Holistic Student Development | Rainbow International School",
+    metaTitle: "Co-Curricular Activities",
     metaDescription: "Discover how co-curricular activities — sports, arts, music, drama, and clubs — build leadership, teamwork, creativity, and emotional intelligence in students. See how Rainbow International School leads the way.",
     keywords: "co-curricular activities benefits students, extracurricular activities school India, holistic development CBSE school, sports arts music school Thane",
     date: "28 Jan 2025",
@@ -801,7 +801,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "age-criteria-for-international-schools-admission-2025-in-mumbai",
     title: "Age Criteria for International School Admission 2025 in Mumbai: A Parent's Guide",
-    metaTitle: "Age Criteria for International School Admission 2025 Mumbai | Rainbow International",
+    metaTitle: "School Admission Age Criteria",
     metaDescription: "What is the right age to enrol your child in an international school in Mumbai? Explore the 2025 age criteria for each grade level and what factors truly determine school readiness.",
     keywords: "international school admission age Mumbai 2025, age criteria school admission India, right age for school admission, Rainbow International School admission age Thane",
     date: "10 Jan 2025",
@@ -870,7 +870,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "international-school-admission-process-guide",
     title: "A Complete Guide to the International School Admission Process in India",
-    metaTitle: "International School Admission Process Guide India | Rainbow International School Thane",
+    metaTitle: "School Admission Process Guide",
     metaDescription: "Step-by-step guide to the international school admission process in India — from inquiry and campus visit to documents, assessment, and confirmation. Know what to expect at Rainbow International School.",
     keywords: "international school admission process India, CBSE school admission steps, how to apply school admission Thane, Rainbow International School admission guide",
     date: "10 Jan 2025",
@@ -954,7 +954,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "advantages-of-starting-early-international-school",
     title: "The Advantages of Starting Early at an International School",
-    metaTitle: "Advantages of Early Admission to an International School | Rainbow International School",
+    metaTitle: "Benefits of Early Admission",
     metaDescription: "Why should parents consider enrolling their child early at an international school? Explore the cognitive, social, linguistic, and confidence-building advantages of early admission — with insights from Rainbow International School, Thane.",
     keywords: "advantages early international school admission, benefits of early schooling India, starting school early benefits, Rainbow International School early admission Thane",
     date: "08 Jan 2025",
@@ -1020,7 +1020,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "the-benefits-of-early-learning-in-shaping-a-childs-personality",
     title: "The Benefits of Early Learning in Shaping a Child's Personality",
-    metaTitle: "Benefits of Early Learning in Shaping a Child's Personality | Rainbow International School",
+    metaTitle: "Benefits of Early Learning",
     metaDescription: "Early childhood learning does far more than teach ABCs and 123s — it shapes character, confidence, empathy, and resilience. Explore how Rainbow International School's early education programme develops well-rounded personalities.",
     keywords: "benefits of early learning child personality, early childhood education India, how early learning shapes personality, Rainbow International School pre-primary",
     date: "06 Jan 2025",
@@ -1078,7 +1078,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "what-you-need-to-know-before-applying-to-an-international-school",
     title: "What You Need to Know Before Applying to an International School",
-    metaTitle: "What to Know Before Applying to an International School | Rainbow International School",
+    metaTitle: "Applying to a School? Know This",
     metaDescription: "Thinking of applying to an international school? Here is everything you need to know — from curriculum types and class sizes to fees, co-curriculars, and school philosophy. A parent's essential guide.",
     keywords: "international school application guide, what to know before applying to school India, choosing international school Mumbai Thane, CBSE international school admission checklist",
     date: "04 Jan 2025",
@@ -1155,7 +1155,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "best-age-for-international-school-admission",
     title: "Best Age for International School Admission: A Complete Parent's Guide",
-    metaTitle: "Best Age for International School Admission | Rainbow International School Thane",
+    metaTitle: "Best Age for School Admission",
     metaDescription: "When is the best age to enrol your child in an international school? From Early Years at 3–5 to Primary at 5–7, explore key factors like academic readiness, social development, and curriculum fit.",
     keywords: "best age international school admission, ideal age school enrollment India, when to enrol child international school, Rainbow International School admission age Thane",
     date: "14 Jan 2025",
@@ -1231,7 +1231,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "why-maths-matters-in-student-life-benefits-uses",
     title: "Why Maths Matters in Student Life: Benefits, Uses, and How to Build a Love for Numbers",
-    metaTitle: "Why Maths Matters in Student Life | Benefits & Uses | Rainbow International School",
+    metaTitle: "Why Maths Matters for Students",
     metaDescription: "Mathematics is far more than a school subject — it is a life skill. Explore why maths matters for students, its real-world applications, and how Rainbow International School makes maths engaging and enjoyable.",
     keywords: "why maths matters students, importance of mathematics student life, benefits of maths in daily life, maths in school CBSE Rainbow Thane",
     date: "14 Jan 2025",
@@ -1310,7 +1310,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "importance-of-sports-in-students-life-teamwork-skills",
     title: "The Importance of Sports in a Student's Life: Building Teamwork and Life Skills",
-    metaTitle: "Importance of Sports for Students: Teamwork & Life Skills | Rainbow International School",
+    metaTitle: "Importance of Sports for Kids",
     metaDescription: "Sports do far more than keep students fit — they build teamwork, resilience, leadership, and emotional intelligence. Explore how Rainbow International School's sports programme develops well-rounded students.",
     keywords: "importance of sports students teamwork, sports life skills school students, CBSE school sports programme Thane, Rainbow International School sports",
     date: "12 Jan 2025",
@@ -1368,7 +1368,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "ideal-teacher-qualities-traits-of-a-great-educator",
     title: "The Ideal Teacher: 8 Qualities and Traits That Define a Great Educator",
-    metaTitle: "Ideal Teacher Qualities and Traits of a Great Educator | Rainbow International School",
+    metaTitle: "Qualities of a Great Teacher",
     metaDescription: "What makes a truly great teacher? From passion and patience to emotional intelligence and creativity — explore the 8 defining qualities of an ideal educator, and how Rainbow International School develops them.",
     keywords: "ideal teacher qualities, traits of a great educator, what makes a good teacher, CBSE teacher qualities India Rainbow International School",
     date: "12 Jan 2025",
@@ -1434,7 +1434,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "10-fun-and-educational-republic-day-activities-for-kids",
     title: "10 Fun and Educational Republic Day Activities for Kids",
-    metaTitle: "10 Fun Republic Day Activities for Kids | Rainbow International School Thane",
+    metaTitle: "10 Republic Day Activities",
     metaDescription: "Celebrate Republic Day with activities that are both fun and educational for children. From creating the Tricolor flag to Constitution awareness games — here are 10 engaging ideas for kids.",
     keywords: "Republic Day activities for kids, republic day school activities India, fun republic day crafts children, Rainbow International School Republic Day",
     date: "22 Jan 2025",
@@ -1509,7 +1509,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time",
     title: "Understanding the Effects of Mobile Phones on Children: Benefits, Risks, and Managing Screen Time",
-    metaTitle: "Effects of Mobile Phones on Children: Benefits, Risks & Screen Time | Rainbow International",
+    metaTitle: "Mobile Phones & Children",
     metaDescription: "Mobile phones offer children real educational benefits — but also real risks. Explore the effects of mobile phone use on children, and how parents and schools can manage screen time effectively.",
     keywords: "effects of mobile phones on children, mobile phone risks children, managing screen time kids, screen time guidelines India, Rainbow International School",
     date: "18 Jan 2025",
@@ -1585,7 +1585,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "5-tips-to-choose-best-cbse-schools-in-mumbai",
     title: "5 Tips to Choose the Best CBSE School in Mumbai: A Parent's Practical Guide",
-    metaTitle: "5 Tips to Choose the Best CBSE School in Mumbai | Rainbow International School",
+    metaTitle: "Choosing the Best CBSE School",
     metaDescription: "With so many CBSE schools in Mumbai, how do you choose the right one? Explore 5 practical, research-backed tips — from curriculum quality and infrastructure to teacher qualifications and transparency.",
     keywords: "best CBSE school Mumbai, how to choose CBSE school Mumbai, tips choosing school Mumbai, top CBSE schools Thane Rainbow International",
     date: "16 Jan 2025",
@@ -1662,7 +1662,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "benefits-of-rainbow-international-school",
     title: "The Key Benefits of Rainbow International School: What Makes It the Right Choice for Your Child",
-    metaTitle: "Benefits of Rainbow International School Thane | Why Choose Rainbow",
+    metaTitle: "Why Choose RIS Thane",
     metaDescription: "What makes Rainbow International School, Thane, stand out? Explore the key benefits — from holistic development and world-class infrastructure to qualified faculty, global exposure, and a safe, nurturing environment.",
     keywords: "benefits of Rainbow International School, why choose Rainbow International School Thane, Rainbow International School advantages, top CBSE school Thane benefits",
     date: "16 Jan 2025",
@@ -1730,7 +1730,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "christmas-celebration-in-school-10-fun-and-festive-activity-ideas",
     title: "Christmas Celebration in School: 10 Fun and Festive Activity Ideas for Students",
-    metaTitle: "10 Christmas Celebration Activities for School Students | Rainbow International",
+    metaTitle: "10 Christmas School Activities",
     metaDescription: "Looking for fun and educational Christmas activities for school? From eco-friendly decoration contests to Constitution awareness activities — here are 10 festive ideas that make learning joyful.",
     keywords: "Christmas celebration activities school, Christmas school activities India, festive school activities students, Rainbow International School Christmas",
     date: "20 Dec 2024",
@@ -1811,7 +1811,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "back-to-school-a-step-by-step-guide-to-international-school-admissions",
     title: "Back to School: A Step-by-Step Guide to International School Admissions",
-    metaTitle: "Step-by-Step Guide to International School Admissions | Rainbow International School",
+    metaTitle: "School Admissions Guide",
     metaDescription: "A complete step-by-step guide to navigating international school admissions in India — from researching schools and understanding requirements to submitting your application and choosing Rainbow International School.",
     keywords: "international school admissions step by step guide, how to apply international school India, school admission checklist India, Rainbow International School admission guide",
     date: "18 Jan 2025",
@@ -1915,7 +1915,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "benefits-of-meditation-for-students",
     title: "Benefits of Meditation for Students: How Mindfulness Improves Learning and Wellbeing",
-    metaTitle: "Benefits of Meditation for Students | Mindfulness in Schools | Rainbow International",
+    metaTitle: "Meditation for Students",
     metaDescription: "Meditation is one of the most powerful tools available to students — improving focus, managing stress, building emotional resilience, and supporting academic performance. Explore the evidence-backed benefits of mindfulness for school students.",
     keywords: "benefits of meditation for students, mindfulness in schools India, meditation for student focus, student wellbeing mindfulness CBSE school Thane",
     date: "22 Jan 2025",
@@ -1977,7 +1977,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "diwali-activities-for-students",
     title: "Diwali Activities for Students: Fun, Creative, and Culturally Rich Ideas for School",
-    metaTitle: "Diwali Activities for Students: Creative School Ideas | Rainbow International School",
+    metaTitle: "Diwali Activities for Students",
     metaDescription: "Celebrate Diwali with meaningful, creative, and educational activities for students. From DIY diyas and rangoli to storytelling, cultural presentations, and Diwali quizzes — make the festival of lights memorable.",
     keywords: "Diwali activities for students, Diwali school activities India, Diwali crafts kids school, Rainbow International School Diwali celebration",
     date: "28 Oct 2024",
@@ -2063,7 +2063,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "cbse-vs-icse-which-board-prepares-students-better-for-the-future",
     title: "CBSE vs ICSE: Which Board Prepares Students Better for the Future?",
-    metaTitle: "CBSE vs ICSE: Which Board Is Better for Students? | Rainbow International School",
+    metaTitle: "CBSE vs ICSE: Which Is Better?",
     metaDescription: "CBSE or ICSE — which board is right for your child? Compare curriculum focus, pedagogy, exam patterns, global recognition, and career readiness. Make an informed choice with this comprehensive guide.",
     keywords: "CBSE vs ICSE which is better, CBSE vs ICSE comparison India, CBSE ICSE difference students future, Rainbow International School CBSE Thane",
     date: "20 Jan 2025",
@@ -2125,7 +2125,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "10-things-in-the-classroom-to-boost-student-engagement",
     title: "10 Things in the Classroom to Boost Student Engagement",
-    metaTitle: "10 Classroom Strategies to Boost Student Engagement | Rainbow International School",
+    metaTitle: "10 Student Engagement Tips",
     metaDescription: "Student engagement is the foundation of effective learning. Explore 10 evidence-based classroom strategies — from interactive technology and flexible seating to gamification and peer teaching — used at Rainbow International School.",
     keywords: "classroom strategies boost student engagement, student engagement techniques school, interactive classroom India CBSE, Rainbow International School teaching methods",
     date: "24 Jan 2025",
@@ -2195,7 +2195,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "holistic-development-rainbow-international-school",
     title: "Holistic Development at Rainbow International School: Educating the Whole Child",
-    metaTitle: "Holistic Development at Rainbow International School Thane | Beyond Academics",
+    metaTitle: "Holistic Development at RIS",
     metaDescription: "Rainbow International School's approach to holistic development goes far beyond academics — shaping leaders, nurturing emotional intelligence, and preparing students for life beyond the classroom.",
     keywords: "holistic development Rainbow International School, whole child education Thane, Rainbow International School extracurriculars leadership, CBSE school holistic education Mumbai",
     date: "24 Jan 2025",
@@ -2250,7 +2250,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "top-reasons-choose-rainbow-international-school-thane",
     title: "Top Reasons to Choose Rainbow International School, Thane",
-    metaTitle: "Top Reasons to Choose Rainbow International School Thane | CBSE School",
+    metaTitle: "Top Reasons to Choose RIS Thane",
     metaDescription: "Discover the top reasons families across Thane choose Rainbow International School — from a world-class CBSE curriculum and modern facilities to passionate faculty, holistic development, and strong community.",
     keywords: "top reasons choose Rainbow International School Thane, why Rainbow International School, best school Thane reasons, Rainbow CBSE school Thane benefits",
     date: "27 Jan 2025",
@@ -2319,7 +2319,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "group-activities-for-students",
     title: "Group Activities for Students: Benefits, Types, and How to Make Them Work",
-    metaTitle: "Group Activities for Students: Benefits & Types | Rainbow International School",
+    metaTitle: "Group Activities for Students",
     metaDescription: "Group activities develop communication, critical thinking, teamwork, and social skills that individual study simply cannot. Explore the benefits, types, and best practices for group learning at school.",
     keywords: "group activities for students, collaborative learning school India, teamwork activities students CBSE, group learning benefits Rainbow International School",
     date: "27 Jan 2025",
@@ -2408,7 +2408,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "imporatnce-of-sports-in-students-life",
     title: "The Importance of Sports in a Student's Life: Physical Health, Mental Wellbeing, and Academic Benefits",
-    metaTitle: "Importance of Sports in Student Life: Health & Academic Benefits | Rainbow International",
+    metaTitle: "Sports in Student Life",
     metaDescription: "Sports do far more than keep students fit. From improved cardiovascular health and stress relief to sharper academic focus and discipline — explore the full importance of sports in a student's life.",
     keywords: "importance of sports in student life, sports benefits students health, sports academic benefits school India, Rainbow International School sports programme",
     date: "25 Jan 2025",
@@ -2501,7 +2501,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "cultural-activities-for-students-key-to-developing-critical-thinking-skills",
     title: "Cultural Activities for Students: The Key to Developing Critical Thinking Skills",
-    metaTitle: "Cultural Activities for Students: Developing Critical Thinking | Rainbow International",
+    metaTitle: "Cultural Activities for Students",
     metaDescription: "Cultural activities in school go far beyond celebration — they develop critical thinking, multicultural awareness, creativity, and social skills that define well-rounded students. Explore the best cultural activities for school.",
     keywords: "cultural activities for students school, cultural activities critical thinking India, school cultural programme benefits, Rainbow International School cultural activities",
     date: "25 Jan 2025",
@@ -2575,7 +2575,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child",
     title: "Parental Guidance: How to Choose the Best CBSE School in Thane for Your Child",
-    metaTitle: "How to Choose the Best CBSE School in Thane | Parental Guide | Rainbow International",
+    metaTitle: "Best CBSE School in Thane Guide",
     metaDescription: "Choosing the right CBSE school in Thane is one of the most important decisions you will make as a parent. This practical guide covers curriculum, faculty, infrastructure, safety, and more — with insights from Rainbow International School.",
     keywords: "best CBSE school Thane how to choose, parental guidance CBSE school Thane, choosing school Thane for child, Rainbow International School Thane admission guide",
     date: "28 Jan 2025",
@@ -2658,7 +2658,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-learn-boring-subjects",
     title: "How to Learn Boring Subjects: 8 Strategies That Actually Work",
-    metaTitle: "How to Learn Boring Subjects: 8 Effective Strategies | Rainbow International School",
+    metaTitle: "How to Learn Boring Subjects",
     metaDescription: "Struggling with a subject that feels dull or difficult to engage with? These 8 evidence-based strategies will help students transform boring subjects into genuinely manageable — and even enjoyable — learning experiences.",
     keywords: "how to learn boring subjects students, make boring subjects interesting, study strategies boring topics, Rainbow International School study tips",
     date: "30 Jan 2025",
@@ -2720,7 +2720,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-increase-attention-span",
     title: "How to Increase Attention Span: Proven Tips for Students to Focus Better",
-    metaTitle: "How to Increase Attention Span for Students | Focus Tips | Rainbow International",
+    metaTitle: "Increase Student Attention Span",
     metaDescription: "Poor attention span is one of the biggest barriers to student learning. Explore the causes, key strategies, and practical tips to help students increase their focus and concentration for better academic results.",
     keywords: "how to increase attention span students, improve focus concentration school, attention span tips India students, Rainbow International School study focus",
     date: "30 Jan 2025",
@@ -2793,7 +2793,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "benefits-of-learning-a-second-language",
     title: "The Benefits of Learning a Second Language for Students",
-    metaTitle: "Benefits of Learning a Second Language for Students | Rainbow International School",
+    metaTitle: "Learning a Second Language",
     metaDescription: "Learning a second language does far more than expand vocabulary — it sharpens the mind, opens career doors, deepens cultural understanding, and builds cognitive resilience. Explore the full benefits for school students.",
     keywords: "benefits of learning a second language, second language advantages students India, bilingual education school benefits, Rainbow International School language learning",
     date: "28 Jan 2025",
@@ -2858,7 +2858,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-avoid-procrastination-while-studying",
     title: "How to Avoid Procrastination While Studying: 8 Strategies That Work",
-    metaTitle: "How to Avoid Procrastination While Studying | Student Tips | Rainbow International",
+    metaTitle: "Avoid Procrastination: Tips",
     metaDescription: "Procrastination is one of the biggest obstacles to academic success. Discover 8 targeted, evidence-based strategies to help students stop delaying, start studying, and make consistent academic progress.",
     keywords: "how to avoid procrastination while studying, stop procrastinating study tips students, overcome procrastination school India, Rainbow International School study habits",
     date: "28 Jan 2025",
@@ -2920,7 +2920,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "innovative-teaching-method-for-active-learning",
     title: "Innovative Teaching Methods for Active Learning: The Flipped Classroom and Beyond",
-    metaTitle: "Innovative Teaching Methods for Active Learning | Rainbow International School",
+    metaTitle: "Innovative Teaching Methods",
     metaDescription: "The flipped classroom is one of the most transformative innovations in modern education — moving instruction outside the classroom so that class time is spent on active, collaborative, and applied learning.",
     keywords: "innovative teaching methods active learning, flipped classroom India school, active learning strategies CBSE, Rainbow International School teaching innovation",
     date: "26 Jan 2025",
@@ -3002,7 +3002,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "smart-revision-techniques-for-students",
     title: "Smart Revision Techniques for Students: Beyond Rote Memorisation",
-    metaTitle: "Smart Revision Techniques for Students | Rainbow International School Thane",
+    metaTitle: "Smart Revision Techniques",
     metaDescription: "Move beyond rote memorisation with these smart, evidence-backed revision techniques — concept mapping, group discussions, spaced repetition, and technology — that build genuine understanding and long-term retention.",
     keywords: "smart revision techniques students, how to revise effectively CBSE, revision strategies for exams India, Rainbow International School study tips",
     date: "2 Feb 2025",
@@ -3076,7 +3076,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "teen-entrepreneurship-fostering-innovation-and-responsibility",
     title: "Teen Entrepreneurship: Fostering Innovation and Responsibility in Young People",
-    metaTitle: "Teen Entrepreneurship: Fostering Innovation & Responsibility | Rainbow International",
+    metaTitle: "Teen Entrepreneurship Skills",
     metaDescription: "Teen entrepreneurship develops innovation, financial literacy, resilience, and responsibility — essential life skills that serve young people in every future path. Explore how parents and schools can support teenage entrepreneurs.",
     keywords: "teen entrepreneurship school India, fostering innovation teenagers, teaching teens financial literacy responsibility, Rainbow International School life skills",
     date: "2 Feb 2025",
@@ -3140,7 +3140,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "teaching-teens-resilience-and-thriving-through-failure",
     title: "Teaching Teens Resilience: How to Help Young People Thrive Through Failure",
-    metaTitle: "Teaching Teens Resilience: Thriving Through Failure | Rainbow International School",
+    metaTitle: "Teaching Teens Resilience",
     metaDescription: "Resilience is one of the most critical life skills a teenager can develop. Learn how schools and parents can cultivate a growth mindset, provide supportive parenting, and teach coping strategies that help teens thrive through failure.",
     keywords: "teaching teens resilience, helping teenagers cope with failure, growth mindset teenagers India, Rainbow International School student wellbeing",
     date: "3 Feb 2025",
@@ -3209,7 +3209,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "nutritional-requirements-of-the-teenagers-how-to-fulfil-them",
     title: "Nutritional Requirements of Teenagers and How to Fulfil Them",
-    metaTitle: "Nutritional Requirements of Teenagers | Diet Tips for Adolescents | Rainbow International",
+    metaTitle: "Nutrition Tips for Teenagers",
     metaDescription: "Adolescence is a period of rapid physical and psychological change — and a teenager's nutritional needs are greater than at almost any other stage of life. Learn what nutrients teenagers need and how parents can help meet them.",
     keywords: "nutritional requirements teenagers India, teenage diet nutrition school, adolescent nutrition healthy eating, Rainbow International School student health",
     date: "3 Feb 2025",
@@ -3287,7 +3287,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "stress-in-teenagers-symptoms-management",
     title: "Stress in Teenagers: Symptoms, Causes, and Effective Management Strategies",
-    metaTitle: "Stress in Teenagers: Symptoms & Management | Rainbow International School Thane",
+    metaTitle: "Teen Stress: Signs & Solutions",
     metaDescription: "Teenage stress is increasingly common — and increasingly serious. Learn to recognise the physical, behavioural, and cognitive signs of teen stress, understand its causes, and discover proven strategies to help teenagers manage it effectively.",
     keywords: "stress in teenagers symptoms management, how to help stressed teenager India, teenage stress signs causes, Rainbow International School student mental health",
     date: "4 Feb 2025",
@@ -3401,7 +3401,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "top-5-techniques-for-taming-anger-in-children",
     title: "Top 5 Techniques for Taming Anger in Children",
-    metaTitle: "Top 5 Techniques for Taming Anger in Children | Rainbow International School",
+    metaTitle: "5 Ways to Manage Anger in Kids",
     metaDescription: "Childhood anger is normal — but when it turns to aggression, it needs to be addressed. These 5 evidence-based techniques help parents and teachers tame anger in children and teach healthy emotional regulation.",
     keywords: "techniques taming anger in children, anger management kids school India, how to help angry child, Rainbow International School child development",
     date: "6 Feb 2025",
@@ -3483,7 +3483,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "top-6-easy-ways-to-develop-patience-in-your-child",
     title: "Top 6 Easy Ways to Develop Patience in Your Child",
-    metaTitle: "6 Ways to Develop Patience in Your Child | Rainbow International School Thane",
+    metaTitle: "Developing Patience in Children",
     metaDescription: "Patience is one of the most powerful qualities a child can develop — improving learning, behaviour, emotional balance, and stress management. Discover 6 practical, evidence-based ways to nurture patience from an early age.",
     keywords: "develop patience in child school India, how to teach children patience, patience benefits kids, Rainbow International School parenting",
     date: "6 Feb 2025",
@@ -3569,7 +3569,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "homework-war-endgame",
     title: "The Homework War: How to End the Nightly Battle and Make Study Time Work",
-    metaTitle: "How to End the Homework War with Your Child | Rainbow International School",
+    metaTitle: "End the Homework War with Kids",
     metaDescription: "The nightly homework battle is one of the most common sources of family stress. Here is how parents can make homework time smoother, more productive, and less confrontational — by making study genuinely engaging.",
     keywords: "homework war children India, how to motivate kids homework, making homework enjoyable school, Rainbow International School parenting study tips",
     date: "7 Feb 2025",
@@ -3638,7 +3638,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "using-gadgets-the-right-way",
     title: "Using Gadgets the Right Way: How Technology Can Benefit Children When Used Wisely",
-    metaTitle: "Using Gadgets the Right Way for Children | Rainbow International School",
+    metaTitle: "Kids & Gadgets: The Right Way",
     metaDescription: "Gadgets are not the enemy — when used wisely, technology builds skills, sparks creativity, supports education, and prepares children for the digital world. Learn how to help children use gadgets constructively.",
     keywords: "using gadgets right way children, technology benefits kids school India, healthy gadget use children, Rainbow International School digital learning",
     date: "8 Feb 2025",
@@ -3692,7 +3692,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "regulating-childrens-screen-time",
     title: "Regulating Children's Screen Time: A Practical Guide for Parents",
-    metaTitle: "Regulating Children's Screen Time: Practical Guide | Rainbow International School",
+    metaTitle: "Screen Time Guide for Parents",
     metaDescription: "Screen time management goes far beyond simply reducing duration — it requires understanding your child's maturity, setting clear rules, modelling healthy behaviour, and selecting appropriate content. Here is the complete guide.",
     keywords: "regulating children screen time India, how to manage child screen time, screen time rules kids, Rainbow International School parenting digital wellbeing",
     date: "8 Feb 2025",
@@ -3770,7 +3770,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-deal-with-anxiety-during-exams",
     title: "How to Deal with Anxiety During Exams: 8 Proven Tips for Students",
-    metaTitle: "How to Deal with Exam Anxiety: 8 Tips for Students | Rainbow International School",
+    metaTitle: "Exam Anxiety: 8 Tips",
     metaDescription: "Exam anxiety affects the majority of students and can significantly undermine performance. Learn what test anxiety is, how to recognise it, and 8 proven strategies to manage it effectively — from preparation to breathing techniques.",
     keywords: "how to deal with exam anxiety students India, test anxiety tips school, reduce anxiety during exams CBSE, Rainbow International School student wellbeing",
     date: "10 Feb 2025",
@@ -3850,7 +3850,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "understanding-adolescence-how-to-handle-the-process",
     title: "Understanding Adolescence: How to Handle the Process as a Parent",
-    metaTitle: "Understanding Adolescence: How to Handle It as a Parent | Rainbow International",
+    metaTitle: "Understanding Adolescence",
     metaDescription: "Adolescence is one of the most turbulent — and most misunderstood — phases of human development. This guide helps parents understand what their teenager is going through and how to navigate it with confidence and compassion.",
     keywords: "understanding adolescence parenting India, how to handle teenage years, adolescence tips parents school, Rainbow International School parenting support",
     date: "10 Feb 2025",
@@ -3925,7 +3925,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-develop-fine-motor-skills-at-home",
     title: "How to Develop Fine Motor Skills at Home: Fun Activities for Toddlers",
-    metaTitle: "How to Develop Fine Motor Skills at Home | Activities for Toddlers | Rainbow International",
+    metaTitle: "Fine Motor Skills for Toddlers",
     metaDescription: "Fine motor skills are foundational for writing, drawing, and everyday self-care — but they need deliberate development. Explore 5 fun, home-based activities that build fine motor skills in toddlers and young children.",
     keywords: "develop fine motor skills at home toddlers, fine motor activities children India, pre-primary fine motor development, Rainbow International School pre-primary",
     date: "11 Feb 2025",
@@ -3999,7 +3999,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "the-leading-school-of-the-year-thane",
     title: "Rainbow International School Wins 'Leading School of the Year – Thane' at Pride of Bharat Awards 2021",
-    metaTitle: "Leading School of the Year Thane – Pride of Bharat Awards 2021 | Rainbow International",
+    metaTitle: "Leading School of the Year 2021",
     metaDescription: "Rainbow International School was honoured as 'The Leading School of the Year – Thane' at the Pride of Bharat Awards 2021 by Trade & Media Group Delhi. Rainbow Preschool International also won 'Most Promising Preschool Chain of Maharashtra'.",
     keywords: "Rainbow International School leading school Thane award, Pride of Bharat Awards 2021, best school Thane award, Rainbow Preschool International award Maharashtra",
     date: "12 Feb 2025",
@@ -4056,7 +4056,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "give-earth-to-life-on-earth",
     title: "Give Earth to Life on Earth: Celebrating Earth Day at Rainbow International School",
-    metaTitle: "Earth Day Celebration at Rainbow International School Thane | Give Earth to Life",
+    metaTitle: "Earth Day Celebration at RIS",
     metaDescription: "Earth Day — celebrated every April 22 — reminds us of our collective responsibility to protect the planet. Discover the history of Earth Day, why it matters for students, and how Rainbow International School marks this important occasion.",
     keywords: "Earth Day school celebration India, Earth Day activities students Rainbow International, environment awareness school Thane, Rainbow International School Earth Day",
     date: "13 Feb 2025",
@@ -4116,7 +4116,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "coronavirus-the-new-monster-in-town",
     title: "Coronavirus: The New Monster in Town — What Schools and Families Need to Know",
-    metaTitle: "Coronavirus: What Schools & Families Need to Know | Rainbow International School",
+    metaTitle: "Coronavirus: School Guide",
     metaDescription: "COVID-19 changed school life across the world. Understand what the coronavirus is, how it spreads, its symptoms, precautions for travel, and how to separate fact from fiction — a guide for school families.",
     keywords: "coronavirus school children India, COVID-19 school precautions, coronavirus symptoms children, Rainbow International School health safety",
     date: "14 Feb 2025",
@@ -4193,7 +4193,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "fit-india-certificate-of-recognition",
     title: "Rainbow International School Receives FIT INDIA Certificate of Recognition",
-    metaTitle: "FIT INDIA Certificate of Recognition | Rainbow International School Thane",
+    metaTitle: "FIT INDIA Recognition",
     metaDescription: "Rainbow International School has been officially recognised as a FIT INDIA School by the Ministry of Youth Affairs & Sports. Learn what this recognition means and why physical fitness is central to the Rainbow educational mission.",
     keywords: "Fit India School recognition Rainbow International Thane, FIT India Certificate CBSE school, school fitness programme India, Rainbow International School sports",
     date: "15 Feb 2025",
@@ -4246,7 +4246,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "the-15th-world-education-summit",
     title: "Rainbow Wins Big at the 15th World Education Summit: Two National Awards",
-    metaTitle: "Rainbow Wins at 15th World Education Summit | Rainbow International School Thane",
+    metaTitle: "RIS Wins World Education Award",
     metaDescription: "Rainbow International School won 'Innovation in Campus Infrastructure' and Rainbow Preschool International won 'Profound Technology Usage in Early Childhood Teaching' at the 15th World Education Summit — a landmark recognition for the Rainbow family.",
     keywords: "World Education Summit Rainbow International School award, campus infrastructure innovation school Thane, Rainbow Preschool International technology award, best school award India",
     date: "16 Feb 2025",
@@ -4300,7 +4300,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "teen-depression-how-to-spot-and-cure-it",
     title: "Teen Depression: How to Spot It Early and Help Your Child",
-    metaTitle: "Teen Depression: How to Spot and Address It | Rainbow International School",
+    metaTitle: "Teen Depression: Signs & Help",
     metaDescription: "Teen depression is serious and, if left unaddressed, dangerous. Learn 8 warning signs of depression in teenagers and 6 practical ways parents and schools can help young people recover and thrive.",
     keywords: "teen depression signs India, how to help depressed teenager, teenage mental health school parents, Rainbow International School student wellbeing",
     date: "17 Feb 2025",
@@ -4372,7 +4372,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "7-areas-in-education-where-indian-women-are-excellent",
     title: "7 Areas in Education Where Indian Women Are Excellent",
-    metaTitle: "7 Areas in Education Where Indian Women Excel | Rainbow International School",
+    metaTitle: "Indian Women in Education",
     metaDescription: "Women are not just teachers in the Indian education system — they are leaders, mentors, coaches, and role models at every level. Explore 7 areas where Indian women have distinguished themselves in education.",
     keywords: "women in education India, Indian women teachers excellence, women school leaders India, Rainbow International School women educators",
     date: "18 Feb 2025",
@@ -4435,7 +4435,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "4-reasons-why-school-bags-should-not-be-a-burden",
     title: "4 Reasons Why School Bags Should Not Be a Burden on Children",
-    metaTitle: "4 Reasons School Bags Should Not Burden Children | Rainbow International School",
+    metaTitle: "School Bag Weight for Kids",
     metaDescription: "Heavy school bags are not just uncomfortable — they cause real, lasting health problems for children. Here are 4 compelling reasons why schools and parents need to rethink the weight children carry every day.",
     keywords: "heavy school bags health problems children India, school bag weight CBSE, digital classrooms reduce school bag weight, Rainbow International School student health",
     date: "19 Feb 2025",
@@ -4498,7 +4498,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "smartphone-addiction-how-to-ensure-healthy-use-by-kids",
     title: "Smartphone Addiction in Kids: 7 Ways to Ensure Healthy Use",
-    metaTitle: "Smartphone Addiction in Kids: 7 Ways to Ensure Healthy Use | Rainbow International",
+    metaTitle: "Smartphone Addiction in Kids",
     metaDescription: "Smartphones are unavoidable — but addiction is not inevitable. Here are 7 practical, parent-tested strategies to ensure your child uses their smartphone safely, productively, and without becoming dependent on it.",
     keywords: "smartphone addiction children India, healthy smartphone use kids, parental control smartphone school children, Rainbow International School screen time",
     date: "20 Feb 2025",
@@ -4573,7 +4573,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "school-sanitation-standards-how-to-stay-clean-and-safe",
     title: "School Sanitation Standards: 7 Hygiene Tips Every School Should Implement",
-    metaTitle: "School Sanitation Standards: 7 Hygiene Tips | Rainbow International School",
+    metaTitle: "School Sanitation & Hygiene",
     metaDescription: "School sanitation is a fundamental responsibility — not an optional extra. Explore 7 essential hygiene and sanitation standards that every school should implement to protect student health, dignity, and safety.",
     keywords: "school sanitation hygiene India, school toilet standards CBSE, school hygiene tips students, Rainbow International School safety clean campus",
     date: "21 Feb 2025",
@@ -4635,7 +4635,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "6-excellent-ideas-to-innovate-cultural-programmes-in-school",
     title: "6 Excellent Ideas to Innovate Cultural Programmes in School",
-    metaTitle: "6 Ideas to Innovate School Cultural Programmes | Rainbow International School",
+    metaTitle: "6 School Cultural Programme Ideas",
     metaDescription: "Most school cultural programmes rely on the same few art forms year after year. Explore 6 innovative, exciting cultural programme ideas that will inspire new talent, engage reluctant performers, and make your school's cultural calendar genuinely memorable.",
     keywords: "innovative cultural programmes school India, school cultural activities ideas, performing arts school CBSE, Rainbow International School cultural extracurricular",
     date: "22 Feb 2025",
@@ -4693,7 +4693,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "teaching-children-the-value-of-money-5-ways-schools-can-help",
     title: "Teaching Children the Value of Money: 5 Ways Schools Can Help",
-    metaTitle: "Teaching Children the Value of Money: 5 School Strategies | Rainbow International",
+    metaTitle: "Teaching Kids the Value of Money",
     metaDescription: "Financial literacy is one of the most important life skills a child can develop — and schools have a powerful role to play in building it. Explore 5 practical ways schools can teach children the value of money from an early age.",
     keywords: "teaching value of money children school India, financial literacy school CBSE, money management kids education, Rainbow International School life skills",
     date: "23 Feb 2025",
@@ -4748,7 +4748,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "amazing-coaches-who-improved-players-willpower",
     title: "Amazing Coaches Who Improved Players' Willpower: Why Schools Need Specialist Sports Coaches",
-    metaTitle: "Amazing Coaches Who Improved Players' Willpower | Rainbow International School",
+    metaTitle: "Coaches Who Built Willpower",
     metaDescription: "Behind every great athlete is a coach who believed in them before the world did. Explore how legendary coaches shaped icons like Sachin Tendulkar and Novak Djokovic — and why specialist sports coaching in school matters.",
     keywords: "sports coaches school India, Achrekar Sachin Tendulkar coach, Djokovic first coach school sports, specialist coaching school children Rainbow International",
     date: "24 Feb 2025",
@@ -4805,7 +4805,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-organic-farming-in-schools-helps-the-nation",
     title: "How Organic Farming in Schools Helps the Nation",
-    metaTitle: "How Organic Farming in Schools Helps the Nation | Rainbow International School",
+    metaTitle: "Organic Farming in Schools",
     metaDescription: "Organic farming in schools is far more than a gardening activity — it is an education in sustainability, nutrition, economics, and environmental responsibility. Discover how school farming programmes contribute to the nation's future.",
     keywords: "organic farming school India, school garden programme CBSE, sustainability education children, Rainbow International School environment",
     date: "25 Feb 2025",
@@ -4859,7 +4859,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-school-buses-are-changing-with-technology",
     title: "How School Buses Are Changing with Technology: Safer, Smarter Commutes for Students",
-    metaTitle: "How Technology Is Changing School Buses | Rainbow International School Thane",
+    metaTitle: "Technology in School Transport",
     metaDescription: "School buses are no longer just vehicles — they are technology-enabled safety systems. Discover how GPS tracking, CCTV, attendance systems, and driver monitoring are transforming school transport and giving parents genuine peace of mind.",
     keywords: "school bus technology India, GPS tracking school bus, school transport safety CBSE, Rainbow International School bus safety",
     date: "26 Feb 2025",
@@ -4920,7 +4920,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "amazing-youtube-channels-on-general-knowledge-for-kids",
     title: "7 Amazing YouTube Channels to Boost Kids' General Knowledge",
-    metaTitle: "7 YouTube Channels for Kids' General Knowledge | Rainbow International School",
+    metaTitle: "7 YouTube Channels for Kids GK",
     metaDescription: "General knowledge opens doors — and the right YouTube channels make learning it genuinely enjoyable. Discover 7 outstanding channels that build children's awareness of history, science, geography, and current affairs through engaging, animated content.",
     keywords: "YouTube channels general knowledge kids India, educational YouTube for students, kids GK channels school, Rainbow International School digital learning",
     date: "27 Feb 2025",
@@ -4982,7 +4982,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "know-how-swimming-helps-your-child-in-7-ways",
     title: "Know How Swimming Helps Your Child in 7 Ways",
-    metaTitle: "7 Ways Swimming Benefits Your Child | Rainbow International School Thane",
+    metaTitle: "7 Benefits of Swimming for Kids",
     metaDescription: "Swimming is far more than a sport — it is a life skill, a full-body workout, a confidence builder, and a social activity all in one. Discover 7 compelling reasons why every child should learn to swim.",
     keywords: "swimming benefits children India, school swimming programme, why swimming is important for kids, Rainbow International School sports swimming",
     date: "28 Feb 2025",
@@ -5045,7 +5045,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "6-reasons-why-cbse-is-the-best-board-of-the-country",
     title: "6 Reasons Why CBSE Is the Best Board in India for Your Child",
-    metaTitle: "6 Reasons CBSE Is the Best Board in India | Rainbow International School",
+    metaTitle: "6 Reasons CBSE Is the Best",
     metaDescription: "CBSE is India's national board — but why is it the preferred choice for millions of families? Explore 6 compelling advantages of the CBSE board that make it the right foundation for your child's academic future.",
     keywords: "why CBSE is best board India, CBSE advantages over ICSE state board, CBSE school Thane, Rainbow International School CBSE affiliation",
     date: "1 Mar 2025",
@@ -5103,7 +5103,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "big-school-playgrounds-6-reasons-why-kids-need-them",
     title: "Big School Playgrounds: 6 Reasons Why Kids Absolutely Need Them",
-    metaTitle: "6 Reasons Why Kids Need Big School Playgrounds | Rainbow International School",
+    metaTitle: "Why Kids Need Big Playgrounds",
     metaDescription: "A school playground is not a luxury — it is a developmental necessity. Explore 6 compelling reasons why the size and quality of a school's playground directly impacts student health, learning, and wellbeing.",
     keywords: "school playground importance India, big playground school benefits, school campus space children, Rainbow International School 3.5 acres campus playground",
     date: "2 Mar 2025",
@@ -5165,7 +5165,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "6-reasons-why-indoor-sports-is-important-in-schools",
     title: "6 Reasons Why Indoor Sports Are Important in Schools",
-    metaTitle: "6 Reasons Indoor Sports Matter in Schools | Rainbow International School Thane",
+    metaTitle: "Indoor Sports in Schools",
     metaDescription: "Indoor sports are often overlooked in favour of outdoor games — but they offer unique developmental benefits that outdoor sports cannot replicate. Discover 6 powerful reasons why schools should invest in indoor sports programmes.",
     keywords: "indoor sports school India, benefits indoor games students, table tennis chess badminton school, Rainbow International School indoor sports",
     date: "3 Mar 2025",
@@ -5223,7 +5223,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming",
     title: "An All-Rounder in the Making: Raghvi Ramanujan Bags Her 101st Swimming Medal",
-    metaTitle: "Raghvi Ramanujan: Rainbow Student Bags 101st Swimming Medal | Rainbow International",
+    metaTitle: "Student Bags 101st Swim Medal",
     metaDescription: "Rainbow International School student Raghvi Ramanujan — just 8 years old — won her 101st medal at the Rotary Club Swimming Competition in Thane. Her story is a testament to talent, dedication, and the power of early specialist sport.",
     keywords: "Rainbow International School student swimmer Thane, Raghvi Ramanujan swimming 101 medals, school student swimming achievement Thane, Rainbow International School student achievements",
     date: "4 Mar 2025",
@@ -5276,7 +5276,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "rainbow-awarded-as-best-preschool-and-secondary-school-in-thane",
     title: "Rainbow Awarded Best Preschool and Secondary School in Thane at Retail & Hospitality Awards 2018",
-    metaTitle: "Rainbow Wins Best Preschool & Secondary School Thane | Retail & Hospitality Awards 2018",
+    metaTitle: "RIS Wins Best School Thane 2018",
     metaDescription: "Rainbow Preschools and Rainbow International School were awarded 'The Best Preschool and Secondary School in Thane' at the Retail & Hospitality Awards 2018. A proud milestone for the Rainbow family.",
     keywords: "Rainbow International School best secondary school Thane award, Rainbow Preschool best preschool Thane, Retail Hospitality Awards 2018 school, best school award Thane 2018",
     date: "5 Mar 2025",
@@ -5330,7 +5330,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "rainbow-preschools-featured-in-knowledge-review-magazine",
     title: "Rainbow Preschools Featured in 'The 10 Best Preschools in India 2018' — The Knowledge Review",
-    metaTitle: "Rainbow Preschools: Top 10 Best Preschools in India 2018 | The Knowledge Review",
+    metaTitle: "Top 10 Best Preschools India",
     metaDescription: "Rainbow Preschools was featured in The Knowledge Review Magazine's prestigious list of 'The 10 Best Preschools in India 2018' — a national recognition of the Rainbow early childhood programme's quality and impact.",
     keywords: "Rainbow Preschool best preschool India 2018, Knowledge Review Magazine best preschool, Rainbow Preschool International Thane recognition, top preschool India",
     date: "6 Mar 2025",
@@ -5383,7 +5383,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "rainbow-wins-award-for-excellence",
     title: "Rainbow Wins India Today Awards for Excellence in Preschool and CBSE Education — Thane 2017",
-    metaTitle: "Rainbow Wins India Today Excellence Awards Thane 2017 | Rainbow International School",
+    metaTitle: "RIS Wins Excellence Award 2017",
     metaDescription: "Rainbow International School and Rainbow Preschools were awarded 'Excellence in Preschool Education' and 'Excellence in CBSE Education' in Thane by India Today on 7th October 2017 — a landmark recognition from one of India's most trusted media brands.",
     keywords: "India Today excellence award Rainbow International School Thane, Rainbow excellence CBSE education award 2017, best CBSE school Thane award India Today",
     date: "7 Mar 2025",
@@ -5436,7 +5436,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "100-result-rainbows-first-batch-2018-19",
     title: "100% Result: Rainbow International School's First Batch Achieves Perfect Class 10 Outcome",
-    metaTitle: "100% Result: Rainbow's First Class 10 Batch 2018–19 | Rainbow International School",
+    metaTitle: "100% Result: Class 10 Batch 2019",
     metaDescription: "Rainbow International School achieved 100% results for its first Class 10 batch in the 2018–19 academic year — one of only 6 schools in Thane to reach this milestone, as reported by The Times of India.",
     keywords: "Rainbow International School 100% result Class 10 2018-19, best CBSE school Thane result, Rainbow first batch 100 percent result Thane Times of India",
     date: "8 Mar 2025",
@@ -5490,7 +5490,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "field-trips-know-how-they-groom-students-in-5-ways",
     title: "Field Trips: Know How They Groom Students in 5 Important Ways",
-    metaTitle: "5 Ways Field Trips Groom Students | Rainbow International School Thane",
+    metaTitle: "5 Ways Field Trips Groom Students",
     metaDescription: "School field trips are far more than a day off from the classroom — they are one of the richest developmental experiences a school can offer. Discover 5 powerful ways that well-planned field trips contribute to student growth.",
     keywords: "school field trips benefits students India, educational field trips CBSE, field trips student development, Rainbow International School beyond classroom",
     date: "9 Mar 2025",
@@ -5544,7 +5544,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "time-management-for-school-children-6-ways-parents-can-help",
     title: "Time Management for School Children: 6 Ways Parents Can Help",
-    metaTitle: "Time Management for School Children: 6 Tips for Parents | Rainbow International",
+    metaTitle: "Time Management for Children",
     metaDescription: "Children juggling school, tuitions, and extracurriculars often feel overwhelmed by time pressure. Discover 6 practical ways parents can help their children develop strong time management skills that serve them for life.",
     keywords: "time management school children India, help kids manage time better, school child time management tips, Rainbow International School parenting study skills",
     date: "10 Mar 2025",
@@ -5603,7 +5603,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-to-teach-benefits-of-family-meals-to-kids",
     title: "How to Teach Kids the Benefits of Family Meals — 6 Reasons to Eat Together",
-    metaTitle: "6 Benefits of Family Meals for Kids | Rainbow International School",
+    metaTitle: "6 Benefits of Family Meals",
     metaDescription: "Family meals are disappearing from modern homes — but the benefits they provide children are irreplaceable. Discover 6 powerful reasons why eating together as a family is one of the best investments you can make in your child's wellbeing.",
     keywords: "benefits of family meals children India, family dinner child development, eating together benefits kids, Rainbow International School parenting tips",
     date: "11 Mar 2025",
@@ -5661,7 +5661,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "do-your-children-hate-reading-know-why-youre-the-reason",
     title: "Do Your Children Hate Reading? Know Why You Might Be the Reason",
-    metaTitle: "Why Kids Hate Reading — And How Parents Can Fix It | Rainbow International School",
+    metaTitle: "Why Kids Hate Reading & How to Fix",
     metaDescription: "If your child struggles with or resists reading, the cause may be closer to home than you think. Discover 6 common parental mistakes that discourage reading — and practical steps to help your child become a confident, enthusiastic reader.",
     keywords: "children hate reading India, how to encourage kids to read, child reading habits parent mistakes, Rainbow International School reading tips",
     date: "12 Mar 2025",
@@ -5719,7 +5719,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "how-regular-sports-help-students-6-reasons",
     title: "How Regular Sports Help Students: 6 Reasons Every School Child Should Play",
-    metaTitle: "6 Reasons Regular Sports Help Students | Rainbow International School Thane",
+    metaTitle: "6 Reasons Sports Help Students",
     metaDescription: "Regular sporting activity does far more than build physical fitness — it shapes the academic performance, emotional resilience, and character of school students. Discover 6 compelling reasons why every child should play sport regularly.",
     keywords: "benefits of sports for students India, regular sports school children, physical activity academic performance, Rainbow International School sports Thane",
     date: "13 Mar 2025",
@@ -5777,7 +5777,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "digital-classrooms-how-technology-improves-education-in-school",
     title: "Digital Classrooms: How Technology Improves Education in School",
-    metaTitle: "5 Benefits of Digital Classrooms in Schools | Rainbow International School Thane",
+    metaTitle: "5 Benefits of Digital Classrooms",
     metaDescription: "Digital classrooms are transforming how students learn — making education more engaging, more accessible, and more effective. Explore 5 key ways technology improves the school learning experience for students.",
     keywords: "digital classrooms India benefits, technology education school, smart classroom CBSE school, Rainbow International School digital learning",
     date: "14 Mar 2025",
@@ -5831,7 +5831,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "9-reasons-why-schools-should-have-an-infirmary-and-paediatrician",
     title: "9 Reasons Why Schools Should Have an Infirmary and a Paediatrician",
-    metaTitle: "9 Reasons Schools Need an Infirmary and Paediatrician | Rainbow International School",
+    metaTitle: "Why Schools Need an Infirmary",
     metaDescription: "A first-aid box and an ambulance are the minimum. Truly responsible schools go further — maintaining a dedicated infirmary and a resident or accessible paediatrician for every student. Here are 9 compelling reasons why.",
     keywords: "school infirmary paediatrician India, school health care children, school nurse doctor CBSE, Rainbow International School student health safety",
     date: "15 Mar 2025",
@@ -5901,7 +5901,7 @@ export const blogPosts: BlogPostData[] = [
   {
     slug: "7-safety-and-security-measures-your-kids-school-should-have",
     title: "7 Safety and Security Measures Your Child's School Must Have",
-    metaTitle: "7 School Safety and Security Measures Every Parent Should Check | Rainbow International",
+    metaTitle: "School Safety: 7 Must-Checks",
     metaDescription: "When choosing a school, safety must be a top priority — not an afterthought. Discover 7 essential safety and security measures that every responsible school should have in place to protect every student, every day.",
     keywords: "school safety security measures India, CBSE school security Thane, child safety school checklist, Rainbow International School safety security",
     date: "16 Mar 2025",

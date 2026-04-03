@@ -20,7 +20,7 @@ export default function VirtualLearning() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Virtual Learning - Rainbow International School Thane"
+        title="Virtual Learning"
         description="Experience education redefined with Rainbow International School's Virtual Learning programme. Anytime access to courses and assessments via Google Classroom."
         keywords="virtual learning Rainbow School, online classes Rainbow International School, Google Classroom Thane school, digital learning Thane"
         canonical="https://rainbowinternationalschool.in/virtual-learning/"

@@ -220,7 +220,7 @@ export default function Curriculum() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Curriculum - Rainbow International School Thane"
+        title="Curriculum"
         description="Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology."
         keywords="CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane West"
         canonical="https://rainbowinternationalschool.in/curriculum/"

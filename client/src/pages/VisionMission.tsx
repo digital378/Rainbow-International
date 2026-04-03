@@ -23,7 +23,7 @@ export default function VisionMission() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="RIS Vision & Mission - Rainbow International School Thane"
+        title="Vision & Mission | Rainbow International School"
         description="Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact."
         keywords="Rainbow school vision mission, Rainbow International School values, school philosophy Thane West"
         canonical="https://rainbowinternationalschool.in/ris-vision-mission/"

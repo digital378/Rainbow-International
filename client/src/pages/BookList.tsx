@@ -15,7 +15,7 @@ export default function BookList() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Book List 2026-27 - Rainbow International School Thane"
+        title="Book List 2026–27"
         description="Rainbow International School provides a book list and study material to each student so they understand the syllabus from the start of the year. View the complete book list for all classes."
         keywords="Rainbow school book list, school books Thane West, CBSE book list Thane, Rainbow International School study material"
         canonical="https://rainbowinternationalschool.in/book-list/"

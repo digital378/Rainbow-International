@@ -33,7 +33,7 @@ export default function BeyondClassroom() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Beyond The Classroom - Rainbow International School Thane"
+        title="Beyond the Classroom"
         description="Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students."
         keywords="beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane"
         canonical="https://rainbowinternationalschool.in/beyond-the-classroom/"

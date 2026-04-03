@@ -66,7 +66,7 @@ export default function ScheduleAppointment() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Schedule an Appointment | Rainbow International School Thane"
+        title="Schedule an Appointment"
         description="Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2026–27."
         keywords="schedule appointment Rainbow International School, campus visit CBSE school Thane, book school visit Brahmand Thane"
         canonical="/schedule-appointment"

@@ -10,7 +10,7 @@ export default function ChairpersonsNote() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Chairperson's Note - Rainbow International School"
+        title="Chairperson's Note"
         description="A message from the Chairperson of Rainbow International School, Thane West — on the school's vision, values, and commitment to excellence in education."
         keywords="Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school"
         canonical="https://rainbowinternationalschool.in/chairpersons-note/"

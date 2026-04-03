@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Best CBSE School in Thane West | Admissions Open"
+        title="Best CBSE School in Thane West"
         description="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce & Humanities. Admissions 2026-27 open."
         keywords="Rainbow International School Thane, CBSE school Thane, best international school Thane West, K-12 school Thane, school admissions Thane 2026, CBSE admissions Thane, top school Thane West Maharashtra"
         canonical="https://rainbowinternationalschool.in/"

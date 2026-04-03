@@ -176,7 +176,7 @@ export default function SafetySecurity() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Safety & Security - Rainbow International School Thane"
+        title="Safety & Security"
         description="Rainbow International School prioritizes student safety with 160 CCTV cameras, metal detectors, GPS transport, trained nurses, ambulance, and 100% female preschool staff."
         keywords="school safety Thane, Rainbow school security, safe school Thane West, CCTV school Thane, GPS school bus Thane"
         canonical="https://rainbowinternationalschool.in/safety-security/"
