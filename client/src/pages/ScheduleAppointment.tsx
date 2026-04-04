@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { getFormTrackingData } from "@/lib/analytics";
 import { Phone, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
 
 const timeSlots = [
@@ -50,6 +51,7 @@ export default function ScheduleAppointment() {
         grade: "Appointment",
         preferredTime: data.timeSlot,
         message: `Appointment Request | Purpose: ${data.purpose} | Date: ${data.date} | Time: ${data.timeSlot} | Notes: ${data.message}`,
+        ...getFormTrackingData("Schedule Appointment Form"),
       }),
     onSuccess: () => setSubmitted(true),
     onError: () => toast({ title: "Submission failed", description: "Please call us directly.", variant: "destructive" }),

@@ -152,14 +152,85 @@ export function pushToDataLayer(event: Record<string, any>): void {
   console.log("[GA4] DataLayer push:", event);
 }
 
-export function getUTMParams(): Record<string, string> {
+const UTM_STORAGE_KEY = "ris_utm_params";
+
+function captureAndStoreUTM(): void {
   const params = new URLSearchParams(window.location.search);
-  return {
-    utm_source: params.get("utm_source") || "",
-    utm_medium: params.get("utm_medium") || "",
-    utm_campaign: params.get("utm_campaign") || "",
+  const hasUTM = params.get("utm_source") || params.get("utm_medium") || params.get("gclid") || params.get("gad_source") || params.get("fbclid");
+  if (!hasUTM) return;
+
+  let source = params.get("utm_source") || "";
+  let medium = params.get("utm_medium") || "";
+
+  if (!source && (params.get("gclid") || params.get("gad_source"))) {
+    source = source || "google";
+    medium = medium || "cpc";
+  }
+  if (!source && params.get("fbclid")) {
+    source = source || "meta";
+    medium = medium || "paid_social";
+  }
+
+  const data: Record<string, string> = {
+    utm_source: source,
+    utm_medium: medium,
+    utm_campaign: params.get("utm_campaign") || params.get("gad_campaignid") || "",
     utm_term: params.get("utm_term") || "",
     utm_content: params.get("utm_content") || "",
+    gclid: params.get("gclid") || "",
+    fbclid: params.get("fbclid") || "",
+  };
+
+  try { sessionStorage.setItem(UTM_STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+
+captureAndStoreUTM();
+
+export function getUTMParams(): Record<string, string> {
+  const params = new URLSearchParams(window.location.search);
+
+  let source = params.get("utm_source") || "";
+  let medium = params.get("utm_medium") || "";
+
+  if (!source && (params.get("gclid") || params.get("gad_source"))) {
+    source = "google";
+    medium = medium || "cpc";
+  }
+  if (!source && params.get("fbclid")) {
+    source = "meta";
+    medium = medium || "paid_social";
+  }
+
+  if (source || medium) {
+    return {
+      utm_source: source,
+      utm_medium: medium,
+      utm_campaign: params.get("utm_campaign") || params.get("gad_campaignid") || "",
+      utm_term: params.get("utm_term") || "",
+      utm_content: params.get("utm_content") || "",
+    };
+  }
+
+  try {
+    const stored = sessionStorage.getItem(UTM_STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      return {
+        utm_source: data.utm_source || "",
+        utm_medium: data.utm_medium || "",
+        utm_campaign: data.utm_campaign || "",
+        utm_term: data.utm_term || "",
+        utm_content: data.utm_content || "",
+      };
+    }
+  } catch {}
+
+  return {
+    utm_source: "",
+    utm_medium: "",
+    utm_campaign: "",
+    utm_term: "",
+    utm_content: "",
   };
 }
 

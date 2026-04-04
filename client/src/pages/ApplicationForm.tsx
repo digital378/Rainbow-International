@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { getFormTrackingData } from "@/lib/analytics";
 import { CheckCircle } from "lucide-react";
 
 const grades = [
@@ -52,6 +53,7 @@ export default function ApplicationForm() {
         grade: data.gradeApplying,
         preferredTime: data.timeSlot,
         message: `Application Form | DOB: ${data.dateOfBirth} | Current School: ${data.currentSchool} | Preferred Visit: ${data.preferredDate} ${data.timeSlot} | Address: ${data.address} | Notes: ${data.message}`,
+        ...getFormTrackingData("Application Form"),
       });
     },
     onSuccess: () => {

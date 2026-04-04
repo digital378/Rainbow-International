@@ -38,7 +38,7 @@ function getLeadSourceLabel(utmSource?: string | null, utmMedium?: string | null
   const src = (utmSource || "").toLowerCase();
   const med = (utmMedium || "").toLowerCase();
   if (src === "google" && (med === "cpc" || med === "paid" || med.includes("paid"))) return "Google Ads";
-  if (src === "facebook" || src === "instagram" || src === "meta") return "Meta Ads (Facebook/Instagram)";
+  if (src === "facebook" || src === "instagram" || src === "meta") return "Meta Ads";
   if (med === "cpc" || med === "ppc" || med.includes("paid")) return `Paid Ads (${utmSource || "Unknown"})`;
   if (med === "email") return "Email Campaign";
   if (med === "social" || med === "organic_social") return `Social Media (${utmSource || "Unknown"})`;
@@ -49,9 +49,10 @@ function getLeadSourceLabel(utmSource?: string | null, utmMedium?: string | null
 function getMediumLabel(utmMedium?: string | null): string {
   if (!utmMedium) return "Direct";
   const med = utmMedium.toLowerCase();
-  if (med === "cpc" || med === "ppc") return "Paid Search";
-  if (med === "display") return "Display Ads";
-  if (med === "social" || med === "paid_social") return "Social";
+  if (med === "cpc" || med === "ppc") return "Paid Ads";
+  if (med === "display") return "Paid Ads";
+  if (med === "paid_social") return "Paid Ads";
+  if (med === "social" || med === "organic_social") return "Social";
   if (med === "email") return "Email";
   if (med === "referral") return "Referral";
   if (med === "organic") return "Organic Search";
