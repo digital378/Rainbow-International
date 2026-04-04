@@ -4,8 +4,30 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
-import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle } from "lucide-react";
+import { PhoneCall, ChevronRight, CheckCircle2, CheckCircle, X } from "lucide-react";
 import { trackFormSubmit, getFormTrackingData, trackWhatsAppClick } from "@/lib/analytics";
+
+const seatData = [
+  { grade: "Nursery", seats: 12, status: "Available" },
+  { grade: "Jr. KG", seats: 4, status: "Almost Full" },
+  { grade: "Sr. KG", seats: 5, status: "Almost Full" },
+  { grade: "I", seats: 3, status: "Almost Full" },
+  { grade: "II", seats: 3, status: "Almost Full" },
+  { grade: "III", seats: 4, status: "Almost Full" },
+  { grade: "IV", seats: 1, status: "Almost Full" },
+  { grade: "V", seats: 1, status: "Almost Full" },
+  { grade: "VI", seats: 2, status: "Almost Full" },
+  { grade: "VII", seats: 0, status: "Closed" },
+  { grade: "VIII", seats: 0, status: "Closed" },
+  { grade: "IX", seats: 0, status: "Closed" },
+  { grade: "X", seats: 0, status: "Closed" },
+  { grade: "XI Science", seats: 20, status: "Available" },
+  { grade: "XI Commerce", seats: 15, status: "Available" },
+  { grade: "XI Humanities", seats: 23, status: "Available" },
+  { grade: "XII Science", seats: 11, status: "Available" },
+  { grade: "XII Commerce", seats: 13, status: "Available" },
+  { grade: "XII Humanities", seats: 17, status: "Available" },
+];
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -26,6 +48,7 @@ export function Hero() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [showSeats, setShowSeats] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
   });
@@ -81,15 +104,19 @@ export function Hero() {
         <div className="flex flex-col lg:flex-row gap-10 xl:gap-16 items-center">
 
           <div className="flex-1">
-            <div className="inline-flex items-center gap-2.5 mb-6 px-4 py-2 border border-amber-400/30 bg-amber-400/10 backdrop-blur-sm rounded-full">
+            <button
+              onClick={() => setShowSeats(true)}
+              data-testid="button-check-seats"
+              className="inline-flex items-center gap-2.5 mb-6 px-4 py-2 border border-amber-400/30 bg-amber-400/10 backdrop-blur-sm rounded-full cursor-pointer hover:bg-amber-400/20 transition-all"
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
               </span>
               <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">
-                Admissions Open · AY 2026–27
+                Check Seat Availability
               </span>
-            </div>
+            </button>
 
             <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold leading-[1.05] text-white mb-5 tracking-tight">
               Rainbow<br />
@@ -251,6 +278,79 @@ export function Hero() {
 
         </div>
       </div>
+
+      {showSeats && (
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ zIndex: 9999, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+          onClick={() => setShowSeats(false)}
+          data-testid="modal-seats-overlay"
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div>
+                <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Seat Availability — AY 2026–27</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Rainbow International School, Thane West</p>
+              </div>
+              <button
+                onClick={() => setShowSeats(false)}
+                data-testid="button-close-seats"
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <X size={16} className="text-gray-500" />
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1">
+              <table className="w-full text-sm" data-testid="table-seats">
+                <thead>
+                  <tr style={{ background: "#091a4f" }}>
+                    <th className="text-left px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Grade</th>
+                    <th className="text-center px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Seats Available</th>
+                    <th className="text-center px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {seatData.map((row, i) => (
+                    <tr key={i} className={`border-b border-gray-100 ${row.status === "Closed" ? "bg-gray-50" : "hover:bg-blue-50/30"}`}>
+                      <td className={`px-6 py-3 font-medium ${row.status === "Closed" ? "text-red-500" : "text-gray-800"}`}>{row.grade}</td>
+                      <td className="px-6 py-3 text-center font-bold text-gray-700">{row.seats}</td>
+                      <td className="px-6 py-3 text-center">
+                        <span
+                          className="inline-block px-3 py-1 rounded-full text-xs font-bold"
+                          style={
+                            row.status === "Available"
+                              ? { background: "#dcfce7", color: "#16a34a" }
+                              : row.status === "Almost Full"
+                              ? { background: "#fff7ed", color: "#ea580c" }
+                              : { background: "#fee2e2", color: "#dc2626" }
+                          }
+                        >
+                          {row.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3 items-center justify-between bg-gray-50">
+              <p className="text-xs text-gray-500">Seats are subject to availability. Contact us to reserve.</p>
+              <a
+                href="#contact"
+                onClick={() => setShowSeats(false)}
+                className="px-6 py-2.5 text-sm font-bold text-white rounded-full hover:opacity-90 transition-all"
+                style={{ background: "linear-gradient(135deg, #091a4f 0%, #1a56db 100%)" }}
+                data-testid="button-seats-enquire"
+              >
+                Enquire Now
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
