@@ -13,23 +13,14 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath, {
     maxAge: "1y",
     immutable: true,
-    etag: true,
-    lastModified: true,
     setHeaders(res, filePath) {
       if (filePath.endsWith(".html")) {
-        res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
-      }
-      if (filePath.match(/\.(webp|jpg|jpeg|png|avif|gif|svg|ico)$/i)) {
-        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-      }
-      if (filePath.match(/\.(woff2?|ttf|otf|eot)$/i)) {
-        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        res.setHeader("Cache-Control", "no-cache");
       }
     },
   }));
 
   app.use("*", (_req, res) => {
-    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

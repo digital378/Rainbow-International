@@ -33,14 +33,6 @@ Preferred communication style: Simple, everyday language.
 - **Production Build**: Vite builds frontend to `dist/public`, esbuild bundles server to `dist/index.cjs`
 - **Path Aliases**: `@/*` maps to client source, `@shared/*` maps to shared code, `@assets` maps to attached assets
 
-### Performance / Core Web Vitals
-- **Hero form lazy-loaded**: `HeroForm.tsx` (react-hook-form + zod) is `React.lazy()` imported in `Hero.tsx` — hero image/text renders without waiting for form JS (~84KB forms chunk deferred)
-- **Critical CSS inline**: `index.html` contains inline `<style>` with hero placeholder (navy background + heading) that paints before JS loads, hidden once React mounts via `#root:not(:empty) ~ #hero-placeholder { display: none }`
-- **CDN caching**: HTML served with `s-maxage=120, stale-while-revalidate=600` for edge caching; static assets get 1-year immutable cache
-- **Font loading**: Google Fonts loaded async via `media="print" onload="this.media='all'"` trick — non-render-blocking
-- **Image preloading**: Hero WebP image preloaded with `fetchpriority="high"`; DNS prefetch for CDN domain
-- **Third-party deferred**: GA4 + GTM scripts deferred 2s after `window.load`
-- **Code splitting**: Manual chunks (vendor, ui, forms, query, blog-data); 40+ page routes lazy-loaded; only Home page is eager
 
 ### Project Structure
 ```
