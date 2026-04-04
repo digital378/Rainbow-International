@@ -151,21 +151,21 @@ export default function Secondary() {
                 {/* Photo */}
                 <div className="grid grid-cols-2 gap-4">
                   <img
-                    src="/images/students/secondary-students.png"
-                    alt="Secondary section students in navy blazers at Rainbow International School"
+                    src="/images/students/secondary-bus.webp"
+                    alt="Rainbow International School secondary students smiling from school bus window"
                     className="rounded-3xl w-full object-cover h-48"
-                    width={512}
-                    height={384}
+                    width={800}
+                    height={533}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                   <img
-                    src="/images/students/secondary-students-2.png"
-                    alt="Secondary students at Rainbow International School"
+                    src="/images/students/secondary-classroom.webp"
+                    alt="Secondary students studying together in classroom at Rainbow International School"
                     className="rounded-3xl w-full object-cover h-48"
-                    width={512}
-                    height={384}
+                    width={800}
+                    height={533}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
