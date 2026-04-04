@@ -7,22 +7,26 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 
 const activities = [
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/HO-web-art-work-for-pranit-04.png",
+    image: "/images/extra/activities/art-craft.jpg",
+    alt: "Students showcasing art and craft projects at the school exhibition",
     title: "Exhibitions",
     description: "Annual Science, Math, Social Science, and EVS Exhibition 'IMPULSE' is organized to showcase the organizational abilities, oratory skills and knowledge of the students.",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/HO-web-art-work-for-pranit-07.png",
+    image: "/images/extra/events/dance-kids.jpg",
+    alt: "Young students dancing with ribbons on stage during club performance",
     title: "Clubs",
     description: "To foster a multi-dimensional personality, students are exposed to various club activities: Health & Wellness Club, Interact Club, Culinary Club, Literary Club, Heritage Club, Science & Maths Club, Eco Club & Cultural Club.",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/HO-web-art-work-for-pranit-06.png",
+    image: "/images/extra/campus/bus-students.jpg",
+    alt: "Students waving from the school bus window before an excursion",
     title: "Tours & Visits",
     description: "To make learning a joyful & hands-on experience, Recreational, Educational & Cultural Tours & Visits are arranged for students throughout the year.",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/HO-web-art-work-for-pranit-05.png",
+    image: "/images/gallery/organic-farming/organic-farming-1.webp",
+    alt: "Students planting and tending to the organic vegetable garden",
     title: "Promoting Green",
     description: "Students are encouraged to feel the soil and develop a green thumb. They participate in green activities like sowing seeds in a vegetable garden, planting saplings in a butterfly garden, and more.",
   },
@@ -37,7 +41,7 @@ export default function BeyondClassroom() {
         description="Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students."
         keywords="beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane"
         canonical="https://rainbowinternationalschool.in/beyond-the-classroom/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
+        ogImage="/images/extra/events/dance-boys.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Beyond the Classroom", href: "https://rainbowinternationalschool.in/beyond-the-classroom" },
@@ -71,7 +75,7 @@ export default function BeyondClassroom() {
                 <div key={i} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex gap-5" data-testid={`card-activity-${i}`}>
                   <img
                     src={item.image}
-                    alt={item.title}
+                    alt={item.alt}
                     className="w-20 h-20 object-contain shrink-0"
                     width={80}
                     height={80}

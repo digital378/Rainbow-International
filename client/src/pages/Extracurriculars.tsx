@@ -208,22 +208,26 @@ function ClubsWheel() {
 // ── Teaching Methodology ──────────────────────────────────────────
 const activities = [
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Exibhition.jpg",
+    image: "/images/extra/classroom/science-lab.jpg",
+    alt: "Students conducting experiments in the school science laboratory",
     title: "Exhibitions",
     description: "Annual Exhibitions for Science, Maths, Social Science, EVS & Language",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Field-trip-1-1.jpg",
+    image: "/images/extra/campus/bus-students.jpg",
+    alt: "Students waving from the school bus window before an educational excursion",
     title: "Tours & Visits",
     description: "Exciting Recreational, Educational & Cultural Excursions",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg",
+    image: "/images/extra/events/choir-uniform.jpg",
+    alt: "Students in school uniform singing Rise Up during special assembly",
     title: "Special Assembly",
     description: "Celebration of Fun & Educational U.N. days, Motivational Speeches & Meaningful Activities",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Cultural.jpg",
+    image: "/images/extra/events/dance-boys.jpg",
+    alt: "Boys performing an energetic dance at the Annual Day cultural event",
     title: "Cultural Activities",
     description: "Annual Day, Sports Day, Indian Festivals & School Events",
   },
@@ -347,7 +351,7 @@ export default function Extracurriculars() {
                   <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100">
                     <img
                       src={item.image}
-                      alt={item.title}
+                      alt={item.alt}
                       className="w-full h-full object-cover"
                       width={400}
                       height={300}

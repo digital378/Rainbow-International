@@ -123,47 +123,46 @@ export default function About() {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <img
-                src="/images/about/welcome-to-ris.jpg"
-                alt="Welcome to Rainbow International School — Campus building and grounds"
+                src="/images/extra/campus/school-front.jpg"
+                alt="Rainbow International School — Main entrance with Rainbow logo"
                 className="rounded-3xl shadow-sm w-full object-cover"
-                width={1024}
-                height={536}
+                width={800}
+                height={533}
                 loading="lazy"
                 decoding="async"
               />
               <img
-                src="/images/gallery/talent/amphitheatre.jpg"
-                alt="Rainbow International School Amphitheatre"
+                src="/images/extra/campus/school-building.jpg"
+                alt="Rainbow International School — Campus building and courtyard"
                 className="rounded-3xl shadow-sm w-full object-cover"
-                width={1024}
-                height={536}
+                width={800}
+                height={533}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/01.jpeg"; }}
               />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
               <img
-                src="/images/students/physics-lab.png"
-                alt="Student in physics lab at Rainbow International School"
+                src="/images/extra/classroom/science-lab.jpg"
+                alt="Students doing experiments in science lab"
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
-                src="/images/students/chemistry-lab.png"
-                alt="Student in chemistry lab at Rainbow International School"
+                src="/images/extra/classroom/students-turf.jpg"
+                alt="Primary students enjoying time on the green turf"
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
-                src="/images/students/primary-walking.png"
-                alt="Primary students walking with school bags"
+                src="/images/extra/campus/swimming-pool.jpg"
+                alt="Olympic-standard swimming pool at Rainbow International School"
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
-                src="/images/students/actor.png"
-                alt="Student achiever at Rainbow International School"
+                src="/images/extra/campus/monument.jpg"
+                alt="Historical monument at Rainbow International School campus"
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />

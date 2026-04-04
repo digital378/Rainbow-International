@@ -18,7 +18,7 @@ const highlights = [
     title: "CCTV Surveillance & Metal Detectors",
   },
   {
-    image: "/images/gallery/support/school-bus.jpg",
+    image: "/images/extra/campus/school-bus.jpg",
     title: "CCTV & GPS enabled Transport",
   },
   {
