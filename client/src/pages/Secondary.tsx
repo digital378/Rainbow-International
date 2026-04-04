@@ -75,22 +75,22 @@ const methodology = [
   {
     title: "Hands-on Activities",
     desc: "Annual exhibitions for many subjects & always active clubs help students apply what they learn",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02.jpeg",
+    img: "/images/students/chemistry-lab.png",
   },
   {
     title: "Tours & Visits",
     desc: "Exciting recreational, educational & cultural excursions get students to \"think outside the classroom\"",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    img: "/images/gallery/sports/cricket-ground.jpg",
   },
   {
     title: "Project Work",
     desc: "Individual & group projects get students to learn from their families & peers & get better at application",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02-1024x554.jpeg",
+    img: "/images/students/secondary-students.png",
   },
   {
     title: "Digital Tools",
     desc: "E-learning amenities make abstract concepts concrete & assist in greater retention of data & processes",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-02-1024x559.jpeg",
+    img: "/images/students/physics-lab.png",
   },
 ];
 
@@ -103,7 +103,7 @@ export default function Secondary() {
         description="Rainbow International School's Secondary Section (Class 9 & 10). CBSE curriculum focused on academic excellence, career guidance, and all-round development."
         keywords="secondary school Thane, Class 9 10 CBSE Thane West, Rainbow school secondary section admission"
         canonical="https://rainbowinternationalschool.in/secondary-section/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-school-class-6-class-8-international-school-admission-ad-2.jpg"
+        ogImage="/images/home/academic/secondary.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/secondary-section" },
@@ -115,7 +115,7 @@ export default function Secondary() {
         title="Secondary Section"
         subtitle="Class 9 and Class 10"
         breadcrumb={[{ label: "Secondary Section" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-school-class-6-class-8-international-school-admission-ad.jpg"
+        bgImage="/images/home/academic/secondary.jpg"
       />
 
       <main className="flex-grow">
@@ -259,7 +259,7 @@ export default function Secondary() {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02.jpeg";
+                        (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
                   </div>

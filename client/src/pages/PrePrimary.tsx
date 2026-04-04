@@ -10,28 +10,28 @@ const curriculum = [
   {
     subject: "English",
     detail: "Small letters, 2–3 letters' words, sentences, Q&A, cursive writing",
-    icon: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/image-24-Traced.png",
+    emoji: "📖",
     color: "#e0edff",
     accent: "#0d3b86",
   },
   {
     subject: "Math",
     detail: "Comparison, addition, subtraction, time, number names",
-    icon: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/image-25-Traced.png",
+    emoji: "🔢",
     color: "#fff7e0",
     accent: "#d97706",
   },
   {
     subject: "Hindi",
     detail: "Swar, vyanjan, 2–3 letters' words",
-    icon: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/image-26-Traced.png",
+    emoji: "✏️",
     color: "#e0f7f0",
     accent: "#059669",
   },
   {
     subject: "GK",
     detail: "Nature, transport, good manners, living & non-living, day & night, seasons, food, community helpers, my body & home",
-    icon: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/image-27-Traced.png",
+    emoji: "🌍",
     color: "#f3e0ff",
     accent: "#7c3aed",
   },
@@ -98,26 +98,22 @@ const methodology = [
   {
     title: "Books",
     desc: "Activity books, E-learning, Flash cards, Memory books",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Books.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg",
+    img: "/images/gallery/educational/school-library.jpg",
   },
   {
     title: "Spaces",
     desc: "Theme Based Classrooms, Picnics and Field Trips",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Space.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
+    img: "/images/preschool/nursery-kids.jpg",
   },
   {
     title: "Action",
     desc: "Enactment, Puppet Shows, Muppet Shows, Celebrations",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Action.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PPS-02.jpg",
+    img: "/images/gallery/talent/multipurpose-hall.jpg",
   },
   {
     title: "Sound",
     desc: "Audio Visual Aids for Phonics, Rhymes and Stories",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Sound.jpg",
-    fallback: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg",
+    img: "/images/gallery/talent/music-room.jpg",
   },
 ];
 
@@ -130,7 +126,7 @@ export default function PrePrimary() {
         description="Rainbow International School's Pre-Primary Section (Nursery, Jr KG, Sr KG) in Thane West. Activity-based, game-based learning for holistic development. Admissions open."
         keywords="pre-primary school Thane, nursery admission Thane West, Jr KG Sr KG admission, Rainbow preschool Thane"
         canonical="https://rainbowinternationalschool.in/pre-primary-school-thane/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
+        ogImage="/images/preschool/hero.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
@@ -142,7 +138,7 @@ export default function PrePrimary() {
         title="Pre-Primary Section"
         subtitle="Nursery | Jr KG | Sr KG"
         breadcrumb={[{ label: "Pre-Primary Section" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/pre-primary-school-nursery-jrkg-srkg-admissions-ad.jpg"
+        bgImage="/images/preschool/hero.jpg"
       />
 
       <main className="flex-grow">
@@ -220,10 +216,8 @@ export default function PrePrimary() {
                   <div className="divide-y divide-gray-100">
                     {curriculum.map((c, i) => (
                       <div key={i} className="flex items-start gap-3 px-5 py-4 bg-white">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.color }}>
-                          <img src={c.icon} alt={c.subject} className="w-6 h-6 object-contain"
-                            width={24} height={24} loading="lazy" decoding="async"
-                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-xl" style={{ background: c.color }}>
+                          {c.emoji}
                         </div>
                         <div>
                           <p className="font-black text-sm" style={{ color: c.accent }}>{c.subject}</p>
@@ -279,7 +273,7 @@ export default function PrePrimary() {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = m.fallback;
+                        (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
                   </div>

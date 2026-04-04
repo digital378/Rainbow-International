@@ -81,22 +81,22 @@ const methodology = [
   {
     title: "Hands-on Activities",
     desc: "Annual exhibitions for many subjects & always active clubs help students apply what they learn",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-01-1024x545.jpeg",
+    img: "/images/gallery/talent/art-craft-room.jpg",
   },
   {
     title: "Tours & Visits",
     desc: "Exciting recreational, educational & cultural excursions get students to \"think outside the classroom\"",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    img: "/images/gallery/talent/amphitheatre.jpg",
   },
   {
     title: "Project Work",
     desc: "Individual & group projects get students to learn from their families & peers & get better at application",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-section-768x513.png",
+    img: "/images/gallery/educational/reading-room.jpg",
   },
   {
     title: "Digital Tools",
     desc: "E-learning amenities make abstract concepts concrete & assist in greater retention of data & processes",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-02-1024x559.jpeg",
+    img: "/images/gallery/educational/storage-facility.jpg",
   },
 ];
 
@@ -128,7 +128,7 @@ export default function MiddleSchool() {
         description="Rainbow International School's Middle School Section (Class 6 to 10). Multi-dimensional curriculum to develop creativity, intellectual curiosity and maturity. CBSE affiliated."
         keywords="middle school Thane West, Class 6 to 10 CBSE Thane, Rainbow International School middle section"
         canonical="https://rainbowinternationalschool.in/middle-school-section/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/middle-section-768x513.png"
+        ogImage="/images/home/academic/middle-section.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/middle-school-section" },
@@ -140,7 +140,7 @@ export default function MiddleSchool() {
         title="Middle Section"
         subtitle="Class 6 to Class 10"
         breadcrumb={[{ label: "Middle Section" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-01-1024x545.jpeg"
+        bgImage="/images/home/academic/middle-section.jpg"
       />
 
       <main className="flex-grow">
@@ -297,7 +297,7 @@ export default function MiddleSchool() {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-01-1024x545.jpeg";
+                        (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
                   </div>

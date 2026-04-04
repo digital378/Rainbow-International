@@ -109,25 +109,25 @@ const methodology = [
   {
     title: "Experiential Learning Programmes",
     desc: "Unique International Experiential Learning Certificate Programs, integrated throughout year-round coursework & offered exclusively to our Grade 11 students.",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg",
+    img: "/images/students/senior-secondary-group.jpg",
     color: "#e0edff", accent: "#0d3b86",
   },
   {
     title: "Career Counselling",
     desc: "A Career Guidance Programme powered by Proventus, an Overseas Education Company. Customised workshops for aspirants with individual focus when making life-altering decisions.",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/SS-02-1024x554.jpeg",
+    img: "/images/students/senior-secondary-girls.jpg",
     color: "#fff7e0", accent: "#d97706",
   },
   {
     title: "Foreign Language Classes",
     desc: "Our Foreign Language Skill Development Programme presents one of the most relevant languages of the current era — French — adding to students' global readiness.",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    img: "/images/home/academic/senior-secondary.jpg",
     color: "#e0f7f0", accent: "#047857",
   },
   {
     title: "Summer Internship Programme",
     desc: "Industry expert workshops, lectures, and internship opportunities carefully structured by experienced mentors for students during their Senior Secondary years.",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/MS-02-1024x559.jpeg",
+    img: "/images/students/hero-senior-secondary.jpg",
     color: "#fdf2f8", accent: "#be185d",
   },
 ];
@@ -141,7 +141,7 @@ export default function SeniorSecondary() {
         description="Rainbow International School's Senior Secondary Section (Class 11 & 12). Science, Humanities, and Commerce streams. CBSE affiliation number 1130661."
         keywords="senior secondary school Thane, Class 11 12 CBSE Thane West, science commerce humanities Thane school"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/senior-secondary-768x513.png"
+        ogImage="/images/home/academic/senior-secondary.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
@@ -153,7 +153,7 @@ export default function SeniorSecondary() {
         title="Senior Secondary Section"
         subtitle="Class 11 & 12"
         breadcrumb={[{ label: "Senior Secondary Section" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg"
+        bgImage="/images/home/academic/senior-secondary.jpg"
       />
 
       <main className="flex-grow">
@@ -310,7 +310,7 @@ export default function SeniorSecondary() {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/secondary-school-class-9-class-10-international-school-admission-ad-1.jpg";
+                        (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
                   </div>

@@ -80,22 +80,22 @@ const methodology = [
   {
     title: "Hands-on Activities",
     desc: "Annual exhibitions for many subjects & always active clubs help students apply what they learn",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01-1024x548.jpeg",
+    img: "/images/gallery/educational/maths-science-lab.jpg",
   },
   {
     title: "Tours & Visits",
     desc: "Exciting recreational, educational & cultural excursions get students to \"think outside the classroom\"",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png",
+    img: "/images/gallery/support/school-bus.jpg",
   },
   {
     title: "Project Work",
     desc: "Individual & group projects get students to learn from their families & peers and improve application skills",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-02-1024x546.jpeg",
+    img: "/images/students/primary-group-work.jpg",
   },
   {
     title: "Digital Tools",
     desc: "E-learning amenities make abstract concepts concrete & assist in greater retention of data & processes",
-    img: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01.jpeg",
+    img: "/images/gallery/educational/e-learning-classrooms.jpg",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function Primary() {
         description="Rainbow International School's Primary Section (Class 1 to 5) in Thane West. Language, Math, Science, Creative & Interpersonal skills via CBSE curriculum. Admissions open."
         keywords="primary school Thane West, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
         canonical="https://rainbowinternationalschool.in/primary-section/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion-768x513.png"
+        ogImage="/images/home/academic/primary-section.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/primary-section" },
@@ -139,7 +139,7 @@ export default function Primary() {
         title="Primary Section"
         subtitle="Class 1 to Class 5"
         breadcrumb={[{ label: "Primary Section" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01-1024x548.jpeg"
+        bgImage="/images/home/academic/primary-section.jpg"
       />
 
       <main className="flex-grow">
@@ -338,7 +338,7 @@ export default function Primary() {
                       loading="lazy"
                       decoding="async"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/PS-01-1024x548.jpeg";
+                        (e.target as HTMLImageElement).style.display = "none";
                       }}
                     />
                   </div>
