@@ -181,11 +181,11 @@ export default function PrePrimary() {
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
                 <img
-                  src="/images/students/pre-primary-teacher.jpg"
-                  alt="Pre-Primary teacher engaging with young students at Rainbow International School"
+                  src="/images/students/preprimary-classroom.webp"
+                  alt="Pre-Primary teacher with young children learning at a round table in rainbow-themed classroom"
                   className="rounded-3xl w-full object-cover max-h-72 mt-4"
                   width={800}
-                  height={400}
+                  height={533}
                   loading="lazy"
                   decoding="async"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
