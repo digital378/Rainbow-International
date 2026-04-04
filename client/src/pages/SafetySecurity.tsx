@@ -10,19 +10,19 @@ import { Play, X } from "lucide-react";
 // ── 4 Highlight Cards ─────────────────────────────────────────────
 const highlights = [
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Screenshot--768x415.jpeg",
+    image: "/images/gallery/support/infirmary.jpg",
     title: "Infirmary, Ambulance & Trained Nurse",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-amenities-metal-detectors.jpg",
+    image: "/images/home/discover/amenities.jpg",
     title: "CCTV Surveillance & Metal Detectors",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-transport.jpg",
+    image: "/images/gallery/support/school-bus.jpg",
     title: "CCTV & GPS enabled Transport",
   },
   {
-    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/100-female-768x418.jpeg",
+    image: "/images/preschool/nursery-kids.jpg",
     title: "100% Female Staff for Preschool",
   },
 ];
@@ -180,7 +180,7 @@ export default function SafetySecurity() {
         description="Rainbow International School prioritizes student safety with 160 CCTV cameras, metal detectors, GPS transport, trained nurses, ambulance, and 100% female preschool staff."
         keywords="school safety Thane, Rainbow school security, safe school Thane West, CCTV school Thane, GPS school bus Thane"
         canonical="https://rainbowinternationalschool.in/safety-security/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security.png"
+        ogImage="/images/home/discover/safety-security.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Safety & Security", href: "https://rainbowinternationalschool.in/safety-security" },
@@ -191,7 +191,7 @@ export default function SafetySecurity() {
         title="Safety & Security"
         subtitle="Student safety & well-being is our top-most priority."
         breadcrumb={[{ label: "Safety & Security" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security.png"
+        bgImage="/images/home/discover/safety-security.jpg"
       />
 
       <main className="flex-grow">
@@ -202,7 +202,7 @@ export default function SafetySecurity() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div className="rounded-3xl overflow-hidden shadow-sm">
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Screenshot--768x415.jpeg"
+                  src="/images/home/safety/safety.jpg"
                   alt="Security control room"
                   className="w-full h-72 object-cover"
                   width={768}
@@ -322,7 +322,7 @@ export default function SafetySecurity() {
               style={{ background: "#091a4f" }}
             >
               <img
-                src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/security.png"
+                src="/images/home/discover/safety-security.jpg"
                 alt="Safety video thumbnail"
                 className="w-full h-72 object-cover opacity-40"
                 width={800}

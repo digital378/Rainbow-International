@@ -90,7 +90,7 @@ export default function RainbowPreschool() {
         description="Rainbow Preschool International — award-winning preschool for children aged 1.5 to 5.5 years. Playgroup, Nursery, Jr KG, and Sr KG. 100% female staff. Recognised among India's best preschools."
         keywords="Rainbow Preschool International, best preschool Thane West, playgroup Thane, nursery admission Thane, Rainbow pre-primary school, early childhood education Thane"
         canonical="https://rainbowinternationalschool.in/rainbow-preschool-international/"
-        ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-preschool-playgroup-banner-1.jpg"
+        ogImage="/images/preschool/hero.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Rainbow Preschool", href: "https://rainbowinternationalschool.in/rainbow-preschool-international" },
