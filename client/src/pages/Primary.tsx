@@ -90,7 +90,7 @@ const methodology = [
   {
     title: "Project Work",
     desc: "Individual & group projects get students to learn from their families & peers and improve application skills",
-    img: "/images/students/primary-group-work.jpg",
+    img: "/images/home/academic/primary-2.jpg",
   },
   {
     title: "Digital Tools",

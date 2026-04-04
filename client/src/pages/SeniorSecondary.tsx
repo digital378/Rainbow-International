@@ -109,25 +109,25 @@ const methodology = [
   {
     title: "Experiential Learning Programmes",
     desc: "Unique International Experiential Learning Certificate Programs, integrated throughout year-round coursework & offered exclusively to our Grade 11 students.",
-    img: "/images/students/senior-secondary-group.jpg",
+    img: "/images/home/academic/senior-2.jpg",
     color: "#e0edff", accent: "#0d3b86",
   },
   {
     title: "Career Counselling",
     desc: "A Career Guidance Programme powered by Proventus, an Overseas Education Company. Customised workshops for aspirants with individual focus when making life-altering decisions.",
-    img: "/images/students/senior-secondary-girls.jpg",
+    img: "/images/home/academic/senior-3.jpg",
     color: "#fff7e0", accent: "#d97706",
   },
   {
     title: "Foreign Language Classes",
     desc: "Our Foreign Language Skill Development Programme presents one of the most relevant languages of the current era — French — adding to students' global readiness.",
-    img: "/images/home/academic/senior-secondary.jpg",
+    img: "/images/home/academic/senior-4.jpg",
     color: "#e0f7f0", accent: "#047857",
   },
   {
     title: "Summer Internship Programme",
     desc: "Industry expert workshops, lectures, and internship opportunities carefully structured by experienced mentors for students during their Senior Secondary years.",
-    img: "/images/students/hero-senior-secondary.jpg",
+    img: "/images/home/academic/senior-section.jpg",
     color: "#fdf2f8", accent: "#be185d",
   },
 ];
@@ -182,7 +182,7 @@ export default function SeniorSecondary() {
 
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <img
-                    src="/images/students/senior-secondary-girls.jpg"
+                    src="/images/home/academic/senior-3.jpg"
                     alt="Senior Secondary girls studying together at Rainbow International School"
                     className="rounded-3xl w-full object-cover h-48"
                     width={512}
@@ -192,7 +192,7 @@ export default function SeniorSecondary() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                   <img
-                    src="/images/students/senior-secondary-group.jpg"
+                    src="/images/home/academic/senior-4.jpg"
                     alt="Senior Secondary students in blazers at Rainbow International School"
                     className="rounded-3xl w-full object-cover h-48"
                     width={512}

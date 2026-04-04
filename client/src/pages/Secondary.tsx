@@ -75,22 +75,22 @@ const methodology = [
   {
     title: "Hands-on Activities",
     desc: "Annual exhibitions for many subjects & always active clubs help students apply what they learn",
-    img: "/images/students/chemistry-lab.png",
+    img: "/images/home/academic/secondary-2.jpg",
   },
   {
     title: "Tours & Visits",
     desc: "Exciting recreational, educational & cultural excursions get students to \"think outside the classroom\"",
-    img: "/images/gallery/sports/cricket-ground.jpg",
+    img: "/images/home/academic/secondary-section.jpg",
   },
   {
     title: "Project Work",
     desc: "Individual & group projects get students to learn from their families & peers & get better at application",
-    img: "/images/students/secondary-students.png",
+    img: "/images/gallery/sports/football-turf.jpg",
   },
   {
     title: "Digital Tools",
     desc: "E-learning amenities make abstract concepts concrete & assist in greater retention of data & processes",
-    img: "/images/students/physics-lab.png",
+    img: "/images/gallery/sports/chess.jpg",
   },
 ];
 

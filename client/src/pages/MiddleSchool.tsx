@@ -193,7 +193,7 @@ export default function MiddleSchool() {
 
                 {/* Photo */}
                 <img
-                  src="/images/students/middle-section.jpg"
+                  src="/images/home/academic/middle-2.jpg"
                   alt="Middle school students in classroom at Rainbow International School"
                   className="rounded-3xl w-full object-cover max-h-64"
                   width={1024}
