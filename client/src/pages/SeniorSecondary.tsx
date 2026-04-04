@@ -192,11 +192,11 @@ export default function SeniorSecondary() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                   <img
-                    src="/images/home/academic/senior-4.jpg"
-                    alt="Senior Secondary students in blazers at Rainbow International School"
+                    src="/images/students/senior-secondary-group.webp"
+                    alt="Senior Secondary students in blazers posing for group photo at Rainbow International School"
                     className="rounded-3xl w-full object-cover h-48"
-                    width={512}
-                    height={384}
+                    width={800}
+                    height={533}
                     loading="lazy"
                     decoding="async"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
