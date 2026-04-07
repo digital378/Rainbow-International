@@ -23,7 +23,7 @@ export function trackPageView(url: string): void {
   let retries = 0;
   const fire = () => {
     const title = document.title;
-    if ((!title || title === "Rainbow International School - Best CBSE School in Thane West") && retries < 5) {
+    if ((!title || title === "Best CBSE school in thane near me - Rainbow International") && retries < 5) {
       retries++;
       setTimeout(fire, 200);
       return;

@@ -10,6 +10,7 @@ const AboutPreview = lazy(() => import("@/components/home/AboutPreview").then(m 
 const AcademicSections = lazy(() => import("@/components/home/AcademicSections").then(m => ({ default: m.AcademicSections })));
 const Pedagogy = lazy(() => import("@/components/home/Pedagogy").then(m => ({ default: m.Pedagogy })));
 const DiscoverRainbow = lazy(() => import("@/components/home/DiscoverRainbow").then(m => ({ default: m.DiscoverRainbow })));
+const Neighbourhood = lazy(() => import("@/components/home/Neighbourhood").then(m => ({ default: m.Neighbourhood })));
 const BeyondClassroomSection = lazy(() => import("@/components/home/BeyondClassroomSection").then(m => ({ default: m.BeyondClassroomSection })));
 const Testimonials = lazy(() => import("@/components/home/Testimonials").then(m => ({ default: m.Testimonials })));
 const ContactForm = lazy(() => import("@/components/home/ContactForm").then(m => ({ default: m.ContactForm })));
@@ -22,9 +23,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Best CBSE School in Thane West"
-        description="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce & Humanities. Admissions 2026-27 open."
-        keywords="Rainbow International School Thane, CBSE school Thane, best international school Thane West, K-12 school Thane, school admissions Thane 2026, CBSE admissions Thane, top school Thane West Maharashtra"
+        title="Best CBSE school in thane near me - Rainbow International"
+        description="Rainbow International School — best CBSE school in Thane near you. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce & Humanities streams. Admissions 2026-27 open."
+        keywords="best CBSE school in Thane near me, CBSE school Thane West, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane West"
         canonical="https://rainbowinternationalschool.in/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
         jsonLd={{
@@ -90,6 +91,9 @@ export default function Home() {
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <DiscoverRainbow />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <Neighbourhood />
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <BeyondClassroomSection />

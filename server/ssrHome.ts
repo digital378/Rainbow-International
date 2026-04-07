@@ -19,18 +19,18 @@ function renderHomeSSR(): string {
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
-<title>Best CBSE School in Thane West | Rainbow International School</title>
-<meta name="description" content="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities. Admissions 2026-27 open." />
-<meta name="keywords" content="Rainbow International School Thane, CBSE school Thane, best international school Thane West, K-12 school Thane, school admissions Thane 2026, CBSE admissions Thane, top school Thane West Maharashtra" />
+<title>Best CBSE school in thane near me - Rainbow International</title>
+<meta name="description" content="Rainbow International School — best CBSE school in Thane near you. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities streams. Admissions 2026-27 open." />
+<meta name="keywords" content="best CBSE school in Thane near me, CBSE school Thane West, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane West" />
 <link rel="canonical" href="https://rainbowinternationalschool.in/" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Best CBSE School in Thane West | Rainbow International School" />
+<meta property="og:title" content="Best CBSE school in thane near me - Rainbow International" />
 <meta property="og:description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra. World-class education from Nursery to Class 12." />
 <meta property="og:url" content="https://rainbowinternationalschool.in/" />
 <meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Best CBSE School in Thane West | Rainbow International School" />
+<meta name="twitter:title" content="Best CBSE school in thane near me - Rainbow International" />
 <meta name="twitter:description" content="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open." />
 <meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
