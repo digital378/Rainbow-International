@@ -8,6 +8,29 @@ import { getBlogPost, blogPosts } from "@/data/blogPosts";
 import { Calendar, Tag, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { BlogThumb } from "@/components/home/BlogThumb";
 
+function renderInlineMarkdown(text: string) {
+  const parts: (string | JSX.Element)[] = [];
+  const regex = /\*\*(.+?)\*\*|\[(.+?)\]\((.+?)\)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1]) {
+      parts.push(<strong key={key++}>{match[1]}</strong>);
+    } else if (match[2] && match[3]) {
+      parts.push(<a key={key++} href={match[3]} className="text-blue-700 underline hover:text-blue-900">{match[2]}</a>);
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts;
+}
+
 export default function BlogPost() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
@@ -111,7 +134,7 @@ export default function BlogPost() {
                   )}
                   {section.body.split("\n\n").map((para, j) => (
                     <p key={j} className="text-gray-700 leading-relaxed mb-4 text-base">
-                      {para.replace(/\n/g, " ")}
+                      {renderInlineMarkdown(para.replace(/\n/g, " "))}
                     </p>
                   ))}
                   {section.list && section.list.length > 0 && (
@@ -130,7 +153,11 @@ export default function BlogPost() {
               {/* Conclusion */}
               <div className="mt-10 rounded-3xl p-8" style={{ background: "#f8faff", border: "1px solid #e5eaf5" }}>
                 <h2 className="text-xl font-black mb-4" style={{ color: "#0d3b86" }}>Conclusion</h2>
-                <p className="text-gray-700 leading-relaxed">{post.conclusion}</p>
+                {post.conclusion.split("\n\n").map((para, j) => (
+                  <p key={j} className="text-gray-700 leading-relaxed mb-3">
+                    {renderInlineMarkdown(para.replace(/\n/g, " "))}
+                  </p>
+                ))}
               </div>
 
               {/* Tags */}
