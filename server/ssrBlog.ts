@@ -10,6 +10,35 @@ function e(str: string | undefined | null): string {
     .replace(/"/g, "&quot;");
 }
 
+const CAT_IMAGE: Record<string, string> = {
+  "CBSE School": "/blog/cat-school.png",
+  "About Rainbow": "/blog/cat-school.png",
+  "School Selection": "/blog/cat-school.png",
+  "School": "/blog/cat-school.png",
+  "Academics": "/blog/cat-education.png",
+  "Education": "/blog/cat-education.png",
+  "Parenting": "/blog/cat-parenting.png",
+  "Student Health": "/blog/cat-health.png",
+  "Student Wellbeing": "/blog/cat-health.png",
+  "Student Wellness": "/blog/cat-health.png",
+  "Sports": "/blog/cat-sports.png",
+  "Beyond the Classroom": "/blog/cat-sports.png",
+  "Study Skills": "/blog/cat-study.png",
+  "Study Tips": "/blog/cat-study.png",
+  "Student Development": "/blog/cat-development.png",
+  "Student Life": "/blog/cat-development.png",
+  "Early Learning": "/blog/cat-early.png",
+  "Pre-Primary": "/blog/cat-early.png",
+  "Awards": "/blog/cat-awards.png",
+  "Events": "/blog/cat-events.png",
+  "Admissions": "/blog/cat-school.png",
+  "General": "/blog/cat-education.png",
+};
+
+function getCatImage(cat: string): string {
+  return CAT_IMAGE[cat] || "/blog/cat-education.png";
+}
+
 function renderInlineMd(text: string): string {
   return e(text)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -67,9 +96,10 @@ function renderBlogSSR(slug: string): string | null {
   const relatedHtml = related
     .map((rel) => {
       if (!rel) return "";
+      const catImg = getCatImage(rel.cat);
       return `<a href="/blog/${e(rel.slug)}" class="related-card">
         <div class="related-img-wrap">
-          <img src="${e(rel.thumbUrl)}" alt="${e(rel.title)}" onerror="this.style.display='none'" class="related-img" />
+          <img src="${e(rel.thumbUrl)}" alt="${e(rel.title)}" onerror="this.onerror=null;this.src='${catImg}'" class="related-img" loading="lazy" />
         </div>
         <div class="related-body">
           <span class="related-cat">${e(rel.cat)}</span>
