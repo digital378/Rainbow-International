@@ -535,12 +535,11 @@ function renderBlogSSR(slug: string): string | null {
 
 export function registerSSRRoutes(app: Express) {
   // Production SSR — replaces React blog pages, no demo badge
-  app.get("/blog/:slug", (req, res) => {
+  app.get("/blog/:slug", (req, res, next) => {
     const { slug } = req.params;
+    if (/\.\w+$/.test(slug)) return next();
     const html = renderBlogSSR(slug);
-    if (!html) {
-      return res.status(404).send("<h1>Blog post not found</h1>");
-    }
+    if (!html) return next();
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("X-Rendered-By", "Express SSR");
     res.send(html);
