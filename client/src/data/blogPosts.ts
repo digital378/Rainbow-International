@@ -19,6 +19,7 @@ export interface BlogPostData {
   conclusion: string;
   relatedSlugs: string[];
   internalLinks: { label: string; href: string }[];
+  faqs?: { q: string; a: string }[];
 }
 
 export const blogPosts: BlogPostData[] = [
@@ -6034,6 +6035,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "Apply for Admission", href: "/application-form" },
       { label: "Contact Us", href: "/contact-us" },
     ],
+    faqs: [
+      { q: "Is CBSE easier than ICSE?", a: "CBSE is not easier — it is differently structured. CBSE focuses on conceptual clarity and application, while ICSE covers more content in greater depth. Both are rigorous in their own way." },
+      { q: "Can my child switch from State Board to CBSE mid-year?", a: "Mid-year switches are possible but depend on seat availability and the student’s readiness. Most transitions happen between academic years. Rainbow International School accepts transfer students subject to availability." },
+      { q: "Which board gives higher marks?", a: "State Board students often score higher in absolute terms because the syllabus is shorter and questions are more predictable. However, colleges and employers increasingly look at the quality of education rather than just percentage scores." },
+      { q: "Is CBSE accepted internationally?", a: "Yes, CBSE is widely recognised by universities worldwide, including in the US, UK, Canada, Australia, and the Middle East." },
+      { q: "Does board choice affect college admissions?", a: "For most Indian universities, all three boards are equally accepted. For competitive exams (JEE, NEET), CBSE alignment gives a practical advantage." },
+    ],
   },
 
   {
@@ -6125,6 +6133,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "FAQs", href: "/faqs" },
       { label: "Contact Us", href: "/contact-us" },
     ],
+    faqs: [
+      { q: "When do school admissions open in Thane?", a: "Most schools open admissions between September and January for the following June academic year. Rainbow International School’s admissions for 2026-27 are currently open." },
+      { q: "What if my child’s age does not meet the criteria by a few days?", a: "CBSE schools strictly follow the age criteria as on 31st March. Schools cannot make exceptions to this rule. Plan your application for the correct academic year." },
+      { q: "Can I apply to multiple schools simultaneously?", a: "Yes, applying to 3-5 schools is common and recommended. This ensures you have options and can compare offers before making a final decision." },
+      { q: "Is an entrance test required for Nursery or KG admission?", a: "No. For Pre-Primary admissions, schools conduct informal interactions — not tests. The focus is on observing the child’s basic readiness and comfort level." },
+      { q: "What if we are relocating to Thane mid-year?", a: "Many schools accept mid-year admissions. Contact the school directly to check seat availability for your child’s grade." },
+    ],
   },
 
   {
@@ -6207,6 +6222,12 @@ export const blogPosts: BlogPostData[] = [
       { label: "Safety & Security", href: "/safety-security" },
       { label: "Contact Us", href: "/contact-us" },
     ],
+    faqs: [
+      { q: "At what age can children be expected to focus for longer periods?", a: "Sustained focus develops gradually. Most children can focus for about 2-3 minutes per year of age. A 6-year-old can typically focus for 12-18 minutes. By age 14-15, most teenagers can sustain focus for 35-45 minutes." },
+      { q: "Is it normal for my child to fidget while studying?", a: "Yes, especially for younger children. Some children actually focus better when they can move slightly — using a stress ball, sitting on a wobble cushion, or standing at a desk. Movement and focus are not opposites." },
+      { q: "Should I use rewards to motivate my child to study?", a: "Small, meaningful rewards can help build initial habits. However, avoid making rewards the primary motivation — the goal is for your child to develop intrinsic motivation over time." },
+      { q: "How much homework should my child be doing each day?", a: "Research suggests about 10 minutes per grade level per night. A Class 3 student should have about 30 minutes; a Class 8 student about 80 minutes. If homework consistently exceeds this, speak with the school." },
+    ],
   },
 
   {
@@ -6279,6 +6300,12 @@ export const blogPosts: BlogPostData[] = [
       { label: "Awards & Achievements", href: "/awards-achievements" },
       { label: "Contact Us", href: "/contact-us" },
     ],
+    faqs: [
+      { q: "Should academics or extracurriculars come first?", a: "They are not in competition. The best approach is integration — schools that balance both produce students who are academically strong and personally well-rounded. Rainbow International School’s daily schedule includes dedicated time for both." },
+      { q: "My child is not interested in sports. What should I do?", a: "Extracurriculars are not limited to sports. Music, drama, robotics, debate, art, coding — there are dozens of options. Help your child explore until they find something that excites them." },
+      { q: "How many extracurricular activities should my child participate in?", a: "Quality over quantity. One or two activities that your child is genuinely passionate about are better than five they attend half-heartedly." },
+      { q: "At what age should children start extracurricular activities?", a: "Children can start with informal, play-based activities from age 3-4. Structured extracurriculars typically begin around Class 1 (age 6). Let the child’s interest and readiness guide you." },
+    ],
   },
 
   {
@@ -6343,6 +6370,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "Pre-Primary Section", href: "/pre-primary-school-thane" },
       { label: "Extracurriculars", href: "/extracurriculars" },
       { label: "Contact Us", href: "/contact-us" },
+    ],
+    faqs: [
+      { q: "Will NEP 2020 eliminate board exams?", a: "No, but it will transform them. Board exams will test conceptual understanding rather than rote memorisation, and students may have multiple attempts to reduce pressure." },
+      { q: "Is NEP 2020 only for government schools?", a: "No. NEP 2020 applies to all schools — government, private, and aided — including CBSE-affiliated schools like Rainbow International School." },
+      { q: "Will my child have to change boards because of NEP 2020?", a: "No. NEP 2020 does not require students to change boards. It changes how education is delivered within existing board frameworks." },
+      { q: "When will NEP 2020 be fully implemented?", a: "Full implementation is expected by 2035. However, many changes — including coding education, experiential learning, and reduced content load — are already being adopted by progressive schools." },
+      { q: "Does NEP 2020 mean less homework?", a: "Not necessarily less homework, but more meaningful homework. The focus shifts from repetitive practice to project-based, exploratory, and applied learning tasks." },
     ],
   },
 
@@ -6422,6 +6456,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "Safety & Security", href: "/safety-security" },
       { label: "Schedule a Campus Visit", href: "/schedule-appointment" },
     ],
+    faqs: [
+      { q: "How long does it take for a child to adjust to school?", a: "Most children adjust within 2-4 weeks. Some may take up to 6-8 weeks. Consistency, a calm routine, and positive reinforcement are key during this period." },
+      { q: "Should I stay at school on the first day?", a: "Many schools invite parents to stay nearby for the first day or two. Follow the school’s guidance — they know what works best for the children." },
+      { q: "What if my child cries every day at drop-off?", a: "Consistent, brief goodbyes and a calm demeanour from you are key. Speak with the teacher to understand how your child behaves after you leave — most children stop crying within minutes." },
+      { q: "Should I start with half-days?", a: "Many schools offer a phased start for Nursery and KG students — beginning with shorter days and gradually extending to full days over the first week or two. Rainbow International School follows this approach for new Pre-Primary students." },
+      { q: "What if my child says they do not want to go to school?", a: "This is normal, especially in the first few weeks. Acknowledge their feelings, maintain the routine, and keep the morning positive. If resistance persists beyond a month, speak with the teacher to identify and address the root cause." },
+    ],
   },
 
   {
@@ -6486,6 +6527,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "Primary Section", href: "/primary-section" },
       { label: "Amenities & Facilities", href: "/amenities" },
       { label: "Contact Us", href: "/contact-us" },
+    ],
+    faqs: [
+      { q: "Is Multiple Intelligence theory scientifically proven?", a: "While some aspects of Gardner’s theory are debated in academic psychology, the practical application — teaching through multiple modalities — is widely supported by educational research. Multimodal instruction consistently outperforms single-method teaching." },
+      { q: "Will MI-based learning help my child score higher in exams?", a: "Yes, indirectly. When children understand concepts more deeply through multiple pathways, they can recall and apply knowledge more effectively — which translates to better exam performance." },
+      { q: "Can a child’s dominant intelligence change over time?", a: "Yes. Intelligences develop and shift throughout childhood and adolescence. A child who is primarily kinesthetic at age 6 may develop strong linguistic or logical abilities by age 12." },
+      { q: "Do all CBSE schools use MI-based learning?", a: "No. While CBSE encourages holistic and experiential learning, not all schools implement MI-based pedagogy. It requires specialised teacher training and curriculum design." },
+      { q: "Is MI-based learning the same as learning styles?", a: "They are related but different. Learning styles (visual, auditory, kinesthetic) describe preferences for receiving information. Multiple intelligences describe broader cognitive strengths that affect how a person processes, understands, and applies knowledge." },
     ],
   },
 
@@ -6575,6 +6623,13 @@ export const blogPosts: BlogPostData[] = [
       { label: "Amenities & Facilities", href: "/amenities" },
       { label: "Safety & Security", href: "/safety-security" },
       { label: "Contact Us", href: "/contact-us" },
+    ],
+    faqs: [
+      { q: "How many CBSE schools are there in Thane?", a: "Thane has over 40 CBSE-affiliated schools. The number continues to grow, making it important for parents to evaluate each school carefully rather than relying on reputation alone." },
+      { q: "Should I choose a school based on board results alone?", a: "No. Board results are one indicator, but infrastructure, teacher quality, safety, extracurriculars, and school culture are equally important. A school that produces good results but has poor facilities or an unhealthy culture is not a good choice." },
+      { q: "Is a larger campus always better?", a: "A larger campus provides more space for sports, outdoor learning, and recreation — which is beneficial for physical and mental development. However, how the space is used matters more than the size alone." },
+      { q: "How important is the school’s location?", a: "Very important. A long commute can tire your child before the school day even begins. Aim for a commute under 30 minutes. If the ideal school is further away, check if they offer a reliable bus service to your area." },
+      { q: "Can I visit a school before applying?", a: "Yes, and you should. Most schools welcome campus visits by appointment. Rainbow International School offers guided campus tours for prospective families." },
     ],
   },
 ];
