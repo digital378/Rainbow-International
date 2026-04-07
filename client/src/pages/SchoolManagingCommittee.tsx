@@ -166,7 +166,7 @@ export default function SchoolManagingCommittee() {
       <SEO
         title="School Managing Committee"
         description="Meet the School Managing Committee of Rainbow International School, Thane — 16 members including the Chairperson, Principal, parent & teacher representatives."
-        keywords="Rainbow school managing committee, Rainbow International School leadership, school management Thane West, CBSE school committee"
+        keywords="Rainbow school managing committee, Rainbow International School leadership, school management Thane, CBSE school committee"
         canonical="https://rainbowinternationalschool.in/school-managing-committee/"
       />
       <Navbar />
@@ -270,7 +270,7 @@ export default function SchoolManagingCommittee() {
             <div className="mt-10 rounded-3xl p-8 border border-gray-100 shadow-sm" style={{ background: "#f8faff" }}>
               <h3 className="text-xl font-black mb-3" style={{ color: "#0d3b86" }}>Our Governance Philosophy</h3>
               <p className="text-gray-600 leading-relaxed text-sm">
-                The School Managing Committee of Rainbow International School is committed to maintaining the highest standards of academic excellence, ethical governance and student well-being. Constituted in accordance with CBSE guidelines, the committee meets regularly to review policies, budgets, academic outcomes and infrastructure development — ensuring Rainbow continues to be one of the finest CBSE schools in Thane West.
+                The School Managing Committee of Rainbow International School is committed to maintaining the highest standards of academic excellence, ethical governance and student well-being. Constituted in accordance with CBSE guidelines, the committee meets regularly to review policies, budgets, academic outcomes and infrastructure development — ensuring Rainbow continues to be one of the finest CBSE schools in Thane.
               </p>
             </div>
           </div>

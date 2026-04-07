@@ -40,7 +40,7 @@ const contactItems = [
   {
     icon: MapPin,
     label: "Locations",
-    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra"],
+    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane, Maharashtra"],
     href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
   },
 ];
@@ -88,8 +88,8 @@ export default function ContactUs() {
       <ScrollProgress />
       <SEO
         title="Contact Us"
-        description="Connect with Rainbow International School, Thane West. Call +91 82915 68972, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 12."
-        keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane West"
+        description="Connect with Rainbow International School, Thane. Call +91 82915 68972, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 12."
+        keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane"
         canonical="https://rainbowinternationalschool.in/contact-us/"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },

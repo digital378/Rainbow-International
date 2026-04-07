@@ -441,7 +441,7 @@ function renderBlogSSR(slug: string): string | null {
       </div>
       <a href="https://maps.app.goo.gl/mfJjMMkksCkcXzMCA" target="_blank" rel="noopener noreferrer" class="contact-card">
         <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-        <div><p class="contact-label">Our Address</p><p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane West, Maharashtra</p></div>
+        <div><p class="contact-label">Our Address</p><p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane, Maharashtra</p></div>
       </a>
     </div>
   </div>
@@ -452,7 +452,7 @@ function renderBlogSSR(slug: string): string | null {
   <div class="footer-inner">
     <div>
       <p class="footer-brand">Rainbow International School</p>
-      <p class="footer-desc">CBSE-affiliated school in Thane West, Maharashtra. Nursery to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
+      <p class="footer-desc">CBSE-affiliated school in Thane, Maharashtra. Nursery to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
       <div class="footer-socials">
         <a href="https://www.facebook.com/RainbowInternationalSchoolThane" class="footer-social-btn" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg>
@@ -493,7 +493,7 @@ function renderBlogSSR(slug: string): string | null {
       <p class="footer-col-title">Contact Us</p>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <span>Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra</span>
+        <span>Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra</span>
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>

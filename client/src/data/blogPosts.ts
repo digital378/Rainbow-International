@@ -93,7 +93,7 @@ export const blogPosts: BlogPostData[] = [
     title: "Why Rainbow International School Is Among the Top Schools in Thane",
     metaTitle: "Why Rainbow International School Is a Top School in Thane",
     metaDescription: "Find out what makes Rainbow International School one of the top CBSE schools in Thane — from its 3.5-acre campus and world-class facilities to caring teachers and a holistic curriculum.",
-    keywords: "top schools in Thane, best CBSE school Thane West, Rainbow International School Thane, top school Brahmand",
+    keywords: "top schools in Thane, best CBSE school Thane, Rainbow International School Thane, top school Brahmand",
     date: "24 Nov 2025",
     cat: "CBSE School",
     thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/11/why-rainbow-international-school-is-among-the-top-schools-in-thane.jpg",
@@ -110,7 +110,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "A 3.5-Acre Campus That Makes Space for Everything",
-        body: "Even at first glance, the campus draws your attention. Spread across 3.5 acres in Brahmand Phase 4, Thane West, the school offers:",
+        body: "Even at first glance, the campus draws your attention. Spread across 3.5 acres in Brahmand Phase 4, Thane, the school offers:",
         list: [
           "Smart, air-conditioned classrooms with interactive technology",
           "Fully-equipped Science, Maths, and Computer labs",
@@ -168,23 +168,23 @@ export const blogPosts: BlogPostData[] = [
 
   {
     slug: "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents",
-    title: "The Growing Popularity of CBSE Schools in Thane West Among Parents",
+    title: "The Growing Popularity of CBSE Schools in Thane Among Parents",
     metaTitle: "Why CBSE Schools in Thane Thrive",
-    metaDescription: "Explore why more and more parents in Thane West are choosing CBSE schools for their children. Understand the key factors — curriculum clarity, campus safety, teacher quality, and community trust.",
-    keywords: "CBSE schools Thane West, CBSE school popularity Thane, best school Thane West parents, Rainbow International School Thane West",
+    metaDescription: "Explore why more and more parents in Thane are choosing CBSE schools for their children. Understand the key factors — curriculum clarity, campus safety, teacher quality, and community trust.",
+    keywords: "CBSE schools Thane, CBSE school popularity Thane, best school Thane parents, Rainbow International School Thane",
     date: "19 Nov 2025",
     cat: "CBSE School",
     thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/11/the-growing-popularity-of-cbse-schools-in-thane-west-among-parents.jpg",
     heroUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/11/the-growing-popularity-of-cbse-schools-in-thane-west-among-parents.jpg",
-    intro: "You might have noticed how rapidly Thane West has changed. New buildings, new families, more cafes, more traffic — and definitely more conversations about schools. You can stand in a lift for two minutes and someone will mention admissions, fees, or 'Which board should I choose?' Somewhere in the middle of all these discussions, CBSE schools in Thane West keep coming up again and again. This article explores exactly why that is.",
+    intro: "You might have noticed how rapidly Thane has changed. New buildings, new families, more cafes, more traffic — and definitely more conversations about schools. You can stand in a lift for two minutes and someone will mention admissions, fees, or 'Which board should I choose?' Somewhere in the middle of all these discussions, CBSE schools in Thane keep coming up again and again. This article explores exactly why that is.",
     sections: [
       {
         heading: "Parents Have Become Very Thoughtful About Schooling",
         body: "Gone are the days when choosing a school was a quick decision based on proximity or reputation alone. Today's parents spend hours — sometimes weeks — comparing everything from teaching methodology and safety standards to how teachers interact with students on an ordinary Tuesday afternoon.\n\nCBSE fits comfortably into this thoughtful mindset. The board has remained consistent for decades. The syllabus does not surprise you with sudden changes. It does not rely too much on memorisation. When you are helping your child with homework after a long workday, the clear, practical approach of CBSE makes the process far less frustrating for both parent and child.",
       },
       {
-        heading: "Thane West: A City That Needed Schools That Could Keep Up",
-        body: "Thane West has become a melting pot of sorts. With expanding work prospects and the convenience of being close to Mumbai, people from different states, professions, and lifestyles all end up here. This combination naturally creates demand for schools that are not too rigid, not too elite, and not too unfamiliar.\n\nCBSE schools in Thane West offer exactly that balance. They are familiar with the structure of the Indian education system without being unnecessarily conservative. The curriculum is nationally standardised, which is a genuine comfort for families who have moved from other cities or who anticipate moving in the future. A child who studied in a CBSE school in Pune can join a CBSE school in Thane — or anywhere else in India — without starting from scratch.",
+        heading: "Thane: A City That Needed Schools That Could Keep Up",
+        body: "Thane has become a melting pot of sorts. With expanding work prospects and the convenience of being close to Mumbai, people from different states, professions, and lifestyles all end up here. This combination naturally creates demand for schools that are not too rigid, not too elite, and not too unfamiliar.\n\nCBSE schools in Thane offer exactly that balance. They are familiar with the structure of the Indian education system without being unnecessarily conservative. The curriculum is nationally standardised, which is a genuine comfort for families who have moved from other cities or who anticipate moving in the future. A child who studied in a CBSE school in Pune can join a CBSE school in Thane — or anywhere else in India — without starting from scratch.",
       },
       {
         heading: "Curriculum That Does Not Overcomplicate Things",
@@ -192,15 +192,15 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "Schools Are Paying Attention to Atmosphere",
-        body: "Walk into any good CBSE school in Thane West and you will see that the best ones have worked hard on creating a positive environment. Bright classrooms, interactive learning spaces, safe play areas, and thoughtfully designed common areas — all of these matter to parents who are evaluating a school.\n\nChildren spend six to eight hours a day in school. The physical and emotional atmosphere of that space affects everything from academic performance to social development. Parents who visit Rainbow International School, for instance, often remark on how calm and happy the students seem — even on busy exam days.",
+        body: "Walk into any good CBSE school in Thane and you will see that the best ones have worked hard on creating a positive environment. Bright classrooms, interactive learning spaces, safe play areas, and thoughtfully designed common areas — all of these matter to parents who are evaluating a school.\n\nChildren spend six to eight hours a day in school. The physical and emotional atmosphere of that space affects everything from academic performance to social development. Parents who visit Rainbow International School, for instance, often remark on how calm and happy the students seem — even on busy exam days.",
       },
       {
         heading: "Teachers Who Can Connect",
-        body: "Parent conversations about schools almost always circle back to teachers. 'The right teacher can change everything' — and they are absolutely right. Many CBSE schools in Thane West invest in teacher training, skills workshops, and updated teaching techniques. Making learning meaningful goes far beyond finishing the syllabus on time.\n\nAt Rainbow International School, teachers are selected and trained not just for their subject expertise but for their ability to connect with children of different temperaments and learning styles. The Multiple Intelligence approach ensures that no child is left behind simply because they do not learn in the conventional way.",
+        body: "Parent conversations about schools almost always circle back to teachers. 'The right teacher can change everything' — and they are absolutely right. Many CBSE schools in Thane invest in teacher training, skills workshops, and updated teaching techniques. Making learning meaningful goes far beyond finishing the syllabus on time.\n\nAt Rainbow International School, teachers are selected and trained not just for their subject expertise but for their ability to connect with children of different temperaments and learning styles. The Multiple Intelligence approach ensures that no child is left behind simply because they do not learn in the conventional way.",
       },
       {
         heading: "Safety and Communication Are Big Priorities",
-        body: "Modern parents are acutely aware of safety. From transport and campus security to hygiene and emergency protocols, parents ask detailed questions about all of it — and rightly so. CBSE schools in Thane West that take safety seriously stand out clearly from those that do not.\n\nRainbow International School maintains CCTV surveillance across the campus, a trained nurse in the infirmary, metal detectors at entry points, a school ambulance, and fire compliance measures. Parents receive regular communication about their child's progress and any campus developments. This transparency builds trust over time — and trust, once established, is what drives word-of-mouth recommendations.",
+        body: "Modern parents are acutely aware of safety. From transport and campus security to hygiene and emergency protocols, parents ask detailed questions about all of it — and rightly so. CBSE schools in Thane that take safety seriously stand out clearly from those that do not.\n\nRainbow International School maintains CCTV surveillance across the campus, a trained nurse in the infirmary, metal detectors at entry points, a school ambulance, and fire compliance measures. Parents receive regular communication about their child's progress and any campus developments. This transparency builds trust over time — and trust, once established, is what drives word-of-mouth recommendations.",
         list: [
           "24/7 CCTV surveillance across the entire 3.5-acre campus",
           "Metal detectors at campus entry points",
@@ -212,10 +212,10 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "Word of Mouth Still Rules",
-        body: "For all the online research parents do, nothing beats a recommendation from someone they trust. And in Thane West's tight-knit housing societies, recommendations travel fast. When a child comes home genuinely excited about school — not just about a result, but about a project, a teacher's comment, or a sports day — parents talk about it.\n\nRainbow International School has over 3,000 current students and has impacted over 1 lakh students since its founding in 2009. That kind of community does not build itself on advertising. It builds itself on genuine experiences, day after day.",
+        body: "For all the online research parents do, nothing beats a recommendation from someone they trust. And in Thane's tight-knit housing societies, recommendations travel fast. When a child comes home genuinely excited about school — not just about a result, but about a project, a teacher's comment, or a sports day — parents talk about it.\n\nRainbow International School has over 3,000 current students and has impacted over 1 lakh students since its founding in 2009. That kind of community does not build itself on advertising. It builds itself on genuine experiences, day after day.",
       },
     ],
-    conclusion: "The growing popularity of CBSE schools in Thane West is not a coincidence. It is the result of schools genuinely improving — better facilities, better teachers, better communication, and a genuine commitment to each child's well-being. Rainbow International School, situated in Brahmand Phase 4, Thane West, has been at the forefront of this growth. If you are a parent currently searching for the right school, we invite you to come visit and see what all the conversation is about.",
+    conclusion: "The growing popularity of CBSE schools in Thane is not a coincidence. It is the result of schools genuinely improving — better facilities, better teachers, better communication, and a genuine commitment to each child's well-being. Rainbow International School, situated in Brahmand Phase 4, Thane, has been at the forefront of this growth. If you are a parent currently searching for the right school, we invite you to come visit and see what all the conversation is about.",
     relatedSlugs: [
       "why-choose-a-cbse-school-for-your-childs-education",
       "key-facilities-every-good-cbse-school-should-have",
@@ -237,7 +237,7 @@ export const blogPosts: BlogPostData[] = [
     title: "Key Facilities Every Good CBSE School Should Have",
     metaTitle: "Key Facilities in a CBSE School",
     metaDescription: "What should you look for in a CBSE school beyond academics? This guide covers 10 essential facilities — from smart classrooms and science labs to safety systems and holistic growth programmes.",
-    keywords: "CBSE school facilities checklist, what to look for in a school, best CBSE school Thane West facilities, school amenities India",
+    keywords: "CBSE school facilities checklist, what to look for in a school, best CBSE school Thane facilities, school amenities India",
     date: "31 Oct 2025",
     cat: "CBSE School",
     thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/10/key-facilities-every-good-cbse-schools-should-have-300x183.jpg",
@@ -288,7 +288,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "7. Reliable and Safe School Transport",
-        body: "For many families in Thane West, school transport is not optional — it is essential. A good CBSE school should maintain a well-managed fleet of school buses with GPS tracking, trained drivers, and female attendants. Buses should follow fixed, safe routes and pick-up and drop times should be communicated clearly to parents. Any changes should be notified in advance.",
+        body: "For many families in Thane, school transport is not optional — it is essential. A good CBSE school should maintain a well-managed fleet of school buses with GPS tracking, trained drivers, and female attendants. Buses should follow fixed, safe routes and pick-up and drop times should be communicated clearly to parents. Any changes should be notified in advance.",
       },
       {
         heading: "8. Counselling and Guidance Services",
@@ -365,10 +365,10 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "Why Rainbow International School Is the Right CBSE Choice in Thane",
-        body: "Located in Brahmand Phase 4, Thane West — just opposite TMC Water Tank — Rainbow International School has been delivering exceptional CBSE education since April 2009. With over 3,000 students currently enrolled and more than 1 lakh students impacted since its founding, Rainbow is a trusted name in Thane's educational community.\n\nThe school is affiliated to Rainbow Preschool International, giving families a seamless early childhood to Class 12 journey within a unified educational philosophy. CBSE Affiliation Number: 1130661.",
+        body: "Located in Brahmand Phase 4, Thane — just opposite TMC Water Tank — Rainbow International School has been delivering exceptional CBSE education since April 2009. With over 3,000 students currently enrolled and more than 1 lakh students impacted since its founding, Rainbow is a trusted name in Thane's educational community.\n\nThe school is affiliated to Rainbow Preschool International, giving families a seamless early childhood to Class 12 journey within a unified educational philosophy. CBSE Affiliation Number: 1130661.",
       },
     ],
-    conclusion: "Choosing a CBSE school for your child is choosing a system that balances rigour with flexibility, tradition with modernity, and academic excellence with holistic development. It is a choice millions of Indian families make every year — not out of convention, but out of confidence. If you are looking for the best CBSE school in Thane West, Rainbow International School is ready to welcome your child. Get in touch with us today.",
+    conclusion: "Choosing a CBSE school for your child is choosing a system that balances rigour with flexibility, tradition with modernity, and academic excellence with holistic development. It is a choice millions of Indian families make every year — not out of convention, but out of confidence. If you are looking for the best CBSE school in Thane, Rainbow International School is ready to welcome your child. Get in touch with us today.",
     relatedSlugs: [
       "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents",
       "key-facilities-every-good-cbse-school-should-have",
@@ -1058,7 +1058,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Perhaps the most important thing early learning does is shape a child's attitude toward learning itself. Children who experience their first years of formal education as warm, engaging, encouraging, and successful develop a fundamentally positive orientation toward school and learning. They arrive at primary school expecting to enjoy it — and that expectation becomes a self-fulfilling prophecy.\n\nChildren who experience their early schooling as pressured, cold, or focused exclusively on rote academic content often arrive at primary school already carrying negative associations with learning that can take years to undo.\n\nRainbow International School's Pre-Primary programme — and the Rainbow Preschool International network that feeds into it — is built around the conviction that every child deserves an early education that makes them love learning. That conviction drives every decision, from how classrooms are set up to how teachers are trained to how parents are engaged.",
       },
     ],
-    conclusion: "Early learning shapes personality in ways that last a lifetime. The curiosity, resilience, creativity, emotional intelligence, and social confidence that children develop in their earliest school years become the character traits they carry through every stage of life. Rainbow International School's early childhood programme is designed to develop the whole child — not just the academic child. If you are considering Pre-Primary admission for your child, we warmly invite you to visit our campus in Brahmand Phase 4, Thane West.",
+    conclusion: "Early learning shapes personality in ways that last a lifetime. The curiosity, resilience, creativity, emotional intelligence, and social confidence that children develop in their earliest school years become the character traits they carry through every stage of life. Rainbow International School's early childhood programme is designed to develop the whole child — not just the academic child. If you are considering Pre-Primary admission for your child, we warmly invite you to visit our campus in Brahmand Phase 4, Thane.",
     relatedSlugs: [
       "advantages-of-starting-early-international-school",
       "importance-of-foundational-literacy-and-numeracy-in-schools",
@@ -1107,7 +1107,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "4. Location, Transport, and Practical Logistics",
-        body: "The most wonderful school is the wrong school if your child spends two hours each way commuting. Consider not just the distance from your home, but the quality and safety of the school's transport service, the route it takes, and how long the journey would realistically take during peak Thane or Mumbai traffic.\n\nRainbow International School is conveniently located in Cosmos Arcade, Brahmand Phase 4, Thane West — well-connected within Thane and accessible from surrounding areas including Ghodbunder Road. The school operates a fleet of GPS-tracked school buses with fixed routes, trained drivers, and female attendants.",
+        body: "The most wonderful school is the wrong school if your child spends two hours each way commuting. Consider not just the distance from your home, but the quality and safety of the school's transport service, the route it takes, and how long the journey would realistically take during peak Thane or Mumbai traffic.\n\nRainbow International School is conveniently located in Cosmos Arcade, Brahmand Phase 4, Thane — well-connected within Thane and accessible from surrounding areas including Ghodbunder Road. The school operates a fleet of GPS-tracked school buses with fixed routes, trained drivers, and female attendants.",
       },
       {
         heading: "5. Co-Curricular Activities and Beyond-Classroom Opportunities",
@@ -1290,7 +1290,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Research consistently shows that a student's attitude toward mathematics is one of the strongest predictors of their mathematical achievement. Students who believe they can improve at maths — who have a growth mindset about the subject — put in more effort, persist longer through difficulty, and ultimately achieve more.\n\nAt Rainbow International School, teachers are trained to celebrate mathematical effort as well as mathematical results. Mistakes are treated as learning opportunities rather than failures. Students are encouraged to explain their thinking, not just their answers — because the process of mathematical reasoning is as important as the correct result.",
       },
     ],
-    conclusion: "Mathematics is not a talent some students are born with and others lack. It is a set of skills and habits of mind that every student can develop, with the right teaching, the right support, and the right attitude. Rainbow International School is committed to giving every student a mathematically rich education — one that builds not just competence, but genuine confidence and curiosity. If you are looking for a school where your child will grow to love learning, we invite you to visit our campus in Thane West.",
+    conclusion: "Mathematics is not a talent some students are born with and others lack. It is a set of skills and habits of mind that every student can develop, with the right teaching, the right support, and the right attitude. Rainbow International School is committed to giving every student a mathematically rich education — one that builds not just competence, but genuine confidence and curiosity. If you are looking for a school where your child will grow to love learning, we invite you to visit our campus in Thane.",
     relatedSlugs: [
       "problem-solving-activities-life-skills-students",
       "importance-of-foundational-literacy-and-numeracy-in-schools",
@@ -1348,7 +1348,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Rainbow International School's 3.5-acre campus provides extensive facilities for a wide range of sporting activities. Students can participate in cricket, football, basketball, kabaddi, athletics, yoga, and more — with qualified coaches providing structured training across age groups.\n\nThe school participates in inter-school sporting competitions across Thane and the Mumbai region, giving students the experience of representing their school with pride. Annual sports days and inter-house competitions create a culture of healthy competition and sporting celebration that involves the entire school community.",
       },
     ],
-    conclusion: "Sport is not a luxury that schools can dispense with when examination pressure builds. It is a fundamental component of a complete education — one that builds the teamwork, resilience, leadership, emotional intelligence, and physical vitality that students need to thrive. Rainbow International School's commitment to sport reflects a deep belief: that the fields, courts, and tracks of a school are as important as its classrooms. If you are looking for a school that takes the whole child seriously, we invite you to visit our campus in Brahmand Phase 4, Thane West.",
+    conclusion: "Sport is not a luxury that schools can dispense with when examination pressure builds. It is a fundamental component of a complete education — one that builds the teamwork, resilience, leadership, emotional intelligence, and physical vitality that students need to thrive. Rainbow International School's commitment to sport reflects a deep belief: that the fields, courts, and tracks of a school are as important as its classrooms. If you are looking for a school that takes the whole child seriously, we invite you to visit our campus in Brahmand Phase 4, Thane.",
     relatedSlugs: [
       "co-curricular-activities",
       "beyond-the-classroom-activities",
@@ -1414,7 +1414,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Rainbow International School is committed to the ongoing professional development of every member of its teaching faculty. Regular workshops, peer observation, mentoring, and external training programmes ensure that our teachers are continuously growing — both in their subject expertise and in their pedagogical skills. We believe that teachers who are themselves committed learners are the ones best placed to inspire a love of learning in their students.",
       },
     ],
-    conclusion: "Great teachers are not born — they are developed, supported, and given the conditions in which they can flourish. Rainbow International School invests seriously in its faculty because we know that the quality of our teachers is the most important thing we can offer our students. If you are looking for a school where exceptional teachers will know your child as an individual, challenge them appropriately, and inspire them to reach their potential — we warmly invite you to visit our campus in Thane West.",
+    conclusion: "Great teachers are not born — they are developed, supported, and given the conditions in which they can flourish. Rainbow International School invests seriously in its faculty because we know that the quality of our teachers is the most important thing we can offer our students. If you are looking for a school where exceptional teachers will know your child as an individual, challenge them appropriately, and inspire them to reach their potential — we warmly invite you to visit our campus in Thane.",
     relatedSlugs: [
       "role-of-parents-in-education-orientation-importance",
       "importance-of-foundational-literacy-and-numeracy-in-schools",
@@ -1565,7 +1565,7 @@ export const blogPosts: BlogPostData[] = [
         body: "The healthiest relationship a child can have with a mobile phone is one in which the phone is a tool — one among many — rather than the dominant feature of their social and emotional life. Children who have rich offline lives: who play sport, read books, create things with their hands, have deep conversations with family, and develop their inner lives through imagination and reflection, will naturally use technology more wisely and more selectively.\n\nBuilding that richness is the shared work of parents, schools, and the children themselves. Rainbow International School is proud to be a partner in that work.",
       },
     ],
-    conclusion: "Mobile phones are neither inherently good nor inherently bad for children — their impact depends entirely on how they are used and managed. With clear boundaries, open conversations, and a rich offline life, children can enjoy the genuine benefits of mobile technology without suffering its harms. If you would like to discuss how Rainbow International School supports students' digital wellbeing, please contact us or visit our campus in Brahmand Phase 4, Thane West.",
+    conclusion: "Mobile phones are neither inherently good nor inherently bad for children — their impact depends entirely on how they are used and managed. With clear boundaries, open conversations, and a rich offline life, children can enjoy the genuine benefits of mobile technology without suffering its harms. If you would like to discuss how Rainbow International School supports students' digital wellbeing, please contact us or visit our campus in Brahmand Phase 4, Thane.",
     relatedSlugs: [
       "regulating-childrens-screen-time",
       "using-gadgets-the-right-way",
@@ -1642,7 +1642,7 @@ export const blogPosts: BlogPostData[] = [
         body: "The best schools do not just communicate well during the admission process — they maintain clear, regular, and honest communication with parents throughout their child's school journey. Ask how the school communicates with parents: What platforms do they use? How frequently are formal reports issued? How easy is it to arrange a meeting with a class teacher or the principal? What is the school's policy if a parent has a serious concern?\n\nA school that is responsive, transparent, and genuinely welcoming of parental engagement is one that sees its relationship with families as a partnership — and that partnership is one of the strongest predictors of a child's educational success.",
       },
     ],
-    conclusion: "Choosing the best CBSE school in Mumbai requires careful research, personal visits, and honest reflection about your child's individual needs and your family's priorities. No ranking or reputation can substitute for the experience of walking through a school, speaking with the staff, and trusting your instincts about whether this is a community your child will thrive in. Rainbow International School, Thane, welcomes families to visit our campus in Brahmand Phase 4, Thane West, and judge for themselves. Admissions for the 2026–27 academic year are now open.",
+    conclusion: "Choosing the best CBSE school in Mumbai requires careful research, personal visits, and honest reflection about your child's individual needs and your family's priorities. No ranking or reputation can substitute for the experience of walking through a school, speaking with the staff, and trusting your instincts about whether this is a community your child will thrive in. Rainbow International School, Thane, welcomes families to visit our campus in Brahmand Phase 4, Thane, and judge for themselves. Admissions for the 2026–27 academic year are now open.",
     relatedSlugs: [
       "key-facilities-every-good-cbse-school-should-have",
       "why-choose-a-cbse-school-for-your-childs-education",
@@ -1677,7 +1677,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "2. State-of-the-Art Infrastructure Across 3.5 Acres",
-        body: "Rainbow International School's campus in Cosmos Arcade, Brahmand Phase 4, Thane West, spreads across 3.5 acres of thoughtfully designed learning space. The school's infrastructure is designed to support both focused academic learning and rich beyond-classroom development:",
+        body: "Rainbow International School's campus in Cosmos Arcade, Brahmand Phase 4, Thane, spreads across 3.5 acres of thoughtfully designed learning space. The school's infrastructure is designed to support both focused academic learning and rich beyond-classroom development:",
         list: [
           "Spacious, well-ventilated classrooms equipped with interactive smartboards",
           "Fully equipped science laboratories for Physics, Chemistry, and Biology",
@@ -1710,7 +1710,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Rainbow International School's association with Rainbow Preschool International (RPS) — one of India's most respected preschool networks — gives families a seamless educational journey from the earliest years through to Class XII. Children who begin their educational journey at an RPS preschool centre find a natural, familiar continuation of values, philosophy, and expectations when they transition to Rainbow International School.\n\nThis continuity is one of Rainbow's most distinctive advantages. Rather than experiencing the jarring transition that many children face when moving between an unrelated preschool and a primary school, Rainbow students move through their education in a coherent, connected community where they are known and valued.",
       },
     ],
-    conclusion: "Rainbow International School, Thane, offers something that no amount of marketing can manufacture: a genuine community of learning, care, and growth that has stood the test of fifteen years and thousands of students. If you are looking for a school where your child will be challenged, supported, celebrated, and prepared for the very best that life has to offer — we warmly invite you to visit our campus in Brahmand Phase 4, Thane West. Admissions for the 2026–27 academic year are open now.",
+    conclusion: "Rainbow International School, Thane, offers something that no amount of marketing can manufacture: a genuine community of learning, care, and growth that has stood the test of fifteen years and thousands of students. If you are looking for a school where your child will be challenged, supported, celebrated, and prepared for the very best that life has to offer — we warmly invite you to visit our campus in Brahmand Phase 4, Thane. Admissions for the 2026–27 academic year are open now.",
     relatedSlugs: [
       "why-rainbow-international-school-is-among-the-top-schools-in-thane",
       "top-reasons-choose-rainbow-international-school-thane",
@@ -1957,7 +1957,7 @@ export const blogPosts: BlogPostData[] = [
         body: "At Rainbow International School, student wellbeing is understood as a prerequisite for academic excellence — not a distraction from it. The school incorporates mindfulness and meditation into the school day through morning assembly practices, dedicated pastoral care sessions, and yoga as part of the physical education programme.\n\nTeachers are supported to bring mindful awareness into their classroom practice — creating learning environments in which students feel safe, calm, and genuinely present for their learning. The school's counselling team offers individual and group support for students experiencing stress, anxiety, or other challenges, drawing on evidence-based mindfulness techniques as part of their toolkit.",
       },
     ],
-    conclusion: "Meditation is not a distraction from education — it is one of the most powerful educational investments a student can make. The focus, emotional resilience, cognitive performance, and self-awareness that a regular meditation practice develops are precisely the qualities that enable students to get the most from their schooling. Rainbow International School is committed to supporting the whole student — mind, body, and spirit — and meditation is one important way we do that. If you would like to know more about our approach to student wellbeing, we welcome you to visit our campus in Thane West.",
+    conclusion: "Meditation is not a distraction from education — it is one of the most powerful educational investments a student can make. The focus, emotional resilience, cognitive performance, and self-awareness that a regular meditation practice develops are precisely the qualities that enable students to get the most from their schooling. Rainbow International School is committed to supporting the whole student — mind, body, and spirit — and meditation is one important way we do that. If you would like to know more about our approach to student wellbeing, we welcome you to visit our campus in Thane.",
     relatedSlugs: [
       "stress-in-teenagers-symptoms-management",
       "how-to-deal-with-anxiety-during-exams",
@@ -2105,7 +2105,7 @@ export const blogPosts: BlogPostData[] = [
         body: "The honest answer is: neither board is objectively better — but one board may be significantly better for your specific child.\n\nChoose CBSE if: your child is interested in science, technology, engineering, or medicine; your family may relocate across India; you want a nationally standardised curriculum with clear alignment to competitive examinations; or you prefer a curriculum that prioritises depth in core subjects over breadth across many subjects.\n\nChoose ICSE if: your child has strong English language ability and enjoys writing; you are considering UK or international higher education; your child has broad intellectual interests across humanities and sciences; or you value a curriculum that develops analytical, literary, and communication skills alongside core academic content.\n\nAt Rainbow International School, Thane, we follow the CBSE curriculum — and we do so with a deep commitment to going beyond the minimum standard to develop well-rounded, critically thinking, globally prepared students.",
       },
     ],
-    conclusion: "The CBSE vs ICSE question does not have a universally right answer — it has a right answer for your child. Understanding the genuine differences between the two boards, and how those differences align with your child's strengths, interests, and future goals, is the key to making a confident, informed choice. Rainbow International School's admissions team is happy to discuss your child's specific situation and help you understand how our CBSE programme will serve their individual needs. We welcome you to visit our campus in Brahmand Phase 4, Thane West.",
+    conclusion: "The CBSE vs ICSE question does not have a universally right answer — it has a right answer for your child. Understanding the genuine differences between the two boards, and how those differences align with your child's strengths, interests, and future goals, is the key to making a confident, informed choice. Rainbow International School's admissions team is happy to discuss your child's specific situation and help you understand how our CBSE programme will serve their individual needs. We welcome you to visit our campus in Brahmand Phase 4, Thane.",
     relatedSlugs: [
       "why-choose-a-cbse-school-for-your-childs-education",
       "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents",
@@ -2229,7 +2229,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Holistic development begins at the very beginning. Rainbow International School's Pre-Primary programme — for students from Nursery through Senior KG — is designed to lay the foundations not just of literacy and numeracy, but of emotional health, social confidence, creative curiosity, and physical vitality.\n\nThe school's association with Rainbow Preschool International (RPS) means that many students arrive at Class I already thoroughly familiar with the Rainbow philosophy of education — its warmth, its celebration of individual strengths, its creative richness, and its genuine care for each child as a whole person. This continuity of philosophy from the earliest years through to Class XII is one of Rainbow International School's most distinctive and most valuable features.",
       },
     ],
-    conclusion: "Holistic development at Rainbow International School is not an aspiration — it is an achievement, demonstrated every day in the quality of the young people who graduate from the school: academically prepared, emotionally mature, physically active, creatively confident, and morally grounded. If you are looking for a school that will develop your child as a whole person — not just a student — we warmly invite you to visit our campus in Brahmand Phase 4, Thane West. Admissions for the 2026–27 academic year are open now.",
+    conclusion: "Holistic development at Rainbow International School is not an aspiration — it is an achievement, demonstrated every day in the quality of the young people who graduate from the school: academically prepared, emotionally mature, physically active, creatively confident, and morally grounded. If you are looking for a school that will develop your child as a whole person — not just a student — we warmly invite you to visit our campus in Brahmand Phase 4, Thane. Admissions for the 2026–27 academic year are open now.",
     relatedSlugs: [
       "benefits-of-rainbow-international-school",
       "why-rainbow-international-school-is-among-the-top-schools-in-thane",
@@ -2265,7 +2265,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "2. State-of-the-Art Facilities Across 3.5 Acres",
-        body: "Rainbow International School's campus in Cosmos Arcade, Brahmand Phase 4, Thane West, offers the kind of learning environment that brings out the best in students — spacious, well-maintained, and richly resourced:\n",
+        body: "Rainbow International School's campus in Cosmos Arcade, Brahmand Phase 4, Thane, offers the kind of learning environment that brings out the best in students — spacious, well-maintained, and richly resourced:\n",
         list: [
           "Fully equipped Physics, Chemistry, and Biology laboratories",
           "Modern computer laboratories with high-speed internet connectivity",
@@ -2299,7 +2299,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Rainbow International School was founded in April 2009 with a clear mission: to provide exceptional, holistic education to every child who walks through its doors. Fifteen years later, the school's track record speaks for itself — in Board examination results, in co-curricular achievements, in the calibre of its alumni, and in the loyalty of its families, many of whom have enrolled multiple children at Rainbow across different generations.",
       },
     ],
-    conclusion: "Choosing Rainbow International School means choosing an institution with proven excellence, genuine care for every student, and an unwavering commitment to developing well-rounded, confident, and capable young people. Admissions for the 2026–27 academic year are open. We warmly invite you to visit our campus in Brahmand Phase 4, Thane West, and experience the Rainbow difference for yourself.",
+    conclusion: "Choosing Rainbow International School means choosing an institution with proven excellence, genuine care for every student, and an unwavering commitment to developing well-rounded, confident, and capable young people. Admissions for the 2026–27 academic year are open. We warmly invite you to visit our campus in Brahmand Phase 4, Thane, and experience the Rainbow difference for yourself.",
     relatedSlugs: [
       "benefits-of-rainbow-international-school",
       "holistic-development-rainbow-international-school",
@@ -4020,7 +4020,7 @@ export const blogPosts: BlogPostData[] = [
           "Holistic development — the school's sustained commitment to co-curricular activity, sports, arts, and character development alongside academic rigour",
           "World-class infrastructure — a 3.5-acre campus with comprehensive facilities including smart classrooms, science laboratories, sports facilities, arts studios, and a school infirmary",
           "Student-centred culture — a school community built around genuine care for every child's individual development, wellbeing, and growth",
-          "Community engagement — the school's partnership with parents, its active contribution to Thane's educational landscape, and its role as a trusted institution in the Brahmand and Thane West communities",
+          "Community engagement — the school's partnership with parents, its active contribution to Thane's educational landscape, and its role as a trusted institution in the Brahmand and Thane communities",
         ],
       },
       {
@@ -4029,14 +4029,14 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "A Word from the Rainbow Family",
-        body: "The award was accepted on behalf of both institutions by Mrs. Divya Singh, Principal of Rainbow International School, who expressed the gratitude of the entire Rainbow community: 'This recognition belongs to our students, our teachers, and our families — every one of whom contributes to the Rainbow community that makes achievements like this possible. It is an honour to serve the families of Thane West, and this award deepens our commitment to being the school of first choice for every family in our community.'\n\nFor the Rainbow team, this recognition is not a destination — it is a milestone on a journey of continuous improvement, innovation, and commitment to the families who trust the school with the education of their most important people.",
+        body: "The award was accepted on behalf of both institutions by Mrs. Divya Singh, Principal of Rainbow International School, who expressed the gratitude of the entire Rainbow community: 'This recognition belongs to our students, our teachers, and our families — every one of whom contributes to the Rainbow community that makes achievements like this possible. It is an honour to serve the families of Thane, and this award deepens our commitment to being the school of first choice for every family in our community.'\n\nFor the Rainbow team, this recognition is not a destination — it is a milestone on a journey of continuous improvement, innovation, and commitment to the families who trust the school with the education of their most important people.",
       },
       {
         heading: "Rainbow International School: A Consistent Record of Recognition",
-        body: "The Pride of Bharat Award is one of several prestigious recognitions Rainbow International School has received since its founding in April 2009. The school's consistent appearance on regional and national 'best school' lists — alongside its strong Board results, co-curricular achievements, and community reputation — reflects a culture of excellence that is embedded in every dimension of the institution.\n\nWith over 3,000 current students, 1 Lakh+ lives impacted since founding, and a faculty of dedicated, highly qualified educators, Rainbow International School continues to be the first choice for thousands of families across Thane West and the wider Mumbai Metropolitan Region.",
+        body: "The Pride of Bharat Award is one of several prestigious recognitions Rainbow International School has received since its founding in April 2009. The school's consistent appearance on regional and national 'best school' lists — alongside its strong Board results, co-curricular achievements, and community reputation — reflects a culture of excellence that is embedded in every dimension of the institution.\n\nWith over 3,000 current students, 1 Lakh+ lives impacted since founding, and a faculty of dedicated, highly qualified educators, Rainbow International School continues to be the first choice for thousands of families across Thane and the wider Mumbai Metropolitan Region.",
       },
     ],
-    conclusion: "Rainbow International School's recognition as 'The Leading School of the Year – Thane' at the Pride of Bharat Awards 2021 is a reflection of the commitment, quality, and care that the entire Rainbow community brings to education every day. We are grateful to the families who trust us with their children, the teachers who bring excellence to every classroom, and the students who inspire us with their growth and achievement. Admissions for the 2026–27 academic year are open. We warmly invite every family to visit our campus in Brahmand Phase 4, Thane West, and experience the Rainbow difference for themselves.",
+    conclusion: "Rainbow International School's recognition as 'The Leading School of the Year – Thane' at the Pride of Bharat Awards 2021 is a reflection of the commitment, quality, and care that the entire Rainbow community brings to education every day. We are grateful to the families who trust us with their children, the teachers who bring excellence to every classroom, and the students who inspire us with their growth and achievement. Admissions for the 2026–27 academic year are open. We warmly invite every family to visit our campus in Brahmand Phase 4, Thane, and experience the Rainbow difference for themselves.",
     relatedSlugs: [
       "awards-achievements",
       "rainbow-wins-award-for-excellence",
@@ -4088,7 +4088,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "Earth Day at Rainbow International School",
-        body: "Rainbow International School marks Earth Day as an important moment in the school's environmental education programme. Students across all year groups engage in themed activities — tree planting in the school garden, classroom discussions about environmental challenges and solutions, artwork and creative writing about the natural world, and practical sustainability pledges for the year ahead.\n\nThe school's campus — across its 3.5 acres in Brahmand Phase 4, Thane West — includes green spaces that are managed with environmental sensitivity, and the school's facilities include energy-efficient systems and waste management practices that reflect a commitment to environmental responsibility in daily institutional life, not just on special occasions.",
+        body: "Rainbow International School marks Earth Day as an important moment in the school's environmental education programme. Students across all year groups engage in themed activities — tree planting in the school garden, classroom discussions about environmental challenges and solutions, artwork and creative writing about the natural world, and practical sustainability pledges for the year ahead.\n\nThe school's campus — across its 3.5 acres in Brahmand Phase 4, Thane — includes green spaces that are managed with environmental sensitivity, and the school's facilities include energy-efficient systems and waste management practices that reflect a commitment to environmental responsibility in daily institutional life, not just on special occasions.",
       },
       {
         heading: "Environmental Values as Part of Holistic Education",
@@ -4261,7 +4261,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "Award 1: Innovation in Campus Infrastructure — Rainbow International School",
-        body: "Rainbow International School's award for 'Innovation in Campus Infrastructure' recognises the school's sustained investment in creating a physical learning environment that is not only world-class in its facilities but genuinely innovative in how those facilities support learning.\n\nThe school's 3.5-acre campus in Brahmand Phase 4, Thane West has been developed with a clear philosophy: every physical space should actively support student learning, wellbeing, and development. This has meant:\n",
+        body: "Rainbow International School's award for 'Innovation in Campus Infrastructure' recognises the school's sustained investment in creating a physical learning environment that is not only world-class in its facilities but genuinely innovative in how those facilities support learning.\n\nThe school's 3.5-acre campus in Brahmand Phase 4, Thane has been developed with a clear philosophy: every physical space should actively support student learning, wellbeing, and development. This has meant:\n",
         list: [
           "Smart classrooms throughout the school — equipped with interactive whiteboards, audio-visual systems, and connectivity that enables a wide range of teaching and learning approaches",
           "Dedicated science, computer, and language laboratories that provide hands-on learning environments across the curriculum",
@@ -4277,7 +4277,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "A Message of Gratitude from the Rainbow Family",
-        body: "These awards belong to every member of the Rainbow community: the teachers who bring creativity and dedication to their classrooms every day, the support staff who maintain the campus and its facilities to the highest standards, the leadership team whose vision has shaped both institutions, and above all the students and families whose trust and engagement make everything possible.\n\nThe Rainbow family looks forward to using these recognitions as a foundation for the next chapter of innovation and excellence — continuing to set the standard for educational quality in Thane West and across the Mumbai Metropolitan Region.",
+        body: "These awards belong to every member of the Rainbow community: the teachers who bring creativity and dedication to their classrooms every day, the support staff who maintain the campus and its facilities to the highest standards, the leadership team whose vision has shaped both institutions, and above all the students and families whose trust and engagement make everything possible.\n\nThe Rainbow family looks forward to using these recognitions as a foundation for the next chapter of innovation and excellence — continuing to set the standard for educational quality in Thane and across the Mumbai Metropolitan Region.",
       },
     ],
     conclusion: "Two national awards at one of Asia's most prestigious education summits represent a landmark moment for the Rainbow family — and a powerful confirmation of the school's position as one of the most innovative and excellent educational institutions in the region. Rainbow International School and Rainbow Preschool International together offer a seamless, high-quality educational journey from the earliest years through to Class 12. Admissions for 2026–27 are open. We warmly invite every family to visit our campus and experience what Rainbow can offer your child.",
@@ -5145,7 +5145,7 @@ export const blogPosts: BlogPostData[] = [
         body: "A school with a large, well-maintained, well-equipped playground is making a visible, unambiguous statement about its priorities: it is a school that genuinely values the full development of its students — physical, social, emotional, and creative — alongside the academic. This commitment is not just developmental philosophy — it is an architectural fact.\n\nWhen evaluating schools, parents should consider the playground as one of the most honest indicators of the school's genuine priorities. A school that has invested in outdoor space, maintained it well, and given students meaningful time to use it is a school that takes student wellbeing seriously.",
       },
     ],
-    conclusion: "Rainbow International School's 3.5-acre campus in Brahmand Phase 4, Thane West includes extensive outdoor sports and play areas that give students across all year groups the space to run, play, and engage in the full range of physical and creative activities that healthy development requires. Our campus is not a compromise — it is a genuine investment in the complete development of every student. We warmly invite every family to visit and experience our campus for themselves. Admissions for 2026–27 are open.",
+    conclusion: "Rainbow International School's 3.5-acre campus in Brahmand Phase 4, Thane includes extensive outdoor sports and play areas that give students across all year groups the space to run, play, and engage in the full range of physical and creative activities that healthy development requires. Our campus is not a compromise — it is a genuine investment in the complete development of every student. We warmly invite every family to visit and experience our campus for themselves. Admissions for 2026–27 are open.",
     relatedSlugs: [
       "imporatnce-of-sports-in-students-life",
       "6-reasons-why-indoor-sports-is-important-in-schools",
@@ -5295,7 +5295,7 @@ export const blogPosts: BlogPostData[] = [
         list: [
           "Academic excellence — Rainbow International School's record of strong CBSE Board results across Class X and Class XII, reflecting the quality of teaching, curriculum delivery, and student preparation across all subjects",
           "Early childhood quality — Rainbow Preschools' reputation among Thane families as the most nurturing, most developmentally appropriate early childhood programme in the region",
-          "Community trust — the thousands of families across Thane West and beyond who have chosen Rainbow for their children, and whose satisfaction with the education their children receive is the most powerful endorsement available",
+          "Community trust — the thousands of families across Thane and beyond who have chosen Rainbow for their children, and whose satisfaction with the education their children receive is the most powerful endorsement available",
           "Institutional leadership — the vision, consistency, and commitment of the Rainbow leadership team, whose investment in quality at every level of the institution makes awards like this possible",
           "Staff excellence — the teachers, coaches, counsellors, and support staff whose daily dedication provides the foundation on which Rainbow's reputation rests",
         ],
@@ -5309,7 +5309,7 @@ export const blogPosts: BlogPostData[] = [
         body: "Every award that Rainbow International School and Rainbow Preschools receive belongs first and foremost to the people who make both institutions what they are: the students whose growth and achievement are the school's reason for existing, the teachers whose dedication and expertise are the school's most important resource, the parents whose trust and engagement are the foundation of the school community, and the support staff whose work behind the scenes makes everything else possible.\n\nTo receive recognition from an external, independent panel is gratifying — but the most meaningful recognition comes every day in the form of the families who choose Rainbow for their children, the alumni who speak warmly of their school years, and the students who come back as parents to enrol their own children in the institution that shaped them.",
       },
     ],
-    conclusion: "The 'Best Preschool and Secondary School in Thane' recognition at the Retail and Hospitality Awards 2018 is a proud chapter in Rainbow International School's ongoing story of excellence, community trust, and institutional commitment to the families of Thane West. Rainbow International School and Rainbow Preschool International together provide the most complete, most consistent, and most celebrated educational pathway available in Thane — from nursery to Class 12. Admissions for 2026–27 are open. We warmly invite every family to visit our campus and experience the Rainbow difference for themselves.",
+    conclusion: "The 'Best Preschool and Secondary School in Thane' recognition at the Retail and Hospitality Awards 2018 is a proud chapter in Rainbow International School's ongoing story of excellence, community trust, and institutional commitment to the families of Thane. Rainbow International School and Rainbow Preschool International together provide the most complete, most consistent, and most celebrated educational pathway available in Thane — from nursery to Class 12. Admissions for 2026–27 are open. We warmly invite every family to visit our campus and experience the Rainbow difference for themselves.",
     relatedSlugs: [
       "the-leading-school-of-the-year-thane",
       "the-15th-world-education-summit",
@@ -5413,10 +5413,10 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "What These Awards Mean for Rainbow Families",
-        body: "For families who have chosen Rainbow International School or Rainbow Preschools for their children, these recognitions from India Today provide an independent, credible confirmation of what they already experience daily: that the Rainbow institutions are among the finest educational establishments available in Thane West.\n\nFor families who are considering Rainbow for the first time, the India Today recognition provides a powerful assurance. India Today does not award recognition to institutions that simply apply for it — it identifies institutions that have demonstrably earned it through consistent, measurable excellence across the dimensions that matter most to students and families.",
+        body: "For families who have chosen Rainbow International School or Rainbow Preschools for their children, these recognitions from India Today provide an independent, credible confirmation of what they already experience daily: that the Rainbow institutions are among the finest educational establishments available in Thane.\n\nFor families who are considering Rainbow for the first time, the India Today recognition provides a powerful assurance. India Today does not award recognition to institutions that simply apply for it — it identifies institutions that have demonstrably earned it through consistent, measurable excellence across the dimensions that matter most to students and families.",
       },
     ],
-    conclusion: "The India Today awards for 'Excellence in Preschool Education' and 'Excellence in CBSE Education' in Thane are among the most meaningful recognitions the Rainbow family has received — coming as they do from one of India's most trusted editorial brands and reflecting a rigorous, independent evaluation of institutional quality. Rainbow International School and Rainbow Preschool International together provide an unmatched educational pathway for the families of Thane West — from the earliest years through to Class 12. We warmly invite every family to visit our campus and experience this excellence for themselves. Admissions for 2026–27 are open.",
+    conclusion: "The India Today awards for 'Excellence in Preschool Education' and 'Excellence in CBSE Education' in Thane are among the most meaningful recognitions the Rainbow family has received — coming as they do from one of India's most trusted editorial brands and reflecting a rigorous, independent evaluation of institutional quality. Rainbow International School and Rainbow Preschool International together provide an unmatched educational pathway for the families of Thane — from the earliest years through to Class 12. We warmly invite every family to visit our campus and experience this excellence for themselves. Admissions for 2026–27 are open.",
     relatedSlugs: [
       "the-leading-school-of-the-year-thane",
       "rainbow-awarded-as-best-preschool-and-secondary-school-in-thane",
@@ -5467,7 +5467,7 @@ export const blogPosts: BlogPostData[] = [
       },
       {
         heading: "A Foundation for Continuing Excellence",
-        body: "The 100% result of Rainbow International School's first Class 10 batch established a standard that the school has sustained and built upon in every subsequent academic year. The academic culture, the teaching quality, and the student support systems that produced this landmark result did not evaporate after 2018-19 — they became the foundation on which Rainbow International School's growing reputation for academic excellence rests.\n\nFor the families of Thane West who are choosing a secondary school for their children today, Rainbow's track record — beginning with this landmark 100% first-batch result — provides the evidential basis for confidence that the school consistently delivers what it promises: genuine, measurable academic excellence for every student.",
+        body: "The 100% result of Rainbow International School's first Class 10 batch established a standard that the school has sustained and built upon in every subsequent academic year. The academic culture, the teaching quality, and the student support systems that produced this landmark result did not evaporate after 2018-19 — they became the foundation on which Rainbow International School's growing reputation for academic excellence rests.\n\nFor the families of Thane who are choosing a secondary school for their children today, Rainbow's track record — beginning with this landmark 100% first-batch result — provides the evidential basis for confidence that the school consistently delivers what it promises: genuine, measurable academic excellence for every student.",
       },
     ],
     conclusion: "Rainbow International School's 100% result in its first Class 10 Board examination batch — one of only six schools across Thane to achieve this milestone — is a defining chapter in the school's history and a powerful foundation for the academic reputation the school has built in every year since. It is proof that the Rainbow commitment to academic excellence is not aspiration — it is achievement. Admissions for the 2026–27 academic year are now open. We warmly invite every family to visit our campus and discover what Rainbow can offer your child.",

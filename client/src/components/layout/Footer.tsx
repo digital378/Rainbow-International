@@ -99,7 +99,7 @@ export function Footer() {
               </div>
               <div>
                 <p className="font-black text-xs text-white leading-tight">Rainbow International School</p>
-                <p className="text-white/50 text-[10px] mt-0.5 leading-tight">Cosmos Arcade, Brahmand Phase 4<br />Thane West, Maharashtra</p>
+                <p className="text-white/50 text-[10px] mt-0.5 leading-tight">Cosmos Arcade, Brahmand Phase 4<br />Thane, Maharashtra</p>
               </div>
             </div>
 
@@ -216,7 +216,7 @@ export function Footer() {
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(251,191,36,0.12)", border: "1px solid rgba(251,191,36,0.2)" }}>
                       <MapPin size={16} style={{ color: "#fbbf24" }} />
                     </div>
-                    <span className="text-white/60 text-sm leading-relaxed">Cosmos Arcade, Brahmand Phase 4,<br />Thane West, Maharashtra</span>
+                    <span className="text-white/60 text-sm leading-relaxed">Cosmos Arcade, Brahmand Phase 4,<br />Thane, Maharashtra</span>
                   </div>
                 </li>
                 <li>

@@ -32,7 +32,7 @@ function getBotReply(input: string): string {
     return "Our school office hours are Monday to Saturday, 9:00 AM – 6:00 PM.\n\nContact: +91 82915 68972";
   }
   if (t.includes("campus") || t.includes("location") || t.includes("address") || t.includes("centre") || t.includes("center")) {
-    return "We are located at:\nCosmos Arcade, Brahmand Phase 4,\nThane West, Maharashtra.\n\nOur campus spans 3.5 acres and serves 3,000+ students from Nursery to Class 12 — all under one roof.";
+    return "We are located at:\nCosmos Arcade, Brahmand Phase 4,\nThane, Maharashtra.\n\nOur campus spans 3.5 acres and serves 3,000+ students from Nursery to Class 12 — all under one roof.";
   }
   if (t.includes("admission") || t.includes("apply") || t.includes("enrol") || t.includes("enroll") || t.includes("2026")) {
     return "Admissions are open for Academic Year 2026–27!\n\nWe welcome students from Nursery to Class 12.\n\nCall: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\n\nOr fill the enquiry form on our Contact Us page.";
@@ -381,7 +381,7 @@ export function ChatBot() {
           {/* Footer */}
           <div className="text-center py-2 border-t flex-shrink-0" style={{ background: "#f8faff" }}>
             <p className="text-gray-400 text-[10px]">
-              Rainbow International School &nbsp;&middot;&nbsp; Thane West &nbsp;&middot;&nbsp; Since 2009
+              Rainbow International School &nbsp;&middot;&nbsp; Thane &nbsp;&middot;&nbsp; Since 2009
             </p>
           </div>
         </div>

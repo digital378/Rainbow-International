@@ -11,7 +11,7 @@ export default function ChairpersonsNote() {
       <ScrollProgress />
       <SEO
         title="Chairperson's Note"
-        description="A message from the Chairperson of Rainbow International School, Thane West — on the school's vision, values, and commitment to excellence in education."
+        description="A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education."
         keywords="Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school"
         canonical="https://rainbowinternationalschool.in/chairpersons-note/"
       />
@@ -49,7 +49,7 @@ export default function ChairpersonsNote() {
                 <p>Dear Students, Parents, and Well-wishers,</p>
 
                 <p>
-                  It is with immense pride and joy that I welcome you to Rainbow International School — an institution that has been a beacon of excellence in Thane West since 2009. What began as a dream to create a world-class school rooted in Indian values has today grown into one of the most trusted names in education, serving over <strong>3,000 students</strong> across Nursery to Class 12.
+                  It is with immense pride and joy that I welcome you to Rainbow International School — an institution that has been a beacon of excellence in Thane since 2009. What began as a dream to create a world-class school rooted in Indian values has today grown into one of the most trusted names in education, serving over <strong>3,000 students</strong> across Nursery to Class 12.
                 </p>
 
                 <p>

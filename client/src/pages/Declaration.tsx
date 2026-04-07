@@ -15,7 +15,7 @@ export default function Declaration() {
       <ScrollProgress />
       <SEO
         title="Declaration"
-        description="Official declaration document of Rainbow International School, Thane West — CBSE affiliation number 1130661."
+        description="Official declaration document of Rainbow International School, Thane — CBSE affiliation number 1130661."
         keywords="Rainbow International School declaration, CBSE school declaration Thane, school declaration document"
         canonical="https://rainbowinternationalschool.in/declaration/"
       />

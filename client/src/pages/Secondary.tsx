@@ -101,7 +101,7 @@ export default function Secondary() {
       <SEO
         title="Secondary Section (Class 9–10)"
         description="Rainbow International School's Secondary Section (Class 9 & 10). CBSE curriculum focused on academic excellence, career guidance, and all-round development."
-        keywords="secondary school Thane, Class 9 10 CBSE Thane West, Rainbow school secondary section admission"
+        keywords="secondary school Thane, Class 9 10 CBSE Thane, Rainbow school secondary section admission"
         canonical="https://rainbowinternationalschool.in/secondary-section/"
         ogImage="/images/home/academic/secondary.jpg"
         breadcrumbs={[

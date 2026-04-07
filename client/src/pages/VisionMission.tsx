@@ -25,7 +25,7 @@ export default function VisionMission() {
       <SEO
         title="Vision & Mission | Rainbow International School"
         description="Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact."
-        keywords="Rainbow school vision mission, Rainbow International School values, school philosophy Thane West"
+        keywords="Rainbow school vision mission, Rainbow International School values, school philosophy Thane"
         canonical="https://rainbowinternationalschool.in/ris-vision-mission/"
       />
       <Navbar />

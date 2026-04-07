@@ -180,8 +180,8 @@ export default function PhotoGallery() {
       <ScrollProgress />
       <SEO
         title="Photo Gallery"
-        description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane West."
-        keywords="Rainbow school photo gallery, school photos Thane West, school campus photos Rainbow International"
+        description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane."
+        keywords="Rainbow school photo gallery, school photos Thane, school campus photos Rainbow International"
         canonical="https://rainbowinternationalschool.in/photo-gallery/"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },

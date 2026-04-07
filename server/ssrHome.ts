@@ -21,17 +21,17 @@ function renderHomeSSR(): string {
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
 <title>Best CBSE school in thane near me - Rainbow International</title>
 <meta name="description" content="Rainbow International School — best CBSE school in Thane near you. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities streams. Admissions 2026-27 open." />
-<meta name="keywords" content="best CBSE school in Thane near me, CBSE school Thane West, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane West" />
+<meta name="keywords" content="best CBSE school in Thane near me, CBSE school Thane, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane" />
 <link rel="canonical" href="https://rainbowinternationalschool.in/" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Best CBSE school in thane near me - Rainbow International" />
-<meta property="og:description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane West, Maharashtra. World-class education from Nursery to Class 12." />
+<meta property="og:description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane, Maharashtra. World-class education from Nursery to Class 12." />
 <meta property="og:url" content="https://rainbowinternationalschool.in/" />
 <meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Best CBSE school in thane near me - Rainbow International" />
-<meta name="twitter:description" content="Rainbow International School — top CBSE K-12 school in Thane West. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open." />
+<meta name="twitter:description" content="Rainbow International School — top CBSE K-12 school in Thane. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open." />
 <meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,13 +46,13 @@ function renderHomeSSR(): string {
   "url": "https://rainbowinternationalschool.in/",
   "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
   "image": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
-  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane West, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
+  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
   "foundingDate": "2009-04-01",
   "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
-    "addressLocality": "Thane West",
+    "addressLocality": "Thane",
     "addressRegion": "Maharashtra",
     "postalCode": "400607",
     "addressCountry": "IN"
@@ -338,8 +338,8 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
 <main role="main">
 <article itemscope itemtype="https://schema.org/School">
 <meta itemprop="name" content="Rainbow International School" />
-<meta itemprop="description" content="One of the top CBSE-affiliated K-12 schools in Thane West, Maharashtra. Offering world-class education from Nursery to Class 12." />
-<meta itemprop="address" content="Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607" />
+<meta itemprop="description" content="One of the top CBSE-affiliated K-12 schools in Thane, Maharashtra. Offering world-class education from Nursery to Class 12." />
+<meta itemprop="address" content="Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607" />
 <meta itemprop="telephone" content="+91 82915 68972" />
 <meta itemprop="url" content="https://rainbowinternationalschool.in" />
 <meta itemprop="foundingDate" content="2009-04" />
@@ -356,7 +356,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
           Admissions Open &middot; Academic Year 2026–27
         </div>
         <h1>Rainbow <span class="gold">International</span><br/>School</h1>
-        <p class="hero-sub">Thane West's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.</p>
+        <p class="hero-sub">Thane's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.</p>
         <div class="hero-stats">
           <div class="hero-stat"><div class="hero-stat-num">50K+</div><div class="hero-stat-label">Happy Students</div></div>
           <div class="hero-stat"><div class="hero-stat-num">Since 2009</div><div class="hero-stat-label">Established</div></div>
@@ -447,7 +447,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
           <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>CBSE Affiliated (No. 1130661)</div>
           <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Nursery to Class 12</div>
           <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Multiple Intelligence methodology</div>
-          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>3.5-acre green campus in Thane West</div>
+          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>3.5-acre green campus in Thane</div>
         </div>
         <a href="/about-rainbow-international-school" class="btn-blue">Learn More About Us &rarr;</a>
       </div>
@@ -682,7 +682,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       <a href="https://maps.google.com/?q=Rainbow+International+School+Thane" target="_blank" rel="noopener noreferrer" class="contact-card" style="background:#fef2f2;border-radius:24px">
         <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
         <p class="contact-label">Our Address</p>
-        <p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane West, Maharashtra</p>
+        <p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane, Maharashtra</p>
       </a>
     </div>
   </div>
@@ -696,7 +696,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <div class="footer-inner">
     <div>
       <p class="footer-brand">Rainbow International School</p>
-      <p class="footer-desc">CBSE-affiliated school in Thane West, Maharashtra. Nursery to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
+      <p class="footer-desc">CBSE-affiliated school in Thane, Maharashtra. Nursery to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
       <div class="footer-socials">
         <a href="https://www.facebook.com/RainbowInternationalSchoolThane/" class="footer-social-btn" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg>
@@ -747,7 +747,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       <p class="footer-col-title">Get In Touch</p>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <span>Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra</span>
+        <span>Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra</span>
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>

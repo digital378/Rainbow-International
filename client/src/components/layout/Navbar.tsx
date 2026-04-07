@@ -165,7 +165,7 @@ export function Navbar() {
               <MapPin className={`mt-0.5 shrink-0 transition-colors ${isTransparent ? "text-amber-300" : "text-primary"}`} size={16} />
               <div>
                 <p className={`text-xs transition-colors ${isTransparent ? "text-white/80" : "text-gray-600"}`}>Cosmos Arcade,</p>
-                <p className={`text-xs transition-colors ${isTransparent ? "text-white/80" : "text-gray-600"}`}>Brahmand Phase 4, Thane West</p>
+                <p className={`text-xs transition-colors ${isTransparent ? "text-white/80" : "text-gray-600"}`}>Brahmand Phase 4, Thane</p>
               </div>
             </div>
             <div className={`h-8 w-px transition-colors ${isTransparent ? "bg-white/20" : "bg-gray-200"}`} />

@@ -80,7 +80,7 @@ export default function ApplicationForm() {
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="Application Form 2026–27"
-        description="Apply for admission to Rainbow International School, Thane West. Fill out the online application form for Nursery to Class 12. CBSE Affiliation No. 1130661."
+        description="Apply for admission to Rainbow International School, Thane. Fill out the online application form for Nursery to Class 12. CBSE Affiliation No. 1130661."
         keywords="Rainbow International School application form, CBSE school admission Thane 2026-27, apply Rainbow school online"
         canonical="/application-form"
       />
@@ -112,7 +112,7 @@ export default function ApplicationForm() {
             {[
               { label: "Grades", value: "Nursery – Class 12" },
               { label: "Affiliation", value: "CBSE No. 1130661" },
-              { label: "Campus", value: "Brahmand, Thane West" },
+              { label: "Campus", value: "Brahmand, Thane" },
             ].map(item => (
               <div key={item.label} className="bg-[#f8faff] rounded-xl p-4 text-center border border-blue-100">
                 <div className="text-xs text-gray-500 mb-1">{item.label}</div>

@@ -98,8 +98,8 @@ export default function Amenities() {
       <ScrollProgress />
       <SEO
         title="Amenities & Facilities"
-        description="Rainbow International School offers world-class amenities including Amphitheatre, Music Room, Swimming Pool, Cricket Ground, Football Turf, Science Labs, Library, and Organic Farm in Thane West."
-        keywords="Rainbow school amenities Thane, school facilities Thane West, swimming pool school Thane, CBSE school facilities Thane"
+        description="Rainbow International School offers world-class amenities including Amphitheatre, Music Room, Swimming Pool, Cricket Ground, Football Turf, Science Labs, Library, and Organic Farm in Thane."
+        keywords="Rainbow school amenities Thane, school facilities Thane, swimming pool school Thane, CBSE school facilities Thane"
         canonical="https://rainbowinternationalschool.in/amenities/"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },

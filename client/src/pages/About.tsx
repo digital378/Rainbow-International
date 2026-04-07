@@ -70,8 +70,8 @@ export default function About() {
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="About Us | Rainbow International School Thane"
-        description="Learn about Rainbow International School — founded in April 2009, serving 3000+ students across 3.5 acres in Thane West. CBSE affiliated, Nursery to Class 12."
-        keywords="about Rainbow International School, CBSE school Thane West, best school Thane, Rainbow school history"
+        description="Learn about Rainbow International School — founded in April 2009, serving 3000+ students across 3.5 acres in Thane. CBSE affiliated, Nursery to Class 12."
+        keywords="about Rainbow International School, CBSE school Thane, best school Thane, Rainbow school history"
         canonical="https://rainbowinternationalschool.in/about-rainbow-international-school/"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },

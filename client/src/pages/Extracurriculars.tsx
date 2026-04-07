@@ -266,7 +266,7 @@ export default function Extracurriculars() {
       <ScrollProgress />
       <SEO
         title="Extracurricular Activities"
-        description="Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane West."
+        description="Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane."
         keywords="extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane"
         canonical="https://rainbowinternationalschool.in/extracurriculars/"
         breadcrumbs={[

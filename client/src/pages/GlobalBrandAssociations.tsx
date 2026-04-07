@@ -30,7 +30,7 @@ export default function GlobalBrandAssociations() {
       <ScrollProgress />
       <SEO
         title="Global Brand Associations"
-        description="Rainbow International School's global brand associations and partnerships that enhance the quality of education and learning experiences for students in Thane West."
+        description="Rainbow International School's global brand associations and partnerships that enhance the quality of education and learning experiences for students in Thane."
         keywords="Rainbow school global partnerships, school associations Thane, Rainbow International School CBSE Google partnership"
         canonical="https://rainbowinternationalschool.in/global-brand-associations/"
       />
@@ -45,7 +45,7 @@ export default function GlobalBrandAssociations() {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
             <p className="text-lg text-gray-600 leading-relaxed mb-12">
-              Rainbow International School's commitment to world-class education is reflected in our carefully curated global brand associations. These partnerships enable us to deliver the best of global educational practices to our students in Thane West.
+              Rainbow International School's commitment to world-class education is reflected in our carefully curated global brand associations. These partnerships enable us to deliver the best of global educational practices to our students in Thane.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

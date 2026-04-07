@@ -30,7 +30,7 @@ export default function GoogleSchool() {
       <SEO
         title="Google School 2025–26"
         description="Rainbow International School is a certified Google for Education school — integrating Google Classroom, Google Workspace, and Google-certified teaching for seamless, technology-enhanced learning."
-        keywords="Google for Education school Thane, Google Classroom CBSE school, Rainbow International School Google certified, digital school Thane West"
+        keywords="Google for Education school Thane, Google Classroom CBSE school, Rainbow International School Google certified, digital school Thane"
         canonical="/google-school-2025-26"
       />
       <ScrollProgress />

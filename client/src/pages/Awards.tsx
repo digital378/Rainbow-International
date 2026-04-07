@@ -82,7 +82,7 @@ export default function Awards() {
       <SEO
         title="Awards & Achievements"
         description="Rainbow International School's awards and achievements — World Education Summit, Best Preschool & Secondary School in Thane, Excellence in CBSE Education, FIT INDIA School and more."
-        keywords="Rainbow International School awards, best school Thane West, CBSE school awards Thane, school achievements Thane"
+        keywords="Rainbow International School awards, best school Thane, CBSE school awards Thane, school achievements Thane"
         canonical="https://rainbowinternationalschool.in/awards-achievements/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
         breadcrumbs={[

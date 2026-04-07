@@ -12,7 +12,7 @@ const generalInfo = [
   { label: "Name of the School", value: "Rainbow International School" },
   { label: "Affiliation Number (if applicable)", value: "1130661" },
   { label: "School Code (if applicable)", value: "30562" },
-  { label: "Complete Address with PIN Code", value: "Brahmand Phase 4, Opp. TMC Water Tank, Kolshet Rd, Thane West, Maharashtra – 400607" },
+  { label: "Complete Address with PIN Code", value: "Brahmand Phase 4, Opp. TMC Water Tank, Kolshet Rd, Thane, Maharashtra – 400607" },
   { label: "Principal Name & Qualification", value: "MA B.Ed" },
   { label: "School E-mail ID", value: "vimikti@rainbowpreschools.com" },
   { label: "Contact Details (Mobile)", value: "+91 82915 68972" },
@@ -209,7 +209,7 @@ export default function CbseDisclosures() {
       <ScrollProgress />
       <SEO
         title="CBSE Public Disclosures | Rainbow International School"
-        description="CBSE mandatory public disclosures for Rainbow International School, Thane West. Affiliation number 1130661. Full details including staff, infrastructure, results and documents."
+        description="CBSE mandatory public disclosures for Rainbow International School, Thane. Affiliation number 1130661. Full details including staff, infrastructure, results and documents."
         keywords="Rainbow school CBSE disclosure, CBSE affiliation number 1130661, public disclosure school Thane"
         canonical="https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures/"
         breadcrumbs={[

@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
             <ul className="space-y-1 text-sm text-gray-600">
               <li>Email: <a href="mailto:info@rainbowinternationalschool.in" className="underline" style={{ color: "#0d3b86" }}>info@rainbowinternationalschool.in</a></li>
               <li>Phone: <a href="tel:+918655003366" className="underline" style={{ color: "#0d3b86" }}>+91 86550 03366</a></li>
-              <li>Address: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra, India</li>
+              <li>Address: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra, India</li>
             </ul>
           </div>
         </div>
