@@ -10,6 +10,12 @@ function e(str: string | undefined | null): string {
     .replace(/"/g, "&quot;");
 }
 
+function renderInlineMd(text: string): string {
+  return e(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[(.+?)\]\((https?:\/\/.+?)\)/g, '<a href="$2" class="text-link" target="_blank" rel="noopener">$1</a>');
+}
+
 function toISODate(dateStr: string): string {
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return "2025-01-01";
@@ -29,7 +35,7 @@ function renderBlogSSR(slug: string): string | null {
     .map((sec) => {
       const paras = sec.body
         .split("\n\n")
-        .map((para) => `<p class="body-para">${e(para.replace(/\n/g, " "))}</p>`)
+        .map((para) => `<p class="body-para">${renderInlineMd(para.replace(/\n/g, " "))}</p>`)
         .join("");
       const listHtml =
         sec.list && sec.list.length > 0
@@ -197,7 +203,12 @@ function renderBlogSSR(slug: string): string | null {
     /* ── Conclusion ── */
     .conclusion-box { margin-top: 40px; border-radius: 24px; padding: 32px; background: #f8faff; border: 1px solid #e5eaf5; }
     .conclusion-box h2 { font-family: 'League Spartan', sans-serif; font-size: 20px; font-weight: 900; color: #0d3b86; margin-bottom: 16px; }
-    .conclusion-box p { color: #374151; line-height: 1.8; font-size: 15px; }
+    .conclusion-box p { color: #374151; line-height: 1.8; font-size: 15px; margin-bottom: 12px; }
+    .text-link { color: #1d4ed8; text-decoration: underline; }
+    .text-link:hover { color: #1e3a8a; }
+    .backlink-box { margin-top: 24px; border-radius: 16px; padding: 24px; display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fbbf24; }
+    .backlink-icon { font-size: 24px; flex-shrink: 0; }
+    .backlink-box p { color: #1f2937; font-size: 14px; line-height: 1.6; margin: 0; }
 
     /* ── Tags ── */
     .tags { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 8px; }
@@ -355,10 +366,14 @@ function renderBlogSSR(slug: string): string | null {
         ${sectionsHtml}
 
         <!-- Conclusion -->
-        <div class="conclusion-box">
-          <h2>Conclusion</h2>
-          <p>${e(post.conclusion)}</p>
-        </div>
+        ${(() => {
+          const parts = post.conclusion.split(/\n\nRIS_BACKLINK:\s*/);
+          const mainText = parts[0] || "";
+          const backlink = parts[1] || "";
+          const mainHtml = mainText.split("\n\n").map((p: string) => `<p>${renderInlineMd(p.replace(/\n/g, " "))}</p>`).join("");
+          const backlinkHtml = backlink ? `<div class="backlink-box"><span class="backlink-icon">🌈</span><p>${renderInlineMd(backlink.trim())}</p></div>` : "";
+          return `<div class="conclusion-box"><h2>Conclusion</h2>${mainHtml}</div>${backlinkHtml}`;
+        })()}
 
         <!-- Tags -->
         <div class="tags">${tagsHtml}</div>
