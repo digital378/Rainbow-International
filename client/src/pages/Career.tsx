@@ -27,8 +27,13 @@ export default function Career() {
   const [submitted, setSubmitted] = useState(false);
   const { register, handleSubmit, formState: { isSubmitting } } = useForm();
 
-  const onSubmit = async (_data: unknown) => {
-    await new Promise(r => setTimeout(r, 800));
+  const onSubmit = async (data: Record<string, string>) => {
+    const res = await fetch("/api/career-applications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error("Submission failed");
     setSubmitted(true);
   };
 

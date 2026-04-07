@@ -1,4 +1,4 @@
-import { type Inquiry, type InsertInquiry, type Event, type InsertEvent, type CallbackRequest, type InsertCallbackRequest, inquiries, events, callbackRequests } from "@shared/schema";
+import { type Inquiry, type InsertInquiry, type Event, type InsertEvent, type CallbackRequest, type InsertCallbackRequest, type CareerApplication, type InsertCareerApplication, inquiries, events, callbackRequests, careerApplications } from "@shared/schema";
 import { db } from "./db";
 import { desc, eq } from "drizzle-orm";
 
@@ -14,6 +14,9 @@ export interface IStorage {
 
   createCallbackRequest(req: InsertCallbackRequest): Promise<CallbackRequest>;
   getAllCallbackRequests(): Promise<CallbackRequest[]>;
+
+  createCareerApplication(app: InsertCareerApplication): Promise<CareerApplication>;
+  getAllCareerApplications(): Promise<CareerApplication[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -56,6 +59,15 @@ export class DbStorage implements IStorage {
 
   async getAllCallbackRequests(): Promise<CallbackRequest[]> {
     return await db.select().from(callbackRequests).orderBy(desc(callbackRequests.createdAt));
+  }
+
+  async createCareerApplication(app: InsertCareerApplication): Promise<CareerApplication> {
+    const [result] = await db.insert(careerApplications).values(app).returning();
+    return result;
+  }
+
+  async getAllCareerApplications(): Promise<CareerApplication[]> {
+    return await db.select().from(careerApplications).orderBy(desc(careerApplications.createdAt));
   }
 }
 

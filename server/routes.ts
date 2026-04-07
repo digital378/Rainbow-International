@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import { registerSSRRoutes } from "./ssrBlog";
@@ -161,6 +161,42 @@ async function sendCallbackEmail(data: { name: string; phone: string; preferredT
   console.log("[callback] Email sent to", mailer.to);
 }
 
+const CAREER_EMAIL_TO = "hr.recruiter3@rainbowinternationalschool.in";
+
+async function sendCareerEmail(data: { name: string; email: string; phone: string; position: string; experience?: string | null; qualification?: string | null; message?: string | null }) {
+  const mailer = getTransporter();
+  if (!mailer) {
+    console.log("[career] SMTP not configured — skipping email. Application saved to DB.");
+    return;
+  }
+
+  await mailer.transport.sendMail({
+    from: mailer.from,
+    to: CAREER_EMAIL_TO,
+    replyTo: data.email,
+    subject: `New Job Application – ${data.name} (${data.position})`,
+    html: `
+      <div style="font-family:'Segoe UI',sans-serif;max-width:600px;">
+        <div style="background:#091a4f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
+          <h2 style="margin:0;font-size:20px;">💼 New Career Application</h2>
+          <p style="margin:4px 0 0;opacity:0.85;font-size:13px;">Rainbow International School — Careers Page</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e5e7eb;border-top:none;">
+          ${tableRow("Full Name", data.name)}
+          ${tableRow("Email", data.email)}
+          ${tableRow("Phone", data.phone)}
+          ${tableRow("Position Applied For", data.position)}
+          ${tableRow("Experience", data.experience)}
+          ${tableRow("Qualification", data.qualification)}
+          ${tableRow("Message", data.message)}
+        </table>
+        <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the school website careers page.</p>
+      </div>
+    `,
+  });
+  console.log("[career] Email sent to", CAREER_EMAIL_TO);
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -218,6 +254,24 @@ export async function registerRoutes(
       res.json(requests);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch callback requests" });
+    }
+  });
+
+  // ── Career applications ────────────────────────────────────
+  app.post("/api/career-applications", async (req, res) => {
+    try {
+      const validatedData = insertCareerApplicationSchema.parse(req.body);
+      const application = await storage.createCareerApplication(validatedData);
+      sendCareerEmail(validatedData).catch((err) =>
+        console.error("[career] Email error:", err)
+      );
+      res.status(201).json(application);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: "Failed to submit career application" });
     }
   });
 

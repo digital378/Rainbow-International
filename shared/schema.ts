@@ -80,3 +80,31 @@ export const insertCallbackRequestSchema = createInsertSchema(callbackRequests).
 
 export type InsertCallbackRequest = z.infer<typeof insertCallbackRequestSchema>;
 export type CallbackRequest = typeof callbackRequests.$inferSelect;
+
+export const careerApplications = pgTable("career_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  position: text("position").notNull(),
+  experience: text("experience"),
+  qualification: text("qualification"),
+  message: text("message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertCareerApplicationSchema = createInsertSchema(careerApplications).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  name: z.string().min(1, "Full name is required"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().min(1, "Phone number is required"),
+  position: z.string().min(1, "Please select a position"),
+  experience: z.string().optional().or(z.literal("")),
+  qualification: z.string().optional().or(z.literal("")),
+  message: z.string().optional().or(z.literal("")),
+});
+
+export type InsertCareerApplication = z.infer<typeof insertCareerApplicationSchema>;
+export type CareerApplication = typeof careerApplications.$inferSelect;
