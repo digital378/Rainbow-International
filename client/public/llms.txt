@@ -1,11 +1,11 @@
 # Rainbow International School
 
-> Rainbow International School is a CBSE-affiliated K-12 school in Thane West, Maharashtra, India. Founded in April 2009, it serves over 3,000 students from Nursery to Class 12 on a 3.5-acre campus.
+> Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra, India. Founded in April 2009, it serves over 3,000 students from Nursery to Class 12 on a 3.5-acre campus.
 
 ## Quick Facts
 
 - Name: Rainbow International School
-- Location: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607, India
+- Location: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607, India
 - Founded: April 2009
 - CBSE Affiliation Number: 1130661
 - School Code: 30562
@@ -38,7 +38,7 @@
 
 ## Awards and Recognition
 
-- Times Education Icon Award — Best CBSE School, Thane West
+- Times Education Icon Award — Best CBSE School, Thane
 - International School Award by British Council
 - NABET Accreditation for Quality Education
 - FIT India School certification
@@ -54,7 +54,7 @@ Rainbow Preschool International is the early childhood wing for children aged 1.
 - Phone: +91 82915 68972
 - Email: info@rainbowinternationalschool.in
 - WhatsApp: https://wa.me/918291568972
-- Address: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
+- Address: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607
 - Google Maps: https://maps.app.goo.gl/mfJjMMkksCkcXzMCA
 
 ## Pages

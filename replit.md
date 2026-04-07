@@ -2,7 +2,7 @@
 
 ## Overview
 
-A full-stack replication of the Rainbow International School website (rainbowinternationalschool.in) — a CBSE-affiliated school in Thane West, Maharashtra. Built with React frontend, Express.js backend, and PostgreSQL database.
+A full-stack replication of the Rainbow International School website (rainbowinternationalschool.in) — a CBSE-affiliated school in Thane, Maharashtra. Built with React frontend, Express.js backend, and PostgreSQL database.
 
 ## User Preferences
 
@@ -108,7 +108,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 
 - **Name**: Rainbow International School
 - **Founded**: April 2009
-- **Location**: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra, India
+- **Location**: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra, India
 - **Phone**: (022) 69105000 / +91 82915 68972
 - **Email**: info@rainbowinternationalschool.in
 - **CBSE Affiliation**: 1130661

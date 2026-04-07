@@ -92,11 +92,11 @@ export function AboutPreview() {
             </h2>
 
             <div className="space-y-4 text-gray-600 text-[15px] leading-[1.8] mb-7">
-              <p>Rainbow International School is a trailblazer in the arena of education with a passion for excellence. We are considered as one of the top CBSE schools in Thane west because we emphasize that the child enjoys his learning, dares to dream, and becomes a lifelong learner.</p>
+              <p>Rainbow International School is a trailblazer in the arena of education with a passion for excellence. We are considered as one of the top CBSE schools in Thane because we emphasize that the child enjoys his learning, dares to dream, and becomes a lifelong learner.</p>
               <p>Our expert educators provide a conducive environment with their multicultural perspectives. Social ethics like empathy, compassion, and respect for others is inculcated in the pedagogy. We provide state-of-the-art facilities, technologies, and infrastructure to optimize teaching and learning outcomes.</p>
               <p>Our educational programs support child's academic, moral, social, and physical development. Our curriculum reflects global, rural, and urban dimensions, thereby preparing our students to face all future challenges. At the preschool level, we follow the theory of{" "}
                 <Link href="/about-rainbow-international-school" className="font-medium underline" style={{ color: "#091a4f" }} data-testid="link-multiple-intelligence">Multiple Intelligence</Link>{" "}for holistic development.</p>
-              <p>We are proud to consistently deliver world-class education and remain the best international school in Thane west.</p>
+              <p>We are proud to consistently deliver world-class education and remain the best international school in Thane.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-8">

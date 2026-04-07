@@ -439,10 +439,10 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
       <div class="about-text">
         <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Why Choose Us</span>
         <h2 class="section-title">Why Parents Trust<br/><span style="color:#0d3b86">Rainbow</span></h2>
-        <p>Rainbow International School is a trailblazer in the arena of education with a passion for excellence. We are considered as one of the top CBSE schools in Thane west because we emphasize that the child enjoys his learning, dares to dream, and becomes a lifelong learner.</p>
+        <p>Rainbow International School is a trailblazer in the arena of education with a passion for excellence. We are considered as one of the top CBSE schools in Thane because we emphasize that the child enjoys his learning, dares to dream, and becomes a lifelong learner.</p>
         <p>Our expert educators provide a conducive environment with their multicultural perspectives. Social ethics like empathy, compassion, and respect for others is inculcated in the pedagogy. We provide state-of-the-art facilities, technologies, and infrastructure to optimize teaching and learning outcomes.</p>
         <p>Our educational programs support child's academic, moral, social, and physical development. Our curriculum reflects global, rural, and urban dimensions, thereby preparing our students to face all future challenges. At the preschool level, we follow the theory of <a href="/about-rainbow-international-school" style="color:#0d3b86;font-weight:600;text-decoration:underline">Multiple Intelligence</a> for holistic development.</p>
-        <p>We are proud to consistently deliver world-class education and remain the best international school in Thane west.</p>
+        <p>We are proud to consistently deliver world-class education and remain the best international school in Thane.</p>
         <div class="about-highlights">
           <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>CBSE Affiliated (No. 1130661)</div>
           <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Nursery to Class 12</div>
