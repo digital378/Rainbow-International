@@ -151,14 +151,31 @@ export default function BlogPost() {
               ))}
 
               {/* Conclusion */}
-              <div className="mt-10 rounded-3xl p-8" style={{ background: "#f8faff", border: "1px solid #e5eaf5" }}>
-                <h2 className="text-xl font-black mb-4" style={{ color: "#0d3b86" }}>Conclusion</h2>
-                {post.conclusion.split("\n\n").map((para, j) => (
-                  <p key={j} className="text-gray-700 leading-relaxed mb-3">
-                    {renderInlineMarkdown(para.replace(/\n/g, " "))}
-                  </p>
-                ))}
-              </div>
+              {(() => {
+                const parts = post.conclusion.split(/\n\nRIS_BACKLINK:\s*|^RIS_BACKLINK:\s*/m);
+                const mainConclusion = parts[0] || "";
+                const backlink = parts[1] || "";
+                return (
+                  <>
+                    <div className="mt-10 rounded-3xl p-8" style={{ background: "#f8faff", border: "1px solid #e5eaf5" }}>
+                      <h2 className="text-xl font-black mb-4" style={{ color: "#0d3b86" }}>Conclusion</h2>
+                      {mainConclusion.split("\n\n").map((para, j) => (
+                        <p key={j} className="text-gray-700 leading-relaxed mb-3">
+                          {renderInlineMarkdown(para.replace(/\n/g, " "))}
+                        </p>
+                      ))}
+                    </div>
+                    {backlink && (
+                      <div className="mt-6 rounded-2xl p-6 flex items-center gap-4" style={{ background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)", border: "1px solid #fbbf24" }}>
+                        <span className="text-2xl flex-shrink-0">🌈</span>
+                        <p className="text-gray-800 text-sm leading-relaxed">
+                          {renderInlineMarkdown(backlink.trim())}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Tags */}
               <div className="mt-8 flex flex-wrap gap-2">
