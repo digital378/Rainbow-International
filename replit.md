@@ -25,7 +25,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful JSON API endpoints under `/api/*`
 - **Database ORM**: Drizzle ORM with PostgreSQL dialect
 - **Schema Validation**: Zod schemas generated from Drizzle schemas via drizzle-zod
-- **Blog SSR**: All 86 blog posts at `/blog/:slug` are Server-Side Rendered via `server/ssrBlog.ts` — Express intercepts before Vite/React, returns complete pre-rendered HTML. Demo route with badge at `/ssr-demo/blog/:slug`.
+- **Blog SSR**: All 94 blog posts at `/blog/:slug` are Server-Side Rendered via `server/ssrBlog.ts` — Express intercepts before Vite/React, returns complete pre-rendered HTML. Demo route with badge at `/ssr-demo/blog/:slug`.
 - **Home SSR**: Home page (`/`) is Server-Side Rendered for search-engine bots via `server/ssrHome.ts`. Bot user-agents (Googlebot, Bingbot, etc.) receive a fully pre-rendered ~58KB HTML page with all content (Hero, Awards, Features, About, Academics, Pedagogy, Discover, Beyond Classroom, Testimonials, Contact), structured data (Schema.org School), OG/Twitter meta tags, and inline CSS. Regular browser visitors still get the React SPA with full interactivity.
 
 ### Build System
@@ -56,9 +56,19 @@ Preferred communication style: Simple, everyday language.
 └── migrations/       # Database migrations (Drizzle Kit)
 ```
 
-## Blog Posts (86 total)
+## Blog Posts (94 total)
 
-All 86 blog posts from the live site are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
+All 94 blog posts are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
+
+### SEO Blog Batch (Apr 2026 — 8 posts)
+- CBSE vs ICSE vs State Board comparison (School Selection)
+- School Admission Checklist Thane 2026-27 (CBSE School)
+- How to Help Your Child Focus Better (Parenting)
+- Importance of Extracurricular Activities (Parenting)
+- NEP 2020 Explained for Parents (CBSE School)
+- Prepare Your Child for First Day of School (Parenting)
+- Multiple Intelligence-Based Learning (CBSE School)
+- Best CBSE Schools in Thane — Selection Guide (School Selection)
 
 Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier fallback: CDN image → category image (`/blog/cat-*.png`) → gradient placeholder. Category images stored in `client/public/blog/`.
 

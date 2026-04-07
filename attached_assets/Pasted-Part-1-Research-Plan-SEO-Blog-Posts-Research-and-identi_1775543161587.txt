@@ -1,0 +1,43 @@
+Part 1: Research & Plan SEO Blog Posts
+
+Research and identify 8 high-search-volume blog post topics relevant to Rainbow International School (RIS) — a CBSE school in Thane, Maharashtra, India. The topics should target keywords that parents actively search when looking for schools, making education decisions, or seeking parenting/academic guidance.
+
+Focus on topics with:
+
+High search volume and clear parent intent (informational + commercial)
+Relevance to school admissions, choosing schools, academic guidance, and parenting
+Local SEO potential (Thane-specific where appropriate)
+Opportunity to naturally position RIS as the answer
+Think about what parents Google when:
+
+Choosing between schools or boards (CBSE/ICSE/State)
+Preparing for school admissions
+Helping their child academically or emotionally
+Understanding education policies or trends
+Looking for school-related advice in Thane
+For each blog post, define:
+
+Title (SEO-optimized, compelling for parents)
+Slug
+Primary + secondary target keywords
+Content outline (what the article covers)
+Estimated word count (1,800-2,500 words each)
+Content format (numbered lists, comparison tables, checklists, timelines, FAQ sections, etc.)
+Part 2: Create the Blog Posts
+
+After finalizing the 8 topics, create all blog posts following the same pattern used in the existing blog system. Each post should:
+
+Be stored in the blog data structure (same pattern as existing blog posts in blog-post.tsx)
+Have 1,800-2,500 words of genuinely useful, detailed content — not filler
+Use proper markdown formatting: ## for h2 headings, ### for h3, **bold** for emphasis, bullet lists, numbered lists
+Include a FAQ section at the end using **Q: / A: format for FAQ schema
+End with a RIS_BACKLINK: entry linking to Rainbow Preschool (sister school) — use the format RIS_BACKLINK:Looking for early education? Visit [Rainbow Preschool International](https://www.rainbowpreschools.com) for Playgroup, Nursery & Kindergarten in Thane.
+Include natural internal links to other RIS pages (admissions, programmes, contact) within the content
+Cross-link between the new blog posts where relevant
+Part 3: Register Everything
+
+Register all 8 blog posts in the blog listing page
+Add bot SSR entries with BlogPosting schema for each post
+Add all blog URLs to sitemap.xml
+Update llms.txt with the new blog section
+Ensure the blog listing page displays all new posts with proper titles, descriptions, and thumbnails
