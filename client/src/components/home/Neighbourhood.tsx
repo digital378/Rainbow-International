@@ -16,14 +16,14 @@ const features = [
   {
     icon: MapPin,
     title: "Central Thane Location",
-    desc: "Situated in Brahmand Phase 4, easily accessible from all major Thane neighbourhoods and the Mumbai–Ahmedabad highway.",
+    desc: "Situated in Brahmand Phase 4, easily accessible from all major Thane neighbourhoods.",
     color: "#e0edff",
     accent: "#0d3b86",
   },
   {
     icon: Bus,
     title: "Door-to-Door Transport",
-    desc: "A fleet of GPS-tracked school buses covers 30+ routes across Thane, Mulund, Airoli, and neighbouring areas.",
+    desc: "A fleet of GPS-tracked school buses covers 30+ routes across all of Thane.",
     color: "#e0f7f0",
     accent: "#059669",
   },
