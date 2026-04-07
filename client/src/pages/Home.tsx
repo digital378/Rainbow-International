@@ -13,6 +13,7 @@ const DiscoverRainbow = lazy(() => import("@/components/home/DiscoverRainbow").t
 const Neighbourhood = lazy(() => import("@/components/home/Neighbourhood").then(m => ({ default: m.Neighbourhood })));
 const BeyondClassroomSection = lazy(() => import("@/components/home/BeyondClassroomSection").then(m => ({ default: m.BeyondClassroomSection })));
 const Testimonials = lazy(() => import("@/components/home/Testimonials").then(m => ({ default: m.Testimonials })));
+const HomeFAQ = lazy(() => import("@/components/home/HomeFAQ").then(m => ({ default: m.HomeFAQ })));
 const ContactForm = lazy(() => import("@/components/home/ContactForm").then(m => ({ default: m.ContactForm })));
 
 function SectionFallback() {
@@ -100,6 +101,9 @@ export default function Home() {
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <Testimonials />
+          </Suspense>
+          <Suspense fallback={<SectionFallback />}>
+            <HomeFAQ />
           </Suspense>
           <Suspense fallback={<SectionFallback />}>
             <ContactForm />
