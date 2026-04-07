@@ -34,6 +34,22 @@ const faqs = [
     q: "What is the student-to-teacher ratio?",
     a: "We maintain an optimal student-to-teacher ratio to ensure personalised attention for every child. Our team of 200+ qualified educators are trained in modern pedagogical approaches, including the Multiple Intelligence methodology used in our Pre-Primary section.",
   },
+  {
+    q: "Is Rainbow International the best CBSE school in Thane?",
+    a: "Rainbow International School is consistently recognised as one of the best CBSE schools in Thane. We have received multiple awards for academic excellence, innovative pedagogy, and holistic student development. With a 100% board result in our very first batch, a 3.5-acre campus, and a curriculum that balances academics with sports and the arts, parents across Thane West trust Rainbow as a top choice for quality education.",
+  },
+  {
+    q: "Is there a good school near me in Thane West?",
+    a: "If you live in or around Thane West — including Brahmand, Hiranandani Estate, Manpada, Ghodbunder Road, Patlipada, Kavesar, Kolshet, or Pokhran Road — Rainbow International School is likely just minutes from your home. Our central location in Brahmand Phase 4 and a network of 30+ bus routes make us one of the most accessible schools in the area.",
+  },
+  {
+    q: "What makes Rainbow International different from other schools near me?",
+    a: "Rainbow stands out through its combination of a rigorous CBSE curriculum, the Multiple Intelligence approach in early years, one-on-one career counselling for senior students, and a 3.5-acre campus with world-class facilities. Unlike many schools in the area, we offer three streams in senior secondary — Science, Commerce, and Humanities — giving students flexibility to pursue their true interests.",
+  },
+  {
+    q: "How do I find the best school near me for my child in Thane?",
+    a: "When looking for the best school near you in Thane, consider factors like board affiliation, campus infrastructure, extracurricular programmes, teacher quality, and proximity to your home. Rainbow International School checks every box — CBSE-affiliated, award-winning, located centrally in Thane West, and offering Nursery to Class 12 with door-to-door bus transport across the city.",
+  },
 ];
 
 function FAQItem({ faq, index, isOpen, toggle }: { faq: typeof faqs[0]; index: number; isOpen: boolean; toggle: () => void }) {
