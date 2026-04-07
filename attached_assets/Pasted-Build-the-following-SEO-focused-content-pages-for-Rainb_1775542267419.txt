@@ -1,0 +1,40 @@
+Build the following SEO-focused content pages for RainbowInternationalSchool.com. Each page should be fully registered with routes, bot SSR (with proper meta tags, structured data, breadcrumbs), sitemap entries, and llms.txt updates.
+
+1. School Readiness Quiz (/school-readiness-quiz)
+
+Interactive "Is My Child Ready for Grade 1?" quiz (or appropriate entry grade)
+10 research-backed questions covering academic readiness, social skills, emotional maturity, physical development, and independence
+3 result tiers: Ready / Almost Ready / Give It Time
+Score breakdown by category, answer summary, and CTA to schedule a campus visit
+SEO target: "school readiness quiz", "is my child ready for school"
+2. Top Schools Comparison (/top-schools-in-thane)
+
+Comparison of top 10 schools in Thane with ratings, reviews, highlights, and considerations
+Rainbow International School positioned as #1 with detailed breakdown (CBSE/ICSE affiliation, infrastructure, teacher ratios, extracurriculars, K-12 pathway from Rainbow Preschool)
+"How to Choose the Right School" guidance section
+SEO target: "top schools in thane", "best schools thane", "school comparison thane"
+3. Parent Testimonials (/testimonials)
+
+12+ genuine-sounding parent testimonials across different grades and branches
+Each testimonial includes: parent name, grade, branch, star rating, detailed review
+AggregateRating + Review schema markup for rich snippets in search results
+Grid layout with quote cards, aggregate rating banner, and CTA to schedule a visit
+SEO target: "rainbow international school reviews", "school testimonials thane"
+4. FAQ Hub (/faqs)
+
+30+ questions organized into categories: Admissions, Fees, Academics & Curriculum, Safety, Timings, Transport, Extracurriculars, Facilities
+Accordion-style layout with search/filter functionality
+Accessible accordions (aria-expanded, aria-controls, role="region")
+FAQPage schema markup for rich snippets
+Category jump links and related page links within answers
+SEO target: "rainbow international school faq", "school admission questions thane"
+Technical Requirements:
+
+Each page uses the site's existing SEO component, CTA section, and internal links component
+All pages registered in the router with lazy loading
+Bot SSR entries with title, description, keywords, canonical URL, structured data, breadcrumbs, and content sections
+URLs added to sitemap.xml and llms.txt
+No pink colors — use the brand's primary color palette
+All interactive elements must have data-testid attributes
+Proper accessibility: labels for inputs, aria attributes on accordions
+Check for any existing redirect rules that might conflict with new URLs (e.g., old WordPress redirects for /testimonials or /faqs) and remove them

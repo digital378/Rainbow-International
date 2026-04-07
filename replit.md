@@ -62,7 +62,7 @@ All 86 blog posts from the live site are built as individual SEO-optimised pages
 
 Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier fallback: CDN image → category image (`/blog/cat-*.png`) → gradient placeholder. Category images stored in `client/public/blog/`.
 
-## Pages (20 total)
+## Pages (24 total)
 
 | Route | Page | File |
 |-------|------|------|
@@ -86,6 +86,10 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/cbse-mandatory-public-disclosures` | CBSE Disclosures | `pages/CbseDisclosures.tsx` |
 | `/declaration` | Declaration (PDF embed) | `pages/Declaration.tsx` |
 | `/book-list` | Book List (PDF embed) | `pages/BookList.tsx` |
+| `/school-readiness-quiz` | School Readiness Quiz | `pages/SchoolReadinessQuiz.tsx` |
+| `/top-schools-in-thane` | Top Schools Comparison | `pages/TopSchools.tsx` |
+| `/testimonials` | Parent Testimonials | `pages/Testimonials.tsx` |
+| `/faqs` | FAQ Hub | `pages/FAQs.tsx` |
 
 ## Key Components
 

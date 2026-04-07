@@ -47,6 +47,10 @@ const GoogleSchool = lazy(() => import("@/pages/GoogleSchool"));
 const MetaSchool = lazy(() => import("@/pages/MetaSchool"));
 const ScheduleAppointment = lazy(() => import("@/pages/ScheduleAppointment"));
 const ThankYou = lazy(() => import("@/pages/ThankYou"));
+const SchoolReadinessQuiz = lazy(() => import("@/pages/SchoolReadinessQuiz"));
+const TopSchools = lazy(() => import("@/pages/TopSchools"));
+const TestimonialsPage = lazy(() => import("@/pages/Testimonials"));
+const FAQsPage = lazy(() => import("@/pages/FAQs"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
@@ -101,6 +105,10 @@ function Router() {
       <Route path="/meta-school-2025-26" component={MetaSchool} />
       <Route path="/schedule-appointment" component={ScheduleAppointment} />
       <Route path="/thank-you" component={ThankYou} />
+      <Route path="/school-readiness-quiz" component={SchoolReadinessQuiz} />
+      <Route path="/top-schools-in-thane" component={TopSchools} />
+      <Route path="/testimonials" component={TestimonialsPage} />
+      <Route path="/faqs" component={FAQsPage} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>

@@ -6,6 +6,7 @@ import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
+import { registerPageSSR } from "./ssrPages";
 
 // ── Email helpers ───────────────────────────────────────────────
 function getTransporter() {
@@ -283,6 +284,7 @@ export async function registerRoutes(
   });
 
   registerHomeSSR(app);
+  registerPageSSR(app);
   registerSSRRoutes(app);
 
   return httpServer;
