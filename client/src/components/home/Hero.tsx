@@ -83,7 +83,7 @@ export function Hero() {
             </h1>
 
             <p className="text-blue-200/80 text-base md:text-lg leading-relaxed max-w-lg font-light mb-8">
-              Thane West's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.
+              Thane's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-8">
@@ -141,7 +141,7 @@ export function Hero() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
                 <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Seat Availability — AY 2026–27</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Rainbow International School, Thane West</p>
+                <p className="text-xs text-gray-500 mt-0.5">Rainbow International School, Thane</p>
               </div>
               <button
                 onClick={() => setShowSeats(false)}

@@ -13,7 +13,7 @@ const highlights = [
   "CBSE Affiliated (No. 1130661)",
   "Nursery to Class 12",
   "Multiple Intelligence methodology",
-  "3.5-acre green campus in Thane West",
+  "3.5-acre green campus in Thane",
 ];
 
 function formatNum(val: number, decimals?: number, suffix?: string, target?: number): string {

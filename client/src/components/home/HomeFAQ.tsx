@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: "Where is Rainbow International School located in Thane?",
-    a: "Our campus is located at Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607. We are centrally situated and easily accessible from Hiranandani Estate, Manpada, Ghodbunder Road, Patlipada, Kavesar, Pokhran Road, and other Thane neighbourhoods.",
+    a: "Our campus is located at Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607. We are centrally situated and easily accessible from Hiranandani Estate, Manpada, Ghodbunder Road, Patlipada, Kavesar, Pokhran Road, and other neighbourhoods across Thane.",
   },
   {
     q: "How do I apply for admission at Rainbow International School?",
@@ -36,11 +36,11 @@ const faqs = [
   },
   {
     q: "Is Rainbow International the best CBSE school in Thane?",
-    a: "Rainbow International School is consistently recognised as one of the best CBSE schools in Thane. We have received multiple awards for academic excellence, innovative pedagogy, and holistic student development. With a 100% board result in our very first batch, a 3.5-acre campus, and a curriculum that balances academics with sports and the arts, parents across Thane West trust Rainbow as a top choice for quality education.",
+    a: "Rainbow International School is consistently recognised as one of the best CBSE schools in Thane. We have received multiple awards for academic excellence, innovative pedagogy, and holistic student development. With a 100% board result in our very first batch, a 3.5-acre campus, and a curriculum that balances academics with sports and the arts, parents across Thane trust Rainbow as a top choice for quality education.",
   },
   {
-    q: "Is there a good school near me in Thane West?",
-    a: "If you live in or around Thane West — including Brahmand, Hiranandani Estate, Manpada, Ghodbunder Road, Patlipada, Kavesar, Kolshet, or Pokhran Road — Rainbow International School is likely just minutes from your home. Our central location in Brahmand Phase 4 and a network of 30+ bus routes make us one of the most accessible schools in the area.",
+    q: "Is there a good school near me in Thane?",
+    a: "If you live in or around Thane — including Brahmand, Hiranandani Estate, Manpada, Ghodbunder Road, Patlipada, Kavesar, Kolshet, or Pokhran Road — Rainbow International School is likely just minutes from your home. Our central location in Brahmand Phase 4 and a network of 30+ bus routes make us one of the most accessible schools in the area.",
   },
   {
     q: "What makes Rainbow International different from other schools near me?",
@@ -48,7 +48,7 @@ const faqs = [
   },
   {
     q: "How do I find the best school near me for my child in Thane?",
-    a: "When looking for the best school near you in Thane, consider factors like board affiliation, campus infrastructure, extracurricular programmes, teacher quality, and proximity to your home. Rainbow International School checks every box — CBSE-affiliated, award-winning, located centrally in Thane West, and offering Nursery to Class 12 with door-to-door bus transport across the city.",
+    a: "When looking for the best school near you in Thane, consider factors like board affiliation, campus infrastructure, extracurricular programmes, teacher quality, and proximity to your home. Rainbow International School checks every box — CBSE-affiliated, award-winning, located centrally in Thane, and offering Nursery to Class 12 with door-to-door bus transport across the city.",
   },
 ];
 

@@ -15,7 +15,7 @@ const areas = [
 const features = [
   {
     icon: MapPin,
-    title: "Central Thane West Location",
+    title: "Central Thane Location",
     desc: "Situated in Brahmand Phase 4, easily accessible from all major Thane neighbourhoods and the Mumbai–Ahmedabad highway.",
     color: "#e0edff",
     accent: "#0d3b86",
@@ -56,7 +56,7 @@ export function Neighbourhood() {
             A Top School, Right in Your Neighbourhood
           </h2>
           <p className="text-gray-500 text-base max-w-2xl mx-auto">
-            Located in the heart of Thane West, Rainbow International School is just minutes away from most residential areas — making the daily commute easy for families.
+            Located in the heart of Thane, Rainbow International School is just minutes away from most residential areas — making the daily commute easy for families.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export function Neighbourhood() {
               ))}
             </div>
             <p className="text-xs text-gray-400 mt-4 leading-relaxed">
-              Cosmos Arcade, Brahmand Phase 4, Thane West 400607 · <Link href="/contact-us" className="underline hover:text-gray-600">Get directions</Link>
+              Cosmos Arcade, Brahmand Phase 4, Thane 400607 · <Link href="/contact-us" className="underline hover:text-gray-600">Get directions</Link>
             </p>
           </div>
         </div>

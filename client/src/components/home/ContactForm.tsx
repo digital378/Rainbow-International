@@ -35,7 +35,7 @@ const contactCards = [
   {
     icon: MapPin,
     label: "Our Address",
-    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra"],
+    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane, Maharashtra"],
     href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
   },
 ];

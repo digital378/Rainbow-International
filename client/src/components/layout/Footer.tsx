@@ -134,7 +134,7 @@ export function Footer() {
                 <strong className="text-white/80">World-Class Education, Indian Values.</strong>
               </p>
               <p className="text-white/50 leading-relaxed text-sm mb-8">
-                One of the top CBSE schools in Thane West — where every child dares to dream and becomes a lifelong learner.
+                One of the top CBSE schools in Thane — where every child dares to dream and becomes a lifelong learner.
               </p>
               <p className="text-white/40 text-xs mb-3 font-semibold uppercase tracking-wider">Follow Us</p>
               <div className="flex gap-3">
