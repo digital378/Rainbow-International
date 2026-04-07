@@ -260,15 +260,12 @@ export default function BlogPost() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {related.map((rel) => (
                   <Link key={rel.slug} href={`/blog/${rel.slug}`} className="group block rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow bg-white">
-                    <div className="relative aspect-[16/9] overflow-hidden bg-gray-50">
-                      <BlogThumb src={rel.thumbUrl} alt={rel.title} cat={rel.cat} />
-                    </div>
-                    <div className="p-4">
+                    <div className="p-5">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{rel.cat}</span>
-                      <h3 className="text-sm font-bold mt-1 leading-snug text-gray-800 group-hover:text-blue-800 transition-colors line-clamp-2">
+                      <h3 className="text-base font-bold mt-2 leading-snug text-gray-800 group-hover:text-blue-800 transition-colors line-clamp-3">
                         {rel.title}
                       </h3>
-                      <p className="text-xs text-gray-500 mt-1">{rel.date}</p>
+                      <p className="text-xs text-gray-500 mt-2">{rel.date}</p>
                     </div>
                   </Link>
                 ))}

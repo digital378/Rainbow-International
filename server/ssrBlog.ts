@@ -98,11 +98,7 @@ function renderBlogSSR(slug: string): string | null {
   const relatedHtml = related
     .map((rel) => {
       if (!rel) return "";
-      const catImg = getCatImage(rel.cat);
       return `<a href="/blog/${e(rel.slug)}" class="related-card">
-        <div class="related-img-wrap">
-          <img src="${e(rel.thumbUrl)}" alt="${e(rel.title)}" onerror="this.onerror=null;this.src='${catImg}'" class="related-img" loading="lazy" />
-        </div>
         <div class="related-body">
           <span class="related-cat">${e(rel.cat)}</span>
           <h3 class="related-title">${e(rel.title)}</h3>
@@ -286,9 +282,7 @@ function renderBlogSSR(slug: string): string | null {
     @media(max-width: 767px) { .related-grid { grid-template-columns: 1fr; } }
     .related-card { display: block; border-radius: 16px; overflow: hidden; border: 1px solid #f3f4f6; box-shadow: 0 1px 6px rgba(0,0,0,0.06); text-decoration: none; background: #fff; transition: box-shadow 0.2s; }
     .related-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
-    .related-img-wrap { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; background: #f9fafb; }
-    .related-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .related-body { padding: 16px; }
+    .related-body { padding: 20px; }
     .related-cat { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #f97316; }
     .related-title-text { font-size: 14px; font-weight: 700; margin-top: 5px; line-height: 1.4; color: #111827; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .related-card:hover .related-title-text { color: #1d4ed8; }
