@@ -23,7 +23,7 @@ export default function VirtualLearning() {
         title="Virtual Learning"
         description="Experience education redefined with Rainbow International School's Virtual Learning programme. Anytime access to courses and assessments via Google Classroom."
         keywords="virtual learning Rainbow School, online classes Rainbow International School, Google Classroom Thane school, digital learning Thane"
-        canonical="https://rainbowinternationalschool.in/virtual-learning/"
+        canonical="https://www.rainbowinternationalschool.in/virtual-learning/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
       />
       <Navbar />

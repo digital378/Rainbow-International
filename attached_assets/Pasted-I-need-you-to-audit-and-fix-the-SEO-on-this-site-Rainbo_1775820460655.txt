@@ -1,0 +1,54 @@
+I need you to audit and fix the SEO on this site — Rainbow International School at https://rainbowinternationalschool.in/. The site is already built in React + TypeScript + Express (same stack as Rainbow Preschool). Here are the specific issues found, ordered by priority:
+
+CRITICAL — Structured Data (currently zero JSON-LD on the site):
+
+Add the following JSON-LD schemas — both client-side (via a <SEO> component useEffect) and in the bot SSR system (so Googlebot gets them server-side):
+
+EducationalOrganization + School (homepage) — name: "Rainbow International School", url: https://www.rainbowinternationalschool.in, logo, telephone, address (Thane), real geo coordinates (lat/lng), sameAs social links, AggregateRating (use real rating if available, otherwise 4.8/5 based on ~200 reviews), numberOfStudents: 3000.
+WebSite schema on homepage — name, url, potentialAction omitted (no site search functionality).
+FAQPage schema on every keyword landing page (e.g. "best CBSE school in Thane", "school near me Thane", etc.) — use the existing FAQ content on those pages.
+BreadcrumbList on every inner page — e.g. Home > Academics > Pre-Primary.
+VideoObject on homepage if a campus walkthrough/promo video exists.
+Course or EducationalOccupationalProgram schema on each academic section page (Pre-Primary, Primary, Middle, Secondary, Senior Secondary).
+HIGH — Canonical host redirect is missing:
+
+The site serves from rainbowinternationalschool.in (non-www) with no redirect to www. Fix: add canonical host enforcement in server/redirects.ts — 301 redirect http:// and rainbowinternationalschool.in (non-www) to https://www.rainbowinternationalschool.in. Critical: only fire the redirect when host.includes("rainbowinternationalschool.in") — otherwise Replit health checks will get a redirect loop and deployment will fail.
+
+Also update sitemap.xml — all URLs currently use non-www (https://rainbowinternationalschool.in/...). Change all to https://www.rainbowinternationalschool.in/....
+
+HIGH — Fix broken/wrong meta tags:
+
+twitter:site is currently set to @replit — change to the school's actual Twitter/X handle (or remove if none).
+og:image points to https://rainbow-international.replit.app/opengraph.jpg — update to https://www.rainbowinternationalschool.in/opengraph.jpg (copy the image to client/public/ if not already there).
+og:url should be https://www.rainbowinternationalschool.in (with www).
+Add <link rel="canonical"> tag on every page pointing to the www version.
+MEDIUM — Bot SSR improvements:
+
+The bot SSR system exists but currently only serves meta tags — it does not inject any JSON-LD structured data. Update the SSR responses for bots to include all the JSON-LD schemas listed above, embedded as <script type="application/ld+json"> tags in the <head>.
+
+Also verify the bot SSR covers all key pages: homepage, all academic section pages, contact, about, admissions/application form, and any keyword landing pages.
+
+MEDIUM — robots.txt improvements:
+
+Current robots.txt blocks only /api/. Add blocks for: ad landing pages (/ad, /ad-google, /RIS, /ris), any internal/admin pages, and duplicate/thin content pages. Keep the sitemap and llms.txt directives already in place.
+
+LOW — Performance (Core Web Vitals):
+
+Hero image: add fetchpriority="high" to the hero <img> and a <link rel="preload" fetchpriority="high"> in the document head for LCP.
+Lazy-load all below-fold sections using IntersectionObserver.
+Defer analytics initialisation with requestIdleCallback.
+Set video preload="none" on any embedded videos.
+School details to use across all schemas:
+
+Name: Rainbow International School
+Canonical domain: https://www.rainbowinternationalschool.in
+Board: CBSE
+Grades: Nursery to Class 12 (streams: Science, Commerce, Humanities)
+Campus: 3.5 acres, Thane, Maharashtra, India
+Students: 3000+
+Admissions: 2026-27 open
+Phone: [confirm from site/team]
+Address: [confirm exact address]
+Geo coordinates: [confirm real lat/lng for the campus]
+Start by reading the existing codebase structure — especially server/ssr-pages.ts (or equivalent), client/src/components/seo.tsx, server/redirects.ts, and client/public/sitemap.xml — before making any changes.
+

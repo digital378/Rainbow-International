@@ -170,10 +170,10 @@ export default function TopSchools() {
         title="Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School"
         description="Compare the top 10 schools in Thane for 2026. Detailed ratings, reviews, highlights, and considerations for CBSE, ICSE, and International schools. Find the best school for your child."
         keywords="top schools in thane, best schools thane, school comparison thane, best CBSE school thane, best ICSE school thane, top 10 schools thane 2026"
-        canonical="https://rainbowinternationalschool.in/top-schools-in-thane"
+        canonical="https://www.rainbowinternationalschool.in/top-schools-in-thane"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Top Schools in Thane", href: "https://rainbowinternationalschool.in/top-schools-in-thane" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Top Schools in Thane", href: "https://www.rainbowinternationalschool.in/top-schools-in-thane" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",

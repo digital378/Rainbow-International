@@ -125,13 +125,24 @@ export default function PrePrimary() {
         title="Pre-Primary (Nursery–Sr KG) Thane"
         description="Rainbow International School's Pre-Primary Section (Nursery, Jr KG, Sr KG) in Thane. Activity-based, game-based learning for holistic development. Admissions open."
         keywords="pre-primary school Thane, nursery admission Thane, Jr KG Sr KG admission, Rainbow preschool Thane"
-        canonical="https://rainbowinternationalschool.in/pre-primary-school-thane/"
+        canonical="https://www.rainbowinternationalschool.in/pre-primary-school-thane/"
         ogImage="/images/preschool/hero.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Academics", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
-          { name: "Pre-Primary", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://www.rainbowinternationalschool.in/pre-primary-school-thane" },
+          { name: "Pre-Primary", href: "https://www.rainbowinternationalschool.in/pre-primary-school-thane" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOccupationalProgram",
+          "name": "Pre-Primary Programme (Nursery to Sr KG)",
+          "description": "Activity-based, game-based early learning programme for children aged 2.5–5.5 years, following the CBSE framework and Multiple Intelligence pedagogy.",
+          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
+          "educationalProgramMode": "full-time",
+          "programPrerequisites": "Age 2.5 years and above",
+          "occupationalCategory": "Pre-Primary Education",
+          "url": "https://www.rainbowinternationalschool.in/pre-primary-school-thane/"
+        }}
       />
       <Navbar />
       <PageBanner

@@ -40,6 +40,8 @@ export function SEO({ title, description, canonical, ogImage, keywords, breadcru
     setMeta("og:image", ogImage || defaultImage, true);
     setMeta("og:type", "website", true);
     setMeta("og:locale", "en_IN", true);
+    setMeta("og:site_name", "Rainbow International School", true);
+    if (canonical) setMeta("og:url", canonical, true);
     setMeta("twitter:title", fullTitle);
     setMeta("twitter:description", description);
     setMeta("twitter:card", "summary_large_image");

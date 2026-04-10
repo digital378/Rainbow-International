@@ -42,12 +42,12 @@ function shell(cfg: PageSSRConfig): string {
 <meta property="og:description" content="${e(cfg.description)}"/>
 <meta property="og:url" content="${e(cfg.canonical)}"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta property="og:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <meta property="og:locale" content="en_IN"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${e(cfg.title)}"/>
 <meta name="twitter:description" content="${e(cfg.description)}"/>
-<meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta name="twitter:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <script type="application/ld+json">${JSON.stringify(cfg.jsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 <style>
@@ -238,10 +238,10 @@ const pages: PageSSRConfig[] = [
     title: "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",
     description: "Take our free 10-question school readiness quiz to find out if your child is prepared for Grade 1. Covers academic, social, emotional, physical, and independence skills.",
     keywords: "school readiness quiz, is my child ready for school, grade 1 readiness test, school readiness checklist, child development assessment",
-    canonical: "https://rainbowinternationalschool.in/school-readiness-quiz",
+    canonical: "https://www.rainbowinternationalschool.in/school-readiness-quiz",
     breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "School Readiness Quiz", url: "https://rainbowinternationalschool.in/school-readiness-quiz" },
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "School Readiness Quiz", url: "https://www.rainbowinternationalschool.in/school-readiness-quiz" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -258,10 +258,10 @@ const pages: PageSSRConfig[] = [
     title: "Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School",
     description: "Compare the top 10 schools in Thane for 2026. Detailed ratings, reviews, highlights for CBSE, ICSE, and International schools.",
     keywords: "top schools in thane, best schools thane, school comparison thane, best CBSE school thane, top 10 schools thane 2026",
-    canonical: "https://rainbowinternationalschool.in/top-schools-in-thane",
+    canonical: "https://www.rainbowinternationalschool.in/top-schools-in-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Top Schools in Thane", url: "https://rainbowinternationalschool.in/top-schools-in-thane" },
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Top Schools in Thane", url: "https://www.rainbowinternationalschool.in/top-schools-in-thane" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -288,10 +288,10 @@ const pages: PageSSRConfig[] = [
     title: "Parent Testimonials & Reviews | Rainbow International School Thane",
     description: "Read genuine parent testimonials and reviews from Rainbow International School, Thane. Rated 4.8/5 by parents across all sections.",
     keywords: "rainbow international school reviews, school testimonials thane, parent reviews rainbow school, best school reviews thane",
-    canonical: "https://rainbowinternationalschool.in/testimonials",
+    canonical: "https://www.rainbowinternationalschool.in/testimonials",
     breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Testimonials", url: "https://rainbowinternationalschool.in/testimonials" },
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Testimonials", url: "https://www.rainbowinternationalschool.in/testimonials" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -308,10 +308,10 @@ const pages: PageSSRConfig[] = [
     title: "FAQs — Admissions, Fees, Academics & More | Rainbow International School",
     description: "Find answers to 30+ frequently asked questions about Rainbow International School, Thane — admissions, fees, curriculum, safety, transport, and facilities.",
     keywords: "rainbow international school faq, school admission questions thane, CBSE school faq, school fees thane",
-    canonical: "https://rainbowinternationalschool.in/faqs",
+    canonical: "https://www.rainbowinternationalschool.in/faqs",
     breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "FAQs", url: "https://rainbowinternationalschool.in/faqs" },
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "FAQs", url: "https://www.rainbowinternationalschool.in/faqs" },
     ],
     jsonLd: {
       "@context": "https://schema.org",

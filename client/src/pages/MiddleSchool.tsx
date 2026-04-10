@@ -127,13 +127,23 @@ export default function MiddleSchool() {
         title="Middle School (Class 6–10)"
         description="Rainbow International School's Middle School Section (Class 6 to 10). Multi-dimensional curriculum to develop creativity, intellectual curiosity and maturity. CBSE affiliated."
         keywords="middle school Thane, Class 6 to 10 CBSE Thane, Rainbow International School middle section"
-        canonical="https://rainbowinternationalschool.in/middle-school-section/"
+        canonical="https://www.rainbowinternationalschool.in/middle-school-section/"
         ogImage="/images/home/academic/middle-section.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Academics", href: "https://rainbowinternationalschool.in/middle-school-section" },
-          { name: "Middle School (Class 6-10)", href: "https://rainbowinternationalschool.in/middle-school-section" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://www.rainbowinternationalschool.in/middle-school-section" },
+          { name: "Middle School (Class 6-10)", href: "https://www.rainbowinternationalschool.in/middle-school-section" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "EducationalOccupationalProgram",
+          "name": "Middle School Section (Class 6–10)",
+          "description": "CBSE middle school for Class 6 to 10 in Thane, building creativity, intellectual curiosity, and conceptual depth through project-based and collaborative learning.",
+          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
+          "educationalProgramMode": "full-time",
+          "programPrerequisites": "Completion of Class 5",
+          "url": "https://www.rainbowinternationalschool.in/middle-school-section/"
+        }}
       />
       <Navbar />
       <PageBanner

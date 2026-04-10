@@ -22,17 +22,17 @@ function renderHomeSSR(): string {
 <title>Best CBSE school in thane near me - Rainbow International</title>
 <meta name="description" content="Rainbow International School — best CBSE school in Thane near you. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities streams. Admissions 2026-27 open." />
 <meta name="keywords" content="best CBSE school in Thane near me, CBSE school Thane, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane" />
-<link rel="canonical" href="https://rainbowinternationalschool.in/" />
+<link rel="canonical" href="https://www.rainbowinternationalschool.in/" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Best CBSE school in thane near me - Rainbow International" />
 <meta property="og:description" content="Rainbow International School is one of the top CBSE K–12 schools in Thane, Maharashtra. World-class education from Nursery to Class 12." />
-<meta property="og:url" content="https://rainbowinternationalschool.in/" />
-<meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
+<meta property="og:url" content="https://www.rainbowinternationalschool.in/" />
+<meta property="og:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Best CBSE school in thane near me - Rainbow International" />
 <meta name="twitter:description" content="Rainbow International School — top CBSE K-12 school in Thane. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open." />
-<meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
+<meta name="twitter:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet" />
@@ -40,14 +40,15 @@ function renderHomeSSR(): string {
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "School",
+  "@type": ["EducationalOrganization", "School"],
   "name": "Rainbow International School",
   "alternateName": "RIS Thane",
-  "url": "https://rainbowinternationalschool.in/",
-  "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
-  "image": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+  "url": "https://www.rainbowinternationalschool.in/",
+  "logo": "https://www.rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
+  "image": "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
   "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
   "foundingDate": "2009-04-01",
+  "numberOfStudents": 3000,
   "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
   "address": {
     "@type": "PostalAddress",
@@ -83,6 +84,14 @@ function renderHomeSSR(): string {
     "reviewCount": "250",
     "bestRating": "5"
   }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Rainbow International School",
+  "url": "https://www.rainbowinternationalschool.in/"
 }
 </script>
 

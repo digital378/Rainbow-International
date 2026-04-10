@@ -12,9 +12,9 @@ app.use(compression());
 if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     const host = req.hostname;
-    if (host && host.startsWith("www.")) {
-      const newHost = host.slice(4);
-      return res.redirect(301, `https://${newHost}${req.originalUrl}`);
+    // Only enforce www on the real domain — skip Replit preview URLs to prevent redirect loops
+    if (host && host.includes("rainbowinternationalschool.in") && !host.startsWith("www.")) {
+      return res.redirect(301, `https://www.${host}${req.originalUrl}`);
     }
     next();
   });

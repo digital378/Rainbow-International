@@ -143,10 +143,10 @@ export default function FAQsPage() {
         title="FAQs — Admissions, Fees, Academics & More | Rainbow International School"
         description="Find answers to 30+ frequently asked questions about Rainbow International School, Thane — admissions, fees, curriculum, safety, timings, transport, extracurriculars, and facilities."
         keywords="rainbow international school faq, school admission questions thane, CBSE school faq, school fees thane, rainbow school admissions, school timings thane"
-        canonical="https://rainbowinternationalschool.in/faqs"
+        canonical="https://www.rainbowinternationalschool.in/faqs"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "FAQs", href: "https://rainbowinternationalschool.in/faqs" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "FAQs", href: "https://www.rainbowinternationalschool.in/faqs" },
         ]}
         jsonLd={faqJsonLd}
       />

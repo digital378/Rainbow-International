@@ -179,11 +179,11 @@ export default function SafetySecurity() {
         title="Safety & Security"
         description="Rainbow International School prioritizes student safety with 160 CCTV cameras, metal detectors, GPS transport, trained nurses, ambulance, and 100% female preschool staff."
         keywords="school safety Thane, Rainbow school security, safe school Thane, CCTV school Thane, GPS school bus Thane"
-        canonical="https://rainbowinternationalschool.in/safety-security/"
+        canonical="https://www.rainbowinternationalschool.in/safety-security/"
         ogImage="/images/home/discover/safety-security.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Safety & Security", href: "https://rainbowinternationalschool.in/safety-security" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Safety & Security", href: "https://www.rainbowinternationalschool.in/safety-security" },
         ]}
       />
       <Navbar />

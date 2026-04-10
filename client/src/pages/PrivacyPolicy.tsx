@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
         title="Privacy Policy & Cookie Policy"
         description="Rainbow International School's Privacy Policy and Cookie Policy. Learn how we collect, use, and protect your personal information."
         keywords="privacy policy, cookie policy, Rainbow International School, data protection, school website policy"
-        canonical="https://rainbowinternationalschool.in/privacy-policy-and-cookie-policy/"
+        canonical="https://www.rainbowinternationalschool.in/privacy-policy-and-cookie-policy/"
       />
       <Navbar />
       <PageBanner

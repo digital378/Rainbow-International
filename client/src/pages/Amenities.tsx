@@ -100,10 +100,10 @@ export default function Amenities() {
         title="Amenities & Facilities"
         description="Rainbow International School offers world-class amenities including Amphitheatre, Music Room, Swimming Pool, Cricket Ground, Football Turf, Science Labs, Library, and Organic Farm in Thane."
         keywords="Rainbow school amenities Thane, school facilities Thane, swimming pool school Thane, CBSE school facilities Thane"
-        canonical="https://rainbowinternationalschool.in/amenities/"
+        canonical="https://www.rainbowinternationalschool.in/amenities/"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Amenities & Facilities", href: "https://rainbowinternationalschool.in/amenities" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Amenities & Facilities", href: "https://www.rainbowinternationalschool.in/amenities" },
         ]}
       />
       <Navbar />

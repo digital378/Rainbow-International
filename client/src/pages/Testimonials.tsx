@@ -135,10 +135,10 @@ export default function TestimonialsPage() {
         title="Parent Testimonials & Reviews | Rainbow International School Thane"
         description="Read genuine parent testimonials and reviews from Rainbow International School, Thane. Rated 4.8/5 by parents across Pre-Primary, Primary, Middle, Secondary, and Senior Secondary sections."
         keywords="rainbow international school reviews, school testimonials thane, parent reviews rainbow school, best school reviews thane, rainbow international school thane feedback"
-        canonical="https://rainbowinternationalschool.in/testimonials"
+        canonical="https://www.rainbowinternationalschool.in/testimonials"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Testimonials", href: "https://rainbowinternationalschool.in/testimonials" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Testimonials", href: "https://www.rainbowinternationalschool.in/testimonials" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",

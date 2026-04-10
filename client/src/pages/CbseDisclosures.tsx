@@ -211,10 +211,10 @@ export default function CbseDisclosures() {
         title="CBSE Public Disclosures | Rainbow International School"
         description="CBSE mandatory public disclosures for Rainbow International School, Thane. Affiliation number 1130661. Full details including staff, infrastructure, results and documents."
         keywords="Rainbow school CBSE disclosure, CBSE affiliation number 1130661, public disclosure school Thane"
-        canonical="https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures/"
+        canonical="https://www.rainbowinternationalschool.in/cbse-mandatory-public-disclosures/"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "CBSE Disclosures", href: "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "CBSE Disclosures", href: "https://www.rainbowinternationalschool.in/cbse-mandatory-public-disclosures" },
         ]}
       />
       <Navbar />

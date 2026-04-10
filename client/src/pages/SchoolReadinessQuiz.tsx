@@ -176,10 +176,10 @@ export default function SchoolReadinessQuiz() {
         title="School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School"
         description="Take our free 10-question school readiness quiz to find out if your child is prepared for Grade 1. Covers academic, social, emotional, physical, and independence skills."
         keywords="school readiness quiz, is my child ready for school, grade 1 readiness test, school readiness checklist, preschool to grade 1, child development assessment"
-        canonical="https://rainbowinternationalschool.in/school-readiness-quiz"
+        canonical="https://www.rainbowinternationalschool.in/school-readiness-quiz"
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "School Readiness Quiz", href: "https://rainbowinternationalschool.in/school-readiness-quiz" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "School Readiness Quiz", href: "https://www.rainbowinternationalschool.in/school-readiness-quiz" },
         ]}
         jsonLd={quizJsonLd}
       />

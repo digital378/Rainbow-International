@@ -1,10 +1,16 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /ad
+Disallow: /ad-google
+Disallow: /RIS
+Disallow: /ris
+Disallow: /declaration
+Disallow: /ssr-demo/
 
-Host: https://rainbowinternationalschool.in
+Host: https://www.rainbowinternationalschool.in
 
-Sitemap: https://rainbowinternationalschool.in/sitemap.xml
+Sitemap: https://www.rainbowinternationalschool.in/sitemap.xml
 
 # AI/LLM discovery
-LLMs.txt: https://rainbowinternationalschool.in/llms.txt
+LLMs.txt: https://www.rainbowinternationalschool.in/llms.txt

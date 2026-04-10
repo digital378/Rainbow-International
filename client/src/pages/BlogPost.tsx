@@ -69,8 +69,8 @@ export default function BlogPost() {
         canonical={`https://rainbowinternationalschool.in/blog/${post.slug}/`}
         ogImage={post.heroUrl}
         breadcrumbs={[
-          { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Blogs", href: "https://rainbowinternationalschool.in/blogs" },
+          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
+          { name: "Blogs", href: "https://www.rainbowinternationalschool.in/blogs" },
           { name: post.title, href: `https://rainbowinternationalschool.in/blog/${post.slug}/` },
         ]}
       />
