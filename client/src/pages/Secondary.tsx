@@ -102,7 +102,7 @@ export default function Secondary() {
         title="Secondary Section (Class 9–10)"
         description="Rainbow International School's Secondary Section (Class 9 & 10). CBSE curriculum focused on academic excellence, career guidance, and all-round development."
         keywords="secondary school Thane, Class 9 10 CBSE Thane, Rainbow school secondary section admission"
-        canonical="https://www.rainbowinternationalschool.in/secondary-section/"
+        canonical="https://www.rainbowinternationalschool.in/secondary-section"
         ogImage="/images/home/academic/secondary.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
@@ -117,7 +117,7 @@ export default function Secondary() {
           "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
           "educationalProgramMode": "full-time",
           "programPrerequisites": "Completion of Class 8",
-          "url": "https://www.rainbowinternationalschool.in/secondary-section/"
+          "url": "https://www.rainbowinternationalschool.in/secondary-section"
         }}
       />
       <Navbar />

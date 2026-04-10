@@ -40,7 +40,7 @@ export default function SchoolNearGhodbunderRoad() {
         title="Best School Near Ghodbunder Road Thane — CBSE K–12"
         description="Rainbow International School — top-rated CBSE school near Ghodbunder Road, Thane. 8 min from GB Road. Nursery to Class 12, 3.5-acre campus. Bus routes covering Patlipada, Waghbil, Kavesar."
         keywords="school near Ghodbunder Road, best school Ghodbunder Road Thane, CBSE school GB Road Thane, school near me Ghodbunder Road, nursery school Ghodbunder Road"
-        canonical="https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane/"
+        canonical="https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "School Near Ghodbunder Road", href: "https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane" },

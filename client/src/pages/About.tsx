@@ -72,7 +72,7 @@ export default function About() {
         title="About Us | Rainbow International School Thane"
         description="Learn about Rainbow International School — founded in April 2009, serving 3000+ students across 3.5 acres in Thane. CBSE affiliated, Nursery to Class 12."
         keywords="about Rainbow International School, CBSE school Thane, best school Thane, Rainbow school history"
-        canonical="https://www.rainbowinternationalschool.in/about-rainbow-international-school/"
+        canonical="https://www.rainbowinternationalschool.in/about-rainbow-international-school"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "About Us", href: "https://www.rainbowinternationalschool.in/about-rainbow-international-school" },

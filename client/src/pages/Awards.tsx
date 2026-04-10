@@ -83,7 +83,7 @@ export default function Awards() {
         title="Awards & Achievements"
         description="Rainbow International School's awards and achievements — World Education Summit, Best Preschool & Secondary School in Thane, Excellence in CBSE Education, FIT INDIA School and more."
         keywords="Rainbow International School awards, best school Thane, CBSE school awards Thane, school achievements Thane"
-        canonical="https://www.rainbowinternationalschool.in/awards-achievements/"
+        canonical="https://www.rainbowinternationalschool.in/awards-achievements"
         ogImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },

@@ -12,7 +12,7 @@ export default function TermsOfUse() {
         title="Terms of Use - Rainbow International School"
         description="Terms of Use for Rainbow International School's website. Understand the rules and guidelines for using our site."
         keywords="terms of use, website terms, Rainbow International School, user agreement, school website terms"
-        canonical="https://www.rainbowinternationalschool.in/term-of-use/"
+        canonical="https://www.rainbowinternationalschool.in/term-of-use"
       />
       <Navbar />
       <PageBanner

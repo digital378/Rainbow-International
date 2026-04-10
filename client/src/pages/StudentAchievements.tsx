@@ -32,7 +32,7 @@ export default function StudentAchievements() {
         title="Student Achievements"
         description="Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more."
         keywords="Rainbow school student achievements, CBSE school results Thane, school sports achievements Thane"
-        canonical="https://www.rainbowinternationalschool.in/student-achievements/"
+        canonical="https://www.rainbowinternationalschool.in/student-achievements"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "Student Achievements", href: "https://www.rainbowinternationalschool.in/student-achievements" },

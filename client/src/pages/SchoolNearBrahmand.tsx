@@ -40,7 +40,7 @@ export default function SchoolNearBrahmand() {
         title="Best School Near Brahmand Thane — CBSE Nursery to Class 12"
         description="Rainbow International School — the best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
         keywords="school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane, school near me Brahmand, nursery school Brahmand Thane"
-        canonical="https://www.rainbowinternationalschool.in/school-near-brahmand-thane/"
+        canonical="https://www.rainbowinternationalschool.in/school-near-brahmand-thane"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "School Near Brahmand", href: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane" },

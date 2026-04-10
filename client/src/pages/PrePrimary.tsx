@@ -125,7 +125,7 @@ export default function PrePrimary() {
         title="Pre-Primary (Nursery–Sr KG) Thane"
         description="Rainbow International School's Pre-Primary Section (Nursery, Jr KG, Sr KG) in Thane. Activity-based, game-based learning for holistic development. Admissions open."
         keywords="pre-primary school Thane, nursery admission Thane, Jr KG Sr KG admission, Rainbow preschool Thane"
-        canonical="https://www.rainbowinternationalschool.in/pre-primary-school-thane/"
+        canonical="https://www.rainbowinternationalschool.in/pre-primary-school-thane"
         ogImage="/images/preschool/hero.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
@@ -141,7 +141,7 @@ export default function PrePrimary() {
           "educationalProgramMode": "full-time",
           "programPrerequisites": "Age 2.5 years and above",
           "occupationalCategory": "Pre-Primary Education",
-          "url": "https://www.rainbowinternationalschool.in/pre-primary-school-thane/"
+          "url": "https://www.rainbowinternationalschool.in/pre-primary-school-thane"
         }}
       />
       <Navbar />

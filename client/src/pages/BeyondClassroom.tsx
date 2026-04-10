@@ -40,7 +40,7 @@ export default function BeyondClassroom() {
         title="Beyond the Classroom"
         description="Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students."
         keywords="beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane"
-        canonical="https://www.rainbowinternationalschool.in/beyond-the-classroom/"
+        canonical="https://www.rainbowinternationalschool.in/beyond-the-classroom"
         ogImage="/images/extra/events/dance-boys.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },

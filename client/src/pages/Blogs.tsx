@@ -129,7 +129,7 @@ export default function Blogs() {
         title="Blogs"
         description="Read 86+ insightful articles from Rainbow International School on education, parenting, CBSE, student wellness, admissions, sports and more."
         keywords="Rainbow school blog, education blog Thane, CBSE school blog, parenting tips school Thane, student development blog Rainbow International"
-        canonical="https://www.rainbowinternationalschool.in/blogs/"
+        canonical="https://www.rainbowinternationalschool.in/blogs"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "Blogs", href: "https://www.rainbowinternationalschool.in/blogs" },

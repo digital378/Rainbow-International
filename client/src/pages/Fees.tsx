@@ -30,7 +30,7 @@ export default function Fees() {
         title="CBSE School Fee Structure Thane 2026-27"
         description="Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment. Contact admissions for exact fee schedule."
         keywords="CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane, school fees near me Thane"
-        canonical="https://www.rainbowinternationalschool.in/fee-structure/"
+        canonical="https://www.rainbowinternationalschool.in/fee-structure"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "Fee Structure", href: "https://www.rainbowinternationalschool.in/fee-structure" },

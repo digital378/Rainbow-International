@@ -233,6 +233,9 @@ export function Navbar() {
                 <Dropdown label={label} links={links} isTransparent={isTransparent} />
               </div>
             ))}
+            <Link href="/admissions" className={`text-sm font-semibold transition-colors px-3 py-3.5 border-b-2 border-amber-400 ${isTransparent ? "text-amber-300 hover:text-amber-200" : "text-amber-600 hover:text-amber-700"}`}>
+              Admissions
+            </Link>
             <Link href="/blogs" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>
               Blogs
             </Link>
@@ -254,6 +257,7 @@ export function Navbar() {
           <div className="p-4 space-y-1">
             {[
               { href: "/", label: "Home" },
+              { href: "/admissions", label: "Admissions 2026–27" },
               { href: "/blogs", label: "Blogs" },
               { href: "/contact-us", label: "Connect with us" },
               { href: "/career", label: "Career" },

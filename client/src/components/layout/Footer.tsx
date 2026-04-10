@@ -15,6 +15,8 @@ const quickLinks = [
 ];
 
 const exploreLinks = [
+  { label: "Admissions 2026–27", href: "/admissions" },
+  { label: "Fee Structure", href: "/fee-structure" },
   { label: "Awards & Achievements", href: "/awards-achievements" },
   { label: "Amenities & Facilities", href: "/amenities" },
   { label: "Student Achievements", href: "/student-achievements" },

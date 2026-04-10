@@ -30,7 +30,7 @@ export default function StudentsLeavingCertificate() {
         title="Students Leaving Certificate"
         description="Information on how to apply for a Leaving Certificate (Transfer Certificate) from Rainbow International School, Thane. Process, required documents, and timelines."
         keywords="leaving certificate Rainbow school, transfer certificate Thane school, Rainbow International School TC, student leaving certificate Thane"
-        canonical="https://www.rainbowinternationalschool.in/students-leaving-certificate/"
+        canonical="https://www.rainbowinternationalschool.in/students-leaving-certificate"
       />
       <Navbar />
       <PageBanner

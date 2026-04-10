@@ -13,7 +13,7 @@ export default function ChairpersonsNote() {
         title="Chairperson's Note"
         description="A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education."
         keywords="Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school"
-        canonical="https://www.rainbowinternationalschool.in/chairpersons-note/"
+        canonical="https://www.rainbowinternationalschool.in/chairpersons-note"
       />
       <Navbar />
       <PageBanner

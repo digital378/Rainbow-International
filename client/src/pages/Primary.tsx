@@ -126,7 +126,7 @@ export default function Primary() {
         title="Primary Section (Class 1–5)"
         description="Rainbow International School's Primary Section (Class 1 to 5) in Thane. Language, Math, Science, Creative & Interpersonal skills via CBSE curriculum. Admissions open."
         keywords="primary school Thane, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
-        canonical="https://www.rainbowinternationalschool.in/primary-section/"
+        canonical="https://www.rainbowinternationalschool.in/primary-section"
         ogImage="/images/home/academic/primary-section.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
@@ -141,7 +141,7 @@ export default function Primary() {
           "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
           "educationalProgramMode": "full-time",
           "programPrerequisites": "Completion of Pre-Primary / Age 6 years",
-          "url": "https://www.rainbowinternationalschool.in/primary-section/"
+          "url": "https://www.rainbowinternationalschool.in/primary-section"
         }}
       />
       <Navbar />

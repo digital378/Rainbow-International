@@ -40,7 +40,7 @@ export default function SchoolNearManpada() {
         title="Best School Near Manpada Thane — CBSE Nursery to Class 12"
         description="Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
         keywords="school near Manpada Thane, best school Manpada, CBSE school Manpada Thane, school near me Manpada, nursery school Manpada Thane, school Pokhran Road"
-        canonical="https://www.rainbowinternationalschool.in/school-near-manpada-thane/"
+        canonical="https://www.rainbowinternationalschool.in/school-near-manpada-thane"
         breadcrumbs={[
           { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
           { name: "School Near Manpada", href: "https://www.rainbowinternationalschool.in/school-near-manpada-thane" },

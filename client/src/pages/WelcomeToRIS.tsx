@@ -14,7 +14,7 @@ export default function WelcomeToRIS() {
         title="Welcome to Rainbow International School"
         description="Welcome to Rainbow International School — founded in 2009, one of the finest CBSE-affiliated educational institutes in Thane with 3.5 acres campus and 3000+ students."
         keywords="Welcome Rainbow International School, about Rainbow school, Rainbow International School Thane"
-        canonical="https://www.rainbowinternationalschool.in/about-rainbow-international-school/"
+        canonical="https://www.rainbowinternationalschool.in/about-rainbow-international-school"
       />
       <Navbar />
       <PageBanner
