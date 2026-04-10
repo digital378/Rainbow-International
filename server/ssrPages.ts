@@ -232,7 +232,691 @@ ${cat.faqs.map(f => `<div class="card">
 </div>`;
 }
 
+function renderAbout(): string {
+  return `
+<div class="section">
+<h2>About Rainbow International School</h2>
+<p>Rainbow International School was founded in April 2009 with a vision to provide world-class education rooted in Indian values. Located on a sprawling 3.5-acre campus in Brahmand Phase 4, Thane, we are one of the leading CBSE-affiliated K–12 schools in Maharashtra, serving over 3,000 students from Nursery to Class 12.</p>
+
+<h2>Our Legacy</h2>
+<p>Over the past 17 years, Rainbow International School has impacted more than 1 lakh students. We have consistently been recognised as one of the Best Schools in Thane, earning accolades from national education bodies, the British Council (International School Award), Google for Education, and Meta for Education.</p>
+
+<h2>Campus & Infrastructure</h2>
+<p>Our 3.5-acre campus features smart classrooms, fully equipped science and computer labs, a 10,000+ book library, a temperature-controlled swimming pool, skating rink, basketball and football courts, a 500-seat amphitheatre, art and music studios, an organic farm, and a dedicated pre-primary wing with all-female staff.</p>
+
+<h2>Academic Excellence</h2>
+<p>Affiliated to CBSE (Affiliation No. 1130661), we offer classes from Nursery to Class 12 with three streams in senior secondary: Science, Commerce, and Humanities. Our pedagogy is based on the Multiple Intelligence framework, emphasising experiential, project-based, and collaborative learning.</p>
+
+<h2>Holistic Development</h2>
+<p>Beyond academics, we offer 30+ extracurricular activities including swimming, skating, robotics, coding, MUN, art, music, dance, drama, cricket, football, and organic farming. Our students regularly participate in inter-school competitions, science exhibitions, and national-level events.</p>
+
+<h2>Safety & Security</h2>
+<p>With 200+ CCTV cameras, card-based entry, trained security personnel, a full-time nurse, visiting paediatrician, equipped ambulance, and GPS-tracked school buses, Rainbow International School is among the safest schools in Thane.</p>
+
+<p>Learn more about our <a href="/ris-vision-mission">Vision & Mission</a>, <a href="/our-philosophy">Philosophy</a>, or <a href="/contact-us">get in touch</a>.</p>
+</div>`;
+}
+
+function renderPrePrimary(): string {
+  return `
+<div class="section">
+<h2>Pre-Primary Section — Nursery, Jr KG, Sr KG</h2>
+<p>The Pre-Primary Section at Rainbow International School provides a nurturing, play-based learning environment for children aged 2.5 to 5 years. Our dedicated pre-primary wing is staffed entirely by female educators, ensuring a safe and comforting atmosphere for young learners.</p>
+
+<h2>Age Criteria</h2>
+<ul>
+<li><strong>Nursery:</strong> 2.5 years as on 31st March</li>
+<li><strong>Jr KG:</strong> 3.5 years as on 31st March</li>
+<li><strong>Sr KG:</strong> 4.5 years as on 31st March</li>
+</ul>
+
+<h2>Curriculum & Pedagogy</h2>
+<p>Our pre-primary curriculum is built on the Multiple Intelligence framework, incorporating thematic learning, sensory play, creative arts, storytelling, and early literacy and numeracy. Every classroom is designed with age-appropriate furniture, learning stations, and colourful, stimulating environments.</p>
+
+<h2>Facilities</h2>
+<ul>
+<li>Dedicated air-conditioned classrooms</li>
+<li>Indoor play area and sandpit</li>
+<li>Splash pool for water play</li>
+<li>Art, music, and movement rooms</li>
+<li>100% female staff and trained caregivers</li>
+<li>CCTV-monitored premises</li>
+</ul>
+
+<h2>Activities</h2>
+<p>Children participate in storytelling, puppet shows, clay modelling, finger painting, dance, music, yoga, and outdoor nature walks. Annual events include Sports Day, Grandparents Day, and festive celebrations.</p>
+
+<p>Explore our <a href="/primary-section">Primary Section</a> or <a href="/admissions">apply for admission</a>.</p>
+</div>`;
+}
+
+function renderPrimary(): string {
+  return `
+<div class="section">
+<h2>Primary Section — Class 1 to 5</h2>
+<p>The Primary Section at Rainbow International School builds a strong academic foundation while nurturing curiosity, creativity, and confidence. Our CBSE-aligned curriculum is delivered through experiential, project-based, and collaborative learning methods.</p>
+
+<h2>Curriculum</h2>
+<p>Subjects include English, Hindi, Mathematics, Environmental Science (EVS), Computer Science, Art, Music, and Physical Education. The curriculum integrates the Multiple Intelligence framework to address diverse learning styles.</p>
+
+<h2>Key Features</h2>
+<ul>
+<li>Smart classrooms with interactive whiteboards</li>
+<li>Dedicated science and computer labs</li>
+<li>Library with 10,000+ age-appropriate books</li>
+<li>Activity-based learning and project work</li>
+<li>Regular assessments with detailed progress reports</li>
+<li>Personalised attention with low teacher-student ratio</li>
+</ul>
+
+<h2>Extracurriculars</h2>
+<p>Primary students participate in swimming, skating, football, cricket, art, music, dance, drama, yoga, and robotics. Inter-house and inter-school competitions build confidence and teamwork.</p>
+
+<p>Explore our <a href="/pre-primary-school-thane">Pre-Primary</a> or <a href="/middle-school-section">Middle School</a> sections.</p>
+</div>`;
+}
+
+function renderMiddleSchool(): string {
+  return `
+<div class="section">
+<h2>Middle School Section — Class 6 to 8</h2>
+<p>The Middle School years at Rainbow International School are a critical bridge between primary learning and secondary academics. Our programme deepens subject knowledge while developing analytical thinking, research skills, and independent learning habits.</p>
+
+<h2>Subjects Offered</h2>
+<p>English, Hindi, Sanskrit/French (third language), Mathematics, Science, Social Science, Computer Science, Art, Music, and Physical Education.</p>
+
+<h2>Academic Approach</h2>
+<ul>
+<li>CBSE-aligned curriculum with experiential learning</li>
+<li>Fully equipped Physics, Chemistry, and Biology labs</li>
+<li>Computer lab with modern systems</li>
+<li>Project-based assessments and collaborative learning</li>
+<li>Career awareness and skill development programmes</li>
+<li>Regular parent-teacher interactions</li>
+</ul>
+
+<h2>Beyond the Classroom</h2>
+<p>Students engage in MUN, science exhibitions, robotics, coding, inter-school debates, sports tournaments, field trips, and community service. Leadership opportunities through student council and house captaincy prepare them for senior school.</p>
+
+<p>Explore our <a href="/primary-section">Primary</a> or <a href="/secondary-section">Secondary</a> sections.</p>
+</div>`;
+}
+
+function renderSecondary(): string {
+  return `
+<div class="section">
+<h2>Secondary Section — Class 9 & 10</h2>
+<p>The Secondary Section at Rainbow International School prepares students for the CBSE Class 10 Board Examinations with a rigorous, structured academic programme complemented by comprehensive co-curricular development.</p>
+
+<h2>Subjects</h2>
+<p>English, Hindi, Mathematics, Science (Physics, Chemistry, Biology), Social Science (History, Geography, Political Science, Economics), Computer Applications / Information Technology, and Physical Education.</p>
+
+<h2>Board Exam Preparation</h2>
+<ul>
+<li>Structured study plans aligned to CBSE syllabus</li>
+<li>Regular practice tests and mock examinations</li>
+<li>Dedicated remedial and enrichment classes</li>
+<li>Previous year paper analysis and exam strategy workshops</li>
+<li>Personal mentoring and academic counselling</li>
+</ul>
+
+<h2>Results</h2>
+<p>Rainbow International School has consistently delivered outstanding Class 10 Board results, with students scoring above 95% and many achieving perfect scores in individual subjects. Our first batch (2018–19) achieved a 100% pass rate.</p>
+
+<h2>Career Guidance</h2>
+<p>From Class 9, students receive structured career counselling to help them choose the right stream — Science, Commerce, or Humanities — for Class 11.</p>
+
+<p>Explore our <a href="/middle-school-section">Middle School</a> or <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
+</div>`;
+}
+
+function renderSeniorSecondary(): string {
+  return `
+<div class="section">
+<h2>Senior Secondary Section — Class 11 & 12</h2>
+<p>Rainbow International School offers a comprehensive Senior Secondary programme with three streams — Science, Commerce, and Humanities — preparing students for CBSE Class 12 Board Examinations and competitive entrance tests.</p>
+
+<h2>Streams & Subjects</h2>
+<h3>Science Stream</h3>
+<p>Physics, Chemistry, Mathematics / Biology, English, Physical Education / Computer Science</p>
+
+<h3>Commerce Stream</h3>
+<p>Accountancy, Business Studies, Economics, English, Mathematics / Informatics Practices</p>
+
+<h3>Humanities Stream</h3>
+<p>History, Political Science, Economics / Psychology, English, Physical Education / Sociology</p>
+
+<h2>Key Features</h2>
+<ul>
+<li>Advanced Physics, Chemistry, Biology, and Computer labs</li>
+<li>Experienced faculty with subject expertise</li>
+<li>Competitive exam preparation (JEE, NEET, CUET, CLAT)</li>
+<li>Career counselling and college application support</li>
+<li>Internship and industry exposure opportunities</li>
+<li>Regular mock tests and performance analytics</li>
+</ul>
+
+<h2>Beyond Academics</h2>
+<p>Senior students participate in MUN, debate, leadership programmes, community service, inter-school competitions, and career fairs. Class 12 students receive dedicated college counselling.</p>
+
+<p>Explore our <a href="/secondary-section">Secondary Section</a> or <a href="/admissions">apply for admission</a>.</p>
+</div>`;
+}
+
+function renderContact(): string {
+  return `
+<div class="section">
+<h2>Contact Rainbow International School</h2>
+<p>We would love to hear from you. Whether you have questions about admissions, want to schedule a campus visit, or need any other information, our team is here to help.</p>
+
+<h2>Contact Details</h2>
+<ul>
+<li><strong>Address:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607, India</li>
+<li><strong>Phone:</strong> +91 82915 68972</li>
+<li><strong>Landline:</strong> (022) 69105000</li>
+<li><strong>Email:</strong> info@rainbowinternationalschool.in</li>
+<li><strong>Working Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</li>
+</ul>
+
+<h2>Visit Our Campus</h2>
+<p>Rainbow International School is located on a 3.5-acre campus in Brahmand Phase 4, Thane. The campus is easily accessible from Ghodbunder Road, Manpada, Hiranandani Estate, and all parts of Thane.</p>
+
+<h2>Admissions Enquiry</h2>
+<p>For admissions-related queries, call +91 82915 68972 or fill the enquiry form on our website. <a href="/admissions">View admissions details</a> or <a href="/schedule-appointment">schedule a campus visit</a>.</p>
+</div>`;
+}
+
+function renderAmenities(): string {
+  return `
+<div class="section">
+<h2>Amenities & Facilities</h2>
+<p>Rainbow International School's 3.5-acre campus in Thane is equipped with world-class facilities designed to support academic excellence, physical fitness, creative expression, and overall child development.</p>
+
+<h2>Academic Facilities</h2>
+<ul>
+<li><strong>Smart Classrooms:</strong> Interactive whiteboards and digital learning tools in every classroom</li>
+<li><strong>Science Labs:</strong> Fully equipped Physics, Chemistry, and Biology laboratories</li>
+<li><strong>Computer Lab:</strong> Modern systems with high-speed internet</li>
+<li><strong>Library:</strong> 10,000+ books, reference materials, and digital resources</li>
+<li><strong>Robotics & STEM Lab:</strong> Hands-on engineering and coding facilities</li>
+</ul>
+
+<h2>Sports & Recreation</h2>
+<ul>
+<li><strong>Swimming Pool:</strong> Temperature-controlled pool with trained coaches</li>
+<li><strong>Skating Rink:</strong> Professional skating area for all age groups</li>
+<li><strong>Sports Fields:</strong> Football, cricket, basketball, and athletics grounds</li>
+<li><strong>Indoor Games:</strong> Table tennis, chess, carrom facilities</li>
+</ul>
+
+<h2>Creative & Performing Arts</h2>
+<ul>
+<li><strong>Amphitheatre:</strong> 500-seat open-air venue for performances and events</li>
+<li><strong>Art Studio:</strong> Dedicated space for visual arts, pottery, and crafts</li>
+<li><strong>Music Room:</strong> Instruments and vocal training facilities</li>
+<li><strong>Dance Studio:</strong> Mirrored studio for classical and contemporary dance</li>
+</ul>
+
+<h2>Health & Wellness</h2>
+<ul>
+<li><strong>Infirmary:</strong> Full-time nurse and visiting paediatrician</li>
+<li><strong>Ambulance:</strong> Equipped ambulance on standby</li>
+<li><strong>Organic Farm:</strong> Students learn sustainable farming practices</li>
+<li><strong>Cafeteria:</strong> Nutritious meals with hygienic preparation</li>
+</ul>
+
+<p>Take a virtual tour — visit our <a href="/photo-gallery">Photo Gallery</a> or <a href="/schedule-appointment">schedule a campus visit</a>.</p>
+</div>`;
+}
+
+function renderAwards(): string {
+  return `
+<div class="section">
+<h2>Awards & Achievements</h2>
+<p>Rainbow International School has been consistently recognised as one of the top schools in Thane and Maharashtra. Our awards reflect our commitment to academic excellence, innovation in teaching, safety, and holistic student development.</p>
+
+<h2>Key Recognitions</h2>
+<ul>
+<li><strong>Best School in Thane</strong> — Multiple years running (Education Today, Brainfeed Magazine)</li>
+<li><strong>British Council International School Award (ISA)</strong> — Recognised for international dimension in teaching</li>
+<li><strong>Google for Education Partner School</strong> — Certified for digital learning excellence</li>
+<li><strong>Meta for Education Partner</strong> — Innovation in technology-enhanced learning</li>
+<li><strong>Fit India School Certificate</strong> — Ministry of Youth Affairs & Sports recognition</li>
+<li><strong>15th World Education Summit</strong> — Featured for educational leadership</li>
+<li><strong>Knowledge Review Magazine</strong> — Rainbow Preschools featured as top early learning centres</li>
+</ul>
+
+<h2>Academic Results</h2>
+<p>Our first batch (2018–19) achieved a 100% pass rate in CBSE Class 10 Board Exams. Since then, students have consistently scored above 95%, with toppers achieving near-perfect scores across subjects.</p>
+
+<h2>Student Achievements</h2>
+<p>Rainbow students excel in inter-school and national-level competitions in academics, sports, arts, robotics, MUN, and science exhibitions. View our <a href="/student-achievements">Student Achievements</a> page for detailed highlights.</p>
+</div>`;
+}
+
+function renderSafety(): string {
+  return `
+<div class="section">
+<h2>Safety & Security</h2>
+<p>At Rainbow International School, student safety is our highest priority. We have implemented comprehensive, multi-layered safety systems that cover physical security, health, transport, and digital safety — ensuring complete peace of mind for parents.</p>
+
+<h2>Campus Security</h2>
+<ul>
+<li><strong>200+ CCTV Cameras:</strong> Continuous monitoring of all campus areas including classrooms, corridors, gates, and play areas</li>
+<li><strong>Card-Based Entry:</strong> Electronic access control at all entry points</li>
+<li><strong>Trained Security Personnel:</strong> Professional security team on duty 24/7</li>
+<li><strong>Metal Detectors:</strong> Screening at campus entry points</li>
+<li><strong>Visitor Management System:</strong> Digital check-in/check-out for all visitors</li>
+<li><strong>Boundary Wall & Fencing:</strong> Fully secured perimeter</li>
+</ul>
+
+<h2>Health & Medical</h2>
+<ul>
+<li><strong>On-Campus Infirmary:</strong> Full-time nurse and first-aid facilities</li>
+<li><strong>Visiting Paediatrician:</strong> Regular health check-ups for all students</li>
+<li><strong>Equipped Ambulance:</strong> On standby for emergencies</li>
+<li><strong>First Aid Training:</strong> Staff trained in emergency first aid and CPR</li>
+</ul>
+
+<h2>Transport Safety</h2>
+<ul>
+<li><strong>GPS-Tracked Buses:</strong> Real-time tracking on 30+ routes</li>
+<li><strong>Trained Attendants:</strong> Female attendant on every bus</li>
+<li><strong>CCTV in Buses:</strong> Video monitoring inside every school bus</li>
+<li><strong>Speed Governors:</strong> Speed limiters fitted on all vehicles</li>
+</ul>
+
+<h2>Child Protection</h2>
+<ul>
+<li><strong>100% Female Staff for Pre-Primary:</strong> Dedicated female educators and caregivers in the preschool wing</li>
+<li><strong>Self-Defence Training:</strong> Regular sessions for all students</li>
+<li><strong>Anti-Bullying Policy:</strong> Zero-tolerance approach with counsellor support</li>
+<li><strong>Fire Safety:</strong> Fire extinguishers, drills, and evacuation training</li>
+</ul>
+
+<p>Visit <a href="/amenities">our facilities</a> or <a href="/contact-us">contact us</a> to learn more about our safety protocols.</p>
+</div>`;
+}
+
+function renderAdmissions(): string {
+  return `
+<div class="section">
+<h2>Admissions 2026–27</h2>
+<p>Admissions are now open at Rainbow International School, Thane for the academic year 2026–27. We welcome applications for all classes from Nursery to Class 12 (CBSE).</p>
+
+<h2>Why Choose Rainbow International School?</h2>
+<ul>
+<li>3.5-acre campus in Brahmand Phase 4, Thane</li>
+<li>CBSE-affiliated (No. 1130661) — Nursery to Class 12</li>
+<li>3,000+ students, 200+ dedicated educators</li>
+<li>Multiple Intelligence-based pedagogy</li>
+<li>30+ extracurricular activities</li>
+<li>Award-winning school — Best School in Thane (multiple years)</li>
+</ul>
+
+<h2>Admission Process</h2>
+<ol>
+<li><strong>Step 1 — Submit Application:</strong> Fill the online application form with your child's details and preferred class.</li>
+<li><strong>Step 2 — Interaction Session:</strong> Attend a one-on-one interaction with our academic team. Class 9+ requires a written assessment.</li>
+<li><strong>Step 3 — Document Verification:</strong> Submit original documents including birth certificate, Aadhaar, TC, and report cards.</li>
+<li><strong>Step 4 — Confirmation:</strong> Complete fee payment and receive admission confirmation.</li>
+</ol>
+
+<h2>Age Criteria</h2>
+<ul>
+<li><strong>Nursery:</strong> 2.5 years (as on 31st March)</li>
+<li><strong>Jr KG:</strong> 3.5 years</li>
+<li><strong>Sr KG:</strong> 4.5 years</li>
+<li><strong>Class 1:</strong> 6 years</li>
+<li><strong>Class 2–8:</strong> Age appropriate as per CBSE norms</li>
+<li><strong>Class 9+:</strong> Written assessment required</li>
+</ul>
+
+<h2>Documents Required</h2>
+<ul>
+<li>Birth Certificate (original + photocopy)</li>
+<li>Aadhaar Card of child and parent</li>
+<li>Transfer Certificate from previous school</li>
+<li>Report card / mark sheet of last 2 years</li>
+<li>4 passport-size photographs</li>
+<li>Address proof and medical fitness certificate</li>
+</ul>
+
+<p>Contact our admissions desk at <strong>+91 82915 68972</strong> or <a href="/application-form">apply online</a>.</p>
+</div>`;
+}
+
+function renderFees(): string {
+  return `
+<div class="section">
+<h2>Fee Structure</h2>
+<p>Rainbow International School offers comprehensive, value-driven education from Nursery to Class 12 at competitive fee levels. Our fee structure covers tuition, access to world-class facilities, and a wide range of co-curricular activities.</p>
+
+<h2>Fee Categories</h2>
+<ul>
+<li><strong>Pre-Primary (Nursery, Jr KG, Sr KG):</strong> Includes activity kits and learning materials</li>
+<li><strong>Primary (Class 1–5):</strong> Includes lab access and library</li>
+<li><strong>Middle School (Class 6–8):</strong> Includes all lab sessions and project materials</li>
+<li><strong>Secondary (Class 9–10):</strong> Includes CBSE board exam preparation</li>
+<li><strong>Senior Secondary (Class 11–12):</strong> Science, Commerce, and Humanities streams</li>
+</ul>
+
+<h2>What's Included</h2>
+<ul>
+<li>All classroom instruction, lab sessions, library access</li>
+<li>Digital learning resources and smart classroom access</li>
+<li>Core extracurricular activities</li>
+<li>Safety and security infrastructure</li>
+<li>On-campus health services (infirmary, nurse)</li>
+</ul>
+
+<h2>Payment</h2>
+<p>Fees are payable in quarterly instalments via online bank transfer, UPI, or demand draft. Sibling concessions are available. The exact fee schedule is shared during the admission interaction.</p>
+
+<p>Contact <strong>+91 82915 68972</strong> for the complete fee breakdown or <a href="/admissions">start the admission process</a>.</p>
+</div>`;
+}
+
+function renderLocalityBrahmand(): string {
+  return `
+<div class="section">
+<h2>Best School Near Brahmand, Thane</h2>
+<p>Rainbow International School is located right inside Brahmand Phase 4 at Cosmos Arcade — making it the closest premium K–12 CBSE school for families across Brahmand Phase 1 through 4, Hiranandani Estate, and surrounding areas.</p>
+
+<h2>Location Advantage</h2>
+<ul>
+<li><strong>Brahmand Phase 1–4:</strong> 2–5 min walk</li>
+<li><strong>Cosmos Arcade / Brahmand Market:</strong> 3 min walk</li>
+<li><strong>Hiranandani Estate:</strong> 5 min drive</li>
+<li><strong>Manpada Junction:</strong> 5 min drive</li>
+<li><strong>Ghodbunder Road:</strong> 8 min drive</li>
+<li><strong>Viviana Mall:</strong> 10 min drive</li>
+</ul>
+
+<h2>Why Brahmand Families Choose Rainbow</h2>
+<ul>
+<li>Walking distance — no long commutes for young children</li>
+<li>K–12 under one roof (Nursery to Class 12, CBSE)</li>
+<li>3.5-acre campus with world-class facilities</li>
+<li>200+ CCTV cameras, on-campus nurse, GPS-tracked buses</li>
+<li>3,000+ students — largest school community in Brahmand</li>
+<li>Multiple 'Best School in Thane' awards</li>
+</ul>
+
+<p>Schedule a campus visit — call <strong>+91 82915 68972</strong> or <a href="/admissions">apply online</a>.</p>
+</div>`;
+}
+
+function renderLocalityGhodbunder(): string {
+  return `
+<div class="section">
+<h2>Best School Near Ghodbunder Road, Thane</h2>
+<p>Rainbow International School at Brahmand Phase 4 is the top-rated CBSE K–12 school serving the entire Ghodbunder Road corridor — from Patlipada and Waghbil to Kavesar, Owale, and Kolshet. Just 8 minutes from the main GB Road junction.</p>
+
+<h2>Distance from GB Road Areas</h2>
+<ul>
+<li><strong>Ghodbunder Road (main junction):</strong> 8 min drive</li>
+<li><strong>Patlipada:</strong> 10 min drive</li>
+<li><strong>Waghbil / Kavesar:</strong> 12 min drive</li>
+<li><strong>Kolshet Road:</strong> 15 min drive</li>
+<li><strong>Owale / Dosti Vihar:</strong> 12 min drive</li>
+<li><strong>Hiranandani Estate:</strong> 5 min drive</li>
+</ul>
+
+<h2>Why GB Road Families Choose Rainbow</h2>
+<ul>
+<li>Dedicated bus routes covering the entire GB Road corridor</li>
+<li>Complete K–12 CBSE school (Nursery to Class 12)</li>
+<li>3.5-acre campus with swimming pool, skating rink, labs, amphitheatre</li>
+<li>Award-winning school — British Council ISA, Google & Meta partnerships</li>
+<li>3,000+ students, rated 4.8/5 by parents</li>
+<li>GPS-tracked transport with trained attendants</li>
+</ul>
+
+<p>Contact us at <strong>+91 82915 68972</strong> or <a href="/admissions">apply for 2026–27</a>.</p>
+</div>`;
+}
+
+function renderLocalityManpada(): string {
+  return `
+<div class="section">
+<h2>Best School Near Manpada, Thane</h2>
+<p>Rainbow International School is located just 5 minutes from Manpada Junction at Brahmand Phase 4 — the highest-rated CBSE K–12 school serving the Manpada, Pokhran Road, and Majiwada corridor.</p>
+
+<h2>Distance from Nearby Areas</h2>
+<ul>
+<li><strong>Manpada Junction:</strong> 5 min drive</li>
+<li><strong>Pokhran Road No. 2:</strong> 7 min drive</li>
+<li><strong>Majiwada Junction:</strong> 10 min drive</li>
+<li><strong>Dhokali:</strong> 12 min drive</li>
+<li><strong>Brahmand (all phases):</strong> 2–5 min</li>
+<li><strong>Hiranandani Estate:</strong> 5 min drive</li>
+</ul>
+
+<h2>Why Manpada Families Choose Rainbow</h2>
+<ul>
+<li>5 minutes from Manpada — convenient daily commute</li>
+<li>Nursery to Class 12 CBSE with Science, Commerce, and Humanities</li>
+<li>3.5-acre campus with smart classrooms, labs, pool, rink, amphitheatre</li>
+<li>Award-winning school — Best School in Thane multiple years</li>
+<li>Dedicated bus routes covering Manpada, Pokhran Road, Majiwada</li>
+<li>200+ CCTV cameras, on-campus infirmary, GPS-tracked buses</li>
+</ul>
+
+<p>Contact us at <strong>+91 82915 68972</strong> or <a href="/admissions">start the admission process</a>.</p>
+</div>`;
+}
+
+const SCHOOL_LD = {
+  "@context": "https://schema.org",
+  "@type": ["EducationalOrganization", "School"],
+  name: "Rainbow International School",
+  url: "https://www.rainbowinternationalschool.in/",
+  address: { "@type": "PostalAddress", streetAddress: "Cosmos Arcade, Brahmand Phase 4", addressLocality: "Thane", addressRegion: "Maharashtra", postalCode: "400607", addressCountry: "IN" },
+  telephone: "+91-82915-68972",
+  foundingDate: "2009-04-01",
+  numberOfStudents: "3000",
+};
+
 const pages: PageSSRConfig[] = [
+  {
+    path: "/about-rainbow-international-school",
+    title: "About Rainbow International School — Best CBSE School in Thane",
+    description: "Rainbow International School, founded in 2009, is a top-rated CBSE K–12 school in Thane. 3.5-acre campus, 3000+ students, award-winning education from Nursery to Class 12.",
+    keywords: "about Rainbow International School, CBSE school Thane, best school Thane, K-12 school Thane, international school Thane",
+    canonical: "https://www.rainbowinternationalschool.in/about-rainbow-international-school",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://www.rainbowinternationalschool.in/about-rainbow-international-school" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderAbout,
+  },
+  {
+    path: "/pre-primary-school-thane",
+    title: "Pre-Primary School in Thane — Nursery, Jr KG, Sr KG | Rainbow International School",
+    description: "Best pre-primary school in Thane. Nursery, Jr KG, Sr KG with play-based learning, 100% female staff, CBSE-aligned curriculum. Admissions open for 2026–27.",
+    keywords: "pre-primary school Thane, nursery school Thane, Jr KG admission Thane, best preschool Thane, kindergarten Thane",
+    canonical: "https://www.rainbowinternationalschool.in/pre-primary-school-thane",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Pre-Primary Section", url: "https://www.rainbowinternationalschool.in/pre-primary-school-thane" },
+    ],
+    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Pre-Primary Section", educationalLevel: "Preschool" } },
+    renderBody: renderPrePrimary,
+  },
+  {
+    path: "/primary-section",
+    title: "Primary School in Thane — Class 1 to 5 CBSE | Rainbow International School",
+    description: "Primary section (Class 1–5) at Rainbow International School, Thane. CBSE curriculum, smart classrooms, experiential learning, 30+ extracurriculars.",
+    keywords: "primary school Thane, Class 1 to 5 CBSE Thane, best primary school Thane, CBSE primary Thane",
+    canonical: "https://www.rainbowinternationalschool.in/primary-section",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Primary Section", url: "https://www.rainbowinternationalschool.in/primary-section" },
+    ],
+    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Primary Section", educationalLevel: "Primary" } },
+    renderBody: renderPrimary,
+  },
+  {
+    path: "/middle-school-section",
+    title: "Middle School in Thane — Class 6 to 8 CBSE | Rainbow International School",
+    description: "Middle school section (Class 6–8) at Rainbow International School, Thane. CBSE curriculum, project-based learning, science labs, MUN, robotics.",
+    keywords: "middle school Thane, Class 6 to 8 CBSE Thane, best middle school Thane, CBSE school Class 6 7 8 Thane",
+    canonical: "https://www.rainbowinternationalschool.in/middle-school-section",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Middle School", url: "https://www.rainbowinternationalschool.in/middle-school-section" },
+    ],
+    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Middle School Section", educationalLevel: "Middle School" } },
+    renderBody: renderMiddleSchool,
+  },
+  {
+    path: "/secondary-section",
+    title: "Secondary School in Thane — Class 9 & 10 CBSE | Rainbow International School",
+    description: "Secondary section (Class 9–10) at Rainbow International School, Thane. CBSE board exam prep, mock tests, career counselling, outstanding results.",
+    keywords: "secondary school Thane, Class 9 10 CBSE Thane, CBSE board exam school Thane, Class 10 school Thane",
+    canonical: "https://www.rainbowinternationalschool.in/secondary-section",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Secondary Section", url: "https://www.rainbowinternationalschool.in/secondary-section" },
+    ],
+    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Secondary Section", educationalLevel: "Secondary" } },
+    renderBody: renderSecondary,
+  },
+  {
+    path: "/senior-secondary-section",
+    title: "Senior Secondary in Thane — Class 11 & 12 Science Commerce Humanities | Rainbow International School",
+    description: "Senior secondary (Class 11–12) at Rainbow International School, Thane. Science, Commerce, Humanities streams. JEE, NEET, CUET preparation. CBSE board.",
+    keywords: "senior secondary school Thane, Class 11 12 Thane, Science Commerce Humanities Thane, CBSE Class 12 school Thane, JEE NEET school Thane",
+    canonical: "https://www.rainbowinternationalschool.in/senior-secondary-section",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Senior Secondary", url: "https://www.rainbowinternationalschool.in/senior-secondary-section" },
+    ],
+    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Senior Secondary Section", educationalLevel: "Senior Secondary" } },
+    renderBody: renderSeniorSecondary,
+  },
+  {
+    path: "/contact-us",
+    title: "Contact Rainbow International School Thane — Phone, Email, Address",
+    description: "Contact Rainbow International School, Thane. Phone: +91 82915 68972. Email: info@rainbowinternationalschool.in. Address: Cosmos Arcade, Brahmand Phase 4, Thane 400607.",
+    keywords: "contact Rainbow International School, school phone number Thane, school address Thane, Rainbow school email, visit campus Thane",
+    canonical: "https://www.rainbowinternationalschool.in/contact-us",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Contact Us", url: "https://www.rainbowinternationalschool.in/contact-us" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderContact,
+  },
+  {
+    path: "/amenities",
+    title: "School Amenities & Facilities — 3.5-Acre Campus | Rainbow International School Thane",
+    description: "Explore world-class amenities at Rainbow International School, Thane. Smart classrooms, science labs, swimming pool, skating rink, amphitheatre, library, organic farm.",
+    keywords: "school amenities Thane, school facilities Thane, school with swimming pool Thane, best campus school Thane, school infrastructure Thane",
+    canonical: "https://www.rainbowinternationalschool.in/amenities",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Amenities & Facilities", url: "https://www.rainbowinternationalschool.in/amenities" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderAmenities,
+  },
+  {
+    path: "/awards-achievements",
+    title: "Awards & Achievements — Best School in Thane | Rainbow International School",
+    description: "Rainbow International School awards: Best School in Thane, British Council ISA, Google for Education, Fit India. View our complete recognition list.",
+    keywords: "best school Thane awards, school achievements Thane, British Council school Thane, award winning school Thane",
+    canonical: "https://www.rainbowinternationalschool.in/awards-achievements",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Awards & Achievements", url: "https://www.rainbowinternationalschool.in/awards-achievements" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderAwards,
+  },
+  {
+    path: "/safety-security",
+    title: "School Safety & Security — 200+ CCTV, GPS Buses | Rainbow International School Thane",
+    description: "Comprehensive safety at Rainbow International School, Thane. 200+ CCTV cameras, card-based entry, infirmary, GPS-tracked buses, trained security, fire safety.",
+    keywords: "school safety Thane, safe school Thane, CCTV school Thane, school security Thane, school with nurse Thane",
+    canonical: "https://www.rainbowinternationalschool.in/safety-security",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Safety & Security", url: "https://www.rainbowinternationalschool.in/safety-security" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderSafety,
+  },
+  {
+    path: "/admissions",
+    title: "School Admissions 2026-27 Thane — Nursery to Class 12 | Rainbow International School",
+    description: "Admissions open at Rainbow International School, Thane for 2026-27. Nursery to Class 12, CBSE board. Age criteria, process, documents, and fee details.",
+    keywords: "school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission",
+    canonical: "https://www.rainbowinternationalschool.in/admissions",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Admissions 2026-27", url: "https://www.rainbowinternationalschool.in/admissions" },
+    ],
+    jsonLd: SCHOOL_LD,
+    renderBody: renderAdmissions,
+  },
+  {
+    path: "/fee-structure",
+    title: "CBSE School Fee Structure Thane 2026-27 | Rainbow International School",
+    description: "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
+    keywords: "CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane",
+    canonical: "https://www.rainbowinternationalschool.in/fee-structure",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "Fee Structure", url: "https://www.rainbowinternationalschool.in/fee-structure" },
+    ],
+    jsonLd: { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [
+      { "@type": "Question", name: "What is the fee payment schedule?", acceptedAnswer: { "@type": "Answer", text: "Fees are payable in quarterly instalments." } },
+      { "@type": "Question", name: "Are there sibling concessions?", acceptedAnswer: { "@type": "Answer", text: "Yes, sibling discounts are available." } },
+    ]},
+    renderBody: renderFees,
+  },
+  {
+    path: "/school-near-brahmand-thane",
+    title: "Best School Near Brahmand Thane — CBSE Nursery to Class 12 | Rainbow International School",
+    description: "Rainbow International School — best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus.",
+    keywords: "school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane",
+    canonical: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "School Near Brahmand", url: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane" },
+    ],
+    jsonLd: { ...SCHOOL_LD, areaServed: "Brahmand, Thane" },
+    renderBody: renderLocalityBrahmand,
+  },
+  {
+    path: "/school-near-ghodbunder-road-thane",
+    title: "Best School Near Ghodbunder Road Thane — CBSE K–12 | Rainbow International School",
+    description: "Rainbow International School — top CBSE school near Ghodbunder Road, Thane. 8 min from GB Road. Bus routes covering Patlipada, Waghbil, Kavesar.",
+    keywords: "school near Ghodbunder Road, best school GB Road Thane, CBSE school Ghodbunder Road",
+    canonical: "https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "School Near Ghodbunder Road", url: "https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane" },
+    ],
+    jsonLd: { ...SCHOOL_LD, areaServed: "Ghodbunder Road, Thane" },
+    renderBody: renderLocalityGhodbunder,
+  },
+  {
+    path: "/school-near-manpada-thane",
+    title: "Best School Near Manpada Thane — CBSE Nursery to Class 12 | Rainbow International School",
+    description: "Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus.",
+    keywords: "school near Manpada Thane, best school Manpada, CBSE school Manpada Thane",
+    canonical: "https://www.rainbowinternationalschool.in/school-near-manpada-thane",
+    breadcrumbs: [
+      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
+      { name: "School Near Manpada", url: "https://www.rainbowinternationalschool.in/school-near-manpada-thane" },
+    ],
+    jsonLd: { ...SCHOOL_LD, areaServed: "Manpada, Thane" },
+    renderBody: renderLocalityManpada,
+  },
   {
     path: "/school-readiness-quiz",
     title: "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",

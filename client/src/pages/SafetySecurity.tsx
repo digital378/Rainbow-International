@@ -167,7 +167,7 @@ function SafetyMindMap() {
 }
 
 // ── Video Modal ───────────────────────────────────────────────────
-const VIDEO_URL = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Rainbow-International-School-Thane.mp4";
+const VIDEO_URL = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Rainbow-International-School-Thane.mp4";
 
 export default function SafetySecurity() {
   const [videoOpen, setVideoOpen] = useState(false);

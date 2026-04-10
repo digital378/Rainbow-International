@@ -100,6 +100,11 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/top-schools-in-thane` | Top Schools Comparison | `pages/TopSchools.tsx` |
 | `/testimonials` | Parent Testimonials | `pages/Testimonials.tsx` |
 | `/faqs` | FAQ Hub | `pages/FAQs.tsx` |
+| `/admissions` | Admissions 2026-27 | `pages/Admissions.tsx` |
+| `/fee-structure` | Fee Structure | `pages/Fees.tsx` |
+| `/school-near-brahmand-thane` | Locality: Brahmand | `pages/SchoolNearBrahmand.tsx` |
+| `/school-near-ghodbunder-road-thane` | Locality: GB Road | `pages/SchoolNearGhodbunderRoad.tsx` |
+| `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
 
 ## Key Components
 
@@ -116,6 +121,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 - **Hero**: Full-width background image (picwish.webp) with navy gradient overlay; title + stats + CTA on left, Quick Enquiry form card on right; quick-link pills at bottom
 - **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
 - **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component; JSON-LD structured data (School on home, BlogPosting on blog SSR, BreadcrumbList on all inner pages); llms.txt for AI visibility; sitemap.xml with `lastmod` dates; semantic HTML landmarks (`<header>`, `<nav>`, `<main>`, `<footer>` with ARIA roles)
+- **Bot SSR**: `ssrPages.ts` serves pre-rendered HTML to search bots for 20 pages: About, Pre-Primary, Primary, Middle, Secondary, Senior Secondary, Contact, Amenities, Awards, Safety, Admissions, Fees, 3 locality pages, Quiz, Top Schools, Testimonials, FAQs. Navbar About dropdown includes Vision/Mission, Philosophy, Chairperson's Note. Footer Explore includes Top Schools, Testimonials, FAQs links.
 - **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL
 
 ## School Info (from real site)

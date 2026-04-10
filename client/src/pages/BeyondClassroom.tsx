@@ -52,7 +52,7 @@ export default function BeyondClassroom() {
         title="Beyond The Classroom"
         subtitle="The real aim of education is not only knowledge but also Action."
         breadcrumb={[{ label: "Beyond The Classroom" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
+        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
       />
 
       <main className="flex-grow">

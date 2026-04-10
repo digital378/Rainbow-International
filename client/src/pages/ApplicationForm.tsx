@@ -90,7 +90,7 @@ export default function ApplicationForm() {
         title="Application Form"
         subtitle="Admissions Open for Academic Year 2026–27"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Application Form" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg"
+        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg"
       />
 
       <main className="flex-1 py-16 px-4">

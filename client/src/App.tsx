@@ -51,6 +51,11 @@ const SchoolReadinessQuiz = lazy(() => import("@/pages/SchoolReadinessQuiz"));
 const TopSchools = lazy(() => import("@/pages/TopSchools"));
 const TestimonialsPage = lazy(() => import("@/pages/Testimonials"));
 const FAQsPage = lazy(() => import("@/pages/FAQs"));
+const Admissions = lazy(() => import("@/pages/Admissions"));
+const Fees = lazy(() => import("@/pages/Fees"));
+const SchoolNearBrahmand = lazy(() => import("@/pages/SchoolNearBrahmand"));
+const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunderRoad"));
+const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
@@ -109,6 +114,11 @@ function Router() {
       <Route path="/top-schools-in-thane" component={TopSchools} />
       <Route path="/testimonials" component={TestimonialsPage} />
       <Route path="/faqs" component={FAQsPage} />
+      <Route path="/admissions" component={Admissions} />
+      <Route path="/fee-structure" component={Fees} />
+      <Route path="/school-near-brahmand-thane" component={SchoolNearBrahmand} />
+      <Route path="/school-near-ghodbunder-road-thane" component={SchoolNearGhodbunderRoad} />
+      <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>

@@ -17,7 +17,7 @@ interface SEOProps {
 
 export function SEO({ title, description, canonical, ogImage, keywords, breadcrumbs, jsonLd }: SEOProps) {
   const fullTitle = title.includes("Rainbow International") ? title : `${title} | Rainbow International School`;
-  const defaultImage = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg";
+  const defaultImage = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg";
 
   useEffect(() => {
     document.title = fullTitle;

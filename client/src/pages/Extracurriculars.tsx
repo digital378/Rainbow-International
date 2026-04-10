@@ -45,7 +45,7 @@ function SportsWheel() {
       <circle cx={cx} cy={cy} r={innerR} fill="#e0edff" />
       {/* Sports image clipped to inner circle */}
       <image
-        href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg"
+        href="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg"
         x={cx - innerR} y={cy - innerR} width={innerR * 2} height={innerR * 2}
         clipPath="url(#sc1)"
         preserveAspectRatio="xMidYMid slice"
@@ -241,7 +241,7 @@ const testimonials = [
   {
     quote: "The study pattern in Rainbow is very well balanced between books & extra activity. I love to hear from my 8 yr son when he explains everything he learnt — this means he is enjoying, which was not the case one year back. Great going Rainbow teachers, keep it up.",
     name: "Chandrasekhar Ella",
-    photo: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg",
+    photo: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg",
   },
   {
     quote: "Rainbow International School has been a wonderful experience for my daughter. The teachers are dedicated and the holistic approach to education is commendable.",
@@ -293,7 +293,7 @@ export default function Extracurriculars() {
                   Our declaration has been approved by the Ministry of Youth Affairs and Sports and we are a FIT INDIA School!
                 </p>
                 <a
-                  href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                  href="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-white font-bold py-2.5 px-6 rounded-full transition-opacity hover:opacity-90"
@@ -306,7 +306,7 @@ export default function Extracurriculars() {
               <div className="flex-shrink-0">
                 <div className="w-36 h-36 rounded-2xl overflow-hidden flex items-center justify-center" style={{ background: "#e0edff" }}>
                   <img
-                    src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                    src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                     alt="FIT INDIA School Certificate"
                     className="w-full h-full object-cover"
                     width={144}

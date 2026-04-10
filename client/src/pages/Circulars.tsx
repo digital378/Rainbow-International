@@ -55,7 +55,7 @@ export default function Circulars() {
         title="Circulars"
         subtitle="School notices, examination schedules and important announcements."
         breadcrumb={[{ label: "Circulars" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
+        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
       />
 
       <main className="flex-grow">

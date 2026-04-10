@@ -6,7 +6,7 @@ import { SEO } from "@/components/SEO";
 import { X } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
-const CDN = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
+const CDN = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09";
 
 const galleryData = [
   {

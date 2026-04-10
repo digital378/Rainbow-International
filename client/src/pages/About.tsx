@@ -84,7 +84,7 @@ export default function About() {
         title="Welcome to RIS"
         subtitle="Building tomorrow's leaders since April 2009"
         breadcrumb={[{ label: "About Us" }, { label: "Welcome to RIS" }]}
-        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
+        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
       />
 
       <main className="flex-grow">

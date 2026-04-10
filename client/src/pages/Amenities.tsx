@@ -5,8 +5,8 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
-const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
-const BASE2 = "https://rainbowinternationalschool.in/wp-content/uploads";
+const BASE = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09";
+const BASE2 = "https://www.rainbowinternationalschool.in/wp-content/uploads";
 
 const talentSpaces = [
   { name: "Amphitheatre",       image: "/images/gallery/talent/amphitheatre.jpg",       fallback: `${BASE}/Amphitheatre--768x512.png` },
