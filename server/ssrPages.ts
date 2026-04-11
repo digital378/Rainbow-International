@@ -917,10 +917,42 @@ function renderBlogs(): string {
     { slug: "how-to-prepare-your-child-for-first-day-of-school", title: "How to Prepare Your Child for Their First Day of School — A Parent's Guide" },
     { slug: "benefits-of-multiple-intelligence-based-learning-in-schools", title: "Multiple Intelligence-Based Learning — How It Helps Every Child Succeed" },
     { slug: "best-cbse-schools-in-thane-what-to-look-for", title: "Best CBSE Schools in Thane — What to Look for When Choosing One" },
+    { slug: "group-activities-for-students", title: "Group Activities for Students: Benefits, Types, and How to Make Them Work" },
+    { slug: "imporatnce-of-sports-in-students-life", title: "The Importance of Sports in a Student's Life: Physical Health, Mental Wellbeing, and Academic Benefits" },
+    { slug: "cultural-activities-for-students-key-to-developing-critical-thinking-skills", title: "Cultural Activities for Students: The Key to Developing Critical Thinking Skills" },
+    { slug: "parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child", title: "Parental Guidance: How to Choose the Best CBSE School in Thane for Your Child" },
+    { slug: "how-to-learn-boring-subjects", title: "How to Learn Boring Subjects: 8 Strategies That Actually Work" },
+    { slug: "how-to-increase-attention-span", title: "How to Increase Attention Span: Proven Tips for Students to Focus Better" },
+    { slug: "benefits-of-learning-a-second-language", title: "The Benefits of Learning a Second Language for Students" },
+    { slug: "how-to-avoid-procrastination-while-studying", title: "How to Avoid Procrastination While Studying: 8 Strategies That Work" },
+    { slug: "innovative-teaching-method-for-active-learning", title: "Innovative Teaching Methods for Active Learning: The Flipped Classroom and Beyond" },
+    { slug: "smart-revision-techniques-for-students", title: "Smart Revision Techniques for Students: Beyond Rote Memorisation" },
+    { slug: "teen-entrepreneurship-fostering-innovation-and-responsibility", title: "Teen Entrepreneurship: Fostering Innovation and Responsibility in Young People" },
+    { slug: "teaching-teens-resilience-and-thriving-through-failure", title: "Teaching Teens Resilience: How to Help Young People Thrive Through Failure" },
+    { slug: "nutritional-requirements-of-the-teenagers-how-to-fulfil-them", title: "Nutritional Requirements of Teenagers and How to Fulfil Them" },
+    { slug: "stress-in-teenagers-symptoms-management", title: "Stress in Teenagers: Symptoms, Causes, and Effective Management Strategies" },
+    { slug: "top-5-techniques-for-taming-anger-in-children", title: "Top 5 Techniques for Taming Anger in Children" },
+    { slug: "top-6-easy-ways-to-develop-patience-in-your-child", title: "Top 6 Easy Ways to Develop Patience in Your Child" },
+    { slug: "homework-war-endgame", title: "The Homework War: How to End the Nightly Battle and Make Study Time Work" },
+    { slug: "using-gadgets-the-right-way", title: "Using Gadgets the Right Way: How Technology Can Benefit Children When Used Wisely" },
+    { slug: "regulating-childrens-screen-time", title: "Regulating Children's Screen Time: A Practical Guide for Parents" },
+    { slug: "how-to-deal-with-anxiety-during-exams", title: "How to Deal with Anxiety During Exams: 8 Proven Tips for Students" },
+    { slug: "understanding-adolescence-how-to-handle-the-process", title: "Understanding Adolescence: How to Handle the Process as a Parent" },
+    { slug: "how-to-develop-fine-motor-skills-at-home", title: "How to Develop Fine Motor Skills at Home: Fun Activities for Toddlers" },
+    { slug: "the-leading-school-of-the-year-thane", title: "Rainbow International School Wins 'Leading School of the Year – Thane' at Pride of Bharat Awards 2021" },
+    { slug: "give-earth-to-life-on-earth", title: "Give Earth to Life on Earth: Celebrating Earth Day at Rainbow International School" },
+    { slug: "coronavirus-the-new-monster-in-town", title: "Coronavirus: The New Monster in Town — What Schools and Families Need to Know" },
+    { slug: "fit-india-certificate-of-recognition", title: "Rainbow International School Receives FIT INDIA Certificate of Recognition" },
+    { slug: "the-15th-world-education-summit", title: "Rainbow Wins Big at the 15th World Education Summit: Two National Awards" },
+    { slug: "teen-depression-how-to-spot-and-cure-it", title: "Teen Depression: How to Spot It Early and Help Your Child" },
+    { slug: "7-areas-in-education-where-indian-women-are-excellent", title: "7 Areas in Education Where Indian Women Are Excellent" },
+    { slug: "4-reasons-why-school-bags-should-not-be-a-burden", title: "4 Reasons Why School Bags Should Not Be a Burden on Children" },
+    { slug: "smartphone-addiction-how-to-ensure-healthy-use-by-kids", title: "Smartphone Addiction in Kids: 7 Ways to Ensure Healthy Use" },
+    { slug: "school-sanitation-standards-how-to-stay-clean-and-safe", title: "School Sanitation Standards: 7 Hygiene Tips Every School Should Implement" },
   ];
   return `
 <div class="section">
-<h2>86+ Articles on Education, Parenting &amp; Student Development</h2>
+<h2>94 Articles on Education, Parenting &amp; Student Development</h2>
 <p>The Rainbow International School blog covers CBSE curriculum updates, parenting strategies, sports achievements, student wellness, school life in Thane, and much more — written by our educators and academic team.</p>
 
 <h2>All Blog Posts</h2>
