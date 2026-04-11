@@ -854,42 +854,81 @@ ${sports.map(s => `<div class="card">
 }
 
 function renderBlogs(): string {
-  const categories = [
-    { name: "CBSE School", count: 18, desc: "CBSE board updates, curriculum insights, affiliation requirements, NEP 2020 explanations." },
-    { name: "Parenting", count: 22, desc: "Practical tips for supporting your child's learning, well-being, and development at home." },
-    { name: "Sports", count: 8, desc: "Sports education, fitness, physical development, and Rainbow's sports achievements." },
-    { name: "Study Skills", count: 10, desc: "Effective study habits, exam preparation, time management, and focus techniques." },
-    { name: "Awards", count: 6, desc: "Rainbow's national and international recognitions and what they mean for students." },
-    { name: "Health", count: 8, desc: "Student health, nutrition, mental well-being, and safe school environments." },
-    { name: "Student Achievements", count: 7, desc: "Stories of Rainbow students excelling academically and in sports at state/national levels." },
-    { name: "Beyond the Classroom", count: 5, desc: "Clubs, exhibitions, organic farming, tours, and co-curricular activities." },
-    { name: "School Selection", count: 6, desc: "How to choose the right school in Thane — board comparison, admission checklists, tips." },
-    { name: "About Rainbow", count: 4, desc: "School history, philosophy, team, and campus life at Rainbow International School." },
+  const posts = [
+    { slug: "how-cbse-schools-can-foster-entrepreneurship-and-innovation", title: "How CBSE Schools Can Foster Entrepreneurship and Innovation Among Students" },
+    { slug: "why-rainbow-international-school-is-among-the-top-schools-in-thane", title: "Why Rainbow International School Is Among the Top Schools in Thane" },
+    { slug: "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents", title: "The Growing Popularity of CBSE Schools in Thane Among Parents" },
+    { slug: "key-facilities-every-good-cbse-school-should-have", title: "Key Facilities Every Good CBSE School Should Have" },
+    { slug: "why-choose-a-cbse-school-for-your-childs-education", title: "Why Choose a CBSE School for Your Child's Education?" },
+    { slug: "riddles-for-kids", title: "100 Fun Riddles for Kids to Sharpen Their Minds" },
+    { slug: "problem-solving-activities-life-skills-students", title: "Problem-Solving Activities & Life Skills for Students: Why They Matter" },
+    { slug: "role-of-parents-in-education-orientation-importance", title: "The Role of Parents in Education: Why School Orientation Programmes Matter" },
+    { slug: "importance-of-foundational-literacy-and-numeracy-in-schools", title: "The Importance of Foundational Literacy and Numeracy in Schools" },
+    { slug: "co-curricular-activities", title: "Co-Curricular Activities: The Key to Holistic Student Development" },
+    { slug: "age-criteria-for-international-schools-admission-2025-in-mumbai", title: "Age Criteria for International School Admission 2025 in Mumbai: A Parent's Guide" },
+    { slug: "international-school-admission-process-guide", title: "A Complete Guide to the International School Admission Process in India" },
+    { slug: "advantages-of-starting-early-international-school", title: "The Advantages of Starting Early at an International School" },
+    { slug: "the-benefits-of-early-learning-in-shaping-a-childs-personality", title: "The Benefits of Early Learning in Shaping a Child's Personality" },
+    { slug: "what-you-need-to-know-before-applying-to-an-international-school", title: "What You Need to Know Before Applying to an International School" },
+    { slug: "best-age-for-international-school-admission", title: "Best Age for International School Admission: A Complete Parent's Guide" },
+    { slug: "why-maths-matters-in-student-life-benefits-uses", title: "Why Maths Matters in Student Life: Benefits, Uses, and How to Build a Love for Numbers" },
+    { slug: "importance-of-sports-in-students-life-teamwork-skills", title: "The Importance of Sports in a Student's Life: Building Teamwork and Life Skills" },
+    { slug: "ideal-teacher-qualities-traits-of-a-great-educator", title: "The Ideal Teacher: 8 Qualities and Traits That Define a Great Educator" },
+    { slug: "10-fun-and-educational-republic-day-activities-for-kids", title: "10 Fun and Educational Republic Day Activities for Kids" },
+    { slug: "understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time", title: "Understanding the Effects of Mobile Phones on Children: Benefits, Risks, and Managing Screen Time" },
+    { slug: "5-tips-to-choose-best-cbse-schools-in-mumbai", title: "5 Tips to Choose the Best CBSE School in Mumbai: A Parent's Practical Guide" },
+    { slug: "benefits-of-rainbow-international-school", title: "The Key Benefits of Rainbow International School: What Makes It the Right Choice for Your Child" },
+    { slug: "christmas-celebration-in-school-10-fun-and-festive-activity-ideas", title: "Christmas Celebration in School: 10 Fun and Festive Activity Ideas for Students" },
+    { slug: "back-to-school-a-step-by-step-guide-to-international-school-admissions", title: "Back to School: A Step-by-Step Guide to International School Admissions" },
+    { slug: "benefits-of-meditation-for-students", title: "Benefits of Meditation for Students: How Mindfulness Improves Learning and Wellbeing" },
+    { slug: "diwali-activities-for-students", title: "Diwali Activities for Students: Fun, Creative, and Culturally Rich Ideas for School" },
+    { slug: "cbse-vs-icse-which-board-prepares-students-better-for-the-future", title: "CBSE vs ICSE: Which Board Prepares Students Better for the Future?" },
+    { slug: "10-things-in-the-classroom-to-boost-student-engagement", title: "10 Things in the Classroom to Boost Student Engagement" },
+    { slug: "holistic-development-rainbow-international-school", title: "Holistic Development at Rainbow International School: Educating the Whole Child" },
+    { slug: "top-reasons-choose-rainbow-international-school-thane", title: "Top Reasons to Choose Rainbow International School, Thane" },
+    { slug: "6-excellent-ideas-to-innovate-cultural-programmes-in-school", title: "6 Excellent Ideas to Innovate Cultural Programmes in School" },
+    { slug: "teaching-children-the-value-of-money-5-ways-schools-can-help", title: "Teaching Children the Value of Money: 5 Ways Schools Can Help" },
+    { slug: "amazing-coaches-who-improved-players-willpower", title: "Amazing Coaches Who Improved Players' Willpower: Why Schools Need Specialist Sports Coaches" },
+    { slug: "how-organic-farming-in-schools-helps-the-nation", title: "How Organic Farming in Schools Helps the Nation" },
+    { slug: "how-school-buses-are-changing-with-technology", title: "How School Buses Are Changing with Technology: Safer, Smarter Commutes for Students" },
+    { slug: "amazing-youtube-channels-on-general-knowledge-for-kids", title: "7 Amazing YouTube Channels to Boost Kids' General Knowledge" },
+    { slug: "know-how-swimming-helps-your-child-in-7-ways", title: "Know How Swimming Helps Your Child in 7 Ways" },
+    { slug: "6-reasons-why-cbse-is-the-best-board-of-the-country", title: "6 Reasons Why CBSE Is the Best Board in India for Your Child" },
+    { slug: "big-school-playgrounds-6-reasons-why-kids-need-them", title: "Big School Playgrounds: 6 Reasons Why Kids Absolutely Need Them" },
+    { slug: "6-reasons-why-indoor-sports-is-important-in-schools", title: "6 Reasons Why Indoor Sports Are Important in Schools" },
+    { slug: "an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming", title: "An All-Rounder in the Making: Raghvi Ramanujan Bags Her 101st Swimming Medal" },
+    { slug: "rainbow-awarded-as-best-preschool-and-secondary-school-in-thane", title: "Rainbow Awarded Best Preschool and Secondary School in Thane at Retail & Hospitality Awards 2018" },
+    { slug: "rainbow-preschools-featured-in-knowledge-review-magazine", title: "Rainbow Preschools Featured in 'The 10 Best Preschools in India 2018' — The Knowledge Review" },
+    { slug: "rainbow-wins-award-for-excellence", title: "Rainbow Wins India Today Awards for Excellence in Preschool and CBSE Education — Thane 2017" },
+    { slug: "100-result-rainbows-first-batch-2018-19", title: "100% Result: Rainbow International School's First Batch Achieves Perfect Class 10 Outcome" },
+    { slug: "field-trips-know-how-they-groom-students-in-5-ways", title: "Field Trips: Know How They Groom Students in 5 Important Ways" },
+    { slug: "time-management-for-school-children-6-ways-parents-can-help", title: "Time Management for School Children: 6 Ways Parents Can Help" },
+    { slug: "how-to-teach-benefits-of-family-meals-to-kids", title: "How to Teach Kids the Benefits of Family Meals — 6 Reasons to Eat Together" },
+    { slug: "do-your-children-hate-reading-know-why-youre-the-reason", title: "Do Your Children Hate Reading? Know Why You Might Be the Reason" },
+    { slug: "how-regular-sports-help-students-6-reasons", title: "How Regular Sports Help Students: 6 Reasons Every School Child Should Play" },
+    { slug: "digital-classrooms-how-technology-improves-education-in-school", title: "Digital Classrooms: How Technology Improves Education in School" },
+    { slug: "9-reasons-why-schools-should-have-an-infirmary-and-paediatrician", title: "9 Reasons Why Schools Should Have an Infirmary and a Paediatrician" },
+    { slug: "7-safety-and-security-measures-your-kids-school-should-have", title: "7 Safety and Security Measures Your Child's School Must Have" },
+    { slug: "cbse-vs-icse-vs-state-board-which-is-best-for-your-child", title: "CBSE vs ICSE vs State Board — Which Is Best for Your Child in 2026?" },
+    { slug: "school-admission-checklist-thane-parents-guide-2026", title: "School Admission Checklist for Parents in Thane — Complete Guide for 2026-27" },
+    { slug: "how-to-help-your-child-focus-better-in-studies", title: "How to Help Your Child Focus Better in Studies — 12 Proven Strategies" },
+    { slug: "importance-of-extracurricular-activities-in-school", title: "Why Extracurricular Activities Are Just as Important as Academics" },
+    { slug: "new-education-policy-nep-2020-what-parents-should-know", title: "NEP 2020 Explained for Parents — What Changes and How It Affects Your Child" },
+    { slug: "how-to-prepare-your-child-for-first-day-of-school", title: "How to Prepare Your Child for Their First Day of School — A Parent's Guide" },
+    { slug: "benefits-of-multiple-intelligence-based-learning-in-schools", title: "Multiple Intelligence-Based Learning — How It Helps Every Child Succeed" },
+    { slug: "best-cbse-schools-in-thane-what-to-look-for", title: "Best CBSE Schools in Thane — What to Look for When Choosing One" },
   ];
   return `
 <div class="section">
-<h2>Education Insights — 86+ Articles</h2>
-<p>The Rainbow International School blog covers everything from CBSE curriculum updates to parenting strategies, sports achievements, student wellness, and school life in Thane. Written by our educators and academic team.</p>
+<h2>86+ Articles on Education, Parenting &amp; Student Development</h2>
+<p>The Rainbow International School blog covers CBSE curriculum updates, parenting strategies, sports achievements, student wellness, school life in Thane, and much more — written by our educators and academic team.</p>
 
-<h2>Blog Categories</h2>
-${categories.map(c => `<div class="card">
-<h3>${e(c.name)}</h3>
-<p>${c.desc} <strong>${c.count} articles.</strong></p>
-</div>`).join("")}
-
-<h2>Popular Topics</h2>
+<h2>All Blog Posts</h2>
 <ul>
-<li>CBSE vs ICSE vs State Board — which is best for your child?</li>
-<li>School admission checklist for Thane parents (2026–27)</li>
-<li>How to help your child focus better at home</li>
-<li>NEP 2020 explained for parents</li>
-<li>Importance of extracurricular activities in school</li>
-<li>Preparing your child for their first day of school</li>
-<li>Multiple Intelligence-based learning — what it means</li>
-<li>How to choose the best CBSE school in Thane</li>
+${posts.map(p => `<li><a href="/blog/${e(p.slug)}">${e(p.title)}</a></li>`).join("\n")}
 </ul>
 
-<p>Read all our articles at <a href="/blogs">Rainbow School Blog</a> or explore our <a href="/about-rainbow-international-school">About page</a>.</p>
+<p>Explore all articles on our <a href="/blogs">blog listing page</a>, or learn more about <a href="/about-rainbow-international-school">Rainbow International School</a>.</p>
 </div>`;
 }
 
@@ -1471,7 +1510,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/career",
-    title: "Career Opportunities at Rainbow International School Thane",
+    title: "Career Opportunities | Rainbow International School",
     description: "Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution.",
     keywords: "Rainbow school career, teacher jobs Thane, school jobs Thane, educator jobs Rainbow International School",
     canonical: "https://rainbowinternationalschool.in/career",
@@ -1491,7 +1530,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/beyond-the-classroom",
-    title: "Beyond the Classroom — Co-Curricular Activities | Rainbow International School",
+    title: "Beyond the Classroom | Rainbow International School",
     description: "Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students.",
     keywords: "beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane",
     canonical: "https://rainbowinternationalschool.in/beyond-the-classroom",
@@ -1510,7 +1549,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/extracurriculars",
-    title: "Extracurricular Activities — FIT INDIA School Thane | Rainbow International School",
+    title: "Extracurricular Activities | Rainbow International School",
     description: "Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane.",
     keywords: "extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane",
     canonical: "https://rainbowinternationalschool.in/extracurriculars",
@@ -1529,7 +1568,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/student-achievements",
-    title: "Student Achievements — National & State Level | Rainbow International School",
+    title: "Student Achievements | Rainbow International School",
     description: "Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more.",
     keywords: "Rainbow school student achievements, CBSE school results Thane, school sports achievements Thane",
     canonical: "https://rainbowinternationalschool.in/student-achievements",
@@ -1548,7 +1587,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/blogs",
-    title: "School Blog — Education, Parenting & CBSE Insights | Rainbow International School",
+    title: "Blogs | Rainbow International School",
     description: "Read 86+ insightful articles from Rainbow International School on education, parenting, CBSE, student wellness, admissions, sports and more.",
     keywords: "Rainbow school blog, education blog Thane, CBSE school blog, parenting tips school Thane, student development blog Rainbow International",
     canonical: "https://rainbowinternationalschool.in/blogs",
@@ -1568,7 +1607,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/curriculum",
-    title: "CBSE Curriculum Nursery to Class 12 | Rainbow International School Thane",
+    title: "Curriculum | Rainbow International School",
     description: "Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology.",
     keywords: "CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane",
     canonical: "https://rainbowinternationalschool.in/curriculum",
@@ -1608,7 +1647,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/rainbow-preschool-international",
-    title: "Rainbow Preschool International — Best Preschool Thane (Age 1.5–5.5)",
+    title: "Preschool (Age 1.5–5.5) Thane | Rainbow International School",
     description: "Rainbow Preschool International — award-winning preschool for children aged 1.5 to 5.5 years. Playgroup, Nursery, Jr KG, and Sr KG. 100% female staff. Recognised among India's best preschools.",
     keywords: "Rainbow Preschool International, best preschool Thane, playgroup Thane, nursery admission Thane, Rainbow pre-primary school, early childhood education Thane",
     canonical: "https://rainbowinternationalschool.in/rainbow-preschool-international",
@@ -1629,7 +1668,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/academic-calendar",
-    title: "Academic Calendar 2026–27 | Rainbow International School Thane",
+    title: "Academic Calendar 2026–27 | Rainbow International School",
     description: "View and download the academic calendar for Rainbow International School, Thane. Stay updated with important dates, events, and school activities.",
     keywords: "Rainbow school academic calendar, school calendar Thane, Rainbow International School events schedule",
     canonical: "https://rainbowinternationalschool.in/academic-calendar",
@@ -1648,7 +1687,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/academic-team",
-    title: "Academic Team — Teachers & Educators | Rainbow International School Thane",
+    title: "Academic Team | Rainbow International School",
     description: "Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers, coaches, counsellors and support staff committed to student excellence.",
     keywords: "Rainbow school teachers, academic team Rainbow International School, school faculty Thane, CBSE school staff",
     canonical: "https://rainbowinternationalschool.in/academic-team",
@@ -1668,7 +1707,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/our-philosophy",
-    title: "Our Philosophy — 4 Pillars of Education | Rainbow International School",
+    title: "Our Philosophy | Rainbow International School",
     description: "Rainbow International School's educational philosophy — built on four pillars: Competence, Conscience, Compassion, and Courage. Holistic development for every Rainbow student.",
     keywords: "Rainbow school philosophy, Rainbow International School education approach, school philosophy Thane CBSE",
     canonical: "https://rainbowinternationalschool.in/our-philosophy",
@@ -1689,7 +1728,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/ris-vision-mission",
-    title: "Vision & Mission | Rainbow International School Thane",
+    title: "Vision & Mission | Rainbow International School",
     description: "Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact.",
     keywords: "Rainbow school vision mission, Rainbow International School values, school philosophy Thane",
     canonical: "https://rainbowinternationalschool.in/ris-vision-mission",
@@ -1710,7 +1749,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/chairpersons-note",
-    title: "Chairperson's Note | Rainbow International School Thane",
+    title: "Chairperson's Note | Rainbow International School",
     description: "A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education.",
     keywords: "Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school",
     canonical: "https://rainbowinternationalschool.in/chairpersons-note",
@@ -1731,7 +1770,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/photo-gallery",
-    title: "Photo Gallery — Campus & Events | Rainbow International School Thane",
+    title: "Photo Gallery | Rainbow International School",
     description: "Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane.",
     keywords: "Rainbow school photo gallery, school photos Thane, school campus photos Rainbow International",
     canonical: "https://rainbowinternationalschool.in/photo-gallery",
