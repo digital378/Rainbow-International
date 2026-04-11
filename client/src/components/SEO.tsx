@@ -11,11 +11,12 @@ interface SEOProps {
   canonical?: string;
   ogImage?: string;
   keywords?: string;
+  robots?: string;
   breadcrumbs?: BreadcrumbItem[];
   jsonLd?: Record<string, unknown>;
 }
 
-export function SEO({ title, description, canonical, ogImage, keywords, breadcrumbs, jsonLd }: SEOProps) {
+export function SEO({ title, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd }: SEOProps) {
   const fullTitle = title.includes("Rainbow International") ? title : `${title} | Rainbow International School`;
   const defaultImage = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg";
 
@@ -35,6 +36,7 @@ export function SEO({ title, description, canonical, ogImage, keywords, breadcru
 
     setMeta("description", description);
     if (keywords) setMeta("keywords", keywords);
+    if (robots) setMeta("robots", robots);
     setMeta("og:title", fullTitle, true);
     setMeta("og:description", description, true);
     setMeta("og:image", ogImage || defaultImage, true);

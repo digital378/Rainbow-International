@@ -41,6 +41,13 @@ const galleryLinks = [
   { href: "https://www.google.co.in/maps/@19.2410872,72.9834173,3a,75y,173.49h,78.89t/data=!3m7!1e1!3m5!1sCIHM0ogKEICAgICEoPa6nwE!2e10!6shttps:%2F%2Flh3.googleusercontent.com%2Fgpms-cs-s%2FAFfmt2aWGOsrPaLwSCl_hpv4b0782kWAfeFtnO6PY5ALsP7irCvkUkFM4Mj-PBqTjsMKjRbuIfgun0HJuqtMJMNBEuil-DTNGWYGhJdBl9PnQ5TYN9T192c28YY8tQXxUB9Pxfez7bYSrA%3Dw900-h600-k-no-pi11.106874019713445-ya67.45613033629051-ro0-fo100!7i13312!8i6656?entry=ttu&g_ep=EgoyMDI2MDMyOS4wIKXMDSoASAFQAw%3D%3D", label: "360 View", external: true },
 ];
 
+const exploreLinks = [
+  { href: "/top-schools-in-thane", label: "Top Schools in Thane" },
+  { href: "/testimonials", label: "Testimonials" },
+  { href: "/faqs", label: "FAQs" },
+  { href: "/school-readiness-quiz", label: "School Readiness Quiz" },
+];
+
 const parentLinks = [
   { href: "/contact-us", label: "Application Form" },
   { href: "/students-leaving-certificate", label: "Leaving Certificate" },
@@ -240,6 +247,9 @@ export function Navbar() {
               Blogs
             </Link>
             <div className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
+              <Dropdown label="Explore" links={exploreLinks} isTransparent={isTransparent} />
+            </div>
+            <div className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
               <Dropdown label="Parent's Corner" links={parentLinks} isTransparent={isTransparent} />
             </div>
             <Link href="/contact-us" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>
@@ -272,6 +282,7 @@ export function Navbar() {
               { key: "academics", label: "Academics", links: academicsLinks },
               { key: "at-rainbow", label: "At Rainbow", links: atRainbowLinks },
               { key: "gallery", label: "Gallery", links: galleryLinks },
+              { key: "explore", label: "Explore", links: exploreLinks },
               { key: "parents", label: "Parent's Corner", links: parentLinks },
             ].map(({ key, label, links }) => (
               <div key={key}>

@@ -26,6 +26,7 @@ const exploreLinks = [
   { label: "Top Schools in Thane", href: "/top-schools-in-thane" },
   { label: "Testimonials", href: "/testimonials" },
   { label: "FAQs", href: "/faqs" },
+  { label: "School Readiness Quiz", href: "/school-readiness-quiz" },
   { label: "Photo Gallery", href: "/photo-gallery" },
   { label: "Blogs", href: "/blogs" },
   { label: "CBSE Disclosures", href: "/cbse-mandatory-public-disclosures" },

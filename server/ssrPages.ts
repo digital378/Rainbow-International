@@ -1258,6 +1258,32 @@ ${categories.map(c => `<div class="card">
 </div>`;
 }
 
+function renderScheduleAppointment(): string {
+  return `
+<div class="section">
+<h2>Schedule a Campus Visit</h2>
+<p>We warmly invite parents and guardians to visit the Rainbow International School campus in Thane. A campus visit is the best way to experience our facilities, meet our faculty, and understand the Rainbow learning environment first-hand.</p>
+
+<div class="card">
+<h3>Book an Appointment</h3>
+<p>To schedule a campus visit or meeting with our admissions team, reach out to us through any of the following:</p>
+<ul>
+<li><strong>Phone:</strong> <a href="tel:02269105000">(022) 69105000</a> &nbsp;|&nbsp; <a href="tel:+918291568972">+91 82915 68972</a></li>
+<li><strong>WhatsApp:</strong> <a href="https://wa.me/918291568972">+91 82915 68972</a></li>
+<li><strong>Email:</strong> <a href="mailto:info@rainbowinternationalschool.in">info@rainbowinternationalschool.in</a></li>
+</ul>
+</div>
+
+<div class="card">
+<h3>Campus Location &amp; Hours</h3>
+<p><strong>Address:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607</p>
+<p><strong>Working Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</p>
+</div>
+
+<p>Interested in admissions for 2026–27? <a href="/admissions">View admissions details</a> or <a href="/contact-us">fill an enquiry form</a> and our team will get back to you promptly.</p>
+</div>`;
+}
+
 function renderWelcomeToRIS(): string {
   return `
 <div class="section">
@@ -1880,6 +1906,26 @@ const pages: PageSSRConfig[] = [
       },
     },
     renderBody: renderWelcomeToRIS,
+  },
+  {
+    path: "/schedule-appointment",
+    title: "Schedule a Campus Visit | Rainbow International School Thane",
+    description: "Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2026–27.",
+    keywords: "schedule appointment Rainbow International School, campus visit CBSE school Thane, book school visit Brahmand Thane",
+    canonical: "https://rainbowinternationalschool.in/schedule-appointment",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Contact Us", url: "https://rainbowinternationalschool.in/contact-us" },
+      { name: "Schedule a Visit", url: "https://rainbowinternationalschool.in/schedule-appointment" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Schedule a Campus Visit — Rainbow International School",
+      description: "Book a campus visit or appointment with the Rainbow International School admissions team in Thane.",
+      url: "https://rainbowinternationalschool.in/schedule-appointment",
+    },
+    renderBody: renderScheduleAppointment,
   },
 ];
 
