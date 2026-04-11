@@ -437,7 +437,7 @@ Rainbow International School is a day school. There are no boarding facilities. 
 
 ## Blog Posts (94 Total)
 
-All 94 blog posts are available at https://rainbowinternationalschool.in/blogs and individually at https://rainbowinternationalschool.in/blog/[slug]
+All 94 blog posts are available at https://rainbowinternationalschool.in/blogs. Each post is also accessible at its individual URL listed below.
 
 ### CBSE School & Education
 - How CBSE Schools Can Foster Entrepreneurship and Innovation Among Students — https://rainbowinternationalschool.in/blog/how-cbse-schools-can-foster-entrepreneurship-and-innovation
