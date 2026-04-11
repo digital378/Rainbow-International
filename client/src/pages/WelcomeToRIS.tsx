@@ -14,11 +14,11 @@ export default function WelcomeToRIS() {
         title="Welcome to Rainbow International School"
         description="Welcome to Rainbow International School — founded in 2009, one of the finest CBSE-affiliated educational institutes in Thane with 3.5 acres campus and 3000+ students."
         keywords="Welcome Rainbow International School, about Rainbow school, Rainbow International School Thane"
-        canonical="https://rainbowinternationalschool.in/about-rainbow-international-school"
+        canonical="https://rainbowinternationalschool.in/welcome-to-ris"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
-          { name: "Welcome to RIS", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+          { name: "Welcome to RIS", href: "https://rainbowinternationalschool.in/welcome-to-ris" },
         ]}
       />
       <Navbar />

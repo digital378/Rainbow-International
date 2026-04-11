@@ -59,15 +59,6 @@ export default function Career() {
             "@type": "WebSite",
             "name": "Rainbow International School",
             "url": "https://rainbowinternationalschool.in"
-          },
-          "about": {
-            "@type": "EmployerAggregateRating",
-            "itemReviewed": {
-              "@type": "Organization",
-              "name": "Rainbow International School",
-              "url": "https://rainbowinternationalschool.in",
-              "sameAs": "https://rainbowinternationalschool.in"
-            }
           }
         }}
       />

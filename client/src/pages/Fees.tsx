@@ -37,12 +37,22 @@ export default function Fees() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": faqs.map(f => ({
-            "@type": "Question",
-            "name": f.q,
-            "acceptedAnswer": { "@type": "Answer", "text": f.a }
-          }))
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "name": "CBSE School Fee Structure Thane 2026-27 — Rainbow International School",
+              "description": "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
+              "url": "https://rainbowinternationalschool.in/fee-structure"
+            },
+            {
+              "@type": "FAQPage",
+              "mainEntity": faqs.map(f => ({
+                "@type": "Question",
+                "name": f.q,
+                "acceptedAnswer": { "@type": "Answer", "text": f.a }
+              }))
+            }
+          ]
         }}
       />
       <Navbar />
