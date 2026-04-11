@@ -720,6 +720,12 @@ const SCHOOL_LD = {
   telephone: "+91-82915-68972",
   foundingDate: "2009-04-01",
   numberOfStudents: "3000",
+  sameAs: [
+    "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA",
+    "https://www.facebook.com/RainbowInternationalSchoolThane/",
+    "https://www.instagram.com/rainbowinternationalschool/",
+    "https://www.youtube.com/@RainbowInternationalSchool",
+  ],
 };
 
 function renderCareer(): string {

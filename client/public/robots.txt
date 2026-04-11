@@ -1,3 +1,31 @@
+# AI search crawlers — explicitly allowed
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
 User-agent: *
 Allow: /
 Disallow: /api/
@@ -14,3 +42,4 @@ Sitemap: https://rainbowinternationalschool.in/sitemap.xml
 
 # AI/LLM discovery
 LLMs.txt: https://rainbowinternationalschool.in/llms.txt
+LLMs-Full.txt: https://rainbowinternationalschool.in/llms-full.txt

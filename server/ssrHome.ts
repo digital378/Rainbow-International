@@ -66,6 +66,7 @@ function renderHomeSSR(): string {
   "telephone": "+918291568972",
   "email": "info@rainbowinternationalschool.in",
   "sameAs": [
+    "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA",
     "https://www.facebook.com/RainbowInternationalSchoolThane/",
     "https://www.instagram.com/rainbowinternationalschool/",
     "https://www.youtube.com/@RainbowInternationalSchool"
