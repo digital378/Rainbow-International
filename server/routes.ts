@@ -202,6 +202,10 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  registerHomeSSR(app);
+  registerPageSSR(app);
+  registerSSRRoutes(app);
+
   const wpRedirects: Record<string, string> = {
     "/rainbow-preschool-international": "/pre-primary-school-thane",
     "/importance-of-foundational-literacy-and-numeracy-in-schools": "/blog/importance-of-foundational-literacy-and-numeracy-in-schools",
@@ -354,10 +358,6 @@ export async function registerRoutes(
       res.status(500).json({ message: "Failed to delete event" });
     }
   });
-
-  registerHomeSSR(app);
-  registerPageSSR(app);
-  registerSSRRoutes(app);
 
   return httpServer;
 }
