@@ -71,7 +71,7 @@ export default function ScheduleAppointment() {
         title="Schedule an Appointment"
         description="Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2026–27."
         keywords="schedule appointment Rainbow International School, campus visit CBSE school Thane, book school visit Brahmand Thane"
-        canonical="/schedule-appointment"
+        canonical="https://rainbowinternationalschool.in/schedule-appointment"
       />
       <ScrollProgress />
       <Navbar />
