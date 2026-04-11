@@ -4,6 +4,10 @@ function e(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+function seoTitle(t: string): string {
+  return t.includes("Rainbow International") ? t : `${t} | Rainbow International School`;
+}
+
 const BOT_RE = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsappbot|telegrambot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot/i;
 
 interface PageSSRConfig {
@@ -34,18 +38,18 @@ function shell(cfg: PageSSRConfig): string {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>${e(cfg.title)}</title>
+<title>${e(seoTitle(cfg.title))}</title>
 <meta name="description" content="${e(cfg.description)}"/>
 <meta name="keywords" content="${e(cfg.keywords)}"/>
 <link rel="canonical" href="${e(cfg.canonical)}"/>
-<meta property="og:title" content="${e(cfg.title)}"/>
+<meta property="og:title" content="${e(seoTitle(cfg.title))}"/>
 <meta property="og:description" content="${e(cfg.description)}"/>
 <meta property="og:url" content="${e(cfg.canonical)}"/>
 <meta property="og:type" content="website"/>
 <meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <meta property="og:locale" content="en_IN"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="${e(cfg.title)}"/>
+<meta name="twitter:title" content="${e(seoTitle(cfg.title))}"/>
 <meta name="twitter:description" content="${e(cfg.description)}"/>
 <meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <script type="application/ld+json">${JSON.stringify(cfg.jsonLd)}</script>
@@ -1542,7 +1546,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/career",
-    title: "Career Opportunities | Rainbow International School",
+    title: "Career Opportunities",
     description: "Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution.",
     keywords: "Rainbow school career, teacher jobs Thane, school jobs Thane, educator jobs Rainbow International School",
     canonical: "https://rainbowinternationalschool.in/career",
@@ -1562,7 +1566,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/beyond-the-classroom",
-    title: "Beyond the Classroom | Rainbow International School",
+    title: "Beyond the Classroom",
     description: "Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students.",
     keywords: "beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane",
     canonical: "https://rainbowinternationalschool.in/beyond-the-classroom",
@@ -1581,7 +1585,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/extracurriculars",
-    title: "Extracurricular Activities | Rainbow International School",
+    title: "Extracurricular Activities",
     description: "Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane.",
     keywords: "extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane",
     canonical: "https://rainbowinternationalschool.in/extracurriculars",
@@ -1600,7 +1604,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/student-achievements",
-    title: "Student Achievements | Rainbow International School",
+    title: "Student Achievements",
     description: "Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more.",
     keywords: "Rainbow school student achievements, CBSE school results Thane, school sports achievements Thane",
     canonical: "https://rainbowinternationalschool.in/student-achievements",
@@ -1619,7 +1623,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/blogs",
-    title: "Blogs | Rainbow International School",
+    title: "Blogs",
     description: "Read 86+ insightful articles from Rainbow International School on education, parenting, CBSE, student wellness, admissions, sports and more.",
     keywords: "Rainbow school blog, education blog Thane, CBSE school blog, parenting tips school Thane, student development blog Rainbow International",
     canonical: "https://rainbowinternationalschool.in/blogs",
@@ -1639,7 +1643,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/curriculum",
-    title: "Curriculum | Rainbow International School",
+    title: "Curriculum",
     description: "Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology.",
     keywords: "CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane",
     canonical: "https://rainbowinternationalschool.in/curriculum",
@@ -1659,7 +1663,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/cbse-mandatory-public-disclosures",
-    title: "CBSE Public Disclosures | Rainbow International School — Affiliation No. 1130661",
+    title: "CBSE Public Disclosures | Rainbow International School",
     description: "CBSE mandatory public disclosures for Rainbow International School, Thane. Affiliation number 1130661. Full details including staff, infrastructure, results and documents.",
     keywords: "Rainbow school CBSE disclosure, CBSE affiliation number 1130661, public disclosure school Thane",
     canonical: "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures",
@@ -1679,7 +1683,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/rainbow-preschool-international",
-    title: "Preschool (Age 1.5–5.5) Thane | Rainbow International School",
+    title: "Preschool (Age 1.5–5.5) Thane",
     description: "Rainbow Preschool International — award-winning preschool for children aged 1.5 to 5.5 years. Playgroup, Nursery, Jr KG, and Sr KG. 100% female staff. Recognised among India's best preschools.",
     keywords: "Rainbow Preschool International, best preschool Thane, playgroup Thane, nursery admission Thane, Rainbow pre-primary school, early childhood education Thane",
     canonical: "https://rainbowinternationalschool.in/rainbow-preschool-international",
@@ -1700,7 +1704,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/academic-calendar",
-    title: "Academic Calendar 2026–27 | Rainbow International School",
+    title: "Academic Calendar 2026–27",
     description: "View and download the academic calendar for Rainbow International School, Thane. Stay updated with important dates, events, and school activities.",
     keywords: "Rainbow school academic calendar, school calendar Thane, Rainbow International School events schedule",
     canonical: "https://rainbowinternationalschool.in/academic-calendar",
@@ -1719,7 +1723,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/academic-team",
-    title: "Academic Team | Rainbow International School",
+    title: "Academic Team",
     description: "Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers, coaches, counsellors and support staff committed to student excellence.",
     keywords: "Rainbow school teachers, academic team Rainbow International School, school faculty Thane, CBSE school staff",
     canonical: "https://rainbowinternationalschool.in/academic-team",
@@ -1739,7 +1743,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/our-philosophy",
-    title: "Our Philosophy | Rainbow International School",
+    title: "Our Philosophy",
     description: "Rainbow International School's educational philosophy — built on four pillars: Competence, Conscience, Compassion, and Courage. Holistic development for every Rainbow student.",
     keywords: "Rainbow school philosophy, Rainbow International School education approach, school philosophy Thane CBSE",
     canonical: "https://rainbowinternationalschool.in/our-philosophy",
@@ -1781,7 +1785,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/chairpersons-note",
-    title: "Chairperson's Note | Rainbow International School",
+    title: "Chairperson's Note",
     description: "A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education.",
     keywords: "Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school",
     canonical: "https://rainbowinternationalschool.in/chairpersons-note",
@@ -1802,7 +1806,7 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/photo-gallery",
-    title: "Photo Gallery | Rainbow International School",
+    title: "Photo Gallery",
     description: "Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane.",
     keywords: "Rainbow school photo gallery, school photos Thane, school campus photos Rainbow International",
     canonical: "https://rainbowinternationalschool.in/photo-gallery",

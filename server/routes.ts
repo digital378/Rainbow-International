@@ -202,6 +202,12 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  // SSR must be registered BEFORE wpRedirects so that search engine bots receive
+  // fully-rendered HTML for all registered paths. For bots, the SSR handler returns
+  // early with HTML. For regular browsers, SSR calls next() and the redirect fires.
+  // Intentional split for /rainbow-preschool-international:
+  //   - Bots → SSR content for the preschool page (indexable)
+  //   - Browsers → 301 redirect to /pre-primary-school-thane (legacy URL consolidation)
   registerHomeSSR(app);
   registerPageSSR(app);
   registerSSRRoutes(app);
