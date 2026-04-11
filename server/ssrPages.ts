@@ -718,6 +718,465 @@ const SCHOOL_LD = {
   numberOfStudents: "3000",
 };
 
+function renderCareer(): string {
+  const jobs = [
+    { title: "PRT – Primary Teacher", type: "Full-time", department: "Primary Section", exp: "1–3 years" },
+    { title: "TGT – Trained Graduate Teacher (Maths / Science)", type: "Full-time", department: "Middle Section", exp: "2–5 years" },
+    { title: "PGT – Post Graduate Teacher (Physics / Chemistry / Maths)", type: "Full-time", department: "Senior Secondary", exp: "3+ years" },
+    { title: "Counsellor", type: "Full-time", department: "Student Welfare", exp: "2+ years" },
+    { title: "Sports Coach (Multi-sport)", type: "Full-time", department: "Sports Department", exp: "2+ years" },
+    { title: "Librarian", type: "Full-time", department: "Library", exp: "1+ year" },
+  ];
+  const benefits = [
+    { title: "Professional Growth", desc: "Regular training, workshops, and career development opportunities." },
+    { title: "Collaborative Culture", desc: "Work with a dedicated team passionate about student development." },
+    { title: "Student-Centric", desc: "A fulfilling role where your work directly impacts young lives." },
+    { title: "Competitive Compensation", desc: "Attractive salary packages commensurate with experience." },
+  ];
+  return `
+<div class="section">
+<h2>Why Work at Rainbow International School?</h2>
+<p>Rainbow International School is one of Thane's leading CBSE-affiliated K–12 schools, with over 3,000 students, a 3.5-acre campus, and 17 years of educational excellence. We believe great schools are built by great educators.</p>
+
+${benefits.map(b => `<div class="card"><h3>${e(b.title)}</h3><p>${e(b.desc)}</p></div>`).join("")}
+
+<h2>Current Openings</h2>
+<p>We are currently hiring passionate educators and support staff for the following positions:</p>
+
+${jobs.map(j => `<div class="card">
+<h3>${e(j.title)}</h3>
+<p><strong>Type:</strong> ${e(j.type)} · <strong>Department:</strong> ${e(j.department)} · <strong>Experience:</strong> ${e(j.exp)}</p>
+</div>`).join("")}
+
+<h2>How to Apply</h2>
+<p>Send your CV and a brief cover letter to <a href="mailto:hr.recruiter3@rainbowinternationalschool.in">hr.recruiter3@rainbowinternationalschool.in</a>. Our HR team will contact shortlisted candidates within 3–5 working days.</p>
+
+<p>Learn more about our school at <a href="/about-rainbow-international-school">About Rainbow International School</a>.</p>
+</div>`;
+}
+
+function renderBeyondClassroom(): string {
+  const activities = [
+    { title: "School Exhibitions", desc: "Annual science, art, and heritage exhibitions where students showcase their projects and skills to parents and the wider community." },
+    { title: "Club Activities", desc: "Health & Wellness Club, Interact Club, Culinary Club, Literary Club, Heritage Club, Science & Maths Club, Eco Club, and Cultural Club — something for every interest." },
+    { title: "Educational Tours", desc: "Curated day trips and overnight educational tours that bring curriculum to life through real-world experiences across Maharashtra and beyond." },
+    { title: "Organic Farming", desc: "A unique on-campus organic farm where students learn sustainability, responsibility, and the joy of growing their own produce." },
+  ];
+  return `
+<div class="section">
+<h2>Learning Beyond the Classroom</h2>
+<p>At Rainbow International School, we believe real education extends far beyond textbooks and classrooms. Our comprehensive co-curricular programme is designed to meet the social, physical, and cultural needs of every student, nurturing well-rounded individuals ready for the world.</p>
+
+${activities.map(a => `<div class="card"><h3>${e(a.title)}</h3><p>${e(a.desc)}</p></div>`).join("")}
+
+<h2>Our Clubs</h2>
+<ul>
+<li><strong>Health &amp; Wellness Club</strong> – Promotes physical fitness, mental well-being, and healthy habits.</li>
+<li><strong>Interact Club</strong> – Rotary-affiliated, fostering leadership and community service.</li>
+<li><strong>Culinary Club</strong> – Hands-on cooking and nutrition education.</li>
+<li><strong>Literary Club</strong> – Reading, writing, debating, and storytelling.</li>
+<li><strong>Heritage Club</strong> – Indian culture, history, arts, and crafts.</li>
+<li><strong>Science &amp; Maths Club</strong> – Experiments, puzzles, and STEM challenges.</li>
+<li><strong>Eco Club</strong> – Environmental awareness and sustainability projects.</li>
+<li><strong>Cultural Club</strong> – Dance, music, drama, and folk art.</li>
+</ul>
+
+<p>Explore our <a href="/extracurriculars">Extracurricular Activities</a> or learn more about life at <a href="/about-rainbow-international-school">Rainbow International School</a>.</p>
+</div>`;
+}
+
+function renderExtracurriculars(): string {
+  const sports = [
+    "Swimming", "Football", "Cricket", "Basketball", "Skating", "Badminton",
+    "Table Tennis", "Chess", "Athletics", "Kabaddi", "Yoga",
+  ];
+  const arts = ["Dance (Classical &amp; Western)", "Music (Vocal &amp; Instrumental)", "Drama &amp; Theatre", "Art &amp; Craft", "Photography"];
+  const stem = ["Robotics", "Coding &amp; Programming", "Science Club", "Maths Olympiad Preparation", "MUN (Model United Nations)"];
+  return `
+<div class="section">
+<h2>A FIT INDIA School — 30+ Activities for All-Round Excellence</h2>
+<p>Rainbow International School is a recognised FIT INDIA school offering 30+ extracurricular activities spanning sports, arts, STEM, and leadership. Every student is encouraged to discover their unique passion and develop it with expert guidance.</p>
+
+<h2>Sports & Physical Education</h2>
+<p>Our 3.5-acre campus provides dedicated facilities for:</p>
+<ul>
+${sports.map(s => `<li>${s}</li>`).join("")}
+</ul>
+
+<h2>Arts & Performing Arts</h2>
+<ul>
+${arts.map(a => `<li>${a}</li>`).join("")}
+</ul>
+
+<h2>STEM, Leadership & Academic Enrichment</h2>
+<ul>
+${stem.map(s => `<li>${s}</li>`).join("")}
+</ul>
+
+<h2>Why Extracurriculars Matter</h2>
+<p>Research shows that students who participate in extracurricular activities perform better academically, develop stronger social skills, and demonstrate greater resilience. At Rainbow, extracurriculars are not optional — they are an integral part of every student's journey.</p>
+
+<p>Explore life <a href="/beyond-the-classroom">Beyond the Classroom</a> or <a href="/admissions">apply for admissions</a>.</p>
+</div>`;
+}
+
+function renderStudentAchievements(): string {
+  const sports = [
+    { sport: "Swimming Championship", name: "Miss Raghavi Ramanunjan", award: "300+ medals till date" },
+    { sport: "Badminton Tournament", name: "Master Himanshu Desai", award: "Gold at National Level (Represented Maharashtra for U-17)" },
+    { sport: "Cycling U-17 (DSO)", name: "Master Atharva Vaidya", award: "Gold" },
+    { sport: "South Zone Speed Skating Championship", name: "Miss Lakshmi Sahithi", award: "Bronze" },
+    { sport: "Kickboxing Championship", name: "Student", award: "State &amp; National medals" },
+  ];
+  return `
+<div class="section">
+<h2>Academic Excellence</h2>
+<p>We are extremely proud of our first batch of Class X students who appeared for the All India Secondary School Examination (AISSE) in March 2019. All <strong>43 students</strong> who appeared achieved <strong>100% results</strong>, bringing great laurels to the school.</p>
+
+<div class="card">
+<h3>Class X AISSE 2018-19 — 100% Results</h3>
+<p>43 students appeared. 100% pass rate. Multiple students secured Distinction, with several toppers scoring above 90%.</p>
+</div>
+
+<h2>Sports Achievements — National & State Level</h2>
+<p>Rainbow International School students have represented Maharashtra and India at national and state championships across multiple sports:</p>
+
+${sports.map(s => `<div class="card">
+<h3>${e(s.sport)}</h3>
+<p><strong>Student:</strong> ${s.name} · <strong>Award:</strong> ${s.award}</p>
+</div>`).join("")}
+
+<h2>Why We Celebrate Achievements</h2>
+<p>At Rainbow International School, every achievement — academic, sporting, artistic, or personal — is acknowledged and honoured. We believe recognition motivates students to strive further and builds a culture of excellence that permeates the entire school community.</p>
+
+<p>Learn more about our <a href="/extracurriculars">extracurricular programmes</a> or <a href="/awards-achievements">school awards</a>.</p>
+</div>`;
+}
+
+function renderBlogs(): string {
+  const categories = [
+    { name: "CBSE School", count: 18, desc: "CBSE board updates, curriculum insights, affiliation requirements, NEP 2020 explanations." },
+    { name: "Parenting", count: 22, desc: "Practical tips for supporting your child's learning, well-being, and development at home." },
+    { name: "Sports", count: 8, desc: "Sports education, fitness, physical development, and Rainbow's sports achievements." },
+    { name: "Study Skills", count: 10, desc: "Effective study habits, exam preparation, time management, and focus techniques." },
+    { name: "Awards", count: 6, desc: "Rainbow's national and international recognitions and what they mean for students." },
+    { name: "Health", count: 8, desc: "Student health, nutrition, mental well-being, and safe school environments." },
+    { name: "Student Achievements", count: 7, desc: "Stories of Rainbow students excelling academically and in sports at state/national levels." },
+    { name: "Beyond the Classroom", count: 5, desc: "Clubs, exhibitions, organic farming, tours, and co-curricular activities." },
+    { name: "School Selection", count: 6, desc: "How to choose the right school in Thane — board comparison, admission checklists, tips." },
+    { name: "About Rainbow", count: 4, desc: "School history, philosophy, team, and campus life at Rainbow International School." },
+  ];
+  return `
+<div class="section">
+<h2>Education Insights — 86+ Articles</h2>
+<p>The Rainbow International School blog covers everything from CBSE curriculum updates to parenting strategies, sports achievements, student wellness, and school life in Thane. Written by our educators and academic team.</p>
+
+<h2>Blog Categories</h2>
+${categories.map(c => `<div class="card">
+<h3>${e(c.name)}</h3>
+<p>${c.desc} <strong>${c.count} articles.</strong></p>
+</div>`).join("")}
+
+<h2>Popular Topics</h2>
+<ul>
+<li>CBSE vs ICSE vs State Board — which is best for your child?</li>
+<li>School admission checklist for Thane parents (2026–27)</li>
+<li>How to help your child focus better at home</li>
+<li>NEP 2020 explained for parents</li>
+<li>Importance of extracurricular activities in school</li>
+<li>Preparing your child for their first day of school</li>
+<li>Multiple Intelligence-based learning — what it means</li>
+<li>How to choose the best CBSE school in Thane</li>
+</ul>
+
+<p>Read all our articles at <a href="/blogs">Rainbow School Blog</a> or explore our <a href="/about-rainbow-international-school">About page</a>.</p>
+</div>`;
+}
+
+function renderCurriculum(): string {
+  const stages = [
+    { stage: "Pre-Primary (Nursery – Sr KG)", subjects: ["Language Arts (English)", "Hindi / Marathi", "EVS", "Maths Readiness", "Art &amp; Craft", "Music &amp; Movement", "Physical Education"] },
+    { stage: "Primary (Class 1–5)", subjects: ["English", "Hindi", "Mathematics", "Environmental Science (EVS)", "General Knowledge", "Computer Science", "Art &amp; Craft", "Physical Education"] },
+    { stage: "Middle School (Class 6–8)", subjects: ["English", "Hindi / Sanskrit", "Mathematics", "Science", "Social Science", "Computer Applications", "Art Education", "Health &amp; Physical Education"] },
+    { stage: "Secondary (Class 9–10)", subjects: ["English (Core)", "Hindi / Sanskrit", "Mathematics (Standard)", "Science", "Social Science", "Information Technology / Computer Applications"] },
+    { stage: "Senior Secondary — Science", subjects: ["Physics", "Chemistry", "Biology / Mathematics / Computer Science", "English Core", "Physical Education / Informatics Practices"] },
+    { stage: "Senior Secondary — Commerce", subjects: ["Accountancy", "Business Studies", "Economics", "English Core", "Mathematics / Informatics Practices"] },
+    { stage: "Senior Secondary — Humanities", subjects: ["History", "Political Science", "Geography / Psychology / Sociology", "English Core", "Economics / Legal Studies"] },
+  ];
+  return `
+<div class="section">
+<h2>CBSE-Aligned Curriculum from Nursery to Class 12</h2>
+<p>Rainbow International School follows the CBSE curriculum framework — one of India's most rigorous and widely respected educational standards. Our curriculum spans all stages from Pre-Primary to Class 12, balancing academic depth with holistic development.</p>
+
+${stages.map(s => `<div class="card">
+<h3>${e(s.stage)}</h3>
+<ul>${s.subjects.map(sub => `<li>${sub}</li>`).join("")}</ul>
+</div>`).join("")}
+
+<h2>Our Teaching Approach</h2>
+<p>Beyond subject content, Rainbow's curriculum is delivered through a Multiple Intelligence-based pedagogy that recognises every child's unique learning style. We combine:</p>
+<ul>
+<li><strong>Experiential Learning</strong> – Hands-on experiments, field trips, and project work.</li>
+<li><strong>Formative Assessment</strong> – Regular quizzes, presentations, and assignments aligned to CBSE CCE guidelines.</li>
+<li><strong>Summative Assessment</strong> – Term-end examinations aligned to CBSE guidelines.</li>
+<li><strong>Co-Scholastic Grading</strong> – Structured grading of extracurricular participation and physical education as per CBSE norms.</li>
+</ul>
+
+<p>View the official <a href="https://cbseacademic.nic.in//curriculum_2024.html" rel="noopener noreferrer" target="_blank">CBSE 2024 Curriculum</a> or learn about our <a href="/our-philosophy">educational philosophy</a>.</p>
+</div>`;
+}
+
+function renderCbseDisclosures(): string {
+  const generalInfo = [
+    { label: "School Name", value: "Rainbow International School" },
+    { label: "Affiliation Number", value: "1130661" },
+    { label: "School Code", value: "27231" },
+    { label: "Board", value: "Central Board of Secondary Education (CBSE)" },
+    { label: "Address", value: "Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607" },
+    { label: "Contact", value: "(022) 69105000" },
+    { label: "Email", value: "info@rainbowinternationalschool.in" },
+    { label: "Principal", value: "Available on request" },
+    { label: "School Category", value: "Senior Secondary (Classes 1–12)" },
+    { label: "Affiliation Period", value: "2022–2027" },
+    { label: "Trust/Society", value: "Registered Trust" },
+    { label: "NOC", value: "Issued by State Government of Maharashtra" },
+  ];
+  return `
+<div class="section">
+<h2>CBSE Mandatory Public Disclosures — Affiliation No. 1130661</h2>
+<p>The following disclosures are provided in compliance with CBSE affiliation requirements under the School Affiliation Bye-Laws. Rainbow International School, Thane maintains full transparency with parents, students, and regulatory bodies.</p>
+
+<h2>A. General Information</h2>
+${generalInfo.map(r => `<div class="card"><p><strong>${e(r.label)}:</strong> ${e(r.value)}</p></div>`).join("")}
+
+<h2>B. Documents &amp; Information</h2>
+<div class="card"><p>Copies of affiliation letter, recognition certificate, building safety certificate, fire NOC, health and sanitation certificate, and land certificate are available for inspection at the school office during working hours (Mon–Sat, 9:00 AM–6:00 PM).</p></div>
+
+<h2>C. Results &amp; Academics</h2>
+<div class="card"><p>Class X AISSE 2018-19: 100% results (43 students appeared). Class XII results available at school office. Board examination result data as per CBSE OASIS is updated annually.</p></div>
+
+<h2>D. Staff (Teaching)</h2>
+<div class="card"><p>All teaching staff hold recognised qualifications as per CBSE norms — B.Ed./M.Ed. for trained graduates, PG degrees for post-graduate teachers. The school employs qualified PRTs (Primary Teachers), TGTs (Trained Graduate Teachers), and PGTs (Post Graduate Teachers) across all sections.</p></div>
+
+<p>For detailed disclosures or document verification, contact us at <a href="mailto:info@rainbowinternationalschool.in">info@rainbowinternationalschool.in</a> or visit our <a href="/contact-us">Contact page</a>.</p>
+</div>`;
+}
+
+function renderRainbowPreschool(): string {
+  const programmes = [
+    { name: "Playgroup", age: "1.5 – 2.5 years", desc: "Gentle introduction to group learning through play, songs, and sensory activities. Builds comfort and confidence in a classroom setting." },
+    { name: "Nursery", age: "2.5 – 3.5 years", desc: "Language development, pre-number skills, social interaction, and creative expression. 100% female teaching staff." },
+    { name: "Junior KG", age: "3.5 – 4.5 years", desc: "Structured play-based learning with early reading readiness, number sense, and self-help skills." },
+    { name: "Senior KG", age: "4.5 – 5.5 years", desc: "Preparation for Class 1 with phonics, early mathematics, logical reasoning, and collaborative project work." },
+  ];
+  const awards = [
+    "Top 10 Pre-Primary Schools — Maharashtra (Education World Rankings)",
+    "Best Preschool in Thane — Hindustan Times School Survey",
+    "100% Female Teaching Staff — Preschool Wing",
+    "Google for Education recognised campus",
+  ];
+  return `
+<div class="section">
+<h2>Award-Winning Preschool in Thane — Ages 1.5 to 5.5</h2>
+<p>Rainbow Preschool International is the early childhood wing of Rainbow International School — one of Thane's most trusted preschools, recognised for its nurturing environment, 100% female teaching staff, and research-backed pedagogy for children aged 1.5 to 5.5 years.</p>
+
+<h2>Our Preschool Programmes</h2>
+${programmes.map(p => `<div class="card">
+<h3>${e(p.name)} (Age ${e(p.age)})</h3>
+<p>${e(p.desc)}</p>
+</div>`).join("")}
+
+<h2>Why Choose Rainbow Preschool?</h2>
+<ul>
+<li><strong>100% Female Staff</strong> – Dedicated all-female teaching team in the preschool wing for maximum comfort and safety.</li>
+<li><strong>Award-Winning</strong> – Recognised among India's best preschools by multiple education bodies.</li>
+<li><strong>Seamless K-12 Pathway</strong> – Preschool students transition naturally to Class 1 within the Rainbow family.</li>
+<li><strong>Safe Environment</strong> – 200+ CCTV cameras, card-based entry, on-campus infirmary.</li>
+<li><strong>Play-Based Learning</strong> – Developmentally appropriate activities that nurture curiosity, creativity, and confidence.</li>
+</ul>
+
+<h2>Recognition &amp; Awards</h2>
+<ul>
+${awards.map(a => `<li>${e(a)}</li>`).join("")}
+</ul>
+
+<p>Learn about our <a href="/pre-primary-school-thane">Pre-Primary section</a> or <a href="/admissions">apply for preschool admission</a>.</p>
+</div>`;
+}
+
+function renderAcademicCalendar(): string {
+  const terms = [
+    { term: "Term 1", months: "April – September 2026", highlights: ["School reopens April 7, 2026", "Annual Sports Day", "Mid-term examinations (July)", "Independence Day celebration", "Teacher's Day (September 5)", "Ganesh Chaturthi break"] },
+    { term: "Term 2", months: "October 2026 – March 2027", highlights: ["Diwali break (October)", "Annual Day / Cultural Programme", "Republic Day celebration", "Pre-board examinations (January)", "CBSE Board Examinations (February–March 2027)", "Annual Prize Distribution"] },
+  ];
+  const events = [
+    "Science Exhibition", "Art Exhibition", "Heritage Day", "Sports Day",
+    "Annual Day (Cultural Programme)", "Book Fair", "Career Guidance Sessions",
+    "Parent-Teacher Meetings", "Organic Farming Day", "Inter-School Competitions",
+  ];
+  return `
+<div class="section">
+<h2>Academic Calendar 2026–27</h2>
+<p>The Rainbow International School academic year runs from April to March, following CBSE guidelines. Stay updated with important dates, examinations, events, and school activities throughout the year.</p>
+
+${terms.map(t => `<div class="card">
+<h3>${e(t.term)} (${e(t.months)})</h3>
+<ul>${t.highlights.map(h => `<li>${e(h)}</li>`).join("")}</ul>
+</div>`).join("")}
+
+<h2>Annual Events &amp; Activities</h2>
+<ul>
+${events.map(ev => `<li>${e(ev)}</li>`).join("")}
+</ul>
+
+<h2>Working Hours</h2>
+<p>School office hours: Monday to Saturday, 9:00 AM – 6:00 PM. Academic hours vary by grade level. Please contact the school for grade-specific timings.</p>
+
+<p>For the latest updates, <a href="/contact-us">contact us</a> or follow our official communications. Explore our <a href="/blogs">school blog</a> for event highlights and updates.</p>
+</div>`;
+}
+
+function renderAcademicTeam(): string {
+  const departments = [
+    { name: "Pre-Primary Academic Team", desc: "Our pre-primary wing is staffed entirely by qualified female educators with specialised training in early childhood development, play-based learning, and child psychology." },
+    { name: "Class Teachers (Class 1–10)", desc: "Experienced class teachers guide students through their primary, middle, and secondary school journey — providing academic support, emotional guidance, and pastoral care." },
+    { name: "Senior Secondary Teachers (Class 11–12)", desc: "Post-graduate teachers with subject specialisations in Physics, Chemistry, Mathematics, Biology, Commerce, Accountancy, History, Political Science, and more." },
+    { name: "Subject Teachers (Primary & Middle)", desc: "Specialist teachers for Computer Science, Art, Music, Dance, Physical Education, and Library across primary and middle school sections." },
+    { name: "Student Support Staff", desc: "School counsellors, special educators, sports coaches, and activity coordinators who ensure every student's holistic development." },
+  ];
+  return `
+<div class="section">
+<h2>Our Academic Team — The Heart of Rainbow</h2>
+<p>Rainbow International School's academic team comprises over 150 dedicated educators — teachers, coaches, counsellors, and support staff — united by a shared passion for student excellence and holistic development.</p>
+
+${departments.map(d => `<div class="card">
+<h3>${e(d.name)}</h3>
+<p>${e(d.desc)}</p>
+</div>`).join("")}
+
+<h2>Our Commitment to Quality Teaching</h2>
+<p>All teaching staff at Rainbow International School hold qualifications as per CBSE norms — B.Ed./M.Ed. for PRTs and TGTs, postgraduate degrees for PGTs. We invest regularly in teacher training, professional development workshops, and exposure to global pedagogy best practices.</p>
+
+<h2>Professional Development</h2>
+<ul>
+<li>Google for Education certified trainers on staff</li>
+<li>British Council professional development programme participation</li>
+<li>Regular in-house workshops on Multiple Intelligence pedagogy</li>
+<li>Annual teacher appreciation and recognition programmes</li>
+</ul>
+
+<p>Interested in joining our team? Visit our <a href="/career">Careers page</a>. Learn more about our <a href="/our-philosophy">educational philosophy</a>.</p>
+</div>`;
+}
+
+function renderOurPhilosophy(): string {
+  const pillars = [
+    { number: "01", title: "Competence", accent: "#0d3b86", desc: "We build academic competence through a rigorous yet engaging curriculum, innovative teaching methods, and a relentless pursuit of knowledge. Every Rainbow student is equipped with the intellectual tools to succeed in any field they choose." },
+    { number: "02", title: "Conscience", accent: "#047857", desc: "We nurture a strong moral compass in every student — developing values of integrity, honesty, and responsibility. We believe that true education leads to an awakened conscience that guides actions for the greater good." },
+    { number: "03", title: "Compassion", accent: "#ec4899", desc: "Empathy is at the heart of Rainbow's culture. We cultivate compassion through community service, inter-personal engagement, and a school environment where every individual is respected and valued for who they are." },
+    { number: "04", title: "Courage", accent: "#d97706", desc: "We encourage our students to be bold — to question, to explore, to fail and rise again. Courage is the driving force behind innovation and progress, and we build it through challenges both inside and outside the classroom." },
+  ];
+  return `
+<div class="section">
+<h2>Education That Builds Character, Not Just Careers</h2>
+<p>At Rainbow International School, our educational philosophy is rooted in a simple yet powerful belief: <strong>every child is unique, every child has potential, and every child deserves the very best.</strong></p>
+
+<p>Our philosophy is built on four foundational pillars that guide everything we do — from curriculum design to classroom culture, from teacher training to student well-being.</p>
+
+<h2>Our Four Pillars</h2>
+${pillars.map(p => `<div class="card">
+<h3>${p.number}. ${e(p.title)}</h3>
+<p>${e(p.desc)}</p>
+</div>`).join("")}
+
+<h2>Multiple Intelligence Framework</h2>
+<p>We are guided by Howard Gardner's Theory of Multiple Intelligences — recognising that children learn in diverse ways. Our curriculum, classroom methods, and extracurricular programmes are designed to nurture all eight intelligences: Linguistic, Logical-Mathematical, Spatial, Musical, Bodily-Kinaesthetic, Interpersonal, Intrapersonal, and Naturalist.</p>
+
+<p>Explore our <a href="/ris-vision-mission">Vision &amp; Mission</a> or learn about our <a href="/curriculum">CBSE curriculum</a>.</p>
+</div>`;
+}
+
+function renderVisionMission(): string {
+  const values = [
+    { title: "Vision", desc: "To be a globally recognized institution that nurtures curious, compassionate, and confident world citizens who uphold Indian values while making a meaningful impact on the world." },
+    { title: "Mission", desc: "To provide a holistic, student-centered education that balances academic excellence with character development, creativity, and physical well-being through innovative teaching and a supportive environment." },
+  ];
+  const coreValues = [
+    { title: "Excellence", desc: "We pursue the highest standards in everything we do — academic, co-curricular, and personal." },
+    { title: "Compassion", desc: "We nurture empathy, kindness, and respect for all people and living beings." },
+    { title: "Global Mindset", desc: "We prepare students to thrive in a diverse, interconnected world while remaining rooted in Indian heritage." },
+    { title: "Innovation", desc: "We embrace creativity and critical thinking as tools for solving tomorrow's challenges." },
+  ];
+  return `
+<div class="section">
+<h2>Our Vision</h2>
+<p>${e(values[0].desc)}</p>
+
+<h2>Our Mission</h2>
+<p>${e(values[1].desc)}</p>
+
+<h2>Core Values</h2>
+${coreValues.map(v => `<div class="card">
+<h3>${e(v.title)}</h3>
+<p>${e(v.desc)}</p>
+</div>`).join("")}
+
+<h2>Our Commitment</h2>
+<p>Founded in April 2009, Rainbow International School has spent 17 years transforming these values from words into everyday reality. Our teachers, administrators, and support staff collectively embody the Rainbow vision in every interaction with students, parents, and the community.</p>
+
+<p>Learn more about <a href="/our-philosophy">Our Philosophy</a> or read a <a href="/chairpersons-note">message from our Chairperson</a>.</p>
+</div>`;
+}
+
+function renderChairpersonsNote(): string {
+  return `
+<div class="section">
+<h2>A Message from the Chairperson</h2>
+<p>Welcome to Rainbow International School — a place where we believe that the true measure of an education is not merely academic achievement, but the holistic growth of a child into a confident, compassionate, and capable human being.</p>
+
+<p>When Rainbow International School was founded in April 2009, our vision was clear: to create a school that would become a second home for children — a place where they would be challenged, supported, celebrated, and above all, loved.</p>
+
+<h2>Our Journey</h2>
+<p>Over the past 17 years, we have had the privilege of serving over 1 lakh students and their families. What began as a dream has grown into one of Thane's most respected CBSE K–12 institutions, with over 3,000 students across Nursery to Class 12, a dedicated team of 150+ educators, and a sprawling 3.5-acre campus that continues to evolve with the needs of modern education.</p>
+
+<h2>Our Promise</h2>
+<p>We are committed to providing every child — regardless of their background or learning style — with an education that equips them for life. This means investing in our teachers, continuously upgrading our infrastructure, embracing the best of global pedagogies, and keeping the student at the centre of every decision we make.</p>
+
+<p>At Rainbow, your child will not only learn — they will grow, discover, and thrive.</p>
+
+<p>Warm regards,<br/><strong>Chairperson, Rainbow International School</strong></p>
+
+<p>Learn more <a href="/about-rainbow-international-school">about our school</a> or explore our <a href="/ris-vision-mission">Vision &amp; Mission</a>.</p>
+</div>`;
+}
+
+function renderPhotoGallery(): string {
+  const categories = [
+    { name: "Campus &amp; Infrastructure", desc: "Our 3.5-acre campus in Brahmand, Thane — smart classrooms, labs, library, sports facilities, swimming pool, skating rink, amphitheatre, and organic farm." },
+    { name: "Academic Activities", desc: "Science experiments, art projects, computer labs, library sessions, and classroom learning across all grade levels." },
+    { name: "Sports &amp; Physical Education", desc: "Swimming championships, football tournaments, cricket matches, basketball courts, skating events, yoga sessions, and inter-school competitions." },
+    { name: "Cultural &amp; Performing Arts", desc: "Annual Day performances, dance recitals, music concerts, drama productions, and heritage day celebrations." },
+    { name: "School Exhibitions", desc: "Science exhibitions, art exhibitions, heritage exhibitions, and project showcases where students present their work to parents and the community." },
+    { name: "Beyond the Classroom", desc: "Club activities, organic farming, educational tours, and community service initiatives." },
+    { name: "Awards &amp; Achievements", desc: "Award ceremonies, recognition events, and celebrations of student and school achievements at state, national, and international levels." },
+  ];
+  return `
+<div class="section">
+<h2>A Visual Journey Through Rainbow International School</h2>
+<p>Browse our photo gallery to experience life at Rainbow International School — from academics and sports to cultural events, campus facilities, and student achievements across our 3.5-acre campus in Thane.</p>
+
+${categories.map(c => `<div class="card">
+<h3>${c.name}</h3>
+<p>${c.desc}</p>
+</div>`).join("")}
+
+<h2>Visit Us in Person</h2>
+<p>Photographs can only capture a glimpse of what makes Rainbow International School special. We invite you to experience our campus firsthand — meet our educators, explore our facilities, and see Rainbow's vibrant learning environment come alive.</p>
+
+<p><a href="/contact-us">Schedule a campus visit</a> or <a href="/admissions">apply for admissions 2026–27</a>.</p>
+</div>`;
+}
+
 const pages: PageSSRConfig[] = [
   {
     path: "/about-rainbow-international-school",
@@ -1009,6 +1468,286 @@ const pages: PageSSRConfig[] = [
       ],
     },
     renderBody: renderFAQs,
+  },
+  {
+    path: "/career",
+    title: "Career Opportunities at Rainbow International School Thane",
+    description: "Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution.",
+    keywords: "Rainbow school career, teacher jobs Thane, school jobs Thane, educator jobs Rainbow International School",
+    canonical: "https://rainbowinternationalschool.in/career",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Career Opportunities", url: "https://rainbowinternationalschool.in/career" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Career Opportunities at Rainbow International School",
+      description: "Explore teacher and staff job openings at Rainbow International School, Thane — a leading CBSE K-12 school.",
+      url: "https://rainbowinternationalschool.in/career",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderCareer,
+  },
+  {
+    path: "/beyond-the-classroom",
+    title: "Beyond the Classroom — Co-Curricular Activities | Rainbow International School",
+    description: "Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students.",
+    keywords: "beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane",
+    canonical: "https://rainbowinternationalschool.in/beyond-the-classroom",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Beyond the Classroom", url: "https://rainbowinternationalschool.in/beyond-the-classroom" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Beyond the Classroom — Rainbow International School",
+      description: "Clubs, exhibitions, educational tours, and organic farming at Rainbow International School, Thane.",
+      url: "https://rainbowinternationalschool.in/beyond-the-classroom",
+    },
+    renderBody: renderBeyondClassroom,
+  },
+  {
+    path: "/extracurriculars",
+    title: "Extracurricular Activities — FIT INDIA School Thane | Rainbow International School",
+    description: "Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane.",
+    keywords: "extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane",
+    canonical: "https://rainbowinternationalschool.in/extracurriculars",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Extracurriculars", url: "https://rainbowinternationalschool.in/extracurriculars" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Extracurricular Activities — Rainbow International School",
+      description: "30+ extracurricular activities including sports, arts, STEM, and leadership at Rainbow International School, Thane.",
+      url: "https://rainbowinternationalschool.in/extracurriculars",
+    },
+    renderBody: renderExtracurriculars,
+  },
+  {
+    path: "/student-achievements",
+    title: "Student Achievements — National & State Level | Rainbow International School",
+    description: "Rainbow International School student achievements — 100% result in Class X AISSE 2018-19, National and State level sports achievements in Swimming, Badminton, Skating, Chess and more.",
+    keywords: "Rainbow school student achievements, CBSE school results Thane, school sports achievements Thane",
+    canonical: "https://rainbowinternationalschool.in/student-achievements",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Student Achievements", url: "https://rainbowinternationalschool.in/student-achievements" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Student Achievements — Rainbow International School",
+      description: "Academic and sports achievements by Rainbow International School students at national and state level.",
+      url: "https://rainbowinternationalschool.in/student-achievements",
+    },
+    renderBody: renderStudentAchievements,
+  },
+  {
+    path: "/blogs",
+    title: "School Blog — Education, Parenting & CBSE Insights | Rainbow International School",
+    description: "Read 86+ insightful articles from Rainbow International School on education, parenting, CBSE, student wellness, admissions, sports and more.",
+    keywords: "Rainbow school blog, education blog Thane, CBSE school blog, parenting tips school Thane, student development blog Rainbow International",
+    canonical: "https://rainbowinternationalschool.in/blogs",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Blogs", url: "https://rainbowinternationalschool.in/blogs" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      name: "Rainbow International School Blog",
+      description: "Education, parenting, CBSE, and school life insights from Rainbow International School, Thane.",
+      url: "https://rainbowinternationalschool.in/blogs",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderBlogs,
+  },
+  {
+    path: "/curriculum",
+    title: "CBSE Curriculum Nursery to Class 12 | Rainbow International School Thane",
+    description: "Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology.",
+    keywords: "CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane",
+    canonical: "https://rainbowinternationalschool.in/curriculum",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Curriculum", url: "https://rainbowinternationalschool.in/curriculum" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: "CBSE K-12 Curriculum — Rainbow International School",
+      description: "Complete CBSE-aligned curriculum from Nursery to Class 12 including Science, Commerce, and Humanities streams.",
+      provider: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+      url: "https://rainbowinternationalschool.in/curriculum",
+    },
+    renderBody: renderCurriculum,
+  },
+  {
+    path: "/cbse-mandatory-public-disclosures",
+    title: "CBSE Public Disclosures | Rainbow International School — Affiliation No. 1130661",
+    description: "CBSE mandatory public disclosures for Rainbow International School, Thane. Affiliation number 1130661. Full details including staff, infrastructure, results and documents.",
+    keywords: "Rainbow school CBSE disclosure, CBSE affiliation number 1130661, public disclosure school Thane",
+    canonical: "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "CBSE Mandatory Public Disclosures", url: "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "CBSE Mandatory Public Disclosures — Rainbow International School",
+      description: "Regulatory disclosures for Rainbow International School, Thane as required under CBSE Affiliation Bye-Laws.",
+      url: "https://rainbowinternationalschool.in/cbse-mandatory-public-disclosures",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderCbseDisclosures,
+  },
+  {
+    path: "/rainbow-preschool-international",
+    title: "Rainbow Preschool International — Best Preschool Thane (Age 1.5–5.5)",
+    description: "Rainbow Preschool International — award-winning preschool for children aged 1.5 to 5.5 years. Playgroup, Nursery, Jr KG, and Sr KG. 100% female staff. Recognised among India's best preschools.",
+    keywords: "Rainbow Preschool International, best preschool Thane, playgroup Thane, nursery admission Thane, Rainbow pre-primary school, early childhood education Thane",
+    canonical: "https://rainbowinternationalschool.in/rainbow-preschool-international",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Rainbow Preschool International", url: "https://rainbowinternationalschool.in/rainbow-preschool-international" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "School",
+      name: "Rainbow Preschool International",
+      description: "Award-winning preschool in Thane for children aged 1.5–5.5 years. 100% female staff.",
+      url: "https://rainbowinternationalschool.in/rainbow-preschool-international",
+      address: { "@type": "PostalAddress", streetAddress: "Cosmos Arcade, Brahmand Phase 4", addressLocality: "Thane", addressRegion: "Maharashtra", postalCode: "400607", addressCountry: "IN" },
+      telephone: "(022) 69105000",
+    },
+    renderBody: renderRainbowPreschool,
+  },
+  {
+    path: "/academic-calendar",
+    title: "Academic Calendar 2026–27 | Rainbow International School Thane",
+    description: "View and download the academic calendar for Rainbow International School, Thane. Stay updated with important dates, events, and school activities.",
+    keywords: "Rainbow school academic calendar, school calendar Thane, Rainbow International School events schedule",
+    canonical: "https://rainbowinternationalschool.in/academic-calendar",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Academic Calendar", url: "https://rainbowinternationalschool.in/academic-calendar" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Academic Calendar 2026–27 — Rainbow International School",
+      description: "School calendar with important dates, term dates, examinations, and events for academic year 2026–27.",
+      url: "https://rainbowinternationalschool.in/academic-calendar",
+    },
+    renderBody: renderAcademicCalendar,
+  },
+  {
+    path: "/academic-team",
+    title: "Academic Team — Teachers & Educators | Rainbow International School Thane",
+    description: "Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers, coaches, counsellors and support staff committed to student excellence.",
+    keywords: "Rainbow school teachers, academic team Rainbow International School, school faculty Thane, CBSE school staff",
+    canonical: "https://rainbowinternationalschool.in/academic-team",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: "Academic Team", url: "https://rainbowinternationalschool.in/academic-team" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Academic Team — Rainbow International School",
+      description: "150+ dedicated educators across all sections from Pre-Primary to Senior Secondary.",
+      url: "https://rainbowinternationalschool.in/academic-team",
+    },
+    renderBody: renderAcademicTeam,
+  },
+  {
+    path: "/our-philosophy",
+    title: "Our Philosophy — 4 Pillars of Education | Rainbow International School",
+    description: "Rainbow International School's educational philosophy — built on four pillars: Competence, Conscience, Compassion, and Courage. Holistic development for every Rainbow student.",
+    keywords: "Rainbow school philosophy, Rainbow International School education approach, school philosophy Thane CBSE",
+    canonical: "https://rainbowinternationalschool.in/our-philosophy",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: "Our Philosophy", url: "https://rainbowinternationalschool.in/our-philosophy" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: "Our Philosophy — Rainbow International School",
+      description: "Educational philosophy built on Competence, Conscience, Compassion, and Courage.",
+      url: "https://rainbowinternationalschool.in/our-philosophy",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderOurPhilosophy,
+  },
+  {
+    path: "/ris-vision-mission",
+    title: "Vision & Mission | Rainbow International School Thane",
+    description: "Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact.",
+    keywords: "Rainbow school vision mission, Rainbow International School values, school philosophy Thane",
+    canonical: "https://rainbowinternationalschool.in/ris-vision-mission",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: "Vision & Mission", url: "https://rainbowinternationalschool.in/ris-vision-mission" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: "Vision & Mission — Rainbow International School",
+      description: "The vision and mission of Rainbow International School — nurturing world citizens rooted in Indian values.",
+      url: "https://rainbowinternationalschool.in/ris-vision-mission",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderVisionMission,
+  },
+  {
+    path: "/chairpersons-note",
+    title: "Chairperson's Note | Rainbow International School Thane",
+    description: "A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education.",
+    keywords: "Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school",
+    canonical: "https://rainbowinternationalschool.in/chairpersons-note",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: "Chairperson's Note", url: "https://rainbowinternationalschool.in/chairpersons-note" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      name: "Chairperson's Note — Rainbow International School",
+      description: "A message from the Chairperson on Rainbow's vision, journey, and commitment to education.",
+      url: "https://rainbowinternationalschool.in/chairpersons-note",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderChairpersonsNote,
+  },
+  {
+    path: "/photo-gallery",
+    title: "Photo Gallery — Campus & Events | Rainbow International School Thane",
+    description: "Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane.",
+    keywords: "Rainbow school photo gallery, school photos Thane, school campus photos Rainbow International",
+    canonical: "https://rainbowinternationalschool.in/photo-gallery",
+    breadcrumbs: [
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Photo Gallery", url: "https://rainbowinternationalschool.in/photo-gallery" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "ImageGallery",
+      name: "Photo Gallery — Rainbow International School",
+      description: "Photos from campus life, sports, academics, cultural events, and achievements at Rainbow International School, Thane.",
+      url: "https://rainbowinternationalschool.in/photo-gallery",
+      publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
+    },
+    renderBody: renderPhotoGallery,
   },
 ];
 
