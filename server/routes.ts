@@ -202,6 +202,24 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  const wpRedirects: Record<string, string> = {
+    "/rainbow-preschool-international": "/pre-primary-school-thane",
+    "/importance-of-foundational-literacy-and-numeracy-in-schools": "/blog/importance-of-foundational-literacy-and-numeracy-in-schools",
+    "/benefits-of-rainbow-international-school": "/about-rainbow-international-school",
+    "/fee-structure-2": "/fee-structure",
+  };
+
+  for (const [from, to] of Object.entries(wpRedirects)) {
+    app.get(from, (_req, res) => res.redirect(301, to));
+  }
+
+  app.get("/wp-content/uploads/*", (req, res) => {
+    if (req.path.toLowerCase().includes("fee")) {
+      return res.redirect(301, "/fee-structure");
+    }
+    return res.redirect(301, "/");
+  });
+
   // ── Inquiries ───────────────────────────────────────────────
   app.post("/api/inquiries", async (req, res) => {
     try {

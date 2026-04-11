@@ -17,8 +17,19 @@ if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     const host = req.hostname;
     if (host && host.startsWith("www.") && host.includes("rainbowinternationalschool.in")) {
-      const bare = host.replace(/^www\./, "");
-      return res.redirect(301, `https://${bare}${req.originalUrl}`);
+      return res.redirect(301, `https://rainbowinternationalschool.in${req.originalUrl}`);
+    }
+    if (host && host.includes("replit.app")) {
+      return res.redirect(301, `https://rainbowinternationalschool.in${req.originalUrl}`);
+    }
+    next();
+  });
+
+  app.use((req, res, next) => {
+    const path = req.path;
+    if (path !== "/" && path.endsWith("/")) {
+      const query = req.originalUrl.slice(path.length);
+      return res.redirect(301, path.slice(0, -1) + query);
     }
     next();
   });
