@@ -9,6 +9,10 @@ const httpServer = createServer(app);
 
 app.use(compression());
 
+app.get("/__repl_health", (_req, res) => {
+  res.status(200).send("OK");
+});
+
 if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     const host = req.hostname;
