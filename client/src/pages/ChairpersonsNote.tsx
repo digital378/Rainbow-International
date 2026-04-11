@@ -14,6 +14,11 @@ export default function ChairpersonsNote() {
         description="A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education."
         keywords="Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school"
         canonical="https://rainbowinternationalschool.in/chairpersons-note"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+          { name: "Chairperson's Note", href: "https://rainbowinternationalschool.in/chairpersons-note" },
+        ]}
       />
       <Navbar />
       <PageBanner

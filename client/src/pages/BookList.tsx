@@ -19,6 +19,10 @@ export default function BookList() {
         description="Rainbow International School provides a book list and study material to each student so they understand the syllabus from the start of the year. View the complete book list for all classes."
         keywords="Rainbow school book list, school books Thane, CBSE book list Thane, Rainbow International School study material"
         canonical="https://rainbowinternationalschool.in/book-list"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Book List", href: "https://rainbowinternationalschool.in/book-list" },
+        ]}
       />
       <Navbar />
       <PageBanner

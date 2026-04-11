@@ -95,6 +95,33 @@ export default function ContactUs() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Contact Us", href: "https://rainbowinternationalschool.in/contact-us" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "name": "Contact Rainbow International School",
+          "description": "Contact Rainbow International School, Thane — for admissions enquiries, call +91 82915 68972 or email info@rainbowinternationalschool.in.",
+          "url": "https://rainbowinternationalschool.in/contact-us",
+          "mainEntity": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "telephone": ["+912269105000", "+918291568972"],
+            "email": "info@rainbowinternationalschool.in",
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+              "opens": "09:00",
+              "closes": "18:00"
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
+              "addressLocality": "Thane",
+              "addressRegion": "Maharashtra",
+              "postalCode": "400607",
+              "addressCountry": "IN"
+            }
+          }
+        }}
       />
       <Navbar />
       <PageBanner

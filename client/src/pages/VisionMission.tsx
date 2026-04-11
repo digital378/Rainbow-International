@@ -27,6 +27,11 @@ export default function VisionMission() {
         description="Rainbow International School's Vision and Mission — nurturing curious, compassionate, and confident world citizens who uphold Indian values while making a global impact."
         keywords="Rainbow school vision mission, Rainbow International School values, school philosophy Thane"
         canonical="https://rainbowinternationalschool.in/ris-vision-mission"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+          { name: "Vision & Mission", href: "https://rainbowinternationalschool.in/ris-vision-mission" },
+        ]}
       />
       <Navbar />
       <PageBanner

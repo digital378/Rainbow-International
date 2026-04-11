@@ -273,6 +273,18 @@ export default function Extracurriculars() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Extracurriculars", href: "https://rainbowinternationalschool.in/extracurriculars" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Extracurricular Activities — Rainbow International School",
+          "description": "Sports, clubs, cultural programmes and FIT INDIA activities at Rainbow International School, Thane — holistic development beyond academics.",
+          "url": "https://rainbowinternationalschool.in/extracurriculars",
+          "about": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "url": "https://rainbowinternationalschool.in"
+          }
+        }}
       />
       <Navbar />
       <PageBanner

@@ -31,7 +31,7 @@ export default function MetaSchool() {
         title="Meta School 2025–26"
         description="Rainbow International School is a Meta for Education partner school — integrating digital citizenship, online safety, creative thinking, and future-ready digital skills into the student learning experience."
         keywords="Meta for Education school Thane, digital citizenship CBSE school, online safety school programme, Rainbow International School Meta school"
-        canonical="/meta-school-2025-26"
+        canonical="https://rainbowinternationalschool.in/meta-school-2025-26"
       />
       <ScrollProgress />
       <Navbar />

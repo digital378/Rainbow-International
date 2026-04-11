@@ -37,6 +37,18 @@ export default function StudentAchievements() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Student Achievements", href: "https://rainbowinternationalschool.in/student-achievements" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Student Achievements — Rainbow International School",
+          "description": "100% CBSE results, national and state sports achievements in swimming, badminton, skating and chess at Rainbow International School, Thane.",
+          "url": "https://rainbowinternationalschool.in/student-achievements",
+          "about": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "url": "https://rainbowinternationalschool.in"
+          }
+        }}
       />
       <Navbar />
       <PageBanner

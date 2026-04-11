@@ -189,6 +189,10 @@ export default function AcademicTeam() {
         description="Meet Rainbow International School's dedicated academic team — highly qualified and experienced teachers, coaches, counsellors and support staff committed to student excellence."
         keywords="Rainbow school teachers, academic team Rainbow International School, school faculty Thane, CBSE school staff"
         canonical="https://rainbowinternationalschool.in/academic-team"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academic Team", href: "https://rainbowinternationalschool.in/academic-team" },
+        ]}
       />
       <Navbar />
       <PageBanner

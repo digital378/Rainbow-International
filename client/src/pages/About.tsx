@@ -77,6 +77,33 @@ export default function About() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          "name": "About Rainbow International School — Best CBSE School in Thane",
+          "description": "Rainbow International School, founded in April 2009, is a CBSE-affiliated K-12 school in Thane serving 3000+ students across 3.5 acres.",
+          "url": "https://rainbowinternationalschool.in/about-rainbow-international-school",
+          "sameAs": [
+            "https://www.facebook.com/rainbowinternationalschoolthane",
+            "https://www.instagram.com/rainbow_international_school_"
+          ],
+          "about": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "foundingDate": "2009-04",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
+              "addressLocality": "Thane",
+              "addressRegion": "Maharashtra",
+              "postalCode": "400607",
+              "addressCountry": "IN"
+            },
+            "telephone": "+912269105000",
+            "numberOfEmployees": { "@type": "QuantitativeValue", "value": 150 },
+            "hasCredential": "CBSE Affiliation No. 1130661"
+          }
+        }}
       />
       <ScrollProgress />
       <Navbar />

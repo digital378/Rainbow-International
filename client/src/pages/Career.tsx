@@ -45,6 +45,31 @@ export default function Career() {
         description="Explore career opportunities at Rainbow International School in Thane. We're looking for passionate educators and staff to join our esteemed institution."
         keywords="Rainbow school career, teacher jobs Thane, school jobs Thane, educator jobs Rainbow International School"
         canonical="https://rainbowinternationalschool.in/career"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Career Opportunities", href: "https://rainbowinternationalschool.in/career" },
+        ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Career Opportunities at Rainbow International School",
+          "description": "Explore teaching and staff career opportunities at Rainbow International School, Thane — a leading CBSE-affiliated K-12 school.",
+          "url": "https://rainbowinternationalschool.in/career",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "Rainbow International School",
+            "url": "https://rainbowinternationalschool.in"
+          },
+          "about": {
+            "@type": "EmployerAggregateRating",
+            "itemReviewed": {
+              "@type": "Organization",
+              "name": "Rainbow International School",
+              "url": "https://rainbowinternationalschool.in",
+              "sameAs": "https://rainbowinternationalschool.in"
+            }
+          }
+        }}
       />
       <Navbar />
       <PageBanner

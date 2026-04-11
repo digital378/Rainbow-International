@@ -225,6 +225,34 @@ export default function Curriculum() {
         keywords="CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane"
         canonical="https://rainbowinternationalschool.in/curriculum"
         ogImage="/images/home/academic/primary-section.jpg"
+        breadcrumbs={[
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Curriculum", href: "https://rainbowinternationalschool.in/curriculum" },
+        ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "CBSE Curriculum — Rainbow International School",
+          "description": "Comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12, covering all subjects, streams and modern teaching methodology.",
+          "url": "https://rainbowinternationalschool.in/curriculum",
+          "provider": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "url": "https://rainbowinternationalschool.in",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Thane",
+              "addressRegion": "Maharashtra",
+              "addressCountry": "IN"
+            }
+          },
+          "educationalCredentialAwarded": "CBSE Certificate",
+          "hasCourseInstance": {
+            "@type": "CourseInstance",
+            "courseMode": "Onsite",
+            "inLanguage": "en"
+          }
+        }}
       />
       <Navbar />
       <PageBanner

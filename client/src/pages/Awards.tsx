@@ -89,6 +89,45 @@ export default function Awards() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Awards & Achievements", href: "https://rainbowinternationalschool.in/awards-achievements" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "Awards & Achievements — Rainbow International School",
+          "description": "Major awards and recognition received by Rainbow International School, Thane.",
+          "url": "https://rainbowinternationalschool.in/awards-achievements",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "World Education Summit Award — Best Preschool in Thane",
+              "url": "https://rainbowinternationalschool.in/awards-achievements"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Best Secondary School in Thane — Education Excellence Award",
+              "url": "https://rainbowinternationalschool.in/awards-achievements"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "FIT INDIA School Award — Government of India",
+              "url": "https://rainbowinternationalschool.in/awards-achievements"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "name": "Google for Education Certified School",
+              "url": "https://rainbowinternationalschool.in/awards-achievements"
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "name": "Excellence in CBSE Education — Maharashtra State Award",
+              "url": "https://rainbowinternationalschool.in/awards-achievements"
+            }
+          ]
+        }}
       />
       <Navbar />
       <PageBanner

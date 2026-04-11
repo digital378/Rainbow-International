@@ -27,7 +27,7 @@ export default function ThankYou() {
         title="Thank You for Your Enquiry"
         description="Thank you for reaching out to Rainbow International School. Our admissions team will contact you within one working day."
         keywords="Rainbow International School enquiry received, thank you admissions"
-        canonical="/thank-you"
+        canonical="https://rainbowinternationalschool.in/thank-you"
       />
       <ScrollProgress />
       <Navbar />

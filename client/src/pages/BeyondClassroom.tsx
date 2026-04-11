@@ -46,6 +46,18 @@ export default function BeyondClassroom() {
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Beyond the Classroom", href: "https://rainbowinternationalschool.in/beyond-the-classroom" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Beyond the Classroom — Rainbow International School",
+          "description": "Exhibitions, organic farming, student clubs, school tours and cultural activities beyond academics at Rainbow International School, Thane.",
+          "url": "https://rainbowinternationalschool.in/beyond-the-classroom",
+          "about": {
+            "@type": "EducationalOrganization",
+            "name": "Rainbow International School",
+            "url": "https://rainbowinternationalschool.in"
+          }
+        }}
       />
       <Navbar />
       <PageBanner
