@@ -1256,29 +1256,15 @@ function renderWelcomeToRIS(): string {
   return `
 <div class="section">
 <h2>Welcome to Rainbow International School</h2>
-<p>Rainbow International School is one of the finest CBSE-affiliated K–12 educational institutions in Thane, Maharashtra. Founded in April 2009 and located on a sprawling 3.5-acre campus in Brahmand Phase 4, Thane West, Rainbow has grown to serve over 3,000 students from Nursery to Class 12 — and has positively impacted more than 1 Lac families across the region.</p>
-
-<p>With CBSE Affiliation Number 1130661, Rainbow International School offers a comprehensive, future-ready education from the earliest years of pre-primary learning right through to Senior Secondary (Class 11–12) with Science, Commerce, and Humanities streams.</p>
-
-<div class="card">
-<h3>Our Campus</h3>
-<p>Our 3.5-acre campus in Cosmos Arcade, Brahmand Phase 4, Thane, is purpose-built for learning and growth. It features modern smart classrooms, science and computer laboratories, a library, a swimming pool, a skating rink, a basketball court, a football ground, an organic farm, and an amphitheatre — all within a safe, secure, and nurturing environment.</p>
-</div>
+<p>Rainbow International School is a CBSE-affiliated K–12 institution in Thane, Maharashtra, founded in April 2009. Set on a 3.5-acre campus in Brahmand Phase 4, Thane, it serves 3,000+ students from Nursery to Class 12 (CBSE Affiliation No. 1130661).</p>
 
 <div class="card">
 <h3>School At a Glance</h3>
 <p><strong>Founded:</strong> April 2009 &nbsp;|&nbsp; <strong>Campus:</strong> 3.5 acres &nbsp;|&nbsp; <strong>Students:</strong> 3,000+ &nbsp;|&nbsp; <strong>Grades:</strong> Nursery to Class 12 &nbsp;|&nbsp; <strong>CBSE Affiliation:</strong> 1130661</p>
 <p><strong>Location:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607</p>
-<p><strong>Phone:</strong> (022) 69105000 / +91 82915 68972 &nbsp;|&nbsp; <strong>Email:</strong> info@rainbowinternationalschool.in</p>
 </div>
 
-<div class="card">
-<h3>Our Approach to Education</h3>
-<p>Rainbow International School follows a Multiple Intelligence-based learning methodology — recognising that every child is unique and has a distinct way of learning and excelling. Our curriculum blends CBSE academic rigour with holistic development, equipping students with the knowledge, skills, values, and confidence to succeed in a rapidly changing world.</p>
-</div>
-
-<h2>Admissions 2026–27</h2>
-<p>We welcome families who share our belief in the transformative power of quality education. Admissions for the academic year 2026–27 are now open for all classes from Nursery to Class 12. <a href="/admissions">Apply online</a> or <a href="/contact-us">contact our admissions team</a> to learn more.</p>
+<p>Admissions for 2026–27 are open. <a href="/admissions">Apply online</a> or <a href="/contact-us">contact our admissions team</a> to learn more.</p>
 </div>`;
 }
 
