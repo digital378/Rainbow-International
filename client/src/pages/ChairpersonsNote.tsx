@@ -43,7 +43,7 @@ export default function ChairpersonsNote() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 </div>
-                <p className="font-black text-lg text-center md:text-left" style={{ color: "#0d3b86" }}>Mr. Dhananjay Sapre</p>
+                <p className="font-black text-lg text-center md:text-left" style={{ color: "#0d3b86" }}>Ms. Akila Balbale</p>
                 <p className="text-sm font-bold uppercase tracking-wide text-center md:text-left text-amber-500">Chairperson</p>
                 <p className="text-xs text-gray-500 text-center md:text-left mt-1">Rainbow International School</p>
               </div>
@@ -77,7 +77,7 @@ export default function ChairpersonsNote() {
 
                 <div className="pt-4">
                   <p className="font-black text-lg" style={{ color: "#0d3b86" }}>Warm regards,</p>
-                  <p className="font-black mt-1" style={{ color: "#0d3b86" }}>Mr. Dhananjay Sapre</p>
+                  <p className="font-black mt-1" style={{ color: "#0d3b86" }}>Ms. Akila Balbale</p>
                   <p className="text-sm text-gray-500">Chairperson, Rainbow International School</p>
                 </div>
               </div>
