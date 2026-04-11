@@ -51,10 +51,10 @@ export default function Admissions() {
         title="School Admissions 2026-27 Thane — Nursery to Class 12"
         description="Admissions open at Rainbow International School, Thane for 2026-27. Nursery to Class 12, CBSE board. Apply online — age criteria, process, documents, and fee details."
         keywords="school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission, school admission near me Thane, Class 11 admission Thane"
-        canonical="https://www.rainbowinternationalschool.in/admissions"
+        canonical="https://rainbowinternationalschool.in/admissions"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Admissions 2026-27", href: "https://www.rainbowinternationalschool.in/admissions" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Admissions 2026-27", href: "https://rainbowinternationalschool.in/admissions" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",

@@ -42,12 +42,12 @@ function shell(cfg: PageSSRConfig): string {
 <meta property="og:description" content="${e(cfg.description)}"/>
 <meta property="og:url" content="${e(cfg.canonical)}"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <meta property="og:locale" content="en_IN"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${e(cfg.title)}"/>
 <meta name="twitter:description" content="${e(cfg.description)}"/>
-<meta name="twitter:image" content="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
 <script type="application/ld+json">${JSON.stringify(cfg.jsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 <style>
@@ -711,7 +711,7 @@ const SCHOOL_LD = {
   "@context": "https://schema.org",
   "@type": ["EducationalOrganization", "School"],
   name: "Rainbow International School",
-  url: "https://www.rainbowinternationalschool.in/",
+  url: "https://rainbowinternationalschool.in/",
   address: { "@type": "PostalAddress", streetAddress: "Cosmos Arcade, Brahmand Phase 4", addressLocality: "Thane", addressRegion: "Maharashtra", postalCode: "400607", addressCountry: "IN" },
   telephone: "+91-82915-68972",
   foundingDate: "2009-04-01",
@@ -724,10 +724,10 @@ const pages: PageSSRConfig[] = [
     title: "About Rainbow International School — Best CBSE School in Thane",
     description: "Rainbow International School, founded in 2009, is a top-rated CBSE K–12 school in Thane. 3.5-acre campus, 3000+ students, award-winning education from Nursery to Class 12.",
     keywords: "about Rainbow International School, CBSE school Thane, best school Thane, K-12 school Thane, international school Thane",
-    canonical: "https://www.rainbowinternationalschool.in/about-rainbow-international-school",
+    canonical: "https://rainbowinternationalschool.in/about-rainbow-international-school",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "About Us", url: "https://www.rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAbout,
@@ -737,10 +737,10 @@ const pages: PageSSRConfig[] = [
     title: "Pre-Primary School in Thane — Nursery, Jr KG, Sr KG | Rainbow International School",
     description: "Best pre-primary school in Thane. Nursery, Jr KG, Sr KG with play-based learning, 100% female staff, CBSE-aligned curriculum. Admissions open for 2026–27.",
     keywords: "pre-primary school Thane, nursery school Thane, Jr KG admission Thane, best preschool Thane, kindergarten Thane",
-    canonical: "https://www.rainbowinternationalschool.in/pre-primary-school-thane",
+    canonical: "https://rainbowinternationalschool.in/pre-primary-school-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Pre-Primary Section", url: "https://www.rainbowinternationalschool.in/pre-primary-school-thane" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Pre-Primary Section", url: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Pre-Primary Section", educationalLevel: "Preschool" } },
     renderBody: renderPrePrimary,
@@ -750,10 +750,10 @@ const pages: PageSSRConfig[] = [
     title: "Primary School in Thane — Class 1 to 5 CBSE | Rainbow International School",
     description: "Primary section (Class 1–5) at Rainbow International School, Thane. CBSE curriculum, smart classrooms, experiential learning, 30+ extracurriculars.",
     keywords: "primary school Thane, Class 1 to 5 CBSE Thane, best primary school Thane, CBSE primary Thane",
-    canonical: "https://www.rainbowinternationalschool.in/primary-section",
+    canonical: "https://rainbowinternationalschool.in/primary-section",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Primary Section", url: "https://www.rainbowinternationalschool.in/primary-section" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Primary Section", url: "https://rainbowinternationalschool.in/primary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Primary Section", educationalLevel: "Primary" } },
     renderBody: renderPrimary,
@@ -763,10 +763,10 @@ const pages: PageSSRConfig[] = [
     title: "Middle School in Thane — Class 6 to 8 CBSE | Rainbow International School",
     description: "Middle school section (Class 6–8) at Rainbow International School, Thane. CBSE curriculum, project-based learning, science labs, MUN, robotics.",
     keywords: "middle school Thane, Class 6 to 8 CBSE Thane, best middle school Thane, CBSE school Class 6 7 8 Thane",
-    canonical: "https://www.rainbowinternationalschool.in/middle-school-section",
+    canonical: "https://rainbowinternationalschool.in/middle-school-section",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Middle School", url: "https://www.rainbowinternationalschool.in/middle-school-section" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Middle School", url: "https://rainbowinternationalschool.in/middle-school-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Middle School Section", educationalLevel: "Middle School" } },
     renderBody: renderMiddleSchool,
@@ -776,10 +776,10 @@ const pages: PageSSRConfig[] = [
     title: "Secondary School in Thane — Class 9 & 10 CBSE | Rainbow International School",
     description: "Secondary section (Class 9–10) at Rainbow International School, Thane. CBSE board exam prep, mock tests, career counselling, outstanding results.",
     keywords: "secondary school Thane, Class 9 10 CBSE Thane, CBSE board exam school Thane, Class 10 school Thane",
-    canonical: "https://www.rainbowinternationalschool.in/secondary-section",
+    canonical: "https://rainbowinternationalschool.in/secondary-section",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Secondary Section", url: "https://www.rainbowinternationalschool.in/secondary-section" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Secondary Section", url: "https://rainbowinternationalschool.in/secondary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Secondary Section", educationalLevel: "Secondary" } },
     renderBody: renderSecondary,
@@ -789,10 +789,10 @@ const pages: PageSSRConfig[] = [
     title: "Senior Secondary in Thane — Class 11 & 12 Science Commerce Humanities | Rainbow International School",
     description: "Senior secondary (Class 11–12) at Rainbow International School, Thane. Science, Commerce, Humanities streams. JEE, NEET, CUET preparation. CBSE board.",
     keywords: "senior secondary school Thane, Class 11 12 Thane, Science Commerce Humanities Thane, CBSE Class 12 school Thane, JEE NEET school Thane",
-    canonical: "https://www.rainbowinternationalschool.in/senior-secondary-section",
+    canonical: "https://rainbowinternationalschool.in/senior-secondary-section",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Senior Secondary", url: "https://www.rainbowinternationalschool.in/senior-secondary-section" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Senior Secondary", url: "https://rainbowinternationalschool.in/senior-secondary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Senior Secondary Section", educationalLevel: "Senior Secondary" } },
     renderBody: renderSeniorSecondary,
@@ -802,10 +802,10 @@ const pages: PageSSRConfig[] = [
     title: "Contact Rainbow International School Thane — Phone, Email, Address",
     description: "Contact Rainbow International School, Thane. Phone: +91 82915 68972. Email: info@rainbowinternationalschool.in. Address: Cosmos Arcade, Brahmand Phase 4, Thane 400607.",
     keywords: "contact Rainbow International School, school phone number Thane, school address Thane, Rainbow school email, visit campus Thane",
-    canonical: "https://www.rainbowinternationalschool.in/contact-us",
+    canonical: "https://rainbowinternationalschool.in/contact-us",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Contact Us", url: "https://www.rainbowinternationalschool.in/contact-us" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Contact Us", url: "https://rainbowinternationalschool.in/contact-us" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderContact,
@@ -815,10 +815,10 @@ const pages: PageSSRConfig[] = [
     title: "School Amenities & Facilities — 3.5-Acre Campus | Rainbow International School Thane",
     description: "Explore world-class amenities at Rainbow International School, Thane. Smart classrooms, science labs, swimming pool, skating rink, amphitheatre, library, organic farm.",
     keywords: "school amenities Thane, school facilities Thane, school with swimming pool Thane, best campus school Thane, school infrastructure Thane",
-    canonical: "https://www.rainbowinternationalschool.in/amenities",
+    canonical: "https://rainbowinternationalschool.in/amenities",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Amenities & Facilities", url: "https://www.rainbowinternationalschool.in/amenities" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Amenities & Facilities", url: "https://rainbowinternationalschool.in/amenities" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAmenities,
@@ -828,10 +828,10 @@ const pages: PageSSRConfig[] = [
     title: "Awards & Achievements — Best School in Thane | Rainbow International School",
     description: "Rainbow International School awards: Best School in Thane, British Council ISA, Google for Education, Fit India. View our complete recognition list.",
     keywords: "best school Thane awards, school achievements Thane, British Council school Thane, award winning school Thane",
-    canonical: "https://www.rainbowinternationalschool.in/awards-achievements",
+    canonical: "https://rainbowinternationalschool.in/awards-achievements",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Awards & Achievements", url: "https://www.rainbowinternationalschool.in/awards-achievements" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Awards & Achievements", url: "https://rainbowinternationalschool.in/awards-achievements" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAwards,
@@ -841,10 +841,10 @@ const pages: PageSSRConfig[] = [
     title: "School Safety & Security — 200+ CCTV, GPS Buses | Rainbow International School Thane",
     description: "Comprehensive safety at Rainbow International School, Thane. 200+ CCTV cameras, card-based entry, infirmary, GPS-tracked buses, trained security, fire safety.",
     keywords: "school safety Thane, safe school Thane, CCTV school Thane, school security Thane, school with nurse Thane",
-    canonical: "https://www.rainbowinternationalschool.in/safety-security",
+    canonical: "https://rainbowinternationalschool.in/safety-security",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Safety & Security", url: "https://www.rainbowinternationalschool.in/safety-security" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Safety & Security", url: "https://rainbowinternationalschool.in/safety-security" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderSafety,
@@ -854,10 +854,10 @@ const pages: PageSSRConfig[] = [
     title: "School Admissions 2026-27 Thane — Nursery to Class 12 | Rainbow International School",
     description: "Admissions open at Rainbow International School, Thane for 2026-27. Nursery to Class 12, CBSE board. Age criteria, process, documents, and fee details.",
     keywords: "school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission",
-    canonical: "https://www.rainbowinternationalschool.in/admissions",
+    canonical: "https://rainbowinternationalschool.in/admissions",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Admissions 2026-27", url: "https://www.rainbowinternationalschool.in/admissions" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Admissions 2026-27", url: "https://rainbowinternationalschool.in/admissions" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAdmissions,
@@ -867,10 +867,10 @@ const pages: PageSSRConfig[] = [
     title: "CBSE School Fee Structure Thane 2026-27 | Rainbow International School",
     description: "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
     keywords: "CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane",
-    canonical: "https://www.rainbowinternationalschool.in/fee-structure",
+    canonical: "https://rainbowinternationalschool.in/fee-structure",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Fee Structure", url: "https://www.rainbowinternationalschool.in/fee-structure" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Fee Structure", url: "https://rainbowinternationalschool.in/fee-structure" },
     ],
     jsonLd: { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [
       { "@type": "Question", name: "What is the fee payment schedule?", acceptedAnswer: { "@type": "Answer", text: "Fees are payable in quarterly instalments." } },
@@ -883,10 +883,10 @@ const pages: PageSSRConfig[] = [
     title: "Best School Near Brahmand Thane — CBSE Nursery to Class 12 | Rainbow International School",
     description: "Rainbow International School — best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus.",
     keywords: "school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane",
-    canonical: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane",
+    canonical: "https://rainbowinternationalschool.in/school-near-brahmand-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "School Near Brahmand", url: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "School Near Brahmand", url: "https://rainbowinternationalschool.in/school-near-brahmand-thane" },
     ],
     jsonLd: { ...SCHOOL_LD, areaServed: "Brahmand, Thane" },
     renderBody: renderLocalityBrahmand,
@@ -896,10 +896,10 @@ const pages: PageSSRConfig[] = [
     title: "Best School Near Ghodbunder Road Thane — CBSE K–12 | Rainbow International School",
     description: "Rainbow International School — top CBSE school near Ghodbunder Road, Thane. 8 min from GB Road. Bus routes covering Patlipada, Waghbil, Kavesar.",
     keywords: "school near Ghodbunder Road, best school GB Road Thane, CBSE school Ghodbunder Road",
-    canonical: "https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane",
+    canonical: "https://rainbowinternationalschool.in/school-near-ghodbunder-road-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "School Near Ghodbunder Road", url: "https://www.rainbowinternationalschool.in/school-near-ghodbunder-road-thane" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "School Near Ghodbunder Road", url: "https://rainbowinternationalschool.in/school-near-ghodbunder-road-thane" },
     ],
     jsonLd: { ...SCHOOL_LD, areaServed: "Ghodbunder Road, Thane" },
     renderBody: renderLocalityGhodbunder,
@@ -909,10 +909,10 @@ const pages: PageSSRConfig[] = [
     title: "Best School Near Manpada Thane — CBSE Nursery to Class 12 | Rainbow International School",
     description: "Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus.",
     keywords: "school near Manpada Thane, best school Manpada, CBSE school Manpada Thane",
-    canonical: "https://www.rainbowinternationalschool.in/school-near-manpada-thane",
+    canonical: "https://rainbowinternationalschool.in/school-near-manpada-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "School Near Manpada", url: "https://www.rainbowinternationalschool.in/school-near-manpada-thane" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "School Near Manpada", url: "https://rainbowinternationalschool.in/school-near-manpada-thane" },
     ],
     jsonLd: { ...SCHOOL_LD, areaServed: "Manpada, Thane" },
     renderBody: renderLocalityManpada,
@@ -922,10 +922,10 @@ const pages: PageSSRConfig[] = [
     title: "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",
     description: "Take our free 10-question school readiness quiz to find out if your child is prepared for Grade 1. Covers academic, social, emotional, physical, and independence skills.",
     keywords: "school readiness quiz, is my child ready for school, grade 1 readiness test, school readiness checklist, child development assessment",
-    canonical: "https://www.rainbowinternationalschool.in/school-readiness-quiz",
+    canonical: "https://rainbowinternationalschool.in/school-readiness-quiz",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "School Readiness Quiz", url: "https://www.rainbowinternationalschool.in/school-readiness-quiz" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "School Readiness Quiz", url: "https://rainbowinternationalschool.in/school-readiness-quiz" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -942,10 +942,10 @@ const pages: PageSSRConfig[] = [
     title: "Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School",
     description: "Compare the top 10 schools in Thane for 2026. Detailed ratings, reviews, highlights for CBSE, ICSE, and International schools.",
     keywords: "top schools in thane, best schools thane, school comparison thane, best CBSE school thane, top 10 schools thane 2026",
-    canonical: "https://www.rainbowinternationalschool.in/top-schools-in-thane",
+    canonical: "https://rainbowinternationalschool.in/top-schools-in-thane",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Top Schools in Thane", url: "https://www.rainbowinternationalschool.in/top-schools-in-thane" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Top Schools in Thane", url: "https://rainbowinternationalschool.in/top-schools-in-thane" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -972,10 +972,10 @@ const pages: PageSSRConfig[] = [
     title: "Parent Testimonials & Reviews | Rainbow International School Thane",
     description: "Read genuine parent testimonials and reviews from Rainbow International School, Thane. Rated 4.8/5 by parents across all sections.",
     keywords: "rainbow international school reviews, school testimonials thane, parent reviews rainbow school, best school reviews thane",
-    canonical: "https://www.rainbowinternationalschool.in/testimonials",
+    canonical: "https://rainbowinternationalschool.in/testimonials",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "Testimonials", url: "https://www.rainbowinternationalschool.in/testimonials" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "Testimonials", url: "https://rainbowinternationalschool.in/testimonials" },
     ],
     jsonLd: {
       "@context": "https://schema.org",
@@ -992,10 +992,10 @@ const pages: PageSSRConfig[] = [
     title: "FAQs — Admissions, Fees, Academics & More | Rainbow International School",
     description: "Find answers to 30+ frequently asked questions about Rainbow International School, Thane — admissions, fees, curriculum, safety, transport, and facilities.",
     keywords: "rainbow international school faq, school admission questions thane, CBSE school faq, school fees thane",
-    canonical: "https://www.rainbowinternationalschool.in/faqs",
+    canonical: "https://rainbowinternationalschool.in/faqs",
     breadcrumbs: [
-      { name: "Home", url: "https://www.rainbowinternationalschool.in/" },
-      { name: "FAQs", url: "https://www.rainbowinternationalschool.in/faqs" },
+      { name: "Home", url: "https://rainbowinternationalschool.in/" },
+      { name: "FAQs", url: "https://rainbowinternationalschool.in/faqs" },
     ],
     jsonLd: {
       "@context": "https://schema.org",

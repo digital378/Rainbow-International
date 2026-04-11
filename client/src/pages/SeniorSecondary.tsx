@@ -140,19 +140,19 @@ export default function SeniorSecondary() {
         title="Senior Secondary (Class 11–12)"
         description="Rainbow International School's Senior Secondary Section (Class 11 & 12). Science, Humanities, and Commerce streams. CBSE affiliation number 1130661."
         keywords="senior secondary school Thane, Class 11 12 CBSE Thane, science commerce humanities Thane school"
-        canonical="https://www.rainbowinternationalschool.in/senior-secondary-section"
+        canonical="https://rainbowinternationalschool.in/senior-secondary-section"
         ogImage="/images/home/academic/senior-secondary.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Academics", href: "https://www.rainbowinternationalschool.in/senior-secondary-section" },
-          { name: "Senior Secondary (Class 11-12)", href: "https://www.rainbowinternationalschool.in/senior-secondary-section" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
+          { name: "Senior Secondary (Class 11-12)", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "EducationalOccupationalProgram",
           "name": "Senior Secondary Section (Class 11–12)",
           "description": "CBSE Senior Secondary (Class 11 & 12) with Science, Commerce, and Humanities streams at Rainbow International School, Thane. CBSE Affiliation No. 1130661.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
+          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
           "educationalProgramMode": "full-time",
           "programPrerequisites": "Completion of Class 10 (CBSE)",
           "hasCourse": [
@@ -160,7 +160,7 @@ export default function SeniorSecondary() {
             { "@type": "Course", "name": "Commerce Stream (Class 11–12)", "description": "Accountancy, Business Studies, Economics, and electives." },
             { "@type": "Course", "name": "Humanities Stream (Class 11–12)", "description": "History, Political Science, Psychology, Sociology, and electives." }
           ],
-          "url": "https://www.rainbowinternationalschool.in/senior-secondary-section"
+          "url": "https://rainbowinternationalschool.in/senior-secondary-section"
         }}
       />
       <Navbar />

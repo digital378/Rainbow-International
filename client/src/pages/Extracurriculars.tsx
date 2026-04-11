@@ -45,7 +45,7 @@ function SportsWheel() {
       <circle cx={cx} cy={cy} r={innerR} fill="#e0edff" />
       {/* Sports image clipped to inner circle */}
       <image
-        href="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg"
+        href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-extracurricular-activity-special-assembly.jpg"
         x={cx - innerR} y={cy - innerR} width={innerR * 2} height={innerR * 2}
         clipPath="url(#sc1)"
         preserveAspectRatio="xMidYMid slice"
@@ -241,7 +241,7 @@ const testimonials = [
   {
     quote: "The study pattern in Rainbow is very well balanced between books & extra activity. I love to hear from my 8 yr son when he explains everything he learnt — this means he is enjoying, which was not the case one year back. Great going Rainbow teachers, keep it up.",
     name: "Chandrasekhar Ella",
-    photo: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg",
+    photo: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg",
   },
   {
     quote: "Rainbow International School has been a wonderful experience for my daughter. The teachers are dedicated and the holistic approach to education is commendable.",
@@ -268,10 +268,10 @@ export default function Extracurriculars() {
         title="Extracurricular Activities"
         description="Rainbow International School — FIT INDIA School with sports, clubs, exhibitions, cultural activities and tours for holistic student development in Thane."
         keywords="extracurricular activities Thane school, Rainbow school sports clubs, FIT INDIA school Thane"
-        canonical="https://www.rainbowinternationalschool.in/extracurriculars"
+        canonical="https://rainbowinternationalschool.in/extracurriculars"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Extracurriculars", href: "https://www.rainbowinternationalschool.in/extracurriculars" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Extracurriculars", href: "https://rainbowinternationalschool.in/extracurriculars" },
         ]}
       />
       <Navbar />
@@ -293,7 +293,7 @@ export default function Extracurriculars() {
                   Our declaration has been approved by the Ministry of Youth Affairs and Sports and we are a FIT INDIA School!
                 </p>
                 <a
-                  href="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                  href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-white font-bold py-2.5 px-6 rounded-full transition-opacity hover:opacity-90"
@@ -306,7 +306,7 @@ export default function Extracurriculars() {
               <div className="flex-shrink-0">
                 <div className="w-36 h-36 rounded-2xl overflow-hidden flex items-center justify-center" style={{ background: "#e0edff" }}>
                   <img
-                    src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                    src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
                     alt="FIT INDIA School Certificate"
                     className="w-full h-full object-cover"
                     width={144}

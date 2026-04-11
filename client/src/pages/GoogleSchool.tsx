@@ -39,7 +39,7 @@ export default function GoogleSchool() {
         title="Google School 2025–26"
         subtitle="Rainbow International School — Certified Google for Education Partner"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Google School 2025–26" }]}
-        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg"
       />
 
       <main className="flex-1">
@@ -47,7 +47,7 @@ export default function GoogleSchool() {
         <section className="py-16 px-4 bg-[#f8faff]">
           <div className="max-w-5xl mx-auto text-center">
             <div className="inline-flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-sm mb-8 border border-blue-100">
-              <img src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/08/education.png" alt="Google for Education" className="h-8 object-contain" width={100} height={32} loading="lazy" decoding="async" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <img src="https://rainbowinternationalschool.in/wp-content/uploads/2022/08/education.png" alt="Google for Education" className="h-8 object-contain" width={100} height={32} loading="lazy" decoding="async" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               <span className="font-bold text-[#0d3b86] text-sm">Certified Google for Education School — 2025–26</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-[#091a4f] mb-6">

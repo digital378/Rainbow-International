@@ -14,13 +14,13 @@ export default function WelcomeToRIS() {
         title="Welcome to Rainbow International School"
         description="Welcome to Rainbow International School — founded in 2009, one of the finest CBSE-affiliated educational institutes in Thane with 3.5 acres campus and 3000+ students."
         keywords="Welcome Rainbow International School, about Rainbow school, Rainbow International School Thane"
-        canonical="https://www.rainbowinternationalschool.in/about-rainbow-international-school"
+        canonical="https://rainbowinternationalschool.in/about-rainbow-international-school"
       />
       <Navbar />
       <PageBanner
         title="Welcome to Rainbow International School"
         breadcrumb={[{ label: "About Us", href: "/about-rainbow-international-school" }, { label: "Welcome to RIS" }]}
-        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
       />
 
       <main className="flex-grow">
@@ -46,7 +46,7 @@ export default function WelcomeToRIS() {
               </div>
               <div className="space-y-4">
                 <img
-                  src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
+                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
                   alt="Rainbow International School"
                   className="rounded-3xl shadow-sm w-full object-cover"
                   width={1024}

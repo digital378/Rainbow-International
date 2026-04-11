@@ -48,14 +48,14 @@ export default function Circulars() {
         title="Circulars & Notices"
         description="School circulars and notices from Rainbow International School, Thane. Examination schedules, event notices, PTM dates, and general announcements."
         keywords="Rainbow school circulars Thane, school notices Thane, Rainbow International School announcements"
-        canonical="https://www.rainbowinternationalschool.in/circulars"
+        canonical="https://rainbowinternationalschool.in/circulars"
       />
       <Navbar />
       <PageBanner
         title="Circulars"
         subtitle="School notices, examination schedules and important announcements."
         breadcrumb={[{ label: "Circulars" }]}
-        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Primary-scetion.png"
       />
 
       <main className="flex-grow">

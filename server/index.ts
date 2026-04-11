@@ -16,9 +16,9 @@ app.get("/__repl_health", (_req, res) => {
 if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     const host = req.hostname;
-    // Only enforce www on the real domain — skip Replit preview URLs to prevent redirect loops
-    if (host && host.includes("rainbowinternationalschool.in") && !host.startsWith("www.")) {
-      return res.redirect(301, `https://www.${host}${req.originalUrl}`);
+    if (host && host.startsWith("www.") && host.includes("rainbowinternationalschool.in")) {
+      const bare = host.replace(/^www\./, "");
+      return res.redirect(301, `https://${bare}${req.originalUrl}`);
     }
     next();
   });

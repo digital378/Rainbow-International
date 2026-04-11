@@ -142,7 +142,7 @@ export function Navbar() {
               className={`w-auto object-contain transition-all duration-300 ${scrolled ? "h-12" : "h-14"}`}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png";
+                target.src = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png";
               }}
             />
           </Link>

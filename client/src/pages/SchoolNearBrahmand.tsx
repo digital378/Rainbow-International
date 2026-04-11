@@ -40,16 +40,16 @@ export default function SchoolNearBrahmand() {
         title="Best School Near Brahmand Thane — CBSE Nursery to Class 12"
         description="Rainbow International School — the best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
         keywords="school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane, school near me Brahmand, nursery school Brahmand Thane"
-        canonical="https://www.rainbowinternationalschool.in/school-near-brahmand-thane"
+        canonical="https://rainbowinternationalschool.in/school-near-brahmand-thane"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "School Near Brahmand", href: "https://www.rainbowinternationalschool.in/school-near-brahmand-thane" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "School Near Brahmand", href: "https://rainbowinternationalschool.in/school-near-brahmand-thane" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "School",
           "name": "Rainbow International School",
-          "url": "https://www.rainbowinternationalschool.in/",
+          "url": "https://rainbowinternationalschool.in/",
           "address": { "@type": "PostalAddress", "streetAddress": "Cosmos Arcade, Brahmand Phase 4", "addressLocality": "Thane", "addressRegion": "Maharashtra", "postalCode": "400607", "addressCountry": "IN" },
           "geo": { "@type": "GeoCoordinates", "latitude": 19.2287, "longitude": 72.9637 },
           "areaServed": "Brahmand, Thane"

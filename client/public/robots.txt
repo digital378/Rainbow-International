@@ -8,9 +8,9 @@ Disallow: /ris
 Disallow: /declaration
 Disallow: /ssr-demo/
 
-Host: https://www.rainbowinternationalschool.in
+Host: https://rainbowinternationalschool.in
 
-Sitemap: https://www.rainbowinternationalschool.in/sitemap.xml
+Sitemap: https://rainbowinternationalschool.in/sitemap.xml
 
 # AI/LLM discovery
-LLMs.txt: https://www.rainbowinternationalschool.in/llms.txt
+LLMs.txt: https://rainbowinternationalschool.in/llms.txt

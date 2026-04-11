@@ -40,11 +40,11 @@ export default function BeyondClassroom() {
         title="Beyond the Classroom"
         description="Rainbow International School offers exhibitions, clubs, tours, and organic farming activities beyond academics. A comprehensive programme designed to meet the social, physical, and cultural needs of students."
         keywords="beyond classroom activities Rainbow School, school clubs Thane, extracurricular activities Thane school, school exhibitions Thane"
-        canonical="https://www.rainbowinternationalschool.in/beyond-the-classroom"
+        canonical="https://rainbowinternationalschool.in/beyond-the-classroom"
         ogImage="/images/extra/events/dance-boys.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Beyond the Classroom", href: "https://www.rainbowinternationalschool.in/beyond-the-classroom" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Beyond the Classroom", href: "https://rainbowinternationalschool.in/beyond-the-classroom" },
         ]}
       />
       <Navbar />
@@ -52,7 +52,7 @@ export default function BeyondClassroom() {
         title="Beyond The Classroom"
         subtitle="The real aim of education is not only knowledge but also Action."
         breadcrumb={[{ label: "Beyond The Classroom" }]}
-        bgImage="https://www.rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
+        bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2023/07/web-art-work-for-pranit-d-02-1024x831.png"
       />
 
       <main className="flex-grow">

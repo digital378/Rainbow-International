@@ -6,7 +6,7 @@ import { SEO } from "@/components/SEO";
 import { X } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 
-const CDN = "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09";
+const CDN = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
 
 const galleryData = [
   {
@@ -182,10 +182,10 @@ export default function PhotoGallery() {
         title="Photo Gallery"
         description="Browse the Rainbow International School photo gallery — academics, extracurriculars, sports, amenities, and achievements from our campus in Thane."
         keywords="Rainbow school photo gallery, school photos Thane, school campus photos Rainbow International"
-        canonical="https://www.rainbowinternationalschool.in/photo-gallery"
+        canonical="https://rainbowinternationalschool.in/photo-gallery"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Photo Gallery", href: "https://www.rainbowinternationalschool.in/photo-gallery" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Photo Gallery", href: "https://rainbowinternationalschool.in/photo-gallery" },
         ]}
       />
       <Navbar />

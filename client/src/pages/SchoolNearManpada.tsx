@@ -40,16 +40,16 @@ export default function SchoolNearManpada() {
         title="Best School Near Manpada Thane — CBSE Nursery to Class 12"
         description="Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
         keywords="school near Manpada Thane, best school Manpada, CBSE school Manpada Thane, school near me Manpada, nursery school Manpada Thane, school Pokhran Road"
-        canonical="https://www.rainbowinternationalschool.in/school-near-manpada-thane"
+        canonical="https://rainbowinternationalschool.in/school-near-manpada-thane"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "School Near Manpada", href: "https://www.rainbowinternationalschool.in/school-near-manpada-thane" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "School Near Manpada", href: "https://rainbowinternationalschool.in/school-near-manpada-thane" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "School",
           "name": "Rainbow International School",
-          "url": "https://www.rainbowinternationalschool.in/",
+          "url": "https://rainbowinternationalschool.in/",
           "address": { "@type": "PostalAddress", "streetAddress": "Cosmos Arcade, Brahmand Phase 4", "addressLocality": "Thane", "addressRegion": "Maharashtra", "postalCode": "400607", "addressCountry": "IN" },
           "geo": { "@type": "GeoCoordinates", "latitude": 19.2287, "longitude": 72.9637 },
           "areaServed": "Manpada, Thane"

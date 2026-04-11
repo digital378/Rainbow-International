@@ -126,22 +126,22 @@ export default function Primary() {
         title="Primary Section (Class 1–5)"
         description="Rainbow International School's Primary Section (Class 1 to 5) in Thane. Language, Math, Science, Creative & Interpersonal skills via CBSE curriculum. Admissions open."
         keywords="primary school Thane, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
-        canonical="https://www.rainbowinternationalschool.in/primary-section"
+        canonical="https://rainbowinternationalschool.in/primary-section"
         ogImage="/images/home/academic/primary-section.jpg"
         breadcrumbs={[
-          { name: "Home", href: "https://www.rainbowinternationalschool.in/" },
-          { name: "Academics", href: "https://www.rainbowinternationalschool.in/primary-section" },
-          { name: "Primary (Class 1-5)", href: "https://www.rainbowinternationalschool.in/primary-section" },
+          { name: "Home", href: "https://rainbowinternationalschool.in/" },
+          { name: "Academics", href: "https://rainbowinternationalschool.in/primary-section" },
+          { name: "Primary (Class 1-5)", href: "https://rainbowinternationalschool.in/primary-section" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "EducationalOccupationalProgram",
           "name": "Primary Section (Class 1–5)",
           "description": "CBSE-affiliated primary education for Class 1 to 5, covering Language, Mathematics, Science, Social Studies, and creative skills using Multiple Intelligence pedagogy.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://www.rainbowinternationalschool.in/" },
+          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
           "educationalProgramMode": "full-time",
           "programPrerequisites": "Completion of Pre-Primary / Age 6 years",
-          "url": "https://www.rainbowinternationalschool.in/primary-section"
+          "url": "https://rainbowinternationalschool.in/primary-section"
         }}
       />
       <Navbar />

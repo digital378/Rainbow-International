@@ -32,7 +32,7 @@ export default function GlobalBrandAssociations() {
         title="Global Brand Associations"
         description="Rainbow International School's global brand associations and partnerships that enhance the quality of education and learning experiences for students in Thane."
         keywords="Rainbow school global partnerships, school associations Thane, Rainbow International School CBSE Google partnership"
-        canonical="https://www.rainbowinternationalschool.in/global-brand-associations"
+        canonical="https://rainbowinternationalschool.in/global-brand-associations"
       />
       <Navbar />
       <PageBanner

@@ -13,7 +13,7 @@ export default function ChairpersonsNote() {
         title="Chairperson's Note"
         description="A message from the Chairperson of Rainbow International School, Thane — on the school's vision, values, and commitment to excellence in education."
         keywords="Rainbow school chairperson, Rainbow International School leadership message, chairperson note Thane school"
-        canonical="https://www.rainbowinternationalschool.in/chairpersons-note"
+        canonical="https://rainbowinternationalschool.in/chairpersons-note"
       />
       <Navbar />
       <PageBanner
@@ -28,7 +28,7 @@ export default function ChairpersonsNote() {
               <div className="md:w-64 shrink-0 flex flex-col items-center md:items-start">
                 <div className="w-44 h-44 rounded-3xl overflow-hidden shadow-sm border border-gray-100 flex items-center justify-center mb-4" style={{ background: "#f0f4ff" }}>
                   <img
-                    src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png"
+                    src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/cropped-RIS-Logo-PNG.png"
                     alt="Rainbow International School"
                     className="w-full h-full object-cover"
                     width={176}

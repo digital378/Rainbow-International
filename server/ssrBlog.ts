@@ -119,11 +119,11 @@ function renderBlogSSR(slug: string): string | null {
   <title>${post.metaTitle.includes('Rainbow International') ? e(post.metaTitle) : `${e(post.metaTitle)} | Rainbow International School`}</title>
   <meta name="description" content="${e(post.metaDescription)}" />
   <meta name="keywords" content="${e(post.keywords)}" />
-  <link rel="canonical" href="https://www.rainbowinternationalschool.in/blog/${e(post.slug)}/" />
+  <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />
-  <meta property="og:image" content="${e(post.heroUrl || 'https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg')}" />
-  <meta property="og:url" content="https://www.rainbowinternationalschool.in/blog/${e(post.slug)}/" />
+  <meta property="og:image" content="${e(post.heroUrl || 'https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg')}" />
+  <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta property="og:locale" content="en_IN" />
@@ -133,25 +133,25 @@ function renderBlogSSR(slug: string): string | null {
     "@type": "BlogPosting",
     "headline": post.metaTitle || post.title,
     "description": post.metaDescription,
-    "image": post.heroUrl || "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+    "image": post.heroUrl || "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
     "datePublished": toISODate(post.date),
     "dateModified": toISODate(post.date),
     "author": {
       "@type": "Organization",
       "name": "Rainbow International School",
-      "url": "https://www.rainbowinternationalschool.in"
+      "url": "https://rainbowinternationalschool.in"
     },
     "publisher": {
       "@type": "Organization",
       "name": "Rainbow International School",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://www.rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png"
+        "url": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png"
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://www.rainbowinternationalschool.in/blog/${post.slug}/`
+      "@id": `https://rainbowinternationalschool.in/blog/${post.slug}/`
     },
     "keywords": post.keywords,
     "articleSection": post.cat
@@ -162,9 +162,9 @@ function renderBlogSSR(slug: string): string | null {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.rainbowinternationalschool.in/" },
-      { "@type": "ListItem", "position": 2, "name": "Blogs", "item": "https://www.rainbowinternationalschool.in/blogs" },
-      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://www.rainbowinternationalschool.in/blog/${post.slug}/` }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://rainbowinternationalschool.in/" },
+      { "@type": "ListItem", "position": 2, "name": "Blogs", "item": "https://rainbowinternationalschool.in/blogs" },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://rainbowinternationalschool.in/blog/${post.slug}/` }
     ]
   })}
   </script>

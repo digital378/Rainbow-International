@@ -8,19 +8,19 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 
 const calendars = [
   {
-    image: "https://www.rainbowinternationalschool.in/wp-content/uploads/2025/09/rainbow_calendar.jpeg",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2025/09/rainbow_calendar.jpeg",
     label: "Academic Calendar 2025–26",
-    href: "https://www.rainbowinternationalschool.in/wp-content/uploads/2025/09/rainbow_calendar.jpeg",
+    href: "https://rainbowinternationalschool.in/wp-content/uploads/2025/09/rainbow_calendar.jpeg",
   },
   {
-    image: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-feb-2020-1024x727-1.png",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-feb-2020-1024x727-1.png",
     label: "Academic Calendar — February 2020",
-    href: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-feb-2020-1024x727-1.png",
+    href: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-feb-2020-1024x727-1.png",
   },
   {
-    image: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-march-2020-1024x725-1.png",
+    image: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-march-2020-1024x725-1.png",
     label: "Academic Calendar — March 2020",
-    href: "https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-march-2020-1024x725-1.png",
+    href: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-academic-calendar-march-2020-1024x725-1.png",
   },
 ];
 
@@ -32,7 +32,7 @@ export default function AcademicCalendar() {
         title="Academic Calendar 2026–27"
         description="View and download the academic calendar for Rainbow International School, Thane. Stay updated with important dates, events, and school activities."
         keywords="Rainbow school academic calendar, school calendar Thane, Rainbow International School events schedule"
-        canonical="https://www.rainbowinternationalschool.in/academic-calendar"
+        canonical="https://rainbowinternationalschool.in/academic-calendar"
       />
       <Navbar />
       <PageBanner
