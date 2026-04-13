@@ -119,6 +119,7 @@ function renderBlogSSR(slug: string): string | null {
   <title>${post.metaTitle.includes('Rainbow International') ? e(post.metaTitle) : `${e(post.metaTitle)} | Rainbow International School`}</title>
   <meta name="description" content="${e(post.metaDescription)}" />
   <meta name="keywords" content="${e(post.keywords)}" />
+  <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />

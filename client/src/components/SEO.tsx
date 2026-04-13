@@ -36,7 +36,7 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
 
     setMeta("description", description);
     if (keywords) setMeta("keywords", keywords);
-    if (robots) setMeta("robots", robots);
+    setMeta("robots", robots || "index, follow");
     setMeta("og:title", fullTitle, true);
     setMeta("og:description", description, true);
     setMeta("og:image", ogImage || defaultImage, true);
@@ -93,7 +93,7 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
       const scripts = document.querySelectorAll('script[data-seo-jsonld]');
       scripts.forEach(s => s.remove());
     };
-  }, [fullTitle, description, canonical, ogImage, keywords, breadcrumbs, jsonLd]);
+  }, [fullTitle, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd]);
 
   return null;
 }

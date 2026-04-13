@@ -41,6 +41,7 @@ function shell(cfg: PageSSRConfig): string {
 <title>${e(seoTitle(cfg.title))}</title>
 <meta name="description" content="${e(cfg.description)}"/>
 <meta name="keywords" content="${e(cfg.keywords)}"/>
+<meta name="robots" content="index, follow"/>
 <link rel="canonical" href="${e(cfg.canonical)}"/>
 <meta property="og:title" content="${e(seoTitle(cfg.title))}"/>
 <meta property="og:description" content="${e(cfg.description)}"/>
