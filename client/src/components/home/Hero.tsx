@@ -6,7 +6,7 @@ const HeroForm = lazy(() => import("./HeroForm").then(m => ({ default: m.HeroFor
 
 const seatData = [
   { grade: "Nursery", seats: 7, status: "Available" },
-  { grade: "Jr. KG", seats: 4, status: "Almost Full" },
+  { grade: "Jr. KG", seats: 3, status: "Almost Full" },
   { grade: "Sr. KG", seats: 2, status: "Almost Full" },
   { grade: "I", seats: 1, status: "Almost Full" },
   { grade: "II", seats: 2, status: "Almost Full" },
