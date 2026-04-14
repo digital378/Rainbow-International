@@ -5,25 +5,25 @@ import { ChevronRight, X } from "lucide-react";
 const HeroForm = lazy(() => import("./HeroForm").then(m => ({ default: m.HeroForm })));
 
 const seatData = [
-  { grade: "Nursery", seats: 12, status: "Available" },
+  { grade: "Nursery", seats: 7, status: "Available" },
   { grade: "Jr. KG", seats: 4, status: "Almost Full" },
-  { grade: "Sr. KG", seats: 5, status: "Almost Full" },
-  { grade: "I", seats: 3, status: "Almost Full" },
-  { grade: "II", seats: 3, status: "Almost Full" },
-  { grade: "III", seats: 4, status: "Almost Full" },
+  { grade: "Sr. KG", seats: 2, status: "Almost Full" },
+  { grade: "I", seats: 1, status: "Almost Full" },
+  { grade: "II", seats: 2, status: "Almost Full" },
+  { grade: "III", seats: 3, status: "Almost Full" },
   { grade: "IV", seats: 1, status: "Almost Full" },
   { grade: "V", seats: 1, status: "Almost Full" },
-  { grade: "VI", seats: 2, status: "Almost Full" },
-  { grade: "VII", seats: 0, status: "Closed" },
-  { grade: "VIII", seats: 0, status: "Closed" },
-  { grade: "IX", seats: 0, status: "Closed" },
-  { grade: "X", seats: 0, status: "Closed" },
+  { grade: "VI", seats: 3, status: "Almost Full" },
+  { grade: "VII", seats: 2, status: "Almost Full" },
+  { grade: "VIII", seats: 3, status: "Almost Full" },
+  { grade: "IX", seats: 1, status: "Almost Full" },
+  { grade: "X", seats: 2, status: "Almost Full" },
   { grade: "XI Science", seats: 20, status: "Available" },
   { grade: "XI Commerce", seats: 15, status: "Available" },
   { grade: "XI Humanities", seats: 23, status: "Available" },
-  { grade: "XII Science", seats: 11, status: "Available" },
-  { grade: "XII Commerce", seats: 13, status: "Available" },
-  { grade: "XII Humanities", seats: 17, status: "Available" },
+  { grade: "XII Science", seats: 1, status: "Almost Full" },
+  { grade: "XII Commerce", seats: 3, status: "Almost Full" },
+  { grade: "XII Humanities", seats: 2, status: "Almost Full" },
 ];
 
 const quickLinks = [
