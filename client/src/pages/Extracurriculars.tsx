@@ -315,11 +315,11 @@ export default function Extracurriculars() {
                 </button>
               </div>
               <div className="flex-shrink-0">
-                <button onClick={() => setShowCert(true)} className="block w-36 h-36 rounded-2xl overflow-hidden" aria-label="View FIT INDIA Certificate">
+                <button onClick={() => setShowCert(true)} className="block w-36 h-36 rounded-2xl overflow-hidden bg-white p-3" aria-label="View FIT INDIA Certificate">
                   <img
-                    src="/fit-india-certificate.jpg"
-                    alt="FIT INDIA School Certificate"
-                    className="w-full h-full object-cover"
+                    src="/fit-india-logo.jpg"
+                    alt="FIT INDIA School Logo"
+                    className="w-full h-full object-contain"
                     width={144}
                     height={144}
                     loading="lazy"
