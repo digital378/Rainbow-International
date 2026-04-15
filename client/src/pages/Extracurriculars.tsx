@@ -257,6 +257,7 @@ const testimonials = [
 
 export default function Extracurriculars() {
   const [current, setCurrent] = useState(0);
+  const [showCert, setShowCert] = useState(false);
   const prev = () => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
   const next = () => setCurrent((c) => (c + 1) % testimonials.length);
   const t = testimonials[current];
@@ -304,35 +305,49 @@ export default function Extracurriculars() {
                 <p className="text-gray-600 leading-relaxed">
                   Our declaration has been approved by the Ministry of Youth Affairs and Sports and we are a FIT INDIA School!
                 </p>
-                <a
-                  href="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => setShowCert(true)}
                   className="inline-flex items-center gap-2 text-white font-bold py-2.5 px-6 rounded-full transition-opacity hover:opacity-90"
                   style={{ background: "#0d3b86" }}
                   data-testid="link-fit-india-certificate"
                 >
                   View Certificate →
-                </a>
+                </button>
               </div>
               <div className="flex-shrink-0">
-                <div className="w-36 h-36 rounded-2xl overflow-hidden flex items-center justify-center" style={{ background: "#e0edff" }}>
+                <button onClick={() => setShowCert(true)} className="block w-36 h-36 rounded-2xl overflow-hidden" aria-label="View FIT INDIA Certificate">
                   <img
-                    src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-fit-india-4-1.jpg"
+                    src="/fit-india-certificate.jpg"
                     alt="FIT INDIA School Certificate"
                     className="w-full h-full object-cover"
                     width={144}
                     height={144}
                     loading="lazy"
                     decoding="async"
-                    onError={(e) => {
-                      const el = e.target as HTMLImageElement;
-                      el.style.display = "none";
-                      el.parentElement!.innerHTML = `<div style="padding:16px;text-align:center;font-weight:900;font-size:24px;color:#0d3b86;line-height:1.1">FIT<br/>INDIA</div>`;
-                    }}
                   />
-                </div>
+                </button>
               </div>
+
+              {showCert && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+                  onClick={() => setShowCert(false)}
+                  data-testid="modal-fit-india-cert"
+                >
+                  <div className="relative max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => setShowCert(false)}
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg text-gray-600 hover:text-gray-900 font-bold text-lg z-10"
+                      aria-label="Close"
+                    >×</button>
+                    <img
+                      src="/fit-india-certificate.jpg"
+                      alt="FIT INDIA School Certificate"
+                      className="w-full rounded-2xl shadow-2xl"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>

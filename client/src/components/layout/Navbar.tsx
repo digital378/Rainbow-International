@@ -48,10 +48,6 @@ const exploreLinks = [
   { href: "/school-readiness-quiz", label: "School Readiness Quiz" },
 ];
 
-const parentLinks = [
-  { href: "/contact-us", label: "Application Form" },
-  { href: "/students-leaving-certificate", label: "Leaving Certificate" },
-];
 
 function Dropdown({ label, links, isTransparent }: { label: string; links: { href: string; label: string; external?: boolean }[]; isTransparent?: boolean }) {
   const [open, setOpen] = useState(false);
@@ -249,9 +245,6 @@ export function Navbar() {
             <div className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
               <Dropdown label="Explore" links={exploreLinks} isTransparent={isTransparent} />
             </div>
-            <div className="px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400">
-              <Dropdown label="Parent's Corner" links={parentLinks} isTransparent={isTransparent} />
-            </div>
             <Link href="/contact-us" className={`text-sm font-medium transition-colors px-3 py-3.5 border-b-2 border-transparent hover:border-amber-400 ${isTransparent ? "text-white/90 hover:text-white" : "text-[#333] hover:text-primary"}`}>
               Connect with us
             </Link>
@@ -283,7 +276,6 @@ export function Navbar() {
               { key: "at-rainbow", label: "At Rainbow", links: atRainbowLinks },
               { key: "gallery", label: "Gallery", links: galleryLinks },
               { key: "explore", label: "Explore", links: exploreLinks },
-              { key: "parents", label: "Parent's Corner", links: parentLinks },
             ].map(({ key, label, links }) => (
               <div key={key}>
                 <button
