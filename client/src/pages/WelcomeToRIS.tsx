@@ -51,7 +51,7 @@ export default function WelcomeToRIS() {
               </div>
               <div className="space-y-4">
                 <img
-                  src="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
+                  src="https://www.rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
                   alt="Rainbow International School"
                   className="rounded-3xl shadow-sm w-full object-cover"
                   width={1024}
