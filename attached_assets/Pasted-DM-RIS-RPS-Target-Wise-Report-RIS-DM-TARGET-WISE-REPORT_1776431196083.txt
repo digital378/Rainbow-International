@@ -1,0 +1,41 @@
+DM - RIS & RPS Target Wise Report															
+															
+RIS -  DM TARGET WISE REPORT AS ON 13th June 2025															
+Month	 Amount Spend RIS 		Total Number of Leads		Total Number of walkins 		Admissions for RIS 		Admission Conversion %	Total Number of walkin % 	Cost per lead 	Cost per Admission 	Marketing CPA	True CPA	
+	 Budget Approved 	 Budget Utilised 	Target	Result	Target	Result	Target	Result	Result	Result	Result	Result			
+Oct'24	  100,000 	  13,556 	150	116	60	40	15	7	18%	34%	  117 	  1,937 	1936.6	25865	
+Nov'24	  250,000 	  15,202 	150	137	120	49	45	18	37%	36%	  111 	  845 	844.6	10150	
+Dec '24	  200,000 	  19,189 	200	159	120	54	60	22	41%	34%	  121 	  872 	872.2	8486	
+Jan'25	  225,000 	  56,111 	250	193	100	73	60	26	36%	38%	  291 	  2,158 	2158.1	8600	
+Feb-25	  250,000 	  15,732 	300	66	120	40	65	11	28%	61%	  238.36 	  1,430.18 	1430.2	16657	
+Mar-25	  200,000 	  200,000 	300	125	120	36	60	8	22%	29%			25000.0	45938	
+Apr-25	  100,000 	  150,000 	300	132	140	35	50	6	17%	27%			25000.0	52917	
+May-25	  100,000 	  56,000 	130	125	50	53	20	21	40%	42%			2666.7	10643	
+June-25	  100,000 	  5,846 	100	89	40	31	20	11	35%	35%			531.5	15759	
+															
+ Total 	  1,525,000 	  531,636 	1880	1142	870	411	395	130	32%	36%			4089.5	15686	
+															
+															
+RPS -  DM TARGET WISE REPORT AS ON 13th June 2025															
+Month	 Amount Spend RPS 		Total Number of Leads		Total Number of walkins 		Admissions for RPS 		Admission Conversion %	Total Number of walkin % 	Cost per lead 	Cost per Admission 	Marketing CPA	True CPA	
+	 Budget Approved 	 Budget Utilised 	Target	Result	Target	Result	Target	Result	Result	Result	Result	Result			
+Oct'24	  100,000 	  57,147 	120	78	60	24	15	12	50%	31%	  733 	  4,762 	4762.3	18721	
+Nov'24	  200,000 	  61,853 	200	96	100	36	40	13	36%	38%	  644 	  4,758 	4757.9	17643	
+Dec '24	  200,000 	  88,738 	200	158	100	59	50	20	34%	37%	  562 	  4,437 	4436.9	12812	
+Jan'25	  250,000 	  89,510 	250	160	160	68	65	25	37%	43%	  559 	  3,580 	3580.4	10280	
+Feb-25	  250,000 	  130,200 	250	62	160	29	65	12	41%	47%	  2,100 	  10,850 	10850.0	24808	
+Mar-25	  250,000 	  200,000 	250	122	160	66	65	14	21%	54%	  1,639 	  14,286 	14285.7	26250	
+Apr-25	  200,000 	  200,000 	250	147	130	21	55	14	67%	14%			14285.7	26250	
+May 25	  150,000 	  89,050 	150	83	60	31	30	16	52%	37%			5565.6	16034	
+June-25	  100,000 	  88,595 	110	114	65	32	40	14	44%	28%			6328.2	18293	
+															
+ Total 	  1,700,000 	  1,005,093 	1780	1020	995	366	425	140	38%	36%			7179.2	17947	
+															
+															
+Total Summay RPS & RIS 															
+Format	 Budget Approved 	 Budget Utilised 	Target	Achieved	Target	Achieved	Target	Achieved	Total admission %	Total Number of walkin % 	Result	Result			
+ RIS 	  1,525,000 	  531,636 	1880	1142	870	411	395	130	32%	36%					
+ RPS 	  1,700,000 	  1,005,093 	1780	1020	995	366	425	140	38%	36%					
+ Total Summay RPS & RIS  	  3,225,000 	  1,536,729 	3660	2162	1865	777	820	270			  -   	  -   			
+															
+															
