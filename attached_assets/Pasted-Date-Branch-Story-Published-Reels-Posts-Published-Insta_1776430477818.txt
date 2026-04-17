@@ -1,0 +1,314 @@
+Date	Branch	Story Published	Reels/Posts Published	Instagram							Facebook							Youtube		Website				Top Search Query		
+				Total Views 	Organic	Ads	Total Engagement	Variance	Total Followers	New Followers	Total Views 	Organic	Ads	Total Engagement	Variance	Total Followers	New Followers	Total Published	Total Views	Clicks	Impressions	Pages Updated	Forms/Links QA	Title	Clicks 	Impressions
+																										
+19 Jan 26	RIS	1	0	0	0	0	0	0	5,463		0	0	0	0	0	9,861		2	Shorts - 46 / 36	141	20,257	0	0	rainbow international school	4	97
+	RPS	1	0	0	0	0	0	0	10,082		0	0	0	0	0	12,963		2	Shorts - 15 / 5	34	13,761	0	0	rainbow preschool -	3	893
+																										
+20 Jan 26	RIS	1	0	0	0	0	0	0	5,469	6	0	0	0	0	0	9,860	-1	2	Shorts - 946 / 731	161	23,135	0	0	rainbow international school	2	112
+	RPS	1	0	0	0	0	0	0	10,082	0	0	0	0	0	0	12,964	1	2	Shorts - 8 / 8	32	13,622	0	0	rainbow preschool -	0	1,207
+																										
+21 Jan 26	RIS	1	0	0	0	0	0	0	5,473	4	0	0	0	-	0	9,860	0	1	Post Likes - 1	163	23,295	0	0	rainbow international school thane	8	137
+	RPS	1	1	1,596	0	0	Likes - 39, Comm - 0, Avg. W - 7s (T-11s)	0	10,092	10	760	0	0	Likes - 7, Comm - 0, Avg. W - 5s (T-11s)	0	12,963	-1	1	Post Likes - 0	33	15,876	0	0	rainbow preschool -	5	1,073
+																										
+22 Jan 26	RIS	1	1	4,026	0	0	Likes - 149, Comm - 2, Avg. W - 14s (T-30s)	0	5,490	17	809	0	0	Likes - 24, Comm - 1, Avg. W - 12s (T-30s)	0	9,859	-1	0	-	154	24,960	0	0	rainbow international school thane	3	98
+	RPS	1	0	0	0	0	0	0	10,098	6	0	0	0	0	0	12,964	1	1	Post Likes - 2	40	19,402	0	0	rainbow preschool -	0	118
+																										
+23 Jan 26	RIS	1	0	0	0	0	0	0	5,490	0	0	0	0	0	0	9,859	0	1	Shorts Views - 159	151	22,423	0	0	rainbow international school	4	96
+	RPS	1	1	3,173	0	0	Likes - 80, Comm - 3, Avg. W - 16s (T-57s)	0	10,103	5	836	0	0	Likes - 9, Comm - 0, Avg. W - 9s (T-57s)	0	12,964	0	1	Shorts Views - 6	30	10,724	0	0	rainbow preschool	1	15
+																										
+24 Jan 26	RIS	1	0	0	0	0	0	0	5,510	20	0	0	0	0	0	9,862	3	1	Shorts Views - 691	136	17,343	0	0	rainbow international school	1	92
+	RPS	1	0	0	0	0	0	0	10,103	0	0	0	0	0	0	12,964	0	0	0	145	23,929	0	0	preschool admission	0	9
+																										
+"Week 4
+(19 Jan-25 Jan)"	RIS	6	1	139,740	46,711	93,029	1,813	↓ 9.3%	5,510	0	180,565	3,877	176,466	295	↓ 44.1%	9,862	0	7	28,353	1,084	153,846	0	0	rainbow international school thane	82	720
+	RPS	6	2	284,501	17,947	266,554	2,871	↑ 148.6%	10,103	0	277,773	5,160	272,613	516	↑ 214.6%	12,964	0	7	12,106	361	112,380	1	0	rainbow preschool -	7	3,580
+																										
+26 Jan 26	RIS	1	1	3,089	0	0	Likes - 131, Comm - 0, Avg. W - 10s (T-27s)	0	5,514	4	1,706	0	0	Likes - 34, Comm - 1, Avg. W - 8s (T-27s)	0	9,865	3	1	234	127	16,547	0	0	rainbow international school thane	10	92
+	RPS	16	1	1,682	0	0	Likes - 59, Comm - 0, Avg. W - 9s (T-23s)	0	10,108	5	662	0	0	Likes - 17, Comm - 1, Avg. W - 6s (T-23s)	0	12,964	0	0	0	66	14,125	0	0	rainbow preschool -	0	32
+																										
+27 Jan 26	RIS	1	1	2,008	0	0	Likes - 58, Comm - 0, Avg. W - 8s (T-24s)	0	5,527	13	534	0	0	Likes - 11, Comm - 0, Avg. W - 8s (T-27s)	0	9,866	1	1	22	133	15,139	0	0	rainbow international school	8	113
+	RPS	1	1	0	0	0	0	0	10,111	3	0	0	0	-	0	12,964	0	0	0	29	9,428	0	0	rainbow preschool -	0	50
+																										
+28 Jan 26	RIS	1	2	10,482	0	0	Likes - 209, Comm - 1, Avg. W - 8s (T-11s)	0	5,551	24	1,062	0	0	Likes - 11, Comm - 2, Avg. W - 6s (T-11s)	0	9,866	0	1	691	119	15,706	0	0	rainbow international school	4	123
+				10,226	0	0	Likes - 384, Comm - 13, Avg. W - 22s (T-2:03 Mins)	0			1,222	0	0	Likes - 17, Comm - 5, Avg. W - 11s (T-2:03 Mins)	0											
+	RPS	1	0	-	0	0	0	0	10,111	0	0	0	0	0	0	12,964	0	0	0	19	3,757	0	0	rainbow preschool -	0	30
+																										
+29 Jan 26	RIS	1	0	0	0	0	0	0	5,561	10	0	0	0	0	0	9,865	-1	1	92	133	13,987	0	0	rainbow international school	9	118
+	RPS	1	0	0	0	0	0	0	10,110	-1	0	0	0	0	0	12,964	0	0	0	18	3,247	0	0	preschool admission	0	10
+																										
+30 Jan 26	RIS	1	0	0	0	0	0	0	5,575	14	0	0	0	0	0	9,865	0	0	0	121	13,217	0	0	rainbow international school thane	20	95
+	RPS	1	0	0	0	0	0	0	10,111	1	0	0	0	0	0	12,964	0	0	0	11	2,696	0	0	preschool in kalwa	0	7
+																										
+"Week 5
+(23 Jan-1 Feb)"	RIS	6	4	91,852	74,656	17,196	3,336	↑ 82.3%	5,579	4	158,188	7,680	150,323	358	↑ 15.5%	9,861	-4	4	14,462	785	101,011	0	0	rainbow international school	32	655
+	RPS	21	2	183,064	22,678	160,386	850	↓ 70.8%	10,113	2	136,570	3,964	132,606	186	↓ 64.9%	12,964	0	0	64,308	127	32,310	0	0	rainbow preschool -	1	249
+																										
+"January 2026
+Report"	RIS	3	9	819,529	279,810	539,719	10,477	↑ 10%	5,579	0	1,314,022	37,599	1,276,423	2,445	↑ 19.7%	9,861	0	35	145,009	3,780	481,881	0	0	rainbow international school	160	3,315
+	RPS	3	5	1,615,925	84,534	1,531,391	9,238	↑ 274.6%	10,113	0	1,879,162	39,119	1,840,043	2,059	↑ 39.9%	12,964	0	31	138,364	1,066	307,620	1	0	rainbow preschool -	17	7,532
+																										
+1 Feb 26	RIS	0	0	0	0	0	0	0	5,580	5,580	0	0	0	0	0	9,861	9,861	0	0	104	16,335	0	0	rainbow international school thane	24	89
+	RPS	0	0	0	0	0	0	0	10,111	4,532	0	0	0	0	0	12,964	3,103	0	0	8	2,180	0	0	preschool admission	0	16
+																										
+2 Feb 26	RIS	1	1	2,644	0	0	Likes - 122, Comm - 1, Avg. W - 10s (T-28s)	0	5,580	1	548	0	0	Likes - 21, Comm - 3, Avg. W - 9s (T-28s)	0	9,861	0	1	61	110	15,562	0	0	rainbow international school thane	19	125
+	RPS	1	1	1,775	0	0	Likes - 59, Comm - 0, Avg. W - 13s (T-26s)	0	10,111	-2	853	0	0	Likes - 14, Comm - 0, Avg. W - 8s (T-26s)	0	12,964	0	0	0	7	2,272	0	0	rainbow preschool thane	0	11
+																										
+3 Feb 26	RIS	1	0	0	0	0	0	0	5,585	5	0	0	0	0	0	9,860	-1	1	81	139	12,116	0	0	rainbow international school thane	26	119
+	RPS	1	0	0	0	0	0	0	10,111	0	0	0	0	0	0	12,964	0	1	29 / New Channel - 3	12	1,994	0	0	preschool admission	0	18
+																										
+4 Feb 26	RIS	1	0	0	0	0	0	0	5,592	7	0	0	0	0	0	9,858	-2	1	45	137	13,500	0	0	rainbow international school thane	18	159
+	RPS	1	0	0	0	0	0	0	10,112	1	0	0	0	0	0	12,964	0	0	0	50	8,384	0	0	pre kg age	1	30
+																										
+5 Feb 26	RIS	1	0	0	0	0	0	0	5,589	-3	0	0	0	0	0	9,857	-1	1	249	135	13,256	0	0	rainbow international school thane	35	175
+	RPS	1	0	0	0	0	0	0	10,110	-2	0	0	0	0	0	12,963	-1	1	1	56	9,740	0	0	pre kg age	1	32
+																										
+6 Feb 26	RIS	1	1	4,380	0	0	Likes - 190, Comm - 1, Avg. W - 11s (T-25s)	0	5,594	5	974	0	0	Likes - 23, Comm - 2, Avg. W - 10s (T-25s)	0	9,858	1	1	149	128	12,168	0	0	rainbow international school thane	24	130
+	RPS	1	0	0	0	0	0	0	10,113	3	0	0	0	0	0	12,962	-1	0	0	26	8,372	0	0	pre kg age	0	22
+																										
+7 Feb 26	RIS	1	0	0	0	0	0	0	5,594	0	0	0	0	0	0	9,858	0	1	1,450	107	9,928	0	0	rainbow international school	2	87
+	RPS	1	0	0	0	0	0	0	10,113	0	0	0	0	0	0	12,962	0	1	90	17	5,687	0	0	rainbow preschool	1	21
+																										
+8 Feb 26	RIS	1	1	7,294	0	0	Likes - 205, Comm - 0, Avg. W - 9s (T-21s)	0	5,594	0	1,851	0	0	Likes - 21, Comm - 0, Avg. W - 7s (T-21s)	0	9,858	0	0	0	107	11,645	0	0	rainbow international school thane	19	101
+	RPS	0	0	0	0	0	0	0	10,113	0	0	0	0	0	0	12,962	0	0	0	36	6,822	0	0	pre kg age	0	32
+																										
+"Feb Week 1
+(2 Feb-8 Feb)"	RIS	6	3	50,865	36,831	14,034	1,270	↓ 62%	5,593	-1	66,558	6,389	60,169	187	↓ 48.2%	9,855	-3	6	12,934	883	90,603	0	0	rainbow international school thane	165	929
+	RPS	6	1	137,926	11,358	126,568	592	↓ 31.4%	10,114	1	191,507	4,068	187,439	229	↑ 23.1%	12,963	1	6	8,267	299	62,159	0	0	rainbow preschool	4	111
+																										
+9 Feb 26	RIS	1	0	0	0	0	0	0	5,593	0	0	0	0	0	0	9,855	0	1	826	145	12,855	0	0	rainbow international school thane	29	131
+	RPS	1	0	0	0	0	0	0	10,114	0	0	0	0	0	0	12,963	0	1	0	49	8,820	0	0	pre kg age	1	41
+																										
+10 Feb 26	RIS	1	0	0	0	0	0	0	5,592	-1	0	0	0	0	0	9,854	-1	1	243	143	13,219	0	0	rainbow international school thane	16	99
+	RPS	1	1	1,155	0	0	Likes - 23, Comm - 0, Avg. W - 10s (T-42s)	0	10,112	-2	398	0	0	Likes - 6, Comm - 0, Avg. W - 7s (T-42s)	0	12,963	0	1	24	44	10,336	0	0	pre kg age	0	48
+																										
+11 Feb 26	RIS	1	1	2,302	0	0	Likes - 42, Comm - 0, Avg. W - 6s (T-20s)	0	5,592	0	811	0	0	Likes - 13, Comm - 0, Avg. W - 6s (T-20s)	0	9,852	-2	1	1,463	141	16,593	0	0	rainbow international school thane	24	106
+	RPS	1	0	0	0	0	0	0	10,121	9	0	0	0	0	0	12,962	-1	1	1	49	10,462	0	0	pre kg age	2	54
+																										
+12 Feb 26	RIS	1	0	0	0	0	0	0	5,592	0	0	0	0	0	0	9,852	0	1	1	131	14,583	0	0	rainbow international school thane	23	108
+	RPS	1	0	0	0	0	0	0	10,121	0	0	0	0	0	0	12,962	0	0	0	50	10,064	0	0	pre kg age	1	48
+																										
+13 Feb 26	RIS	1	0	0	0	0	0	0	5,597	5	0	0	0	0	0	9,851	-1	1	28	99	11,608	0	0	rainbow international school thane	10	77
+	RPS	1	0	0	0	0	0	0	10,127	6	0	0	0	0	0	12,962	0	1	0	33	8,095	0	0	pre kg age	0	30
+																										
+14 Feb 26	RIS	1	1	4,986	0	0	Likes - 98, Comm - 0, Avg. W - 7s (T-7s)	0	5,604	7	1,062	0	0	Likes - 9, Comm - 0, Avg. W - 6s (T-7s)	0	9,853	2	1	1,757	74	11,815	0	0	rainbow international school thane	11	80
+	RPS	1	0	0	0	0	0	0	10,132	5	0	0	0	0	0	12,961	-1	0	0	23	5,940	0	0	pre kg age	0	33
+																										
+15 Feb 26	RIS	0	0	0	0	0	0	0	5,604	0	0	0	0	0	0	9,853	0	0	0	55	8,497	0	0	rainbow international school thane	4	39
+	RPS	0	0	0	0	0	0	0	10,132	0	0	0	0	0	0	12,961	0	0	0	14	3,203	0	0	daycare vs preschool	0	23
+																										
+"Feb Week 2
+(9 Feb-15 Feb)"	RIS	6	2	24,535	24,535	0	620	↓ 51.2%	5,604	11	3,459	3,462	0	61	↓ 6.9%	9,853	-2	5	10,790	810	94,248	0	0	rainbow international school thane	118	663
+	RPS	6	1	137,470	13,171	124,299	551	↓ 31.4%	10,132	18	191,788	2,901	188,887	183	↓ 20.1%	12,961	-2	4	8,547	276	60,113	0	0	pre kg age	3	283
+																										
+16 Feb 26	RIS	1	0	0	0	0	0	0	5,600	-4	0	0	0	0	0	9,852	-1	0	0	98	13,716	0	0	rainbow international school thane	21	121
+	RPS	1	1	1,561	0	0	Likes - 52, Comm - 0, Avg. W - 9s (T-19s)	0	10,138	6	481	0	0	Likes - 4, Comm - 1, Avg. W - 5s (T-19s)	0	12,960	-1	1	1,129	43	6,717	0	0	pre kg age	0	28
+																										
+17 Feb 26	RIS	1	0	0	0	0	0	0	5,598	-2	0	0	0	0	0	9,852	0	1	28	101	12,215	0	0	rainbow international school thane	18	79
+	RPS	1	0	0	0	0	0	0	10,141	3	0	0	0	0	0	12,959	-1	1	2	48	5,630	0	0	junior kg	0	35
+																										
+18 Feb 26	RIS	1	0	0	0	0	0	0	5,597	-1	0	0	0	0	0	9,851	-1	0	0	129	16,131	0	0	rainbow international school thane	22	101
+	RPS	4	0	0	0	0	0	0	10,142	1	0	0	0	0	0	12,959	0	1	1	44	7,521	0	0	pre kg age	0	48
+																										
+19 Feb 26	RIS	1	0	0	0	0	0	0	5,600	3	0	0	0	0	0	9,849	-2	0	0	119	15,312	0	0	rainbow international school	5	83
+	RPS	1	0	0	0	0	0	0	10,144	2	0	0	0	0	0	12,959	0	0	0	39	7,834	0	0	pre kg age	0	44
+																										
+20 Feb 26	RIS	1	0	0	0	0	0	0	5,599	-1	0	0	0	0	0	9,849	0	1	715	122	12,165	0	0	rainbow international school thane	22	89
+	RPS	1	0	0	0	0	0	0	10,146	2	0	0	0	0	0	12,958	-1	1	19	52	7,130	0	0	pre kg age	1	46
+																										
+21 Feb 26	RIS	1	1	2,161	0	0	Likes - 37 & Comm - 0	0	5,599	0	254	0	0	Likes - 12 & Comm - 0	0	9,849	0	1	Likes - 5	96	10,810	0	0	rainbow international school thane	13	67
+	RPS	2	1	2,040	0	0	Likes - 38, Comm - 0, Avg. W - 11s (T-31s)	0	10,146	0	1,386	0	0	Likes - 11, Comm - 0, Avg. W - 7s (T-31s)	0	12,958	0	1	60	32	5,257	0	0	play group age	0	47
+																										
+22 Feb 26	RIS	0	0	0	0	0	0	0	5,599	0	0	0	0	0	0	9,849	0	0	0	108	12,766	0	0	rainbow international school thane	12	83
+	RPS	0	0	0	0	0	0	0	10,146	0	0	0	0	0	0	12,958	0	0	0	31	6,195	0	0	play group age	1	54
+																										
+"Feb Week 3
+(16 Feb-22 Feb)"	RIS	6	1	15,065	15,063	2	295	↓ 52.7%	5,612	8	2,621	2,621	0	42	↓ 31.1%	9,849	-4	3	4,008	829	99,214	0	0	rainbow international school thane	124	663
+	RPS	10	2	152,334	21,525	130,809	815	↑ 45.8%	10,151	19	196,637	4,632	192,005	161	↓ 13.4%	12,956	-5	5	1,508	310	49,410	0	0	pre kg age	3	309
+																										
+23 Feb 26	RIS	0	0	0	0	0	0	0	5,613	1	0	0	0	0	0	9,849	0	0	0	127	13,293	0	0	rainbow international school thane	15	96
+	RPS	0	0	0	0	0	0	0	10,151	0	0	0	0	0	0	12,956	0	0	0	33	8,194	0	0	pre kg age	0	58
+																										
+24 Feb 26	RIS	1	0	0	0	0	0	0	5,615	2	0	0	0	0	0	9,848	-1	0	0	145	13,591	0	0	rainbow international school thane	27	107
+	RPS	1	0	0	0	0	0	0	10,152	1	0	0	0	0	0	12,957	1	1	0	59	9,159	0	0	play group age	0	67
+																										
+25 Feb 26	RIS	1	0	0	0	0	0	0	5,615	0	0	0	0	0	0	9,846	-2	0	0	121	12,630	0	0	rainbow international school thane	14	108
+	RPS	1	1	1,104	0	0	Likes - 20, Comm - 0, Avg. W - 8s (T-21s)	0	10,154	2	373	0	0	Likes - 5, Comm - 0, Avg. W - 8s (T-21s)	0	12,955	-2	1	14	36	7,465	0	0	pre kg age	1	59
+																										
+26 Feb 26	RIS	1	0	0	0	0	0	0	5,615	0	0	0	0	0	0	9,847	1	0	0	121	12,630	0	0	rainbow international school thane	23	91
+	RPS	1	0	0	0	0	0	0	10,157	3	0	0	0	0	0	12,953	-2	0	0	41	7,799	0	0	play group age	0	62
+																										
+27 Feb 26	RIS	1	0	0	0	0	0	0	5,619	4	0	0	0	0	0	9,846	-1	0	0	115	14,107	0	0	rainbow international school thane	17	103
+	RPS	1	0	0	0	0	0	0	10,158	1	0	0	0	0	0	12,954	1	1	17	32	8,379	0	0	play group age	0	46
+																										
+28 Feb 26	RIS	1	0	0	0	0	0	0	5,619	0	0	0	0	0	0	9,845	-1	0	0	100	10,556	0	0	rainbow international school thane	11	85
+	RPS	1	1	2,169	0	0	Likes - 54, Comm - 1, Avg. W - 9s (T-18s)	0	10,170	12	1,457	0	0	Likes - 11, Comm - 0, Avg. W - 6s (T-18s)	0	12,951	-3	1	6	33	6,967	0	0	pre kg age	0	41
+																										
+1 Mar 26	RIS	0	0	0	0	0	0	0	5,619	0	0	0	0	0	0	9,845	0	0	0	83	9,877	0	0	rainbow international school thane	6	82
+	RPS	0	0	0	0	0	0	0	10,170	0	0	0	0	0	0	12,951	0	0	0	52	8,466	0	0	pre kg age	0	47
+																										
+"Feb Week 4
+(23 Feb-01 Mar)"	RIS	5	0	9,875	9,875	0	184	↓ 36.8%	5,619	20	1,553	1,553	0	28	↓ 33.3%	9,845	-4	0	2,190	829	99,214	0	0	rainbow international school thane	122	687
+	RPS	5	2	160,686	21,700	138,986	866	↑ 6.3%	10,170	24	167,853	4,227	163,626	134	↓ 16.8%	12,951	-7	5	2,825	282	58,798	0	0	pre kg age	2	338
+																										
+"February 2026
+Report"	RIS	23	6	104,714	90,675	14,039	2,385	↓ 77.2%	5,619	40	97,926	14,229	83,697	351	↓ 85.6%	9,845	-16	12	34,886	3,425	384,940	0	0	rainbow international school thane	554	2,990
+	RPS	27	6	603,834	66,285	537,549	2,847	↓ 69.9%	10,170	57	752,248	15,202	737,046	703	↓ 65.9%	12,951	-13	19	24,298	1,047	212,211	0	0	pre kg age	9	1,064
+																										
+2 Mar 26	RIS	1	1	2,131	0	0	Likes - 72, Comm - 0, Avg. W - 9s (T-39s)	0	5,619	0	419	0	0	Likes - 4, Comm - 0, Avg. W - 8s (T-39s)	0	9,845	0	1	68	104	9,243	0	0	rainbow international school thane	15	68
+	RPS	2	1	1,889	0	0	Likes - 47, Comm - 2, Avg. W - 10s (T-28s)	0	10,170	0	904	0	0	Likes - 9, Comm - 0, Avg. W - 6s (T-28s)	0	12,951	0	1	32	39	8,418	0	0	pre kg age	0	43
+																										
+3 Mar 26	RIS	1	0	0	0	0	0	0	5,619	0	0	0	0	0	0	9,845	0	0	0	75	8,544	0	0	rainbow international school	5	68
+	RPS	2	0	0	0	0	0	0	10,170	0	0	0	0	0	0	12,951	0	0	0	36	8,757	0	0	pre kg age	0	65
+																										
+4 Mar 26	RIS	1	0	0	0	0	0	0	5,626	7	0	0	0	0	0	9,844	-1	0	0	121	8,634	0	0	rainbow international school	21	107
+	RPS	1	0	0	0	0	0	0	10,173	3	0	0	0	0	0	12,950	-1	0	0	42	8,026	0	0	pre kg age	0	46
+																										
+5 Mar 26	RIS	1	0	0	0	0	0	0	5,626	0	0	0	0	0	0	9,844	0	0	0	131	12,940	0	0	rainbow international school thane	16	98
+	RPS	1	0	0	0	0	0	0	10,173	0	0	0	0	0	0	12,950	0	1	18	38	4,223	0	0	pre kg age	2	70
+																										
+6 Mar 26	RIS	1	0	0	0	0	0	0	5,630	4	0	0	0	0	0	9,845	1	0	0	131	11,974	0	0	rainbow international school thane	22	116
+	RPS	1	0	0	0	0	0	0	10,177	4	0	0	0	0	0	12,949	-1	0	0	24	3,816	0	0	pre kg age	0	57
+																										
+7 Mar 26	RIS	1	0	0	0	0	0	0	5,631	1	0	0	0	0	0	9,844	-1	0	0	94	8,900	0	0	rainbow international school thane	10	76
+	RPS	1	0	0	0	0	0	0	10,187	10	0	0	0	0	0	12,949	0	0	0	30	5,063	0	0	pre kg age	0	30
+																										
+8 Mar 26	RIS	0	0	0	0	0	0	0	5,631	0	0	0	0	0	0	9,844	0	0	0	92	8,823	0	0	rainbow international school thane	14	57
+	RPS	0	0	0	0	0	0	0	10,187	0	0	0	0	0	0	12,949	0	0	0	21	5,832	0	0	pre kg	0	21
+																										
+"March Week 1
+(02 Mar-08 Mar)"	RIS	6	1	12,437	12,437	0	274	↑ 48.9%	5,631	12	2,938	2,938	0	40	↑ 42.9%	9,845	0	1	9,975	727	67,904	0	0	rainbow international school thane	103	621
+	RPS	8	1	139,326	18,379	120,947	855	↓ 1.3%	10,187	17	113,636	3,147	110,340	68	↓ 49.3%	12,951	0	2	9,538	234	42,781	0	0	pre kg age	2	312
+																										
+9 Mar 26	RIS	1	1	1,629	0	0	Likes - 47, Comm - 0, Avg. W - 11s (T-23s)	0	5,633	2	0	0	0	0	0	9,845	1	1	64	125	11,126	0	0	rainbow international school thane	20	110
+	RPS	1	0	0	0	0	0	0	10,194	7	0	0	0	Likes - 6, Comm - 0, Avg. W - 9s (T-23s)	0	12,950	1	0	0	42	9,213	0	0	pre kg age	2	66
+																										
+10 Mar 26	RIS	1	0	0	0	0	0	0	5,635	2	0	0	0	0	0	9,845	0	0	0	99	10,396	0	0	rainbow international school thane	12	98
+	RPS	1	0	0	0	0	0	0	10,200	6	0	0	0	0	0	12,949	-1	1	4	41	8,967	0	0	pre kg age	2	66
+																										
+11 Mar 26	RIS	1	0	0	0	0	0	0	5,635	0	0	0	0	0	0	9,846	1	0	0	110	10,688	0	0	rainbow international school thane	12	92
+	RPS	1	1	1,898	0	0	Likes - 55, Comm - 0, Avg. W - 11s (T-22s)	0	10,206	6	669	0	0	Likes - 7, Comm - 0, Avg. W - 11s (T-22s)	0	12,949	0	0	0	38	5,992	0	0	pre kg age	0	56
+																										
+12 Mar 26	RIS	1	1	2,618	0	0	Likes - 49, Comm - 0, Avg. W - 7s (T-10s)	0	5,637	2	586	0	0	Likes - 2, Comm - 0, Avg. W - 7s (T-10s)	0	9,846	0	0	0	125	10,528	0	0	rainbow international school thane	20	123
+	RPS	1	0	0	0	0	0	0	10,215	9	0	0	0	0	0	12,949	0	0	0	43	6,747	0	0	pre kg age	0	43
+																										
+13 Mar 26	RIS	1	0	0	0	0	0	0	5,634	-3	0	0	0	0	0	9,846	0	1	163	104	8,894	0	0	rainbow international school thane	22	91
+	RPS	1	1	0	0	0	Likes - 14, Comm - 0	0	10,222	7	0	0	0	Likes - 9, Comm - 0	0	12,949	0	1	Likes - 1	27	5,349	0	0	pre kg age	0	30
+																										
+14 Mar 26	RIS	1	0	0	0	0	0	0	5,631	-3	0	0	0	0	0	9,848	2	0	0	89	9,265	0	0	rainbow international school thane	23	115
+	RPS	1	0	0	0	0	0	0	10,230	8	0	0	0	0	0	12,951	2	0	0	29	2,951	0	0	pre kg age	0	29
+																										
+15 Mar 26	RIS	0	0	0	0	0	0	0	5,631	0	0	0	0	0	0	9,848	0	0	0	68	6,344	0	0	rainbow international school thane	12	55
+	RPS	1	0	0	0	0	0	0	10,230	0	0	0	0	0	0	12,951	0	0	0	18	1,810	0	0	pre kg age	0	25
+																										
+"March Week 2
+(09 Mar-15 Mar)"	RIS	6	2	17,330	17,330	0	522	↑ 87.8%	5,631	0	2,964	2,964	0	37	↓ 7.5%	9,848	3	2	6,915	781	72,351	0	0	rainbow international school thane	136	746
+	RPS	7	2	161,141	25,863	135,278	1,082	↑ 23.7%	10,230	43	133,139	5,180	127,959	80	↑ 15.9%	12,951	0	2	11,447	246	42,314	0	0	pre kg age	3	319
+																										
+16 Mar 26	RIS	1	0	0	0	0	0	0	5,636	5	0	0	0	0	0	9,847	-1	0	0	130	11,708	0	0	rainbow international school thane	27	175
+	RPS	1	0	0	0	0	0	0	10,237	7	0	0	0	0	0	12,950	-1	0	0	41	4,394	0	0	pre kg age	0	66
+																										
+17 Mar 26	RIS	1	0	0	0	0	0	0	5,640	4	0	0	0	0	0	9,847	0	0	0	114	10,393	0	0	rainbow international school thane	22	130
+	RPS	1	0	0	0	0	0	0	10,242	5	0	0	0	0	0	12,950	0	0	0	37	3,906	0	0	play group age	1	55
+																										
+18 Mar 26	RIS	1	0	0	0	0	0	0	5,647	7	0	0	0	0	0	9,848	1	0	0	93	8,666	0	0	rainbow international school thane	17	93
+	RPS	1	1	1,700	0	0	Likes - 47, Comm - 0, Avg. W - 10s (T-27s)	0	10,247	5	0	0	0	Likes - 6, Comm - 1, Avg. W - 8s (T-27s)	0	12,950	0	1	163	26	3,034	0	0	pre kg age	0	45
+																										
+19 Mar 26	RIS	1	0	0	0	0	0	0	5,645	-2	0	0	0	0	0	9,847	-1	0	0	79	8,061	0	0	rainbow international school thane	17	92
+	RPS	1	0	0	0	0	0	0	10,253	6	0	0	0	0	0	12,950	0	0	0	14	2,335	0	0	pre kg age	0	43
+																										
+20 Mar 26	RIS	1	0	0	0	0	0	0	5,651	6	0	0	0	0	0	9,845	-2	0	0	119	7,964	0	0	rainbow international school thane	24	94
+	RPS	1	0	0	0	0	0	0	10,271	18	0	0	0	0	0	12,948	-2	0	0	15	2,666	0	0	pre kg age	0	37
+																										
+21 Mar 26	RIS	1	0	0	0	0	0	0	5,651	0	0	0	0	0	0	9,845	0	0	0	96	7,248	0	0	rainbow international school	6	139
+	RPS	1	1	968	0	0	Likes - 22, Comm - 0, Avg. W - 7s (T-22s)	0	10,271	0	642	0	0	Likes - 3, Comm - 0, Avg. W - 4s (T-22s)	0	12,948	0	1	3	23	2,161	0	0	pre kg age	0	39
+																										
+22 Mar 26	RIS	0	0	0	0	0	0	0	5,651	0	0	0	0	0	0	9,845	0	0	0	103	7,647	0	0	rainbow international school	6	123
+	RPS	0	0	0	0	0	0	0	10,271	0	0	0	0	0	0	12,948	0	0	0	12	2,236	0	0	senior kg means	1	66
+																										
+"March Week 3
+(16 Mar-22 Mar)"	RIS	6	0	16,950	12,093	4,857	184	↓ 64.8%	5,651	20	13,837	799	13,038	16	↓ 56.8%	9,845	-3	0	4,477	719	61,941	0	0	rainbow international school thane	123	723
+	RPS	6	2	150,837	18,001	132,836	813	↓ 26%	10,271	41	125,707	4,603	121,104	80	↓ 1.2%	12,948	-3	2	4,476	163	20,420	0	0	pre kg age	1	304
+																										
+23 Mar 26	RIS	1	0	0	0	0	0	0	5,656	5	0	0	0	0	0	9,845	0	0	0	188	10,739	0	0	rainbow international school	10	276
+	RPS	1	0	0	0	0	0	0	10,279	8	0	0	0	0	0	12,948	0	0	0	35	3,454	0	0	rainbow kids play school	0	87
+																										
+24 Mar 26	RIS	1	0	0	0	0	0	0	5,654	-2	0	0	0	0	0	9,845	0	0	0	180	11,794	0	0	rainbow international school	13	242
+	RPS	1	1	3,858	0	0	Likes - 64, Comm - 0, Avg. W - 7s (T-10s)	0	10,279	0	591	0	0	Likes - 7, Comm - 0, Avg. W - 6s (T-10s)	0	12,948	0	0	0	26	2,671	0	0	pre kg age	0	69
+																										
+25 Mar 26	RIS	1	0	0	0	0	0	0	5,655	1	0	0	0	0	0	9,844	-1	0	0	150	10,986	0	0	rainbow international school	11	116
+	RPS	1	0	0	0	0	0	0	10,313	34	0	0	0	0	0	12,946	-2	1	19	22	2,420	0	0	senior kg means	0	38
+																										
+26 Mar 26	RIS	1	0	0	0	0	0	0	5,655	0	0	0	0	0	0	9,843	-1	0	0	96	8,617	0	0	rainbow international school	7	89
+	RPS	1	0	0	0	0	0	0	10,319	6	0	0	0	0	0	12,946	0	0	0	19	2,167	0	0	pre kg full form	0	55
+																										
+27 Mar 26	RIS	1	0	0	0	0	0	0	5,655	0	0	0	0	0	0	9,843	0	0	0	131	10,735	0	0	rainbow international school	4	118
+	RPS	1	0	0	0	0	0	0	10,319	0	0	0	0	0	0	12,946	0	0	0	23	2,752	0	0	pre kg full form	0	64
+																										
+28 Mar 26	RIS	1	1	0	0	0	Likes - 32, Comm - 0	0	5,657	2	0	0	0	Likes - 4, Comm - 0	0	9,843	0	0	0	112	10,683	0	0	rainbow international school thane	21	87
+	RPS	1	1	1,639	0	0	Likes - 49, Comm - 0, Avg. W - 9s (T-22s)	0	10,325	6	754	0	0	Likes - 8, Comm - 0, Avg. W - 4s (T-22s)	0	12,946	0	1	17	24	2,475	0	0	pre kg full form	0	51
+																										
+29 Mar 26	RIS	0	0	0	0	0	0	0	5,660	3	0	0	0	0	0	9,843	0	0	0	69	8,148	0	0	rainbow international school thane	13	61
+	RPS	0	0	0	0	0	0	0	10,329	4	0	0	0	0	0	12,946	0	0	0	18	1,731	0	0	pre kg age	0	41
+																										
+"March Week 4
+(23 Mar-29 Mar)"	RIS	6	1	10,860	10,860	0	243	↑ 25.9%	5,664	13	831	831	0	27	↑ 68.8%	9,842	-3	0	2,165	930	73,030	0	0	rainbow international school	50	987
+	RPS	6	2	259,826	30,253	229,573	1,225	↑ 47.1%	10,335	64	250,378	3,915	246,166	110	↑ 34.1%	12,948	0	2	3,746	168	17,717	0	0	pre kg full form	0	392
+																										
+30 Mar 26	RIS	1	0	0	0	0	0	0	5,664	0	0	0	0	0	0	9,842	0	0	0	140	11,409	0	0	rainbow international school thane	25	144
+	RPS	1	0	0	0	0	0	0	10,341	6	0	0	0	0	0	12,948	0	0	0	35	3,204	0	0	pre kg full form	0	63
+																										
+31 Mar 26	RIS	1	0	0	0	0	0	0	5,663	-1	0	0	0	0	0	9,840	-2	0	0	104	10,610	0	0	rainbow international school thane	20	101
+	RPS	1	0	0	0	0	0	0	10,352	11	0	0	0	0	0	12,948	0	0	0	36	2,876	0	0	pre kg age	2	72
+																										
+1 Apr 26	RIS	1	0	0	0	0	0	0	5,664	1	0	0	0	0	0	9,838	-2	0	0	144	9,739	0	0	rainbow international school thane	32	132
+	RPS	1	1	28,563	0	0	Likes - 240, Comm - 0, Avg. W - 9s (T-13s)	0	10,365	13	1,815	0	0	Likes - 15, Comm - 0, Avg. W - 6s (T-13s)	0	12,946	-2	1	14	27	3,147	0	0	pre kg full form	0	68
+																										
+2 Apr 26	RIS	1	0	0	0	0	0	0	5,664	0	0	0	0	0	0	9,838	0	0	0	120	10,849	0	0	rainbow international school thane	24	112
+	RPS	1	0	0	0	0	0	0	10,369	4	0	0	0	0	0	12,946	0	0	0	20	2,201	0	0	junior kg	0	66
+																										
+3 Apr 26	RIS	1	0	0	0	0	0	0	5,667	3	0	0	0	0	0	9,838	0	0	0	110	8,310	0	0	rainbow international school	7	107
+	RPS	1	0	0	0	0	0	0	10,375	6	0	0	0	0	0	12,946	0	0	0	25	1,950	0	0	junior kg	0	63
+																										
+4 Apr 26	RIS	1	0	0	0	0	0	0	5,669	2	0	0	0	0	0	9,838	0	0	0	97	7,013	0	0	rainbow international school thane	17	93
+	RPS	1	1	0	0	0	Likes - 42, Comm - 3	0	10,379	4	0	0	0	Likes - 5, Comm - 0	0	12,946	0	1	Likes - 3	14	1,415	0	0	pre kg full form	0	46
+																										
+5 Apr 26	RIS	0	0	0	0	0	0	0	5,670	1	0	0	0	0	0	9,840	2	0	0	88	5,722	0	0	rainbow international school thane	16	107
+	RPS	0	0	0	0	0	0	0	10,391	12	0	0	0	0	0	12,948	2	0	0	9	1,593	0	0	preschool near me	0	63
+																										
+"April Week 1
+(30 Mar-05 Apr)"	RIS	6	0	9,290	9,290	0	203	↓ 15.4%	5,672	8	433	433	0	16	↓ 40.7%	9,842	0	0	1,821	815	65,061	0	0	rainbow international school	147	810
+	RPS	6	2	295,300	47,543	247,757	1,808	↑ 47.1%	10,405	70	241,032	4,726	236,306	166	↑ 49.5%	12,948	0	2	5,512	172	16,794	0	0	pre kg full form	0	330
+																										
+6 Apr 26	RIS	0	0	0	0	0	0	0	5,672	2	0	0	0	0	0	9,840	0	0	0	94	6,905	0	0	rainbow international school thane	23	138
+	RPS	0	0	0	0	0	0	0	10,405	14	0	0	0	0	0	12,948	0	0	0	37	2,075	0	0	preschool near me	1	96
+																										
+7 Apr 26	RIS	0	0	0	0	0	0	0	5,676	4	0	0	0	0	0	9,842	0	0	0	75	6,175	0	0	rainbow international school thane	25	140
+	RPS	0	0	0	0	0	0	0	10,427	22	0	0	0	0	0	12,948	0	0	0	32	1,897	0	0	preschool near me	2	86
+																										
+8 Apr 26	RIS	1	0	0	0	0	0	0	5,680	4	0	0	0	0	0	9,842	2	0	0	81	4,975	0	0	rainbow international school thane	18	99
+	RPS	1	0	0	0	0	0	0	10,430	3	0	0	0	0	0	12,950	2	0	0	26	1,937	0	0	preschool near me	0	65
+																										
+9 Apr 26	RIS	1	0	0	0	0	0	0	5,681	1	0	0	0	0	0	9,842	0	0	0	56	4,754	0	0	rainbow international school thane	13	158
+	RPS	1	0	0	0	0	0	0	10,435	5	0	0	0	0	0	12,950	0	0	0	16	2,023	0	0	preschool near me	0	105
+																										
+10 Apr 26	RIS	1	0	0	0	0	0	0	5,681	0	0	0	0	0	0	9,842	0	0	0	80	4,409	0	0	rainbow international school thane	23	120
+	RPS	1	0	0	0	0	0	0	10,438	3	0	0	0	0	0	12,950	0	0	0	41	1,699	0	0	preschool near me	0	96
+																										
+11 Apr 26	RIS	1	0	0	0	0	0	0	5,681	0	0	0	0	0	0	9,842	0	0	0	35	2,771	0	0	rainbow international school thane	9	79
+	RPS	1	0	1,624	0	0	Likes - 9, Comm - 0, Avg. W - 0.5s (T-0.5s)	0	10,441	3	0	0	0	0	0	12,947	-3	0	0	14	1,060	0	0	pre kg full form	0	37
+																										
+12 Apr 26	RIS	0	0	0	0	0	0	0	5,681	0	0	0	0	0	0	9,842	0	0	0	24	1,881	0	0	rainbow international school thane	4	38
+	RPS	0	0	0	0	0	0	0	10,448	7	0	0	0	0	0	12,947	0	0	0	4	669	0	0	pre kg full form	0	22
+																										
+"April Week 2
+(06 Apr-12 Apr)"	RIS	4	0	8,724	8,723	1	149	↓ 26.6%	5,681	9	463	463	0	21	↑ 31.3%	9,842	0	0	2,337	454	31,861	0	0	rainbow international school thane	119	778
+	RPS	4	0	131,215	19,106	112,109	708	↓ 60.8%	10,448	43	115,065	1,957	113,108	57	↓ 65.7%	12,947	-1	0	2,671	159	11,435	0	0	preschool near me	2	463
+																										
+13 Apr 26	RIS	1	0	1,896	0	0	Likes - 94, Comm - 0, Avg. W - 14s (T-22s)	0	5,679	-2	713	0	0	Likes - 21, Comm - 0, Avg. W - 7s (T-22s)	0	9,839	-3	0	0	58	4,396	0	0	rainbow international school thane	14	118
+	RPS	1	0	0	0	0	0	0	10,450	2	0	0	0	0	0	12,946	-1	0	0	13	1,422	0	0	pre kg full form	0	56
+																										
+14 Apr 26	RIS	1	0	0	0	0	0	0	5,679	0	0	0	0	0	0	9,838	-1	1	275	43	3,828	0	0	rainbow international school thane	14	92
+	RPS	1	0	0	0	0	0	0	10,454	4	0	0	0	0	0	12,947	1	1	53	6	1,019	0	0	pre kg full form	0	17
+																										
+15 Apr 26	RIS	1	1	0	0	0	Likes - 25, Comm - 0	0	5,681	2	0	0	0	Likes - 3, Comm - 0	0	9,840	2	0	0	92	4,387	0	0	rainbow international school thane	21	130
+	RPS	1	1	1,952	0	0	Likes - 38, Comm - 0, Avg. W - 7s (T-22s)	0	10,460	6	691	0	0	Likes - 8, Comm - 0, Avg. W - 4s (T-22s)	0	12,947	0	0	0	16	934	0	0	pre kg full form	0	40

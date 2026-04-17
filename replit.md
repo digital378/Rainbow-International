@@ -105,6 +105,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/school-near-brahmand-thane` | Locality: Brahmand | `pages/SchoolNearBrahmand.tsx` |
 | `/school-near-ghodbunder-road-thane` | Locality: GB Road | `pages/SchoolNearGhodbunderRoad.tsx` |
 | `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
+| `/marketing` | Marketing Dashboard (noindex) | `pages/Marketing.tsx` |
 
 ## Key Components
 

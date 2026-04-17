@@ -56,6 +56,7 @@ const Fees = lazy(() => import("@/pages/Fees"));
 const SchoolNearBrahmand = lazy(() => import("@/pages/SchoolNearBrahmand"));
 const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunderRoad"));
 const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
+const Marketing = lazy(() => import("@/pages/Marketing"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
@@ -119,6 +120,7 @@ function Router() {
       <Route path="/school-near-brahmand-thane" component={SchoolNearBrahmand} />
       <Route path="/school-near-ghodbunder-road-thane" component={SchoolNearGhodbunderRoad} />
       <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
+      <Route path="/marketing" component={Marketing} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>
