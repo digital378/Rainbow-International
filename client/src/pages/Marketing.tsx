@@ -735,7 +735,7 @@ export default function Marketing() {
             {[
               { label: "Leads → Bookings", from: totals.leads, to: totals.bookings, color: PURPLE },
               { label: "Bookings → Walk-ins", from: totals.bookings, to: totals.walkins, color: CYAN },
-              { label: "Walk-ins → Admissions", from: totals.walkins, to: totals.admissions, color: GREEN },
+              { label: "Walk-ins → Admissions", from: totals.walkins, to: ytdAdmissionsFull, color: GREEN },
             ].map(s => {
               const conv = (s.to / Math.max(s.from, 1)) * 100;
               const dropoff = 100 - conv;
