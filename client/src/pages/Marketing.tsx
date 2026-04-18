@@ -500,19 +500,13 @@ export default function Marketing() {
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
-          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 16, 2026) · Ad spend active Dec onwards" />
+          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 16, 2026)" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${num(totals.leads)} ad-driven · ${num(organic.leads)} organic`} color={NAVY} />
-            <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of ad-driven leads`} color={PURPLE} />
-            <KpiCard label="Total Walk-ins" value={num(totals.walkins)} sub={`${pct(leadToWalk)} of ad-driven leads`} color={CYAN} />
-            <KpiCard
-              label="Total Admissions"
-              value={num(ytdAdmissionsFull)}
-              sub={`${num(totals.admissions)} ad-driven (Dec–Apr) + ${num(organic.admissions)} organic (Jun–Nov)`}
-              color={GREEN}
-              tooltip="Full AY admissions reconciles with sheet TOTAL TILL DATE"
-            />
-            <KpiCard label="Marketing Spend" value={inr(totals.spend)} sub="Meta + Google (5 mo)" color={RED} />
+            <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 11).toFixed(0)} avg/month`} color={NAVY} />
+            <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of leads`} color={PURPLE} />
+            <KpiCard label="Total Walk-ins" value={num(totals.walkins)} sub={`${pct(leadToWalk)} of leads`} color={CYAN} />
+            <KpiCard label="Total Admissions" value={num(ytdAdmissionsFull)} sub={`${pct(walkToAdm)} of walk-ins`} color={GREEN} />
+            <KpiCard label="Marketing Spend" value={inr(totals.spend)} sub="Meta + Google" color={RED} />
             <KpiCard label="Min. ROI (Mktg)" value={`${ytdMarketingRoi.toFixed(0)}%`} sub={`True ROI: ${ytdTrueRoi.toFixed(0)}%`} color={GREEN} />
           </div>
         </section>
