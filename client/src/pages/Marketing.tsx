@@ -1252,6 +1252,174 @@ export default function Marketing() {
           </div>
         </section>
 
+        {/* ───────── 13b. YEAR-ON-YEAR MONTH COMPARISON (Dec-Apr) ───────── */}
+        <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <SectionTitle
+            title="YoY Month-by-Month Comparison — Dec to Apr"
+            sub={`Combined RIS + RPS · LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`}
+          />
+          {(() => {
+            const LY_FIXED = 250000 + 85000; // ₹3,35,000/mo (salary + agency)
+            const TY_FIXED = monthlyFixed;
+            const monthsYoY = [
+              { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] }, // Dec24 vs Dec25
+              { label: "Jan", ly: LAST_YEAR[3], ty: segmentRows[1] },
+              { label: "Feb", ly: LAST_YEAR[4], ty: segmentRows[2] },
+              { label: "Mar", ly: LAST_YEAR[5], ty: segmentRows[3] },
+              { label: "Apr", ly: LAST_YEAR[6], ty: segmentRows[4] },
+            ];
+            type Row = {
+              label: string;
+              lySpend: number; tySpend: number;
+              lyDept: number; tyDept: number;
+              lyAdm: number; tyAdm: number;
+              lyTrueCpa: number; tyTrueCpa: number;
+              lyTrueRoi: number; tyTrueRoi: number;
+            };
+            const rows: Row[] = monthsYoY.map(m => {
+              const lySpend = m.ly.ris.spend + m.ly.rps.spend;
+              const tySpend = m.ty.spend;
+              const lyAdm = m.ly.ris.admissions + m.ly.rps.admissions;
+              const tyAdm = m.ty.admissions;
+              const lyDept = lySpend + LY_FIXED;
+              const tyDept = tySpend + TY_FIXED;
+              const lyRev = lyAdm * MIN_REVENUE_PER_ADM;
+              const tyRev = tyAdm * MIN_REVENUE_PER_ADM;
+              return {
+                label: m.label,
+                lySpend, tySpend,
+                lyDept, tyDept,
+                lyAdm, tyAdm,
+                lyTrueCpa: lyAdm > 0 ? lyDept / lyAdm : 0,
+                tyTrueCpa: tyAdm > 0 ? tyDept / tyAdm : 0,
+                lyTrueRoi: lyDept > 0 ? ((lyRev - lyDept) / lyDept) * 100 : 0,
+                tyTrueRoi: tyDept > 0 ? ((tyRev - tyDept) / tyDept) * 100 : 0,
+              };
+            });
+            const tot: Row = rows.reduce((a, r) => ({
+              label: "TOTAL",
+              lySpend: a.lySpend + r.lySpend, tySpend: a.tySpend + r.tySpend,
+              lyDept: a.lyDept + r.lyDept, tyDept: a.tyDept + r.tyDept,
+              lyAdm: a.lyAdm + r.lyAdm, tyAdm: a.tyAdm + r.tyAdm,
+              lyTrueCpa: 0, tyTrueCpa: 0, lyTrueRoi: 0, tyTrueRoi: 0,
+            }), { label: "TOTAL", lySpend: 0, tySpend: 0, lyDept: 0, tyDept: 0, lyAdm: 0, tyAdm: 0, lyTrueCpa: 0, tyTrueCpa: 0, lyTrueRoi: 0, tyTrueRoi: 0 });
+            tot.lyTrueCpa = tot.lyAdm > 0 ? tot.lyDept / tot.lyAdm : 0;
+            tot.tyTrueCpa = tot.tyAdm > 0 ? tot.tyDept / tot.tyAdm : 0;
+            tot.lyTrueRoi = tot.lyDept > 0 ? ((tot.lyAdm * MIN_REVENUE_PER_ADM - tot.lyDept) / tot.lyDept) * 100 : 0;
+            tot.tyTrueRoi = tot.tyDept > 0 ? ((tot.tyAdm * MIN_REVENUE_PER_ADM - tot.tyDept) / tot.tyDept) * 100 : 0;
+
+            const deltaPct = (ly: number, ty: number) => ly === 0 ? 0 : ((ty - ly) / ly) * 100;
+            // For cost-style metrics lower is better → green when delta < 0
+            const DeltaCell = ({ ly, ty, lowerBetter = false, isPP = false }: { ly: number; ty: number; lowerBetter?: boolean; isPP?: boolean }) => {
+              const d = isPP ? (ty - ly) : deltaPct(ly, ty);
+              const positive = d > 0;
+              const good = lowerBetter ? !positive : positive;
+              if (Math.abs(d) < 0.05) return <span className="text-gray-400">—</span>;
+              const cls = good ? "text-green-700" : "text-red-600";
+              const arrow = positive ? "▲" : "▼";
+              const txt = isPP ? `${positive ? "+" : ""}${d.toFixed(0)} pp` : `${positive ? "+" : ""}${d.toFixed(1)}%`;
+              return <span className={`font-semibold ${cls}`}>{arrow} {txt}</span>;
+            };
+
+            // Top KPI summary
+            const totalSavings = (tot.lyDept - tot.tyDept);
+            const admDelta = deltaPct(tot.lyAdm, tot.tyAdm);
+            const cpaDelta = deltaPct(tot.lyTrueCpa, tot.tyTrueCpa);
+
+            return (
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+                  <div className="rounded-xl p-4 bg-blue-50 border-l-4 border-blue-400">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-blue-700">LY Total Ad Spend</div>
+                    <div className="text-2xl font-black text-[#091a4f] mt-1">{inr(tot.lySpend)}</div>
+                    <div className="text-[11px] text-gray-500 mt-1">TY: {inr(tot.tySpend)} · <DeltaCell ly={tot.lySpend} ty={tot.tySpend} lowerBetter /></div>
+                  </div>
+                  <div className="rounded-xl p-4 bg-amber-50 border-l-4 border-amber-400">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-amber-700">LY Total Dept Cost</div>
+                    <div className="text-2xl font-black text-[#091a4f] mt-1">{inr(tot.lyDept)}</div>
+                    <div className="text-[11px] text-gray-500 mt-1">TY: {inr(tot.tyDept)} · {totalSavings >= 0 ? <span className="text-green-700 font-semibold">saved {inr(totalSavings)}</span> : <span className="text-red-600 font-semibold">+{inr(-totalSavings)}</span>}</div>
+                  </div>
+                  <div className="rounded-xl p-4 bg-green-50 border-l-4 border-green-400">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-green-700">Admissions YoY</div>
+                    <div className="text-2xl font-black text-[#091a4f] mt-1">{tot.lyAdm} → {tot.tyAdm}</div>
+                    <div className="text-[11px] text-gray-500 mt-1"><DeltaCell ly={tot.lyAdm} ty={tot.tyAdm} /></div>
+                  </div>
+                  <div className="rounded-xl p-4 bg-purple-50 border-l-4 border-purple-400">
+                    <div className="text-[10px] uppercase tracking-wider font-bold text-purple-700">True CPA YoY</div>
+                    <div className="text-2xl font-black text-[#091a4f] mt-1">{inr(tot.lyTrueCpa)} → {inr(tot.tyTrueCpa)}</div>
+                    <div className="text-[11px] text-gray-500 mt-1"><DeltaCell ly={tot.lyTrueCpa} ty={tot.tyTrueCpa} lowerBetter /> {cpaDelta < 0 ? "(more efficient)" : "(less efficient)"}</div>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr style={{ background: SLATE }} className="text-white">
+                        <th rowSpan={2} className="py-2 px-2 text-left font-semibold">Month</th>
+                        <th colSpan={3} className="py-2 px-2 text-center font-semibold border-l border-white/20">Ad Spend</th>
+                        <th colSpan={3} className="py-2 px-2 text-center font-semibold border-l border-white/20">Dept Cost (Ad + Fixed)</th>
+                        <th colSpan={3} className="py-2 px-2 text-center font-semibold border-l border-white/20">Admissions</th>
+                        <th colSpan={3} className="py-2 px-2 text-center font-semibold border-l border-white/20">True CPA</th>
+                        <th colSpan={3} className="py-2 px-2 text-center font-semibold border-l border-white/20">True ROI</th>
+                      </tr>
+                      <tr style={{ background: SLATE }} className="text-white text-[10px]">
+                        <th className="py-1 px-2 text-center border-l border-white/20">LY 24-25</th><th className="py-1 px-2 text-center">TY 25-26</th><th className="py-1 px-2 text-center">Δ</th>
+                        <th className="py-1 px-2 text-center border-l border-white/20">LY</th><th className="py-1 px-2 text-center">TY</th><th className="py-1 px-2 text-center">Δ</th>
+                        <th className="py-1 px-2 text-center border-l border-white/20">LY</th><th className="py-1 px-2 text-center">TY</th><th className="py-1 px-2 text-center">Δ</th>
+                        <th className="py-1 px-2 text-center border-l border-white/20">LY</th><th className="py-1 px-2 text-center">TY</th><th className="py-1 px-2 text-center">Δ</th>
+                        <th className="py-1 px-2 text-center border-l border-white/20">LY</th><th className="py-1 px-2 text-center">TY</th><th className="py-1 px-2 text-center">Δ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r, i) => (
+                        <tr key={i} className={`border-b border-gray-50 ${i % 2 === 0 ? "bg-gray-50/50" : ""}`}>
+                          <td className="py-2 px-2 font-bold text-[#091a4f]">{r.label}</td>
+                          <td className="py-2 px-2 text-center border-l border-gray-100">{inr(r.lySpend)}</td>
+                          <td className="py-2 px-2 text-center">{inr(r.tySpend)}</td>
+                          <td className="py-2 px-2 text-center"><DeltaCell ly={r.lySpend} ty={r.tySpend} lowerBetter /></td>
+                          <td className="py-2 px-2 text-center border-l border-gray-100">{inr(r.lyDept)}</td>
+                          <td className="py-2 px-2 text-center">{inr(r.tyDept)}</td>
+                          <td className="py-2 px-2 text-center"><DeltaCell ly={r.lyDept} ty={r.tyDept} lowerBetter /></td>
+                          <td className="py-2 px-2 text-center border-l border-gray-100 font-bold text-green-700">{r.lyAdm}</td>
+                          <td className="py-2 px-2 text-center font-bold text-green-700">{r.tyAdm}</td>
+                          <td className="py-2 px-2 text-center"><DeltaCell ly={r.lyAdm} ty={r.tyAdm} /></td>
+                          <td className="py-2 px-2 text-center border-l border-gray-100">{inr(r.lyTrueCpa)}</td>
+                          <td className="py-2 px-2 text-center">{inr(r.tyTrueCpa)}</td>
+                          <td className="py-2 px-2 text-center"><DeltaCell ly={r.lyTrueCpa} ty={r.tyTrueCpa} lowerBetter /></td>
+                          <td className="py-2 px-2 text-center border-l border-gray-100">{r.lyTrueRoi.toFixed(0)}%</td>
+                          <td className="py-2 px-2 text-center">{r.tyTrueRoi.toFixed(0)}%</td>
+                          <td className="py-2 px-2 text-center"><DeltaCell ly={r.lyTrueRoi} ty={r.tyTrueRoi} isPP /></td>
+                        </tr>
+                      ))}
+                      <tr className="bg-[#091a4f]/5 border-t-2 border-[#091a4f]">
+                        <td className="py-2 px-2 font-black text-[#091a4f]">TOTAL</td>
+                        <td className="py-2 px-2 text-center font-bold border-l border-gray-200">{inr(tot.lySpend)}</td>
+                        <td className="py-2 px-2 text-center font-bold">{inr(tot.tySpend)}</td>
+                        <td className="py-2 px-2 text-center"><DeltaCell ly={tot.lySpend} ty={tot.tySpend} lowerBetter /></td>
+                        <td className="py-2 px-2 text-center font-bold border-l border-gray-200">{inr(tot.lyDept)}</td>
+                        <td className="py-2 px-2 text-center font-bold">{inr(tot.tyDept)}</td>
+                        <td className="py-2 px-2 text-center"><DeltaCell ly={tot.lyDept} ty={tot.tyDept} lowerBetter /></td>
+                        <td className="py-2 px-2 text-center font-black text-green-700 border-l border-gray-200">{tot.lyAdm}</td>
+                        <td className="py-2 px-2 text-center font-black text-green-700">{tot.tyAdm}</td>
+                        <td className="py-2 px-2 text-center"><DeltaCell ly={tot.lyAdm} ty={tot.tyAdm} /></td>
+                        <td className="py-2 px-2 text-center font-bold border-l border-gray-200">{inr(tot.lyTrueCpa)}</td>
+                        <td className="py-2 px-2 text-center font-bold">{inr(tot.tyTrueCpa)}</td>
+                        <td className="py-2 px-2 text-center"><DeltaCell ly={tot.lyTrueCpa} ty={tot.tyTrueCpa} lowerBetter /></td>
+                        <td className="py-2 px-2 text-center font-bold border-l border-gray-200">{tot.lyTrueRoi.toFixed(0)}%</td>
+                        <td className="py-2 px-2 text-center font-bold">{tot.tyTrueRoi.toFixed(0)}%</td>
+                        <td className="py-2 px-2 text-center"><DeltaCell ly={tot.lyTrueRoi} ty={tot.tyTrueRoi} isPP /></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-3 text-[11px] text-gray-500 leading-relaxed">
+                  <strong>Method:</strong> LY Dept Cost adds ₹3,35,000/mo (₹2,50,000 salary + ₹85,000 agency retainer). TY Dept Cost adds {inr(monthlyFixed)}/mo (in-house — no agency fee). True CPA = Dept Cost ÷ Admissions. True ROI = (Revenue − Dept Cost) ÷ Dept Cost, where revenue = admissions × ₹90,000 minimum. Green Δ = better outcome (lower cost / higher admissions / higher ROI).
+                </div>
+              </>
+            );
+          })()}
+        </section>
+
         {/* ───────── 14. DYNAMIC INSIGHTS ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle title="Dynamic Insights & Recommendations" sub={`Auto-generated from ${segmentLabel} data — recomputed on every segment / cost change`} />
