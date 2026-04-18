@@ -1341,9 +1341,8 @@ export default function Marketing() {
               const good = lowerBetter ? !positive : positive;
               if (Math.abs(d) < 0.05) return <span className="text-gray-400">—</span>;
               const cls = good ? "text-green-700" : "text-red-600";
-              const arrow = positive ? "▲" : "▼";
               const txt = isPP ? `${positive ? "+" : ""}${d.toFixed(0)} pp` : `${positive ? "+" : ""}${d.toFixed(1)}%`;
-              return <span className={`font-semibold ${cls}`}>{arrow} {txt}</span>;
+              return <span className={`font-semibold ${cls}`}>{txt}</span>;
             };
 
             // Top KPI summary
