@@ -1259,7 +1259,7 @@ export default function Marketing() {
             sub={
               segment === "combined"
                 ? `LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`
-                : `Salary & agency split equally per branch · LY True Cost = Ad Spend + ₹1,25,000 salary + ₹42,500 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed / 2)} salary/mo (no agency)`
+                : `Salary & agency split equally per branch · LY True Cost = Ad Spend + ₹1,25,000 salary + ₹42,500 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salary/mo (no agency)`
             }
           />
           {(() => {
@@ -1267,7 +1267,8 @@ export default function Marketing() {
                LY: ₹3.35L combined (₹2.5L salary + ₹85k agency) → split 50/50 per branch.
                TY: monthlyFixed driven by salary slider, halved for single-branch view. */
             const LY_FIXED = segment === "combined" ? 335000 : 167500;
-            const TY_FIXED = segment === "combined" ? monthlyFixed : monthlyFixed / 2;
+            // monthlyFixed is already segment-aware (₹2.5L combined / ₹1.25L per branch via DEFAULT_FIXED)
+            const TY_FIXED = monthlyFixed;
             /* Oct/Nov 2025 = pre-DM-team organic months (₹0 ad spend).
                Combined dept cost = ₹1.5L (lean team, no agency). For single-branch view we
                keep the standard ₹1.25L salary split per user spec — no override applied. */
