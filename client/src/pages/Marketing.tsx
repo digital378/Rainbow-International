@@ -316,10 +316,12 @@ export default function Marketing() {
   const current = segmentRows[4]; // April
   const previous = segmentRows[3]; // March
 
-  /* Full-AY admissions: ad-spend window (Dec–Apr) + organic Jun–Nov */
+  /* Full-AY totals (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
   const ytdAdmissionsFull = totals.admissions + organic.admissions;
   const ytdLeadsFull = totals.leads + organic.leads;
+  /* All efficiency metrics use the full-AY admissions denominator (160 combined) */
+  const admForCosts = ytdAdmissionsFull;
 
   /* Conversion funnel rates */
   const funnelData = [
@@ -328,14 +330,14 @@ export default function Marketing() {
     { name: "Walk-ins", value: totals.walkins, fill: CYAN },
     { name: "Admissions", value: totals.admissions, fill: GREEN },
   ];
-  const leadToWalk = totals.leads ? (totals.walkins / totals.leads) * 100 : 0;
-  const walkToAdm = totals.walkins ? (totals.admissions / totals.walkins) * 100 : 0;
-  const bookToAdm = totals.bookings ? (totals.admissions / totals.bookings) * 100 : 0;
+  const leadToWalk = ytdLeadsFull ? (totals.walkins / ytdLeadsFull) * 100 : 0;
+  const walkToAdm = totals.walkins ? (ytdAdmissionsFull / totals.walkins) * 100 : 0;
+  const bookToAdm = totals.bookings ? (ytdAdmissionsFull / totals.bookings) * 100 : 0;
 
-  /* Totals: True CPA (5 months × monthlyFixed) */
-  const ytdRevenue = totals.admissions * MIN_REVENUE_PER_ADM;
-  const ytdMarketingCpa = cpa(totals.spend, totals.admissions);
-  const ytdTrueCpa = trueCpa(totals.spend, totals.admissions, monthlyFixed, totalMonths);
+  /* YTD totals using full-AY admissions (matches sheet's CPA ₹6,960 / True CPA ₹14,772) */
+  const ytdRevenue = admForCosts * MIN_REVENUE_PER_ADM;
+  const ytdMarketingCpa = cpa(totals.spend, admForCosts);
+  const ytdTrueCpa = trueCpa(totals.spend, admForCosts, monthlyFixed, totalMonths);
   const ytdMarketingRoi = roi(ytdRevenue, totals.spend);
   const ytdTrueRoi = roi(ytdRevenue, totals.spend + monthlyFixed * totalMonths);
 
@@ -513,14 +515,14 @@ export default function Marketing() {
 
         {/* ───────── 2. CPA DUAL METRIC + EFFICIENCY ───────── */}
         <section>
-          <SectionTitle title="Cost Efficiency Metrics" sub="Marketing CPA = ad spend only · True CPA = ad spend + salaries + CRM + overhead" />
+          <SectionTitle title="Cost Efficiency Metrics — Year-to-Date" sub={`Full AY 2025–26 totals · Marketing CPA = ad spend ÷ ${num(admForCosts)} admissions · True CPA also includes salaries`} />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <KpiCard label="CPA (Marketing)" value={inr(ytdMarketingCpa)} sub="ad spend / admissions" color={NAVY} tooltip="Includes only Meta + Google ad spend" />
-            <KpiCard label="CPA (True)" value={inr(ytdTrueCpa)} sub={`+${(((ytdTrueCpa / Math.max(ytdMarketingCpa, 1)) - 1) * 100).toFixed(0)}% over marketing CPA`} color={RED} tooltip="True CPA includes salaries, CRM costs, and operational overheads" />
+            <KpiCard label="CPA (Marketing)" value={inr(ytdMarketingCpa)} sub={`${inr(totals.spend)} ÷ ${num(admForCosts)} adm`} color={NAVY} tooltip="Total Meta + Google ad spend ÷ total admissions" />
+            <KpiCard label="CPA (True)" value={inr(ytdTrueCpa)} sub={`+${(((ytdTrueCpa / Math.max(ytdMarketingCpa, 1)) - 1) * 100).toFixed(0)}% over marketing CPA`} color={RED} tooltip="(Ad spend + salaries × months) ÷ admissions" />
             <KpiCard label="Cost per Lead" value={inr(cpl(totals.spend, totals.leads))} sub="ad spend / leads" color={PURPLE} />
             <KpiCard label="Cost per Booking" value={inr(cpb(totals.spend, totals.bookings))} sub="ad spend / bookings" color={AMBER} />
             <KpiCard label="Cost per Walk-in" value={inr(cpw(totals.spend, totals.walkins))} sub="ad spend / walk-ins" color={CYAN} />
-            <KpiCard label="Booking → Adm" value={pct(bookToAdm)} sub={`${totals.admissions} of ${totals.bookings} bookings`} color={GREEN} />
+            <KpiCard label="Booking → Adm" value={pct(bookToAdm)} sub={`${num(admForCosts)} of ${num(totals.bookings)} bookings`} color={GREEN} />
           </div>
         </section>
 
