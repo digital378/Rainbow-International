@@ -1255,23 +1255,44 @@ export default function Marketing() {
         {/* ───────── 13b. YEAR-ON-YEAR MONTH COMPARISON (Dec-Apr) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title="YoY Month-by-Month Comparison — Oct to Apr"
-            sub={`Combined RIS + RPS · LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`}
+            title={`YoY Month-by-Month Comparison — Oct to Apr (${segmentLabel})`}
+            sub={`LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`}
           />
           {(() => {
-            const LY_FIXED = 250000 + 85000; // ₹3,35,000/mo (salary + agency)
-            const TY_FIXED = monthlyFixed;
-            const TY_OCT = { month: "Oct 25", spend: 0, leads: 0, walkins: 0, admissions: 4, bookings: 0 };
-            const TY_NOV = { month: "Nov 25", spend: 0, leads: 0, walkins: 0, admissions: 8, bookings: 0 };
+            /* Segment-aware LY/TY fixed costs.
+               LY: ₹3.35L combined (₹2.5L salary + ₹85k agency) → split 50/50 per branch.
+               TY: monthlyFixed driven by salary slider, halved for single-branch view. */
+            const LY_FIXED = segment === "combined" ? 335000 : 167500;
+            const TY_FIXED = segment === "combined" ? monthlyFixed : monthlyFixed / 2;
+            /* Oct/Nov 2025 = pre-DM-team organic months (₹0 ad spend).
+               Combined dept cost = ₹1.5L (no agency, lean team). Split equally for branches. */
+            const PRE_FIXED = segment === "combined" ? 150000 : 75000;
+            /* Per-branch organic admissions for Oct/Nov 2025 */
+            const TY_PRE: Record<typeof segment, { oct: number; nov: number }> = {
+              combined: { oct: 6, nov: 15 },   // 4+2, 8+7
+              ris:      { oct: 4, nov: 8 },
+              rps:      { oct: 2, nov: 7 },
+            };
+            const tyPre = TY_PRE[segment];
+            const TY_OCT = { month: "Oct 25", spend: 0, leads: 0, walkins: 0, admissions: tyPre.oct, bookings: 0 };
+            const TY_NOV = { month: "Nov 25", spend: 0, leads: 0, walkins: 0, admissions: tyPre.nov, bookings: 0 };
+            /* LY pickers honour segment toggle */
+            const lyPick = (i: number) =>
+              segment === "ris" ? LAST_YEAR[i].ris
+              : segment === "rps" ? LAST_YEAR[i].rps
+              : { spend: LAST_YEAR[i].ris.spend + LAST_YEAR[i].rps.spend,
+                  leads: LAST_YEAR[i].ris.leads + LAST_YEAR[i].rps.leads,
+                  walkins: LAST_YEAR[i].ris.walkins + LAST_YEAR[i].rps.walkins,
+                  admissions: LAST_YEAR[i].ris.admissions + LAST_YEAR[i].rps.admissions };
             const monthsYoY = [
-              { label: "Oct", ly: LAST_YEAR[0], ty: TY_OCT, tyFixedOverride: 150000 }, // pre-DM-team months: ₹1.5L only
-              { label: "Nov", ly: LAST_YEAR[1], ty: TY_NOV, tyFixedOverride: 150000 },
-              { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] },
-              { label: "Jan", ly: LAST_YEAR[3], ty: segmentRows[1] },
-              { label: "Feb", ly: LAST_YEAR[4], ty: segmentRows[2] },
-              { label: "Mar", ly: LAST_YEAR[5], ty: segmentRows[3] },
-              { label: "Apr", ly: LAST_YEAR[6], ty: segmentRows[4] },
-            ] as Array<{ label: string; ly: typeof LAST_YEAR[number]; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
+              { label: "Oct", ly: lyPick(0), ty: TY_OCT, tyFixedOverride: PRE_FIXED },
+              { label: "Nov", ly: lyPick(1), ty: TY_NOV, tyFixedOverride: PRE_FIXED },
+              { label: "Dec", ly: lyPick(2), ty: segmentRows[0] },
+              { label: "Jan", ly: lyPick(3), ty: segmentRows[1] },
+              { label: "Feb", ly: lyPick(4), ty: segmentRows[2] },
+              { label: "Mar", ly: lyPick(5), ty: segmentRows[3] },
+              { label: "Apr", ly: lyPick(6), ty: segmentRows[4] },
+            ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
             type Row = {
               label: string;
               lySpend: number; tySpend: number;
@@ -1281,9 +1302,9 @@ export default function Marketing() {
               lyTrueRoi: number; tyTrueRoi: number;
             };
             const rows: Row[] = monthsYoY.map(m => {
-              const lySpend = m.ly.ris.spend + m.ly.rps.spend;
+              const lySpend = m.ly.spend;
               const tySpend = m.ty.spend;
-              const lyAdm = m.ly.ris.admissions + m.ly.rps.admissions;
+              const lyAdm = m.ly.admissions;
               const tyAdm = m.ty.admissions;
               const lyDept = lySpend + LY_FIXED;
               const tyDept = tySpend + (m.tyFixedOverride ?? TY_FIXED);
