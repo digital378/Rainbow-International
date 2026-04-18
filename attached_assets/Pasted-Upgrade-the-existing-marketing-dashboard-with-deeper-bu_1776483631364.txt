@@ -1,0 +1,246 @@
+Upgrade the existing /marketing dashboard with deeper business intelligence, True CPA integration, and multi-view segmentation (RIS / RPS / Combined).
+
+IMPORTANT CONTEXT
+- Current dashboard already shows CPA (based only on ad spend)
+- We now need to introduce TRUE CPA (includes salaries + overheads)
+- TRUE CPA data is already available in Replit chat context — fetch and integrate it
+- Do NOT remove existing metrics — enhance and layer intelligently
+
+==================================================
+1. ADD TRUE CPA LAYER (CRITICAL UPGRADE)
+==================================================
+
+Introduce dual-metric system everywhere:
+
+1. Marketing CPA (existing)
+= Ad Spend / Admissions
+
+2. True CPA (new)
+= (Ad Spend + Salaries + Overheads) / Admissions
+
+Implementation:
+- Show both CPAs side-by-side wherever CPA is used
+- Add toggle:
+  [ Marketing CPA ] [ True CPA ]  (default: Marketing CPA)
+
+OR better:
+- Show both with clear labels:
+  CPA (MKTG): ₹X
+  CPA (TRUE): ₹Y
+
+- Add tooltip:
+  "True CPA includes salaries, CRM costs, and operational overheads"
+
+Where to integrate:
+- Top summary cards
+- Monthly table
+- What-if calculator
+- Forecast section
+- Insights section
+
+==================================================
+2. ADD RIS / RPS / COMBINED VIEW TOGGLE (MAJOR UX UPGRADE)
+==================================================
+
+At the top of /marketing page add:
+
+Segment Toggle:
+[ COMBINED ] [ RIS ] [ RPS ]
+
+Behavior:
+- COMBINED = current view (default)
+- RIS = only RIS data
+- RPS = only RPS data
+
+This should dynamically update:
+- All KPI cards
+- Graphs
+- Forecasts
+- Tables
+- Insights
+- Spend breakdown
+- Conversion rates
+
+Technical:
+- Use a global state (context/store)
+- Filter dataset based on selected segment
+- Ensure smooth transitions (no reload)
+
+==================================================
+3. IMPROVE KPI SECTION (MAKE IT DECISION-DRIVEN)
+==================================================
+
+Enhance top cards:
+
+Add:
+- TRUE CPA
+- Cost per Booking (CPB)
+- Cost per Walk-in (CPW) (already exists but highlight better)
+- Lead → Walk-in %
+- Walk-in → Admission %
+- Booking → Admission %
+
+Add visual indicators:
+- Green (improving)
+- Red (declining)
+
+==================================================
+4. UPGRADE WHAT-IF CALCULATOR (VERY IMPORTANT)
+==================================================
+
+Enhance logic:
+
+Currently:
+- Based on CPL, CPW, CPA
+
+Upgrade to:
+- Include TRUE CPA scenario
+- Add toggle:
+  "Include Salaries in Projection" (ON/OFF)
+
+Add:
+- Editable fields:
+  - Salary cost/month
+  - Team size
+  - Fixed overhead
+
+Show:
+- Marketing ROI
+- True ROI (after salaries)
+
+Add comparison:
+- "You think you’re at 1500% ROI"
+- "Actual ROI after costs: 820%"
+
+This is a HIGH IMPACT business feature.
+
+==================================================
+5. FORECAST SECTION UPGRADE
+==================================================
+
+Enhance April Forecast:
+
+Add:
+- TRUE CPA forecast
+- True ROI projection
+- Cost efficiency trend (improving/declining)
+
+Add:
+- confidence indicator (low/medium/high)
+
+==================================================
+6. GRAPH IMPROVEMENTS
+==================================================
+
+Upgrade all graphs:
+
+A. Add toggle views:
+[ Leads & Admissions ] [ Spend ] [ ROI ] [ TRUE CPA ]
+
+B. Add:
+- TRUE CPA trend line
+- Conversion funnel graph:
+  Leads → Bookings → Walk-ins → Admissions
+
+C. Add:
+- RIS vs RPS comparison toggle inside graphs
+
+==================================================
+7. INSIGHTS SECTION (MAKE IT SMARTER)
+==================================================
+
+Current insights are static.
+
+Upgrade to dynamic insights:
+
+Examples:
+
+- "True CPA is 42% higher than Marketing CPA → hidden cost inefficiency"
+- "RPS has better CPL but worse conversion than RIS"
+- "Google driving higher volume but Meta better efficiency"
+- "Admissions dropped despite stable leads → CRM inefficiency"
+
+Add tags:
+- 🔴 Critical
+- 🟡 Warning
+- 🟢 Opportunity
+
+==================================================
+8. ADD CRM PERFORMANCE LAYER (VERY IMPORTANT FOR YOU)
+==================================================
+
+Since your KPI focus is CPB & CPW:
+
+Add section:
+"CRM Performance Snapshot"
+
+Metrics:
+- Walk-ins per 100 leads
+- Admissions per 100 walk-ins
+- Conversion lag
+- Drop-off points
+
+Optional (if data available):
+- Team efficiency (per caller)
+
+==================================================
+9. ADD DATA SOURCE FLEXIBILITY
+==================================================
+
+Currently static.
+
+Upgrade:
+- Structure data layer so future API / Google Sheets integration is easy
+- Separate:
+  - data logic
+  - UI rendering
+
+==================================================
+10. UX / UI IMPROVEMENTS
+==================================================
+
+- Sticky segment toggle (RIS / RPS / Combined)
+- Smooth transitions
+- Skeleton loaders for switching views
+- Better spacing for dense sections
+- Make dashboard feel like a premium SaaS BI tool
+
+==================================================
+11. PERFORMANCE OPTIMIZATION
+==================================================
+
+- Memoize heavy calculations
+- Avoid recalculating all charts on small changes
+- Optimize chart rendering
+
+==================================================
+12. FINAL OUTPUT REQUIRED
+==================================================
+
+After implementation, provide:
+
+1. Explanation of:
+   - how TRUE CPA is calculated
+   - where it is used
+
+2. How segment filtering works (RIS / RPS / Combined)
+
+3. What new insights were added
+
+4. What assumptions were made for salary cost (if not explicitly mapped)
+
+5. Suggested next upgrades (predictive analytics, CRM integration, etc.)
+
+==================================================
+GOAL
+==================================================
+
+Convert this from a reporting dashboard → decision-making system.
+
+It should clearly answer:
+- Are we actually profitable?
+- Which branch performs better?
+- Where are we losing money?
+- What happens if we scale spend?
+
+Make it sharp, business-focused, and actionable.
