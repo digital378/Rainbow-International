@@ -1446,9 +1446,9 @@ export default function Marketing() {
 
         {/* ───────── 14. DYNAMIC INSIGHTS ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <SectionTitle title="Dynamic Insights & Recommendations" sub={`Auto-generated from ${segmentLabel} data — recomputed on every segment / cost change`} />
+          <SectionTitle title="Opportunities & Suggestions" sub={`Auto-generated from ${segmentLabel} data — recomputed on every segment / cost change`} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {insights.map((ins, i) => {
+            {insights.filter(ins => ins.severity === "opportunity").map((ins, i) => {
               const tag = ins.severity === "critical" ? { emoji: "🔴", label: "CRITICAL", bg: "bg-red-50", border: "border-red-400", text: "text-red-700" }
                 : ins.severity === "warning" ? { emoji: "🟡", label: "WARNING", bg: "bg-amber-50", border: "border-amber-400", text: "text-amber-700" }
                 : { emoji: "🟢", label: "OPPORTUNITY", bg: "bg-green-50", border: "border-green-400", text: "text-green-700" };
