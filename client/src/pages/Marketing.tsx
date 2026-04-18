@@ -1261,10 +1261,11 @@ export default function Marketing() {
           {(() => {
             const LY_FIXED = 250000 + 85000; // ₹3,35,000/mo (salary + agency)
             const TY_FIXED = monthlyFixed;
-            const ZERO_TY = { month: "", spend: 0, leads: 0, walkins: 0, admissions: 0, bookings: 0 };
+            const TY_OCT = { month: "Oct 25", spend: 0, leads: 0, walkins: 0, admissions: 4, bookings: 0 };
+            const TY_NOV = { month: "Nov 25", spend: 0, leads: 0, walkins: 0, admissions: 8, bookings: 0 };
             const monthsYoY = [
-              { label: "Oct", ly: LAST_YEAR[0], ty: ZERO_TY }, // Oct24 vs Oct25 (no TY ad activity)
-              { label: "Nov", ly: LAST_YEAR[1], ty: ZERO_TY },
+              { label: "Oct", ly: LAST_YEAR[0], ty: TY_OCT }, // Oct24 vs Oct25 (organic only, 4 adm)
+              { label: "Nov", ly: LAST_YEAR[1], ty: TY_NOV }, // Nov24 vs Nov25 (organic only, 8 adm)
               { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] },
               { label: "Jan", ly: LAST_YEAR[3], ty: segmentRows[1] },
               { label: "Feb", ly: LAST_YEAR[4], ty: segmentRows[2] },
