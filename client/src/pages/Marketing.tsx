@@ -76,6 +76,15 @@ const MONTHLY: MonthRow[] = [
 const APRIL_RIS_BASE = MONTHLY[APRIL_IDX].ris;
 const APRIL_RPS_BASE = MONTHLY[APRIL_IDX].rps;
 
+/* Pre-spend organic admissions Jun – Nov 2025 (no marketing investment).
+   These reconcile the 5-month "ad-spend window" with the sheet's full-AY
+   "TOTAL TILL DATE" of 160 admissions. */
+const ORGANIC_PRE_SPEND = {
+  combined: { leads: 197, admissions: 21 },  // Jun–Nov: 8+4+5+20+57+103 = 197 leads, 6 (Oct) + 15 (Nov) = 21 adm
+  ris:      { leads: 134, admissions: 12 },  // Jun–Nov RIS: 134 leads, 4 (Oct) + 8 (Nov) = 12 adm
+  rps:      { leads:  63, admissions:  9 },  // Jun–Nov RPS: 63 leads, 2 (Oct) + 7 (Nov) = 9 adm
+};
+
 /* Last year (Oct 24 – Jun 25) — real RIS/RPS splits from sheet */
 const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: number; admissions: number }; rps: { spend: number; leads: number; walkins: number; admissions: number } }[] = [
   { month: "Oct 24", ris: { spend: 13556, leads: 116, walkins: 40, admissions: 7 }, rps: { spend: 57147, leads: 78, walkins: 24, admissions: 12 } },
@@ -307,6 +316,11 @@ export default function Marketing() {
   const current = segmentRows[4]; // April
   const previous = segmentRows[3]; // March
 
+  /* Full-AY admissions: ad-spend window (Dec–Apr) + organic Jun–Nov */
+  const organic = ORGANIC_PRE_SPEND[segment];
+  const ytdAdmissionsFull = totals.admissions + organic.admissions;
+  const ytdLeadsFull = totals.leads + organic.leads;
+
   /* Conversion funnel rates */
   const funnelData = [
     { name: "Leads", value: totals.leads, fill: NAVY },
@@ -486,13 +500,19 @@ export default function Marketing() {
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
-          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Dec 2025 – Apr 16, 2026 · 5-month period" />
+          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 16, 2026) · Ad spend active Dec onwards" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <KpiCard label="Total Leads" value={num(totals.leads)} sub={`${(totals.leads / 5).toFixed(0)} avg/month`} color={NAVY} />
-            <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of leads`} color={PURPLE} />
-            <KpiCard label="Total Walk-ins" value={num(totals.walkins)} sub={`${pct(leadToWalk)} of leads`} color={CYAN} />
-            <KpiCard label="Total Admissions" value={num(totals.admissions)} sub={`${pct(walkToAdm)} of walk-ins`} color={GREEN} />
-            <KpiCard label="Marketing Spend" value={inr(totals.spend)} sub="Meta + Google" color={RED} />
+            <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${num(totals.leads)} ad-driven · ${num(organic.leads)} organic`} color={NAVY} />
+            <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of ad-driven leads`} color={PURPLE} />
+            <KpiCard label="Total Walk-ins" value={num(totals.walkins)} sub={`${pct(leadToWalk)} of ad-driven leads`} color={CYAN} />
+            <KpiCard
+              label="Total Admissions"
+              value={num(ytdAdmissionsFull)}
+              sub={`${num(totals.admissions)} ad-driven (Dec–Apr) + ${num(organic.admissions)} organic (Jun–Nov)`}
+              color={GREEN}
+              tooltip="Full AY admissions reconciles with sheet TOTAL TILL DATE"
+            />
+            <KpiCard label="Marketing Spend" value={inr(totals.spend)} sub="Meta + Google (5 mo)" color={RED} />
             <KpiCard label="Min. ROI (Mktg)" value={`${ytdMarketingRoi.toFixed(0)}%`} sub={`True ROI: ${ytdTrueRoi.toFixed(0)}%`} color={GREEN} />
           </div>
         </section>
