@@ -522,7 +522,7 @@ export default function Marketing() {
             <KpiCard label="Cost per Lead" value={inr(cpl(totals.spend, totals.leads))} sub="ad spend / leads" color={PURPLE} />
             <KpiCard label="Cost per Booking" value={inr(cpb(totals.spend, totals.bookings))} sub="ad spend / bookings" color={AMBER} />
             <KpiCard label="Cost per Walk-in" value={inr(cpw(totals.spend, totals.walkins))} sub="ad spend / walk-ins" color={CYAN} />
-            <KpiCard label="Booking → Adm" value={pct(bookToAdm)} sub={`${num(admForCosts)} of ${num(totals.bookings)} bookings`} color={GREEN} />
+            <KpiCard label="Walk-in → Adm" value={pct(walkToAdm)} sub={`${num(admForCosts)} of ${num(totals.walkins)} walk-ins`} color={GREEN} />
           </div>
         </section>
 
