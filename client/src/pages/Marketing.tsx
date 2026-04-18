@@ -1265,8 +1265,9 @@ export default function Marketing() {
             const LY_FIXED = segment === "combined" ? 335000 : 167500;
             const TY_FIXED = segment === "combined" ? monthlyFixed : monthlyFixed / 2;
             /* Oct/Nov 2025 = pre-DM-team organic months (₹0 ad spend).
-               Combined dept cost = ₹1.5L (no agency, lean team). Split equally for branches. */
-            const PRE_FIXED = segment === "combined" ? 150000 : 75000;
+               Combined dept cost = ₹1.5L (lean team, no agency). For single-branch view we
+               keep the standard ₹1.25L salary split per user spec — no override applied. */
+            const PRE_FIXED: number | undefined = segment === "combined" ? 150000 : undefined;
             /* Per-branch organic admissions for Oct/Nov 2025 */
             const TY_PRE: Record<typeof segment, { oct: number; nov: number }> = {
               combined: { oct: 6, nov: 15 },   // 4+2, 8+7
