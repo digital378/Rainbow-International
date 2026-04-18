@@ -1255,14 +1255,17 @@ export default function Marketing() {
         {/* ───────── 13b. YEAR-ON-YEAR MONTH COMPARISON (Dec-Apr) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title="YoY Month-by-Month Comparison — Dec to Apr"
+            title="YoY Month-by-Month Comparison — Oct to Apr"
             sub={`Combined RIS + RPS · LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`}
           />
           {(() => {
             const LY_FIXED = 250000 + 85000; // ₹3,35,000/mo (salary + agency)
             const TY_FIXED = monthlyFixed;
+            const ZERO_TY = { month: "", spend: 0, leads: 0, walkins: 0, admissions: 0, bookings: 0 };
             const monthsYoY = [
-              { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] }, // Dec24 vs Dec25
+              { label: "Oct", ly: LAST_YEAR[0], ty: ZERO_TY }, // Oct24 vs Oct25 (no TY ad activity)
+              { label: "Nov", ly: LAST_YEAR[1], ty: ZERO_TY },
+              { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] },
               { label: "Jan", ly: LAST_YEAR[3], ty: segmentRows[1] },
               { label: "Feb", ly: LAST_YEAR[4], ty: segmentRows[2] },
               { label: "Mar", ly: LAST_YEAR[5], ty: segmentRows[3] },
