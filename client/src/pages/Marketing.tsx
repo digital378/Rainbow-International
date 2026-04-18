@@ -1264,14 +1264,14 @@ export default function Marketing() {
             const TY_OCT = { month: "Oct 25", spend: 0, leads: 0, walkins: 0, admissions: 4, bookings: 0 };
             const TY_NOV = { month: "Nov 25", spend: 0, leads: 0, walkins: 0, admissions: 8, bookings: 0 };
             const monthsYoY = [
-              { label: "Oct", ly: LAST_YEAR[0], ty: TY_OCT }, // Oct24 vs Oct25 (organic only, 4 adm)
-              { label: "Nov", ly: LAST_YEAR[1], ty: TY_NOV }, // Nov24 vs Nov25 (organic only, 8 adm)
+              { label: "Oct", ly: LAST_YEAR[0], ty: TY_OCT, tyFixedOverride: 150000 }, // pre-DM-team months: ₹1.5L only
+              { label: "Nov", ly: LAST_YEAR[1], ty: TY_NOV, tyFixedOverride: 150000 },
               { label: "Dec", ly: LAST_YEAR[2], ty: segmentRows[0] },
               { label: "Jan", ly: LAST_YEAR[3], ty: segmentRows[1] },
               { label: "Feb", ly: LAST_YEAR[4], ty: segmentRows[2] },
               { label: "Mar", ly: LAST_YEAR[5], ty: segmentRows[3] },
               { label: "Apr", ly: LAST_YEAR[6], ty: segmentRows[4] },
-            ];
+            ] as Array<{ label: string; ly: typeof LAST_YEAR[number]; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
             type Row = {
               label: string;
               lySpend: number; tySpend: number;
@@ -1286,7 +1286,7 @@ export default function Marketing() {
               const lyAdm = m.ly.ris.admissions + m.ly.rps.admissions;
               const tyAdm = m.ty.admissions;
               const lyDept = lySpend + LY_FIXED;
-              const tyDept = tySpend + TY_FIXED;
+              const tyDept = tySpend + (m.tyFixedOverride ?? TY_FIXED);
               const lyRev = lyAdm * MIN_REVENUE_PER_ADM;
               const tyRev = tyAdm * MIN_REVENUE_PER_ADM;
               return {
