@@ -1256,7 +1256,11 @@ export default function Marketing() {
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
             title={`YoY Month-by-Month Comparison — Oct to Apr (${segmentLabel})`}
-            sub={`LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`}
+            sub={
+              segment === "combined"
+                ? `LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`
+                : `Salary & agency split equally per branch · LY True Cost = Ad Spend + ₹1,25,000 salary + ₹42,500 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed / 2)} salary/mo (no agency)`
+            }
           />
           {(() => {
             /* Segment-aware LY/TY fixed costs.
