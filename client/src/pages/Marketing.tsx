@@ -20,51 +20,61 @@ type SegmentKey = "combined" | "ris" | "rps";
 type MetricSet = { leads: number; bookings: number; walkins: number; admissions: number; spend: number; meta: number; google: number; };
 type MonthRow = { month: string; combined: MetricSet; ris: MetricSet; rps: MetricSet; };
 
-/* April 2026 splits (real RIS / RPS data) */
-const APRIL_RIS_BASE = { leads: 90, bookings: 32, walkins: 25, admissions: 8, spend: 38845, meta: 11760, google: 27085 };
-const APRIL_RPS_BASE = { leads: 123, bookings: 53, walkins: 33, admissions: 10, spend: 62323, meta: 18864, google: 43459 };
+/* AUTHORITATIVE monthly data straight from the source sheets:
+   - Combined values from "DM Overall ROI Analysis" sheet
+   - RIS values from "DM RIS April'26" sheet  
+   - RPS values from "DM RPS April'26" sheet
+   April per-branch spend back-calculated from the sheet's published True CPA
+   (RIS True CPA ₹19,224, RPS True CPA ₹18,012 — both at ₹1.25L/mo salary).
+   Note: branch sums may not exactly equal Combined for some months due to
+   minor source-sheet reconciliation gaps; we keep both as-published. */
 
-/* For prior months we don't have explicit RIS/RPS splits in the source sheet,
-   so we apply the April-derived ratios. Marked clearly as estimates. */
-const RATIO_RIS = { leads: 0.423, bookings: 0.376, walkins: 0.431, admissions: 0.444, spend: 0.384, meta: 0.384, google: 0.384 };
-const splitRis = <T extends MetricSet,>(c: T): T => ({
-  ...c,
-  leads: Math.round(c.leads * RATIO_RIS.leads),
-  bookings: Math.round(c.bookings * RATIO_RIS.bookings),
-  walkins: Math.round(c.walkins * RATIO_RIS.walkins),
-  admissions: Math.round(c.admissions * RATIO_RIS.admissions),
-  spend: Math.round(c.spend * RATIO_RIS.spend),
-  meta: Math.round(c.meta * RATIO_RIS.meta),
-  google: Math.round(c.google * RATIO_RIS.google),
-});
-const splitRps = <T extends MetricSet,>(c: T, ris: T): T => ({
-  ...c,
-  leads: c.leads - ris.leads, bookings: c.bookings - ris.bookings, walkins: c.walkins - ris.walkins,
-  admissions: c.admissions - ris.admissions, spend: c.spend - ris.spend, meta: c.meta - ris.meta, google: c.google - ris.google,
-});
+const APRIL_CHANNEL_RATIO = { meta: 0.303, google: 0.697 }; // Combined Apr Meta/Google split
 
-const COMBINED_BASE: { month: string; data: MetricSet }[] = [
-  { month: "Dec 25", data: { leads: 455, bookings: 93, walkins: 71, admissions: 23, spend: 178604, meta: 100231, google: 78373 } },
-  { month: "Jan 26", data: { leads: 895, bookings: 171, walkins: 125, admissions: 27, spend: 459906, meta: 248585, google: 211321 } },
-  { month: "Feb 26", data: { leads: 418, bookings: 115, walkins: 94, admissions: 24, spend: 179377, meta: 58885, google: 120492 } },
-  { month: "Mar 26", data: { leads: 498, bookings: 196, walkins: 121, admissions: 47, spend: 194500, meta: 61121, google: 133379 } },
-  { month: "Apr 26*", data: {
-      leads: APRIL_RIS_BASE.leads + APRIL_RPS_BASE.leads,
-      bookings: APRIL_RIS_BASE.bookings + APRIL_RPS_BASE.bookings,
-      walkins: APRIL_RIS_BASE.walkins + APRIL_RPS_BASE.walkins,
-      admissions: APRIL_RIS_BASE.admissions + APRIL_RPS_BASE.admissions,
-      spend: APRIL_RIS_BASE.spend + APRIL_RPS_BASE.spend,
-      meta: APRIL_RIS_BASE.meta + APRIL_RPS_BASE.meta,
-      google: APRIL_RIS_BASE.google + APRIL_RPS_BASE.google,
-  } },
+/* Convenience aliases for components that read April per-branch directly */
+const APRIL_IDX = 4;
+
+const MONTHLY: MonthRow[] = [
+  {
+    month: "Dec 25",
+    combined: { leads: 455, bookings: 93,  walkins: 71,  admissions: 23, spend: 178604, meta: 100231, google: 78373 },
+    ris:      { leads: 194, bookings: 35,  walkins: 26,  admissions: 4,  spend: 85496,  meta: 53977,  google: 31519 },
+    rps:      { leads: 261, bookings: 58,  walkins: 45,  admissions: 19, spend: 93108,  meta: 46254,  google: 46854 },
+  },
+  {
+    month: "Jan 26",
+    combined: { leads: 895, bookings: 171, walkins: 125, admissions: 27, spend: 459906, meta: 248585, google: 211321 },
+    ris:      { leads: 352, bookings: 58,  walkins: 39,  admissions: 8,  spend: 202555, meta: 107452, google: 95103 },
+    rps:      { leads: 543, bookings: 113, walkins: 86,  admissions: 19, spend: 257351, meta: 141133, google: 116218 },
+  },
+  {
+    month: "Feb 26",
+    combined: { leads: 418, bookings: 115, walkins: 94,  admissions: 24, spend: 179377, meta: 58885,  google: 120492 },
+    ris:      { leads: 180, bookings: 36,  walkins: 27,  admissions: 6,  spend: 54620,  meta: 8796,   google: 45824 },
+    rps:      { leads: 238, bookings: 79,  walkins: 67,  admissions: 18, spend: 129285, meta: 51750,  google: 77535 },
+  },
+  {
+    month: "Mar 26",
+    combined: { leads: 498, bookings: 196, walkins: 121, admissions: 47, spend: 194500, meta: 61121,  google: 133379 },
+    ris:      { leads: 211, bookings: 67,  walkins: 40,  admissions: 11, spend: 75051,  meta: 3011,   google: 72040 },
+    rps:      { leads: 287, bookings: 130, walkins: 81,  admissions: 36, spend: 148955, meta: 68927,  google: 80028 },
+  },
+  {
+    month: "Apr 26*",
+    combined: { leads: 213, bookings: 85,  walkins: 58,  admissions: 18, spend: 101168, meta: 30624,  google: 70544 },
+    ris:      { leads: 90,  bookings: 32,  walkins: 25,  admissions: 8,
+                spend: 28792,
+                meta:   Math.round(28792 * APRIL_CHANNEL_RATIO.meta),
+                google: Math.round(28792 * APRIL_CHANNEL_RATIO.google) },
+    rps:      { leads: 123, bookings: 53,  walkins: 33,  admissions: 10,
+                spend: 55120,
+                meta:   Math.round(55120 * APRIL_CHANNEL_RATIO.meta),
+                google: Math.round(55120 * APRIL_CHANNEL_RATIO.google) },
+  },
 ];
 
-const MONTHLY: MonthRow[] = COMBINED_BASE.map((row, i) => {
-  if (row.month === "Apr 26*") return { month: row.month, combined: row.data, ris: APRIL_RIS_BASE, rps: APRIL_RPS_BASE };
-  const ris = splitRis(row.data);
-  const rps = splitRps(row.data, ris);
-  return { month: row.month, combined: row.data, ris, rps };
-});
+const APRIL_RIS_BASE = MONTHLY[APRIL_IDX].ris;
+const APRIL_RPS_BASE = MONTHLY[APRIL_IDX].rps;
 
 /* Last year (Oct 24 – Jun 25) — real RIS/RPS splits from sheet */
 const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: number; admissions: number }; rps: { spend: number; leads: number; walkins: number; admissions: number } }[] = [
@@ -90,12 +100,57 @@ const SOCIAL = {
   rps: { instaFollowers: 12947, fbFollowers: 12964, ytViews: 138364, websiteClicks: 159 },
 };
 
-/* Default fixed monthly costs (salaries + CRM + overhead) — editable in What-If */
+/* Default fixed monthly costs (per source sheet: salary line = ₹1.25L/branch/mo).
+   Sheet treats this as a single fixed cost; CRM & overhead default to 0 but
+   remain editable in What-If for scenario modelling. */
 const DEFAULT_FIXED = {
-  combined: { salary: 150000, crm: 30000, overhead: 70000 },   // ₹2,50,000/month combined
-  ris:      { salary: 60000,  crm: 15000, overhead: 35000 },   // ₹1,10,000/month
-  rps:      { salary: 90000,  crm: 15000, overhead: 35000 },   // ₹1,40,000/month
+  combined: { salary: 250000, crm: 0, overhead: 0 },   // ₹2,50,000/mo (₹1.25L × 2 branches)
+  ris:      { salary: 125000, crm: 0, overhead: 0 },   // ₹1,25,000/mo
+  rps:      { salary: 125000, crm: 0, overhead: 0 },   // ₹1,25,000/mo
 };
+
+/* CRM Branch Performance — RPS centre-wise breakdown (Jan – Apr 2026)
+   Source: RPS sheet "Centre-wise Lead Distribution".
+   RIS operates a single centre (Brahmand) so no breakdown is shown for it. */
+type CrmRow = { centre: string; leads: number; bookings: number; walkins: number; admissions: number };
+const CRM_RPS: { month: string; rows: CrmRow[]; total: CrmRow }[] = [
+  { month: "Jan 26", rows: [
+    { centre: "Aggarwal",      leads: 84,  bookings: 27, walkins: 24, admissions: 7 },
+    { centre: "Anand Nagar",   leads: 25,  bookings: 4,  walkins: 1,  admissions: 0 },
+    { centre: "Kasarvadavali", leads: 22,  bookings: 9,  walkins: 6,  admissions: 0 },
+    { centre: "Hariniwas",     leads: 70,  bookings: 19, walkins: 11, admissions: 3 },
+    { centre: "Dhokali",       leads: 52,  bookings: 24, walkins: 19, admissions: 3 },
+    { centre: "Kalwa",         leads: 68,  bookings: 14, walkins: 9,  admissions: 4 },
+    { centre: "Unassigned",    leads: 222, bookings: 0,  walkins: 0,  admissions: 0 },
+  ], total: { centre: "Total", leads: 543, bookings: 97,  walkins: 70, admissions: 17 } },
+  { month: "Feb 26", rows: [
+    { centre: "Aggarwal",      leads: 39, bookings: 13, walkins: 9, admissions: 6 },
+    { centre: "Anand Nagar",   leads: 18, bookings: 9,  walkins: 6, admissions: 2 },
+    { centre: "Kasarvadavali", leads: 24, bookings: 16, walkins: 8, admissions: 3 },
+    { centre: "Hariniwas",     leads: 49, bookings: 14, walkins: 9, admissions: 6 },
+    { centre: "Dhokali",       leads: 21, bookings: 12, walkins: 7, admissions: 3 },
+    { centre: "Kalwa",         leads: 36, bookings: 13, walkins: 7, admissions: 2 },
+    { centre: "Unassigned",    leads: 51, bookings: 0,  walkins: 0, admissions: 0 },
+  ], total: { centre: "Total", leads: 238, bookings: 77, walkins: 46, admissions: 22 } },
+  { month: "Mar 26", rows: [
+    { centre: "Aggarwal",      leads: 71, bookings: 24, walkins: 14, admissions: 7 },
+    { centre: "Anand Nagar",   leads: 32, bookings: 14, walkins: 7,  admissions: 4 },
+    { centre: "Kasarvadavali", leads: 23, bookings: 7,  walkins: 5,  admissions: 2 },
+    { centre: "Hariniwas",     leads: 55, bookings: 20, walkins: 9,  admissions: 4 },
+    { centre: "Dhokali",       leads: 37, bookings: 18, walkins: 8,  admissions: 4 },
+    { centre: "Kalwa",         leads: 61, bookings: 25, walkins: 15, admissions: 5 },
+    { centre: "Unassigned",    leads: 7,  bookings: 0,  walkins: 0,  admissions: 0 },
+  ], total: { centre: "Total", leads: 286, bookings: 108, walkins: 58, admissions: 26 } },
+  { month: "Apr 26*", rows: [
+    { centre: "Aggarwal",      leads: 20, bookings: 10, walkins: 6, admissions: 2 },
+    { centre: "Anand Nagar",   leads: 12, bookings: 4,  walkins: 2, admissions: 0 },
+    { centre: "Kasarvadavali", leads: 15, bookings: 8,  walkins: 3, admissions: 2 },
+    { centre: "Hariniwas",     leads: 25, bookings: 15, walkins: 3, admissions: 2 },
+    { centre: "Dhokali",       leads: 17, bookings: 9,  walkins: 1, admissions: 0 },
+    { centre: "Kalwa",         leads: 26, bookings: 10, walkins: 2, admissions: 0 },
+    { centre: "Unassigned",    leads: 0,  bookings: 0,  walkins: 0, admissions: 0 },
+  ], total: { centre: "Total", leads: 115, bookings: 56, walkins: 17, admissions: 6 } },
+];
 
 /* ═══════════════════════════════════════════════════════════════════
    HELPERS
@@ -745,6 +800,160 @@ export default function Marketing() {
                 </div>
               </div>
             </div>
+          </section>
+        )}
+
+        {/* ───────── 7b. CRM Branch Performance (RPS centre-wise) ───────── */}
+        {(segment === "combined" || segment === "rps") && (
+          <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <SectionTitle
+              title="CRM Branch Performance — RPS Centres"
+              sub="Centre-wise lead distribution, conversion & admissions (Jan – Apr 2026). RIS operates a single Brahmand centre."
+              badge="LIVE FROM CRM"
+            />
+            {(() => {
+              /* Aggregate across the 4 months for centre rankings */
+              const centres = ["Aggarwal","Anand Nagar","Kasarvadavali","Hariniwas","Dhokali","Kalwa","Unassigned"];
+              const totals: Record<string, CrmRow> = Object.fromEntries(
+                centres.map(c => [c, { centre: c, leads: 0, bookings: 0, walkins: 0, admissions: 0 }])
+              );
+              CRM_RPS.forEach(m => m.rows.forEach(r => {
+                totals[r.centre].leads += r.leads;
+                totals[r.centre].bookings += r.bookings;
+                totals[r.centre].walkins += r.walkins;
+                totals[r.centre].admissions += r.admissions;
+              }));
+              const rows = centres.map(c => totals[c]);
+              const grandTotal = rows.reduce((a, r) => ({
+                centre: "Total", leads: a.leads + r.leads, bookings: a.bookings + r.bookings,
+                walkins: a.walkins + r.walkins, admissions: a.admissions + r.admissions,
+              }), { centre: "Total", leads: 0, bookings: 0, walkins: 0, admissions: 0 });
+              const maxLeads = Math.max(...rows.map(r => r.leads));
+              const maxAdm = Math.max(...rows.map(r => r.admissions));
+              const top = [...rows].filter(r => r.centre !== "Unassigned" && r.admissions > 0)
+                .sort((a, b) => (b.admissions / Math.max(b.leads, 1)) - (a.admissions / Math.max(a.leads, 1)))[0];
+              return (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs" data-testid="table-crm-branches">
+                      <thead>
+                        <tr className="text-left text-gray-500 border-b">
+                          <th className="py-2 pr-3 font-bold">Centre</th>
+                          <th className="py-2 px-2 font-bold text-right">Leads</th>
+                          <th className="py-2 px-2 font-bold text-right">Bookings</th>
+                          <th className="py-2 px-2 font-bold text-right">Walk-ins</th>
+                          <th className="py-2 px-2 font-bold text-right">Admissions</th>
+                          <th className="py-2 px-2 font-bold text-right">L→W %</th>
+                          <th className="py-2 px-2 font-bold text-right">L→Adm %</th>
+                          <th className="py-2 pl-2 font-bold text-right">W→Adm %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map(r => {
+                          const lw = r.leads ? (r.walkins / r.leads) * 100 : 0;
+                          const la = r.leads ? (r.admissions / r.leads) * 100 : 0;
+                          const wa = r.walkins ? (r.admissions / r.walkins) * 100 : 0;
+                          const isTop = top && r.centre === top.centre;
+                          const isUnassigned = r.centre === "Unassigned";
+                          return (
+                            <tr key={r.centre} className={`border-b ${isTop ? "bg-amber-50" : isUnassigned ? "bg-red-50/40" : ""}`} data-testid={`row-crm-${r.centre.toLowerCase().replace(/\s+/g,"-")}`}>
+                              <td className="py-2 pr-3 font-bold" style={{ color: NAVY }}>
+                                {r.centre}
+                                {isTop && <span className="ml-2 text-[9px] font-bold uppercase bg-amber-400 text-[#091a4f] px-1.5 py-0.5 rounded">Top</span>}
+                                {isUnassigned && <span className="ml-2 text-[9px] font-bold uppercase bg-red-200 text-red-700 px-1.5 py-0.5 rounded">Unassigned</span>}
+                              </td>
+                              <td className="py-2 px-2 text-right font-semibold">
+                                <div className="flex items-center justify-end gap-2">
+                                  <div className="w-12 h-1.5 bg-gray-100 rounded">
+                                    <div className="h-full rounded" style={{ width: `${(r.leads / maxLeads) * 100}%`, background: NAVY }} />
+                                  </div>
+                                  {num(r.leads)}
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 text-right">{num(r.bookings)}</td>
+                              <td className="py-2 px-2 text-right">{num(r.walkins)}</td>
+                              <td className="py-2 px-2 text-right font-bold" style={{ color: GREEN }}>
+                                <div className="flex items-center justify-end gap-2">
+                                  <div className="w-12 h-1.5 bg-gray-100 rounded">
+                                    <div className="h-full rounded" style={{ width: `${(r.admissions / Math.max(maxAdm,1)) * 100}%`, background: GREEN }} />
+                                  </div>
+                                  {num(r.admissions)}
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 text-right text-gray-600">{pct(lw)}</td>
+                              <td className="py-2 px-2 text-right font-bold" style={{ color: la >= 5 ? GREEN : la >= 2 ? AMBER : RED }}>{pct(la)}</td>
+                              <td className="py-2 pl-2 text-right text-gray-600">{pct(wa)}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr className="font-black border-t-2" style={{ color: NAVY }}>
+                          <td className="py-2 pr-3">Total (Jan–Apr)</td>
+                          <td className="py-2 px-2 text-right">{num(grandTotal.leads)}</td>
+                          <td className="py-2 px-2 text-right">{num(grandTotal.bookings)}</td>
+                          <td className="py-2 px-2 text-right">{num(grandTotal.walkins)}</td>
+                          <td className="py-2 px-2 text-right" style={{ color: GREEN }}>{num(grandTotal.admissions)}</td>
+                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads ? (grandTotal.walkins/grandTotal.leads)*100 : 0)}</td>
+                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads ? (grandTotal.admissions/grandTotal.leads)*100 : 0)}</td>
+                          <td className="py-2 pl-2 text-right">{pct(grandTotal.walkins ? (grandTotal.admissions/grandTotal.walkins)*100 : 0)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Monthly trend per centre — admissions */}
+                  <div className="mt-5">
+                    <div className="text-xs font-bold text-gray-600 mb-2">Admissions by Centre — Monthly</div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="text-left text-gray-500 border-b">
+                            <th className="py-2 pr-3 font-bold">Centre</th>
+                            {CRM_RPS.map(m => <th key={m.month} className="py-2 px-2 font-bold text-right">{m.month}</th>)}
+                            <th className="py-2 pl-2 font-bold text-right">Total</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {centres.filter(c => c !== "Unassigned").map(c => {
+                            const cells = CRM_RPS.map(m => m.rows.find(r => r.centre === c)?.admissions ?? 0);
+                            const tot = cells.reduce((a, n) => a + n, 0);
+                            return (
+                              <tr key={c} className="border-b">
+                                <td className="py-2 pr-3 font-semibold" style={{ color: NAVY }}>{c}</td>
+                                {cells.map((n, i) => <td key={i} className="py-2 px-2 text-right">{n}</td>)}
+                                <td className="py-2 pl-2 text-right font-bold" style={{ color: GREEN }}>{tot}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {top && (
+                    <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs">
+                      <span className="font-black text-amber-900">★ Top performing centre: </span>
+                      <span className="text-amber-900">
+                        <strong>{top.centre}</strong> — {top.admissions} admissions on {top.leads} leads
+                        ({pct((top.admissions/top.leads)*100)} lead→admission rate).
+                      </span>
+                    </div>
+                  )}
+                  {grandTotal.leads > 0 && (() => {
+                    const unassigned = totals["Unassigned"].leads;
+                    if (unassigned === 0) return null;
+                    const pctUn = (unassigned / grandTotal.leads) * 100;
+                    return (
+                      <div className="mt-2 rounded-xl bg-red-50 border border-red-200 p-3 text-xs">
+                        <span className="font-black text-red-800">⚠ Lead-routing gap: </span>
+                        <span className="text-red-800">
+                          {num(unassigned)} leads ({pct(pctUn)}) were never routed to a centre — 0 bookings, 0 walk-ins, 0 admissions from this pool. Likely CRM assignment delay or missing pin-code.
+                        </span>
+                      </div>
+                    );
+                  })()}
+                </>
+              );
+            })()}
           </section>
         )}
 
