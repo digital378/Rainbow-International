@@ -8,8 +8,8 @@ import {
    DATA LAYER — easily replaceable with API/Sheets later
    ═══════════════════════════════════════════════════════════════════ */
 
-const LAST_UPDATED = "April 16, 2026";
-const TODAY_DATE = 16;
+const LAST_UPDATED = "April 18, 2026";
+const TODAY_DATE = 18;
 const DAYS_IN_APRIL = 30;
 const MIN_REVENUE_PER_ADM = 90000;
 
@@ -28,8 +28,6 @@ type MonthRow = { month: string; combined: MetricSet; ris: MetricSet; rps: Metri
    (RIS True CPA ₹19,224, RPS True CPA ₹18,012 — both at ₹1.25L/mo salary).
    Note: branch sums may not exactly equal Combined for some months due to
    minor source-sheet reconciliation gaps; we keep both as-published. */
-
-const APRIL_CHANNEL_RATIO = { meta: 0.303, google: 0.697 }; // Combined Apr Meta/Google split
 
 /* Convenience aliases for components that read April per-branch directly */
 const APRIL_IDX = 4;
@@ -61,15 +59,9 @@ const MONTHLY: MonthRow[] = [
   },
   {
     month: "Apr 26*",
-    combined: { leads: 213, bookings: 85,  walkins: 58,  admissions: 18, spend: 101168, meta: 30624,  google: 70544 },
-    ris:      { leads: 90,  bookings: 32,  walkins: 25,  admissions: 8,
-                spend: 28792,
-                meta:   Math.round(28792 * APRIL_CHANNEL_RATIO.meta),
-                google: Math.round(28792 * APRIL_CHANNEL_RATIO.google) },
-    rps:      { leads: 123, bookings: 53,  walkins: 33,  admissions: 10,
-                spend: 55120,
-                meta:   Math.round(55120 * APRIL_CHANNEL_RATIO.meta),
-                google: Math.round(55120 * APRIL_CHANNEL_RATIO.google) },
+    combined: { leads: 237, bookings: 99,  walkins: 63,  admissions: 21, spend: 119352, meta: 36581, google: 82771 },
+    ris:      { leads: 103, bookings: 39,  walkins: 28,  admissions: 10, spend: 49978,  meta: 5671,  google: 44307 },
+    rps:      { leads: 134, bookings: 60,  walkins: 35,  admissions: 11, spend: 70371,  meta: 34745, google: 35626 },
   },
 ];
 
@@ -99,9 +91,9 @@ const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: 
 ];
 
 const APRIL_WEEKLY = [
-  { week: "01–04 Apr", risLeads: 18, risAdm: 3, risWalk: 6, risBook: 7, rpsLeads: 36, rpsAdm: 3, rpsWalk: 12, rpsBook: 18 },
+  { week: "01–04 Apr", risLeads: 18, risAdm: 3, risWalk: 6,  risBook: 7,  rpsLeads: 36, rpsAdm: 3, rpsWalk: 12, rpsBook: 18 },
   { week: "05–11 Apr", risLeads: 37, risAdm: 3, risWalk: 11, risBook: 15, rpsLeads: 60, rpsAdm: 4, rpsWalk: 15, rpsBook: 32 },
-  { week: "12–18 Apr", risLeads: 35, risAdm: 2, risWalk: 8, risBook: 10, rpsLeads: 27, rpsAdm: 3, rpsWalk: 6, rpsBook: 3 },
+  { week: "12–18 Apr", risLeads: 48, risAdm: 4, risWalk: 11, risBook: 17, rpsLeads: 38, rpsAdm: 4, rpsWalk: 8,  rpsBook: 10 },
 ];
 
 const SOCIAL = {
