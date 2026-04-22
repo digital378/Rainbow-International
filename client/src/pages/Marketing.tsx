@@ -267,7 +267,7 @@ export default function Marketing() {
   const [salaryCost, setSalaryCost] = useState<number>(DEFAULT_FIXED.combined.salary);
   const [crmCost, setCrmCost] = useState<number>(DEFAULT_FIXED.combined.crm);
   const [overheadCost, setOverheadCost] = useState<number>(DEFAULT_FIXED.combined.overhead);
-  const [teamSize, setTeamSize] = useState<number>(3);
+  const [teamSize, setTeamSize] = useState<number>(1);
 
   useEffect(() => {
     document.title = "Marketing Dashboard | Rainbow International School";
