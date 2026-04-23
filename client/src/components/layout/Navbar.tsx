@@ -193,6 +193,16 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 lg:hidden">
             <a
+              href="tel:+918291568972"
+              onClick={() => trackCallClick({ phone: "+91 82915 68972" })}
+              data-testid="link-navbar-call-mobile"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-[10px] font-bold transition-all ${isTransparent ? "bg-amber-400 text-[#091a4f]" : "bg-[#091a4f] text-white"}`}
+              aria-label="Call to book a visit"
+            >
+              <Phone size={14} />
+              Call & Book Visit
+            </a>
+            <a
               href="https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20admissions."
               target="_blank"
               rel="noopener noreferrer"
