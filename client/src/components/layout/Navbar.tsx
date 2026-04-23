@@ -200,7 +200,7 @@ export function Navbar() {
               aria-label="Call to book a visit"
             >
               <Phone size={14} />
-              Call & Book Visit
+              Book Visit
             </a>
             <a
               href="https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20admissions."
