@@ -8,8 +8,8 @@ import {
    DATA LAYER — easily replaceable with API/Sheets later
    ═══════════════════════════════════════════════════════════════════ */
 
-const LAST_UPDATED = "April 18, 2026";
-const TODAY_DATE = 18;
+const LAST_UPDATED = "April 23, 2026";
+const TODAY_DATE = 23;
 const DAYS_IN_APRIL = 30;
 const MIN_REVENUE_PER_ADM = 90000;
 
@@ -59,9 +59,9 @@ const MONTHLY: MonthRow[] = [
   },
   {
     month: "Apr 26*",
-    combined: { leads: 237, bookings: 99,  walkins: 63,  admissions: 21, spend: 119352, meta: 36581, google: 82771 },
-    ris:      { leads: 103, bookings: 39,  walkins: 28,  admissions: 10, spend: 49978,  meta: 5671,  google: 44307 },
-    rps:      { leads: 134, bookings: 60,  walkins: 35,  admissions: 11, spend: 70371,  meta: 34745, google: 35626 },
+    combined: { leads: 308, bookings: 126, walkins: 78,  admissions: 24, spend: 157487, meta: 48242, google: 109245 },
+    ris:      { leads: 141, bookings: 56,  walkins: 37,  admissions: 11, spend: 70735,  meta: 8776,  google: 61959 },
+    rps:      { leads: 167, bookings: 70,  walkins: 41,  admissions: 13, spend: 83914,  meta: 39466, google: 44448 },
   },
 ];
 
@@ -94,6 +94,7 @@ const APRIL_WEEKLY = [
   { week: "01–04 Apr", risLeads: 18, risAdm: 3, risWalk: 6,  risBook: 7,  rpsLeads: 36, rpsAdm: 3, rpsWalk: 12, rpsBook: 18 },
   { week: "05–11 Apr", risLeads: 37, risAdm: 3, risWalk: 11, risBook: 15, rpsLeads: 60, rpsAdm: 4, rpsWalk: 15, rpsBook: 32 },
   { week: "12–18 Apr", risLeads: 48, risAdm: 4, risWalk: 11, risBook: 17, rpsLeads: 38, rpsAdm: 4, rpsWalk: 8,  rpsBook: 10 },
+  { week: "19–25 Apr", risLeads: 38, risAdm: 1, risWalk: 9,  risBook: 17, rpsLeads: 33, rpsAdm: 2, rpsWalk: 6,  rpsBook: 10 },
 ];
 
 const SOCIAL = {
@@ -134,23 +135,23 @@ const CRM_RPS: { month: string; rows: CrmRow[]; total: CrmRow }[] = [
     { centre: "Unassigned",    leads: 51, bookings: 0,  walkins: 0, admissions: 0 },
   ], total: { centre: "Total", leads: 238, bookings: 77, walkins: 46, admissions: 22 } },
   { month: "Mar 26", rows: [
-    { centre: "Aggarwal",      leads: 71, bookings: 24, walkins: 14, admissions: 7 },
+    { centre: "Aggarwal",      leads: 71, bookings: 24, walkins: 14, admissions: 8 },
     { centre: "Anand Nagar",   leads: 32, bookings: 14, walkins: 7,  admissions: 4 },
     { centre: "Kasarvadavali", leads: 23, bookings: 7,  walkins: 5,  admissions: 2 },
-    { centre: "Hariniwas",     leads: 55, bookings: 20, walkins: 9,  admissions: 4 },
+    { centre: "Hariniwas",     leads: 55, bookings: 21, walkins: 10, admissions: 4 },
     { centre: "Dhokali",       leads: 37, bookings: 18, walkins: 8,  admissions: 4 },
     { centre: "Kalwa",         leads: 61, bookings: 25, walkins: 15, admissions: 5 },
     { centre: "Unassigned",    leads: 7,  bookings: 0,  walkins: 0,  admissions: 0 },
-  ], total: { centre: "Total", leads: 286, bookings: 108, walkins: 58, admissions: 26 } },
+  ], total: { centre: "Total", leads: 286, bookings: 109, walkins: 59, admissions: 27 } },
   { month: "Apr 26*", rows: [
-    { centre: "Aggarwal",      leads: 20, bookings: 10, walkins: 6, admissions: 2 },
-    { centre: "Anand Nagar",   leads: 12, bookings: 4,  walkins: 2, admissions: 0 },
-    { centre: "Kasarvadavali", leads: 15, bookings: 8,  walkins: 3, admissions: 2 },
-    { centre: "Hariniwas",     leads: 25, bookings: 15, walkins: 3, admissions: 2 },
-    { centre: "Dhokali",       leads: 17, bookings: 9,  walkins: 1, admissions: 0 },
-    { centre: "Kalwa",         leads: 26, bookings: 10, walkins: 2, admissions: 0 },
+    { centre: "Aggarwal",      leads: 33, bookings: 18, walkins: 8, admissions: 2 },
+    { centre: "Anand Nagar",   leads: 14, bookings: 5,  walkins: 2, admissions: 1 },
+    { centre: "Kasarvadavali", leads: 18, bookings: 8,  walkins: 3, admissions: 2 },
+    { centre: "Hariniwas",     leads: 30, bookings: 19, walkins: 6, admissions: 3 },
+    { centre: "Dhokali",       leads: 19, bookings: 9,  walkins: 1, admissions: 0 },
+    { centre: "Kalwa",         leads: 33, bookings: 13, walkins: 3, admissions: 0 },
     { centre: "Unassigned",    leads: 0,  bookings: 0,  walkins: 0, admissions: 0 },
-  ], total: { centre: "Total", leads: 115, bookings: 56, walkins: 17, admissions: 6 } },
+  ], total: { centre: "Total", leads: 147, bookings: 72, walkins: 23, admissions: 8 } },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -494,7 +495,7 @@ export default function Marketing() {
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
-          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 16, 2026)" />
+          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 23, 2026)" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 11).toFixed(0)} avg/month`} color={NAVY} />
             <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of leads`} color={PURPLE} />
@@ -544,7 +545,7 @@ export default function Marketing() {
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            April figures reflect performance through April 16 only ({TODAY_DATE} of {DAYS_IN_APRIL} days = {Math.round((TODAY_DATE / DAYS_IN_APRIL) * 100)}% of month). See Forecast for projected month-end.
+            April figures reflect performance through April 23 only ({TODAY_DATE} of {DAYS_IN_APRIL} days = {Math.round((TODAY_DATE / DAYS_IN_APRIL) * 100)}% of month). See Forecast for projected month-end.
           </div>
         </section>
 
