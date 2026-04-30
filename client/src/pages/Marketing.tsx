@@ -553,7 +553,7 @@ export default function Marketing() {
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
               { label: "Walk-ins", curr: current.walkins, prev: previous.walkins, format: num, color: CYAN },
               { label: "Admissions", curr: current.admissions, prev: previous.admissions, format: num, color: GREEN },
-              { label: "Marketing Spend", curr: current.spend, prev: previous.spend, format: inr, color: RED },
+              { label: "Marketing Spend", curr: current.spend, prev: previous.spend, format: inr, color: RED, invert: true },
               { label: "Marketing CPA", curr: cpa(current.spend, current.admissions), prev: cpa(previous.spend, previous.admissions), format: inr, color: PURPLE, invert: true },
               { label: "Cost per Lead (CPL)", curr: cpl(current.spend, current.leads), prev: cpl(previous.spend, previous.leads), format: inr, color: BLUE, invert: true },
               { label: "Cost per Booking (CPB)", curr: cpb(current.spend, current.bookings), prev: cpb(previous.spend, previous.bookings), format: inr, color: CYAN, invert: true },
@@ -570,7 +570,7 @@ export default function Marketing() {
                 <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
                   <div className="flex items-baseline justify-between mt-1.5">
-                    <div className="text-xl font-black" style={{ color: k.color }}>{k.format(k.curr)}</div>
+                    <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
                   <div className="text-[11px] text-gray-500 mt-1">vs Mar: {k.format(k.prev)}</div>
@@ -594,7 +594,7 @@ export default function Marketing() {
               { label: "Leads", curr: current.leads,       prev: aprilLastYear.leads,       format: num, color: NAVY },
               { label: "Walk-ins", curr: current.walkins,  prev: aprilLastYear.walkins,     format: num, color: CYAN },
               { label: "Admissions", curr: current.admissions, prev: aprilLastYear.admissions, format: num, color: GREEN },
-              { label: "Marketing Spend", curr: current.spend, prev: aprilLastYear.spend,   format: inr, color: RED },
+              { label: "Marketing Spend", curr: current.spend, prev: aprilLastYear.spend,   format: inr, color: RED, invert: true },
               { label: "Marketing CPA", curr: cpa(current.spend, current.admissions), prev: cpa(aprilLastYear.spend, aprilLastYear.admissions), format: inr, color: PURPLE, invert: true },
               { label: "True CPA", curr: trueCpa(current.spend, current.admissions, monthlyFixed, 1), prev: trueCpa(aprilLastYear.spend, aprilLastYear.admissions, monthlyFixed, 1), format: inr, color: RED, invert: true },
               { label: "Walk-in → Adm %", curr: (current.admissions / Math.max(current.walkins, 1)) * 100, prev: (aprilLastYear.admissions / Math.max(aprilLastYear.walkins, 1)) * 100, format: pct, color: GREEN },
@@ -606,7 +606,7 @@ export default function Marketing() {
                 <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
                   <div className="flex items-baseline justify-between mt-1.5">
-                    <div className="text-xl font-black" style={{ color: k.color }}>{k.format(k.curr)}</div>
+                    <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
                   <div className="text-[11px] text-gray-500 mt-1">vs Apr 25: {k.format(k.prev)}</div>
@@ -622,7 +622,7 @@ export default function Marketing() {
               { label: "Total Leads",       curr: tyJanAprTotals.leads,       prev: lyJanAprTotals.leads,       format: num, color: NAVY },
               { label: "Total Walk-ins",    curr: tyJanAprTotals.walkins,     prev: lyJanAprTotals.walkins,     format: num, color: CYAN },
               { label: "Total Admissions",  curr: tyJanAprTotals.admissions,  prev: lyJanAprTotals.admissions,  format: num, color: GREEN },
-              { label: "Total Spend",       curr: tyJanAprTotals.spend,       prev: lyJanAprTotals.spend,       format: inr, color: RED },
+              { label: "Total Spend",       curr: tyJanAprTotals.spend,       prev: lyJanAprTotals.spend,       format: inr, color: RED, invert: true },
               { label: "Marketing CPA",     curr: cpa(tyJanAprTotals.spend, tyJanAprTotals.admissions), prev: cpa(lyJanAprTotals.spend, lyJanAprTotals.admissions), format: inr, color: PURPLE, invert: true },
               { label: "True CPA",          curr: trueCpa(tyJanAprTotals.spend, tyJanAprTotals.admissions, monthlyFixed, 4), prev: trueCpa(lyJanAprTotals.spend, lyJanAprTotals.admissions, monthlyFixed, 4), format: inr, color: RED, invert: true },
               { label: "Cost per Lead",     curr: cpl(tyJanAprTotals.spend, tyJanAprTotals.leads),               prev: cpl(lyJanAprTotals.spend, lyJanAprTotals.leads),               format: inr, color: BLUE, invert: true },
@@ -634,7 +634,7 @@ export default function Marketing() {
                 <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
                   <div className="flex items-baseline justify-between mt-1.5">
-                    <div className="text-xl font-black" style={{ color: k.color }}>{k.format(k.curr)}</div>
+                    <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
                   <div className="text-[11px] text-gray-500 mt-1">vs LY: {k.format(k.prev)}</div>
