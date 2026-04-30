@@ -317,16 +317,25 @@ export default function Marketing() {
     return { ...ly[segment as "ris" | "rps"], bookings: 0 };
   }, [segment]);
 
-  /* TY Jan–Apr totals (MONTHLY indices 1–4: Jan 26, Feb 26, Mar 26, Apr 26) */
-  const tyJanAprTotals = useMemo(() => totalsFor(MONTHLY.slice(1), segment), [segment]);
+  /* TY Oct–Apr totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
+  const TY_OCT_NOV_ADM = { combined: 21, ris: 12, rps: 9 }; // oct+nov 25 organic adm per segment
+  const tyOctAprTotals = useMemo(() => {
+    const dec_apr = totalsFor(MONTHLY, segment); // Dec 25 – Apr 26 (all 5 rows)
+    return {
+      leads:       dec_apr.leads,       // Oct/Nov digital leads untracked; Dec-Apr only
+      walkins:     dec_apr.walkins,     // same
+      admissions:  dec_apr.admissions + TY_OCT_NOV_ADM[segment], // add organic Oct+Nov adm
+      spend:       dec_apr.spend,       // Oct/Nov had ₹0 ad spend
+    };
+  }, [segment]);
 
-  /* LY Jan–Apr totals (LAST_YEAR indices 3–6: Jan 25, Feb 25, Mar 25, Apr 25) */
-  const lyJanAprTotals = useMemo(() => {
-    const slice = LAST_YEAR.slice(3, 7); // Jan 25 → Apr 25
+  /* LY Oct–Apr totals (LAST_YEAR indices 0–6: Oct 24 → Apr 25) */
+  const lyOctAprTotals = useMemo(() => {
+    const slice = LAST_YEAR.slice(0, 7); // Oct 24 → Apr 25
     if (segment === "combined") return slice.reduce((a, r) => ({
-      spend: a.spend + r.ris.spend + r.rps.spend,
-      leads: a.leads + r.ris.leads + r.rps.leads,
-      walkins: a.walkins + r.ris.walkins + r.rps.walkins,
+      spend:      a.spend      + r.ris.spend      + r.rps.spend,
+      leads:      a.leads      + r.ris.leads      + r.rps.leads,
+      walkins:    a.walkins    + r.ris.walkins    + r.rps.walkins,
       admissions: a.admissions + r.ris.admissions + r.rps.admissions,
     }), { spend: 0, leads: 0, walkins: 0, admissions: 0 });
     return slice.reduce((a, r) => {
@@ -615,18 +624,18 @@ export default function Marketing() {
             })}
           </div>
 
-          {/* ── Part B: Jan–Apr Cumulative YoY ── */}
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">Jan–Apr Cumulative — AY 2025-26 (Jan 26–Apr 26) vs AY 2024-25 (Jan 25–Apr 25)</div>
+          {/* ── Part B: Oct–Apr Cumulative YoY ── */}
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">Oct–Apr Cumulative — AY 2025-26 (Oct 25–Apr 26) vs AY 2024-25 (Oct 24–Apr 25)</div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: "Total Leads",       curr: tyJanAprTotals.leads,       prev: lyJanAprTotals.leads,       format: num, color: NAVY },
-              { label: "Total Walk-ins",    curr: tyJanAprTotals.walkins,     prev: lyJanAprTotals.walkins,     format: num, color: CYAN },
-              { label: "Total Admissions",  curr: tyJanAprTotals.admissions,  prev: lyJanAprTotals.admissions,  format: num, color: GREEN },
-              { label: "Total Spend",       curr: tyJanAprTotals.spend,       prev: lyJanAprTotals.spend,       format: inr, color: RED, invert: true },
-              { label: "Marketing CPA",     curr: cpa(tyJanAprTotals.spend, tyJanAprTotals.admissions), prev: cpa(lyJanAprTotals.spend, lyJanAprTotals.admissions), format: inr, color: PURPLE, invert: true },
-              { label: "True CPA",          curr: trueCpa(tyJanAprTotals.spend, tyJanAprTotals.admissions, monthlyFixed, 4), prev: trueCpa(lyJanAprTotals.spend, lyJanAprTotals.admissions, monthlyFixed, 4), format: inr, color: RED, invert: true },
-              { label: "Cost per Lead",     curr: cpl(tyJanAprTotals.spend, tyJanAprTotals.leads),               prev: cpl(lyJanAprTotals.spend, lyJanAprTotals.leads),               format: inr, color: BLUE, invert: true },
-              { label: "Min. ROI %",        curr: roi(tyJanAprTotals.admissions * MIN_REVENUE_PER_ADM, tyJanAprTotals.spend), prev: roi(lyJanAprTotals.admissions * MIN_REVENUE_PER_ADM, lyJanAprTotals.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
+              { label: "Total Leads",       curr: tyOctAprTotals.leads,       prev: lyOctAprTotals.leads,       format: num },
+              { label: "Total Walk-ins",    curr: tyOctAprTotals.walkins,     prev: lyOctAprTotals.walkins,     format: num },
+              { label: "Total Admissions",  curr: tyOctAprTotals.admissions,  prev: lyOctAprTotals.admissions,  format: num },
+              { label: "Total Spend",       curr: tyOctAprTotals.spend,       prev: lyOctAprTotals.spend,       format: inr, invert: true },
+              { label: "Marketing CPA",     curr: cpa(tyOctAprTotals.spend, tyOctAprTotals.admissions),    prev: cpa(lyOctAprTotals.spend, lyOctAprTotals.admissions),    format: inr, invert: true },
+              { label: "True CPA",          curr: trueCpa(tyOctAprTotals.spend, tyOctAprTotals.admissions, monthlyFixed, totalMonths), prev: trueCpa(lyOctAprTotals.spend, lyOctAprTotals.admissions, monthlyFixed, 7), format: inr, invert: true },
+              { label: "Cost per Lead",     curr: cpl(tyOctAprTotals.spend, tyOctAprTotals.leads),         prev: cpl(lyOctAprTotals.spend, lyOctAprTotals.leads),         format: inr, invert: true },
+              { label: "Min. ROI %",        curr: roi(tyOctAprTotals.admissions * MIN_REVENUE_PER_ADM, tyOctAprTotals.spend), prev: roi(lyOctAprTotals.admissions * MIN_REVENUE_PER_ADM, lyOctAprTotals.spend), format: (n: number) => `${Math.round(n)}%` },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
@@ -643,7 +652,7 @@ export default function Marketing() {
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            Same 4-month window both years (Jan → Apr). LY Jan 25 – Apr 25 data from LAST_YEAR sheet.
+            Same 7-month window both years (Oct → Apr). TY Oct–Nov 25: ₹0 spend, organic admissions only. LY Oct 24 – Apr 25 from sheet.
           </div>
         </section>
 
