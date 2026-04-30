@@ -523,13 +523,16 @@ export default function Marketing() {
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
           <SectionTitle title="Month-over-Month Comparison" sub="April 2026 (final) vs March 2026 (final)" />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
               { label: "Walk-ins", curr: current.walkins, prev: previous.walkins, format: num, color: CYAN },
               { label: "Admissions", curr: current.admissions, prev: previous.admissions, format: num, color: GREEN },
               { label: "Marketing Spend", curr: current.spend, prev: previous.spend, format: inr, color: RED },
               { label: "Marketing CPA", curr: cpa(current.spend, current.admissions), prev: cpa(previous.spend, previous.admissions), format: inr, color: PURPLE, invert: true },
+              { label: "Cost per Lead (CPL)", curr: cpl(current.spend, current.leads), prev: cpl(previous.spend, previous.leads), format: inr, color: BLUE, invert: true },
+              { label: "Cost per Booking (CPB)", curr: cpb(current.spend, current.bookings), prev: cpb(previous.spend, previous.bookings), format: inr, color: CYAN, invert: true },
+              { label: "Cost per Walk-in (CPW)", curr: cpw(current.spend, current.walkins), prev: cpw(previous.spend, previous.walkins), format: inr, color: SLATE, invert: true },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
