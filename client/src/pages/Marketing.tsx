@@ -317,9 +317,12 @@ export default function Marketing() {
     return { ...ly[segment as "ris" | "rps"], bookings: 0 };
   }, [segment]);
 
-  /* Last year Dec–Apr totals (LAST_YEAR indices 2–6: Dec 24, Jan 25, Feb 25, Mar 25, Apr 25) */
-  const lyDecAprTotals = useMemo(() => {
-    const slice = LAST_YEAR.slice(2, 7); // Dec 24 → Apr 25
+  /* TY Jan–Apr totals (MONTHLY indices 1–4: Jan 26, Feb 26, Mar 26, Apr 26) */
+  const tyJanAprTotals = useMemo(() => totalsFor(MONTHLY.slice(1), segment), [segment]);
+
+  /* LY Jan–Apr totals (LAST_YEAR indices 3–6: Jan 25, Feb 25, Mar 25, Apr 25) */
+  const lyJanAprTotals = useMemo(() => {
+    const slice = LAST_YEAR.slice(3, 7); // Jan 25 → Apr 25
     if (segment === "combined") return slice.reduce((a, r) => ({
       spend: a.spend + r.ris.spend + r.rps.spend,
       leads: a.leads + r.ris.leads + r.rps.leads,
@@ -612,18 +615,18 @@ export default function Marketing() {
             })}
           </div>
 
-          {/* ── Part B: Dec–Apr Cumulative YoY ── */}
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">Dec–Apr Cumulative — AY 2025-26 (Dec 25–Apr 26) vs AY 2024-25 (Dec 24–Apr 25)</div>
+          {/* ── Part B: Jan–Apr Cumulative YoY ── */}
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">Jan–Apr Cumulative — AY 2025-26 (Jan 26–Apr 26) vs AY 2024-25 (Jan 25–Apr 25)</div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: "Total Leads",       curr: totals.leads,       prev: lyDecAprTotals.leads,       format: num, color: NAVY },
-              { label: "Total Walk-ins",    curr: totals.walkins,     prev: lyDecAprTotals.walkins,     format: num, color: CYAN },
-              { label: "Total Admissions",  curr: totals.admissions,  prev: lyDecAprTotals.admissions,  format: num, color: GREEN },
-              { label: "Total Spend",       curr: totals.spend,       prev: lyDecAprTotals.spend,       format: inr, color: RED },
-              { label: "Marketing CPA",     curr: cpa(totals.spend, totals.admissions),          prev: cpa(lyDecAprTotals.spend, lyDecAprTotals.admissions),          format: inr, color: PURPLE, invert: true },
-              { label: "True CPA",          curr: trueCpa(totals.spend, totals.admissions, monthlyFixed, totalMonths), prev: trueCpa(lyDecAprTotals.spend, lyDecAprTotals.admissions, monthlyFixed, 5), format: inr, color: RED, invert: true },
-              { label: "Cost per Lead",     curr: cpl(totals.spend, totals.leads),               prev: cpl(lyDecAprTotals.spend, lyDecAprTotals.leads),               format: inr, color: BLUE, invert: true },
-              { label: "Min. ROI %",        curr: roi(totals.admissions * MIN_REVENUE_PER_ADM, totals.spend), prev: roi(lyDecAprTotals.admissions * MIN_REVENUE_PER_ADM, lyDecAprTotals.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
+              { label: "Total Leads",       curr: tyJanAprTotals.leads,       prev: lyJanAprTotals.leads,       format: num, color: NAVY },
+              { label: "Total Walk-ins",    curr: tyJanAprTotals.walkins,     prev: lyJanAprTotals.walkins,     format: num, color: CYAN },
+              { label: "Total Admissions",  curr: tyJanAprTotals.admissions,  prev: lyJanAprTotals.admissions,  format: num, color: GREEN },
+              { label: "Total Spend",       curr: tyJanAprTotals.spend,       prev: lyJanAprTotals.spend,       format: inr, color: RED },
+              { label: "Marketing CPA",     curr: cpa(tyJanAprTotals.spend, tyJanAprTotals.admissions), prev: cpa(lyJanAprTotals.spend, lyJanAprTotals.admissions), format: inr, color: PURPLE, invert: true },
+              { label: "True CPA",          curr: trueCpa(tyJanAprTotals.spend, tyJanAprTotals.admissions, monthlyFixed, 4), prev: trueCpa(lyJanAprTotals.spend, lyJanAprTotals.admissions, monthlyFixed, 4), format: inr, color: RED, invert: true },
+              { label: "Cost per Lead",     curr: cpl(tyJanAprTotals.spend, tyJanAprTotals.leads),               prev: cpl(lyJanAprTotals.spend, lyJanAprTotals.leads),               format: inr, color: BLUE, invert: true },
+              { label: "Min. ROI %",        curr: roi(tyJanAprTotals.admissions * MIN_REVENUE_PER_ADM, tyJanAprTotals.spend), prev: roi(lyJanAprTotals.admissions * MIN_REVENUE_PER_ADM, lyJanAprTotals.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
@@ -640,7 +643,7 @@ export default function Marketing() {
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            Same 5-month window both years (Dec → Apr). LY Dec 24 – Apr 25 data from LAST_YEAR sheet.
+            Same 4-month window both years (Jan → Apr). LY Jan 25 – Apr 25 data from LAST_YEAR sheet.
           </div>
         </section>
 
