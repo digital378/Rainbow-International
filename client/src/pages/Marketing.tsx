@@ -716,11 +716,6 @@ export default function Marketing() {
               <div className="text-3xl font-black text-[#091a4f] mt-1">{((totals.bookings / Math.max(totals.leads, 1)) * 100).toFixed(1)}</div>
               <div className="text-[11px] text-gray-500 mt-1">Lead engagement rate</div>
             </div>
-            <div className="rounded-xl p-4 bg-amber-50 border-l-4 border-amber-400">
-              <div className="text-[10px] uppercase tracking-wider font-bold text-amber-700">Team efficiency</div>
-              <div className="text-3xl font-black text-[#091a4f] mt-1">{(totals.admissions / Math.max(teamSize, 1)).toFixed(1)}</div>
-              <div className="text-[11px] text-gray-500 mt-1">Adm per team member · {teamSize} members</div>
-            </div>
           </div>
 
           {/* Drop-off bars */}
