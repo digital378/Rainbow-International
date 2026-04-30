@@ -8,8 +8,8 @@ import {
    DATA LAYER — easily replaceable with API/Sheets later
    ═══════════════════════════════════════════════════════════════════ */
 
-const LAST_UPDATED = "April 23, 2026";
-const TODAY_DATE = 23;
+const LAST_UPDATED = "April 30, 2026";
+const TODAY_DATE = 30;
 const DAYS_IN_APRIL = 30;
 const MIN_REVENUE_PER_ADM = 90000;
 
@@ -47,21 +47,21 @@ const MONTHLY: MonthRow[] = [
   },
   {
     month: "Feb 26",
-    combined: { leads: 418, bookings: 115, walkins: 94,  admissions: 24, spend: 179377, meta: 58885,  google: 120492 },
+    combined: { leads: 418, bookings: 115, walkins: 94,  admissions: 24, spend: 181038, meta: 60546,  google: 120492 },
     ris:      { leads: 180, bookings: 36,  walkins: 27,  admissions: 6,  spend: 54620,  meta: 8796,   google: 45824 },
     rps:      { leads: 238, bookings: 79,  walkins: 67,  admissions: 18, spend: 129285, meta: 51750,  google: 77535 },
   },
   {
     month: "Mar 26",
-    combined: { leads: 498, bookings: 196, walkins: 121, admissions: 47, spend: 194500, meta: 61121,  google: 133379 },
+    combined: { leads: 498, bookings: 196, walkins: 121, admissions: 47, spend: 205317, meta: 71938,  google: 133379 },
     ris:      { leads: 211, bookings: 67,  walkins: 40,  admissions: 11, spend: 75051,  meta: 3011,   google: 72040 },
     rps:      { leads: 287, bookings: 130, walkins: 81,  admissions: 36, spend: 148955, meta: 68927,  google: 80028 },
   },
   {
-    month: "Apr 26*",
-    combined: { leads: 308, bookings: 126, walkins: 78,  admissions: 24, spend: 157487, meta: 48242, google: 109245 },
-    ris:      { leads: 141, bookings: 56,  walkins: 37,  admissions: 11, spend: 70735,  meta: 8776,  google: 61959 },
-    rps:      { leads: 167, bookings: 70,  walkins: 41,  admissions: 13, spend: 83914,  meta: 39466, google: 44448 },
+    month: "Apr 26",
+    combined: { leads: 357, bookings: 147, walkins: 91,  admissions: 28, spend: 176754, meta: 55758, google: 120996 },
+    ris:      { leads: 162, bookings: 68,  walkins: 45,  admissions: 13, spend: 79364,  meta: 8776,  google: 70588 },
+    rps:      { leads: 195, bookings: 79,  walkins: 46,  admissions: 15, spend: 97390,  meta: 46982, google: 50408 },
   },
 ];
 
@@ -70,7 +70,7 @@ const APRIL_RPS_BASE = MONTHLY[APRIL_IDX].rps;
 
 /* Pre-spend organic admissions Jun – Nov 2025 (no marketing investment).
    These reconcile the 5-month "ad-spend window" with the sheet's full-AY
-   "TOTAL TILL DATE" of 160 admissions. */
+   "TOTAL TILL DATE" of 170 admissions. */
 const ORGANIC_PRE_SPEND = {
   combined: { leads: 197, admissions: 21 },  // Jun–Nov: 8+4+5+20+57+103 = 197 leads, 6 (Oct) + 15 (Nov) = 21 adm
   ris:      { leads: 134, admissions: 12 },  // Jun–Nov RIS: 134 leads, 4 (Oct) + 8 (Nov) = 12 adm
@@ -94,7 +94,8 @@ const APRIL_WEEKLY = [
   { week: "01–04 Apr", risLeads: 18, risAdm: 3, risWalk: 6,  risBook: 7,  rpsLeads: 36, rpsAdm: 3, rpsWalk: 12, rpsBook: 18 },
   { week: "05–11 Apr", risLeads: 37, risAdm: 3, risWalk: 11, risBook: 15, rpsLeads: 60, rpsAdm: 4, rpsWalk: 15, rpsBook: 32 },
   { week: "12–18 Apr", risLeads: 48, risAdm: 4, risWalk: 11, risBook: 17, rpsLeads: 38, rpsAdm: 4, rpsWalk: 8,  rpsBook: 10 },
-  { week: "19–25 Apr", risLeads: 38, risAdm: 1, risWalk: 9,  risBook: 17, rpsLeads: 33, rpsAdm: 2, rpsWalk: 6,  rpsBook: 10 },
+  { week: "19–25 Apr", risLeads: 47, risAdm: 3, risWalk: 13, risBook: 20, rpsLeads: 46, rpsAdm: 3, rpsWalk: 8,  rpsBook: 16 },
+  { week: "26–30 Apr", risLeads: 12, risAdm: 0, risWalk: 4,  risBook: 9,  rpsLeads: 15, rpsAdm: 1, rpsWalk: 3,  rpsBook: 3  },
 ];
 
 const SOCIAL = {
@@ -143,15 +144,15 @@ const CRM_RPS: { month: string; rows: CrmRow[]; total: CrmRow }[] = [
     { centre: "Kalwa",         leads: 61, bookings: 25, walkins: 15, admissions: 5 },
     { centre: "Unassigned",    leads: 7,  bookings: 0,  walkins: 0,  admissions: 0 },
   ], total: { centre: "Total", leads: 286, bookings: 109, walkins: 59, admissions: 27 } },
-  { month: "Apr 26*", rows: [
-    { centre: "Aggarwal",      leads: 33, bookings: 18, walkins: 8, admissions: 2 },
-    { centre: "Anand Nagar",   leads: 14, bookings: 5,  walkins: 2, admissions: 1 },
-    { centre: "Kasarvadavali", leads: 18, bookings: 8,  walkins: 3, admissions: 2 },
-    { centre: "Hariniwas",     leads: 30, bookings: 19, walkins: 6, admissions: 3 },
-    { centre: "Dhokali",       leads: 19, bookings: 9,  walkins: 1, admissions: 0 },
-    { centre: "Kalwa",         leads: 33, bookings: 13, walkins: 3, admissions: 0 },
+  { month: "Apr 26", rows: [
+    { centre: "Aggarwal",      leads: 40, bookings: 22, walkins: 9, admissions: 2 },
+    { centre: "Anand Nagar",   leads: 15, bookings: 6,  walkins: 2, admissions: 1 },
+    { centre: "Kasarvadavali", leads: 24, bookings: 10, walkins: 3, admissions: 2 },
+    { centre: "Hariniwas",     leads: 34, bookings: 19, walkins: 6, admissions: 3 },
+    { centre: "Dhokali",       leads: 26, bookings: 12, walkins: 1, admissions: 0 },
+    { centre: "Kalwa",         leads: 37, bookings: 15, walkins: 4, admissions: 1 },
     { centre: "Unassigned",    leads: 0,  bookings: 0,  walkins: 0, admissions: 0 },
-  ], total: { centre: "Total", leads: 147, bookings: 72, walkins: 23, admissions: 8 } },
+  ], total: { centre: "Total", leads: 176, bookings: 84, walkins: 25, admissions: 9 } },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -261,7 +262,7 @@ export default function Marketing() {
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
   const [calcSpend, setCalcSpend] = useState<number>(100000);
-  const [calcMonth, setCalcMonth] = useState<string>("Apr 26*");
+  const [calcMonth, setCalcMonth] = useState<string>("Apr 26");
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
 
   /* Editable cost inputs — initialized from segment defaults */
@@ -429,8 +430,8 @@ export default function Marketing() {
         body: `${walkToAdm.toFixed(1)}% of walk-ins convert to admissions — above industry standard. Focus on driving more walk-ins to multiply admissions.` });
     }
 
-    /* April pace */
-    if (forecast.leads < previous.leads * 0.95) {
+    /* April pace — only show when month is still running */
+    if (TODAY_DATE < DAYS_IN_APRIL && forecast.leads < previous.leads * 0.95) {
       arr.push({ severity: "warning", title: "April tracking below March",
         body: `Forecasted April leads (${num(forecast.leads)}) projected below March (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_APRIL - TODAY_DATE} days.` });
     }
@@ -495,7 +496,7 @@ export default function Marketing() {
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
-          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 23, 2026)" />
+          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 30, 2026)" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 11).toFixed(0)} avg/month`} color={NAVY} />
             <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of leads`} color={PURPLE} />
@@ -521,7 +522,7 @@ export default function Marketing() {
 
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
-          <SectionTitle title="Month-over-Month Comparison" sub="April 2026 (in progress) vs March 2026 (final)" />
+          <SectionTitle title="Month-over-Month Comparison" sub="April 2026 (final) vs March 2026 (final)" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
@@ -545,23 +546,23 @@ export default function Marketing() {
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            April figures reflect performance through April 23 only ({TODAY_DATE} of {DAYS_IN_APRIL} days = {Math.round((TODAY_DATE / DAYS_IN_APRIL) * 100)}% of month). See Forecast for projected month-end.
+            April is complete ({TODAY_DATE} of {DAYS_IN_APRIL} days). Final month totals shown.
           </div>
         </section>
 
         {/* ───────── 4. April Forecast (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title="April 2026 Forecast (Projected Month-End)"
-            sub={`Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
+            title={TODAY_DATE >= DAYS_IN_APRIL ? "April 2026 — Final Actuals" : "April 2026 Forecast (Projected Month-End)"}
+            sub={TODAY_DATE >= DAYS_IN_APRIL ? `Month complete · All 30 days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
             badge={`Confidence: ${fcConfidence}`}
           />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             {[
-              { label: "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
-              { label: "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
-              { label: "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
-              { label: "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
+              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Leads" : "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
+              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Walk-ins" : "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
+              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Admissions" : "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
+              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Spend" : "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
             ].map((k, i) => (
               <div key={i} className="rounded-xl border border-gray-100 p-3">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
