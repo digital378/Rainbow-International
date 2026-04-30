@@ -594,20 +594,19 @@ export default function Marketing() {
 
         {/* ───────── 3b. Year-over-Year Comparison ───────── */}
         <section>
-          <SectionTitle title="Year-over-Year Comparison" sub="April 2026 vs April 2025 (same month) · AY monthly-average comparison (TY Dec–Apr avg vs LY Oct–Jun avg)" />
+          <SectionTitle title="Year-over-Year Comparison" sub="April 2026 vs April 2025 — same month, same window" />
 
-          {/* ── Part A: April YoY ── */}
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">April 2026 vs April 2025</div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: "Leads", curr: current.leads,       prev: aprilLastYear.leads,       format: num, color: NAVY },
-              { label: "Walk-ins", curr: current.walkins,  prev: aprilLastYear.walkins,     format: num, color: CYAN },
-              { label: "Admissions", curr: current.admissions, prev: aprilLastYear.admissions, format: num, color: GREEN },
-              { label: "Marketing Spend", curr: current.spend, prev: aprilLastYear.spend,   format: inr, color: RED, invert: true },
-              { label: "Marketing CPA", curr: cpa(current.spend, current.admissions), prev: cpa(aprilLastYear.spend, aprilLastYear.admissions), format: inr, color: PURPLE, invert: true },
-              { label: "True CPA", curr: trueCpa(current.spend, current.admissions, monthlyFixed, 1), prev: trueCpa(aprilLastYear.spend, aprilLastYear.admissions, monthlyFixed, 1), format: inr, color: RED, invert: true },
-              { label: "Walk-in → Adm %", curr: (current.admissions / Math.max(current.walkins, 1)) * 100, prev: (aprilLastYear.admissions / Math.max(aprilLastYear.walkins, 1)) * 100, format: pct, color: GREEN },
-              { label: "Min. ROI %", curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend), prev: roi(aprilLastYear.admissions * MIN_REVENUE_PER_ADM, aprilLastYear.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
+              { label: "Leads",              curr: current.leads,       prev: aprilLastYear.leads,       format: num },
+              { label: "Walk-ins",           curr: current.walkins,     prev: aprilLastYear.walkins,     format: num },
+              { label: "Admissions",         curr: current.admissions,  prev: aprilLastYear.admissions,  format: num },
+              { label: "Marketing Spend",    curr: current.spend,       prev: aprilLastYear.spend,       format: inr,  invert: true },
+              { label: "Marketing CPA",      curr: cpa(current.spend, current.admissions),                          prev: cpa(aprilLastYear.spend, aprilLastYear.admissions),                          format: inr, invert: true },
+              { label: "True CPA",           curr: trueCpa(current.spend, current.admissions, monthlyFixed, 1),     prev: trueCpa(aprilLastYear.spend, aprilLastYear.admissions, monthlyFixed, 1),     format: inr, invert: true },
+              { label: "Revenue (Min.)",     curr: current.admissions * MIN_REVENUE_PER_ADM,                        prev: aprilLastYear.admissions * MIN_REVENUE_PER_ADM,                              format: inr },
+              { label: "Walk-in → Adm %",   curr: (current.admissions / Math.max(current.walkins, 1)) * 100,       prev: (aprilLastYear.admissions / Math.max(aprilLastYear.walkins, 1)) * 100,       format: pct },
+              { label: "Min. ROI %",         curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend),   prev: roi(aprilLastYear.admissions * MIN_REVENUE_PER_ADM, aprilLastYear.spend),   format: (n: number) => `${Math.round(n)}%` },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
@@ -622,37 +621,6 @@ export default function Marketing() {
                 </div>
               );
             })}
-          </div>
-
-          {/* ── Part B: Oct–Apr Cumulative YoY ── */}
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-gray-400 pl-1">Oct–Apr Cumulative — AY 2025-26 (Oct 25–Apr 26) vs AY 2024-25 (Oct 24–Apr 25)</div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { label: "Total Leads",       curr: tyOctAprTotals.leads,       prev: lyOctAprTotals.leads,       format: num },
-              { label: "Total Walk-ins",    curr: tyOctAprTotals.walkins,     prev: lyOctAprTotals.walkins,     format: num },
-              { label: "Total Admissions",  curr: tyOctAprTotals.admissions,  prev: lyOctAprTotals.admissions,  format: num },
-              { label: "Total Spend",       curr: tyOctAprTotals.spend,       prev: lyOctAprTotals.spend,       format: inr, invert: true },
-              { label: "Marketing CPA",     curr: cpa(tyOctAprTotals.spend, tyOctAprTotals.admissions),    prev: cpa(lyOctAprTotals.spend, lyOctAprTotals.admissions),    format: inr, invert: true },
-              { label: "True CPA",          curr: trueCpa(tyOctAprTotals.spend, tyOctAprTotals.admissions, monthlyFixed, totalMonths), prev: trueCpa(lyOctAprTotals.spend, lyOctAprTotals.admissions, monthlyFixed, 7), format: inr, invert: true },
-              { label: "Cost per Lead",     curr: cpl(tyOctAprTotals.spend, tyOctAprTotals.leads),         prev: cpl(lyOctAprTotals.spend, lyOctAprTotals.leads),         format: inr, invert: true },
-              { label: "Min. ROI %",        curr: roi(tyOctAprTotals.admissions * MIN_REVENUE_PER_ADM, tyOctAprTotals.spend), prev: roi(lyOctAprTotals.admissions * MIN_REVENUE_PER_ADM, lyOctAprTotals.spend), format: (n: number) => `${Math.round(n)}%` },
-            ].map((k, i) => {
-              const d = mom(k.curr, k.prev);
-              const goodDirection = (k as any).invert ? !d.positive : d.positive;
-              return (
-                <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
-                  <div className="flex items-baseline justify-between mt-1.5">
-                    <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
-                    <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
-                  </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs LY: {k.format(k.prev)}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-3 text-[12px] text-gray-500 italic">
-            Same 7-month window both years (Oct → Apr). TY Oct–Nov 25: ₹0 spend, organic admissions only. LY Oct 24 – Apr 25 from sheet.
           </div>
         </section>
 
