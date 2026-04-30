@@ -60,6 +60,9 @@ Preferred communication style: Simple, everyday language.
 
 All 94 blog posts are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
 
+### Career Page (Apr 2026)
+`/career` lists 6 academic openings (PRT English/EVS/Computer, PGT English/History, TGT English) and 9 non-academic openings (Swimming Coach, Librarian, Admission Counsellor, School Clerk, HR Manager, HR Recruiter, Admin, Sales Manager, L&D Trainer). Each section shows a "Female candidates are preferred…" note. HR contact 87799 81827 is displayed near the form. Application form collects Full Name, Email, Phone, Total Experience, Qualification, Role Applied For (dropdown), Current Location, and an Updated Resume upload (PDF/DOC/DOCX, max 5 MB). Submissions POST `multipart/form-data` to `/api/career-applications`, are validated server-side (multer + magic-byte check + Zod via `insertCareerApplicationSchema`), persisted to the `career_applications` table (extended with `currentLocation`, `resumeFilename`, `resumeMimeType`, `resumeSize`), and emailed to `hr.recruiter3@rainbowinternationalschool.in` with the resume attached. Success message: "Thank you for applying. Our HR team will review your application and contact shortlisted candidates."
+
 ### Brand Partners Page (Apr 2026)
 New page at `/brand-partners` replaces old `/global-brand-associations` (301 redirect in `server/index.ts`). Lists 134 partner brands across 11 categories (Restaurants & Cafés, Health & Wellness, Fitness & Sports, Salon Beauty & Spa, Fashion & Apparel, Eyewear & Optics, Toys/Books/Stationery, Entertainment & Family, Hotels & Stays, Home & Lifestyle, Finance & Services). Logos in `client/public/brands/` as WebP (~1.5MB total, 90% size reduction). Data file: `client/src/data/brandPartners.ts`. Includes filter pills, brochure download modal with privilege card validation. Brochure placeholder URL: `/brochures/brand-partners-brochure.pdf` (not yet uploaded — replace `BROCHURE_URL` constant in `BrandPartners.tsx`).
 
@@ -114,6 +117,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
 | `/marketing` | Marketing Dashboard (noindex, real CRM/branch data) | `pages/Marketing.tsx` |
 | `/brand-partners` | Brand Partners (134 logos, 11 categories, brochure modal) | `pages/BrandPartners.tsx` |
+| `/career` | Careers — 6 academic + 9 non-academic openings, female-preference notes, expanded form with resume upload | `pages/Career.tsx` |
 
 ## Key Components
 

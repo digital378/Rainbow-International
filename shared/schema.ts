@@ -89,6 +89,10 @@ export const careerApplications = pgTable("career_applications", {
   position: text("position").notNull(),
   experience: text("experience"),
   qualification: text("qualification"),
+  currentLocation: text("current_location"),
+  resumeFilename: text("resume_filename"),
+  resumeMimeType: text("resume_mime_type"),
+  resumeSize: text("resume_size"),
   message: text("message"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -99,10 +103,14 @@ export const insertCareerApplicationSchema = createInsertSchema(careerApplicatio
 }).extend({
   name: z.string().min(1, "Full name is required"),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(1, "Phone number is required"),
+  phone: z.string().min(7, "Please enter a valid phone number"),
   position: z.string().min(1, "Please select a position"),
-  experience: z.string().optional().or(z.literal("")),
-  qualification: z.string().optional().or(z.literal("")),
+  experience: z.string().min(1, "Total experience is required"),
+  qualification: z.string().min(1, "Qualification is required"),
+  currentLocation: z.string().min(1, "Current location is required"),
+  resumeFilename: z.string().optional().or(z.literal("")),
+  resumeMimeType: z.string().optional().or(z.literal("")),
+  resumeSize: z.string().optional().or(z.literal("")),
   message: z.string().optional().or(z.literal("")),
 });
 

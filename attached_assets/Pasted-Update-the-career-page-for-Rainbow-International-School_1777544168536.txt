@@ -1,0 +1,211 @@
+Update the /career page for Rainbow International School.
+
+PAGE URL:
+ /career
+
+PRIMARY TASK:
+Remove all old job openings and replace them with the new current openings.
+
+Create two clear sections:
+1. Academic Openings
+2. Non-Academic Openings
+
+Mention clearly in both sections:
+“Female candidates are preferred for these roles, in line with current team requirements.”
+
+--------------------------------------------------
+ACADEMIC OPENINGS
+--------------------------------------------------
+
+Add the following roles:
+
+1. PRT English Teacher
+Experience: 1–4 years
+
+2. PRT EVS Teacher
+Experience: 1–4 years
+
+3. PRT Computer Teacher
+Experience: 1–4 years
+
+4. PGT English
+Experience: 1–4 years
+
+5. PGT History
+Experience: 1–4 years
+
+6. TGT English
+Experience: 1–4 years
+
+--------------------------------------------------
+NON-ACADEMIC OPENINGS
+--------------------------------------------------
+
+Add the following roles:
+
+1. Swimming Coach
+Experience: 1–4 years
+
+2. Librarian
+Experience: 1–4 years
+
+3. Admission Counsellor
+Experience: 2–5 years
+
+4. School Clerk
+Experience: 2–5 years
+
+5. HR Manager
+Experience: 8–12 years
+
+6. HR Recruiter
+Experience: 3–6 years
+
+7. Admin
+Experience: 2–5 years
+
+8. Sales Manager
+Experience: 8–12 years
+
+9. L&D Trainer
+Experience: 5–8 years
+
+--------------------------------------------------
+JOB ENQUIRY / APPLICATION FORM UPDATE
+--------------------------------------------------
+
+Update the job enquiry form with the following required fields:
+
+- Full Name
+- Email ID
+- Phone Number
+- Total Experience
+- Qualification
+- Role Applied For
+- Current Location
+- Updated Resume upload field
+
+Important:
+- Resume upload should support PDF, DOC, and DOCX formats.
+- Mark all fields as required.
+- Role Applied For should ideally be a dropdown with the updated job openings listed.
+- Add proper validation for email, phone number, and resume upload.
+
+--------------------------------------------------
+HR CONTACT DETAILS
+--------------------------------------------------
+
+Add HR contact number clearly on the Career page:
+
+HR Contact Number:
+87799 81827
+
+Suggested placement:
+- Near the job application form
+- In a “For Career Enquiries” contact card
+- Also optionally in the CTA section
+
+--------------------------------------------------
+UI/UX REQUIREMENTS
+--------------------------------------------------
+
+1. Match the current Rainbow International School website design language.
+2. Keep the page modern, clean, and professional.
+3. Use clear job cards or a neat table layout.
+4. Separate Academic and Non-Academic roles visually.
+5. Add experience labels/badges for each job.
+6. Add a strong CTA near each section:
+   “Apply Now”
+7. Clicking Apply Now should scroll to or open the application form.
+8. Keep the page mobile responsive.
+9. Ensure the job list is easy to read on mobile.
+10. Avoid clutter.
+
+Suggested layout:
+- Hero section:
+  “Careers at Rainbow International School”
+  Subtitle: “Join our team and help shape the future of education.”
+
+- Current Openings section:
+  Two tabs or two blocks:
+  Academic | Non-Academic
+
+- Application Form section:
+  “Apply for a Position”
+
+- HR Contact card:
+  “For career enquiries, contact HR: 87799 81827”
+
+--------------------------------------------------
+SEO REQUIREMENTS
+--------------------------------------------------
+
+Optimize the page for relevant career/job search keywords.
+
+SEO Title:
+Careers at Rainbow International School Thane | Teaching & Non-Teaching Jobs
+
+Meta Description:
+Apply for teaching and non-teaching job openings at Rainbow International School Thane. View current academic and non-academic vacancies and submit your resume online.
+
+H1:
+Careers at Rainbow International School
+
+Suggested H2s:
+- Current Job Openings
+- Academic Openings
+- Non-Academic Openings
+- Apply for a Position
+- Career Enquiries
+
+Add relevant keywords naturally:
+- school jobs in Thane
+- teaching jobs in Thane
+- teacher vacancy in Thane
+- CBSE school jobs in Thane
+- non-teaching jobs in school
+- careers at Rainbow International School
+
+--------------------------------------------------
+FUNCTIONAL REQUIREMENTS
+--------------------------------------------------
+
+1. Remove outdated job openings.
+2. Add the updated roles and experience exactly as listed.
+3. Ensure the form submissions go to the existing configured lead/application destination.
+4. Do not break existing form backend or email notification setup.
+5. If form submission destination is unclear, retain existing submission logic and clearly mention it in the completion notes.
+6. Add success message after form submission:
+   “Thank you for applying. Our HR team will review your application and contact shortlisted candidates.”
+
+--------------------------------------------------
+QUALITY CHECKS
+--------------------------------------------------
+
+After implementation, verify:
+
+1. /career page loads correctly.
+2. Old job openings are removed.
+3. Academic and Non-Academic sections are clearly visible.
+4. Female candidate preference note appears in both sections.
+5. HR contact number 87799 81827 is visible.
+6. Application form includes all required fields.
+7. Resume upload works.
+8. Role Applied For dropdown includes all updated job roles.
+9. Page is mobile responsive.
+10. SEO title, meta description, H1, and H2 structure are correct.
+11. Form submission works without errors.
+
+--------------------------------------------------
+OUTPUT EXPECTATION
+--------------------------------------------------
+
+After completing the update, provide:
+
+1. Confirmation that /career page has been updated.
+2. List of updated Academic openings.
+3. List of updated Non-Academic openings.
+4. Confirmation that old openings were removed.
+5. Confirmation that the job application form was updated.
+6. Confirmation of where the applications are being sent/stored.
+7. Any issues or assumptions made during implementation.

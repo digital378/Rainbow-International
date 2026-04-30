@@ -4,9 +4,46 @@ import { storage } from "./storage";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
+import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
+
+const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
+  pdf: new Set(["application/pdf", "application/octet-stream"]),
+  doc: new Set(["application/msword", "application/octet-stream"]),
+  docx: new Set([
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/octet-stream",
+    "application/zip",
+  ]),
+};
+const RESUME_MAX_BYTES = 5 * 1024 * 1024;
+const RESUME_MAGIC_BYTES: Record<string, Buffer[]> = {
+  pdf: [Buffer.from("%PDF-")],
+  doc: [Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1])],
+  docx: [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
+};
+
+const careerUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: RESUME_MAX_BYTES, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    const ext = (file.originalname.split(".").pop() || "").toLowerCase();
+    const allowedMimes = RESUME_ALLOWED_MIMES_BY_EXT[ext];
+    if (!allowedMimes || !allowedMimes.has(file.mimetype)) {
+      return cb(new Error("Resume must be a PDF, DOC, or DOCX file"));
+    }
+    cb(null, true);
+  },
+});
+
+function resumeContentMatchesType(file: Express.Multer.File): boolean {
+  const ext = (file.originalname.split(".").pop() || "").toLowerCase();
+  const signatures = RESUME_MAGIC_BYTES[ext];
+  if (!signatures || file.buffer.length < 4) return false;
+  return signatures.some((sig) => file.buffer.subarray(0, sig.length).equals(sig));
+}
 
 // ── Email helpers ───────────────────────────────────────────────
 function getTransporter() {
@@ -163,7 +200,19 @@ async function sendCallbackEmail(data: { name: string; phone: string; preferredT
 
 const CAREER_EMAIL_TO = "hr.recruiter3@rainbowinternationalschool.in";
 
-async function sendCareerEmail(data: { name: string; email: string; phone: string; position: string; experience?: string | null; qualification?: string | null; message?: string | null }) {
+async function sendCareerEmail(
+  data: {
+    name: string;
+    email: string;
+    phone: string;
+    position: string;
+    experience?: string | null;
+    qualification?: string | null;
+    currentLocation?: string | null;
+    message?: string | null;
+  },
+  resume?: { filename: string; content: Buffer; contentType: string } | null,
+) {
   const mailer = getTransporter();
   if (!mailer) {
     console.log("[career] SMTP not configured — skipping email. Application saved to DB.");
@@ -186,15 +235,20 @@ async function sendCareerEmail(data: { name: string; email: string; phone: strin
           ${tableRow("Email", data.email)}
           ${tableRow("Phone", data.phone)}
           ${tableRow("Position Applied For", data.position)}
-          ${tableRow("Experience", data.experience)}
+          ${tableRow("Total Experience", data.experience)}
           ${tableRow("Qualification", data.qualification)}
+          ${tableRow("Current Location", data.currentLocation)}
+          ${tableRow("Resume", resume ? `Attached: ${resume.filename}` : "Not provided")}
           ${tableRow("Message", data.message)}
         </table>
         <p style="color:#888;font-size:12px;margin-top:16px;padding:0 4px;">Submitted via the school website careers page.</p>
       </div>
     `,
+    attachments: resume
+      ? [{ filename: resume.filename, content: resume.content, contentType: resume.contentType }]
+      : undefined,
   });
-  console.log("[career] Email sent to", CAREER_EMAIL_TO);
+  console.log("[career] Email sent to", CAREER_EMAIL_TO, resume ? `(with ${resume.filename})` : "");
 }
 
 export async function registerRoutes(
@@ -382,22 +436,57 @@ export async function registerRoutes(
   });
 
   // ── Career applications ────────────────────────────────────
-  app.post("/api/career-applications", async (req, res) => {
-    try {
-      const validatedData = insertCareerApplicationSchema.parse(req.body);
-      const application = await storage.createCareerApplication(validatedData);
-      sendCareerEmail(validatedData).catch((err) =>
-        console.error("[career] Email error:", err)
-      );
-      res.status(201).json(application);
-    } catch (error: any) {
-      if (error.name === "ZodError") {
-        const validationError = fromZodError(error);
-        return res.status(400).json({ message: validationError.message });
+  app.post(
+    "/api/career-applications",
+    (req, res, next) => {
+      careerUpload.single("resume")(req, res, (err: any) => {
+        if (err) {
+          const message =
+            err.code === "LIMIT_FILE_SIZE"
+              ? "Resume file is too large (max 5 MB)."
+              : err.message || "Resume upload failed";
+          return res.status(400).json({ message });
+        }
+        next();
+      });
+    },
+    async (req, res) => {
+      try {
+        const file = (req as any).file as Express.Multer.File | undefined;
+        if (!file) {
+          return res.status(400).json({ message: "Resume is required (PDF, DOC, or DOCX)." });
+        }
+        if (!resumeContentMatchesType(file)) {
+          return res
+            .status(400)
+            .json({ message: "Resume content does not match the expected PDF/DOC/DOCX format." });
+        }
+        const body = req.body as Record<string, string>;
+        const merged = {
+          ...body,
+          resumeFilename: file.originalname,
+          resumeMimeType: file.mimetype,
+          resumeSize: String(file.size),
+        };
+        const validatedData = insertCareerApplicationSchema.parse(merged);
+        const application = await storage.createCareerApplication(validatedData);
+        const resume = file
+          ? { filename: file.originalname, content: file.buffer, contentType: file.mimetype }
+          : null;
+        sendCareerEmail(validatedData, resume).catch((err) =>
+          console.error("[career] Email error:", err),
+        );
+        res.status(201).json({ id: application.id });
+      } catch (error: any) {
+        if (error.name === "ZodError") {
+          const validationError = fromZodError(error);
+          return res.status(400).json({ message: validationError.message });
+        }
+        console.error("[career] Submission error:", error);
+        res.status(500).json({ message: "Failed to submit career application" });
       }
-      res.status(500).json({ message: "Failed to submit career application" });
-    }
-  });
+    },
+  );
 
   // ── Brochure requests (Brand Partners privilege card) ─────
   app.post("/api/brochure-requests", async (req, res) => {
