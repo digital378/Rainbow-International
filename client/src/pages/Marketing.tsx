@@ -943,19 +943,6 @@ export default function Marketing() {
                       </span>
                     </div>
                   )}
-                  {grandTotal.leads > 0 && (() => {
-                    const unassigned = totals["Unassigned"].leads;
-                    if (unassigned === 0) return null;
-                    const pctUn = (unassigned / grandTotal.leads) * 100;
-                    return (
-                      <div className="mt-2 rounded-xl bg-red-50 border border-red-200 p-3 text-xs">
-                        <span className="font-black text-red-800">⚠ Lead-routing gap: </span>
-                        <span className="text-red-800">
-                          {num(unassigned)} leads ({pct(pctUn)}) were never routed to a centre — 0 bookings, 0 walk-ins, 0 admissions from this pool. Likely CRM assignment delay or missing pin-code.
-                        </span>
-                      </div>
-                    );
-                  })()}
                 </>
               );
             })()}
