@@ -271,11 +271,31 @@ export default function Marketing() {
   const [overheadCost, setOverheadCost] = useState<number>(DEFAULT_FIXED.combined.overhead);
   const [teamSize, setTeamSize] = useState<number>(1);
 
+  /* Brochure download requests (Brand Partners privilege card leads).
+     Public GET response only exposes id/cardNumber/requestedAt — name/phone/email
+     are stored server-side but only returned to admin-token callers. */
+  type BrochureReq = { id: string; cardNumber: string; requestedAt: string };
+  const [brochureReqs, setBrochureReqs] = useState<BrochureReq[]>([]);
+  const [brochureLoading, setBrochureLoading] = useState<boolean>(true);
+
   useEffect(() => {
     document.title = "Marketing Dashboard | Rainbow International School";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setBrochureLoading(true);
+    fetch("/api/brochure-requests")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: BrochureReq[]) => {
+        if (!cancelled) setBrochureReqs(Array.isArray(data) ? data : []);
+      })
+      .catch(() => { if (!cancelled) setBrochureReqs([]); })
+      .finally(() => { if (!cancelled) setBrochureLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   /* Reset cost inputs when segment changes */
@@ -1498,6 +1518,58 @@ export default function Marketing() {
               </>
             );
           })()}
+        </section>
+
+        {/* ───────── BROCHURE DOWNLOAD REQUESTS ───────── */}
+        <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100" data-testid="section-brochure-requests">
+          <SectionTitle
+            title="Brochure Requests"
+            sub="Latest privilege card numbers submitted via the Brand Partners brochure modal"
+            badge={`${brochureReqs.length} TOTAL`}
+          />
+          {brochureLoading ? (
+            <div className="text-xs text-gray-500" data-testid="text-brochure-loading">Loading…</div>
+          ) : brochureReqs.length === 0 ? (
+            <div className="text-xs text-gray-500" data-testid="text-brochure-empty">
+              No brochure requests captured yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs" data-testid="table-brochure-requests">
+                <thead>
+                  <tr style={{ background: SLATE }} className="text-white">
+                    <th className="py-2 px-3 text-left font-semibold">Requested</th>
+                    <th className="py-2 px-3 text-left font-semibold">Privilege Card</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {brochureReqs.slice(0, 10).map((req, i) => (
+                    <tr
+                      key={req.id}
+                      className={`border-b border-gray-50 ${i % 2 === 0 ? "bg-gray-50/50" : ""}`}
+                      data-testid={`row-brochure-${req.id}`}
+                    >
+                      <td className="py-2 px-3 text-gray-600 whitespace-nowrap" data-testid={`text-brochure-time-${req.id}`}>
+                        {new Date(req.requestedAt).toLocaleString("en-IN", {
+                          day: "2-digit", month: "short", year: "2-digit",
+                          hour: "2-digit", minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="py-2 px-3 font-bold text-[#091a4f]" data-testid={`text-brochure-card-${req.id}`}>
+                        {req.cardNumber}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="mt-2 text-[11px] text-gray-500">
+                {brochureReqs.length > 10
+                  ? `Showing 10 most recent of ${brochureReqs.length} total requests. `
+                  : ""}
+                Optional contact details (name, phone, email) are stored privately and not shown here.
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ───────── 14. DYNAMIC INSIGHTS ───────── */}

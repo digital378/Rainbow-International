@@ -108,3 +108,25 @@ export const insertCareerApplicationSchema = createInsertSchema(careerApplicatio
 
 export type InsertCareerApplication = z.infer<typeof insertCareerApplicationSchema>;
 export type CareerApplication = typeof careerApplications.$inferSelect;
+
+export const brochureRequests = pgTable("brochure_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  cardNumber: text("card_number").notNull(),
+  name: text("name"),
+  email: text("email"),
+  phone: text("phone"),
+  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+});
+
+export const insertBrochureRequestSchema = createInsertSchema(brochureRequests).omit({
+  id: true,
+  requestedAt: true,
+}).extend({
+  cardNumber: z.string().min(1, "Privilege card number is required"),
+  name: z.string().optional().or(z.literal("")),
+  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
+});
+
+export type InsertBrochureRequest = z.infer<typeof insertBrochureRequestSchema>;
+export type BrochureRequest = typeof brochureRequests.$inferSelect;

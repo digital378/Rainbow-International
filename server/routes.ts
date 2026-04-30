@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import { registerSSRRoutes } from "./ssrBlog";
@@ -396,6 +396,46 @@ export async function registerRoutes(
         return res.status(400).json({ message: validationError.message });
       }
       res.status(500).json({ message: "Failed to submit career application" });
+    }
+  });
+
+  // ── Brochure requests (Brand Partners privilege card) ─────
+  app.post("/api/brochure-requests", async (req, res) => {
+    try {
+      const validatedData = insertBrochureRequestSchema.parse(req.body);
+      const saved = await storage.createBrochureRequest(validatedData);
+      res.status(201).json(saved);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ message: validationError.message });
+      }
+      res.status(500).json({ message: "Failed to save brochure request" });
+    }
+  });
+
+  // GET strips PII (name/email/phone) so the public Marketing dashboard widget
+  // can render card numbers + timestamps without leaking contact details.
+  // When ADMIN_TOKEN is set, callers may pass `Authorization: Bearer <token>`
+  // (or `?token=<token>`) to receive the full record for internal admin tooling.
+  app.get("/api/brochure-requests", async (req, res) => {
+    try {
+      const requests = await storage.getAllBrochureRequests();
+      const adminToken = process.env.ADMIN_TOKEN;
+      const headerToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const queryToken = typeof req.query.token === "string" ? req.query.token : "";
+      const isAdmin = !!adminToken && (headerToken === adminToken || queryToken === adminToken);
+      if (isAdmin) {
+        return res.json(requests);
+      }
+      const safe = requests.map((r) => ({
+        id: r.id,
+        cardNumber: r.cardNumber,
+        requestedAt: r.requestedAt,
+      }));
+      res.json(safe);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch brochure requests" });
     }
   });
 

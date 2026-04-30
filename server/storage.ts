@@ -1,4 +1,4 @@
-import { type Inquiry, type InsertInquiry, type Event, type InsertEvent, type CallbackRequest, type InsertCallbackRequest, type CareerApplication, type InsertCareerApplication, inquiries, events, callbackRequests, careerApplications } from "@shared/schema";
+import { type Inquiry, type InsertInquiry, type Event, type InsertEvent, type CallbackRequest, type InsertCallbackRequest, type CareerApplication, type InsertCareerApplication, type BrochureRequest, type InsertBrochureRequest, inquiries, events, callbackRequests, careerApplications, brochureRequests } from "@shared/schema";
 import { db } from "./db";
 import { desc, eq } from "drizzle-orm";
 
@@ -17,6 +17,9 @@ export interface IStorage {
 
   createCareerApplication(app: InsertCareerApplication): Promise<CareerApplication>;
   getAllCareerApplications(): Promise<CareerApplication[]>;
+
+  createBrochureRequest(req: InsertBrochureRequest): Promise<BrochureRequest>;
+  getAllBrochureRequests(): Promise<BrochureRequest[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -68,6 +71,15 @@ export class DbStorage implements IStorage {
 
   async getAllCareerApplications(): Promise<CareerApplication[]> {
     return await db.select().from(careerApplications).orderBy(desc(careerApplications.createdAt));
+  }
+
+  async createBrochureRequest(req: InsertBrochureRequest): Promise<BrochureRequest> {
+    const [result] = await db.insert(brochureRequests).values(req).returning();
+    return result;
+  }
+
+  async getAllBrochureRequests(): Promise<BrochureRequest[]> {
+    return await db.select().from(brochureRequests).orderBy(desc(brochureRequests.requestedAt));
   }
 }
 

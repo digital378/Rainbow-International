@@ -83,6 +83,23 @@ export default function BrandPartners() {
     }
     setError("");
     setSubmitting(true);
+    // Persist the request as a lead — don't block the user if persistence fails
+    try {
+      const recordRes = await fetch("/api/brochure-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cardNumber: trimmed }),
+      });
+      if (!recordRes.ok) {
+        const body = await recordRes.text().catch(() => "");
+        console.error(
+          `[brochure] Failed to record request (HTTP ${recordRes.status}):`,
+          body
+        );
+      }
+    } catch (err) {
+      console.error("[brochure] Failed to record request:", err);
+    }
     let exists = false;
     try {
       const res = await fetch(BROCHURE_URL, { method: "HEAD" });

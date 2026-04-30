@@ -63,6 +63,10 @@ All 94 blog posts are built as individual SEO-optimised pages at `/blog/:slug`. 
 ### Brand Partners Page (Apr 2026)
 New page at `/brand-partners` replaces old `/global-brand-associations` (301 redirect in `server/index.ts`). Lists 134 partner brands across 11 categories (Restaurants & Cafés, Health & Wellness, Fitness & Sports, Salon Beauty & Spa, Fashion & Apparel, Eyewear & Optics, Toys/Books/Stationery, Entertainment & Family, Hotels & Stays, Home & Lifestyle, Finance & Services). Logos in `client/public/brands/` as WebP (~1.5MB total, 90% size reduction). Data file: `client/src/data/brandPartners.ts`. Includes filter pills, brochure download modal with privilege card validation. Brochure placeholder URL: `/brochures/brand-partners-brochure.pdf` (not yet uploaded — replace `BROCHURE_URL` constant in `BrandPartners.tsx`).
 
+Brochure download requests are persisted as leads in the `brochure_requests` table (`shared/schema.ts`). The modal POSTs to `/api/brochure-requests` (defined in `server/routes.ts` with `insertBrochureRequestSchema` validation) before triggering the download/confirmation. Recent requests are surfaced in a "Brochure Requests" widget on the Marketing dashboard (`client/src/pages/Marketing.tsx`) which fetches `/api/brochure-requests` on mount and shows the 10 most recent entries (timestamp + card number only).
+
+The public `GET /api/brochure-requests` response intentionally **strips PII** (`name`, `email`, `phone`) and only returns `id`, `cardNumber`, and `requestedAt` — the optional contact fields stay in the database for future internal use. Callers that present `Authorization: Bearer <ADMIN_TOKEN>` (or `?token=<ADMIN_TOKEN>`) receive the full record, where `ADMIN_TOKEN` is read from the environment. `ADMIN_TOKEN` is unset by default; configure it via the secrets manager before exposing any admin tooling that needs the contact details.
+
 ### SEO Blog Batch (Apr 2026 — 8 posts)
 - CBSE vs ICSE vs State Board comparison (School Selection)
 - School Admission Checklist Thane 2026-27 (CBSE School)
