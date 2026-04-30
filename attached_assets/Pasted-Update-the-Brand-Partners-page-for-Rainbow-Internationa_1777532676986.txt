@@ -1,0 +1,143 @@
+Update the Brand Partners page for Rainbow International School.
+
+CURRENT URL:
+https://rainbowinternationalschool.in/global-brand-associations
+
+NEW URL SLUG:
+/brand-partners
+
+IMPORTANT:
+Set up a proper 301 redirect from:
+/global-brand-associations
+to:
+/brand-partners
+
+REFERENCE PAGE:
+Use this old/staging page only for layout/content reference:
+https://staging.rainbowinternationalschool.in/global-brand-associations/
+
+ASSETS PROVIDED:
+1. Excel sheet with brand partner names and categories
+2. ZIP folder with brand partner logos
+
+PRIMARY GOAL:
+Create a modern, SEO-optimized, fast-loading Brand Partners page that matches the new RIS website UI/UX while preserving the purpose and structure of the old page.
+
+PAGE REQUIREMENTS:
+1. Create/update page at:
+   /brand-partners
+
+2. Replace old URL:
+   /global-brand-associations
+
+3. Add 301 redirect:
+   /global-brand-associations → /brand-partners
+
+4. Use the Excel sheet as the source for:
+   - brand partner names
+   - categories
+   - grouping logic
+
+5. Use the ZIP folder logos for the brand partner cards.
+
+6. Categorize brands logically.
+   - Start with categories from the Excel sheet.
+   - If better grouping is possible, improve categories based on relevance.
+   - Keep categories clean, parent-friendly, and easy to scan.
+
+UI/UX REQUIREMENTS:
+1. Match the new Rainbow International School website design language.
+2. Keep the page premium, modern, clean, and visually aligned with the current RIS website.
+3. Add a strong hero section:
+   - Title: Brand Partners
+   - Supporting line explaining that RIS families get access to exclusive partner benefits through the privilege card.
+4. Add category tabs or filters for easier browsing.
+5. Display logos in clean responsive cards.
+6. Add subtle hover effects.
+7. Make the logo grid responsive for desktop, tablet, and mobile.
+8. Avoid clutter.
+9. Optimize logo sizing so all partner logos look consistent.
+
+BROCHURE DOWNLOAD FEATURE:
+Add a “Download Brochure” CTA near the top section where it feels logical.
+
+When clicked:
+1. Open a modal/popup.
+2. Ask user:
+   “Enter your privilege card number to download the brochure”
+3. Field:
+   - Privilege Card Number
+4. CTA:
+   - Download Brochure
+5. Add validation:
+   - Field cannot be empty
+   - Show clear error message if empty
+6. After entry, allow brochure download/open.
+7. If brochure file is not provided yet, create the UI and keep a placeholder download action clearly marked for easy replacement later.
+
+SEO REQUIREMENTS:
+1. Set SEO title:
+   Brand Partners | Rainbow International School Thane
+
+2. Set meta description:
+   Explore Rainbow International School’s brand partners and exclusive privilege card benefits for RIS families in Thane.
+
+3. Add proper H1:
+   Brand Partners
+
+4. Use proper H2s for:
+   - Exclusive Benefits for RIS Families
+   - Our Brand Partner Categories
+   - Download Brand Partner Brochure
+
+5. Add clean internal linking where relevant:
+   - Home
+   - Admissions
+   - About Rainbow
+   - Contact
+   - Parent’s Corner if relevant
+
+6. Add image alt text for every logo:
+   Format:
+   “[Brand Name] brand partner of Rainbow International School”
+
+7. Add structured data if suitable:
+   - Organization schema
+   - Breadcrumb schema
+   - WebPage schema
+
+PERFORMANCE REQUIREMENTS:
+1. Compress and optimize all logos.
+2. Use WebP where possible.
+3. Do not load oversized images.
+4. Lazy-load logo images below the fold.
+5. Keep page lightweight and fast.
+6. Avoid unnecessary animations or heavy libraries.
+
+CONTENT REQUIREMENTS:
+1. Do not copy the old page blindly.
+2. Use the old page only as reference.
+3. Improve readability and presentation.
+4. Make the page useful for parents and RIS families.
+5. Keep language professional and school-appropriate.
+
+QUALITY CHECKS:
+After implementation, verify:
+1. /brand-partners loads correctly.
+2. /global-brand-associations redirects with 301 to /brand-partners.
+3. All logos appear correctly.
+4. Categories work correctly.
+5. Download brochure modal works.
+6. Privilege card number field validation works.
+7. Page is mobile responsive.
+8. SEO title, meta description, headings, image alt text, schema, and internal links are properly added.
+9. Page speed is optimized.
+
+OUTPUT EXPECTATION:
+After completing the work, provide:
+1. Confirmation that the new /brand-partners page is live.
+2. Confirmation that 301 redirect is added.
+3. List of categories created.
+4. Confirmation that all logos were added and optimized.
+5. Confirmation that the brochure download modal is working.
+6. Any notes if brochure file was missing or placeholder was used.
