@@ -47,3 +47,7 @@ mockupState = "FULLSTACK"
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = "587"
 ENQUIRY_MAIL_TO = "digital@rainbowinternationalschool.in"
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 180000
