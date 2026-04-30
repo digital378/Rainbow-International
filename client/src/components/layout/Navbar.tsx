@@ -8,7 +8,7 @@ const aboutLinks = [
   { href: "/ris-vision-mission", label: "Vision & Mission" },
   { href: "/our-philosophy", label: "Our Philosophy" },
   { href: "/chairpersons-note", label: "Chairperson's Note" },
-  { href: "/global-brand-associations", label: "Brand Partners" },
+  { href: "/brand-partners", label: "Brand Partners" },
   { href: "/rainbow-preschool-international", label: "Rainbow Preschool International" },
 ];
 

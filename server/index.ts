@@ -13,6 +13,11 @@ app.get("/__repl_health", (_req, res) => {
   res.status(200).send("OK");
 });
 
+app.get("/global-brand-associations", (req, res) => {
+  const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+  res.redirect(301, "/brand-partners" + query);
+});
+
 if (process.env.NODE_ENV === "production") {
   app.use((req, res, next) => {
     const host = req.hostname;

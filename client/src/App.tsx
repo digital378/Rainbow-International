@@ -38,7 +38,7 @@ const AcademicTeam = lazy(() => import("@/pages/AcademicTeam"));
 const RainbowPreschool = lazy(() => import("@/pages/RainbowPreschool"));
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 const TermsOfUse = lazy(() => import("@/pages/TermsOfUse"));
-const GlobalBrandAssociations = lazy(() => import("@/pages/GlobalBrandAssociations"));
+const BrandPartners = lazy(() => import("@/pages/BrandPartners"));
 const StudentsLeavingCertificate = lazy(() => import("@/pages/StudentsLeavingCertificate"));
 const Curriculum = lazy(() => import("@/pages/Curriculum"));
 const BlogPost = lazy(() => import("@/pages/BlogPost"));
@@ -102,7 +102,7 @@ function Router() {
       <Route path="/rainbow-preschool-international" component={RainbowPreschool} />
       <Route path="/privacy-policy-and-cookie-policy" component={PrivacyPolicy} />
       <Route path="/term-of-use" component={TermsOfUse} />
-      <Route path="/global-brand-associations" component={GlobalBrandAssociations} />
+      <Route path="/brand-partners" component={BrandPartners} />
       <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
       <Route path="/curriculum" component={Curriculum} />
       <Route path="/blog/:slug" component={BlogPost} />

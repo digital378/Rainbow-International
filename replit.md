@@ -60,6 +60,9 @@ Preferred communication style: Simple, everyday language.
 
 All 94 blog posts are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
 
+### Brand Partners Page (Apr 2026)
+New page at `/brand-partners` replaces old `/global-brand-associations` (301 redirect in `server/index.ts`). Lists 134 partner brands across 11 categories (Restaurants & Cafés, Health & Wellness, Fitness & Sports, Salon Beauty & Spa, Fashion & Apparel, Eyewear & Optics, Toys/Books/Stationery, Entertainment & Family, Hotels & Stays, Home & Lifestyle, Finance & Services). Logos in `client/public/brands/` as WebP (~1.5MB total, 90% size reduction). Data file: `client/src/data/brandPartners.ts`. Includes filter pills, brochure download modal with privilege card validation. Brochure placeholder URL: `/brochures/brand-partners-brochure.pdf` (not yet uploaded — replace `BROCHURE_URL` constant in `BrandPartners.tsx`).
+
 ### SEO Blog Batch (Apr 2026 — 8 posts)
 - CBSE vs ICSE vs State Board comparison (School Selection)
 - School Admission Checklist Thane 2026-27 (CBSE School)
@@ -106,6 +109,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/school-near-ghodbunder-road-thane` | Locality: GB Road | `pages/SchoolNearGhodbunderRoad.tsx` |
 | `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
 | `/marketing` | Marketing Dashboard (noindex, real CRM/branch data) | `pages/Marketing.tsx` |
+| `/brand-partners` | Brand Partners (134 logos, 11 categories, brochure modal) | `pages/BrandPartners.tsx` |
 
 ## Key Components
 
