@@ -533,6 +533,11 @@ export default function Marketing() {
               { label: "Cost per Lead (CPL)", curr: cpl(current.spend, current.leads), prev: cpl(previous.spend, previous.leads), format: inr, color: BLUE, invert: true },
               { label: "Cost per Booking (CPB)", curr: cpb(current.spend, current.bookings), prev: cpb(previous.spend, previous.bookings), format: inr, color: CYAN, invert: true },
               { label: "Cost per Walk-in (CPW)", curr: cpw(current.spend, current.walkins), prev: cpw(previous.spend, previous.walkins), format: inr, color: SLATE, invert: true },
+              { label: "Lead → Booking %", curr: (current.bookings / Math.max(current.leads, 1)) * 100, prev: (previous.bookings / Math.max(previous.leads, 1)) * 100, format: pct, color: PURPLE },
+              { label: "Booking → Walk-in %", curr: (current.walkins / Math.max(current.bookings, 1)) * 100, prev: (previous.walkins / Math.max(previous.bookings, 1)) * 100, format: pct, color: CYAN },
+              { label: "Walk-in → Admission %", curr: (current.admissions / Math.max(current.walkins, 1)) * 100, prev: (previous.admissions / Math.max(previous.walkins, 1)) * 100, format: pct, color: GREEN },
+              { label: "Revenue (Min.)", curr: current.admissions * MIN_REVENUE_PER_ADM, prev: previous.admissions * MIN_REVENUE_PER_ADM, format: inr, color: GREEN },
+              { label: "Min. ROI %", curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend), prev: roi(previous.admissions * MIN_REVENUE_PER_ADM, previous.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
