@@ -4,7 +4,7 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { CheckCircle, Calendar, FileText, Phone, GraduationCap } from "lucide-react";
+import { CheckCircle, Calendar, FileText, Phone, GraduationCap, MessageCircle } from "lucide-react";
 
 const ageData = [
   { grade: "Nursery", age: "2.5 years", by: "31st March" },
@@ -77,6 +77,28 @@ export default function Admissions() {
       />
 
       <main className="flex-grow" role="main">
+        {/* CTA strip */}
+        <div className="bg-white border-b border-gray-100" data-testid="section-cta-strip">
+          <div className="container mx-auto px-4 max-w-5xl py-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="tel:+918291568972"
+              className="inline-flex items-center gap-2 bg-[#091a4f] text-white px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#0d3b86] transition-colors shadow-sm w-full sm:w-auto justify-center"
+              data-testid="btn-cta-call"
+            >
+              <Phone className="w-4 h-4" />
+              Call Us
+            </a>
+            <a
+              href="#enquiry-form"
+              className="inline-flex items-center gap-2 bg-amber-400 text-[#091a4f] px-8 py-3.5 rounded-full font-bold text-sm hover:bg-amber-300 transition-colors shadow-sm w-full sm:w-auto justify-center"
+              data-testid="btn-cta-enquire"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Enquire Now
+            </a>
+          </div>
+        </div>
+
         <section className="py-16 bg-gradient-to-b from-white to-gray-50" data-testid="section-why-rainbow">
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">Why Choose Rainbow International School?</h2>
@@ -176,7 +198,7 @@ export default function Admissions() {
           </div>
         </section>
 
-        <section className="py-16" data-testid="section-contact">
+        <section id="enquiry-form" className="py-16" data-testid="section-contact">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">Start Your Child's Journey</h2>
             <p className="text-gray-500 mb-8 max-w-xl mx-auto">Fill the enquiry form below or call our admissions desk directly.</p>
