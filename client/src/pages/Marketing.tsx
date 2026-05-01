@@ -74,9 +74,12 @@ const APRIL_RPS_BASE = MONTHLY[APRIL_IDX].rps;
    These reconcile the 5-month "ad-spend window" with the sheet's full-AY
    "TOTAL TILL DATE" of 170 admissions. */
 const ORGANIC_PRE_SPEND = {
-  combined: { leads: 197, admissions: 21 },  // Jun–Nov: 8+4+5+20+57+103 = 197 leads, 6 (Oct) + 15 (Nov) = 21 adm
-  ris:      { leads: 134, admissions: 12 },  // Jun–Nov RIS: 134 leads, 4 (Oct) + 8 (Nov) = 12 adm
-  rps:      { leads:  63, admissions:  9 },  // Jun–Nov RPS: 63 leads, 2 (Oct) + 7 (Nov) = 9 adm
+  // Jun–Nov 2025: ₹0 ad spend. Bookings/walk-ins from images 1777611464791 (RIS) and 1777611439046 (RPS).
+  combined: { leads: 197, bookings: 83, walkins: 139, admissions: 21 },
+  // RIS Jun–Nov: leads 8+4+2+15+36+69=134; books 5+3+1+6+14+19=48; walks 1+4+6+10+25+40=86; adm 4+8=12
+  ris:      { leads: 134, bookings: 48, walkins: 86,  admissions: 12 },
+  // RPS Jun–Nov: leads 0+0+3+5+21+34=63; books 0+0+3+5+13+14=35; walks 0+0+3+5+17+28=53; adm 2+7=9
+  rps:      { leads:  63, bookings: 35, walkins: 53,  admissions:  9 },
 };
 
 /* Last year (Oct 24 – Jun 25) — real RIS/RPS splits from sheet */
@@ -366,23 +369,25 @@ export default function Marketing() {
     }, { spend: 0, leads: 0, walkins: 0, admissions: 0 });
   }, [segment]);
 
-  /* Full-AY totals (reconciled with sheet's TOTAL TILL DATE) */
+  /* Full-AY totals — Jun 2025 through Apr 2026 (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
   const ytdAdmissionsFull = totals.admissions + organic.admissions;
-  const ytdLeadsFull = totals.leads + organic.leads;
-  /* All efficiency metrics use the full-AY admissions denominator (160 combined) */
+  const ytdLeadsFull     = totals.leads     + organic.leads;
+  const ytdBookingsFull  = totals.bookings  + organic.bookings;
+  const ytdWalkinsFull   = totals.walkins   + organic.walkins;
+  /* All efficiency metrics use the full-AY admissions denominator */
   const admForCosts = ytdAdmissionsFull;
 
-  /* Conversion funnel rates */
+  /* Conversion funnel rates — full-AY basis */
   const funnelData = [
-    { name: "Leads", value: totals.leads, fill: NAVY },
-    { name: "Bookings", value: totals.bookings, fill: PURPLE },
-    { name: "Walk-ins", value: totals.walkins, fill: CYAN },
-    { name: "Admissions", value: totals.admissions, fill: GREEN },
+    { name: "Leads",      value: ytdLeadsFull,     fill: NAVY   },
+    { name: "Bookings",   value: ytdBookingsFull,   fill: PURPLE },
+    { name: "Walk-ins",   value: ytdWalkinsFull,    fill: CYAN   },
+    { name: "Admissions", value: ytdAdmissionsFull, fill: GREEN  },
   ];
-  const leadToWalk = ytdLeadsFull ? (totals.walkins / ytdLeadsFull) * 100 : 0;
-  const walkToAdm = totals.walkins ? (ytdAdmissionsFull / totals.walkins) * 100 : 0;
-  const bookToAdm = totals.bookings ? (ytdAdmissionsFull / totals.bookings) * 100 : 0;
+  const leadToWalk = ytdLeadsFull    ? (ytdWalkinsFull   / ytdLeadsFull)    * 100 : 0;
+  const walkToAdm  = ytdWalkinsFull  ? (ytdAdmissionsFull / ytdWalkinsFull)  * 100 : 0;
+  const bookToAdm  = ytdBookingsFull ? (ytdAdmissionsFull / ytdBookingsFull) * 100 : 0;
 
   /* YTD totals using full-AY admissions (matches sheet's CPA ₹6,960 / True CPA ₹14,772) */
   const ytdRevenue = admForCosts * MIN_REVENUE_PER_ADM;
@@ -555,8 +560,8 @@ export default function Marketing() {
           <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 30, 2026)" />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 11).toFixed(0)} avg/month`} color={NAVY} />
-            <KpiCard label="Total Bookings" value={num(totals.bookings)} sub={`${pct((totals.bookings / Math.max(totals.leads, 1)) * 100)} of leads`} color={PURPLE} />
-            <KpiCard label="Total Walk-ins" value={num(totals.walkins)} sub={`${pct(leadToWalk)} of leads`} color={CYAN} />
+            <KpiCard label="Total Bookings" value={num(ytdBookingsFull)} sub={`${pct((ytdBookingsFull / Math.max(ytdLeadsFull, 1)) * 100)} of leads`} color={PURPLE} />
+            <KpiCard label="Total Walk-ins" value={num(ytdWalkinsFull)} sub={`${pct(leadToWalk)} of leads`} color={CYAN} />
             <KpiCard label="Total Admissions" value={num(ytdAdmissionsFull)} sub={`${pct(walkToAdm)} of walk-ins`} color={GREEN} />
             <KpiCard label="Marketing Spend" value={inr(totals.spend)} sub="Meta + Google" color={RED} />
             <KpiCard label="Min. ROI (Mktg)" value={`${ytdMarketingRoi.toFixed(0)}%`} sub={`True ROI: ${ytdTrueRoi.toFixed(0)}%`} color={GREEN} />
@@ -572,7 +577,7 @@ export default function Marketing() {
             <KpiCard label="Cost per Lead" value={inr(cpl(totals.spend, totals.leads))} sub="ad spend / leads" color={PURPLE} />
             <KpiCard label="Cost per Booking" value={inr(cpb(totals.spend, totals.bookings))} sub="ad spend / bookings" color={AMBER} />
             <KpiCard label="Cost per Walk-in" value={inr(cpw(totals.spend, totals.walkins))} sub="ad spend / walk-ins" color={CYAN} />
-            <KpiCard label="Walk-in → Adm" value={pct(walkToAdm)} sub={`${num(admForCosts)} of ${num(totals.walkins)} walk-ins`} color={GREEN} />
+            <KpiCard label="Walk-in → Adm" value={pct(walkToAdm)} sub={`${num(admForCosts)} of ${num(ytdWalkinsFull)} walk-ins`} color={GREEN} />
           </div>
         </section>
 
@@ -810,7 +815,7 @@ export default function Marketing() {
             </div>
             <div className="rounded-xl p-4 bg-purple-50 border-l-4 border-purple-400">
               <div className="text-[10px] uppercase tracking-wider font-bold text-purple-700">Bookings per 100 leads</div>
-              <div className="text-3xl font-black text-[#091a4f] mt-1">{((totals.bookings / Math.max(totals.leads, 1)) * 100).toFixed(1)}</div>
+              <div className="text-3xl font-black text-[#091a4f] mt-1">{((ytdBookingsFull / Math.max(ytdLeadsFull, 1)) * 100).toFixed(1)}</div>
               <div className="text-[11px] text-gray-500 mt-1">Lead engagement rate</div>
             </div>
           </div>
@@ -819,9 +824,9 @@ export default function Marketing() {
           <div className="space-y-3">
             <div className="text-xs font-bold text-gray-600 mb-1">Funnel Drop-off Analysis</div>
             {[
-              { label: "Leads → Bookings", from: totals.leads, to: totals.bookings, color: PURPLE },
-              { label: "Bookings → Walk-ins", from: totals.bookings, to: totals.walkins, color: CYAN },
-              { label: "Walk-ins → Admissions", from: totals.walkins, to: ytdAdmissionsFull, color: GREEN },
+              { label: "Leads → Bookings", from: ytdLeadsFull, to: ytdBookingsFull, color: PURPLE },
+              { label: "Bookings → Walk-ins", from: ytdBookingsFull, to: ytdWalkinsFull, color: CYAN },
+              { label: "Walk-ins → Admissions", from: ytdWalkinsFull, to: ytdAdmissionsFull, color: GREEN },
             ].map(s => {
               const conv = (s.to / Math.max(s.from, 1)) * 100;
               const dropoff = 100 - conv;
