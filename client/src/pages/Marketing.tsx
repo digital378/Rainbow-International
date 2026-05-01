@@ -3,12 +3,6 @@ import {
   BarChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ComposedChart, Area,
 } from "recharts";
-import reportRisRpsCombined from "@assets/image_1777611410999.png";
-import reportDmRpsLeads from "@assets/image_1777611439046.png";
-import reportDmRisLeads from "@assets/image_1777611464791.png";
-import reportRisRpsOverall from "@assets/image_1777611526983.png";
-import reportRisSpend from "@assets/image_1777611638575.png";
-import reportPschoolSpend from "@assets/image_1777611704969.png";
 
 /* ═══════════════════════════════════════════════════════════════════
    DATA LAYER — easily replaceable with API/Sheets later
@@ -1224,30 +1218,6 @@ export default function Marketing() {
                 })}
               </tbody>
             </table>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <SectionTitle title="April 2026 Report Cards" sub="Reference screenshots for weekly lead, admissions, and ROI reporting" />
-          <div className="grid gap-4 md:grid-cols-2">
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportRisRpsCombined} alt="April weekly combined RIS and RPS report" className="w-full h-auto block" />
-            </figure>
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportDmRpsLeads} alt="DM RPS lead to admission weekly update for April 2026" className="w-full h-auto block" />
-            </figure>
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportDmRisLeads} alt="DM RIS lead to admission weekly update for April 2026" className="w-full h-auto block" />
-            </figure>
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportRisRpsOverall} alt="DM RIS and RPS overall ROI analysis" className="w-full h-auto block" />
-            </figure>
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportRisSpend} alt="Rainbow International School digital marketing spend analysis" className="w-full h-auto block" />
-            </figure>
-            <figure className="rounded-xl overflow-hidden border border-gray-100">
-              <img src={reportPschoolSpend} alt="Rainbow Preschool International digital marketing spend analysis" className="w-full h-auto block" />
-            </figure>
           </div>
         </section>
 
