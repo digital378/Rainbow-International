@@ -26,14 +26,15 @@ type SegmentKey = "combined" | "ris" | "rps";
 type MetricSet = { leads: number; bookings: number; walkins: number; admissions: number; spend: number; meta: number; google: number; };
 type MonthRow = { month: string; combined: MetricSet; ris: MetricSet; rps: MetricSet; };
 
-/* AUTHORITATIVE monthly data straight from the source sheets:
-   - Combined values from "DM Overall ROI Analysis" sheet
-   - RIS values from "DM RIS April'26" sheet  
-   - RPS values from "DM RPS April'26" sheet
-   April per-branch spend back-calculated from the sheet's published True CPA
-   (RIS True CPA ₹19,224, RPS True CPA ₹18,012 — both at ₹1.25L/mo salary).
-   Note: branch sums may not exactly equal Combined for some months due to
-   minor source-sheet reconciliation gaps; we keep both as-published. */
+/* AUTHORITATIVE monthly data straight from the source sheets (updated Apr 30 2026):
+   - Combined values from "DM RIS & RPS Overall ROI Analysis" sheet (image_1777611526983)
+   - RIS values from "DM RIS Lead to Admission Weekly Update" sheet (image_1777611464791)
+             and "Rainbow International School Digital Marketing Spend" (image_1777611638575)
+   - RPS values from "DM RPS Lead to Admission Weekly Update" sheet (image_1777611439046)
+             and "Rainbow Preschool International Digital Marketing Spend" (image_1777611704969)
+   April weekly per-branch detail from combined Google+Summary sheet (image_1777611410999).
+   Note: branch bookings sum (RIS 77 + RPS 86 = 163) equals the combined sheet's 163.
+   Note: branch ad-spend sum (RIS ₹83,801 + RPS ₹1,08,264 = ₹1,92,065) equals combined. */
 
 /* Convenience aliases for components that read April per-branch directly */
 const APRIL_IDX = 4;
@@ -65,9 +66,10 @@ const MONTHLY: MonthRow[] = [
   },
   {
     month: "Apr 26",
-    combined: { leads: 357, bookings: 147, walkins: 91,  admissions: 28, spend: 176754, meta: 55758, google: 120996 },
-    ris:      { leads: 162, bookings: 68,  walkins: 45,  admissions: 13, spend: 79364,  meta: 8776,  google: 70588 },
-    rps:      { leads: 195, bookings: 79,  walkins: 46,  admissions: 15, spend: 97390,  meta: 46982, google: 50408 },
+    // Source: Overall ROI sheet (image_1777611526983) for combined; branch spend sheets for meta/google splits
+    combined: { leads: 380, bookings: 163, walkins: 91,  admissions: 28, spend: 192065, meta: 63842, google: 128223 },
+    ris:      { leads: 174, bookings: 77,  walkins: 46,  admissions: 13, spend: 83801,  meta: 9996,  google: 73805 },
+    rps:      { leads: 206, bookings: 86,  walkins: 45,  admissions: 15, spend: 108264, meta: 53846, google: 54418 },
   },
 ];
 
@@ -101,7 +103,7 @@ const APRIL_WEEKLY = [
   { week: "05–11 Apr", risLeads: 37, risAdm: 3, risWalk: 11, risBook: 15, rpsLeads: 60, rpsAdm: 4, rpsWalk: 15, rpsBook: 32 },
   { week: "12–18 Apr", risLeads: 48, risAdm: 4, risWalk: 11, risBook: 17, rpsLeads: 38, rpsAdm: 4, rpsWalk: 8,  rpsBook: 10 },
   { week: "19–25 Apr", risLeads: 47, risAdm: 3, risWalk: 13, risBook: 20, rpsLeads: 46, rpsAdm: 3, rpsWalk: 8,  rpsBook: 16 },
-  { week: "26–30 Apr", risLeads: 12, risAdm: 0, risWalk: 4,  risBook: 9,  rpsLeads: 15, rpsAdm: 1, rpsWalk: 3,  rpsBook: 3  },
+  { week: "26–30 Apr", risLeads: 24, risAdm: 0, risWalk: 5,  risBook: 18, rpsLeads: 26, rpsAdm: 1, rpsWalk: 2,  rpsBook: 10 },
 ];
 
 const SOCIAL = {
