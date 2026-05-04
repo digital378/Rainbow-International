@@ -115,7 +115,7 @@ Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier 
 | `/school-near-brahmand-thane` | Locality: Brahmand | `pages/SchoolNearBrahmand.tsx` |
 | `/school-near-ghodbunder-road-thane` | Locality: GB Road | `pages/SchoolNearGhodbunderRoad.tsx` |
 | `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
-| `/marketing` | Marketing Dashboard (noindex, real CRM/branch data) | `pages/Marketing.tsx` |
+| `/marketing` | Marketing Dashboard (noindex, real CRM/branch data, updated through 09-May 2026) | `pages/Marketing.tsx` |
 | `/brand-partners` | Brand Partners (134 logos, 11 categories, brochure modal) | `pages/BrandPartners.tsx` |
 | `/career` | Careers — 6 academic + 9 non-academic openings, female-preference notes, expanded form with resume upload | `pages/Career.tsx` |
 

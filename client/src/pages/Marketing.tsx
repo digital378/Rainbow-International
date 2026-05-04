@@ -8,9 +8,9 @@ import {
    DATA LAYER — easily replaceable with API/Sheets later
    ═══════════════════════════════════════════════════════════════════ */
 
-const LAST_UPDATED = "April 30, 2026";
-const TODAY_DATE = 30;
-const DAYS_IN_APRIL = 30;
+const LAST_UPDATED = "May 9, 2026";
+const TODAY_DATE = 9;
+const DAYS_IN_MAY = 31;
 const MIN_REVENUE_PER_ADM = 90000;
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
@@ -30,8 +30,8 @@ type MonthRow = { month: string; combined: MetricSet; ris: MetricSet; rps: Metri
    Note: branch bookings sum (RIS 77 + RPS 86 = 163) equals the combined sheet's 163.
    Note: branch ad-spend sum (RIS ₹83,801 + RPS ₹1,08,264 = ₹1,92,065) equals combined. */
 
-/* Convenience aliases for components that read April per-branch directly */
-const APRIL_IDX = 4;
+/* Convenience aliases for components that read the latest month per-branch directly */
+const MAY_IDX = 5;
 
 const MONTHLY: MonthRow[] = [
   {
@@ -65,10 +65,18 @@ const MONTHLY: MonthRow[] = [
     ris:      { leads: 174, bookings: 77,  walkins: 46,  admissions: 13, spend: 83801,  meta: 9996,  google: 73805 },
     rps:      { leads: 206, bookings: 86,  walkins: 45,  admissions: 15, spend: 108264, meta: 53846, google: 54418 },
   },
+  {
+    month: "May 26",
+    // Source: Overall ROI sheet (image_1777868799749) for combined; RIS/RPS spend sheets (1777868826022 / 1777868845560).
+    // May is in progress through 09-May (9 of 31 days). Spend excludes ₹1.25L salary line per branch (consistent with prior months).
+    combined: { leads: 47, bookings: 10, walkins: 6, admissions: 1, spend: 27623, meta: 7632, google: 19991 },
+    ris:      { leads: 27, bookings: 7,  walkins: 3, admissions: 0, spend: 13378, meta: 2808, google: 10570 },
+    rps:      { leads: 20, bookings: 3,  walkins: 3, admissions: 1, spend: 14245, meta: 4824, google: 9421  },
+  },
 ];
 
-const APRIL_RIS_BASE = MONTHLY[APRIL_IDX].ris;
-const APRIL_RPS_BASE = MONTHLY[APRIL_IDX].rps;
+const MAY_RIS_BASE = MONTHLY[MAY_IDX].ris;
+const MAY_RPS_BASE = MONTHLY[MAY_IDX].rps;
 
 /* Pre-spend organic admissions Jun – Nov 2025 (no marketing investment).
    These reconcile the 5-month "ad-spend window" with the sheet's full-AY
@@ -95,12 +103,14 @@ const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: 
   { month: "Jun 25", ris: { spend: 5846, leads: 89, walkins: 31, admissions: 11 }, rps: { spend: 88595, leads: 114, walkins: 32, admissions: 14 } },
 ];
 
-const APRIL_WEEKLY = [
-  { week: "01–04 Apr", risLeads: 18, risAdm: 3, risWalk: 6,  risBook: 7,  rpsLeads: 36, rpsAdm: 3, rpsWalk: 12, rpsBook: 18 },
-  { week: "05–11 Apr", risLeads: 37, risAdm: 3, risWalk: 11, risBook: 15, rpsLeads: 60, rpsAdm: 4, rpsWalk: 15, rpsBook: 32 },
-  { week: "12–18 Apr", risLeads: 48, risAdm: 4, risWalk: 11, risBook: 17, rpsLeads: 38, rpsAdm: 4, rpsWalk: 8,  rpsBook: 10 },
-  { week: "19–25 Apr", risLeads: 47, risAdm: 3, risWalk: 13, risBook: 20, rpsLeads: 46, rpsAdm: 3, rpsWalk: 8,  rpsBook: 16 },
-  { week: "26–30 Apr", risLeads: 24, risAdm: 0, risWalk: 5,  risBook: 18, rpsLeads: 26, rpsAdm: 1, rpsWalk: 2,  rpsBook: 10 },
+/* May 2026 weekly — captured through 09-May (Wks 3-5 are zero-data placeholders, in progress).
+   Source: RIS sheet (image_1777868814228), RPS sheet (image_1777868836790). */
+const MAY_WEEKLY = [
+  { week: "01–02 May", risLeads: 15, risAdm: 0, risWalk: 3, risBook: 7, rpsLeads: 14, rpsAdm: 1, rpsWalk: 3, rpsBook: 3 },
+  { week: "03–09 May", risLeads: 12, risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 6,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
+  { week: "10–16 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
+  { week: "17–23 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
+  { week: "24–31 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
 ];
 
 const SOCIAL = {
@@ -164,9 +174,9 @@ const CRM_RPS: { month: string; rows: CrmRow[]; total: CrmRow }[] = [
    HELPERS
    ═══════════════════════════════════════════════════════════════════ */
 
-const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
-const num = (n: number) => Math.round(n).toLocaleString("en-IN");
-const pct = (n: number) => `${n.toFixed(1)}%`;
+const inr = (n: number) => Number.isFinite(n) ? `₹${Math.round(n).toLocaleString("en-IN")}` : "—";
+const num = (n: number) => Number.isFinite(n) ? Math.round(n).toLocaleString("en-IN") : "—";
+const pct = (n: number) => Number.isFinite(n) ? `${n.toFixed(1)}%` : "—";
 
 const TICK = { fontSize: 11, fill: "#6b7280" };
 
@@ -191,9 +201,9 @@ function totalsFor(rows: MonthRow[], segment: SegmentKey) {
 }
 
 /* CPA = spend / adm  ;  TrueCPA = (spend + fixedCost*months) / adm */
-const cpa = (spend: number, adm: number) => adm > 0 ? spend / adm : 0;
+const cpa = (spend: number, adm: number) => adm > 0 ? spend / adm : Infinity;
 const trueCpa = (spend: number, adm: number, monthlyFixed: number, months: number) =>
-  adm > 0 ? (spend + monthlyFixed * months) / adm : 0;
+  adm > 0 ? (spend + monthlyFixed * months) / adm : Infinity;
 const cpl = (spend: number, leads: number) => leads > 0 ? spend / leads : 0;
 const cpw = (spend: number, walkins: number) => walkins > 0 ? spend / walkins : 0;
 const cpb = (spend: number, bookings: number) => bookings > 0 ? spend / bookings : 0;
@@ -267,7 +277,7 @@ export default function Marketing() {
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
   const [calcSpend, setCalcSpend] = useState<number>(100000);
-  const [calcMonth, setCalcMonth] = useState<string>("Apr 26");
+  const [calcMonth, setCalcMonth] = useState<string>("May 26");
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
 
   /* Editable cost inputs — initialized from segment defaults */
@@ -332,31 +342,31 @@ export default function Marketing() {
     return { instaFollowers: SOCIAL.ris.instaFollowers + SOCIAL.rps.instaFollowers, fbFollowers: SOCIAL.ris.fbFollowers + SOCIAL.rps.fbFollowers, ytViews: SOCIAL.ris.ytViews + SOCIAL.rps.ytViews, websiteClicks: SOCIAL.ris.websiteClicks + SOCIAL.rps.websiteClicks };
   }, [segment]);
 
-  const current = segmentRows[4]; // April
-  const previous = segmentRows[3]; // March
+  const current = segmentRows[5]; // May (in progress)
+  const previous = segmentRows[4]; // April (final)
 
-  /* April last year (index 6 = "Apr 25" in LAST_YEAR) */
-  const aprilLastYear = useMemo(() => {
-    const ly = LAST_YEAR[6]; // Apr 25
+  /* May last year (index 7 = "May 25" in LAST_YEAR) */
+  const mayLastYear = useMemo(() => {
+    const ly = LAST_YEAR[7]; // May 25
     if (segment === "combined") return { spend: ly.ris.spend + ly.rps.spend, leads: ly.ris.leads + ly.rps.leads, walkins: ly.ris.walkins + ly.rps.walkins, admissions: ly.ris.admissions + ly.rps.admissions, bookings: 0 };
     return { ...ly[segment as "ris" | "rps"], bookings: 0 };
   }, [segment]);
 
-  /* TY Oct–Apr totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
+  /* TY Oct–May totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
   const TY_OCT_NOV_ADM = { combined: 21, ris: 12, rps: 9 }; // oct+nov 25 organic adm per segment
-  const tyOctAprTotals = useMemo(() => {
-    const dec_apr = totalsFor(MONTHLY, segment); // Dec 25 – Apr 26 (all 5 rows)
+  const tyOctMayTotals = useMemo(() => {
+    const dec_may = totalsFor(MONTHLY, segment); // Dec 25 – May 26 (all 6 rows)
     return {
-      leads:       dec_apr.leads,       // Oct/Nov digital leads untracked; Dec-Apr only
-      walkins:     dec_apr.walkins,     // same
-      admissions:  dec_apr.admissions + TY_OCT_NOV_ADM[segment], // add organic Oct+Nov adm
-      spend:       dec_apr.spend,       // Oct/Nov had ₹0 ad spend
+      leads:       dec_may.leads,       // Oct/Nov digital leads untracked; Dec-May only
+      walkins:     dec_may.walkins,     // same
+      admissions:  dec_may.admissions + TY_OCT_NOV_ADM[segment], // add organic Oct+Nov adm
+      spend:       dec_may.spend,       // Oct/Nov had ₹0 ad spend
     };
   }, [segment]);
 
-  /* LY Oct–Apr totals (LAST_YEAR indices 0–6: Oct 24 → Apr 25) */
-  const lyOctAprTotals = useMemo(() => {
-    const slice = LAST_YEAR.slice(0, 7); // Oct 24 → Apr 25
+  /* LY Oct–May totals (LAST_YEAR indices 0–7: Oct 24 → May 25) */
+  const lyOctMayTotals = useMemo(() => {
+    const slice = LAST_YEAR.slice(0, 8); // Oct 24 → May 25
     if (segment === "combined") return slice.reduce((a, r) => ({
       spend:      a.spend      + r.ris.spend      + r.rps.spend,
       leads:      a.leads      + r.ris.leads      + r.rps.leads,
@@ -369,7 +379,7 @@ export default function Marketing() {
     }, { spend: 0, leads: 0, walkins: 0, admissions: 0 });
   }, [segment]);
 
-  /* Full-AY totals — Jun 2025 through Apr 2026 (reconciled with sheet's TOTAL TILL DATE) */
+  /* Full-AY totals — Jun 2025 through May 2026 (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
   const ytdAdmissionsFull = totals.admissions + organic.admissions;
   const ytdLeadsFull     = totals.leads     + organic.leads;
@@ -396,8 +406,8 @@ export default function Marketing() {
   const ytdMarketingRoi = roi(ytdRevenue, totals.spend);
   const ytdTrueRoi = roi(ytdRevenue, totals.spend + monthlyFixed * totalMonths);
 
-  /* April Forecast */
-  const fcMul = DAYS_IN_APRIL / TODAY_DATE;
+  /* May Forecast (linear pace projection) */
+  const fcMul = DAYS_IN_MAY / TODAY_DATE;
   const forecast = {
     leads: Math.round(current.leads * fcMul), walkins: Math.round(current.walkins * fcMul),
     admissions: Math.round(current.admissions * fcMul), spend: Math.round(current.spend * fcMul),
@@ -491,29 +501,30 @@ export default function Marketing() {
         body: `${walkToAdm.toFixed(1)}% of walk-ins convert to admissions — above industry standard. Focus on driving more walk-ins to multiply admissions.` });
     }
 
-    /* April pace — only show when month is still running */
-    if (TODAY_DATE < DAYS_IN_APRIL && forecast.leads < previous.leads * 0.95) {
-      arr.push({ severity: "warning", title: "April tracking below March",
-        body: `Forecasted April leads (${num(forecast.leads)}) projected below March (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_APRIL - TODAY_DATE} days.` });
+    /* May pace — only show when month is still running */
+    if (TODAY_DATE < DAYS_IN_MAY && forecast.leads < previous.leads * 0.95) {
+      arr.push({ severity: "warning", title: "May tracking below April",
+        body: `Forecasted May leads (${num(forecast.leads)}) projected below April (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_MAY - TODAY_DATE} days.` });
     }
 
     /* YoY growth */
     if (totalsLastYearSegment.admissions > 0) {
-      const yoyGrowth = ((totals.admissions - totalsLastYearSegment.admissions / 9 * 5) / (totalsLastYearSegment.admissions / 9 * 5)) * 100;
+      const lyNormalized = (totalsLastYearSegment.admissions / 9) * totalMonths;
+      const yoyGrowth = ((totals.admissions - lyNormalized) / lyNormalized) * 100;
       arr.push({ severity: yoyGrowth > 0 ? "opportunity" : "warning",
         title: `YoY admissions ${yoyGrowth > 0 ? "growth" : "decline"}: ${Math.abs(yoyGrowth).toFixed(0)}%`,
-        body: `This year (${segment.toUpperCase()}) admissions per month avg: ${(totals.admissions / 5).toFixed(1)} vs last year ${(totalsLastYearSegment.admissions / 9).toFixed(1)}. Marketing efficiency is ${yoyGrowth > 0 ? "improving" : "regressing"}.` });
+        body: `This year (${segment.toUpperCase()}) admissions per month avg: ${(totals.admissions / totalMonths).toFixed(1)} vs last year ${(totalsLastYearSegment.admissions / 9).toFixed(1)}. Marketing efficiency is ${yoyGrowth > 0 ? "improving" : "regressing"}.` });
     }
 
     /* RIS vs RPS specific */
     if (segment === "combined") {
-      const aprilRis = APRIL_RIS_BASE, aprilRps = APRIL_RPS_BASE;
-      const risConv = (aprilRis.admissions / aprilRis.leads) * 100;
-      const rpsConv = (aprilRps.admissions / aprilRps.leads) * 100;
+      const aprRis = MONTHLY[4].ris, aprRps = MONTHLY[4].rps;
+      const risConv = (aprRis.admissions / aprRis.leads) * 100;
+      const rpsConv = (aprRps.admissions / aprRps.leads) * 100;
       if (Math.abs(risConv - rpsConv) > 1) {
         const winner = risConv > rpsConv ? "RIS" : "RPS";
-        arr.push({ severity: "opportunity", title: `${winner} converting better in April`,
-          body: `RIS conversion: ${risConv.toFixed(1)}% vs RPS: ${rpsConv.toFixed(1)}%. Study ${winner} tour/calling process and replicate for the other branch.` });
+        arr.push({ severity: "opportunity", title: `${winner} converted better in April`,
+          body: `April RIS conversion: ${risConv.toFixed(1)}% vs RPS: ${rpsConv.toFixed(1)}%. Study ${winner} tour/calling process and replicate for the other branch.` });
       }
     }
 
@@ -557,9 +568,9 @@ export default function Marketing() {
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
-          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub="Full AY 2025–26 (Jun 2025 – Apr 30, 2026)" />
+          <SectionTitle title={`Year-to-Date Performance (${segmentLabel})`} sub={`Full AY 2025–26 (Jun 2025 – ${LAST_UPDATED})`} />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 11).toFixed(0)} avg/month`} color={NAVY} />
+            <KpiCard label="Total Leads" value={num(ytdLeadsFull)} sub={`${(ytdLeadsFull / 12).toFixed(0)} avg/month`} color={NAVY} />
             <KpiCard label="Total Bookings" value={num(ytdBookingsFull)} sub={`${pct((ytdBookingsFull / Math.max(ytdLeadsFull, 1)) * 100)} of leads`} color={PURPLE} />
             <KpiCard label="Total Walk-ins" value={num(ytdWalkinsFull)} sub={`${pct(leadToWalk)} of leads`} color={CYAN} />
             <KpiCard label="Total Admissions" value={num(ytdAdmissionsFull)} sub={`${pct(walkToAdm)} of walk-ins`} color={GREEN} />
@@ -583,7 +594,7 @@ export default function Marketing() {
 
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
-          <SectionTitle title="Month-over-Month Comparison" sub="April 2026 (final) vs March 2026 (final)" />
+          <SectionTitle title="Month-over-Month Comparison" sub="May 2026 (in progress, 9 days) vs April 2026 (final)" />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
@@ -609,32 +620,32 @@ export default function Marketing() {
                     <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs Mar: {k.format(k.prev)}</div>
+                  <div className="text-[11px] text-gray-500 mt-1">vs Apr: {k.format(k.prev)}</div>
                 </div>
               );
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            April is complete ({TODAY_DATE} of {DAYS_IN_APRIL} days). Final month totals shown.
+            May 2026 is in progress ({TODAY_DATE} of {DAYS_IN_MAY} days captured). Compares partial-May to final April — see Forecast section for projected month-end values.
           </div>
         </section>
 
         {/* ───────── 3b. Year-over-Year Comparison ───────── */}
         <section>
-          <SectionTitle title="Year-over-Year Comparison" sub="April 2026 vs April 2025 — same month, same window" />
+          <SectionTitle title="Year-over-Year Comparison" sub="May 2026 (partial, 9 days) vs May 2025 (full month)" />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { label: "Leads",              curr: current.leads,       prev: aprilLastYear.leads,       format: num },
-              { label: "Walk-ins",           curr: current.walkins,     prev: aprilLastYear.walkins,     format: num },
-              { label: "Admissions",         curr: current.admissions,  prev: aprilLastYear.admissions,  format: num },
-              { label: "Marketing Spend",    curr: current.spend,                        prev: aprilLastYear.spend,                        format: inr, invert: true },
-              { label: "Total Spend (incl. Salary)", curr: current.spend + monthlyFixed,  prev: aprilLastYear.spend + monthlyFixed,  format: inr, invert: true },
-              { label: "Marketing CPA",      curr: cpa(current.spend, current.admissions),                          prev: cpa(aprilLastYear.spend, aprilLastYear.admissions),                          format: inr, invert: true },
-              { label: "True CPA",           curr: trueCpa(current.spend, current.admissions, monthlyFixed, 1),     prev: trueCpa(aprilLastYear.spend, aprilLastYear.admissions, monthlyFixed, 1),     format: inr, invert: true },
-              { label: "Revenue (Min.)",     curr: current.admissions * MIN_REVENUE_PER_ADM,                        prev: aprilLastYear.admissions * MIN_REVENUE_PER_ADM,                              format: inr },
-              { label: "Walk-in → Adm %",   curr: (current.admissions / Math.max(current.walkins, 1)) * 100,       prev: (aprilLastYear.admissions / Math.max(aprilLastYear.walkins, 1)) * 100,       format: pct },
-              { label: "Min. ROI %",         curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend),   prev: roi(aprilLastYear.admissions * MIN_REVENUE_PER_ADM, aprilLastYear.spend),   format: (n: number) => `${Math.round(n)}%` },
+              { label: "Leads",              curr: current.leads,       prev: mayLastYear.leads,       format: num },
+              { label: "Walk-ins",           curr: current.walkins,     prev: mayLastYear.walkins,     format: num },
+              { label: "Admissions",         curr: current.admissions,  prev: mayLastYear.admissions,  format: num },
+              { label: "Marketing Spend",    curr: current.spend,                        prev: mayLastYear.spend,                        format: inr, invert: true },
+              { label: "Total Spend (incl. Salary)", curr: current.spend + monthlyFixed,  prev: mayLastYear.spend + monthlyFixed,  format: inr, invert: true },
+              { label: "Marketing CPA",      curr: cpa(current.spend, current.admissions),                          prev: cpa(mayLastYear.spend, mayLastYear.admissions),                          format: inr, invert: true },
+              { label: "True CPA",           curr: trueCpa(current.spend, current.admissions, monthlyFixed, 1),     prev: trueCpa(mayLastYear.spend, mayLastYear.admissions, monthlyFixed, 1),     format: inr, invert: true },
+              { label: "Revenue (Min.)",     curr: current.admissions * MIN_REVENUE_PER_ADM,                        prev: mayLastYear.admissions * MIN_REVENUE_PER_ADM,                              format: inr },
+              { label: "Walk-in → Adm %",   curr: (current.admissions / Math.max(current.walkins, 1)) * 100,       prev: (mayLastYear.admissions / Math.max(mayLastYear.walkins, 1)) * 100,       format: pct },
+              { label: "Min. ROI %",         curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend),   prev: roi(mayLastYear.admissions * MIN_REVENUE_PER_ADM, mayLastYear.spend),   format: (n: number) => `${Math.round(n)}%` },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               const goodDirection = (k as any).invert ? !d.positive : d.positive;
@@ -645,26 +656,26 @@ export default function Marketing() {
                     <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs Apr 25: {k.format(k.prev)}</div>
+                  <div className="text-[11px] text-gray-500 mt-1">vs May 25: {k.format(k.prev)}</div>
                 </div>
               );
             })}
           </div>
         </section>
 
-        {/* ───────── 4. April Forecast (with True CPA) ───────── */}
+        {/* ───────── 4. May Forecast (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title={TODAY_DATE >= DAYS_IN_APRIL ? "April 2026 — Final Actuals" : "April 2026 Forecast (Projected Month-End)"}
-            sub={TODAY_DATE >= DAYS_IN_APRIL ? `Month complete · All 30 days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
+            title={TODAY_DATE >= DAYS_IN_MAY ? "May 2026 — Final Actuals" : "May 2026 Forecast (Projected Month-End)"}
+            sub={TODAY_DATE >= DAYS_IN_MAY ? `Month complete · All ${DAYS_IN_MAY} days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
             badge={`Confidence: ${fcConfidence}`}
           />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             {[
-              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Leads" : "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
-              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Walk-ins" : "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
-              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Admissions" : "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
-              { label: TODAY_DATE >= DAYS_IN_APRIL ? "Final Spend" : "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
+              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Leads" : "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
+              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Walk-ins" : "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
+              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Admissions" : "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
+              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Spend" : "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
             ].map((k, i) => (
               <div key={i} className="rounded-xl border border-gray-100 p-3">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
@@ -845,17 +856,17 @@ export default function Marketing() {
           </div>
         </section>
 
-        {/* ───────── 7. April Branch Comparison + Channel ───────── */}
+        {/* ───────── 7. May Branch Comparison + Channel ───────── */}
         {segment === "combined" && (
           <section className="grid lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <SectionTitle title="April 2026 — Branch Comparison" sub="RIS vs RPS performance side-by-side" />
+              <SectionTitle title="May 2026 — Branch Comparison" sub="RIS vs RPS performance side-by-side (in progress, 9 days)" />
               <div className="space-y-3">
                 {[
-                  { label: "Total Leads", ris: APRIL_RIS_BASE.leads, rps: APRIL_RPS_BASE.leads, max: 130 },
-                  { label: "Bookings", ris: APRIL_RIS_BASE.bookings, rps: APRIL_RPS_BASE.bookings, max: 60 },
-                  { label: "Walk-ins", ris: APRIL_RIS_BASE.walkins, rps: APRIL_RPS_BASE.walkins, max: 40 },
-                  { label: "Admissions", ris: APRIL_RIS_BASE.admissions, rps: APRIL_RPS_BASE.admissions, max: 15 },
+                  { label: "Total Leads", ris: MAY_RIS_BASE.leads, rps: MAY_RPS_BASE.leads, max: 30 },
+                  { label: "Bookings", ris: MAY_RIS_BASE.bookings, rps: MAY_RPS_BASE.bookings, max: 10 },
+                  { label: "Walk-ins", ris: MAY_RIS_BASE.walkins, rps: MAY_RPS_BASE.walkins, max: 5 },
+                  { label: "Admissions", ris: MAY_RIS_BASE.admissions, rps: MAY_RPS_BASE.admissions, max: 2 },
                 ].map(row => (
                   <div key={row.label}>
                     <div className="flex justify-between text-xs text-gray-500 mb-1">
@@ -875,19 +886,19 @@ export default function Marketing() {
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <div className="rounded-xl bg-[#091a4f]/5 p-3 text-center">
                   <div className="text-xs text-gray-500 font-medium mb-1">RIS Conversion</div>
-                  <div className="text-2xl font-black" style={{ color: NAVY }}>{pct((APRIL_RIS_BASE.admissions / APRIL_RIS_BASE.leads) * 100)}</div>
-                  <div className="text-[11px] text-gray-400">{APRIL_RIS_BASE.admissions} / {APRIL_RIS_BASE.leads}</div>
+                  <div className="text-2xl font-black" style={{ color: NAVY }}>{pct((MAY_RIS_BASE.admissions / Math.max(MAY_RIS_BASE.leads, 1)) * 100)}</div>
+                  <div className="text-[11px] text-gray-400">{MAY_RIS_BASE.admissions} / {MAY_RIS_BASE.leads}</div>
                 </div>
                 <div className="rounded-xl bg-cyan-50 p-3 text-center">
                   <div className="text-xs text-gray-500 font-medium mb-1">RPS Conversion</div>
-                  <div className="text-2xl font-black" style={{ color: CYAN }}>{pct((APRIL_RPS_BASE.admissions / APRIL_RPS_BASE.leads) * 100)}</div>
-                  <div className="text-[11px] text-gray-400">{APRIL_RPS_BASE.admissions} / {APRIL_RPS_BASE.leads}</div>
+                  <div className="text-2xl font-black" style={{ color: CYAN }}>{pct((MAY_RPS_BASE.admissions / Math.max(MAY_RPS_BASE.leads, 1)) * 100)}</div>
+                  <div className="text-[11px] text-gray-400">{MAY_RPS_BASE.admissions} / {MAY_RPS_BASE.leads}</div>
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <SectionTitle title="April 2026 — Channel Spend" sub="Meta vs Google ad investment" />
+              <SectionTitle title="May 2026 — Channel Spend" sub="Meta vs Google ad investment (partial month)" />
               <div className="space-y-3">
                 <div className="rounded-xl p-4 text-white" style={{ background: "#1877f2" }}>
                   <div className="flex justify-between items-baseline">
@@ -1175,16 +1186,16 @@ export default function Marketing() {
               <div className="text-gray-700">Spend: <strong>{inr(totalsLastYearSegment.spend)}</strong> · Leads: <strong>{num(totalsLastYearSegment.leads)}</strong> · Admissions: <strong>{totalsLastYearSegment.admissions}</strong></div>
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
-              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Dec 25 – Apr 26)</div>
+              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Dec 25 – May 26)</div>
               <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
             </div>
           </div>
         </section>
 
-        {/* ───────── 10. April Weekly ───────── */}
+        {/* ───────── 10. May Weekly ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <SectionTitle title="April 2026 — Weekly Breakdown" sub="Week-by-week leads, walk-ins, bookings, admissions" />
+            <SectionTitle title="May 2026 — Weekly Breakdown" sub={`Week-by-week leads, walk-ins, bookings, admissions (through ${LAST_UPDATED})`} />
             <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
               {(["combined", "ris", "rps"] as const).map(t => (
                 <button key={t} onClick={() => setWeeklyTab(t)}
@@ -1204,7 +1215,7 @@ export default function Marketing() {
                 <th className="text-center py-2 px-3 text-gray-500 font-semibold">Conversion</th>
               </tr></thead>
               <tbody>
-                {APRIL_WEEKLY.map((w, i) => {
+                {MAY_WEEKLY.map((w, i) => {
                   const leads = weeklyTab === "ris" ? w.risLeads : weeklyTab === "rps" ? w.rpsLeads : w.risLeads + w.rpsLeads;
                   const walk = weeklyTab === "ris" ? w.risWalk : weeklyTab === "rps" ? w.rpsWalk : w.risWalk + w.rpsWalk;
                   const adm = weeklyTab === "ris" ? w.risAdm : weeklyTab === "rps" ? w.rpsAdm : w.risAdm + w.rpsAdm;
@@ -1233,8 +1244,8 @@ export default function Marketing() {
             {[
               { platform: "Instagram", val: num(social.instaFollowers), label: "Followers", color: "#e1306c" },
               { platform: "Facebook", val: num(social.fbFollowers), label: "Followers", color: "#1877f2" },
-              { platform: "YouTube", val: num(social.ytViews), label: "Views (Apr 2026)", color: "#ff0000" },
-              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Apr Week 3 Clicks", color: GREEN },
+              { platform: "YouTube", val: num(social.ytViews), label: "Views (May 2026)", color: "#ff0000" },
+              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Recent Clicks", color: GREEN },
             ].map(s => (
               <div key={s.platform} className="rounded-xl border border-gray-100 p-4">
                 <div className="font-bold text-sm text-gray-800">{s.platform}</div>
@@ -1604,7 +1615,7 @@ export default function Marketing() {
         <div className="text-center text-xs text-gray-400 pb-6 pt-2 border-t border-gray-200">
           <div>This dashboard is strictly confidential — for internal management use only.</div>
           <div className="mt-1">Data sourced from DM Performance Tracker (Nabeel sub-sheet) and DM Target-Wise Report (June 2025).</div>
-          <div className="mt-1">Last updated: {LAST_UPDATED} · Notes: prior-month RIS/RPS splits use April-derived ratios where source split was unavailable. True CPA uses editable salary defaults.</div>
+          <div className="mt-1">Last updated: {LAST_UPDATED} · Notes: May 2026 reflects partial month (9 of 31 days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.</div>
         </div>
       </div>
     </div>
