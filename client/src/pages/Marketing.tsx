@@ -8,8 +8,8 @@ import {
    DATA LAYER — easily replaceable with API/Sheets later
    ═══════════════════════════════════════════════════════════════════ */
 
-const LAST_UPDATED = "May 9, 2026";
-const TODAY_DATE = 9;
+const LAST_UPDATED = "May 4, 2026";
+const TODAY_DATE = 3; // days elapsed: May 1–3 captured; today is May 4
 const DAYS_IN_MAY = 31;
 const MIN_REVENUE_PER_ADM = 90000;
 
@@ -103,11 +103,11 @@ const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: 
   { month: "Jun 25", ris: { spend: 5846, leads: 89, walkins: 31, admissions: 11 }, rps: { spend: 88595, leads: 114, walkins: 32, admissions: 14 } },
 ];
 
-/* May 2026 weekly — captured through 09-May (Wks 3-5 are zero-data placeholders, in progress).
-   Source: RIS sheet (image_1777868814228), RPS sheet (image_1777868836790). */
+/* May 2026 weekly — 3 days captured (May 1–3); today is May 4.
+   All month-to-date data consolidated into the first block; Wks 2-5 pending. */
 const MAY_WEEKLY = [
-  { week: "01–02 May", risLeads: 15, risAdm: 0, risWalk: 3, risBook: 7, rpsLeads: 14, rpsAdm: 1, rpsWalk: 3, rpsBook: 3 },
-  { week: "03–09 May", risLeads: 12, risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 6,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
+  { week: "01–03 May", risLeads: 27, risAdm: 0, risWalk: 3, risBook: 7, rpsLeads: 20, rpsAdm: 1, rpsWalk: 3, rpsBook: 3 },
+  { week: "04–09 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
   { week: "10–16 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
   { week: "17–23 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
   { week: "24–31 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
@@ -594,7 +594,7 @@ export default function Marketing() {
 
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
-          <SectionTitle title="Month-over-Month Comparison" sub="May 2026 (in progress, 9 days) vs April 2026 (final)" />
+          <SectionTitle title="Month-over-Month Comparison" sub={`May 2026 (in progress, ${TODAY_DATE} days) vs April 2026 (final)`} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
@@ -626,13 +626,13 @@ export default function Marketing() {
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            May 2026 is in progress ({TODAY_DATE} of {DAYS_IN_MAY} days captured). Compares partial-May to final April — see Forecast section for projected month-end values.
+            May 2026 is in progress ({TODAY_DATE} days captured: May 1–3). Compares partial-May to final April — see Forecast section for projected month-end values.
           </div>
         </section>
 
         {/* ───────── 3b. Year-over-Year Comparison ───────── */}
         <section>
-          <SectionTitle title="Year-over-Year Comparison" sub="May 2026 (partial, 9 days) vs May 2025 (full month)" />
+          <SectionTitle title="Year-over-Year Comparison" sub={`May 2026 (partial, ${TODAY_DATE} days) vs May 2025 (full month)`} />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
@@ -1615,7 +1615,7 @@ export default function Marketing() {
         <div className="text-center text-xs text-gray-400 pb-6 pt-2 border-t border-gray-200">
           <div>This dashboard is strictly confidential — for internal management use only.</div>
           <div className="mt-1">Data sourced from DM Performance Tracker (Nabeel sub-sheet) and DM Target-Wise Report (June 2025).</div>
-          <div className="mt-1">Last updated: {LAST_UPDATED} · Notes: May 2026 reflects partial month (9 of 31 days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.</div>
+          <div className="mt-1">Last updated: {LAST_UPDATED} · Notes: May 2026 reflects partial month (3 of 31 days, May 1–3). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.</div>
         </div>
       </div>
     </div>
