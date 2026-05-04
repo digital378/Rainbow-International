@@ -114,8 +114,8 @@ const MAY_WEEKLY = [
 ];
 
 const SOCIAL = {
-  ris: { instaFollowers: 5693,  fbFollowers: 9842,  ytViews: 8354, websiteClicks: 486 },
-  rps: { instaFollowers: 10488, fbFollowers: 12945, ytViews: 9897, websiteClicks: 91 },
+  ris: { instaFollowers: 5739,  fbFollowers: 9831,  ytViews: 8427, websiteClicks: 309 },
+  rps: { instaFollowers: 10570, fbFollowers: 12679, ytViews: 9897, websiteClicks: 82  },
 };
 
 /* Default fixed monthly costs (per source sheet: salary line = ₹1.25L/branch/mo).
@@ -1244,8 +1244,8 @@ export default function Marketing() {
             {[
               { platform: "Instagram", val: num(social.instaFollowers), label: "Followers", color: "#e1306c" },
               { platform: "Facebook", val: num(social.fbFollowers), label: "Followers", color: "#1877f2" },
-              { platform: "YouTube", val: num(social.ytViews), label: "Views (May 2026)", color: "#ff0000" },
-              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Recent Clicks", color: GREEN },
+              { platform: "YouTube", val: num(social.ytViews), label: "Views (Apr 2026)", color: "#ff0000" },
+              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Clicks (27 Apr – 3 May)", color: GREEN },
             ].map(s => (
               <div key={s.platform} className="rounded-xl border border-gray-100 p-4">
                 <div className="font-bold text-sm text-gray-800">{s.platform}</div>
