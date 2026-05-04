@@ -100,15 +100,24 @@ export default function RainbowPreschool() {
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative min-h-[92vh] flex items-center overflow-hidden" style={{ zIndex: 1, marginBottom: "-1px" }}>
-        <img
-          src="/images/preschool/hero.jpg"
-          alt="Rainbow Preschool children with school bags"
-          width={1920}
-          height={1080}
-          loading="eager"
-          decoding="async"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        <picture>
+          <source
+            type="image/webp"
+            media="(max-width: 768px)"
+            srcSet="/images/preschool/hero-mobile.webp"
+          />
+          <source srcSet="/images/preschool/hero.webp" type="image/webp" />
+          <img
+            src="/images/preschool/hero.jpg"
+            alt="Rainbow Preschool children with school bags"
+            width={1616}
+            height={1080}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </picture>
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.82) 50%, rgba(9,26,79,0.75) 100%)" }} />
 
         <div className="relative container mx-auto px-4 lg:px-8 pt-48 pb-28 lg:pt-44 lg:pb-32">
@@ -206,7 +215,7 @@ export default function RainbowPreschool() {
                 <div className="flex-shrink-0 relative w-full lg:w-[340px]">
                   <div className="w-72 h-72 md:w-80 md:h-80 rounded-[40px] overflow-hidden shadow-2xl border-4 border-gray-100 mx-auto">
                     <img
-                      src="/images/preschool/nursery-kids.jpg"
+                      src="/images/preschool/nursery-kids.webp"
                       alt="Rainbow Preschool nursery children smiling on colorful mat"
                       className="w-full h-full object-cover"
                       width={320}
