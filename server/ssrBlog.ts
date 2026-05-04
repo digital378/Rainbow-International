@@ -120,11 +120,11 @@ function renderBlogSSR(slug: string): string | null {
   <meta name="description" content="${e(post.metaDescription)}" />
   <meta name="keywords" content="${e(post.keywords)}" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
+  <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />
   <meta property="og:image" content="${e(post.heroUrl || 'https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg')}" />
-  <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}/" />
+  <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta property="og:locale" content="en_IN" />
@@ -152,7 +152,7 @@ function renderBlogSSR(slug: string): string | null {
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://rainbowinternationalschool.in/blog/${post.slug}/`
+      "@id": `https://rainbowinternationalschool.in/blog/${post.slug}`
     },
     "keywords": post.keywords,
     "articleSection": post.cat
@@ -165,7 +165,7 @@ function renderBlogSSR(slug: string): string | null {
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://rainbowinternationalschool.in/" },
       { "@type": "ListItem", "position": 2, "name": "Blogs", "item": "https://rainbowinternationalschool.in/blogs" },
-      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://rainbowinternationalschool.in/blog/${post.slug}/` }
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": `https://rainbowinternationalschool.in/blog/${post.slug}` }
     ]
   })}
   </script>

@@ -66,12 +66,12 @@ export default function BlogPost() {
         title={post.metaTitle}
         description={post.metaDescription}
         keywords={post.keywords}
-        canonical={`https://rainbowinternationalschool.in/blog/${post.slug}/`}
+        canonical={`https://rainbowinternationalschool.in/blog/${post.slug}`}
         ogImage={post.heroUrl}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Blogs", href: "https://rainbowinternationalschool.in/blogs" },
-          { name: post.title, href: `https://rainbowinternationalschool.in/blog/${post.slug}/` },
+          { name: post.title, href: `https://rainbowinternationalschool.in/blog/${post.slug}` },
         ]}
       />
       <Navbar />
