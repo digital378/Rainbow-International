@@ -5,6 +5,7 @@ import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { Hero } from "@/components/home/Hero";
 import { AwardsStrip } from "@/components/home/AwardsStrip";
+import { LazyVisible } from "@/components/util/LazyVisible";
 
 const AboutPreview = lazy(() => import("@/components/home/AboutPreview").then(m => ({ default: m.AboutPreview })));
 const AcademicSections = lazy(() => import("@/components/home/AcademicSections").then(m => ({ default: m.AcademicSections })));
@@ -88,33 +89,51 @@ export default function Home() {
           <meta itemProp="url" content="https://rainbowinternationalschool.in" />
           <Hero />
           <AwardsStrip />
-          <Suspense fallback={<SectionFallback />}>
-            <AboutPreview />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <AcademicSections />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <Pedagogy />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <DiscoverRainbow />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <Neighbourhood />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <BeyondClassroomSection />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <Testimonials />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <HomeFAQ />
-          </Suspense>
-          <Suspense fallback={<SectionFallback />}>
-            <ContactForm />
-          </Suspense>
+          <LazyVisible minHeight={400}>
+            <Suspense fallback={<SectionFallback />}>
+              <AboutPreview />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={600}>
+            <Suspense fallback={<SectionFallback />}>
+              <AcademicSections />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={500}>
+            <Suspense fallback={<SectionFallback />}>
+              <Pedagogy />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={500}>
+            <Suspense fallback={<SectionFallback />}>
+              <DiscoverRainbow />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={400}>
+            <Suspense fallback={<SectionFallback />}>
+              <Neighbourhood />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={500}>
+            <Suspense fallback={<SectionFallback />}>
+              <BeyondClassroomSection />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={500}>
+            <Suspense fallback={<SectionFallback />}>
+              <Testimonials />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={400}>
+            <Suspense fallback={<SectionFallback />}>
+              <HomeFAQ />
+            </Suspense>
+          </LazyVisible>
+          <LazyVisible minHeight={600}>
+            <Suspense fallback={<SectionFallback />}>
+              <ContactForm />
+            </Suspense>
+          </LazyVisible>
         </article>
       </main>
       <Footer />
