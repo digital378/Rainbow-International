@@ -1,0 +1,143 @@
+# RIS — Diagnose the April Traffic Regression (READ ONLY)
+
+GSC data analysis shows a significant decline:
+- Clicks: dropped 44% comparing first 30 days vs last 30 days of 90-day window
+- Impressions: dropped 67% in the same comparison  
+- Indexed pages: fell from 253 to 220 between April 17–21 (33 pages 
+  de-indexed in 4 days)
+- Average position: worsened from 5.10 to 5.66
+
+This is NOT seasonality. Something specific happened. Find it.
+
+## CONSTRAINTS
+
+- Diagnostic only. Do NOT make any changes, fixes, deploys, or commits.
+- Do NOT propose solutions yet. Just find facts.
+- If you don't know something, say so. Don't guess.
+- Do not dismiss the regression as "Lighthouse variance" or 
+  "Google fluctuation" without specific evidence.
+
+## TASKS
+
+### 1. Git history audit
+Run: `git log --since="2026-03-15" --until="2026-04-25" --oneline`
+
+Report all commits in that window. For each commit, note whether it 
+touched any of these:
+- routing / URL structure
+- sitemap.xml or sitemap generator
+- robots.txt
+- canonical tags
+- schema markup (JSON-LD)
+- bot SSR logic
+- meta tags (title, description, og:*)
+- redirect rules
+- significant content changes (>500 words removed or rewritten)
+
+For the April 14–21 window specifically (when 33 pages de-indexed), 
+provide full diff summaries of any commits.
+
+### 2. Sitemap vs reality cross-check
+Pull current sitemap.xml. Run HEAD requests against every URL in it. 
+Categorize:
+- 200 OK (healthy)
+- 301 redirect (to where?)
+- 404 not found
+- 410 gone
+- 5xx server error
+- noindex meta tag despite being in sitemap
+
+GSC reports these counts — verify against sitemap reality:
+- 91 URLs flagged "Page with redirect" — list which sitemap URLs 
+  are now redirecting
+- 9 URLs flagged "Not found (404)" — list which were in sitemap
+- 19 URLs flagged "Excluded by noindex" — are they intentionally noindex?
+
+### 3. Quality-flag investigation
+GSC flags 168 pages as not worth indexing:
+- 106 "Discovered – currently not indexed"
+- 62 "Crawled – currently not indexed"
+
+For each category, classify the URLs by type:
+- Blog posts (educational, informational)
+- Commercial pages (admissions, fees, programmes)
+- Archive / tag / category pages
+- PDF documents
+- Media / image pages
+- Other
+
+Provide counts and a sample of 5 URLs per category.
+
+### 4. Bot SSR verification
+Run these and report whether full content + meta tags + JSON-LD 
+render in raw HTML (not the SPA shell):
+
+```
+curl -A "Googlebot/2.1 (+http://www.google.com/bot.html)" -s \
+  https://rainbowinternationalschool.in/ | head -300
+
+curl -A "Googlebot/2.1" -s \
+  https://rainbowinternationalschool.in/cbse-vs-icse-which-board-prepares-students-better-for-the-future/ \
+  | head -300
+
+curl -A "Googlebot/2.1" -s \
+  https://rainbowinternationalschool.in/ideal-teacher-qualities-traits-of-a-great-educator/ \
+  | head -300
+
+curl -A "Googlebot/2.1" -s \
+  https://rainbowinternationalschool.in/key-facilities-every-good-cbse-school-should-have/ \
+  | head -300
+
+curl -A "Googlebot/2.1" -s \
+  https://rainbowinternationalschool.in/senior-secondary-section/ \
+  | head -300
+```
+
+For each, confirm presence of:
+- <title> tag with content
+- <meta name="description"> with content
+- <link rel="canonical">
+- JSON-LD <script type="application/ld+json"> blocks
+- Main body content (h1, h2, paragraphs)
+
+### 5. Server logs (if available)
+Check Replit deployment logs for the April 14–21 window. Report:
+- Any spike in 4xx or 5xx errors
+- Any deploy failures or rollbacks
+- Any unusual error patterns
+- Any timeouts
+
+### 6. robots.txt
+Show full contents. Verify nothing is blocked unintentionally. 
+Specifically confirm:
+- Googlebot is not blocked from any commercial pages
+- Sitemap reference is correct
+
+### 7. Specific URL spot-checks
+For these specific URLs that are top-traffic pages, verify their 
+current status (HTTP code, indexed status per GSC URL Inspection):
+- https://rainbowinternationalschool.in/
+- https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Fee-Structure-combinepdf.pdf
+- https://rainbowinternationalschool.in/career/
+- https://rainbowinternationalschool.in/ideal-teacher-qualities-traits-of-a-great-educator/
+- https://rainbowinternationalschool.in/cbse-vs-icse-which-board-prepares-students-better-for-the-future/
+- https://rainbowinternationalschool.in/key-facilities-every-good-cbse-school-should-have/
+- https://rainbowinternationalschool.in/senior-secondary-section/
+
+### 8. Cloudflare / CDN status
+Is RIS proxied through Cloudflare or any CDN? Report cf-ray header 
+values from a fresh request. If yes, list cache rules. If no, just 
+note it (don't fix yet).
+
+## REPORTING FORMAT
+
+Respond with:
+1. A clear summary at the top: "Most likely cause of April regression: ___"
+2. Numbered findings for each task above
+3. Severity per finding: critical / high / medium / low
+4. Confidence level per finding: high / medium / low / unknown
+5. List of follow-up questions you have for me before we plan fixes
+6. Items where you need a strategic decision from me
+
+DO NOT propose fixes. After I review your findings, I'll send a 
+separate prompt to plan and implement fixes.
