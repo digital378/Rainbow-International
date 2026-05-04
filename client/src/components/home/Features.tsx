@@ -1,11 +1,11 @@
 const images = [
-  { src: "/images/home/welcome/doctor.png", alt: "Student aspiring to be a doctor at Rainbow International School", w: 200, h: 240 },
-  { src: "/images/home/welcome/physics.png", alt: "Student exploring physics and science at Rainbow", w: 170, h: 200 },
-  { src: "/images/home/welcome/actor.png", alt: "Student performing in drama and theatre at Rainbow", w: 140, h: 170 },
-  { src: "/images/home/welcome/swimmer.png", alt: "Student swimmer training at Rainbow International School", w: 150, h: 185 },
-  { src: "/images/home/welcome/skater.png", alt: "Student skater at Rainbow International School", w: 170, h: 210 },
-  { src: "/images/home/welcome/kickboxing.png", alt: "Student practising kickboxing at Rainbow", w: 140, h: 170 },
-  { src: "/images/home/welcome/scientist.png", alt: "Student aspiring to be a scientist at Rainbow", w: 160, h: 195 },
+  { src: "/images/home/welcome/doctor.webp", fallback: "/images/home/welcome/doctor.png", alt: "Student aspiring to be a doctor at Rainbow International School", w: 200, h: 240 },
+  { src: "/images/home/welcome/physics.webp", fallback: "/images/home/welcome/physics.png", alt: "Student exploring physics and science at Rainbow", w: 170, h: 200 },
+  { src: "/images/home/welcome/actor.webp", fallback: "/images/home/welcome/actor.png", alt: "Student performing in drama and theatre at Rainbow", w: 140, h: 170 },
+  { src: "/images/home/welcome/swimmer.webp", fallback: "/images/home/welcome/swimmer.png", alt: "Student swimmer training at Rainbow International School", w: 150, h: 185 },
+  { src: "/images/home/welcome/skater.webp", fallback: "/images/home/welcome/skater.png", alt: "Student skater at Rainbow International School", w: 170, h: 210 },
+  { src: "/images/home/welcome/kickboxing.webp", fallback: "/images/home/welcome/kickboxing.png", alt: "Student practising kickboxing at Rainbow", w: 140, h: 170 },
+  { src: "/images/home/welcome/scientist.webp", fallback: "/images/home/welcome/scientist.png", alt: "Student aspiring to be a scientist at Rainbow", w: 160, h: 195 },
 ];
 
 export function Features() {
@@ -33,16 +33,19 @@ export function Features() {
               className="flex-shrink-0 overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-2"
               style={{ width: img.w, height: img.h, borderRadius: "16px" }}
             >
-              <img
-                src={img.src}
-                alt={img.alt}
-                width={img.w}
-                height={img.h}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-              />
+              <picture>
+                <source srcSet={img.src} type="image/webp" />
+                <img
+                  src={img.fallback}
+                  alt={img.alt}
+                  width={img.w}
+                  height={img.h}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              </picture>
             </div>
           ))}
         </div>

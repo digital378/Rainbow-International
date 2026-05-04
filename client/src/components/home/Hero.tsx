@@ -40,11 +40,16 @@ export function Hero() {
   return (
     <section className="relative min-h-[92vh] flex items-center overflow-hidden mb-[-2px]">
       <picture>
+        <source
+          type="image/webp"
+          media="(max-width: 768px)"
+          srcSet="/images/students/hero-senior-secondary-mobile.webp"
+        />
         <source srcSet="/images/students/hero-senior-secondary.webp" type="image/webp" />
         <img
           src="/images/students/hero-senior-secondary.jpg"
           alt="Rainbow International School senior secondary students in blazers"
-          width={1920}
+          width={1620}
           height={1080}
           loading="eager"
           decoding="async"
@@ -67,8 +72,7 @@ export function Hero() {
               style={{ background: "linear-gradient(135deg, rgba(251,191,36,0.2) 0%, rgba(251,191,36,0.1) 100%)", border: "1.5px solid rgba(251,191,36,0.5)" }}
             >
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]" />
               </span>
               <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">
                 Check Seat Availability
