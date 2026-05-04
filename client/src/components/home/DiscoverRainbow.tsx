@@ -5,28 +5,32 @@ const highlights = [
   {
     title: "Awards & Accomplishments",
     description: "Accolades earned for being one of the best and most promising international schools in Thane for over a decade.",
-    image: "/images/home/discover/awards.jpg",
+    image: "/images/home/discover/awards.webp",
+    fallback: "/images/home/discover/awards.jpg",
     href: "/awards-achievements",
     tag: "Recognition",
   },
   {
     title: "Amenities & Facilities",
     description: "Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.",
-    image: "/images/home/discover/amenities.jpg",
+    image: "/images/home/discover/amenities.webp",
+    fallback: "/images/home/discover/amenities.jpg",
     href: "/amenities",
     tag: "Campus",
   },
   {
     title: "Student Achievements",
     description: "Student accomplishments are acknowledged and honored. Here you can view our best achievers.",
-    image: "/images/home/discover/student-achievements.jpg",
+    image: "/images/home/discover/student-achievements.webp",
+    fallback: "/images/home/discover/student-achievements.jpg",
     href: "/student-achievements",
     tag: "Excellence",
   },
   {
     title: "Safety & Security",
     description: "Student safety and well-being is our top priority, safeguarded through stringent modern security measures.",
-    image: "/images/home/discover/safety-security.jpg",
+    image: "/images/home/discover/safety-security.webp",
+    fallback: "/images/home/discover/safety-security.jpg",
     href: "/safety-security",
     tag: "Wellbeing",
   },
@@ -57,15 +61,18 @@ export function DiscoverRainbow() {
                 style={{ height: "360px", borderRadius: "16px" }}
                 data-testid={`card-highlight-${index}`}
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  width={300}
-                  height={360}
-                  loading="lazy"
-                  decoding="async"
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
+                <picture>
+                  <source srcSet={item.image} type="image/webp" />
+                  <img
+                    src={item.fallback}
+                    alt={item.title}
+                    width={300}
+                    height={360}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#091a4f]/90 via-[#091a4f]/30 to-transparent group-hover:from-amber-600/85 group-hover:via-amber-600/20 transition-all duration-500" />
 
                 <div className="absolute top-4 left-4">

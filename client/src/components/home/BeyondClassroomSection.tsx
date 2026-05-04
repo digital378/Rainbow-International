@@ -62,39 +62,48 @@ export function BeyondClassroomSection() {
                   borderRadius: "20px",
                 }}
               >
-                <img
-                  src="/images/home/beyond-classroom-rocket.jpg"
-                  alt="Beyond The Classroom at Rainbow International School — Tours, Exhibitions, Clubs, Promoting Green, Dignity of Labour"
-                  width={384}
-                  height={384}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-contain"
-                />
+                <picture>
+                  <source srcSet="/images/home/beyond-classroom-rocket.webp" type="image/webp" />
+                  <img
+                    src="/images/home/beyond-classroom-rocket.jpg"
+                    alt="Beyond The Classroom at Rainbow International School — Tours, Exhibitions, Clubs, Promoting Green, Dignity of Labour"
+                    width={384}
+                    height={384}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-contain"
+                  />
+                </picture>
               </div>
 
               <div className="absolute -top-4 -right-4 w-28 h-28 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
-                <img
-                  src="/images/home/academic/pre-primary.jpg"
-                  alt="Pre-primary activities"
-                  width={112}
-                  height={112}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
+                <picture>
+                  <source srcSet="/images/home/academic/pre-primary.webp" type="image/webp" />
+                  <img
+                    src="/images/home/academic/pre-primary.jpg"
+                    alt="Pre-primary activities"
+                    width={112}
+                    height={112}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                </picture>
               </div>
 
               <div className="absolute -bottom-4 -left-4 w-24 h-24 overflow-hidden shadow-xl border-4 border-white rounded-2xl">
-                <img
-                  src="/images/home/academic/primary-section.jpg"
-                  alt="Campus amenities"
-                  width={96}
-                  height={96}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
+                <picture>
+                  <source srcSet="/images/home/academic/primary-section.webp" type="image/webp" />
+                  <img
+                    src="/images/home/academic/primary-section.jpg"
+                    alt="Campus amenities"
+                    width={96}
+                    height={96}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
+                </picture>
               </div>
 
               <div

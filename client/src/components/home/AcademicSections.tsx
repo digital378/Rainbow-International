@@ -6,7 +6,8 @@ const programs = [
     label: "Pre-Primary",
     grade: "Nursery · Jr. KG · Sr. KG",
     description: "Play-based learning that nurtures curiosity, creativity, and foundational skills in a safe and joyful environment.",
-    image: "/images/home/academic/pre-primary.jpg",
+    image: "/images/home/academic/pre-primary.webp",
+    fallback: "/images/home/academic/pre-primary.jpg",
     href: "/pre-primary-school-thane",
     accent: "#f59e0b",
   },
@@ -14,7 +15,8 @@ const programs = [
     label: "Primary",
     grade: "Class I – V",
     description: "Building strong literacy, numeracy, and social skills through structured experiential learning.",
-    image: "/images/home/academic/primary-section.jpg",
+    image: "/images/home/academic/primary-section.webp",
+    fallback: "/images/home/academic/primary-section.jpg",
     href: "/primary-section",
     accent: "#091a4f",
   },
@@ -22,7 +24,8 @@ const programs = [
     label: "Middle School",
     grade: "Class VI – VIII",
     description: "Critical thinking, digital literacy, and leadership skills for the evolving modern learner.",
-    image: "/images/home/academic/middle-section.jpg",
+    image: "/images/home/academic/middle-section.webp",
+    fallback: "/images/home/academic/middle-section.jpg",
     href: "/middle-school-section",
     accent: "#0d3b86",
   },
@@ -30,7 +33,8 @@ const programs = [
     label: "Secondary",
     grade: "Class IX – X",
     description: "CBSE board preparation with strong academics and holistic co-curricular engagement.",
-    image: "/images/home/academic/secondary.jpg",
+    image: "/images/home/academic/secondary.webp",
+    fallback: "/images/home/academic/secondary.jpg",
     href: "/secondary-section",
     accent: "#091a4f",
   },
@@ -38,7 +42,8 @@ const programs = [
     label: "Senior Secondary",
     grade: "Class XI – XII",
     description: "Science, Commerce & Humanities streams to launch your child's next chapter.",
-    image: "/images/home/academic/senior-secondary.jpg",
+    image: "/images/home/academic/senior-secondary.webp",
+    fallback: "/images/home/academic/senior-secondary.jpg",
     href: "/senior-secondary-section",
     accent: "#f59e0b",
   },
@@ -53,15 +58,18 @@ function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
         data-testid={`card-section-${index}`}
       >
         <div className="relative overflow-hidden aspect-[4/3]">
-          <img
-            src={p.image}
-            alt={p.label}
-            width={400}
-            height={300}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
+          <picture>
+            <source srcSet={p.image} type="image/webp" />
+            <img
+              src={p.fallback}
+              alt={p.label}
+              width={400}
+              height={300}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         <div className="p-6">
