@@ -115,7 +115,7 @@ const MAY_WEEKLY = [
 
 const SOCIAL = {
   ris: { instaFollowers: 5739,  fbFollowers: 9831,  ytViews: 8427, websiteClicks: 309 },
-  rps: { instaFollowers: 10570, fbFollowers: 12679, ytViews: 9897, websiteClicks: 82  },
+  rps: { instaFollowers: 10570, fbFollowers: 12679, ytViews: 12679, websiteClicks: 82  },
 };
 
 /* Default fixed monthly costs (per source sheet: salary line = ₹1.25L/branch/mo).
