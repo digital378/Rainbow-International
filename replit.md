@@ -2,7 +2,7 @@
 
 ## Overview
 
-A full-stack replication of the Rainbow International School website (rainbowinternationalschool.in) — a CBSE-affiliated school in Thane, Maharashtra. Built with React frontend, Express.js backend, and PostgreSQL database.
+A full-stack replication of the Rainbow International School website, a CBSE-affiliated school. The project aims to provide a comprehensive online presence with a focus on SEO, user experience, and robust backend functionality. It includes features like dynamic content rendering, admission processes, and brand partnerships, mirroring the school's real-world operations and marketing efforts.
 
 ## User Preferences
 
@@ -10,164 +10,56 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Routing**: Wouter for client-side routing (lightweight alternative to React Router)
-- **Styling**: Tailwind CSS v4 with custom theme configuration and CSS variables for theming
-- **UI Components**: shadcn/ui component library (New York style) built on Radix UI primitives
-- **State Management**: TanStack React Query for server state management
-- **Form Handling**: React Hook Form with Zod validation via @hookform/resolvers
-- **Fonts**: Inter (body/UI) and DM Sans (headings) from Google Fonts — JIS-inspired redesign
+### Frontend
+- **Framework**: React 18 with TypeScript.
+- **Routing**: Wouter.
+- **Styling**: Tailwind CSS v4 with custom theming, utilizing shadcn/ui components (New York style) built on Radix UI.
+- **State Management**: TanStack React Query for server state.
+- **Form Handling**: React Hook Form with Zod validation.
+- **Typography**: Inter (body/UI) and DM Sans (headings).
+- **SEO**: Dynamic `<head>` meta tags, JSON-LD structured data, `llms.txt`, `sitemap.xml`, semantic HTML, and image optimization (lazy loading, async decoding, explicit dimensions).
+- **Content Design**: JIS-inspired aesthetic with a deep navy primary and amber/yellow accent, rounded corners, and editorial layouts. Navbar is sticky, transparent on homepage, and solid white on inner pages.
 
-### Backend Architecture
-- **Runtime**: Node.js with Express.js
-- **Language**: TypeScript with ESM modules
-- **API Design**: RESTful JSON API endpoints under `/api/*`
-- **Database ORM**: Drizzle ORM with PostgreSQL dialect
-- **Schema Validation**: Zod schemas generated from Drizzle schemas via drizzle-zod
-- **Blog SSR**: All 94 blog posts at `/blog/:slug` are Server-Side Rendered via `server/ssrBlog.ts` — Express intercepts before Vite/React, returns complete pre-rendered HTML. Demo route with badge at `/ssr-demo/blog/:slug`.
-- **Home SSR**: Home page (`/`) is Server-Side Rendered for search-engine bots via `server/ssrHome.ts`. Bot user-agents (Googlebot, Bingbot, etc.) receive a fully pre-rendered ~58KB HTML page with all content (Hero, Awards, Features, About, Academics, Pedagogy, Discover, Beyond Classroom, Testimonials, Contact), structured data (Schema.org School), OG/Twitter meta tags, and inline CSS. Regular browser visitors still get the React SPA with full interactivity.
+### Backend
+- **Runtime**: Node.js with Express.js (TypeScript, ESM modules).
+- **API Design**: RESTful JSON API endpoints under `/api/*`.
+- **Database ORM**: Drizzle ORM with PostgreSQL dialect, using Zod for schema validation generated from Drizzle schemas.
+- **Server-Side Rendering (SSR)**:
+  - All 94 blog posts (`/blog/:slug`) are SSR via `server/ssrBlog.ts` for pre-rendered HTML.
+  - Home page (`/`) is SSR for search engine bots via `server/ssrHome.ts`, providing a fully pre-rendered HTML page with structured data and meta tags.
+- **Specific Features**:
+  - **Career Page**: Handles job applications with resume uploads, server-side validation, persistence to `career_applications` table, and email notifications to HR.
+  - **Brand Partners Page**: Lists 134 partner brands across 11 categories with filter pills and a brochure download modal. Brochure download requests are persisted as leads in `brochure_requests` table.
+  - **Marketing JSON Export**: `GET /api/marketing/export` provides a token-protected JSON export of marketing data for external analysis.
 
 ### Build System
-- **Development**: Vite dev server with HMR for frontend, tsx for backend
-- **Production Build**: Vite builds frontend to `dist/public`, esbuild bundles server to `dist/index.cjs`
-- **Path Aliases**: `@/*` maps to client source, `@shared/*` maps to shared code, `@assets` maps to attached assets
-
+- **Development**: Vite for frontend (HMR), tsx for backend.
+- **Production**: Vite builds frontend to `dist/public`, esbuild bundles server to `dist/index.cjs`.
+- **Path Aliases**: `@/*` for client, `@shared/*` for shared code, `@assets` for assets.
 
 ### Project Structure
-```
-├── client/           # Frontend React application
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/          # shadcn/ui base components
-│   │   │   ├── home/        # Home page sections (Hero, Features, ContactForm, etc.)
-│   │   │   └── layout/      # Navbar, Footer, PageBanner, SEO
-│   │   ├── pages/           # All page components (18 pages)
-│   │   ├── hooks/           # Custom React hooks
-│   │   └── lib/             # Utilities and query client
-├── server/           # Backend Express application
-│   ├── index.ts      # Server entry point
-│   ├── routes.ts     # API route definitions
-│   ├── ssrHome.ts    # Home page SSR for bots (SEO)
-│   ├── storage.ts    # Database operations
-│   └── db.ts         # Database connection
-├── shared/           # Shared code between frontend and backend
-│   └── schema.ts     # Drizzle schema definitions and Zod types
-└── migrations/       # Database migrations (Drizzle Kit)
-```
-
-## Blog Posts (94 total)
-
-All 94 blog posts are built as individual SEO-optimised pages at `/blog/:slug`. Post data lives in `client/src/data/blogPosts.ts`. Each post has: unique focus keyword, elaborated content (intro + H2 sections + conclusion), 5 internal links to RIS pages, related slugs, and an RPS sidebar block. Categories covered: CBSE School, Parenting, Sports, Study Skills, Awards, Health, Safety & Security, Student Achievements, Beyond the Classroom, School Selection, About Rainbow, Events, Early Education, Teen Development.
-
-### Career Page (Apr 2026)
-`/career` lists 6 academic openings (PRT English/EVS/Computer, PGT English/History, TGT English) and 9 non-academic openings (Swimming Coach, Librarian, Admission Counsellor, School Clerk, HR Manager, HR Recruiter, Admin, Sales Manager, L&D Trainer). Each section shows a "Female candidates are preferred…" note. HR contact 87799 81827 is displayed near the form. Application form collects Full Name, Email, Phone, Total Experience, Qualification, Role Applied For (dropdown), Current Location, and an Updated Resume upload (PDF/DOC/DOCX, max 5 MB). Submissions POST `multipart/form-data` to `/api/career-applications`, are validated server-side (multer + magic-byte check + Zod via `insertCareerApplicationSchema`), persisted to the `career_applications` table (extended with `currentLocation`, `resumeFilename`, `resumeMimeType`, `resumeSize`), and emailed to `hr.recruiter3@rainbowinternationalschool.in` with the resume attached. Success message: "Thank you for applying. Our HR team will review your application and contact shortlisted candidates."
-
-### Brand Partners Page (Apr 2026)
-New page at `/brand-partners` replaces old `/global-brand-associations` (301 redirect in `server/index.ts`). Lists 134 partner brands across 11 categories (Restaurants & Cafés, Health & Wellness, Fitness & Sports, Salon Beauty & Spa, Fashion & Apparel, Eyewear & Optics, Toys/Books/Stationery, Entertainment & Family, Hotels & Stays, Home & Lifestyle, Finance & Services). Logos in `client/public/brands/` as WebP (~1.5MB total, 90% size reduction). Data file: `client/src/data/brandPartners.ts`. Includes filter pills, brochure download modal with privilege card validation. Brochure placeholder URL: `/brochures/brand-partners-brochure.pdf` (not yet uploaded — replace `BROCHURE_URL` constant in `BrandPartners.tsx`).
-
-Brochure download requests are persisted as leads in the `brochure_requests` table (`shared/schema.ts`). The modal POSTs to `/api/brochure-requests` (defined in `server/routes.ts` with `insertBrochureRequestSchema` validation) before triggering the download/confirmation. Recent requests are surfaced in a "Brochure Requests" widget on the Marketing dashboard (`client/src/pages/Marketing.tsx`) which fetches `/api/brochure-requests` on mount and shows the 10 most recent entries (timestamp + card number only).
-
-The public `GET /api/brochure-requests` response intentionally **strips PII** (`name`, `email`, `phone`) and only returns `id`, `cardNumber`, and `requestedAt` — the optional contact fields stay in the database for future internal use. Callers that present `Authorization: Bearer <ADMIN_TOKEN>` (or `?token=<ADMIN_TOKEN>`) receive the full record, where `ADMIN_TOKEN` is read from the environment. `ADMIN_TOKEN` is unset by default; configure it via the secrets manager before exposing any admin tooling that needs the contact details.
-
-### SEO Blog Batch (Apr 2026 — 8 posts)
-- CBSE vs ICSE vs State Board comparison (School Selection)
-- School Admission Checklist Thane 2026-27 (CBSE School)
-- How to Help Your Child Focus Better (Parenting)
-- Importance of Extracurricular Activities (Parenting)
-- NEP 2020 Explained for Parents (CBSE School)
-- Prepare Your Child for First Day of School (Parenting)
-- Multiple Intelligence-Based Learning (CBSE School)
-- Best CBSE Schools in Thane — Selection Guide (School Selection)
-
-Blog thumbnail component: `client/src/components/home/BlogThumb.tsx` — 3-tier fallback: CDN image → category image (`/blog/cat-*.png`) → gradient placeholder. Category images stored in `client/public/blog/`.
-
-## Pages (24 total)
-
-| Route | Page | File |
-|-------|------|------|
-| `/` | Home | `pages/Home.tsx` |
-| `/about-rainbow-international-school` | About | `pages/About.tsx` |
-| `/pre-primary-school-thane` | Pre-Primary | `pages/PrePrimary.tsx` |
-| `/primary-section` | Primary (Class 1–5) | `pages/Primary.tsx` |
-| `/middle-school-section` | Middle School (Class 6–10) | `pages/MiddleSchool.tsx` |
-| `/secondary-section` | Secondary (Class 9–10) | `pages/Secondary.tsx` |
-| `/senior-secondary-section` | Senior Secondary (Class 11–12) | `pages/SeniorSecondary.tsx` |
-| `/amenities` | Amenities & Facilities | `pages/Amenities.tsx` |
-| `/awards-achievements` | Awards | `pages/Awards.tsx` |
-| `/student-achievements` | Student Achievements | `pages/StudentAchievements.tsx` |
-| `/safety-security` | Safety & Security | `pages/SafetySecurity.tsx` |
-| `/beyond-the-classroom` | Beyond Classroom | `pages/BeyondClassroom.tsx` |
-| `/extracurriculars` | Extracurriculars | `pages/Extracurriculars.tsx` |
-| `/photo-gallery` | Photo Gallery | `pages/PhotoGallery.tsx` |
-| `/contact-us` | Contact Us | `pages/ContactUs.tsx` |
-| `/academic-calendar` | Academic Calendar | `pages/AcademicCalendar.tsx` |
-| `/blogs` | Blogs | `pages/Blogs.tsx` |
-| `/cbse-mandatory-public-disclosures` | CBSE Disclosures | `pages/CbseDisclosures.tsx` |
-| `/declaration` | Declaration (PDF embed) | `pages/Declaration.tsx` |
-| `/book-list` | Book List (PDF embed) | `pages/BookList.tsx` |
-| `/school-readiness-quiz` | School Readiness Quiz | `pages/SchoolReadinessQuiz.tsx` |
-| `/top-schools-in-thane` | Top Schools Comparison | `pages/TopSchools.tsx` |
-| `/testimonials` | Parent Testimonials | `pages/Testimonials.tsx` |
-| `/faqs` | FAQ Hub | `pages/FAQs.tsx` |
-| `/admissions` | Admissions 2026-27 | `pages/Admissions.tsx` |
-| `/fee-structure` | Fee Structure | `pages/Fees.tsx` |
-| `/school-near-brahmand-thane` | Locality: Brahmand | `pages/SchoolNearBrahmand.tsx` |
-| `/school-near-ghodbunder-road-thane` | Locality: GB Road | `pages/SchoolNearGhodbunderRoad.tsx` |
-| `/school-near-manpada-thane` | Locality: Manpada | `pages/SchoolNearManpada.tsx` |
-| `/marketing` | Marketing Dashboard (noindex, real CRM/branch data, updated through 09-May 2026) | `pages/Marketing.tsx` |
-| `/brand-partners` | Brand Partners (134 logos, 11 categories, brochure modal) | `pages/BrandPartners.tsx` |
-| `/career` | Careers — 6 academic + 9 non-academic openings, female-preference notes, expanded form with resume upload | `pages/Career.tsx` |
-
-## Key Components
-
-- **ScrollProgress.tsx** — Rainbow-gradient fixed scroll progress bar (3px, top of page, fills as user scrolls)
-- **SEO.tsx** — Dynamic `<head>` meta tag manager for per-page SEO with JSON-LD structured data and BreadcrumbList support
-- **PageBanner.tsx** — Hero banner with title, subtitle, and breadcrumb for inner pages
-- **Navbar.tsx** — Sticky navbar with top bar (phone/email), dropdown menus for Academics and Explore, mobile menu
-- **Footer.tsx** — 4-column footer with logo, links, explore, and contact info
-
-## Content Design
-
-- **Design**: JIS-inspired "Premium International School" aesthetic — deep navy (#091a4f) primary + amber/yellow (#fbbf24) accent; rounded/curved corners (16px cards, 12px icons, full-round buttons/pills); Inter + DM Sans typography; editorial layout with generous whitespace
-- **Navbar**: Fixed position, transparent with white text on homepage (Oberoi-style overlay on hero), solid white on inner pages. Transitions to solid white on scroll. Includes admissions bar, logo+contact row, and nav links row
-- **Hero**: Full-width background image (picwish.webp) with navy gradient overlay; title + stats + CTA on left, Quick Enquiry form card on right; quick-link pills at bottom
-- **Images**: Real CDN images from rainbowinternationalschool.in with onError fallbacks; all images site-wide have `loading="lazy"` (or `eager` for hero/above-fold), `decoding="async"`, and explicit `width`/`height` for CLS prevention
-- **SEO**: Every page has title, description, keywords, canonical, ogImage via `<SEO>` component; JSON-LD structured data (School on home, BlogPosting on blog SSR, BreadcrumbList on all inner pages); llms.txt for AI visibility; sitemap.xml with `lastmod` dates; semantic HTML landmarks (`<header>`, `<nav>`, `<main>`, `<footer>` with ARIA roles)
-- **Bot SSR**: `ssrPages.ts` serves pre-rendered HTML to search bots for 20 pages: About, Pre-Primary, Primary, Middle, Secondary, Senior Secondary, Contact, Amenities, Awards, Safety, Admissions, Fees, 3 locality pages, Quiz, Top Schools, Testimonials, FAQs. Navbar About dropdown includes Vision/Mission, Philosophy, Chairperson's Note. Footer Explore includes Top Schools, Testimonials, FAQs links.
-- **Contact Form**: Inquiry form with time slot + class dropdowns, persists to PostgreSQL
-
-## School Info (from real site)
-
-- **Name**: Rainbow International School
-- **Founded**: April 2009
-- **Location**: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra, India
-- **Phone**: (022) 69105000 / +91 82915 68972
-- **Email**: info@rainbowinternationalschool.in
-- **CBSE Affiliation**: 1130661
-- **Campus**: 3.5 acres
-- **Students**: 3,000+ current, 1 Lac+ impacted
-- **Grades**: Nursery to Class 12
-- **Streams**: Science, Humanities, Commerce (Class 11–12)
-- **Working Hours**: Mon – Sat, 9:00 AM – 6:00 PM
+- `client/`: Frontend React application (components, pages, hooks, lib).
+- `server/`: Backend Express application (entry, routes, SSR logic, database operations).
+- `shared/`: Code shared between frontend and backend (Drizzle schemas, Zod types).
+- `migrations/`: Database migrations.
 
 ## External Dependencies
 
 ### Database
-- **PostgreSQL**: Primary database accessed via `DATABASE_URL` environment variable
-- **Drizzle ORM**: Type-safe ORM for database operations
-- **Drizzle Kit**: Database migration and schema push tooling (`npm run db:push`)
+- **PostgreSQL**: Primary database.
+- **Drizzle ORM**: Type-safe ORM.
+- **Drizzle Kit**: Migration tooling.
 
 ### Key NPM Packages
-- **@tanstack/react-query**: Server state management and caching
-- **drizzle-orm** + **drizzle-zod**: Database ORM with Zod schema generation
-- **express**: HTTP server framework
-- **zod**: Runtime type validation
-- **date-fns**: Date formatting utilities
-- **sonner**: Toast notifications (via shadcn toast component)
+- `@tanstack/react-query`: Server state management.
+- `drizzle-orm` + `drizzle-zod`: ORM and schema validation.
+- `express`: HTTP server framework.
+- `zod`: Runtime type validation.
+- `date-fns`: Date utilities.
+- `sonner`: Toast notifications.
 
 ### Development Tools
-- **Vite**: Frontend build tool with React plugin
-- **tsx**: TypeScript execution for development server
-- **esbuild**: Production server bundling
-- **@replit/vite-plugin-***: Replit-specific development plugins for error handling and navigation
+- **Vite**: Frontend build tool.
+- **tsx**: TypeScript execution for dev server.
+- **esbuild**: Production server bundling.
+- `@replit/vite-plugin-*`: Replit-specific plugins.

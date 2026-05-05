@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { timingSafeEqual } from "node:crypto";
 import { storage } from "./storage";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
@@ -487,6 +488,53 @@ export async function registerRoutes(
       }
     },
   );
+
+  // ── Marketing dashboard JSON export (token-protected) ─────
+  // GET /api/marketing/export
+  //   Header: Authorization: Bearer <ADMIN_TOKEN>   (preferred — does not log)
+  //   Query : ?token=<ADMIN_TOKEN>                  (convenient but logged)
+  // Returns the full Marketing dashboard dataset for ChatGPT / external analysis.
+  app.get("/api/marketing/export", async (req, res) => {
+    try {
+      const adminToken = process.env.ADMIN_TOKEN;
+      if (!adminToken) {
+        return res.status(503).json({ message: "Service unavailable" });
+      }
+      const headerToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const queryToken = typeof req.query.token === "string" ? req.query.token : "";
+      const presented = headerToken || queryToken;
+      const safeEq = (a: string, b: string) => {
+        const ab = Buffer.from(a, "utf8");
+        const bb = Buffer.from(b, "utf8");
+        if (ab.length !== bb.length) return false;
+        return timingSafeEqual(ab, bb);
+      };
+      if (!presented || !safeEq(presented, adminToken)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const data = await import("@shared/marketingData");
+      res.setHeader("Cache-Control", "no-store, private, max-age=0");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Vary", "Authorization");
+      res.json({
+        generatedAt: new Date().toISOString(),
+        lastUpdated: data.LAST_UPDATED,
+        todayDate: data.TODAY_DATE,
+        daysInMay: data.DAYS_IN_MAY,
+        minRevenuePerAdmission: data.MIN_REVENUE_PER_ADM,
+        monthly: data.MONTHLY,
+        organicPreSpend: data.ORGANIC_PRE_SPEND,
+        lastYear: data.LAST_YEAR,
+        mayWeekly: data.MAY_WEEKLY,
+        social: data.SOCIAL,
+        defaultFixedCosts: data.DEFAULT_FIXED,
+        crmRps: data.CRM_RPS,
+      });
+    } catch (error) {
+      console.error("[marketing/export] Error:", error);
+      res.status(500).json({ message: "Failed to export marketing data" });
+    }
+  });
 
   // ── Brochure requests (Brand Partners privilege card) ─────
   app.post("/api/brochure-requests", async (req, res) => {

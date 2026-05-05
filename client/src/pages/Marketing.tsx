@@ -3,172 +3,30 @@ import {
   BarChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ComposedChart, Area,
 } from "recharts";
-
-/* ═══════════════════════════════════════════════════════════════════
-   DATA LAYER — easily replaceable with API/Sheets later
-   ═══════════════════════════════════════════════════════════════════ */
-
-const LAST_UPDATED = "May 4, 2026";
-const TODAY_DATE = 3; // days elapsed: May 1–3 captured; today is May 4
-const DAYS_IN_MAY = 31;
-const MIN_REVENUE_PER_ADM = 90000;
+import {
+  LAST_UPDATED,
+  TODAY_DATE,
+  DAYS_IN_MAY,
+  MIN_REVENUE_PER_ADM,
+  MAY_IDX,
+  MONTHLY,
+  ORGANIC_PRE_SPEND,
+  LAST_YEAR,
+  MAY_WEEKLY,
+  SOCIAL,
+  DEFAULT_FIXED,
+  CRM_RPS,
+  type SegmentKey,
+  type MetricSet,
+  type MonthRow,
+  type CrmRow,
+} from "@shared/marketingData";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", CYAN = "#0891b2", PURPLE = "#7c3aed", SLATE = "#475569";
 
-type SegmentKey = "combined" | "ris" | "rps";
-type MetricSet = { leads: number; bookings: number; walkins: number; admissions: number; spend: number; meta: number; google: number; };
-type MonthRow = { month: string; combined: MetricSet; ris: MetricSet; rps: MetricSet; };
-
-/* AUTHORITATIVE monthly data straight from the source sheets (updated Apr 30 2026):
-   - Combined values from "DM RIS & RPS Overall ROI Analysis" sheet (image_1777611526983)
-   - RIS values from "DM RIS Lead to Admission Weekly Update" sheet (image_1777611464791)
-             and "Rainbow International School Digital Marketing Spend" (image_1777611638575)
-   - RPS values from "DM RPS Lead to Admission Weekly Update" sheet (image_1777611439046)
-             and "Rainbow Preschool International Digital Marketing Spend" (image_1777611704969)
-   April weekly per-branch detail from combined Google+Summary sheet (image_1777611410999).
-   Note: branch bookings sum (RIS 77 + RPS 86 = 163) equals the combined sheet's 163.
-   Note: branch ad-spend sum (RIS ₹83,801 + RPS ₹1,08,264 = ₹1,92,065) equals combined. */
-
-/* Convenience aliases for components that read the latest month per-branch directly */
-const MAY_IDX = 5;
-
-const MONTHLY: MonthRow[] = [
-  {
-    month: "Dec 25",
-    combined: { leads: 455, bookings: 93,  walkins: 71,  admissions: 23, spend: 178604, meta: 100231, google: 78373 },
-    ris:      { leads: 194, bookings: 35,  walkins: 26,  admissions: 4,  spend: 85496,  meta: 53977,  google: 31519 },
-    rps:      { leads: 261, bookings: 58,  walkins: 45,  admissions: 19, spend: 93108,  meta: 46254,  google: 46854 },
-  },
-  {
-    month: "Jan 26",
-    combined: { leads: 895, bookings: 171, walkins: 125, admissions: 27, spend: 459906, meta: 248585, google: 211321 },
-    ris:      { leads: 352, bookings: 58,  walkins: 39,  admissions: 8,  spend: 202555, meta: 107452, google: 95103 },
-    rps:      { leads: 543, bookings: 113, walkins: 86,  admissions: 19, spend: 257351, meta: 141133, google: 116218 },
-  },
-  {
-    month: "Feb 26",
-    combined: { leads: 418, bookings: 115, walkins: 94,  admissions: 24, spend: 181038, meta: 60546,  google: 120492 },
-    ris:      { leads: 180, bookings: 36,  walkins: 27,  admissions: 6,  spend: 54620,  meta: 8796,   google: 45824 },
-    rps:      { leads: 238, bookings: 79,  walkins: 67,  admissions: 18, spend: 129285, meta: 51750,  google: 77535 },
-  },
-  {
-    month: "Mar 26",
-    combined: { leads: 498, bookings: 196, walkins: 121, admissions: 47, spend: 205317, meta: 71938,  google: 133379 },
-    ris:      { leads: 211, bookings: 67,  walkins: 40,  admissions: 11, spend: 75051,  meta: 3011,   google: 72040 },
-    rps:      { leads: 287, bookings: 130, walkins: 81,  admissions: 36, spend: 148955, meta: 68927,  google: 80028 },
-  },
-  {
-    month: "Apr 26",
-    // Source: Overall ROI sheet (image_1777611526983) for combined; branch spend sheets for meta/google splits
-    combined: { leads: 380, bookings: 163, walkins: 91,  admissions: 28, spend: 192065, meta: 63842, google: 128223 },
-    ris:      { leads: 174, bookings: 77,  walkins: 46,  admissions: 13, spend: 83801,  meta: 9996,  google: 73805 },
-    rps:      { leads: 206, bookings: 86,  walkins: 45,  admissions: 15, spend: 108264, meta: 53846, google: 54418 },
-  },
-  {
-    month: "May 26",
-    // Source: Overall ROI sheet (image_1777868799749) for combined; RIS/RPS spend sheets (1777868826022 / 1777868845560).
-    // May is in progress through 09-May (9 of 31 days). Spend excludes ₹1.25L salary line per branch (consistent with prior months).
-    combined: { leads: 47, bookings: 10, walkins: 6, admissions: 1, spend: 27623, meta: 7632, google: 19991 },
-    ris:      { leads: 27, bookings: 7,  walkins: 3, admissions: 0, spend: 13378, meta: 2808, google: 10570 },
-    rps:      { leads: 20, bookings: 3,  walkins: 3, admissions: 1, spend: 14245, meta: 4824, google: 9421  },
-  },
-];
-
 const MAY_RIS_BASE = MONTHLY[MAY_IDX].ris;
 const MAY_RPS_BASE = MONTHLY[MAY_IDX].rps;
-
-/* Pre-spend organic admissions Jun – Nov 2025 (no marketing investment).
-   These reconcile the 5-month "ad-spend window" with the sheet's full-AY
-   "TOTAL TILL DATE" of 170 admissions. */
-const ORGANIC_PRE_SPEND = {
-  // Jun–Nov 2025: ₹0 ad spend. Bookings/walk-ins from images 1777611464791 (RIS) and 1777611439046 (RPS).
-  combined: { leads: 197, bookings: 83, walkins: 139, admissions: 21 },
-  // RIS Jun–Nov: leads 8+4+2+15+36+69=134; books 5+3+1+6+14+19=48; walks 1+4+6+10+25+40=86; adm 4+8=12
-  ris:      { leads: 134, bookings: 48, walkins: 86,  admissions: 12 },
-  // RPS Jun–Nov: leads 0+0+3+5+21+34=63; books 0+0+3+5+13+14=35; walks 0+0+3+5+17+28=53; adm 2+7=9
-  rps:      { leads:  63, bookings: 35, walkins: 53,  admissions:  9 },
-};
-
-/* Last year (Oct 24 – Jun 25) — real RIS/RPS splits from sheet */
-const LAST_YEAR: { month: string; ris: { spend: number; leads: number; walkins: number; admissions: number }; rps: { spend: number; leads: number; walkins: number; admissions: number } }[] = [
-  { month: "Oct 24", ris: { spend: 13556, leads: 116, walkins: 40, admissions: 7 }, rps: { spend: 57147, leads: 78, walkins: 24, admissions: 12 } },
-  { month: "Nov 24", ris: { spend: 15202, leads: 137, walkins: 49, admissions: 18 }, rps: { spend: 61853, leads: 96, walkins: 36, admissions: 13 } },
-  { month: "Dec 24", ris: { spend: 19189, leads: 159, walkins: 54, admissions: 22 }, rps: { spend: 88738, leads: 158, walkins: 59, admissions: 20 } },
-  { month: "Jan 25", ris: { spend: 56111, leads: 193, walkins: 73, admissions: 26 }, rps: { spend: 89510, leads: 160, walkins: 68, admissions: 25 } },
-  { month: "Feb 25", ris: { spend: 15732, leads: 66, walkins: 40, admissions: 11 }, rps: { spend: 130200, leads: 62, walkins: 29, admissions: 12 } },
-  { month: "Mar 25", ris: { spend: 200000, leads: 125, walkins: 36, admissions: 8 }, rps: { spend: 200000, leads: 122, walkins: 66, admissions: 14 } },
-  { month: "Apr 25", ris: { spend: 150000, leads: 132, walkins: 35, admissions: 6 }, rps: { spend: 200000, leads: 147, walkins: 21, admissions: 14 } },
-  { month: "May 25", ris: { spend: 56000, leads: 125, walkins: 53, admissions: 21 }, rps: { spend: 89050, leads: 83, walkins: 31, admissions: 16 } },
-  { month: "Jun 25", ris: { spend: 5846, leads: 89, walkins: 31, admissions: 11 }, rps: { spend: 88595, leads: 114, walkins: 32, admissions: 14 } },
-];
-
-/* May 2026 weekly — 3 days captured (May 1–3); today is May 4.
-   All month-to-date data consolidated into the first block; Wks 2-5 pending. */
-const MAY_WEEKLY = [
-  { week: "01–03 May", risLeads: 27, risAdm: 0, risWalk: 3, risBook: 7, rpsLeads: 20, rpsAdm: 1, rpsWalk: 3, rpsBook: 3 },
-  { week: "04–09 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "10–16 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "17–23 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "24–31 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-];
-
-const SOCIAL = {
-  ris: { instaFollowers: 5739,  fbFollowers: 9831,  ytViews: 8427, websiteClicks: 309 },
-  rps: { instaFollowers: 10570, fbFollowers: 12679, ytViews: 12679, websiteClicks: 82  },
-};
-
-/* Default fixed monthly costs (per source sheet: salary line = ₹1.25L/branch/mo).
-   Sheet treats this as a single fixed cost; CRM & overhead default to 0 but
-   remain editable in What-If for scenario modelling. */
-const DEFAULT_FIXED = {
-  combined: { salary: 250000, crm: 0, overhead: 0 },   // ₹2,50,000/mo (₹1.25L × 2 branches)
-  ris:      { salary: 125000, crm: 0, overhead: 0 },   // ₹1,25,000/mo
-  rps:      { salary: 125000, crm: 0, overhead: 0 },   // ₹1,25,000/mo
-};
-
-/* CRM Branch Performance — RPS centre-wise breakdown (Jan – Apr 2026)
-   Source: RPS sheet "Centre-wise Lead Distribution".
-   RIS operates a single centre (Brahmand) so no breakdown is shown for it. */
-type CrmRow = { centre: string; leads: number; bookings: number; walkins: number; admissions: number };
-const CRM_RPS: { month: string; rows: CrmRow[]; total: CrmRow }[] = [
-  { month: "Jan 26", rows: [
-    { centre: "Aggarwal",      leads: 84,  bookings: 27, walkins: 24, admissions: 7 },
-    { centre: "Anand Nagar",   leads: 25,  bookings: 4,  walkins: 1,  admissions: 0 },
-    { centre: "Kasarvadavali", leads: 22,  bookings: 9,  walkins: 6,  admissions: 0 },
-    { centre: "Hariniwas",     leads: 70,  bookings: 19, walkins: 11, admissions: 3 },
-    { centre: "Dhokali",       leads: 52,  bookings: 24, walkins: 19, admissions: 3 },
-    { centre: "Kalwa",         leads: 68,  bookings: 14, walkins: 9,  admissions: 4 },
-    { centre: "Unassigned",    leads: 222, bookings: 0,  walkins: 0,  admissions: 0 },
-  ], total: { centre: "Total", leads: 543, bookings: 97,  walkins: 70, admissions: 17 } },
-  { month: "Feb 26", rows: [
-    { centre: "Aggarwal",      leads: 39, bookings: 13, walkins: 9, admissions: 6 },
-    { centre: "Anand Nagar",   leads: 18, bookings: 9,  walkins: 6, admissions: 2 },
-    { centre: "Kasarvadavali", leads: 24, bookings: 16, walkins: 8, admissions: 3 },
-    { centre: "Hariniwas",     leads: 49, bookings: 14, walkins: 9, admissions: 6 },
-    { centre: "Dhokali",       leads: 21, bookings: 12, walkins: 7, admissions: 3 },
-    { centre: "Kalwa",         leads: 36, bookings: 13, walkins: 7, admissions: 2 },
-    { centre: "Unassigned",    leads: 51, bookings: 0,  walkins: 0, admissions: 0 },
-  ], total: { centre: "Total", leads: 238, bookings: 77, walkins: 46, admissions: 22 } },
-  { month: "Mar 26", rows: [
-    { centre: "Aggarwal",      leads: 71, bookings: 24, walkins: 14, admissions: 8 },
-    { centre: "Anand Nagar",   leads: 32, bookings: 14, walkins: 7,  admissions: 4 },
-    { centre: "Kasarvadavali", leads: 23, bookings: 7,  walkins: 5,  admissions: 2 },
-    { centre: "Hariniwas",     leads: 55, bookings: 21, walkins: 10, admissions: 4 },
-    { centre: "Dhokali",       leads: 37, bookings: 18, walkins: 8,  admissions: 4 },
-    { centre: "Kalwa",         leads: 61, bookings: 25, walkins: 15, admissions: 5 },
-    { centre: "Unassigned",    leads: 7,  bookings: 0,  walkins: 0,  admissions: 0 },
-  ], total: { centre: "Total", leads: 286, bookings: 109, walkins: 59, admissions: 27 } },
-  { month: "Apr 26", rows: [
-    { centre: "Aggarwal",      leads: 40, bookings: 22, walkins: 9, admissions: 2 },
-    { centre: "Anand Nagar",   leads: 15, bookings: 6,  walkins: 2, admissions: 1 },
-    { centre: "Kasarvadavali", leads: 24, bookings: 10, walkins: 3, admissions: 2 },
-    { centre: "Hariniwas",     leads: 34, bookings: 19, walkins: 6, admissions: 3 },
-    { centre: "Dhokali",       leads: 26, bookings: 12, walkins: 1, admissions: 0 },
-    { centre: "Kalwa",         leads: 37, bookings: 15, walkins: 4, admissions: 1 },
-    { centre: "Unassigned",    leads: 0,  bookings: 0,  walkins: 0, admissions: 0 },
-  ], total: { centre: "Total", leads: 176, bookings: 84, walkins: 25, admissions: 9 } },
-];
 
 /* ═══════════════════════════════════════════════════════════════════
    HELPERS
