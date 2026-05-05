@@ -1,0 +1,83 @@
+Stopped talking to App[debug] Calling HTTP endpoint{
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/marketing/export",
+  "operation": "getMarketingData",
+  "operation_hash": "56a889302e4adf4f6668d77b7ff42382912c85ea",
+  "is_consequential": false,
+  "params": {}
+}[debug] Response received{
+  "function_name": "getMarketingData",
+  "domain": "rainbowinternationalschool.in",
+  "detail": {
+    "retryable": true,
+    "message": "The requested action requires approval"
+  },
+  "action_id": "g-4149219df01df9db26860ddfb950e86b5574e5ed"
+}[debug] Calling HTTP endpoint{
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/marketing/export",
+  "operation": "getMarketingData",
+  "operation_hash": "56a889302e4adf4f6668d77b7ff42382912c85ea",
+  "is_consequential": false,
+  "params": {}
+}[debug] Response received{
+  "response_data": {
+    "message": "Unauthorized"
+  },
+  "status_code": 401,
+  "action_id": "g-4149219df01df9db26860ddfb950e86b5574e5ed"
+}[debug] Failed Outbound Call{
+  "text_raw": {
+    "response_data": {
+      "message": "Unauthorized"
+    },
+    "status_code": 401,
+    "action_id": "g-4149219df01df9db26860ddfb950e86b5574e5ed"
+  },
+  "http_status": 401,
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/marketing/export",
+  "operation": "getMarketingData",
+  "operation_hash": "56a889302e4adf4f6668d77b7ff42382912c85ea",
+  "is_consequential": false,
+  "params": {}
+}Error talking to AppI attempted to fetch the latest marketing data, but the API request failed due to an authorization issue.
+What this means:
+
+
+The system is not allowing access to the data right now (likely due to missing or expired credentials).
+
+
+No live data could be retrieved for leads, bookings, admissions, or ad performance.
+
+
+What you can do next:
+
+
+Check if the API key or access permissions for rainbowinternationalschool.in are active.
+
+
+Re-authenticate or refresh the integration.
+
+
+Once access is restored, I can immediately analyze:
+
+
+Lead to admission conversion trends
+
+
+Centre-wise performance
+
+
+Ad spend vs ROI
+
+
+Year-on-year growth insights
+
+
+
+
+If you want, you can also upload/export the latest marketing report here, and I’ll give you a complete strategic breakdown with clear actions to improve admissions and enquiry quality.
