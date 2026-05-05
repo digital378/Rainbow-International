@@ -9,6 +9,7 @@ import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
+import { google } from "googleapis";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
   pdf: new Set(["application/pdf", "application/octet-stream"]),
@@ -694,6 +695,198 @@ export async function registerRoutes(
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ message: "Failed to delete event" });
+    }
+  });
+
+  // ── Google OAuth + Search Console + PageSpeed ────────────────
+  const GOOGLE_SCOPES = [
+    "https://www.googleapis.com/auth/webmasters.readonly",
+    "https://www.googleapis.com/auth/analytics.readonly",
+  ];
+
+  function getOAuthClient() {
+    return new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      "https://rainbowinternationalschool.in/auth/google/callback"
+    );
+  }
+
+  function getAuthenticatedClient() {
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    if (!refreshToken) return null;
+    const oauth2Client = getOAuthClient();
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
+    return oauth2Client;
+  }
+
+  app.get("/auth/google", (req, res) => {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    if (!clientId || !clientSecret) {
+      return res.status(503).json({ message: "Google credentials not configured" });
+    }
+    const oauth2Client = getOAuthClient();
+    const url = oauth2Client.generateAuthUrl({
+      access_type: "offline",
+      scope: GOOGLE_SCOPES,
+      prompt: "consent",
+    });
+    res.redirect(url);
+  });
+
+  app.get("/auth/google/callback", async (req, res) => {
+    const code = typeof req.query.code === "string" ? req.query.code : "";
+    if (!code) return res.status(400).json({ message: "Missing code" });
+    try {
+      const oauth2Client = getOAuthClient();
+      const { tokens } = await oauth2Client.getToken(code);
+      const refreshToken = tokens.refresh_token;
+      if (!refreshToken) {
+        return res.status(400).send(`
+          <html><body style="font-family:monospace;padding:2rem;background:#0f172a;color:#f8fafc">
+          <h2 style="color:#f59e0b">No refresh token returned</h2>
+          <p>This can happen if this Google account already authorised the app before.<br>
+          Go to <a href="https://myaccount.google.com/permissions" style="color:#60a5fa">Google Account Permissions</a>, 
+          revoke access for "Rainbow Group Bot", then visit 
+          <a href="/auth/google" style="color:#60a5fa">/auth/google</a> again.</p>
+          </body></html>`);
+      }
+      return res.send(`
+        <html><body style="font-family:monospace;padding:2rem;background:#0f172a;color:#f8fafc">
+        <h2 style="color:#22c55e">Google connected successfully</h2>
+        <p>Copy the refresh token below and save it as a Replit secret named <strong style="color:#f59e0b">GOOGLE_REFRESH_TOKEN</strong></p>
+        <div style="background:#1e293b;padding:1rem;border-radius:8px;margin:1rem 0;word-break:break-all;color:#86efac;font-size:0.9rem">${refreshToken}</div>
+        <p style="color:#94a3b8;font-size:0.85rem">Once saved as a secret, the /api/gsc/* and /api/pagespeed endpoints will be live.</p>
+        </body></html>`);
+    } catch (err: any) {
+      res.status(500).json({ message: "OAuth exchange failed", error: err.message });
+    }
+  });
+
+  app.get("/api/gsc/queries", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (!adminToken || !provided || !timingSafeEqual(Buffer.from(adminToken), Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)))) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const auth = getAuthenticatedClient();
+    if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
+    try {
+      const sc = google.searchconsole({ version: "v1", auth });
+      const siteUrl = (req.query.site as string) || "https://rainbowinternationalschool.in/";
+      const startDate = (req.query.startDate as string) || new Date(Date.now() - 28 * 86400000).toISOString().slice(0, 10);
+      const endDate = (req.query.endDate as string) || new Date().toISOString().slice(0, 10);
+      const result = await sc.searchanalytics.query({
+        siteUrl,
+        requestBody: {
+          startDate,
+          endDate,
+          dimensions: ["query"],
+          rowLimit: 25,
+          dimensionFilterGroups: [],
+        },
+      });
+      const rows = (result.data.rows || []).map((r: any) => ({
+        query: r.keys[0],
+        clicks: r.clicks,
+        impressions: r.impressions,
+        ctr: parseFloat((r.ctr * 100).toFixed(2)),
+        position: parseFloat(r.position.toFixed(1)),
+      }));
+      res.json({ site: siteUrl, startDate, endDate, generatedAt: new Date().toISOString(), rows });
+    } catch (err: any) {
+      res.status(500).json({ message: "GSC query failed", error: err.message });
+    }
+  });
+
+  app.get("/api/gsc/pages", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (!adminToken || !provided || !timingSafeEqual(Buffer.from(adminToken), Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)))) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const auth = getAuthenticatedClient();
+    if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
+    try {
+      const sc = google.searchconsole({ version: "v1", auth });
+      const siteUrl = (req.query.site as string) || "https://rainbowinternationalschool.in/";
+      const startDate = (req.query.startDate as string) || new Date(Date.now() - 28 * 86400000).toISOString().slice(0, 10);
+      const endDate = (req.query.endDate as string) || new Date().toISOString().slice(0, 10);
+      const result = await sc.searchanalytics.query({
+        siteUrl,
+        requestBody: {
+          startDate,
+          endDate,
+          dimensions: ["page"],
+          rowLimit: 25,
+        },
+      });
+      const rows = (result.data.rows || [])
+        .map((r: any) => ({
+          page: r.keys[0],
+          clicks: r.clicks,
+          impressions: r.impressions,
+          ctr: parseFloat((r.ctr * 100).toFixed(2)),
+          position: parseFloat(r.position.toFixed(1)),
+        }))
+        .filter((r: any) => r.impressions > 100 && r.ctr < 3)
+        .sort((a: any, b: any) => b.impressions - a.impressions);
+      res.json({ site: siteUrl, startDate, endDate, generatedAt: new Date().toISOString(), note: "Pages with >100 impressions and <3% CTR — highest SEO opportunity", rows });
+    } catch (err: any) {
+      res.status(500).json({ message: "GSC pages query failed", error: err.message });
+    }
+  });
+
+  app.get("/api/pagespeed", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (!adminToken || !provided || !timingSafeEqual(Buffer.from(adminToken), Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)))) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const url = (req.query.url as string) || "https://rainbowinternationalschool.in/";
+    const strategy = (req.query.strategy as string) === "desktop" ? "DESKTOP" : "MOBILE";
+    try {
+      const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&key=${process.env.GOOGLE_CLIENT_ID || ""}`;
+      const fetch = (await import("node-fetch")).default;
+      const r = await fetch(apiUrl);
+      const data: any = await r.json();
+      if (data.error) throw new Error(data.error.message);
+      const cats = data.lighthouseResult?.categories || {};
+      const audits = data.lighthouseResult?.audits || {};
+      res.json({
+        url,
+        strategy,
+        generatedAt: new Date().toISOString(),
+        scores: {
+          performance: Math.round((cats.performance?.score || 0) * 100),
+          accessibility: Math.round((cats.accessibility?.score || 0) * 100),
+          bestPractices: Math.round((cats["best-practices"]?.score || 0) * 100),
+          seo: Math.round((cats.seo?.score || 0) * 100),
+        },
+        coreWebVitals: {
+          lcp: audits["largest-contentful-paint"]?.displayValue,
+          inp: audits["interaction-to-next-paint"]?.displayValue,
+          cls: audits["cumulative-layout-shift"]?.displayValue,
+          fcp: audits["first-contentful-paint"]?.displayValue,
+          ttfb: audits["server-response-time"]?.displayValue,
+        },
+        topOpportunities: Object.values(audits)
+          .filter((a: any) => a.details?.type === "opportunity" && a.score !== null && a.score < 0.9)
+          .map((a: any) => ({ id: a.id, title: a.title, savings: a.displayValue }))
+          .slice(0, 5),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "PageSpeed check failed", error: err.message });
     }
   });
 
