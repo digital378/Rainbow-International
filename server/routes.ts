@@ -856,7 +856,8 @@ export async function registerRoutes(
     const url = (req.query.url as string) || "https://rainbowinternationalschool.in/";
     const strategy = (req.query.strategy as string) === "desktop" ? "DESKTOP" : "MOBILE";
     try {
-      const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&key=${process.env.GOOGLE_CLIENT_ID || ""}`;
+      const apiKey = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : "";
+      const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}${apiKey}`;
       const fetch = (await import("node-fetch")).default;
       const r = await fetch(apiUrl);
       const data: any = await r.json();
