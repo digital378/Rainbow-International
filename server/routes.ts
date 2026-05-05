@@ -1055,8 +1055,9 @@ export async function registerRoutes(
       });
     } catch (err: any) {
       const reason = err?.reason || err?.message || "Unknown error";
+      const detail = JSON.stringify(err, Object.getOwnPropertyNames(err)).slice(0, 800);
       const status = reason === "ACCESS_TOKEN_SCOPE_INSUFFICIENT" ? 403 : 500;
-      res.status(status).json({ message: "Google Ads campaign query failed", reason });
+      res.status(status).json({ message: "Google Ads campaign query failed", reason, detail });
     }
   });
 
@@ -1122,8 +1123,9 @@ export async function registerRoutes(
       });
     } catch (err: any) {
       const reason = err?.reason || err?.message || "Unknown error";
+      const detail = JSON.stringify(err, Object.getOwnPropertyNames(err)).slice(0, 800);
       const status = reason === "ACCESS_TOKEN_SCOPE_INSUFFICIENT" ? 403 : 500;
-      res.status(status).json({ message: "Google Ads keyword query failed", reason });
+      res.status(status).json({ message: "Google Ads keyword query failed", reason, detail });
     }
   });
 
