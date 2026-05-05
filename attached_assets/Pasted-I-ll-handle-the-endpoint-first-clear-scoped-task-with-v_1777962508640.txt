@@ -1,0 +1,66 @@
+I'll handle the endpoint first (clear, scoped task with verification asks). The big SEO session plan is a separate large initiative — I'll address it after, once the endpoint is confirmed live.
+
+Let me start by understanding the route structure and checking the redirect behavior in parallel.
+
+
+8 actions
+Now I'll add the endpoint. I'll place it cleanly near the other API routes.
+
+
+2 actions
+Now let me typecheck and test all three auth paths in parallel.
+
+
+4 actions
+The endpoint is returning the SPA HTML — Vite middleware is catching it. Let me check the registration order.
+
+
+3 actions
+The workflow didn't pick up my edit (no hot-reload for server). Let me restart and retest.
+
+
+3 actions
+The 503 path is verified live. To verify the 401 and 200 paths I need ADMIN_TOKEN set on the server process (the inline ADMIN_TOKEN=... curl only set it for curl, not Express). Let me use the env-secrets system to set a test value, verify all paths, then report.
+
+
+2 actions
+Per the secrets skill, I can't set ADMIN_TOKEN myself — secrets must come from you. The 503 path is verified live, which proves the route is registered, env-var lookup works, Cache-Control header is set, and JSON shape is correct. The 401/200 paths I verified by code review only.
+
+Here are your three answers:
+
+1. Endpoint status
+Code shipped to dev server (verified live):
+
+GET /api/rps/export
+✓ HTTP 503 {"message":"Service unavailable"} when ADMIN_TOKEN unset
+✓ Cache-Control: no-store, private, max-age=0
+✓ Content-Type: application/json
+
+Auth precedence (code-reviewed, awaits your token to test live):
+
+X-Api-Key: <token> header
+Authorization: Bearer <token> header (case-insensitive prefix)
+?token=<token> query param
+Wrong/missing token → 401 {"message":"Unauthorized"}
+Correct token → 200 {"generatedAt":"<ISO>", "school":"Rainbow Preschools (RPS)", "website":"https://www.rainbowpreschools.com", "message":"RPS endpoint live - connect marketing data here"}
+
+To finish verification, set ADMIN_TOKEN via the Secrets tab (or tell me to request it via the secrets system). Once set, I can curl all three auth paths and confirm 200/401.
+
+2. Public deployed URL
+https://www.rainbowpreschools.com
+
+(Replit's .replit.app subdomain still serves the same app, but www.rainbowpreschools.com is the canonical custom domain fronted by Cloudflare.)
+
+3. Redirect direction
+Apex → www (verified just now via curl):
+
+https://rainbowpreschools.com/   → HTTP 301 → https://www.rainbowpreschools.com/
+https://www.rainbowpreschools.com/ → HTTP 200
+
+So the canonical endpoint URL for whoever calls this externally is:
+
+https://www.rainbowpreschools.com/api/rps/export
+
+(If they hit the apex without www, they'll get a 301 — most HTTP clients follow it, but configure them to call the www form directly to skip the redirect hop.)
+
+On your second message (the big SEO title-cannibalization session plan, T001-T010): that's a separate ~30-file initiative covering server SSR titles, client <SEO> props, local-SEO data files, a new homepage <h1>, and a build-time guard script. I haven't started it — wanted to confirm you want me to take that on now (it's a several-hour piece of work) versus just finishing this endpoint task and pausing for your ADMIN_TOKEN + marketing-data drop. Which way do you want to go?
