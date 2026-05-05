@@ -1067,10 +1067,21 @@ export async function registerRoutes(
   // ── Meta Ads ─────────────────────────────────────────────────
   const META_API = "https://graph.facebook.com/v19.0";
 
-  function resolveMetaAccountId(account: string): string | null {
-    if (account === "ris") return process.env.META_AD_ACCOUNT_ID_RIS || null;
-    if (account === "rps") return process.env.META_AD_ACCOUNT_ID_RPS || null;
-    return null;
+  function resolveMetaAccountId(_account: string): string | null {
+    // Both RIS and RPS run on the same ad account
+    return (
+      process.env.META_AD_ACCOUNT_ID ||
+      process.env.META_AD_ACCOUNT_ID_RIS ||
+      process.env.META_AD_ACCOUNT_ID_RPS ||
+      null
+    );
+  }
+
+  function metaCampaignMatchesAccount(name: string, account: string): boolean {
+    const n = name.toLowerCase();
+    if (account === "ris") return n.includes("ris") || n.includes("rainbow international school") || n.includes("school");
+    if (account === "rps") return n.includes("rps") || n.includes("preschool") || n.includes("rainbow ps") || n.includes("playschool");
+    return true;
   }
 
   app.get("/api/meta-ads/campaigns", async (req, res) => {
@@ -1080,9 +1091,9 @@ export async function registerRoutes(
     const token = process.env.META_ADS_TOKEN;
     if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
 
-    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "all";
     const accountId = resolveMetaAccountId(account);
-    if (!accountId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps. Ensure META_AD_ACCOUNT_ID_RIS / META_AD_ACCOUNT_ID_RPS are set." });
+    if (!accountId) return res.status(503).json({ message: "Meta Ads account ID not configured. Add META_AD_ACCOUNT_ID secret." });
 
     try {
       const fields = [
@@ -1091,12 +1102,12 @@ export async function registerRoutes(
       ].join(",");
 
       const url = `${META_API}/act_${accountId}/campaigns`;
-      const response = await fetch(`${url}?fields=${encodeURIComponent(fields)}&limit=20&access_token=${token}`);
+      const response = await fetch(`${url}?fields=${encodeURIComponent(fields)}&limit=50&access_token=${token}`);
       const data: any = await response.json();
 
       if (data.error) return res.status(502).json({ message: "Meta Ads API error", error: data.error.message, code: data.error.code });
 
-      const campaigns = (data.data || []).map((c: any) => {
+      const allCampaigns = (data.data || []).map((c: any) => {
         const ins = c.insights?.data?.[0] || {};
         const leads = (ins.actions || []).find((a: any) => a.action_type === "lead")?.value || 0;
         const landingViews = (ins.actions || []).find((a: any) => a.action_type === "landing_page_view")?.value || 0;
@@ -1119,9 +1130,15 @@ export async function registerRoutes(
         };
       });
 
+      // Filter by brand if account=ris or account=rps; otherwise return all
+      const campaigns = (account === "all")
+        ? allCampaigns
+        : allCampaigns.filter((c: any) => metaCampaignMatchesAccount(c.name, account));
+
       res.json({
         account: account.toUpperCase(),
         accountId,
+        note: account === "all" ? "All campaigns across both brands" : `Campaigns filtered by name matching ${account.toUpperCase()}`,
         period: "last 30 days",
         generatedAt: new Date().toISOString(),
         campaigns,
@@ -1138,9 +1155,9 @@ export async function registerRoutes(
     const token = process.env.META_ADS_TOKEN;
     if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
 
-    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "all";
     const accountId = resolveMetaAccountId(account);
-    if (!accountId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps." });
+    if (!accountId) return res.status(503).json({ message: "Meta Ads account ID not configured. Add META_AD_ACCOUNT_ID secret." });
 
     try {
       const fields = "impressions,clicks,spend,reach,frequency,ctr,cpc,actions,cost_per_action_type,account_name,account_currency";
@@ -1159,6 +1176,7 @@ export async function registerRoutes(
       res.json({
         account: account.toUpperCase(),
         accountId,
+        note: "Combined account-level insights — both RIS and RPS campaigns",
         accountName: ins.account_name,
         currency: ins.account_currency,
         period: "last 30 days",
