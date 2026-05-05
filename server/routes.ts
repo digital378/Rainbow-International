@@ -907,13 +907,13 @@ export async function registerRoutes(
     return true;
   }
 
-  function getGoogleAdsClient() {
+  async function getGoogleAdsClient() {
     const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
     const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     if (!devToken || !refreshToken || !clientId || !clientSecret) return null;
-    const { GoogleAdsApi } = require("google-ads-api");
+    const { GoogleAdsApi } = await import("google-ads-api");
     return new GoogleAdsApi({
       client_id: clientId,
       client_secret: clientSecret,
@@ -938,12 +938,13 @@ export async function registerRoutes(
     const customerId = resolveCustomerId(account);
     if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
 
-    const client = getGoogleAdsClient();
+    const client = await getGoogleAdsClient();
     if (!client) return res.status(503).json({ message: "Google Ads not configured" });
 
     try {
       const customer = client.Customer({
         customer_id: customerId,
+        login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
       });
 
@@ -990,7 +991,9 @@ export async function registerRoutes(
         campaigns: rows,
       });
     } catch (err: any) {
-      res.status(500).json({ message: "Google Ads campaign query failed", error: err.message });
+      const reason = err?.reason || err?.message || "Unknown error";
+      const status = reason === "ACCESS_TOKEN_SCOPE_INSUFFICIENT" ? 403 : 500;
+      res.status(status).json({ message: "Google Ads campaign query failed", reason });
     }
   });
 
@@ -1005,12 +1008,13 @@ export async function registerRoutes(
     const customerId = resolveCustomerId(account);
     if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
 
-    const client = getGoogleAdsClient();
+    const client = await getGoogleAdsClient();
     if (!client) return res.status(503).json({ message: "Google Ads not configured" });
 
     try {
       const customer = client.Customer({
         customer_id: customerId,
+        login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
       });
 
@@ -1054,7 +1058,9 @@ export async function registerRoutes(
         keywords: rows,
       });
     } catch (err: any) {
-      res.status(500).json({ message: "Google Ads keyword query failed", error: err.message });
+      const reason = err?.reason || err?.message || "Unknown error";
+      const status = reason === "ACCESS_TOKEN_SCOPE_INSUFFICIENT" ? 403 : 500;
+      res.status(status).json({ message: "Google Ads keyword query failed", reason });
     }
   });
 
