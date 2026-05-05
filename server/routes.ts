@@ -537,6 +537,64 @@ export async function registerRoutes(
     }
   });
 
+  // ── RPS-specific data export (token-protected) ────────────
+  // GET /api/rps/export — returns only Rainbow Preschools data.
+  // Same token auth as /api/marketing/export (ADMIN_TOKEN).
+  app.get("/api/rps/export", async (req, res) => {
+    try {
+      const adminToken = process.env.ADMIN_TOKEN;
+      if (!adminToken) {
+        return res.status(503).json({ message: "Service unavailable" });
+      }
+      const headerToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const xApiKey = typeof req.headers["x-api-key"] === "string" ? req.headers["x-api-key"] : "";
+      const queryToken = typeof req.query.token === "string" ? req.query.token : "";
+      const presented = xApiKey || headerToken || queryToken;
+      const safeEq = (a: string, b: string) => {
+        const ab = Buffer.from(a, "utf8");
+        const bb = Buffer.from(b, "utf8");
+        if (ab.length !== bb.length) return false;
+        return timingSafeEqual(ab, bb);
+      };
+      if (!presented || !safeEq(presented, adminToken)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const data = await import("@shared/marketingData");
+      res.setHeader("Cache-Control", "no-store, private, max-age=0");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Vary", "Authorization");
+      res.json({
+        generatedAt: new Date().toISOString(),
+        lastUpdated: data.LAST_UPDATED,
+        school: "Rainbow Preschools (RPS)",
+        website: "https://www.rainbowpreschools.com",
+        centres: ["Aggarwal", "Anand Nagar", "Kasarvadavali", "Hariniwas", "Dhokali", "Kalwa"],
+        monthly: data.MONTHLY.map((row) => ({
+          month: row.month,
+          rps: row.rps,
+        })),
+        organicPreSpend: data.ORGANIC_PRE_SPEND.rps,
+        lastYear: data.LAST_YEAR.map((row) => ({
+          month: row.month,
+          rps: row.rps,
+        })),
+        mayWeekly: data.MAY_WEEKLY.map((row) => ({
+          week: row.week,
+          leads: row.rpsLeads,
+          admissions: row.rpsAdm,
+          walkins: row.rpsWalk,
+          bookings: row.rpsBook,
+        })),
+        social: data.SOCIAL.rps,
+        fixedCosts: data.DEFAULT_FIXED.rps,
+        crmCentreWise: data.CRM_RPS,
+      });
+    } catch (error) {
+      console.error("[rps/export] Error:", error);
+      res.status(500).json({ message: "Failed to export RPS data" });
+    }
+  });
+
   // ── Brochure requests (Brand Partners privilege card) ─────
   app.post("/api/brochure-requests", async (req, res) => {
     try {
