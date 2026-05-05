@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "kJ6UP37T2969NQ_IdOsdd"
@@ -246,3 +245,9 @@ id = "k5wQFDTqHDYyDs-Cc5tyG"
 uri = "file://client/public/blog/cat-events.png"
 type = "image"
 title = "school cultural event celebration"
+
+[[outputs]]
+id = "XjtItqtTf0tlv3J8Zz4Yp"
+uri = "file://rainbow_ads_api_design.rtf"
+type = "unspecified"
+title = "Google Ads API Design Document (upload for Q7)"

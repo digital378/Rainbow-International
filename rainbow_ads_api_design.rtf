@@ -1,0 +1,42 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Times New Roman;}}
+{\b\fs28 Google Ads API Tool Design Document\par}
+{\b Organisation:} Rainbow International School \& Rainbow Preschools\par
+{\b Website:} https://rainbowinternationalschool.in\par
+{\b Contact:} digital@rainbowinternationalschool.in\par
+\par
+{\b\fs24 1. Tool Overview\par}
+This is a private, internal-only marketing intelligence tool. It consists of:\par
+- A secure REST API backend (Node.js/Express) hosted on rainbowinternationalschool.in\par
+- A private AI assistant (ChatGPT custom GPT) accessible only to Rainbow Group marketing staff\par
+\par
+{\b\fs24 2. Purpose\par}
+The tool pulls read-only campaign performance data from our two Google Ads accounts:\par
+- Rainbow International School (Customer ID: 709-409-2492)\par
+- Rainbow Preschools (Customer ID: 566-543-8033)\par
+Both accounts are managed under our MCC: Rainbow International school (647-893-9811)\par
+\par
+{\b\fs24 3. Data Accessed (Read-Only)\par}
+- Campaign names, status, type\par
+- Impressions, clicks, cost, CTR, average CPC\par
+- Conversions and cost-per-conversion\par
+- Top performing keywords\par
+\par
+{\b\fs24 4. Access Control\par}
+- API endpoints are protected by a secret token header (X-Api-Key)\par
+- Only authorised internal staff can access the ChatGPT custom GPT\par
+- No public access, no third-party clients, no resale\par
+\par
+{\b\fs24 5. No Write Operations\par}
+The tool performs READ ONLY operations. It does not create, modify, or delete any campaigns, keywords, bids, or ad groups. It has no capability to spend budget or alter account settings.\par
+\par
+{\b\fs24 6. User Flow\par}
+1. Staff member opens Rainbow Group BOT (private ChatGPT GPT)\par
+2. Bot calls our API endpoint with secret token\par
+3. API authenticates with Google Ads API using OAuth refresh token\par
+4. Campaign/keyword data is returned and presented to staff member\par
+5. Staff uses insights to inform manual optimisation decisions\par
+\par
+{\b\fs24 7. Supported Campaign Types\par}
+Search, Display\par
+}
