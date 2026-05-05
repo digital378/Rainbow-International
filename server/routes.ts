@@ -765,6 +765,69 @@ export async function registerRoutes(
     }
   });
 
+  // Site URL resolver for GSC — used by both /api/search-console/* and /api/gsc/*
+  function resolveGscSiteUrl(account: string): string {
+    if (account === "rps") return "https://www.rainbowpreschools.com/";
+    return "https://rainbowinternationalschool.in/"; // default = ris
+  }
+
+  // ── /api/search-console/* — ChatGPT-friendly aliases with ?account=ris|rps ──
+  app.get("/api/search-console/queries", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    const auth = getAuthenticatedClient();
+    if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const siteUrl = resolveGscSiteUrl(account);
+    const startDate = (req.query.startDate as string) || new Date(Date.now() - 28 * 86400000).toISOString().slice(0, 10);
+    const endDate = (req.query.endDate as string) || new Date().toISOString().slice(0, 10);
+    try {
+      const sc = google.searchconsole({ version: "v1", auth });
+      const result = await sc.searchanalytics.query({
+        siteUrl,
+        requestBody: { startDate, endDate, dimensions: ["query"], rowLimit: 25 },
+      });
+      const rows = (result.data.rows || []).map((r: any) => ({
+        query: r.keys[0],
+        clicks: r.clicks,
+        impressions: r.impressions,
+        ctr: parseFloat((r.ctr * 100).toFixed(2)),
+        position: parseFloat(r.position.toFixed(1)),
+      }));
+      res.json({ account: account.toUpperCase(), site: siteUrl, startDate, endDate, generatedAt: new Date().toISOString(), rows });
+    } catch (err: any) {
+      res.status(500).json({ message: "GSC query failed", error: err.message });
+    }
+  });
+
+  app.get("/api/search-console/pages", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    const auth = getAuthenticatedClient();
+    if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const siteUrl = resolveGscSiteUrl(account);
+    const startDate = (req.query.startDate as string) || new Date(Date.now() - 28 * 86400000).toISOString().slice(0, 10);
+    const endDate = (req.query.endDate as string) || new Date().toISOString().slice(0, 10);
+    try {
+      const sc = google.searchconsole({ version: "v1", auth });
+      const result = await sc.searchanalytics.query({
+        siteUrl,
+        requestBody: { startDate, endDate, dimensions: ["page"], rowLimit: 25 },
+      });
+      const rows = (result.data.rows || []).map((r: any) => ({
+        page: r.keys[0],
+        clicks: r.clicks,
+        impressions: r.impressions,
+        ctr: parseFloat((r.ctr * 100).toFixed(2)),
+        position: parseFloat(r.position.toFixed(1)),
+      }));
+      res.json({ account: account.toUpperCase(), site: siteUrl, startDate, endDate, generatedAt: new Date().toISOString(), rows });
+    } catch (err: any) {
+      res.status(500).json({ message: "GSC pages query failed", error: err.message });
+    }
+  });
+
   app.get("/api/gsc/queries", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     const adminToken = process.env.ADMIN_TOKEN;
