@@ -501,8 +501,9 @@ export async function registerRoutes(
         return res.status(503).json({ message: "Service unavailable" });
       }
       const headerToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+      const xApiKey = typeof req.headers["x-api-key"] === "string" ? req.headers["x-api-key"] : "";
       const queryToken = typeof req.query.token === "string" ? req.query.token : "";
-      const presented = headerToken || queryToken;
+      const presented = xApiKey || headerToken || queryToken;
       const safeEq = (a: string, b: string) => {
         const ab = Buffer.from(a, "utf8");
         const bb = Buffer.from(b, "utf8");
