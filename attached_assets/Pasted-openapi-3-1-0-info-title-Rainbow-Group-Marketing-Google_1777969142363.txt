@@ -1,0 +1,75 @@
+openapi: 3.1.0
+info:
+  title: Rainbow Group Marketing & Google Data
+  description: Marketing dashboard, Search Console, and PageSpeed data for Rainbow Group
+  version: 1.0.0
+servers:
+  - url: https://rainbowinternationalschool.in
+paths:
+  /api/marketing/export:
+    get:
+      operationId: getMarketingData
+      summary: Get full RIS and RPS marketing and admissions data
+      description: Returns combined monthly leads, bookings, walk-ins, admissions, ad spend for RIS and RPS, centre-wise CRM breakdown, social stats, and year-on-year comparison
+      responses:
+        "200":
+          description: Marketing data JSON
+        "401":
+          description: Unauthorized
+  /api/gsc/queries:
+    get:
+      operationId: getSearchConsoleQueries
+      summary: Top Google search queries for RIS or RPS
+      description: Returns top 25 search queries with clicks, impressions, CTR and average position. Use site=https://rainbowinternationalschool.in/ for RIS or site=https://www.rainbowpreschools.com/ for RPS
+      parameters:
+        - name: site
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Site URL. RIS: https://rainbowinternationalschool.in/ | RPS: https://www.rainbowpreschools.com/"
+      responses:
+        "200":
+          description: Search query data
+        "401":
+          description: Unauthorized
+  /api/gsc/pages:
+    get:
+      operationId: getSearchConsolePages
+      summary: Underperforming pages with SEO opportunities for RIS or RPS
+      description: Returns pages with over 100 impressions but under 3% CTR. Use site=https://rainbowinternationalschool.in/ for RIS or site=https://www.rainbowpreschools.com/ for RPS
+      parameters:
+        - name: site
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Site URL. RIS: https://rainbowinternationalschool.in/ | RPS: https://www.rainbowpreschools.com/"
+      responses:
+        "200":
+          description: Page performance data
+        "401":
+          description: Unauthorized
+  /api/pagespeed:
+    get:
+      operationId: getPageSpeedData
+      summary: PageSpeed and Core Web Vitals for any RIS or RPS page
+      description: Returns performance score, Core Web Vitals (LCP, CLS, FCP, TTFB) and top improvement opportunities. Use url=https://rainbowinternationalschool.in/ for RIS or url=https://www.rainbowpreschools.com/ for RPS
+      parameters:
+        - name: url
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Full URL. RIS: https://rainbowinternationalschool.in/ | RPS: https://www.rainbowpreschools.com/"
+        - name: strategy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [mobile, desktop]
+      responses:
+        "200":
+          description: PageSpeed data
+        "401":
+          description: Unauthorized
