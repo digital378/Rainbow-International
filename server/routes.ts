@@ -1064,5 +1064,123 @@ export async function registerRoutes(
     }
   });
 
+  // ── Meta Ads ─────────────────────────────────────────────────
+  const META_API = "https://graph.facebook.com/v19.0";
+
+  function resolveMetaAccountId(account: string): string | null {
+    if (account === "ris") return process.env.META_AD_ACCOUNT_ID_RIS || null;
+    if (account === "rps") return process.env.META_AD_ACCOUNT_ID_RPS || null;
+    return null;
+  }
+
+  app.get("/api/meta-ads/campaigns", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+
+    const token = process.env.META_ADS_TOKEN;
+    if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
+
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const accountId = resolveMetaAccountId(account);
+    if (!accountId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps. Ensure META_AD_ACCOUNT_ID_RIS / META_AD_ACCOUNT_ID_RPS are set." });
+
+    try {
+      const fields = [
+        "id", "name", "status", "objective",
+        "insights.date_preset(last_30d){impressions,clicks,spend,reach,frequency,ctr,cpc,actions,cost_per_action_type}",
+      ].join(",");
+
+      const url = `${META_API}/act_${accountId}/campaigns`;
+      const response = await fetch(`${url}?fields=${encodeURIComponent(fields)}&limit=20&access_token=${token}`);
+      const data: any = await response.json();
+
+      if (data.error) return res.status(502).json({ message: "Meta Ads API error", error: data.error.message, code: data.error.code });
+
+      const campaigns = (data.data || []).map((c: any) => {
+        const ins = c.insights?.data?.[0] || {};
+        const leads = (ins.actions || []).find((a: any) => a.action_type === "lead")?.value || 0;
+        const landingViews = (ins.actions || []).find((a: any) => a.action_type === "landing_page_view")?.value || 0;
+        const costPerLead = (ins.cost_per_action_type || []).find((a: any) => a.action_type === "lead")?.value || null;
+        return {
+          id: c.id,
+          name: c.name,
+          status: c.status,
+          objective: c.objective,
+          impressions: parseInt(ins.impressions || "0"),
+          clicks: parseInt(ins.clicks || "0"),
+          spend: parseFloat(parseFloat(ins.spend || "0").toFixed(2)),
+          reach: parseInt(ins.reach || "0"),
+          frequency: parseFloat(parseFloat(ins.frequency || "0").toFixed(2)),
+          ctr: parseFloat(parseFloat(ins.ctr || "0").toFixed(2)),
+          cpc: parseFloat(parseFloat(ins.cpc || "0").toFixed(2)),
+          leads: parseInt(leads),
+          landingPageViews: parseInt(landingViews),
+          costPerLead: costPerLead ? parseFloat(parseFloat(costPerLead).toFixed(2)) : null,
+        };
+      });
+
+      res.json({
+        account: account.toUpperCase(),
+        accountId,
+        period: "last 30 days",
+        generatedAt: new Date().toISOString(),
+        campaigns,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Meta Ads campaign fetch failed", error: err.message });
+    }
+  });
+
+  app.get("/api/meta-ads/insights", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+
+    const token = process.env.META_ADS_TOKEN;
+    if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
+
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const accountId = resolveMetaAccountId(account);
+    if (!accountId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps." });
+
+    try {
+      const fields = "impressions,clicks,spend,reach,frequency,ctr,cpc,actions,cost_per_action_type,account_name,account_currency";
+      const url = `${META_API}/act_${accountId}/insights`;
+      const response = await fetch(`${url}?fields=${encodeURIComponent(fields)}&date_preset=last_30d&level=account&access_token=${token}`);
+      const data: any = await response.json();
+
+      if (data.error) return res.status(502).json({ message: "Meta Ads API error", error: data.error.message, code: data.error.code });
+
+      const ins = data.data?.[0] || {};
+      const leads = (ins.actions || []).find((a: any) => a.action_type === "lead")?.value || 0;
+      const msgSent = (ins.actions || []).find((a: any) => a.action_type === "onsite_conversion.messaging_conversation_started_7d")?.value || 0;
+      const postEngagement = (ins.actions || []).find((a: any) => a.action_type === "post_engagement")?.value || 0;
+      const costPerLead = (ins.cost_per_action_type || []).find((a: any) => a.action_type === "lead")?.value || null;
+
+      res.json({
+        account: account.toUpperCase(),
+        accountId,
+        accountName: ins.account_name,
+        currency: ins.account_currency,
+        period: "last 30 days",
+        generatedAt: new Date().toISOString(),
+        summary: {
+          impressions: parseInt(ins.impressions || "0"),
+          clicks: parseInt(ins.clicks || "0"),
+          spend: parseFloat(parseFloat(ins.spend || "0").toFixed(2)),
+          reach: parseInt(ins.reach || "0"),
+          frequency: parseFloat(parseFloat(ins.frequency || "0").toFixed(2)),
+          ctr: parseFloat(parseFloat(ins.ctr || "0").toFixed(2)),
+          cpc: parseFloat(parseFloat(ins.cpc || "0").toFixed(2)),
+          leads: parseInt(leads),
+          messageConversationsStarted: parseInt(msgSent),
+          postEngagement: parseInt(postEngagement),
+          costPerLead: costPerLead ? parseFloat(parseFloat(costPerLead).toFixed(2)) : null,
+        },
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Meta Ads insights fetch failed", error: err.message });
+    }
+  });
+
   return httpServer;
 }
