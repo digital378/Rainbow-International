@@ -18,7 +18,7 @@ function renderHomeSSR(): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');gtag('config','AW-18140772845');</script>
 <title>Best CBSE school in thane near me - Rainbow International</title>
 <meta name="description" content="Rainbow International School — best CBSE school in Thane near you. Nursery to Class 12, 3.5-acre campus, 3000+ students. Science, Commerce &amp; Humanities streams. Admissions 2026-27 open." />
 <meta name="keywords" content="best CBSE school in Thane near me, CBSE school Thane, Rainbow International School, best school near me Thane, international school Thane, top CBSE school Thane, school admissions Thane 2026, K-12 school near me Thane" />

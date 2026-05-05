@@ -6,6 +6,8 @@ declare global {
 }
 
 const MEASUREMENT_ID = "G-DN4GB6MVJJ";
+const GOOGLE_ADS_ID = "AW-18140772845";
+const GOOGLE_ADS_LEAD_CONVERSION = "AW-18140772845/gWBXCP3B26ccEO3zmMpD";
 
 let lastFormSubmitTime = 0;
 
@@ -90,7 +92,14 @@ export function trackFormSubmit(params: {
     utm_content: utmParams.utm_content || "",
     send_to: MEASUREMENT_ID,
   });
+  // Fire Google Ads lead conversion
+  window.gtag("event", "conversion", {
+    send_to: GOOGLE_ADS_LEAD_CONVERSION,
+    value: 1.0,
+    currency: "INR",
+  });
   console.log("[GA4] Form submit:", eventName, params);
+  console.log("[Google Ads] Lead conversion fired:", GOOGLE_ADS_LEAD_CONVERSION);
 }
 
 export function trackCallClick(params: {
