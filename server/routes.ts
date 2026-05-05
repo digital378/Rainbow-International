@@ -767,7 +767,7 @@ export async function registerRoutes(
 
   // Site URL resolver for GSC — used by both /api/search-console/* and /api/gsc/*
   function resolveGscSiteUrl(account: string): string {
-    if (account === "rps") return "https://www.rainbowpreschools.com/";
+    if (account === "rps") return "sc-domain:rainbowpreschools.com";
     return "https://rainbowinternationalschool.in/"; // default = ris
   }
 
