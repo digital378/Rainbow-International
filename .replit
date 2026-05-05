@@ -47,6 +47,8 @@ mockupState = "FULLSTACK"
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = "587"
 ENQUIRY_MAIL_TO = "digital@rainbowinternationalschool.in"
+GOOGLE_ADS_CUSTOMER_ID_RIS = "7094092492"
+GOOGLE_ADS_CUSTOMER_ID_RPS = "5665438033"
 
 [postMerge]
 path = "scripts/post-merge.sh"

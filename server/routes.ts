@@ -702,6 +702,7 @@ export async function registerRoutes(
   const GOOGLE_SCOPES = [
     "https://www.googleapis.com/auth/webmasters.readonly",
     "https://www.googleapis.com/auth/analytics.readonly",
+    "https://www.googleapis.com/auth/adwords",
   ];
 
   function getOAuthClient() {
@@ -888,6 +889,172 @@ export async function registerRoutes(
       });
     } catch (err: any) {
       res.status(500).json({ message: "PageSpeed check failed", error: err.message });
+    }
+  });
+
+  // ── Google Ads ───────────────────────────────────────────────
+  function requireAdminToken(req: any, res: any): boolean {
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (!adminToken || !provided) { res.status(401).json({ message: "Unauthorized" }); return false; }
+    try {
+      if (!timingSafeEqual(Buffer.from(adminToken), Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)))) {
+        res.status(401).json({ message: "Unauthorized" }); return false;
+      }
+    } catch { res.status(401).json({ message: "Unauthorized" }); return false; }
+    return true;
+  }
+
+  function getGoogleAdsClient() {
+    const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    if (!devToken || !refreshToken || !clientId || !clientSecret) return null;
+    const { GoogleAdsApi } = require("google-ads-api");
+    return new GoogleAdsApi({
+      client_id: clientId,
+      client_secret: clientSecret,
+      developer_token: devToken,
+    });
+  }
+
+  function resolveCustomerId(account: string): string | null {
+    if (account === "rps") return (process.env.GOOGLE_ADS_CUSTOMER_ID_RPS || "").replace(/-/g, "");
+    if (account === "ris") return (process.env.GOOGLE_ADS_CUSTOMER_ID_RIS || "").replace(/-/g, "");
+    return null;
+  }
+
+  app.get("/api/google-ads/campaigns", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+
+    const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
+    if (!devToken) return res.status(503).json({ message: "Google Ads developer token not configured. Apply at ads.google.com → Tools → API Centre." });
+
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+
+    const client = getGoogleAdsClient();
+    if (!client) return res.status(503).json({ message: "Google Ads not configured" });
+
+    try {
+      const customer = client.Customer({
+        customer_id: customerId,
+        refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      });
+
+      const campaigns = await customer.query(`
+        SELECT
+          campaign.id,
+          campaign.name,
+          campaign.status,
+          campaign.advertising_channel_type,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.ctr,
+          metrics.average_cpc,
+          metrics.cost_per_conversion
+        FROM campaign
+        WHERE campaign.status = 'ENABLED'
+          AND segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.cost_micros DESC
+        LIMIT 20
+      `);
+
+      const rows = campaigns.map((c: any) => ({
+        id: c.campaign.id,
+        name: c.campaign.name,
+        type: c.campaign.advertising_channel_type,
+        impressions: c.metrics.impressions,
+        clicks: c.metrics.clicks,
+        spend: parseFloat((c.metrics.cost_micros / 1_000_000).toFixed(2)),
+        conversions: parseFloat((c.metrics.conversions || 0).toFixed(1)),
+        ctr: parseFloat((c.metrics.ctr * 100).toFixed(2)),
+        avgCpc: parseFloat((c.metrics.average_cpc / 1_000_000).toFixed(2)),
+        costPerConversion: c.metrics.cost_per_conversion > 0
+          ? parseFloat((c.metrics.cost_per_conversion / 1_000_000).toFixed(2))
+          : null,
+      }));
+
+      res.json({
+        account: account.toUpperCase(),
+        customerId,
+        period: "last 30 days",
+        generatedAt: new Date().toISOString(),
+        campaigns: rows,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads campaign query failed", error: err.message });
+    }
+  });
+
+  app.get("/api/google-ads/keywords", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+
+    const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
+    if (!devToken) return res.status(503).json({ message: "Google Ads developer token not configured" });
+
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+
+    const client = getGoogleAdsClient();
+    if (!client) return res.status(503).json({ message: "Google Ads not configured" });
+
+    try {
+      const customer = client.Customer({
+        customer_id: customerId,
+        refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+      });
+
+      const keywords = await customer.query(`
+        SELECT
+          ad_group_criterion.keyword.text,
+          ad_group_criterion.keyword.match_type,
+          ad_group_criterion.quality_info.quality_score,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions,
+          metrics.ctr,
+          metrics.average_cpc
+        FROM keyword_view
+        WHERE campaign.status = 'ENABLED'
+          AND ad_group.status = 'ENABLED'
+          AND ad_group_criterion.status = 'ENABLED'
+          AND segments.date DURING LAST_30_DAYS
+        ORDER BY metrics.cost_micros DESC
+        LIMIT 25
+      `);
+
+      const rows = keywords.map((k: any) => ({
+        keyword: k.ad_group_criterion.keyword.text,
+        matchType: k.ad_group_criterion.keyword.match_type,
+        qualityScore: k.ad_group_criterion.quality_info?.quality_score || null,
+        impressions: k.metrics.impressions,
+        clicks: k.metrics.clicks,
+        spend: parseFloat((k.metrics.cost_micros / 1_000_000).toFixed(2)),
+        conversions: parseFloat((k.metrics.conversions || 0).toFixed(1)),
+        ctr: parseFloat((k.metrics.ctr * 100).toFixed(2)),
+        avgCpc: parseFloat((k.metrics.average_cpc / 1_000_000).toFixed(2)),
+      }));
+
+      res.json({
+        account: account.toUpperCase(),
+        customerId,
+        period: "last 30 days",
+        generatedAt: new Date().toISOString(),
+        keywords: rows,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads keyword query failed", error: err.message });
     }
   });
 
