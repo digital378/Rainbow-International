@@ -1,0 +1,259 @@
+This GPT acts as a senior business manager and digital marketing expert representing Rainbow Group BOT, with over 15 years of experience. It provides strategic guidance on marketing, branding, campaign development, competitive positioning, parent enquiry improvement, admission conversion, and school experience enhancement, with a strong focus on the education sector, including preschools and K-12 international schools.
+It supports Rainbow Group’s portfolio of 7 schools: 6 preschools and 1 international school.
+All responses must be formal, professional, strategic, simple, and market-relevant. Do not use emojis unless the user explicitly asks for emojis. Keep recommendations outcome-oriented and practical for school leadership, marketing, sales, and operations teams.
+User-facing language, including suggestion buttons, first prompts, and opening responses, must remain generic, simple, and outcome-oriented. Do not use the terms SOP, KPMG, framework, or internal process terminology in any user-facing UI or initial interaction. When referencing uploaded internal documents, translate internal terminology into simple operational language suitable for school teams.
+Prompt starters visible to users must be generic and aligned to these approved queries:
+- How can I increase admissions for my school?
+- What strategies improve parent enquiries?
+- How do I improve admission conversions?
+- How can I position my school better than competitors?
+When answering, focus on driving enrollment growth, improving brand positioning, strengthening parent perception, improving counselling quality, increasing walk-ins, converting enquiries into admissions, and enhancing academic and campus experience.
+This GPT has access to live Rainbow Group marketing data through getMarketingData connected to the Rainbow Group dashboard. Any time a user asks about performance, results, numbers, admissions, leads, bookings, walk-ins, spend, ROI, conversions, or references any specific month, call getMarketingData before answering. Do not rely on uploaded documents for performance data. The live data includes monthly breakdowns from Dec 2025 to May 2026, last-year comparisons from Oct 2024 to Jun 2025, May 2026 weekly tracker, centre-wise CRM data for Aggarwal, Anand Nagar, Kasarvadavali, Hariniwas, Dhokali, and Kalwa, social media stats, and fixed costs. After fetching, always confirm: “Fetched live data — last updated [lastUpdated]”. Minimum revenue per admission is ₹90,000.
+For strategic advice that does not require current performance figures, answer directly using education-sector expertise and, where relevant, the uploaded internal documents as background knowledge. Keep confidential internal wording out of user-facing responses unless the user explicitly asks for document-specific details.
+If data is incomplete or assumptions are required, state the assumption clearly and give a practical next step. Avoid jargon unless the user asks for detailed technical planning.
+
+This is our current chat GPT bot with configuration with our site into it to get accurate data and access to read our SOPs from KPMG. I want to integrate our google and meta ads as well with it so that it can assit us with campaign optimization and setup for better conversions and help improve SEO for both sites too, how do i do that?
+
+Show less
+12:09 PM
+Claude responded: Integrating Google Ads, Meta Ads, and SEO tools into your custom GPT follows the same pattern you already used for getMarketingData — you expose a simplified A…
+
+Architected multi-API integration strategy for ads and SEO optimization
+Architected multi-API integration strategy for ads and SEO optimization
+Integrating Google Ads, Meta Ads, and SEO tools into your custom GPT follows the same pattern you already used for getMarketingData — you expose a simplified API endpoint from a backend service, then register it as an Action with an OpenAPI schema. The reason you can't connect Google/Meta APIs directly as Actions is that both use OAuth flows with developer tokens, ad account IDs, and refresh-token logic that aren't practical to handle inside a GPT Action call. You need a thin middleware layer (the same role your dashboard plays today).
+
+Here is the recommended architecture and a step-by-step path.
+
+1. The architecture (one backend, multiple endpoints)
+Extend your existing dashboard backend (the one serving getMarketingData) to add new endpoints, for example:
+
+getGoogleAdsPerformance — campaign, ad group, keyword, and conversion data
+getGoogleAdsRecommendations — Google's own optimization suggestions (free, via API)
+getMetaAdsPerformance — campaign, ad set, ad, and audience data
+getSearchConsoleData — impressions, clicks, CTR, position by query/page
+getPageSpeedInsights — Core Web Vitals for both domains
+getSeoAudit — on-page checks, schema, meta tags, broken links
+Your backend handles all OAuth, token refresh, and rate-limit caching. The GPT only sees clean JSON responses. This keeps credentials out of OpenAI's environment, which is also the correct security posture.
+
+2. Google Ads integration
+You'll need a Google Cloud project, a Google Ads developer token (apply through your Google Ads Manager account — basic access is usually approved within a few days), OAuth 2.0 client credentials, and the customer ID of each Rainbow Ads account.
+
+On the backend, use the official Google Ads API client library (Python, Node.js, or PHP all have well-maintained SDKs). The most useful queries for your bot will be:
+
+Campaign-level spend, impressions, clicks, conversions, CPA, ROAS
+Search terms report (to find wasted spend and new keyword opportunities)
+Ad asset performance (which headlines/descriptions are pulling weight)
+Auction insights (competitor overlap and outranking share)
+The RecommendationService endpoint, which returns Google's own optimization suggestions you can surface to your team
+Expose these as REST endpoints (e.g., GET /google-ads/campaigns?dateRange=last_30_days&schoolId=aggarwal) and your GPT can call them like any other Action.
+
+3. Meta Ads integration
+For Meta you'll need a Meta Business Manager app, the Marketing API enabled, a system user with a long-lived access token (these don't expire if generated correctly from Business Settings → System Users), and the ad account IDs for each campaign you run.
+
+The Marketing API gives you everything Ads Manager shows: campaign/adset/ad performance, audience breakdowns, creative-level metrics, and the Insights API for delivery and demographic data. For school admissions, the most relevant calls are:
+
+Insights by ad set with breakdowns by age, gender, region — useful since parent demographics differ between preschool and K-12
+Creative performance to identify winning hooks for parent messaging
+Frequency and reach data to flag creative fatigue (a major issue in localized school campaigns)
+Lead Ads form submissions if you run Lead Generation campaigns — these can flow directly into your CRM and be reconciled with admissions
+4. SEO integration
+SEO is where you can move fastest because the most valuable APIs are free:
+
+Google Search Console API — gives you impressions, clicks, CTR, average position by query and by URL for both rainbowinternationalschool.in and rainbowpreschools.com. This is the single most important SEO data source. Verify both domains in Search Console, then expose endpoints like getTopQueries, getUnderperformingPages (high impressions, low CTR), and getIndexCoverage.
+
+PageSpeed Insights API — free, returns Core Web Vitals (LCP, INP, CLS) for any URL. Critical because school sites are often image-heavy and slow on mobile, which hurts both rankings and parent experience.
+
+Google Analytics 4 Data API — for organic traffic, landing-page conversion, and session quality. You may already have this in your dashboard.
+
+Optional paid layer — Ahrefs, SEMrush, or Moz APIs add competitor keyword gaps, backlink profiles, and SERP tracking. Worth it once the basics are in place. For Mumbai/Thane school competition, Ahrefs is generally the strongest.
+
+For on-page audits, you can have your backend run a simple crawler (using something like Screaming Frog's CLI, or a Node-based crawler with Cheerio) that returns missing meta descriptions, duplicate titles, missing schema markup, broken links, and orphan pages.
+
+5. Registering the new Actions in the GPT
+In your Configure screen, under Actions, click Create new action for each integration. For each one:
+
+Provide an OpenAPI 3.1 schema describing the endpoints, parameters, and response shape.
+Set authentication to API Key (Bearer token) pointing at your backend — never put Google/Meta credentials directly in the GPT.
+Add a Privacy Policy URL (required by OpenAI for any Action).
+You can either create one Action per platform (cleaner separation) or consolidate everything under a single getMarketingData umbrella with an expanded schema. Given you already have getMarketingData working, I'd suggest keeping it for paid-media data (extending it with source: "google_ads" | "meta_ads" parameters) and creating two new Actions for SEO: getSearchConsoleData and getPageSpeedInsights. That keeps the schemas readable.
+
+6. Update the GPT instructions
+Once the Actions exist, extend the system prompt with routing rules so the model picks the right tool. Add something like:
+
+When users ask about Google Ads, search campaigns, keywords, quality score, or paid search performance, call getGoogleAdsPerformance. When users ask about Facebook/Instagram ads, creatives, audience targeting, or social spend, call getMetaAdsPerformance. For organic search performance, rankings, or query data, call getSearchConsoleData. For website speed or Core Web Vitals, call getPageSpeedInsights. Always confirm the data freshness after fetching.
+
+Also add minimum-quality thresholds you want the bot to flag automatically — for example, "any campaign with CPA above ₹30,000 or ROAS below 3.0 should be flagged for review," "any landing page with LCP above 2.5s should be flagged," etc. This turns the bot from a reporter into an actual optimization assistant.
+
+7. Practical next step
+The fastest path to value is usually this order: Search Console (1–2 days of dev work, immediate insight), PageSpeed Insights (half a day), then Meta Ads (3–5 days including app review), then Google Ads (1–2 weeks because of developer token approval). If your dev team is small or external, tools like Supermetrics, Make.com, or n8n can handle the Google/Meta authentication and write data to a database your GPT then reads — this trades monthly cost for development time and is often the right call for a 7-school operation.
+
+One assumption worth confirming: I'm assuming you have engineering capacity (in-house or vendor) to extend the backend that already serves getMarketingData. If not, the Make.com/n8n route is what I'd recommend — it gets you 80% of the value at 20% of the effort, and you can always migrate to direct API integration later.
+
+Want me to draft the OpenAPI schema for any of these Actions, or sketch the specific instruction additions you'd paste into the Configure screen?
+
+You said: Give me a step by step guide to do this setup.
+Give me a step by step guide to do this setup.
+
+12:11 PM
+Claude responded: Step-by-Step Setup Guide: Google Ads, Meta Ads, and SEO Integration
+Step-by-Step Setup Guide: Google Ads, Meta Ads, and SEO Integration
+This guide assumes you already have the backend running getMarketingData. We'll extend that same backend rather than building parallel systems.
+
+Phase 1: Preparation (Day 1)
+Step 1: Inventory what you have
+Before touching any code, gather these from your team:
+
+Backend URL and access credentials for the existing getMarketingData service
+Hosting environment (AWS, GCP, Azure, or VPS) and who has admin access
+Both website domains and confirmation you have admin access to each
+Google Ads Manager (MCC) account ID and admin access
+Meta Business Manager admin access
+Whether Search Console is already verified for both domains
+Whether Google Analytics 4 is installed on both sites
+Step 2: Decide your build approach
+Pick one before proceeding:
+
+Option A — Direct API integration. Your developer writes code against Google Ads, Meta Marketing, and Search Console APIs. More work upfront, lower ongoing cost, full control.
+
+Option B — Middleware tools (Make.com, n8n, or Supermetrics). Faster to deploy, monthly subscription cost, less flexibility for custom logic.
+
+For a 7-school operation, Option B is usually the right starting point. This guide covers Option A because it's the more involved path; if you choose B, skip the API-credential steps and use the tool's built-in connectors instead.
+
+Step 3: Set up a credentials vault
+Create a secure secrets store on your backend (AWS Secrets Manager, Google Secret Manager, or environment variables in a locked-down .env file). Every API key, token, and refresh token goes here. Never commit credentials to your codebase.
+
+Phase 2: Search Console Setup (Day 2 — Easiest, Start Here)
+Step 4: Verify both domains in Search Console
+Go to search.google.com/search-console. Add rainbowinternationalschool.in and rainbowpreschools.com as Domain properties (not URL prefix — domain property captures all subdomains and protocols). Verify via DNS TXT record. Wait 24 hours for data to populate if newly verified.
+
+Step 5: Enable the Search Console API
+In Google Cloud Console, create a new project called "Rainbow Marketing Integrations." Go to APIs & Services → Library, search for "Google Search Console API," and enable it.
+
+Step 6: Create a service account
+Under IAM & Admin → Service Accounts, create a service account named rainbow-gpt-backend. Generate a JSON key file and download it. Store it in your backend secrets vault.
+
+Step 7: Grant the service account access
+Back in Search Console, go to Settings → Users and permissions for each property. Add the service account email (it looks like rainbow-gpt-backend@your-project.iam.gserviceaccount.com) with Full permission.
+
+Step 8: Build the backend endpoint
+Add a route to your existing backend, for example GET /seo/search-console. Use the official google-api-python-client or googleapis Node package. The endpoint should accept query parameters for domain, date range, and dimension (query, page, country, device), then return JSON with rows of impressions, clicks, CTR, and average position.
+
+Step 9: Test the endpoint
+Call it from Postman or curl. Confirm it returns data for both domains. Cache responses for 6–12 hours to stay well under quota limits.
+
+Phase 3: PageSpeed Insights Setup (Day 2 — 2 hours)
+Step 10: Enable the PageSpeed API
+In the same Google Cloud project, enable the PageSpeed Insights API. Under APIs & Services → Credentials, create an API key. Restrict it to the PageSpeed Insights API only.
+
+Step 11: Build the backend endpoint
+Add GET /seo/pagespeed?url=...&strategy=mobile. The endpoint calls https://www.googleapis.com/pagespeedonline/v5/runPagespeed with your API key, parses the response, and returns Core Web Vitals (LCP, INP, CLS), performance score, and the top opportunities.
+
+Step 12: Add a batch wrapper
+Create a second endpoint GET /seo/pagespeed/audit that runs PageSpeed against your top 10 landing pages per domain and returns a consolidated report. This is what the GPT will call most often.
+
+Phase 4: Meta Ads Setup (Days 3–5)
+Step 13: Create a Meta app
+Go to developers.facebook.com, create a new app of type Business. Name it "Rainbow Marketing Integration." Under App Settings → Basic, note the App ID and App Secret.
+
+Step 14: Add the Marketing API product
+In the app dashboard, click Add Product and add Marketing API.
+
+Step 15: Create a System User
+In Meta Business Manager, go to Business Settings → Users → System Users. Create a new system user named rainbow-gpt-system-user with Admin role.
+
+Step 16: Assign assets to the System User
+Still in Business Settings, assign each Ad Account, Page, and Pixel that the bot needs to read. Grant Manage Ad Account access.
+
+Step 17: Generate a long-lived access token
+On the System User page, click Generate New Token. Select your app, then check these permissions: ads_read, ads_management, business_management, read_insights, pages_read_engagement. Generate the token, copy it immediately, and store it in your secrets vault. System user tokens do not expire if generated this way.
+
+Step 18: Build the backend endpoint
+Add GET /ads/meta?adAccountId=...&dateRange=...&level=campaign|adset|ad. Use the facebook-business SDK (Python or Node). The endpoint should query the Insights API and return spend, impressions, reach, frequency, CPM, CTR, conversions, cost per result, and ROAS.
+
+Step 19: Add useful breakdowns
+Add optional query parameters for breakdowns (age, gender, region, placement) and creativePerformance (returns ad-level data including thumbnail URL, primary text, and headline). These are the queries your team will use most for school campaign analysis.
+
+Step 20: Test with a real account
+Call the endpoint for one ad account, verify the numbers match Ads Manager exactly. If they don't, check timezone settings — Ads Manager defaults to ad account timezone but the API returns UTC unless specified.
+
+Phase 5: Google Ads Setup (Days 6–14)
+Step 21: Apply for a developer token
+In your Google Ads Manager (MCC) account, go to Tools → API Center. Apply for Basic access. You'll need to describe how you'll use the API. Approval typically takes 1–5 business days. While waiting, you can develop against the test account using a test developer token.
+
+Step 22: Configure OAuth credentials
+In your existing Google Cloud project, go to APIs & Services → Credentials. Create an OAuth 2.0 Client ID of type Web application. Add an authorized redirect URI pointing at your backend's OAuth callback (e.g., https://your-backend.com/oauth/google/callback).
+
+Step 23: Generate a refresh token
+Run a one-time OAuth consent flow as the user with access to all Rainbow ad accounts. Use Google's OAuth Playground or a small script. Capture the refresh token and store it in the secrets vault. This token doesn't expire as long as it's used periodically.
+
+Step 24: Enable the Google Ads API
+In Google Cloud Console, enable the Google Ads API under the same project.
+
+Step 25: Install the client library and configure
+On your backend, install google-ads (Python) or google-ads-nodejs. Create a config file with: developer token, OAuth client ID, OAuth client secret, refresh token, and login customer ID (your MCC ID).
+
+Step 26: Build the backend endpoint
+Add GET /ads/google?customerId=...&dateRange=...&level=campaign|adgroup|keyword. Use GAQL (Google Ads Query Language) to query the API. Return spend, impressions, clicks, CTR, average CPC, conversions, cost per conversion, and conversion value.
+
+Step 27: Add the recommendations endpoint
+Add GET /ads/google/recommendations?customerId=.... This calls the RecommendationService and returns Google's own optimization suggestions — keyword additions, budget changes, ad strength improvements, bidding adjustments. This is high-leverage data your team will want regularly.
+
+Step 28: Add the search terms endpoint
+Add GET /ads/google/search-terms?customerId=...&dateRange=.... This returns the actual queries triggering your ads, with cost and conversion data. Critical for finding wasted spend and negative keyword opportunities.
+
+Phase 6: Register Actions in the GPT (Day 15)
+Step 29: Write OpenAPI schemas
+For each new endpoint group, write an OpenAPI 3.1 schema. Keep schemas focused — one schema per logical Action (Google Ads, Meta Ads, SEO). Each schema needs a servers block pointing at your backend, a paths block listing endpoints, and a components.securitySchemes block defining bearer-token auth.
+
+Step 30: Set up backend authentication
+Generate three separate API keys (one per Action) and store them in your backend's auth middleware. This way, if one key leaks, you only rotate that one. The backend should reject any request without a valid bearer token.
+
+Step 31: Add the Actions to the GPT
+Open your GPT in Configure mode. Under Actions, click Create new action three times — once for Google Ads, once for Meta Ads, once for SEO.
+
+For each action, paste the OpenAPI schema, set authentication type to API Key → Bearer, paste the corresponding key, and add a privacy policy URL (required by OpenAI — a simple page on your domain stating what data is accessed is sufficient).
+
+Step 32: Test each Action
+Use the Test button in the Action editor. Call each endpoint with sample parameters. Confirm the response comes back cleanly. Common issues: wrong server URL, missing authentication header, schema mismatch with actual response.
+
+Phase 7: Update GPT Instructions (Day 15)
+Step 33: Extend the system prompt
+In the Instructions field, add a routing block. Something like:
+
+When users ask about Google Ads campaigns, search performance, keywords, quality score, or paid search ROI, call getGoogleAdsPerformance. For Google's own optimization suggestions, call getGoogleAdsRecommendations. For wasted-spend analysis, call getGoogleAdsSearchTerms.
+
+When users ask about Facebook or Instagram ads, social creatives, audience targeting, or social ad spend, call getMetaAdsPerformance.
+
+When users ask about organic search, SEO rankings, search queries, or website visibility, call getSearchConsoleData. For page speed, Core Web Vitals, or website performance, call getPageSpeedInsights.
+
+Always confirm data freshness after fetching by stating the last updated timestamp. When recommending optimizations, ground them in the live data fetched, not in general best practices.
+
+Step 34: Add quality thresholds
+Add automatic flagging rules so the bot becomes proactive:
+
+Flag any Google Ads campaign with cost per conversion above ₹30,000 or conversion rate below 2%. Flag any Meta ad set with frequency above 3.5 (creative fatigue) or CPM above ₹400. Flag any landing page with mobile LCP above 2.5 seconds or performance score below 70. Flag any Search Console query in positions 4–10 with high impressions as a quick-win SEO opportunity.
+
+Step 35: Add new conversation starters (optional)
+Consider adding starters such as "Review my Google Ads performance," "Check my SEO opportunities," or "Audit my landing page speed." Keep them generic per your existing UI guidelines.
+
+Phase 8: Validation and Rollout (Days 16–17)
+Step 36: Run end-to-end tests
+Ask the GPT real questions your team would ask: "Which Google Ads keyword is wasting the most spend across all schools last month?" "Show me Aggarwal's top organic search queries." "Which Meta creative has the lowest cost per lead this week?" Verify the responses are accurate by cross-checking against the native dashboards.
+
+Step 37: Set up monitoring
+Add basic logging on your backend: request count per endpoint, error rate, response time. Set up an alert if error rate exceeds 5% on any endpoint. Google and Meta APIs occasionally rate-limit or return transient errors — your backend should retry with exponential backoff.
+
+Step 38: Document for your team
+Write a one-page internal note explaining what the bot can now do, with 5–10 example prompts. Distribute to school marketing leads, counsellors, and centre heads.
+
+Step 39: Train and gather feedback
+Run a 30-minute walkthrough with the marketing and admissions teams. Capture which questions worked, which didn't, and which data points are missing. Iterate on the instructions and add endpoints as needed.
+
+Estimated timeline and effort
+A single experienced developer can complete all phases in roughly 15 working days. If you split SEO (Phases 2–3) to one person and Ads (Phases 4–5) to another, you can compress this to 8–10 days. The Google Ads developer token approval is the only external blocker — start that application on Day 1 even if you plan to work on it last.
+
+One important assumption to confirm
+This guide assumes your existing getMarketingData backend is something your team controls and can extend (Node.js, Python, or similar). If it's a closed third-party service, you'll need to build a separate small backend for these new integrations — the architecture stays the same, just hosted independently.
+
+Want me to draft the actual OpenAPI schema for any of these three Actions next, or write the exact instruction block you'd paste into the Configure screen?
+
