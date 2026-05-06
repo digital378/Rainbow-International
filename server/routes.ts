@@ -1315,6 +1315,7 @@ export async function registerRoutes(
       const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
       const rpsMonthBranch: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
       const rpsCloseReasons: Record<string, number> = {};
+      const rpsMonthReasons: Record<string, Record<string, number>> = {};
       const rpsStatusCount: Record<string, number> = {};
       const rpsSourceCount: Record<string, number> = {};
 
@@ -1338,7 +1339,11 @@ export async function registerRoutes(
         if (status === "ADM DONE") rpsMonthBranch[month][centre].admissions++;
         if (status === "CLOSED" || status === "CLOSED AFTER WALKIN") {
           rpsMonthBranch[month][centre].closed++;
-          if (remark) rpsCloseReasons[remark] = (rpsCloseReasons[remark] || 0) + 1;
+          if (remark) {
+            rpsCloseReasons[remark] = (rpsCloseReasons[remark] || 0) + 1;
+            if (!rpsMonthReasons[month]) rpsMonthReasons[month] = {};
+            rpsMonthReasons[month][remark] = (rpsMonthReasons[month][remark] || 0) + 1;
+          }
         }
         rpsStatusCount[status] = (rpsStatusCount[status] || 0) + 1;
         rpsSourceCount[source] = (rpsSourceCount[source] || 0) + 1;
@@ -1352,7 +1357,8 @@ export async function registerRoutes(
             .filter(b => b.centre && b.centre !== "Unassigned")
             .sort((a, b) => b.leads - a.leads);
           const total = branches.reduce((a, b) => ({ leads:a.leads+b.leads, bookings:a.bookings+b.bookings, walkins:a.walkins+b.walkins, admissions:a.admissions+b.admissions, closed:a.closed+b.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
-          return { month, branches, total };
+          const closedReasons = Object.entries(rpsMonthReasons[month] || {}).filter(([r]) => r.trim()).sort((a,b) => b[1]-a[1]).map(([reason,count]) => ({reason,count}));
+          return { month, branches, total, closedReasons };
         });
 
       // ── RIS CRM → education-level groups by month ──
@@ -1365,6 +1371,7 @@ export async function registerRoutes(
 
       const risMonthGroup: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
       const risCloseReasons: Record<string, number> = {};
+      const risMonthReasons: Record<string, Record<string, number>> = {};
       const risStatusCount: Record<string, number> = {};
       const risSourceCount: Record<string, number> = {};
 
@@ -1388,7 +1395,11 @@ export async function registerRoutes(
         if (status === "ADM DONE") risMonthGroup[month][group].admissions++;
         if (status === "CLOSED") {
           risMonthGroup[month][group].closed++;
-          if (remark) risCloseReasons[remark] = (risCloseReasons[remark] || 0) + 1;
+          if (remark) {
+            risCloseReasons[remark] = (risCloseReasons[remark] || 0) + 1;
+            if (!risMonthReasons[month]) risMonthReasons[month] = {};
+            risMonthReasons[month][remark] = (risMonthReasons[month][remark] || 0) + 1;
+          }
         }
         risStatusCount[status] = (risStatusCount[status] || 0) + 1;
         risSourceCount[source] = (risSourceCount[source] || 0) + 1;
@@ -1402,7 +1413,8 @@ export async function registerRoutes(
             .filter(g => risMonthGroup[month][g])
             .map(g => ({ group: g, ...risMonthGroup[month][g] }));
           const total = groups.reduce((a, g) => ({ leads:a.leads+g.leads, bookings:a.bookings+g.bookings, walkins:a.walkins+g.walkins, admissions:a.admissions+g.admissions, closed:a.closed+g.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
-          return { month, groups, total };
+          const closedReasons = Object.entries(risMonthReasons[month] || {}).filter(([r]) => r.trim()).sort((a,b) => b[1]-a[1]).map(([reason,count]) => ({reason,count}));
+          return { month, groups, total, closedReasons };
         });
 
       const sortReasons = (map: Record<string, number>) =>

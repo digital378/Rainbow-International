@@ -24,8 +24,8 @@ import {
 type LiveCrmEntry = { leads: number; bookings: number; walkins: number; admissions: number; closed: number };
 type LiveBranch = { centre: string } & LiveCrmEntry;
 type LiveGroup  = { group: string  } & LiveCrmEntry;
-type LiveRpsMonth = { month: string; branches: LiveBranch[]; total: LiveCrmEntry };
-type LiveRisMonth = { month: string; groups: LiveGroup[];    total: LiveCrmEntry };
+type LiveRpsMonth = { month: string; branches: LiveBranch[]; total: LiveCrmEntry; closedReasons: Array<{reason:string;count:number}> };
+type LiveRisMonth = { month: string; groups: LiveGroup[];    total: LiveCrmEntry; closedReasons: Array<{reason:string;count:number}> };
 type LiveData = {
   generatedAt: string;
   currentDayOfMonth: number;
@@ -170,6 +170,7 @@ export default function Marketing() {
   const [liveError, setLiveError] = useState<string | null>(null);
   const [rpsCrmMonth, setRpsCrmMonth] = useState<string>("");
   const [risCrmMonth, setRisCrmMonth] = useState<string>("");
+  const [branchCompareMonth, setBranchCompareMonth] = useState<string>("");
 
   useEffect(() => {
     document.title = "Marketing Dashboard | Rainbow International School";
@@ -778,41 +779,88 @@ export default function Marketing() {
         {segment === "combined" && (
           <section className="grid lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <SectionTitle title="May 2026 — Branch Comparison" sub="RIS vs RPS performance side-by-side (in progress, 9 days)" />
-              <div className="space-y-3">
-                {[
-                  { label: "Total Leads", ris: MAY_RIS_BASE.leads, rps: MAY_RPS_BASE.leads, max: 30 },
-                  { label: "Bookings", ris: MAY_RIS_BASE.bookings, rps: MAY_RPS_BASE.bookings, max: 10 },
-                  { label: "Walk-ins", ris: MAY_RIS_BASE.walkins, rps: MAY_RPS_BASE.walkins, max: 5 },
-                  { label: "Admissions", ris: MAY_RIS_BASE.admissions, rps: MAY_RPS_BASE.admissions, max: 2 },
-                ].map(row => (
-                  <div key={row.label}>
-                    <div className="flex justify-between text-xs text-gray-500 mb-1">
-                      <span className="font-medium">{row.label}</span>
-                      <span className="flex gap-4">
-                        <span className="font-bold" style={{ color: NAVY }}>RIS: {row.ris}</span>
-                        <span className="font-bold" style={{ color: CYAN }}>RPS: {row.rps}</span>
-                      </span>
+              {(() => {
+                const rpsMonths = liveData?.rpsCrm.byMonth.map(m => m.month) ?? [];
+                const risMonths = liveData?.risCrm.byMonth.map(m => m.month) ?? [];
+                const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
+                const allMonths = [...new Set([...rpsMonths, ...risMonths])].sort((a,b) => {
+                  const ai = MONTH_ORDER_UI.indexOf(a), bi = MONTH_ORDER_UI.indexOf(b);
+                  return (ai<0?99:ai)-(bi<0?99:bi);
+                });
+                const allTabs = [...allMonths, "YTD"];
+                const selTab = branchCompareMonth || allMonths[allMonths.length - 1] || "YTD";
+                const isYtd = selTab === "YTD";
+
+                const getRisTotals = (tab: string): LiveCrmEntry => {
+                  if (!liveData) return { leads: MAY_RIS_BASE.leads, bookings: MAY_RIS_BASE.bookings, walkins: MAY_RIS_BASE.walkins, admissions: MAY_RIS_BASE.admissions, closed: 0 };
+                  if (tab === "YTD") return liveData.risCrm.byMonth.reduce((a,m) => ({ leads:a.leads+m.total.leads, bookings:a.bookings+m.total.bookings, walkins:a.walkins+m.total.walkins, admissions:a.admissions+m.total.admissions, closed:a.closed+m.total.closed }), { leads:0,bookings:0,walkins:0,admissions:0,closed:0 });
+                  return liveData.risCrm.byMonth.find(m => m.month === tab)?.total ?? { leads:0,bookings:0,walkins:0,admissions:0,closed:0 };
+                };
+                const getRpsTotals = (tab: string): LiveCrmEntry => {
+                  if (!liveData) return { leads: MAY_RPS_BASE.leads, bookings: MAY_RPS_BASE.bookings, walkins: MAY_RPS_BASE.walkins, admissions: MAY_RPS_BASE.admissions, closed: 0 };
+                  if (tab === "YTD") return liveData.rpsCrm.byMonth.reduce((a,m) => ({ leads:a.leads+m.total.leads, bookings:a.bookings+m.total.bookings, walkins:a.walkins+m.total.walkins, admissions:a.admissions+m.total.admissions, closed:a.closed+m.total.closed }), { leads:0,bookings:0,walkins:0,admissions:0,closed:0 });
+                  return liveData.rpsCrm.byMonth.find(m => m.month === tab)?.total ?? { leads:0,bookings:0,walkins:0,admissions:0,closed:0 };
+                };
+
+                const ris = getRisTotals(selTab);
+                const rps = getRpsTotals(selTab);
+                const maxLeads = Math.max(ris.leads, rps.leads, 1);
+                const inProgress = !isYtd && selTab === (allMonths[allMonths.length - 1] ?? "");
+
+                return (
+                  <>
+                    <SectionTitle
+                      title={`${selTab} — Branch Comparison`}
+                      sub={`RIS vs RPS performance side-by-side${inProgress ? ` (in progress, ${liveData?.currentDayOfMonth ?? "?"} days)` : ""}`}
+                    />
+                    {liveData && (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {allTabs.map(tab => (
+                          <button key={tab} onClick={() => setBranchCompareMonth(tab)}
+                            data-testid={`button-branch-compare-${tab}`}
+                            className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors ${selTab===tab ? "bg-[#091a4f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                            {tab}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div className="space-y-3">
+                      {[
+                        { label: "Total Leads", risV: ris.leads, rpsV: rps.leads },
+                        { label: "Bookings", risV: ris.bookings, rpsV: rps.bookings },
+                        { label: "Walk-ins", risV: ris.walkins, rpsV: rps.walkins },
+                        { label: "Admissions", risV: ris.admissions, rpsV: rps.admissions },
+                      ].map(row => (
+                        <div key={row.label}>
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span className="font-medium">{row.label}</span>
+                            <span className="flex gap-4">
+                              <span className="font-bold" style={{ color: NAVY }}>RIS: {row.risV}</span>
+                              <span className="font-bold" style={{ color: CYAN }}>RPS: {row.rpsV}</span>
+                            </span>
+                          </div>
+                          <div className="flex gap-1 h-5">
+                            <div className="rounded-l-full" style={{ width: `${(row.risV / maxLeads) * 48}%`, background: NAVY, minWidth: row.risV > 0 ? 4 : 0 }} />
+                            <div className="rounded-r-full" style={{ width: `${(row.rpsV / maxLeads) * 48}%`, background: CYAN, minWidth: row.rpsV > 0 ? 4 : 0 }} />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex gap-1 h-5">
-                      <div className="rounded-l-full" style={{ width: `${(row.ris / row.max) * 48}%`, background: NAVY, minWidth: 2 }} />
-                      <div className="rounded-r-full" style={{ width: `${(row.rps / row.max) * 48}%`, background: CYAN, minWidth: 2 }} />
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                      <div className="rounded-xl bg-[#091a4f]/5 p-3 text-center">
+                        <div className="text-xs text-gray-500 font-medium mb-1">RIS Conversion</div>
+                        <div className="text-2xl font-black" style={{ color: NAVY }}>{pct((ris.admissions / Math.max(ris.leads, 1)) * 100)}</div>
+                        <div className="text-[11px] text-gray-400">{ris.admissions} / {ris.leads}</div>
+                      </div>
+                      <div className="rounded-xl bg-cyan-50 p-3 text-center">
+                        <div className="text-xs text-gray-500 font-medium mb-1">RPS Conversion</div>
+                        <div className="text-2xl font-black" style={{ color: CYAN }}>{pct((rps.admissions / Math.max(rps.leads, 1)) * 100)}</div>
+                        <div className="text-[11px] text-gray-400">{rps.admissions} / {rps.leads}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <div className="rounded-xl bg-[#091a4f]/5 p-3 text-center">
-                  <div className="text-xs text-gray-500 font-medium mb-1">RIS Conversion</div>
-                  <div className="text-2xl font-black" style={{ color: NAVY }}>{pct((MAY_RIS_BASE.admissions / Math.max(MAY_RIS_BASE.leads, 1)) * 100)}</div>
-                  <div className="text-[11px] text-gray-400">{MAY_RIS_BASE.admissions} / {MAY_RIS_BASE.leads}</div>
-                </div>
-                <div className="rounded-xl bg-cyan-50 p-3 text-center">
-                  <div className="text-xs text-gray-500 font-medium mb-1">RPS Conversion</div>
-                  <div className="text-2xl font-black" style={{ color: CYAN }}>{pct((MAY_RPS_BASE.admissions / Math.max(MAY_RPS_BASE.leads, 1)) * 100)}</div>
-                  <div className="text-[11px] text-gray-400">{MAY_RPS_BASE.admissions} / {MAY_RPS_BASE.leads}</div>
-                </div>
-              </div>
+                  </>
+                );
+              })()}
             </div>
 
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -1014,31 +1062,40 @@ export default function Marketing() {
                     );
                   })()}
 
-                  {liveData.rpsCrm.closedReasons.length > 0 && (
-                    <div className="mt-5">
-                      <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Lead Reasons — RPS (YTD, {totalClosed} closed)</div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs">
-                          <thead><tr className="text-left text-gray-500 border-b">
-                            <th className="py-1.5 pr-2 font-bold w-6">#</th>
-                            <th className="py-1.5 pr-3 font-bold">Reason</th>
-                            <th className="py-1.5 px-2 font-bold text-right">Count</th>
-                            <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
-                          </tr></thead>
-                          <tbody>
-                            {liveData.rpsCrm.closedReasons.map((r, i) => (
-                              <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
-                                <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
-                                <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
-                                <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
-                                <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/totalClosed)*100)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                  {(() => {
+                    const reasons = isYtd
+                      ? liveData.rpsCrm.closedReasons
+                      : (liveData.rpsCrm.byMonth.find(m => m.month === selTab)?.closedReasons ?? []);
+                    const reasonsTotal = reasons.reduce((a,x) => a+x.count, 0);
+                    if (!reasons.length) return null;
+                    return (
+                      <div className="mt-5">
+                        <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">
+                          Closed Lead Reasons — RPS ({isYtd ? "YTD" : selTab}, {reasonsTotal} closed)
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead><tr className="text-left text-gray-500 border-b">
+                              <th className="py-1.5 pr-2 font-bold w-6">#</th>
+                              <th className="py-1.5 pr-3 font-bold">Reason</th>
+                              <th className="py-1.5 px-2 font-bold text-right">Count</th>
+                              <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
+                            </tr></thead>
+                            <tbody>
+                              {reasons.map((r, i) => (
+                                <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
+                                  <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
+                                  <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
+                                  <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
+                                  <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/Math.max(reasonsTotal,1))*100)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </>
               );
             })()}
@@ -1208,31 +1265,40 @@ export default function Marketing() {
                     );
                   })()}
 
-                  {liveData.risCrm.closedReasons.length > 0 && (
-                    <div className="mt-5">
-                      <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Lead Reasons — RIS (YTD, {totalClosed} closed)</div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs">
-                          <thead><tr className="text-left text-gray-500 border-b">
-                            <th className="py-1.5 pr-2 font-bold w-6">#</th>
-                            <th className="py-1.5 pr-3 font-bold">Reason</th>
-                            <th className="py-1.5 px-2 font-bold text-right">Count</th>
-                            <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
-                          </tr></thead>
-                          <tbody>
-                            {liveData.risCrm.closedReasons.map((r, i) => (
-                              <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
-                                <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
-                                <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
-                                <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
-                                <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/totalClosed)*100)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                  {(() => {
+                    const reasons = isYtd
+                      ? liveData.risCrm.closedReasons
+                      : (liveData.risCrm.byMonth.find(m => m.month === selTab)?.closedReasons ?? []);
+                    const reasonsTotal = reasons.reduce((a,x) => a+x.count, 0);
+                    if (!reasons.length) return null;
+                    return (
+                      <div className="mt-5">
+                        <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">
+                          Closed Lead Reasons — RIS ({isYtd ? "YTD" : selTab}, {reasonsTotal} closed)
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead><tr className="text-left text-gray-500 border-b">
+                              <th className="py-1.5 pr-2 font-bold w-6">#</th>
+                              <th className="py-1.5 pr-3 font-bold">Reason</th>
+                              <th className="py-1.5 px-2 font-bold text-right">Count</th>
+                              <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
+                            </tr></thead>
+                            <tbody>
+                              {reasons.map((r, i) => (
+                                <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
+                                  <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
+                                  <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
+                                  <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
+                                  <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/Math.max(reasonsTotal,1))*100)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </>
               );
             })()}
