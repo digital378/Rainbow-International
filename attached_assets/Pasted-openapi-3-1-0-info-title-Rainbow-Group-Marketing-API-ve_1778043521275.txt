@@ -1,0 +1,133 @@
+openapi: 3.1.0
+info:
+  title: Rainbow Group Marketing API
+  version: 1.0.0
+  description: Live marketing data for Rainbow International School (RIS) and Rainbow Preschools (RPS).
+servers:
+  - url: https://rainbowinternationalschool.in
+paths:
+  /api/marketing/export:
+    get:
+      operationId: getMarketingData
+      summary: Full marketing dashboard data for RIS and RPS
+      description: Returns enquiries, events, callback requests, blog posts, admissions info, and SEO metadata.
+      responses:
+        "200":
+          description: Marketing data export
+
+  /api/search-console/queries:
+    get:
+      operationId: getSearchConsoleQueries
+      summary: Top search queries from Google Search Console
+      description: Returns the top 25 queries by clicks for the given site over the last 28 days.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: "ris = Rainbow International School, rps = Rainbow Preschools. Defaults to ris."
+      responses:
+        "200":
+          description: Search Console query data
+
+  /api/search-console/pages:
+    get:
+      operationId: getSearchConsolePages
+      summary: Top pages from Google Search Console
+      description: Returns the top 25 pages by clicks for the given site over the last 28 days.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: "ris = Rainbow International School, rps = Rainbow Preschools. Defaults to ris."
+      responses:
+        "200":
+          description: Search Console page data
+
+  /api/pagespeed:
+    get:
+      operationId: getPageSpeedData
+      summary: Google PageSpeed / Core Web Vitals for a URL
+      description: Returns mobile and desktop performance scores and Core Web Vitals.
+      parameters:
+        - name: url
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Full URL to test. Defaults to https://rainbowinternationalschool.in"
+      responses:
+        "200":
+          description: PageSpeed data
+
+  /api/google-ads/campaigns:
+    get:
+      operationId: getGoogleAdsCampaigns
+      summary: Google Ads campaign performance
+      description: Returns active campaigns with impressions, clicks, cost, and conversions for the last 30 days.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: "ris = RIS account, rps = RPS account. Defaults to ris."
+      responses:
+        "200":
+          description: Google Ads campaigns
+
+  /api/google-ads/keywords:
+    get:
+      operationId: getGoogleAdsKeywords
+      summary: Google Ads keyword performance
+      description: Returns top keywords with impressions, clicks, cost, and quality score for the last 30 days.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: "ris = RIS account, rps = RPS account. Defaults to ris."
+      responses:
+        "200":
+          description: Google Ads keywords
+
+  /api/meta-ads/campaigns:
+    get:
+      operationId: getMetaAdsCampaigns
+      summary: Meta (Facebook/Instagram) Ads campaign performance
+      description: Returns all campaigns with impressions, clicks, spend, reach, CTR, CPC, leads, and cost per lead for the last 30 days. Use account=ris or account=rps to filter by brand based on campaign name.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps, all]
+          description: "ris = Rainbow International School campaigns, rps = Rainbow Preschools campaigns, all = every campaign. Defaults to all."
+      responses:
+        "200":
+          description: Meta Ads campaign list
+
+  /api/meta-ads/insights:
+    get:
+      operationId: getMetaAdsInsights
+      summary: Meta (Facebook/Instagram) Ads account-level summary
+      description: Returns account-wide totals — impressions, clicks, spend, reach, frequency, CTR, CPC, leads, message conversations started, post engagement, and cost per lead for the last 30 days.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Optional. Currently returns combined account data regardless of value."
+      responses:
+        "200":
+          description: Meta Ads account summary

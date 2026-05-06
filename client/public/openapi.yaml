@@ -1,42 +1,35 @@
-openapi: "3.0.0"
+openapi: 3.1.0
 info:
   title: Rainbow Group Marketing API
-  description: >
-    Live marketing, CRM and operations data for Rainbow International School (RIS)
-    and Rainbow Preschools (RPS). Most endpoints require the ADMIN_TOKEN passed
-    as an API key in the X-Api-Key request header.
-  version: "1.0.0"
+  version: 1.0.0
+  description: Live marketing data for Rainbow International School (RIS) and Rainbow Preschools (RPS).
 servers:
   - url: https://rainbowinternationalschool.in
-    description: Rainbow Group Production API
-
-security:
-  - ApiKeyAuth: []
-
-components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: X-Api-Key
-
 paths:
+  /api/marketing/export:
+    get:
+      operationId: getMarketingData
+      summary: Full marketing dashboard data for RIS and RPS
+      description: Returns enquiries, events, callback requests, blog posts, admissions info, and SEO metadata.
+      responses:
+        "200":
+          description: Marketing data export
+
   /api/marketing/live:
     get:
       operationId: getMarketingLive
       summary: Live combined marketing metrics from Google Sheets
       description: >
         Returns live monthly totals (leads, bookings, walk-ins, admissions, ad spend)
-        for both RIS and RPS combined, sourced directly from the DM Overall master
-        Google Sheet. Also includes RPS branch-wise CRM, RIS education-level CRM,
-        closed-lead reasons for both, and May weekly breakdown. No authentication
-        required.
+        for both RIS and RPS combined. Also includes RPS branch-wise CRM, RIS
+        education-level CRM, closed-lead reasons, and May weekly breakdown.
+        No authentication required.
       security: []
       responses:
         "200":
           description: >
-            Aggregated live data including monthlyTotals, rpsCrm (byMonth, closedReasons),
-            risCrm (byMonth, closedReasons), mayWeeklyCombined, and currentDayOfMonth.
+            Aggregated live data — monthlyTotals, rpsCrm (byMonth, closedReasons),
+            risCrm (byMonth, closedReasons), mayWeeklyCombined, currentDayOfMonth.
 
   /api/sheets/crm:
     get:
@@ -52,115 +45,199 @@ paths:
           required: true
           schema:
             type: string
-            enum:
-              - ris
-              - rps
-          description: Which school CRM to query — ris for Rainbow International School, rps for Rainbow Preschools.
+            enum: [ris, rps]
+          description: Which school CRM — ris for Rainbow International School, rps for Rainbow Preschools.
         - name: month
           in: query
           required: false
           schema:
             type: string
-          description: >
-            Optional case-insensitive substring filter on the Month column, e.g. "may",
-            "apr", "jan-26". Omit to return all months.
+          description: Optional month filter e.g. "may", "apr", "jan-26". Omit for all months.
       responses:
         "200":
-          description: >
-            CRM summary with totalLeads, admissionsDone, closed, open, conversionRate,
-            and breakdowns by status, source, month, and lead owner.
+          description: CRM summary with totals and breakdowns by status, source, month, and owner.
         "401":
-          description: Missing or invalid X-Api-Key header.
-        "500":
-          description: Google Sheets fetch error.
+          description: Missing or invalid X-Api-Key.
 
   /api/sheets/master:
     get:
       operationId: getSheetsMaster
       summary: Weekly funnel breakdown from the DM master tracker
-      description: >
-        Returns a week-by-week lead, walk-in and admission breakdown for a given
-        school and month, read directly from the DM master Google Sheet tabs.
+      description: Returns week-by-week lead, walk-in and admission data from the DM master Google Sheet.
       parameters:
         - name: account
           in: query
           required: true
           schema:
             type: string
-            enum:
-              - ris
-              - rps
+            enum: [ris, rps]
           description: Which school tab to fetch.
         - name: month
           in: query
           required: false
           schema:
             type: string
-            enum:
-              - may
-              - april
-              - feb
+            enum: [may, april, feb]
           description: Month to retrieve. Defaults to may.
       responses:
         "200":
-          description: >
-            weeklyBreakdown array — each row has Date plus all columns from that
-            sheet tab (walk-ins, DM walk-ins, admissions, conversion rates, etc.).
+          description: Week-by-week leads, walk-ins, admissions, conversion rates.
         "401":
-          description: Missing or invalid X-Api-Key header.
-        "500":
-          description: Google Sheets fetch error.
+          description: Missing or invalid X-Api-Key.
 
   /api/sheets/targets:
     get:
       operationId: getSheetsTargets
       summary: Branch or grade actuals vs monthly targets
       description: >
-        RPS — returns per-branch actuals (leads, bookings, walk-ins, admissions,
-        conversion rates) alongside monthly targets from the Target Sheet.
-        RIS — returns per-grade actuals (Nursery through Class 12) from the
-        Target sheet tab.
+        RPS — per-branch actuals (leads, bookings, walk-ins, admissions) alongside monthly targets.
+        RIS — per-grade actuals (Nursery through Class 12).
       parameters:
         - name: account
           in: query
           required: true
           schema:
             type: string
-            enum:
-              - ris
-              - rps
+            enum: [ris, rps]
           description: Which school target sheet to fetch.
       responses:
         "200":
-          description: >
-            RPS: branches array with actuals and targets.
-            RIS: grades array with actuals only.
+          description: Per-branch actuals vs targets (RPS) or per-grade actuals (RIS).
         "401":
-          description: Missing or invalid X-Api-Key header.
-        "500":
-          description: Google Sheets fetch error.
+          description: Missing or invalid X-Api-Key.
 
   /api/sheets/tasks:
     get:
       operationId: getSheetsTasks
       summary: DM team key task tracker
-      description: >
-        Returns tasks from the Key Task sheet with assigned date, end date,
-        task name, owner, status, and remarks. Optionally filter by status.
+      description: Returns tasks from the Key Task sheet with assignee, due date, status and remarks.
       parameters:
         - name: status
           in: query
           required: false
           schema:
             type: string
-          description: >
-            Optional case-insensitive substring filter on status, e.g. "pending",
-            "completed". Omit to return all tasks.
+          description: Filter by status e.g. "pending", "completed". Omit for all tasks.
       responses:
         "200":
-          description: >
-            tasks array plus summary counts (total, completed, pending).
+          description: Task list with summary counts (total, completed, pending).
         "401":
-          description: Missing or invalid X-Api-Key header.
-        "500":
-          description: Google Sheets fetch error.
+          description: Missing or invalid X-Api-Key.
+
+  /api/search-console/queries:
+    get:
+      operationId: getSearchConsoleQueries
+      summary: Top search queries from Google Search Console
+      description: Returns the top 25 queries by clicks for the given site over the last 28 days.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Which school's Search Console property.
+      responses:
+        "200":
+          description: Top queries with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+
+  /api/search-console/pages:
+    get:
+      operationId: getSearchConsolePages
+      summary: Top pages from Google Search Console
+      description: Returns the top performing pages for the given site over the last 28 days.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ris, rps]
+      responses:
+        "200":
+          description: Top pages with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+
+  /api/pagespeed:
+    get:
+      operationId: getPageSpeedData
+      summary: PageSpeed Insights for a given URL
+      description: Returns Core Web Vitals and performance scores for a URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Full URL to test e.g. https://rainbowinternationalschool.in
+        - name: strategy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [mobile, desktop]
+          description: Device strategy. Defaults to mobile.
+      responses:
+        "200":
+          description: Performance score, LCP, FID, CLS, and other Core Web Vitals.
+        "401":
+          description: Missing or invalid X-Api-Key.
+
+  /api/google-ads/campaigns:
+    get:
+      operationId: getGoogleAdsCampaigns
+      summary: Google Ads campaign performance
+      description: Returns spend, impressions, clicks, and conversions for all active campaigns.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Filter by school. Omit for all accounts.
+      responses:
+        "200":
+          description: Campaign list with spend, impressions, clicks, conversions.
+        "401":
+          description: Missing or invalid X-Api-Key.
+
+  /api/google-ads/keywords:
+    get:
+      operationId: getGoogleAdsKeywords
+      summary: Google Ads keyword performance
+      description: Returns top keywords by spend with clicks, impressions, and conversion data.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+      responses:
+        "200":
+          description: Keyword performance data.
+        "401":
+          description: Missing or invalid X-Api-Key.
+
+  /api/meta-ads/campaigns:
+    get:
+      operationId: getMetaAdsCampaigns
+      summary: Meta (Facebook/Instagram) Ads campaign performance
+      description: Returns spend, reach, impressions, clicks, and leads for all active Meta campaigns.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Filter by school. Omit for all accounts.
+      responses:
+        "200":
+          description: Meta campaign performance data.
+        "401":
+          description: Missing or invalid X-Api-Key.
