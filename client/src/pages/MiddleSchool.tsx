@@ -5,6 +5,19 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { BookOpen, FlaskConical, Globe, Trophy } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const MIDDLE_QUICK_ANSWER =
+  "The Middle School at Rainbow International School Thane covers CBSE Class 6 to Class 10, building on Primary with a stronger focus on conceptual depth across English, Hindi, Marathi, Mathematics, Science, Social Science and Computer Science, plus structured CBSE board preparation in Class 9 and 10. Admissions for the 2026-27 academic year are open at the Brahmand campus, subject to seat availability.";
+
+const MIDDLE_FAQS: WaveOneFaq[] = [
+  { q: "Which classes are covered in the Middle / Secondary section?", a: "The Middle and Secondary section at RIS Thane covers CBSE Class 6 through Class 10, leading up to the CBSE Class 10 board examination." },
+  { q: "What subjects are taught from Class 6 to Class 10?", a: "Students study English, Hindi, Marathi, Mathematics, Science (Physics, Chemistry, Biology), Social Science (History, Geography, Civics, Economics) and Computer Science, alongside Art, Music, Physical Education and Value Education as part of the CBSE curriculum." },
+  { q: "How does RIS prepare students for the CBSE Class 10 board exam?", a: "From Class 9 onwards, students follow a structured CBSE board-preparation track with regular periodic tests, pre-boards, doubt-clearing sessions and subject-wise revision plans aligned to the official CBSE syllabus and sample papers." },
+  { q: "Is there a third-language option in middle school?", a: "Yes. Students continue with English as the first language and choose between Hindi and Marathi as the second / third language, in line with CBSE and Maharashtra state guidelines." },
+  { q: "Are sports, clubs and co-curricular activities part of the middle school programme?", a: "Yes. Middle school students participate in inter-house sports, music, art, dance, public speaking, science exhibitions, Olympiads and a range of clubs that run on dedicated activity slots within the regular timetable." },
+  { q: "How can I apply for Class 6–10 admission for 2026-27?", a: "Mid-section admissions for Class 6 to Class 10 are open subject to seat availability. Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the document checklist." },
+];
 
 // ── Sidebar curriculum ────────────────────────────────────────────
 const curriculum = [
@@ -136,13 +149,18 @@ export default function MiddleSchool() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "EducationalOccupationalProgram",
-          "name": "Middle School Section (Class 6–10)",
-          "description": "CBSE middle school for Class 6 to 10 in Thane, building creativity, intellectual curiosity, and conceptual depth through project-based and collaborative learning.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-          "educationalProgramMode": "full-time",
-          "programPrerequisites": "Completion of Class 5",
-          "url": "https://rainbowinternationalschool.in/middle-school-section"
+          "@graph": [
+            {
+              "@type": "EducationalOccupationalProgram",
+              "name": "Middle School Section (Class 6–10)",
+              "description": "CBSE middle school for Class 6 to 10 in Thane, building creativity, intellectual curiosity, and conceptual depth through project-based and collaborative learning.",
+              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "educationalProgramMode": "full-time",
+              "programPrerequisites": "Completion of Class 5",
+              "url": "https://rainbowinternationalschool.in/middle-school-section"
+            },
+            buildFaqPageSchema(MIDDLE_FAQS)
+          ]
         }}
       />
       <Navbar />
@@ -351,6 +369,7 @@ export default function MiddleSchool() {
         </div>
 
         <ContactForm />
+        <WaveOneSeoBlock pageId="middle-school" quickAnswer={MIDDLE_QUICK_ANSWER} faqs={MIDDLE_FAQS} />
       </main>
       <Footer />
     </div>

@@ -5,6 +5,19 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { ExternalLink } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const PRE_PRIMARY_QUICK_ANSWER =
+  "The Pre-Primary section at Rainbow International School Thane covers Nursery, Junior KG and Senior KG (ages 2.5–5.5) using activity- and play-based learning aligned to the CBSE foundational stage and Multiple Intelligence pedagogy. Admissions for Nursery, Jr KG and Sr KG for the 2026-27 academic year are open at the Brahmand campus.";
+
+const PRE_PRIMARY_FAQS: WaveOneFaq[] = [
+  { q: "What is the age criteria for Nursery, Jr KG and Sr KG admissions?", a: "Indicative age (as on 30 June of the admission year): Nursery 2.5–3.5 years, Junior KG 3.5–4.5 years, Senior KG 4.5–5.5 years. Final age cut-offs are confirmed at the time of admission as per CBSE / state norms." },
+  { q: "Is the Pre-Primary curriculum CBSE-aligned?", a: "Yes. The Pre-Primary programme follows the CBSE foundational stage framework and uses activity-based, play-based learning rooted in the Multiple Intelligence approach." },
+  { q: "How long is the Pre-Primary school day?", a: "The Pre-Primary day is a structured half-to-full-day session with a balance of circle time, structured activities, free play, snack and rest, designed to keep young learners engaged without fatigue. Exact timings are shared at the time of admission." },
+  { q: "What is the typical class size in Pre-Primary?", a: "Pre-Primary classes are kept small with a dedicated class teacher and a trained helper to ensure individual attention, safety and personalised support for every child." },
+  { q: "How does RIS Thane keep young children safe on campus?", a: "The 3.5-acre Brahmand campus is fully enclosed with CCTV-monitored entry and exit, a female-staff-led Pre-Primary wing, an on-campus infirmary, paediatrician on call and structured pick-up / drop-off protocols." },
+  { q: "How can I apply for Pre-Primary admission for 2026-27?", a: "Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the admission form, fee details and document checklist." },
+];
 
 const curriculum = [
   {
@@ -134,14 +147,19 @@ export default function PrePrimary() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "EducationalOccupationalProgram",
-          "name": "Pre-Primary Programme (Nursery to Sr KG)",
-          "description": "Activity-based, game-based early learning programme for children aged 2.5–5.5 years, following the CBSE framework and Multiple Intelligence pedagogy.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-          "educationalProgramMode": "full-time",
-          "programPrerequisites": "Age 2.5 years and above",
-          "occupationalCategory": "Pre-Primary Education",
-          "url": "https://rainbowinternationalschool.in/pre-primary-school-thane"
+          "@graph": [
+            {
+              "@type": "EducationalOccupationalProgram",
+              "name": "Pre-Primary Programme (Nursery to Sr KG)",
+              "description": "Activity-based, game-based early learning programme for children aged 2.5–5.5 years, following the CBSE framework and Multiple Intelligence pedagogy.",
+              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "educationalProgramMode": "full-time",
+              "programPrerequisites": "Age 2.5 years and above",
+              "occupationalCategory": "Pre-Primary Education",
+              "url": "https://rainbowinternationalschool.in/pre-primary-school-thane"
+            },
+            buildFaqPageSchema(PRE_PRIMARY_FAQS)
+          ]
         }}
       />
       <Navbar />
@@ -509,6 +527,7 @@ export default function PrePrimary() {
 
         {/* ── Contact Form ──────────────────────────────────────── */}
         <ContactForm />
+        <WaveOneSeoBlock pageId="pre-primary" quickAnswer={PRE_PRIMARY_QUICK_ANSWER} faqs={PRE_PRIMARY_FAQS} />
       </main>
       <Footer />
     </div>

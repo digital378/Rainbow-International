@@ -5,6 +5,19 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { BookOpen, FlaskConical, Globe, Trophy } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const SECONDARY_QUICK_ANSWER =
+  "The Secondary section at Rainbow International School Thane covers CBSE Class 9 and Class 10 with a structured board-preparation programme — periodic tests, pre-boards, subject-wise revision plans and doubt-clearing sessions across Science, Mathematics, English, Hindi / Marathi, Social Science and Computer Science. Class 9 admissions for the 2026-27 academic year are open subject to seat availability at the Brahmand campus.";
+
+const SECONDARY_FAQS: WaveOneFaq[] = [
+  { q: "Which board does the Secondary section follow?", a: "The Secondary section follows the CBSE curriculum and prepares students for the CBSE All India Secondary School Examination (Class 10 board exam). RIS Thane is a CBSE-affiliated school (Affiliation No. 1130661)." },
+  { q: "What subjects are offered in Class 9 and Class 10?", a: "Class 9 and 10 students study English, Hindi or Marathi, Mathematics, Science (Physics, Chemistry, Biology), Social Science (History, Geography, Civics, Economics) and Computer Application as per the CBSE Class 10 syllabus, alongside Art, Music, Physical Education and Value Education." },
+  { q: "How does RIS prepare students for the Class 10 CBSE board exam?", a: "Students follow a structured board-preparation track with regular periodic tests, pre-board examinations, subject-wise revision plans aligned to CBSE sample papers, doubt-clearing sessions and individual academic mentoring through the year." },
+  { q: "Is career counselling provided in the Secondary section?", a: "Yes. Class 9 and 10 students receive structured career counselling and stream-selection guidance for Science, Commerce and Humanities so they can choose their Senior Secondary stream confidently." },
+  { q: "Are sports and co-curricular activities continued in Class 9 and 10?", a: "Yes. Inter-house sports, science exhibitions, Olympiads, public speaking, music, art and clubs continue in the Secondary timetable to support all-round development alongside academics." },
+  { q: "How can I apply for Class 9 admission for 2026-27?", a: "Class 9 admissions for 2026-27 are open subject to seat availability. Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the document checklist." },
+];
 
 // ── Sidebar curriculum ────────────────────────────────────────────
 const curriculum = [
@@ -111,13 +124,18 @@ export default function Secondary() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "EducationalOccupationalProgram",
-          "name": "Secondary Section (Class 9–10)",
-          "description": "CBSE-affiliated secondary education for Class 9 and 10 in Thane, focused on board preparation, career guidance, and all-round development. CBSE Affiliation No. 1130661.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-          "educationalProgramMode": "full-time",
-          "programPrerequisites": "Completion of Class 8",
-          "url": "https://rainbowinternationalschool.in/secondary-section"
+          "@graph": [
+            {
+              "@type": "EducationalOccupationalProgram",
+              "name": "Secondary Section (Class 9–10)",
+              "description": "CBSE-affiliated secondary education for Class 9 and 10 in Thane, focused on board preparation, career guidance, and all-round development. CBSE Affiliation No. 1130661.",
+              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "educationalProgramMode": "full-time",
+              "programPrerequisites": "Completion of Class 8",
+              "url": "https://rainbowinternationalschool.in/secondary-section"
+            },
+            buildFaqPageSchema(SECONDARY_FAQS)
+          ]
         }}
       />
       <Navbar />
@@ -309,6 +327,7 @@ export default function Secondary() {
         </div>
 
         <ContactForm />
+        <WaveOneSeoBlock pageId="secondary" quickAnswer={SECONDARY_QUICK_ANSWER} faqs={SECONDARY_FAQS} />
       </main>
       <Footer />
     </div>
