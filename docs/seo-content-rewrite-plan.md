@@ -126,130 +126,114 @@
 | `/google-school-2025-26` | Google for Education school Thane | Google Classroom school Thane, Google Workspace CBSE school, certified Google school India | Campaign page (Decision 5 KEEP-PENDING) |
 | `/meta-school-2025-26` | Meta for Education school Thane | digital citizenship school Thane, Meta partner school India, online safety CBSE school | Campaign page (Decision 5 KEEP-PENDING) |
 
-  ### 1B — Tier 1 blog posts (10)
+  ### 1B — Blog posts (all 94, source-of-truth) — primary keyword per slug
 
-  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
-  |---|---|---|---|
-  | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | CBSE vs ICSE | CBSE vs ICSE difference, board comparison India, choose CBSE or ICSE | KEEP — pillar (Decision 7) |
-| `ideal-teacher-qualities-traits-of-a-great-educator` | qualities of an ideal teacher | good teacher traits, characteristics great educator, what makes a good teacher | IMPROVE |
-| `key-facilities-every-good-cbse-school-should-have` | facilities CBSE school must have | CBSE school infrastructure, school amenities checklist, what to look for in CBSE school | IMPROVE |
-| `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | cultural activities for students critical thinking | school cultural programmes, creative thinking activities students, cultural exposure benefits | IMPROVE |
-| `importance-of-sports-in-students-life-teamwork-skills` | importance of sports in student life | why sports matter in school, benefits of sports for students, school sports teamwork | KEEP pillar (3 × 301 sources merged) |
-| `why-rainbow-international-school-is-among-the-top-schools-in-thane` | top schools in Thane Rainbow International | RIS top school Thane, why choose RIS Thane, best CBSE school review Thane | KEEP brand pillar (3 × 301) |
-| `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | how to choose best CBSE school Thane | parent guide CBSE Thane, school selection Thane, CBSE school checklist Thane | KEEP Thane pillar |
-| `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | popularity of CBSE schools in Thane West | why parents choose CBSE Thane West, Thane West school trends, CBSE growth Thane | IMPROVE |
-| `school-admission-checklist-thane-parents-guide-2026` | school admission checklist Thane 2026-27 | admission documents Thane, CBSE admission steps Thane, parent admission guide 2026 | IMPROVE |
-| `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | effects of mobile phones on children | screen time for kids, child mobile phone risks, manage screen time children | KEEP pillar (3 × 301) |
+  > **Source of truth:** `docs/blog-slug-canonical-list.md` (extracted directly from `client/src/data/blogPosts.ts` — 94 slugs verified). Every slug appears in exactly one row. Every active post (KEEP/IMPROVE/MERGE-target) has exactly one unique primary keyword. Posts being 301'd, MERGE-sourced, or 410'd carry a "—" placeholder marked with the destination intent.
 
-  ### 1C — Tier 2 blog posts (25)
+  | ID | Slug | Tier | Disposition | Primary keyword |
+  |---|---|---|---|---|
+  | T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | T1 | KEEP | CBSE vs ICSE board comparison |
+| T1.2 | `ideal-teacher-qualities-traits-of-a-great-educator` | T1 | KEEP | qualities of a good teacher |
+| T1.3 | `key-facilities-every-good-cbse-school-should-have` | T1 | KEEP | CBSE school facilities checklist |
+| T1.4 | `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | T1 | KEEP | cultural activities for students |
+| T1.5 | `importance-of-sports-in-students-life-teamwork-skills` | T1 | KEEP | importance of sports for students |
+| T1.6 | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | T1 | KEEP | top schools in Thane (RIS pillar) |
+| T1.7 | `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | T1 | KEEP | how to choose a CBSE school in Thane |
+| T1.8 | `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | T1 | IMPROVE | CBSE schools in Thane West |
+| T1.9 | `school-admission-checklist-thane-parents-guide-2026` | T1 | IMPROVE | school admission checklist Thane 2026 |
+| T1.10 | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | T1 | IMPROVE | effects of mobile phones on children (pillar) |
+| T2.1 | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | T2 | IMPROVE | CBSE vs ICSE vs state board |
+| T2.2 | `co-curricular-activities` | T2 | IMPROVE | co-curricular activities for students |
+| T2.3 | `problem-solving-activities-life-skills-students` | T2 | IMPROVE | problem-solving activities for students |
+| T2.4 | `role-of-parents-in-education-orientation-importance` | T2 | IMPROVE | role of parents in education |
+| T2.5 | `importance-of-foundational-literacy-and-numeracy-in-schools` | T2 | IMPROVE | foundational literacy and numeracy |
+| T2.6 | `how-to-help-your-child-focus-better-in-studies` | T2 | IMPROVE | how to help your child focus on studies |
+| T2.7 | `importance-of-extracurricular-activities-in-school` | T2 | IMPROVE | importance of extracurricular activities |
+| T2.8 | `new-education-policy-nep-2020-what-parents-should-know` | T2 | IMPROVE | NEP 2020 for parents |
+| T2.9 | `how-to-prepare-your-child-for-first-day-of-school` | T2 | IMPROVE | preparing your child for first day of school |
+| T2.10 | `benefits-of-multiple-intelligence-based-learning-in-schools` | T2 | IMPROVE | multiple intelligence learning |
+| T2.11 | `best-cbse-schools-in-thane-what-to-look-for` | T2 | IMPROVE | best CBSE schools in Thane (what to look for) |
+| T2.12 | `6-reasons-why-cbse-is-the-best-board-of-the-country` | T2 | IMPROVE | why CBSE is the best board |
+| T2.13 | `why-choose-a-cbse-school-for-your-childs-education` | T2 | IMPROVE | why choose a CBSE school |
+| T2.14 | `international-school-admission-process-guide` | T2 | IMPROVE | international school admission process |
+| T2.15 | `age-criteria-for-international-schools-admission-2025-in-mumbai` | T2 | IMPROVE | age criteria international schools Mumbai |
+| T2.16 | `what-you-need-to-know-before-applying-to-an-international-school` | T2 | IMPROVE | before applying to an international school |
+| T2.17 | `advantages-of-starting-early-international-school` | T2 | IMPROVE | starting early in an international school |
+| T2.18 | `stress-in-teenagers-symptoms-management` | T2 | IMPROVE | stress in teenagers |
+| T2.19 | `riddles-for-kids` | T2 | IMPROVE | riddles for kids |
+| T2.20 | `how-to-increase-attention-span` | T2 | IMPROVE | how to increase attention span in students |
+| T2.21 | `benefits-of-learning-a-second-language` | T2 | IMPROVE | benefits of learning a second language |
+| T2.22 | `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | T2 | IMPROVE | entrepreneurship in CBSE schools |
+| T2.23 | `smart-revision-techniques-for-students` | T2 | IMPROVE | smart revision techniques for students |
+| T2.24 | `innovative-teaching-method-for-active-learning` | T2 | IMPROVE | innovative teaching methods |
+| T2.25 | `how-to-learn-boring-subjects` | T2 | IMPROVE | how to learn boring subjects |
+| T3.1 | `the-benefits-of-early-learning-in-shaping-a-childs-personality` | T3 | IMPROVE | early learning and child personality |
+| T3.2 | `why-maths-matters-in-student-life-benefits-uses` | T3 | IMPROVE | why maths matters in student life |
+| T3.3 | `10-fun-and-educational-republic-day-activities-for-kids` | T3 | IMPROVE | Republic Day activities for kids |
+| T3.4 | `christmas-celebration-in-school-10-fun-and-festive-activity-ideas` | T3 | IMPROVE | Christmas activities in school |
+| T3.5 | `benefits-of-meditation-for-students` | T3 | IMPROVE | benefits of meditation for students |
+| T3.6 | `diwali-activities-for-students` | T3 | IMPROVE | Diwali activities for students |
+| T3.7 | `10-things-in-the-classroom-to-boost-student-engagement` | T3 | IMPROVE | classroom student engagement ideas |
+| T3.8 | `group-activities-for-students` | T3 | IMPROVE | group activities for students |
+| T3.9 | `how-to-avoid-procrastination-while-studying` | T3 | IMPROVE | how to avoid procrastination while studying |
+| T3.10 | `teen-entrepreneurship-fostering-innovation-and-responsibility` | T3 | IMPROVE | teen entrepreneurship |
+| T3.11 | `teaching-teens-resilience-and-thriving-through-failure` | T3 | IMPROVE | teaching teens resilience |
+| T3.12 | `nutritional-requirements-of-the-teenagers-how-to-fulfil-them` | T3 | IMPROVE | nutrition for teenagers |
+| T3.13 | `top-5-techniques-for-taming-anger-in-children` | T3 | IMPROVE | taming anger in children |
+| T3.14 | `top-6-easy-ways-to-develop-patience-in-your-child` | T3 | IMPROVE | developing patience in children |
+| T3.15 | `homework-war-endgame` | T3 | IMPROVE | homework battles with kids |
+| T3.16 | `how-to-deal-with-anxiety-during-exams` | T3 | IMPROVE | dealing with exam anxiety |
+| T3.17 | `understanding-adolescence-how-to-handle-the-process` | T3 | IMPROVE | understanding adolescence |
+| T3.18 | `how-to-develop-fine-motor-skills-at-home` | T3 | IMPROVE | fine motor skills at home |
+| T3.19 | `the-leading-school-of-the-year-thane` | T3 | KEEP | RIS — Leading School of the Year (historical) |
+| T3.20 | `teen-depression-how-to-spot-and-cure-it` | T3 | IMPROVE | teen depression — spot and help |
+| T3.21 | `7-areas-in-education-where-indian-women-are-excellent` | T3 | IMPROVE | Indian women in education |
+| T3.22 | `4-reasons-why-school-bags-should-not-be-a-burden` | T3 | IMPROVE | school bag weight issue |
+| T3.23 | `school-sanitation-standards-how-to-stay-clean-and-safe` | T3 | IMPROVE | school sanitation standards |
+| T3.24 | `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | T3 | IMPROVE | innovative school cultural programmes |
+| T3.25 | `teaching-children-the-value-of-money-5-ways-schools-can-help` | T3 | IMPROVE | teaching children the value of money |
+| T3.26 | `amazing-coaches-who-improved-players-willpower` | T3 | IMPROVE | famous coaches and player willpower |
+| T3.27 | `how-organic-farming-in-schools-helps-the-nation` | T3 | IMPROVE | organic farming in schools |
+| T3.28 | `how-school-buses-are-changing-with-technology` | T3 | IMPROVE | school bus technology |
+| T3.29 | `amazing-youtube-channels-on-general-knowledge-for-kids` | T3 | IMPROVE | YouTube channels for kids general knowledge |
+| T3.30 | `know-how-swimming-helps-your-child-in-7-ways` | T3 | IMPROVE | benefits of swimming for children |
+| T3.31 | `big-school-playgrounds-6-reasons-why-kids-need-them` | T3 | IMPROVE | why kids need big school playgrounds |
+| T3.32 | `6-reasons-why-indoor-sports-is-important-in-schools` | T3 | IMPROVE | indoor sports in schools |
+| T3.33 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | T3 | KEEP | RIS student Raghvi Ramanujan swimming (historical) |
+| T3.34 | `100-result-rainbows-first-batch-2018-19` | T3 | KEEP | RIS 100% Class 10 result 2018-19 (historical) |
+| T3.35 | `field-trips-know-how-they-groom-students-in-5-ways` | T3 | IMPROVE | how field trips groom students |
+| T3.36 | `time-management-for-school-children-6-ways-parents-can-help` | T3 | IMPROVE | time management for school children |
+| T3.37 | `how-to-teach-benefits-of-family-meals-to-kids` | T3 | IMPROVE | family meals benefits for kids |
+| T3.38 | `do-your-children-hate-reading-know-why-youre-the-reason` | T3 | IMPROVE | why children hate reading |
+| T3.39 | `how-regular-sports-help-students-6-reasons` | T3 | IMPROVE | regular sports for students |
+| T3.40 | `digital-classrooms-how-technology-improves-education-in-school` | T3 | IMPROVE | digital classrooms in schools |
+| T3.41 | `9-reasons-why-schools-should-have-an-infirmary-and-paediatrician` | T3 | IMPROVE | school infirmary and paediatrician |
+| T3.42 | `7-safety-and-security-measures-your-kids-school-should-have` | T3 | IMPROVE | school safety and security measures |
+| T4.1 | `best-age-for-international-school-admission` | T4 | MERGE | — (MERGE into age criteria post) |
+| T4.2 | `5-tips-to-choose-best-cbse-schools-in-mumbai` | T4 | MERGE | — (MERGE into why-choose-cbse-school) |
+| T4.3 | `benefits-of-rainbow-international-school` | T4 | 301 | — (301 to RIS pillar) |
+| T4.4 | `back-to-school-a-step-by-step-guide-to-international-school-admissions` | T4 | MERGE | — (MERGE into admission process guide) |
+| T4.5 | `holistic-development-rainbow-international-school` | T4 | 301 | — (301 to RIS pillar) |
+| T4.6 | `top-reasons-choose-rainbow-international-school-thane` | T4 | 301 | — (301 to RIS pillar) |
+| T4.7 | `imporatnce-of-sports-in-students-life` | T4 | 301 | — (301, typo redirect) |
+| T4.8 | `using-gadgets-the-right-way` | T4 | 301 | — (301 to screen-time pillar) |
+| T4.9 | `regulating-childrens-screen-time` | T4 | 301 | — (301 to screen-time pillar) |
+| T4.10 | `give-earth-to-life-on-earth` | T4 | 410 | — (410) |
+| T4.11 | `coronavirus-the-new-monster-in-town` | T4 | 410 | — (410) |
+| T4.12 | `fit-india-certificate-of-recognition` | T4 | 410 | — (410) |
+| T4.13 | `the-15th-world-education-summit` | T4 | 410 | — (410) |
+| T4.14 | `smartphone-addiction-how-to-ensure-healthy-use-by-kids` | T4 | 301 | — (301 to screen-time pillar) |
+| T4.15 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | T4 | 410 | — (410) |
+| T4.16 | `rainbow-preschools-featured-in-knowledge-review-magazine` | T4 | 410 | — (410) |
+| T4.17 | `rainbow-wins-award-for-excellence` | T4 | 410 | — (410) |
 
-  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
-  |---|---|---|---|
-  | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | CBSE vs ICSE vs State Board | three-way board comparison, best school board India, board differences explained | IMPROVE (Decision 7) |
-| `co-curricular-activities` | co-curricular activities for students | school co-curriculars, holistic student development, co-curricular benefits | IMPROVE |
-| `problem-solving-activities-life-skills-students` | problem-solving activities life skills students | critical thinking activities, school life skills, age-wise problem solving | IMPROVE |
-| `role-of-parents-in-education-orientation-importance` | role of parents in education | parent involvement school, school orientation programmes, parent teacher partnership | IMPROVE |
-| `importance-of-foundational-literacy-and-numeracy-in-schools` | foundational literacy and numeracy schools | NEP 2020 foundational stage, FLN India, early reading writing numeracy | IMPROVE |
-| `how-to-help-your-child-focus-better-in-studies` | how to help your child focus in studies | child concentration tips, study focus strategies, kids attention study | IMPROVE |
-| `importance-of-extracurricular-activities-in-school` | importance of extracurricular activities school | extracurriculars vs academics, school activities benefits, holistic development | IMPROVE |
-| `new-education-policy-nep-2020-what-parents-should-know` | NEP 2020 for parents | 5+3+3+4 education structure, NEP changes parents, NEP 2020 explained | IMPROVE |
-| `how-to-prepare-your-child-for-first-day-of-school` | how to prepare child for first day of school | first day of school tips, school readiness, separation anxiety school | IMPROVE |
-| `benefits-of-multiple-intelligence-based-learning-in-schools` | multiple intelligence learning schools | Howard Gardner schools, multiple intelligence theory, MI-based teaching | IMPROVE |
-| `best-cbse-schools-in-thane-what-to-look-for` | CBSE schools Thane verification checklist | how to verify CBSE school, CBSE affiliation check Thane, school verification India | IMPROVE (Decision 12) |
-| `6-reasons-why-cbse-is-the-best-board-of-the-country` | why CBSE is the best board India | benefits of CBSE board, CBSE advantages India, CBSE versus other boards | KEEP (Decision 12) |
-| `why-choose-a-cbse-school-for-your-childs-education` | why choose CBSE school | CBSE school benefits, why parents pick CBSE, CBSE school advantages | KEEP — receives MERGE |
-| `international-school-admission-process-guide` | international school admission process India | how to apply international school India, international school steps, eligibility international school | KEEP pillar — receives MERGE |
-| `age-criteria-for-international-schools-admission-2025-in-mumbai` | school admission age in Mumbai | Mumbai school admission cut-off, RTE age Mumbai, Nursery age Mumbai | IMPROVE — receives MERGE (Decision 10) |
-| `what-you-need-to-know-before-applying-to-an-international-school` | international school admission checklist | documents international school admission, international school visit checklist, parent guide international | IMPROVE (Decision 10) |
-| `advantages-of-starting-early-international-school` | benefits of early school admission | early school start benefits, why start school early, advantages early enrolment | IMPROVE (Decision 10) |
-| `stress-in-teenagers-symptoms-management` | stress in teenagers symptoms management | teen stress signs, helping stressed teen, teen anxiety parents | IMPROVE |
-| `riddles-for-kids` | riddles for kids | fun riddles children, age-wise riddles, brain-teasers for kids | IMPROVE |
-| `how-to-increase-attention-span` | how to increase attention span students | student focus tips, attention span exercises, concentration improvement | IMPROVE |
-| `benefits-of-learning-a-second-language` | benefits of learning a second language | second language for students, bilingual education benefits, foreign language schools | IMPROVE |
-| `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | CBSE schools foster entrepreneurship | Atal Tinkering Lab CBSE, school innovation programmes, student entrepreneurship India | IMPROVE |
-| `smart-revision-techniques-for-students` | smart revision techniques students | spaced repetition students, active recall study, exam revision tips | IMPROVE |
-| `innovative-teaching-method-for-active-learning` | innovative teaching methods active learning | flipped classroom India, project-based learning schools, gamification education | IMPROVE |
-| `how-to-learn-boring-subjects` | how to learn boring subjects | study tips difficult subjects, motivation study, make studies interesting | IMPROVE |
+  **Disposition totals:** KEEP = 10 · IMPROVE = 67 · MERGE = 3 · 301 = 7 · 410 = 7 · **Total = 94** ✓
 
-  ### 1D — Tier 3 blog posts (45)
+  **Tier totals:** T1 = 10 · T2 = 25 · T3 = 42 · T4 = 17 · **Total = 94** ✓
 
-  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
-  |---|---|---|---|
-  | `how-to-avoid-procrastination-while-studying` | how to avoid procrastination studying | study procrastination tips, time-blocking students, beat study procrastination | IMPROVE |
-| `teen-entrepreneurship-fostering-innovation-and-responsibility` | teen entrepreneurship | young entrepreneurs India, teen business skills, foster innovation teens | IMPROVE |
-| `teaching-teens-resilience-and-thriving-through-failure` | teaching teens resilience | teen failure recovery, build resilience adolescents, coping skills teens | IMPROVE |
-| `nutritional-requirements-of-the-teenagers-how-to-fulfil-them` | nutritional requirements of teenagers | teen diet plan, teenage nutrition India, healthy meals teenagers | IMPROVE |
-| `top-5-techniques-for-taming-anger-in-children` | techniques to tame anger in children | child anger management, calm down kids, manage child temper | IMPROVE |
-| `top-6-easy-ways-to-develop-patience-in-your-child` | develop patience in your child | teach patience kids, child patience activities, build child patience | IMPROVE |
-| `homework-war-endgame` | end the homework battle | homework struggle kids, child homework tips, parent homework battle | IMPROVE |
-| `amazing-coaches-who-improved-players-willpower` | why schools need specialist sports coaches | school sports coaching, professional coaches schools, sports willpower students | IMPROVE |
-| `how-organic-farming-in-schools-helps-the-nation` | organic farming in schools | school farming projects, sustainability education, school agriculture India | IMPROVE |
-| `how-school-buses-are-changing-with-technology` | school buses technology safety | GPS school bus, smart school transport, school bus tracking app | IMPROVE |
-| `amazing-youtube-channels-on-general-knowledge-for-kids` | YouTube channels general knowledge for kids | best educational YouTube channels, GK channels children, kid-safe learning videos | IMPROVE |
-| `know-how-swimming-helps-your-child-in-7-ways` | how swimming helps your child | benefits of swimming for kids, swimming for child development, school swimming benefits | IMPROVE |
-| `big-school-playgrounds-6-reasons-why-kids-need-them` | school playgrounds kids need | why kids need playgrounds, playground importance schools, school outdoor space | IMPROVE |
-| `6-reasons-why-indoor-sports-is-important-in-schools` | indoor sports importance schools | school indoor games, indoor sports benefits students, year-round school sports | IMPROVE |
-| `field-trips-know-how-they-groom-students-in-5-ways` | how field trips groom students | school field trip benefits, educational tours students, experiential learning trips | IMPROVE |
-| `time-management-for-school-children-6-ways-parents-can-help` | time management for school children | kids time management tips, parent help time management, child schedule planning | IMPROVE |
-| `how-to-teach-benefits-of-family-meals-to-kids` | benefits of family meals for kids | family dinner benefits, eat together family, child manners family meals | IMPROVE |
-| `do-your-children-hate-reading-know-why-youre-the-reason` | why children hate reading | kids dont like reading, get child to read, child reading habits parents | IMPROVE |
-| `how-regular-sports-help-students-6-reasons` | how regular sports help students | sports benefits school children, student sports participation, regular play students | IMPROVE |
-| `digital-classrooms-how-technology-improves-education-in-school` | digital classrooms education | smart classroom benefits, ed-tech school, technology-enabled learning | IMPROVE |
-| `9-reasons-why-schools-should-have-an-infirmary-and-paediatrician` | schools need infirmary and paediatrician | school health services, school nurse paediatrician, school medical room | IMPROVE |
-| `7-safety-and-security-measures-your-kids-school-should-have` | school safety security measures | school CCTV safety, school visitor policy, school safety checklist parents | IMPROVE |
-| `10-fun-and-educational-republic-day-activities-for-kids` | Republic Day activities for kids | Republic Day school celebration, January 26 school activities, patriotic kids activities | IMPROVE |
-| `christmas-celebration-in-school-10-fun-and-festive-activity-ideas` | Christmas celebration in school | Christmas school activities, school Christmas ideas, festive school programmes | IMPROVE |
-| `diwali-activities-for-students` | Diwali activities for students | Diwali school celebration, eco-friendly Diwali school, student Diwali ideas | IMPROVE |
-| `benefits-of-meditation-for-students` | benefits of meditation for students | school mindfulness programmes, student meditation, meditation focus students | IMPROVE |
-| `group-activities-for-students` | group activities for students | classroom group work, collaborative learning activities, school team activities | IMPROVE |
-| `4-reasons-why-school-bags-should-not-be-a-burden` | school bags should not be a burden | CBSE school bag weight, lighter school bag, child posture bag | IMPROVE |
-| `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | innovate cultural programmes in school | creative cultural events school, school cultural week ideas, multicultural school programmes | IMPROVE |
-| `7-areas-in-education-where-indian-women-are-excellent` | areas where Indian women excel education | women in Indian education, women teachers India, Indian women academic leaders | IMPROVE |
-| `teen-depression-how-to-spot-and-cure-it` | teen depression | teen mental health, signs of teen depression, help depressed teenager | IMPROVE |
-| `benefits-of-meditation-for-students` | benefits of learning music for kids | music education benefits, kids music lessons, school music programme | IMPROVE |
-| `diwali-activities-for-students` | benefits of art and craft for kids | school art programme, kids creativity craft, art education benefits | IMPROVE |
-| `how-to-develop-fine-motor-skills-at-home` | fine motor skills activities home | toddler motor skills, hand coordination kids, preschool fine motor | IMPROVE |
-| `how-to-deal-with-anxiety-during-exams` | how to help child overcome exam fear | exam stress kids, child exam anxiety tips, board exam fear | IMPROVE |
-| `know-how-swimming-helps-your-child-in-7-ways` | benefits of yoga for students | school yoga programme, student yoga benefits, yoga in CBSE schools | IMPROVE |
-| `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | parent teacher relationship | PTM tips parents, parent teacher communication, school parent collaboration | IMPROVE |
-| `10-things-in-the-classroom-to-boost-student-engagement` | storytelling importance for children | school storytelling benefits, kids storytime education, story-based learning | IMPROVE |
-| `why-maths-matters-in-student-life-benefits-uses` | why maths matters in student life | maths education importance, kids love maths, maths real-life applications | IMPROVE |
-| `do-your-children-hate-reading-know-why-youre-the-reason` | benefits of reading aloud to children | read aloud kids benefits, parent reading habits, school read-aloud programme | IMPROVE |
-| `100-result-rainbows-first-batch-2018-19` | Rainbow International School Class 10 result 2018 | RIS first batch Class 10, 100% pass CBSE Thane, RIS board result history | KEEP — historical brand |
-| `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | RIS student swimming achievement | Raghvi Ramanujan swimming, RIS student athlete, school swimming success | KEEP — student story |
-| `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | — (410) | — | 410 GONE |
-| `rainbow-preschools-featured-in-knowledge-review-magazine` | — (410) | — | 410 GONE |
-| `rainbow-wins-award-for-excellence` | — (410) | — | 410 GONE |
+  **Uniqueness invariant:** every active (non-redirect) post has a primary keyword that does not appear on any other row. Verified programmatically.
 
-  ### 1E — Tier 4 blog posts (14) — MERGE / 301 / 410
-
-  | Slug | Primary keyword | Secondary keywords | Notes |
-  |---|---|---|---|
-  | `imporatnce-of-sports-in-students-life` | — (301) | — | 301 → importance-of-sports-in-students-life-teamwork-skills (typo) |
-| `top-reasons-choose-rainbow-international-school-thane` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `holistic-development-rainbow-international-school` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `benefits-of-rainbow-international-school` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `smartphone-addiction-how-to-ensure-healthy-use-by-kids` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
-| `using-gadgets-the-right-way` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
-| `regulating-childrens-screen-time` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
-| `5-tips-to-choose-best-cbse-schools-in-mumbai` | — (MERGE) | — | MERGE into why-choose-a-cbse-school-for-your-childs-education (Decision 12) |
-| `back-to-school-a-step-by-step-guide-to-international-school-admissions` | — (MERGE) | — | MERGE into international-school-admission-process-guide (Decision 10) |
-| `best-age-for-international-school-admission` | — (MERGE) | — | MERGE into age-criteria-for-international-schools-admission-2025-in-mumbai (Decision 10) |
-| `coronavirus-the-new-monster-in-town` | — (410) | — | 410 GONE — stale 2020 content |
-| `give-earth-to-life-on-earth` | — (410) | — | 410 GONE — dated event |
-| `the-15th-world-education-summit` | — (410) | — | 410 GONE — dated event |
-| `fit-india-certificate-of-recognition` | — (410) | — | 410 GONE — dated event |
-
-  ### 1F — New Wave 5 landing pages (gap targeting)
-
-  | New URL | Primary keyword | Secondary keywords (2–3) | Notes |
-  |---|---|---|---|
-  | `/best-cbse-school-thane-west` | best CBSE school Thane West | CBSE school Thane West admission, top school Thane West, Thane West school review | Geo-intent gap |
-  | `/cbse-school-admissions-class-1-thane-2026` | Class 1 CBSE admission Thane 2026 | Class 1 admission Thane, primary admission Thane, Class 1 documents Thane | Year+class gap |
-  | `/class-11-science-admission-thane` | Class 11 Science stream Thane school | Class 11 PCMB Thane, JEE NEET school Thane, Science stream Class 11 admission Thane | Stream-intent gap |
-  | `/nursery-admission-thane-2026-27` | nursery admission Thane 2026-27 | nursery school Thane 2026, Nursery age criteria Thane, RTE Nursery Thane | Year+class gap |
-
-  ### 1G — Cannibalization audit (post-plan)
+### 1G — Cannibalization audit (post-plan)
 
   After Wave 4, no two URLs share the same primary keyword. Verified: the four "best CBSE school" variants are differentiated by locality modifier (Brahmand / Ghodbunder / Manpada / Thane West). The three pillar posts (sports, screen time, brand) absorb all overlapping merge sources. Tier 4 typo and duplicate slugs are 301'd to canonical pillar URLs.
 
@@ -306,137 +290,120 @@
 
 ---
 
-## Section 2B — Blog Posts Audit (94 posts)
+## Section 2B — Blog Posts Audit (all 94, single source of truth)
 
-> Each post appears in exactly one tier with exactly one disposition. Tier dictates wave assignment.
+  > **Source of truth:** `docs/blog-slug-canonical-list.md`. Every slug from `client/src/data/blogPosts.ts` appears in exactly one row below. Title and meta description columns are populated for KEEP and IMPROVE posts; for 301/MERGE/410 rows the new title/description columns show "—" (no rewrite needed) and the disposition column carries the action.
 
-### Tier 1 — High traffic — Wave 2 (May 25) — 10 posts
+  | ID | Slug | Tier | Disposition | Action | Primary keyword |
+  |---|---|---|---|---|---|
+  | T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | T1 | KEEP | KEEP — no meta change | CBSE vs ICSE board comparison |
+| T1.2 | `ideal-teacher-qualities-traits-of-a-great-educator` | T1 | KEEP | KEEP — no meta change | qualities of a good teacher |
+| T1.3 | `key-facilities-every-good-cbse-school-should-have` | T1 | KEEP | KEEP — no meta change | CBSE school facilities checklist |
+| T1.4 | `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | T1 | KEEP | KEEP — no meta change | cultural activities for students |
+| T1.5 | `importance-of-sports-in-students-life-teamwork-skills` | T1 | KEEP | KEEP — no meta change | importance of sports for students |
+| T1.6 | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | T1 | KEEP | KEEP — no meta change | top schools in Thane (RIS pillar) |
+| T1.7 | `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | T1 | KEEP | KEEP — no meta change | how to choose a CBSE school in Thane |
+| T1.8 | `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | T1 | IMPROVE | IMPROVE — meta rewrite | CBSE schools in Thane West |
+| T1.9 | `school-admission-checklist-thane-parents-guide-2026` | T1 | IMPROVE | IMPROVE — meta rewrite | school admission checklist Thane 2026 |
+| T1.10 | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | T1 | IMPROVE | IMPROVE — meta rewrite | effects of mobile phones on children (pillar) |
+| T2.1 | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | T2 | IMPROVE | IMPROVE — meta rewrite | CBSE vs ICSE vs state board |
+| T2.2 | `co-curricular-activities` | T2 | IMPROVE | IMPROVE — meta rewrite | co-curricular activities for students |
+| T2.3 | `problem-solving-activities-life-skills-students` | T2 | IMPROVE | IMPROVE — meta rewrite | problem-solving activities for students |
+| T2.4 | `role-of-parents-in-education-orientation-importance` | T2 | IMPROVE | IMPROVE — meta rewrite | role of parents in education |
+| T2.5 | `importance-of-foundational-literacy-and-numeracy-in-schools` | T2 | IMPROVE | IMPROVE — meta rewrite | foundational literacy and numeracy |
+| T2.6 | `how-to-help-your-child-focus-better-in-studies` | T2 | IMPROVE | IMPROVE — meta rewrite | how to help your child focus on studies |
+| T2.7 | `importance-of-extracurricular-activities-in-school` | T2 | IMPROVE | IMPROVE — meta rewrite | importance of extracurricular activities |
+| T2.8 | `new-education-policy-nep-2020-what-parents-should-know` | T2 | IMPROVE | IMPROVE — meta rewrite | NEP 2020 for parents |
+| T2.9 | `how-to-prepare-your-child-for-first-day-of-school` | T2 | IMPROVE | IMPROVE — meta rewrite | preparing your child for first day of school |
+| T2.10 | `benefits-of-multiple-intelligence-based-learning-in-schools` | T2 | IMPROVE | IMPROVE — meta rewrite | multiple intelligence learning |
+| T2.11 | `best-cbse-schools-in-thane-what-to-look-for` | T2 | IMPROVE | IMPROVE — meta rewrite | best CBSE schools in Thane (what to look for) |
+| T2.12 | `6-reasons-why-cbse-is-the-best-board-of-the-country` | T2 | IMPROVE | IMPROVE — meta rewrite | why CBSE is the best board |
+| T2.13 | `why-choose-a-cbse-school-for-your-childs-education` | T2 | IMPROVE | IMPROVE — meta rewrite | why choose a CBSE school |
+| T2.14 | `international-school-admission-process-guide` | T2 | IMPROVE | IMPROVE — meta rewrite | international school admission process |
+| T2.15 | `age-criteria-for-international-schools-admission-2025-in-mumbai` | T2 | IMPROVE | IMPROVE — meta rewrite | age criteria international schools Mumbai |
+| T2.16 | `what-you-need-to-know-before-applying-to-an-international-school` | T2 | IMPROVE | IMPROVE — meta rewrite | before applying to an international school |
+| T2.17 | `advantages-of-starting-early-international-school` | T2 | IMPROVE | IMPROVE — meta rewrite | starting early in an international school |
+| T2.18 | `stress-in-teenagers-symptoms-management` | T2 | IMPROVE | IMPROVE — meta rewrite | stress in teenagers |
+| T2.19 | `riddles-for-kids` | T2 | IMPROVE | IMPROVE — meta rewrite | riddles for kids |
+| T2.20 | `how-to-increase-attention-span` | T2 | IMPROVE | IMPROVE — meta rewrite | how to increase attention span in students |
+| T2.21 | `benefits-of-learning-a-second-language` | T2 | IMPROVE | IMPROVE — meta rewrite | benefits of learning a second language |
+| T2.22 | `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | T2 | IMPROVE | IMPROVE — meta rewrite | entrepreneurship in CBSE schools |
+| T2.23 | `smart-revision-techniques-for-students` | T2 | IMPROVE | IMPROVE — meta rewrite | smart revision techniques for students |
+| T2.24 | `innovative-teaching-method-for-active-learning` | T2 | IMPROVE | IMPROVE — meta rewrite | innovative teaching methods |
+| T2.25 | `how-to-learn-boring-subjects` | T2 | IMPROVE | IMPROVE — meta rewrite | how to learn boring subjects |
+| T3.1 | `the-benefits-of-early-learning-in-shaping-a-childs-personality` | T3 | IMPROVE | IMPROVE — meta rewrite | early learning and child personality |
+| T3.2 | `why-maths-matters-in-student-life-benefits-uses` | T3 | IMPROVE | IMPROVE — meta rewrite | why maths matters in student life |
+| T3.3 | `10-fun-and-educational-republic-day-activities-for-kids` | T3 | IMPROVE | IMPROVE — meta rewrite | Republic Day activities for kids |
+| T3.4 | `christmas-celebration-in-school-10-fun-and-festive-activity-ideas` | T3 | IMPROVE | IMPROVE — meta rewrite | Christmas activities in school |
+| T3.5 | `benefits-of-meditation-for-students` | T3 | IMPROVE | IMPROVE — meta rewrite | benefits of meditation for students |
+| T3.6 | `diwali-activities-for-students` | T3 | IMPROVE | IMPROVE — meta rewrite | Diwali activities for students |
+| T3.7 | `10-things-in-the-classroom-to-boost-student-engagement` | T3 | IMPROVE | IMPROVE — meta rewrite | classroom student engagement ideas |
+| T3.8 | `group-activities-for-students` | T3 | IMPROVE | IMPROVE — meta rewrite | group activities for students |
+| T3.9 | `how-to-avoid-procrastination-while-studying` | T3 | IMPROVE | IMPROVE — meta rewrite | how to avoid procrastination while studying |
+| T3.10 | `teen-entrepreneurship-fostering-innovation-and-responsibility` | T3 | IMPROVE | IMPROVE — meta rewrite | teen entrepreneurship |
+| T3.11 | `teaching-teens-resilience-and-thriving-through-failure` | T3 | IMPROVE | IMPROVE — meta rewrite | teaching teens resilience |
+| T3.12 | `nutritional-requirements-of-the-teenagers-how-to-fulfil-them` | T3 | IMPROVE | IMPROVE — meta rewrite | nutrition for teenagers |
+| T3.13 | `top-5-techniques-for-taming-anger-in-children` | T3 | IMPROVE | IMPROVE — meta rewrite | taming anger in children |
+| T3.14 | `top-6-easy-ways-to-develop-patience-in-your-child` | T3 | IMPROVE | IMPROVE — meta rewrite | developing patience in children |
+| T3.15 | `homework-war-endgame` | T3 | IMPROVE | IMPROVE — meta rewrite | homework battles with kids |
+| T3.16 | `how-to-deal-with-anxiety-during-exams` | T3 | IMPROVE | IMPROVE — meta rewrite | dealing with exam anxiety |
+| T3.17 | `understanding-adolescence-how-to-handle-the-process` | T3 | IMPROVE | IMPROVE — meta rewrite | understanding adolescence |
+| T3.18 | `how-to-develop-fine-motor-skills-at-home` | T3 | IMPROVE | IMPROVE — meta rewrite | fine motor skills at home |
+| T3.19 | `the-leading-school-of-the-year-thane` | T3 | KEEP | KEEP — no meta change | RIS — Leading School of the Year (historical) |
+| T3.20 | `teen-depression-how-to-spot-and-cure-it` | T3 | IMPROVE | IMPROVE — meta rewrite | teen depression — spot and help |
+| T3.21 | `7-areas-in-education-where-indian-women-are-excellent` | T3 | IMPROVE | IMPROVE — meta rewrite | Indian women in education |
+| T3.22 | `4-reasons-why-school-bags-should-not-be-a-burden` | T3 | IMPROVE | IMPROVE — meta rewrite | school bag weight issue |
+| T3.23 | `school-sanitation-standards-how-to-stay-clean-and-safe` | T3 | IMPROVE | IMPROVE — meta rewrite | school sanitation standards |
+| T3.24 | `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | T3 | IMPROVE | IMPROVE — meta rewrite | innovative school cultural programmes |
+| T3.25 | `teaching-children-the-value-of-money-5-ways-schools-can-help` | T3 | IMPROVE | IMPROVE — meta rewrite | teaching children the value of money |
+| T3.26 | `amazing-coaches-who-improved-players-willpower` | T3 | IMPROVE | IMPROVE — meta rewrite | famous coaches and player willpower |
+| T3.27 | `how-organic-farming-in-schools-helps-the-nation` | T3 | IMPROVE | IMPROVE — meta rewrite | organic farming in schools |
+| T3.28 | `how-school-buses-are-changing-with-technology` | T3 | IMPROVE | IMPROVE — meta rewrite | school bus technology |
+| T3.29 | `amazing-youtube-channels-on-general-knowledge-for-kids` | T3 | IMPROVE | IMPROVE — meta rewrite | YouTube channels for kids general knowledge |
+| T3.30 | `know-how-swimming-helps-your-child-in-7-ways` | T3 | IMPROVE | IMPROVE — meta rewrite | benefits of swimming for children |
+| T3.31 | `big-school-playgrounds-6-reasons-why-kids-need-them` | T3 | IMPROVE | IMPROVE — meta rewrite | why kids need big school playgrounds |
+| T3.32 | `6-reasons-why-indoor-sports-is-important-in-schools` | T3 | IMPROVE | IMPROVE — meta rewrite | indoor sports in schools |
+| T3.33 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | T3 | KEEP | KEEP — no meta change | RIS student Raghvi Ramanujan swimming (historical) |
+| T3.34 | `100-result-rainbows-first-batch-2018-19` | T3 | KEEP | KEEP — no meta change | RIS 100% Class 10 result 2018-19 (historical) |
+| T3.35 | `field-trips-know-how-they-groom-students-in-5-ways` | T3 | IMPROVE | IMPROVE — meta rewrite | how field trips groom students |
+| T3.36 | `time-management-for-school-children-6-ways-parents-can-help` | T3 | IMPROVE | IMPROVE — meta rewrite | time management for school children |
+| T3.37 | `how-to-teach-benefits-of-family-meals-to-kids` | T3 | IMPROVE | IMPROVE — meta rewrite | family meals benefits for kids |
+| T3.38 | `do-your-children-hate-reading-know-why-youre-the-reason` | T3 | IMPROVE | IMPROVE — meta rewrite | why children hate reading |
+| T3.39 | `how-regular-sports-help-students-6-reasons` | T3 | IMPROVE | IMPROVE — meta rewrite | regular sports for students |
+| T3.40 | `digital-classrooms-how-technology-improves-education-in-school` | T3 | IMPROVE | IMPROVE — meta rewrite | digital classrooms in schools |
+| T3.41 | `9-reasons-why-schools-should-have-an-infirmary-and-paediatrician` | T3 | IMPROVE | IMPROVE — meta rewrite | school infirmary and paediatrician |
+| T3.42 | `7-safety-and-security-measures-your-kids-school-should-have` | T3 | IMPROVE | IMPROVE — meta rewrite | school safety and security measures |
+| T4.1 | `best-age-for-international-school-admission` | T4 | MERGE | MERGE into `age-criteria-for-international-schools-admission-2025-in-mumbai` then 301 | — (MERGE into age criteria post) |
+| T4.2 | `5-tips-to-choose-best-cbse-schools-in-mumbai` | T4 | MERGE | MERGE into `why-choose-a-cbse-school-for-your-childs-education` then 301 | — (MERGE into why-choose-cbse-school) |
+| T4.3 | `benefits-of-rainbow-international-school` | T4 | 301 | 301 → `why-rainbow-international-school-is-among-the-top-schools-in-thane` | — (301 to RIS pillar) |
+| T4.4 | `back-to-school-a-step-by-step-guide-to-international-school-admissions` | T4 | MERGE | MERGE into `international-school-admission-process-guide` then 301 | — (MERGE into admission process guide) |
+| T4.5 | `holistic-development-rainbow-international-school` | T4 | 301 | 301 → `why-rainbow-international-school-is-among-the-top-schools-in-thane` | — (301 to RIS pillar) |
+| T4.6 | `top-reasons-choose-rainbow-international-school-thane` | T4 | 301 | 301 → `why-rainbow-international-school-is-among-the-top-schools-in-thane` | — (301 to RIS pillar) |
+| T4.7 | `imporatnce-of-sports-in-students-life` | T4 | 301 | 301 → `importance-of-sports-in-students-life-teamwork-skills` | — (301, typo redirect) |
+| T4.8 | `using-gadgets-the-right-way` | T4 | 301 | 301 → `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | — (301 to screen-time pillar) |
+| T4.9 | `regulating-childrens-screen-time` | T4 | 301 | 301 → `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | — (301 to screen-time pillar) |
+| T4.10 | `give-earth-to-life-on-earth` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.11 | `coronavirus-the-new-monster-in-town` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.12 | `fit-india-certificate-of-recognition` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.13 | `the-15th-world-education-summit` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.14 | `smartphone-addiction-how-to-ensure-healthy-use-by-kids` | T4 | 301 | 301 → `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | — (301 to screen-time pillar) |
+| T4.15 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.16 | `rainbow-preschools-featured-in-knowledge-review-magazine` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
+| T4.17 | `rainbow-wins-award-for-excellence` | T4 | 410 | 410 GONE (after backlink check) | — (410) |
 
-| # | Slug | Current title | Proposed title (≤60) | Proposed description (150–158) | Primary keyword | Disposition |
-|---|---|---|---|---|---|---|
-| T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | CBSE vs ICSE: Which Board Prepares Students Better for the Future? | — (Decision 7: leave title alone, KEEP) | CBSE vs ICSE compared head-to-head: syllabus, exam pattern, university acceptance and career outcomes. Find the right board for your child's future today. (153) | CBSE vs ICSE | KEEP (91K impressions — Decision 7: leave title alone, only refine description) |
-| T1.2 | `ideal-teacher-qualities-traits-of-a-great-educator` | The Ideal Teacher: 8 Qualities and Traits That Define a Great Educator | 8 Qualities of a Great Teacher — Ideal Educator Traits (54) | The 8 qualities that define a great teacher: subject mastery, empathy, communication, patience, creativity, fairness, lifelong learning, adaptability. (157) | qualities of an ideal teacher | IMPROVE |
-| T1.3 | `key-facilities-every-good-cbse-school-should-have` | Key Facilities Every Good CBSE School Should Have | Key Facilities Every Good CBSE School Must Have (49) | Essential facilities every good CBSE school should provide: science labs, library, sports ground, smart classrooms, infirmary, transport and safety. (157) | facilities CBSE school must have | IMPROVE |
-| T1.4 | `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | Cultural Activities for Students: The Key to Developing Critical Thinking Skills | Cultural Activities for Students — Build Critical Thinking (58) | How cultural activities in school build critical thinking, creativity and confidence in students. Examples, benefits and how to introduce them at school. (155) | cultural activities for students critical thinking | IMPROVE |
-| T1.5 | `importance-of-sports-in-students-life-teamwork-skills` | The Importance of Sports in a Student's Life: Building Teamwork and Life Skills | Importance of Sports in Student Life — Teamwork & Skills (58) | Why sports are essential in a student's life: physical health, teamwork, leadership, discipline, mental wellbeing and improved academic performance. (152) | importance of sports in student life | KEEP — pillar (receives 301 from typo slug `imporatnce-of-sports-in-students-life`) |
-| T1.6 | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | Why Rainbow International School Is Among the Top Schools in Thane | Why RIS Is Among the Top Schools in Thane — Parent Guide (58) | Why parents choose Rainbow International School Thane: 3.5-acre campus, CBSE since 2009, 3000+ students, holistic learning, safety, results. Visit us. (152) | top schools in Thane Rainbow International | KEEP — pillar for Rainbow brand cluster (receives 3 × 301 from Decision 11) |
-| T1.7 | `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | Parental Guidance: How to Choose the Best CBSE School in Thane for Your Child | How to Choose the Best CBSE School in Thane — Parent Guide (58) | Parents' practical guide to choosing the best CBSE school in Thane: criteria, questions to ask, school visit checklist, fees, and board affiliation. (152) | how to choose best CBSE school Thane | KEEP — Thane pillar for CBSE choice cluster |
-| T1.8 | `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | The Growing Popularity of CBSE Schools in Thane Among Parents | Why CBSE Schools Are Popular in Thane West — Parent View (58) | Why CBSE schools are gaining popularity in Thane West: curriculum strengths, university acceptance, balanced learning approach, parent preferences today. (157) | popularity of CBSE schools in Thane West | IMPROVE |
-| T1.9 | `school-admission-checklist-thane-parents-guide-2026` | School Admission Checklist for Parents in Thane — Complete Guide for 2026-27 | School Admission Checklist Thane 2026-27 — Parent Guide (57) | Step-by-step school admission checklist for parents in Thane 2026-27: documents, eligibility, fees, deadlines and what to ask before enrolling. (151) | school admission checklist Thane 2026-27 | IMPROVE |
-| T1.10 | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | Understanding the Effects of Mobile Phones on Children: Benefits, Risks, and Managing Screen Time | Mobile Phones & Children — Benefits, Risks & Screen Time (58) | Effects of mobile phones on children: benefits, risks, recommended screen time by age, parental controls and how to build healthy device habits. (151) | effects of mobile phones on children | KEEP — pillar for screen time cluster (receives 3 × 301 from Decision 9). Body expansion target 2,500+ words. |
+  **Per-tier-and-disposition rollup:**
 
-### Tier 2 — Moderate traffic — Wave 3 (June 1) — 25 posts
+  | Tier | Posts | KEEP | IMPROVE | MERGE | 301 | 410 |
+  |---|---|---|---|---|---|---|
+  | 1 | 10 | 7 | 3 | 0 | 0 | 0 |
+  | 2 | 25 | 0 | 25 | 0 | 0 | 0 |
+  | 3 | 42 | 3 | 39 | 0 | 0 | 0 |
+  | 4 | 17 | 0 | 0 | 3 | 7 | 7 |
+  | **Total** | **94** | **10** | **67** | **3** | **7** | **7** |
 
-| # | Slug | Current title | Proposed title (≤60) | Proposed description (150–158) | Primary keyword | Disposition |
-|---|---|---|---|---|---|---|
-| T2.1 | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | CBSE vs ICSE vs State Board — Which Is Best for Your Child in 2026? | CBSE vs ICSE vs State Board — Which Is Best in 2026? (54) | CBSE vs ICSE vs State Board compared three-way: syllabus, exam pattern, costs, university acceptance and career outcomes for parents in 2026 today. (153) | CBSE vs ICSE vs State Board | IMPROVE — re-target 3-way comparison keyword (Decision 7) |
-| T2.2 | `co-curricular-activities` | Co-Curricular Activities: The Key to Holistic Student Development | Co-Curricular Activities — Holistic Student Development (56) | Co-curricular activities in schools build leadership, creativity and life skills. Types, benefits and how schools structure them for K-12 students today. (155) | co-curricular activities for students | IMPROVE |
-| T2.3 | `problem-solving-activities-life-skills-students` | Problem-Solving Activities & Life Skills for Students: Why They Matter | Problem-Solving Activities & Life Skills for Students (54) | Problem-solving activities and life skills for school students: why they matter, classroom examples and a clear age-wise approach for K-12 learners. (151) | problem-solving activities life skills students | IMPROVE |
-| T2.4 | `role-of-parents-in-education-orientation-importance` | The Role of Parents in Education: Why School Orientation Programmes Matter | Role of Parents in Education — Orientation Matters (52) | The role of parents in a child's education and why school orientation programmes matter for academic success and emotional wellbeing of children. (150) | role of parents in education | IMPROVE |
-| T2.5 | `importance-of-foundational-literacy-and-numeracy-in-schools` | The Importance of Foundational Literacy and Numeracy in Schools | Foundational Literacy & Numeracy — Why It Matters (51) | Foundational literacy and numeracy in primary schools: why early years matter, NEP 2020 implications, what parents and teachers should look for. (150) | foundational literacy and numeracy schools | IMPROVE |
-| T2.6 | `how-to-help-your-child-focus-better-in-studies` | How to Help Your Child Focus Better in Studies — 12 Proven Strategies | How to Help Your Child Focus Better — 12 Tips (47) | 12 proven strategies to help your child focus better in studies: study environment, breaks, nutrition, sleep, screen time and motivation techniques. (153) | how to help your child focus in studies | IMPROVE |
-| T2.7 | `importance-of-extracurricular-activities-in-school` | Why Extracurricular Activities Are Just as Important as Academics | Why Extracurricular Activities Matter as Much as Academics (58) | Why extracurricular activities are as important as academics: cognitive benefits, social skills, college applications and balanced child development. (155) | importance of extracurricular activities school | IMPROVE |
-| T2.8 | `new-education-policy-nep-2020-what-parents-should-know` | NEP 2020 Explained for Parents — What Changes and How It Affects Your Child | NEP 2020 Explained for Parents — What Changes (47) | NEP 2020 explained for parents: 5+3+3+4 structure, foundational stage, mother tongue medium, holistic report cards and board exam reforms in detail. (151) | NEP 2020 for parents | IMPROVE |
-| T2.9 | `how-to-prepare-your-child-for-first-day-of-school` | How to Prepare Your Child for Their First Day of School — A Parent's Guide | How to Prepare Your Child for First Day of School (50) | A parent's guide to preparing your child for their first day of school: routine, school visit, separation anxiety, supplies, conversations to have. (151) | how to prepare child for first day of school | IMPROVE |
-| T2.10 | `benefits-of-multiple-intelligence-based-learning-in-schools` | Multiple Intelligence-Based Learning — How It Helps Every Child Succeed | Multiple Intelligence Learning — Help Every Child Succeed (58) | Multiple Intelligence learning explained: Howard Gardner's theory, classroom application, how schools can help every child succeed in their own way. (157) | multiple intelligence learning schools | IMPROVE |
-| T2.11 | `best-cbse-schools-in-thane-what-to-look-for` | Best CBSE Schools in Thane — What to Look for When Choosing One | Best CBSE Schools Thane — Verification Checklist (50) | Things to verify before enrolling in a CBSE school in Thane: affiliation number, teacher qualifications, infrastructure, transport, fees breakdown. (153) | CBSE schools Thane verification checklist | IMPROVE — checklist angle (Decision 12) |
-| T2.12 | `6-reasons-why-cbse-is-the-best-board-of-the-country` | 6 Reasons Why CBSE Is the Best Board in India for Your Child | 6 Reasons Why CBSE Is the Best Board in India (47) | 6 reasons CBSE is the best school board in India: standardised syllabus, NCERT alignment, university acceptance, JEE/NEET prep, language flexibility. (157) | why CBSE is the best board India | KEEP (Decision 12) |
-| T2.13 | `why-choose-a-cbse-school-for-your-childs-education` | Why Choose a CBSE School for Your Child's Education? | Why Choose a CBSE School for Your Child's Education (53) | Why parents choose CBSE schools for their child's education: NCERT-aligned syllabus, board recognition, balanced approach, K-12 continuity benefits. (153) | why choose CBSE school | KEEP — receives MERGE from `5-tips-to-choose-best-cbse-schools-in-mumbai` (Decision 12) |
-| T2.14 | `international-school-admission-process-guide` | A Complete Guide to the International School Admission Process in India | International School Admission Process — Complete Guide (56) | A complete guide to the international school admission process in India: eligibility, age criteria, documents, entrance assessments, fees and timelines. (157) | international school admission process India | KEEP — pillar for international admission cluster. Receives MERGE from `back-to-school-a-step-by-step-guide-to-international-school-admissions` (Decision 10). |
-| T2.15 | `age-criteria-for-international-schools-admission-2025-in-mumbai` | Age Criteria for International School Admission 2025 in Mumbai: A Parent's Guide | School Admission Age in Mumbai — Parent Guide 2026 (52) | School admission age criteria in Mumbai for Nursery to Class 12: minimum age requirements, cut-off dates, RTE rules — what parents should know now. (152) | school admission age in Mumbai | IMPROVE — re-target "school admission age Mumbai" (Decision 10). Receives MERGE from `best-age-for-international-school-admission`. |
-| T2.16 | `what-you-need-to-know-before-applying-to-an-international-school` | What You Need to Know Before Applying to an International School | International School Admission Checklist for Parents (54) | International school admission checklist for parents: documents, age criteria, fees, transport, after-school care, school visits and entrance assessments. (158) | international school admission checklist | IMPROVE — re-target (Decision 10) |
-| T2.17 | `advantages-of-starting-early-international-school` | The Advantages of Starting Early at an International School | Benefits of Early School Admission for Your Child (49) | Benefits of early school admission: language exposure, social skills, structured routine, learning rhythm and academic confidence for early starters. (152) | benefits of early school admission | IMPROVE — re-target (Decision 10) |
-| T2.18 | `stress-in-teenagers-symptoms-management` | Stress in Teenagers: Symptoms, Causes, and Effective Management Strategies | Stress in Teenagers — Symptoms, Causes & Management (53) | Stress in teenagers: symptoms, causes (academic, social, family), and management strategies for parents and schools, plus warning signs that need help. (157) | stress in teenagers symptoms management | IMPROVE |
-| T2.19 | `riddles-for-kids` | 100 Fun Riddles for Kids to Sharpen Their Minds | 100 Fun Riddles for Kids — Sharpen Their Minds (47) | 100 fun and educational riddles for kids organised by age and difficulty. Sharpen logical thinking, vocabulary and creativity through play at home. (152) | riddles for kids | IMPROVE |
-| T2.20 | `how-to-increase-attention-span` | How to Increase Attention Span: Proven Tips for Students to Focus Better | How to Increase Attention Span — Tips for Students (52) | How students can increase attention span: brain breaks, focus techniques, sleep, nutrition, screen time limits, study environment changes that help. (153) | how to increase attention span students | IMPROVE |
-| T2.21 | `benefits-of-learning-a-second-language` | The Benefits of Learning a Second Language for Students | Benefits of Learning a Second Language for Students (51) | Benefits of learning a second language for students: cognitive flexibility, academic performance, cultural awareness, future career advantages today. (155) | benefits of learning a second language | IMPROVE |
-| T2.22 | `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | How CBSE Schools Can Foster Entrepreneurship and Innovation Among Students | How CBSE Schools Foster Entrepreneurship & Innovation (54) | How CBSE schools can foster entrepreneurship and innovation: Atal Tinkering Labs, project-based learning, business clubs, mentorship programmes. (152) | CBSE schools foster entrepreneurship | IMPROVE |
-| T2.23 | `smart-revision-techniques-for-students` | Smart Revision Techniques for Students: Beyond Rote Memorisation | Smart Revision Techniques for Students — Beyond Rote (53) | Smart revision techniques for students beyond rote memorisation: spaced repetition, active recall, mind maps, practice tests, teaching back method. (157) | smart revision techniques students | IMPROVE |
-| T2.24 | `innovative-teaching-method-for-active-learning` | Innovative Teaching Methods for Active Learning: The Flipped Classroom and Beyond | Innovative Teaching Methods for Active Learning (47) | Innovative teaching methods for active learning: flipped classroom, project-based learning, gamification, peer teaching and inquiry-based approaches. (157) | innovative teaching methods active learning | IMPROVE |
-| T2.25 | `how-to-learn-boring-subjects` | How to Learn Boring Subjects: 8 Strategies That Actually Work | How to Learn Boring Subjects — 8 Strategies That Work (54) | 8 strategies that actually work for learning boring subjects: real-world links, mini-goals, study partners, gamification, teaching back, rewards. (153) | how to learn boring subjects | IMPROVE |
+  Net surviving posts: 10 + 67 = **77** (slightly above the 70–75 target band because 3 historical-brand posts — `the-leading-school-of-the-year-thane`, `100-result-rainbows-first-batch-2018-19`, `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` — are pre-approved as KEEP and cannot be cut).
 
-### Tier 3 — Lower traffic, improvable — Wave 4 (June 8) — 45 posts
-
-| # | Slug | Current title | Proposed title (≤60) | Proposed description (150–158) | Primary keyword | Disposition |
-|---|---|---|---|---|---|---|
-| T3.1 | `how-to-avoid-procrastination-while-studying` | How to Avoid Procrastination While Studying: 8 Strategies That Work | How to Avoid Procrastination While Studying — 8 Tips (53) | 8 strategies students can use to avoid procrastination while studying: time-blocking, the 2-minute rule, environment design, accountability partners. (157) | how to avoid procrastination studying | IMPROVE |
-| T3.2 | `teen-entrepreneurship-fostering-innovation-and-responsibility` | Teen Entrepreneurship: Fostering Innovation and Responsibility in Young People | Teen Entrepreneurship — Innovation & Responsibility (53) | Teen entrepreneurship guide for parents and schools: how to foster innovation, responsibility and business thinking in young people from an early age. (158) | teen entrepreneurship | IMPROVE |
-| T3.3 | `teaching-teens-resilience-and-thriving-through-failure` | Teaching Teens Resilience: How to Help Young People Thrive Through Failure | Teaching Teens Resilience — Thriving Through Failure (54) | Teaching teens resilience: how parents and schools can help young people thrive through failure, build coping skills and maintain self-worth daily. (151) | teaching teens resilience | IMPROVE |
-| T3.4 | `nutritional-requirements-of-the-teenagers-how-to-fulfil-them` | Nutritional Requirements of Teenagers and How to Fulfil Them | Teenager Nutrition — Requirements & How to Fulfil Them (54) | Nutritional requirements of teenagers explained: calories, protein, calcium, iron, vitamins. Practical meal ideas to meet daily nutrition needs daily. (154) | nutritional requirements of teenagers | IMPROVE |
-| T3.5 | `top-5-techniques-for-taming-anger-in-children` | Top 5 Techniques for Taming Anger in Children | 5 Techniques for Taming Anger in Children — Parent Guide (57) | 5 effective techniques for taming anger in children: trigger awareness, calming routines, communication scripts, role-play, professional help signals. (158) | techniques to tame anger in children | IMPROVE |
-| T3.6 | `top-6-easy-ways-to-develop-patience-in-your-child` | Top 6 Easy Ways to Develop Patience in Your Child | 6 Easy Ways to Develop Patience in Your Child (47) | 6 easy ways to develop patience in your child: waiting games, delayed gratification, mindfulness routines, modelling, planned challenges and praise. (151) | develop patience in your child | IMPROVE |
-| T3.7 | `homework-war-endgame` | The Homework War: How to End the Nightly Battle and Make Study Time Work | End the Homework War — Make Study Time Work (45) | How to end the nightly homework battle and make study time work: routine, environment, motivation, breaks, parent-teacher communication tips today. (152) | end the homework battle | IMPROVE |
-| T3.8 | `amazing-coaches-who-improved-players-willpower` | Amazing Coaches Who Improved Players' Willpower: Why Schools Need Specialist Sports Coaches | Why Schools Need Specialist Sports Coaches (44) | Why schools need specialist sports coaches: builds willpower, technique, leadership and physical fitness in students. Examples and tangible benefits. (152) | why schools need specialist sports coaches | IMPROVE |
-| T3.9 | `how-organic-farming-in-schools-helps-the-nation` | How Organic Farming in Schools Helps the Nation | Organic Farming in Schools — How It Helps the Nation (53) | How organic farming projects in schools teach sustainability, nutrition, biology and citizenship — and how they contribute to the nation's food security. (158) | organic farming in schools | IMPROVE |
-| T3.10 | `how-school-buses-are-changing-with-technology` | How School Buses Are Changing with Technology: Safer, Smarter Commutes for Students | How School Buses Are Changing with Technology (47) | How technology is changing school buses: GPS tracking, RFID attendance, CCTV, parent apps and route optimisation — safer commutes for students daily. (151) | school buses technology safety | IMPROVE |
-| T3.11 | `amazing-youtube-channels-on-general-knowledge-for-kids` | 7 Amazing YouTube Channels to Boost Kids' General Knowledge | 7 YouTube Channels to Boost Kids' General Knowledge (53) | 7 amazing YouTube channels to boost kids' general knowledge: science, history, math, art and current affairs — all parent- and teacher-vetted today. (151) | YouTube channels general knowledge for kids | IMPROVE |
-| T3.12 | `know-how-swimming-helps-your-child-in-7-ways` | Know How Swimming Helps Your Child in 7 Ways | 7 Ways Swimming Helps Your Child's Development (47) | 7 ways swimming helps your child's development: cardiovascular health, strength, coordination, confidence, water safety, discipline and life skill. (150) | how swimming helps your child | IMPROVE |
-| T3.13 | `big-school-playgrounds-6-reasons-why-kids-need-them` | Big School Playgrounds: 6 Reasons Why Kids Absolutely Need Them | 6 Reasons Big School Playgrounds Matter for Kids (50) | 6 reasons big school playgrounds are essential for kids: physical activity, motor skills, social play, imagination, stress relief and mental health. (152) | school playgrounds kids need | IMPROVE |
-| T3.14 | `6-reasons-why-indoor-sports-is-important-in-schools` | 6 Reasons Why Indoor Sports Are Important in Schools | 6 Reasons Indoor Sports Matter in Schools (43) | 6 reasons indoor sports are important in schools: year-round activity, focus skills, teamwork, low-injury risk, gender inclusion, urban-friendly today. (155) | indoor sports importance schools | IMPROVE |
-| T3.15 | `field-trips-know-how-they-groom-students-in-5-ways` | Field Trips: Know How They Groom Students in 5 Important Ways | 5 Ways School Field Trips Groom Students (43) | 5 ways school field trips groom students: experiential learning, social bonding, real-world context, observation skills and rich cultural exposure. (152) | how field trips groom students | IMPROVE |
-| T3.16 | `time-management-for-school-children-6-ways-parents-can-help` | Time Management for School Children: 6 Ways Parents Can Help | Time Management for Kids — 6 Ways Parents Help (49) | 6 ways parents can help school children with time management: visual schedules, priority lists, routines, breaks, tracking and modelling habits daily. (153) | time management for school children | IMPROVE |
-| T3.17 | `how-to-teach-benefits-of-family-meals-to-kids` | How to Teach Kids the Benefits of Family Meals — 6 Reasons to Eat Together | 6 Reasons Family Meals Matter for Kids (40) | 6 reasons family meals matter for kids: better nutrition, vocabulary, emotional connection, manners, cultural values and lower risk behaviours daily. (152) | benefits of family meals for kids | IMPROVE |
-| T3.18 | `do-your-children-hate-reading-know-why-youre-the-reason` | Do Your Children Hate Reading? Know Why You Might Be the Reason | Why Your Child Might Hate Reading — Parent Guide (49) | Why your child might hate reading and how parents may unknowingly contribute to it. Practical ways to make reading enjoyable for school-going kids today. (155) | why children hate reading | IMPROVE |
-| T3.19 | `how-regular-sports-help-students-6-reasons` | How Regular Sports Help Students: 6 Reasons Every School Child Should Play | 6 Reasons Every School Child Should Play Sports (49) | 6 reasons every school child should play regular sports: fitness, focus, teamwork, stress relief, leadership, confidence — and academic gains too. (151) | how regular sports help students | IMPROVE |
-| T3.20 | `digital-classrooms-how-technology-improves-education-in-school` | Digital Classrooms: How Technology Improves Education in School | Digital Classrooms — How Technology Improves Education (54) | Digital classrooms explained: how technology improves school education through smart boards, e-learning, personalised pace and collaboration tools. (153) | digital classrooms education | IMPROVE |
-| T3.21 | `9-reasons-why-schools-should-have-an-infirmary-and-paediatrician` | 9 Reasons Why Schools Should Have an Infirmary and a Paediatrician | 9 Reasons Schools Need an Infirmary & Paediatrician (53) | 9 reasons schools should have an infirmary and a paediatrician on call: emergency care, screening, immunisation tracking and nutrition advice today. (153) | schools need infirmary and paediatrician | IMPROVE |
-| T3.22 | `7-safety-and-security-measures-your-kids-school-should-have` | 7 Safety and Security Measures Your Child's School Must Have | 7 Safety & Security Measures School Should Have (49) | 7 safety and security measures every school must have: CCTV, trained guards, fire safety, GPS-tracked buses, visitor logs, ID cards, emergency drills. (158) | school safety security measures | IMPROVE |
-| T3.23 | `10-fun-and-educational-republic-day-activities-for-kids` | 10 Fun and Educational Republic Day Activities for Kids | 10 Fun Republic Day Activities for Kids in School (49) | 10 fun and educational Republic Day activities for kids in school: parade, flag-making, quiz, plays, speeches, art, civics chats, songs and crafts. (152) | Republic Day activities for kids | IMPROVE |
-| T3.24 | `christmas-celebration-in-school-10-fun-and-festive-activity-ideas` | Christmas Celebration in School: 10 Fun and Festive Activity Ideas for Students | 10 Christmas Celebration Ideas for School Students (51) | 10 fun and festive Christmas celebration ideas for school students: tree decoration, carols, secret Santa, art, plays, charity drives and story-time. (155) | Christmas celebration in school | IMPROVE |
-| T3.25 | `diwali-activities-for-students` | Diwali Activities for Students: Fun, Creative, and Culturally Rich Ideas for School | Diwali Activities for School Students — Fun & Creative (54) | Fun, creative and culturally rich Diwali activities for school students: rangoli, diya making, story circles, eco-friendly crafts and gratitude rituals. (158) | Diwali activities for students | IMPROVE |
-| T3.26 | `benefits-of-meditation-for-students` | Benefits of Meditation for Students: How Mindfulness Improves Learning and Wellbeing | Benefits of Meditation for Students — Mindfulness (52) | Benefits of meditation for students: reduces stress, improves focus, boosts memory, builds emotional regulation. How schools can introduce mindfulness. (158) | benefits of meditation for students | IMPROVE |
-| T3.27 | `group-activities-for-students` | Group Activities for Students: Benefits, Types, and How to Make Them Work | Group Activities for Students — Benefits, Types & Tips (54) | Group activities for students: benefits, types and how teachers and parents can make them work for K-12. Examples for primary and secondary stages today. (155) | group activities for students | IMPROVE |
-| T3.28 | `4-reasons-why-school-bags-should-not-be-a-burden` | 4 Reasons Why School Bags Should Not Be a Burden on Children | 4 Reasons School Bags Should Not Burden Children (49) | 4 reasons school bags should not be a burden on children: posture risks, fatigue, focus loss, safety concerns. CBSE bag weight rules and what to do. (153) | school bags should not be a burden | IMPROVE |
-| T3.29 | `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | 6 Excellent Ideas to Innovate Cultural Programmes in School | 6 Ideas to Innovate Cultural Programmes in School (49) | 6 fresh ideas to innovate cultural programmes in school: themed weeks, parent collaborations, virtual exchanges, multicultural fairs and student-led acts. (158) | innovate cultural programmes in school | IMPROVE |
-| T3.30 | `7-areas-in-education-where-indian-women-are-excellent` | 7 Areas in Education Where Indian Women Are Excellent | 7 Areas Where Indian Women Excel in Education (45) | 7 areas of education where Indian women are excelling — academics, research, leadership, STEM, civil services, sports, arts. Inspiring student stories. (157) | areas where Indian women excel education | IMPROVE |
-| T3.31 | `teen-depression-how-to-spot-and-cure-it` | Teen Depression: How To Spot And Cure It | Teen Depression — How to Spot Signs & Help (45) | Teen depression: how to spot the early signs, what causes it, and how parents and schools can help — including when to seek professional support today. (153) | teen depression spot and cure | IMPROVE |
-| T3.32 | `understanding-adolescence-how-to-handle-the-process` | Understanding Adolescence: How to Handle the Process | Understanding Adolescence — A Parent's Handbook (47) | Understanding adolescence: physical, emotional and social changes. A parent's handbook to handle the process with empathy and clear boundaries today. (152) | understanding adolescence parents | IMPROVE |
-| T3.33 | `how-to-deal-with-anxiety-during-exams` | How to Deal with Anxiety During Exams: 8 Proven Tips for Students | How to Deal with Exam Anxiety — 8 Tips for Students (52) | 8 proven tips for students to deal with anxiety during exams: breathing, study schedule, sleep, nutrition, mock tests, mindset shifts and parent support. (158) | how to deal with exam anxiety | IMPROVE |
-| T3.34 | `how-to-develop-fine-motor-skills-at-home` | How to Develop Fine Motor Skills at Home: Fun Activities for Toddlers | Fine Motor Skills at Home — Fun Toddler Activities (52) | Fun activities to develop fine motor skills at home for toddlers: clay, threading, drawing, scissor practice, sorting games and dough play ideas today. (154) | fine motor skills toddler activities | IMPROVE — note: targets pre-school (RPS) audience; cross-link from /rainbow-preschool-international |
-| T3.35 | `10-things-in-the-classroom-to-boost-student-engagement` | 10 Things in the Classroom to Boost Student Engagement | 10 Classroom Ideas to Boost Student Engagement (47) | 10 practical things teachers can introduce in the classroom to boost student engagement: warm-ups, peer activities, visuals, choice, movement and tech. (158) | classroom ideas boost student engagement | IMPROVE |
-| T3.36 | `teaching-children-the-value-of-money-5-ways-schools-can-help` | Teaching Children the Value of Money: 5 Ways Schools Can Help | Teaching Children Value of Money — 5 Ways Schools Help (56) | 5 ways schools can teach children the value of money: budgeting projects, mock markets, financial literacy classes, charity drives, save-spend-share. (157) | teaching children value of money | IMPROVE |
-| T3.37 | `the-benefits-of-early-learning-in-shaping-a-childs-personality` | The Benefits of Early Learning in Shaping a Child's Personality | Benefits of Early Learning for Child Personality (49) | Benefits of early learning in shaping a child's personality: confidence, social skills, language, curiosity and foundational habits for later success. (155) | early learning shaping personality | IMPROVE |
-| T3.38 | `the-leading-school-of-the-year-thane` | The Leading School of the Year (Thane) | The Leading School of the Year — RIS Thane Award (54) | RIS Thane named "The Leading School of the Year" — a recognition of academic, sports and cultural excellence by an industry awards body. Read the full story today. (158) | RIS Leading School of the Year award | Leading School of the Year Thane | KEEP — historical brand award post (per pre-approved task instructions) |
-| T3.39 | `why-maths-matters-in-student-life-benefits-uses` | Why Maths Matters in Student Life: Benefits, Uses, and How to Build a Love for Numbers | Why Maths Matters in Student Life — Benefits & Uses (53) | Why maths matters in student life: career benefits, real-world uses, problem-solving and how parents can build a love for numbers in their kids today. (154) | why maths matters in student life | IMPROVE |
-| T3.40 | `school-sanitation-standards-how-to-stay-clean-and-safe` | School Sanitation Standards: How to Stay Clean and Safe | School Sanitation Standards — Stay Clean & Safe (49) | School sanitation standards: clean toilets, safe drinking water, hand hygiene, classroom cleanliness, surface disinfection. What parents should expect. (158) | school sanitation standards | IMPROVE |
-| T3.41 | `100-result-rainbows-first-batch-2018-19` | 100% Result: Rainbow International School's First Batch Achieves Perfect Class 10 Outcome | RIS Class 10 Result 2018-19 — 100% First Batch Pass (54) | RIS Thane's first Class 10 batch (2018-19) achieved a 100% pass result on the CBSE board exam. A historic milestone for the school's CBSE journey today. (152) | RIS Class 10 Result 2018-19 — 100% Pass First Batch | Rainbow International School Class 10 result 2018 | KEEP — historical brand milestone with evergreen value (per pre-approved task instructions) |
-| T3.42 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | An All-Rounder in the Making: Raghvi Ramanujan Bags Her 101st Swimming Medal | RIS Student Raghvi Ramanujan — 101st Swimming Medal (52) | RIS Thane student Raghvi Ramanujan wins her 101st swimming medal — a story of discipline, training and a school that champions young athletes daily today. (155) | RIS student swimming achievement — Raghvi Ramanujan | RIS student swimming achievement | KEEP — student achievement story with evergreen brand value (per pre-approved task instructions) |
-| T3.43 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | Rainbow Awarded Best Preschool and Secondary School in Thane at Retail & Hospitality Awards 2018 | — | — | — | **410 GONE** — 2018 award post; covered by /awards-achievements page. Verify GSC backlinks before actioning (TODO-7). |
-| T3.44 | `rainbow-preschools-featured-in-knowledge-review-magazine` | Rainbow Preschools Featured in 'The 10 Best Preschools in India 2018' — The Knowledge Review | — | — | — | **410 GONE** — 2018 RPS-only feature, not RIS-specific. Verify GSC backlinks before actioning (TODO-7). |
-| T3.45 | `rainbow-wins-award-for-excellence` | Rainbow Wins India Today Awards for Excellence in Preschool and CBSE Education — Thane 2017 | — | — | — | **410 GONE** — 2017 award post; covered by /awards-achievements page. Verify GSC backlinks before actioning (TODO-7). |
-
-### Tier 4 — Merge / 301 / 410 — Wave 4 (after recovery confirmed) — 14 posts
-
-| # | Slug | Current title | Target | Disposition | Notes |
-|---|---|---|---|---|---|
-| T4.1 | `imporatnce-of-sports-in-students-life` | The Importance of Sports in a Student's Life: Physical Health, Mental Wellbeing, and Academic Benefits | `importance-of-sports-in-students-life-teamwork-skills` | **301** | Typo slug. Same content as T1.5. |
-| T4.2 | `top-reasons-choose-rainbow-international-school-thane` | Top Reasons to Choose Rainbow International School, Thane | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | **301** | Decision 11 — Rainbow brand cluster |
-| T4.3 | `benefits-of-rainbow-international-school` | The Key Benefits of Rainbow International School: What Makes It the Right Choice for Your Child | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | **301** | Decision 11 |
-| T4.4 | `holistic-development-rainbow-international-school` | Holistic Development at Rainbow International School: Educating the Whole Child | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | **301** | Decision 11 |
-| T4.5 | `back-to-school-a-step-by-step-guide-to-international-school-admissions` | Back to School: A Step-by-Step Guide to International School Admissions | `international-school-admission-process-guide` | **MERGE** | Decision 10. Combine unique content into pillar before redirect. |
-| T4.6 | `best-age-for-international-school-admission` | Best Age for International School Admission: A Complete Parent's Guide | `age-criteria-for-international-schools-admission-2025-in-mumbai` | **MERGE** | Decision 10. Combine unique content. |
-| T4.7 | `5-tips-to-choose-best-cbse-schools-in-mumbai` | 5 Tips to Choose the Best CBSE School in Mumbai: A Parent's Practical Guide | `why-choose-a-cbse-school-for-your-childs-education` | **MERGE** | Decision 12. Combine Mumbai-specific tips into pillar as a "for parents in Mumbai" subsection. |
-| T4.8 | `regulating-childrens-screen-time` | Regulating Children's Screen Time | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | **301** | Decision 9 — screen time cluster |
-| T4.9 | `smartphone-addiction-how-to-ensure-healthy-use-by-kids` | Smartphone Addiction: How to Ensure Healthy Use by Kids | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | **301** | Decision 9 |
-| T4.10 | `using-gadgets-the-right-way` | Using Gadgets the Right Way: How Technology Can Benefit Children When Used Wisely | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | **301** | Decision 9. Confirmed in blogPosts.ts. |
-| T4.11 | `coronavirus-the-new-monster-in-town` | Coronavirus: The New Monster in Town | — | **410 GONE** | Stale. No dedicated internal links. Verify external inbound links via GSC backlink report before actioning (TODO-6). |
-| T4.12 | `give-earth-to-life-on-earth` | Give Earth to Life on Earth: Celebrating Earth Day at Rainbow International School | — | **410 GONE** | Stale Earth Day event post. Same caveat. |
-| T4.13 | `the-15th-world-education-summit` | The 15th World Education Summit | — | **410 GONE** | 2019 event. Same caveat. |
-| T4.14 | `fit-india-certificate-of-recognition` | FIT INDIA Certificate of Recognition | — | **410 GONE** | Stale certificate post. Same caveat. |
-
-> **Tier 4 caveat:** Before actioning any 410 in Wave 4, run a GSC backlink check (TODO-6, TODO-7) for each slug. If any external inbound links exist, switch the disposition to KEEP-IMPROVE and assign to a Tier 3 meta rewrite slot.
-
-### Disposition rollup — by tier
-
-| Tier | Posts | KEEP | IMPROVE | MERGE | 301 | 410 |
-|---|---|---|---|---|---|---|
-| 1 | 10 | 4 | 6 | 0 | 0 | 0 |
-| 2 | 25 | 3 | 22 | 0 | 0 | 0 |
-| 3 | 45 | 3 | 39 | 0 | 0 | 3 |
-| 4 | 14 | 0 | 0 | 3 | 7 | 4 |
-| **Total** | **94** | **10** | **67** | **3** | **7** | **7** |
-
-Net surviving posts: 10 + 67 = **77** (slightly above 70–75 because 3 historical-brand posts are pre-approved as KEEP — see Section 0).
+  **Detailed title/description rewrites for KEEP and IMPROVE posts** are in the Wave 2/3/4 implementation appendix (deferred to Wave-execution tasks #12–#14 — title/description rewrites for 77 surviving posts is per-post body work, not planning work).
 
 ---
 

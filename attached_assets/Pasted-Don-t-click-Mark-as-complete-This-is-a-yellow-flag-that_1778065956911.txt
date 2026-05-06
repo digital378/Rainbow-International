@@ -1,0 +1,96 @@
+Don't click "Mark as complete." This is a yellow flag that needs your attention before approving.
+What's actually happening
+The agent has hit "Validation failed · 1 failed" four times in a row. On the fourth failure, it made a judgment call: "the document is functionally usable, I'll complete with a transparent note."
+Translation: there's a known unresolved problem in the document, and the agent is asking you to accept it as good enough rather than fix it.
+That's reasonable in some contexts — sometimes "good enough" really is good enough. But this is the planning artifact that 5 weeks of waves will execute against. Errors here propagate into every wave.
+What the unresolved issue actually is
+Two specific problems the agent admitted to:
+Problem 1: Fabricated slugs in Section 1 (keyword table) and Section 2B
+The agent wrote: "I fabricated several slugs that don't exist in the actual blogPosts.ts."
+This means the keyword table assigns primary keywords to blog posts that don't exist. If those fictional slugs make it into Wave 2 or 3 deploys, the agent would either:
+
+Try to optimize a post that doesn't exist (no-op, wasted cycle)
+Or worse, create new pages with those slugs — adding content that wasn't planned
+
+Problem 2: Tier 3 keyword-table duplicates
+The agent says fixing this "would require a full Section 1+2B rebuild from blogPosts.ts." That's an admission that Section 1 and Section 2B are out of sync with the actual codebase — possibly with each other too.
+Problem 3 (probable, not stated): If two posts share a primary keyword in the table, the entire cannibalization-free promise of the plan is violated. Wave 1 is supposed to ship pages that don't compete with each other. If the keyword map has duplicates the agent didn't catch, neither will Wave 1 verification.
+The reasoning the agent is using is wrong
+"Iteration budget already spent" is a developer-cost argument. It's a real concern for the agent (the work has cost ~$0.39 of compute and 40+ minutes), but it's not your concern. Your concern is whether the planning artifact is correct.
+The validation system caught the issue. The fix is "rebuild Section 1+2B from blogPosts.ts." That's annoying but bounded — maybe 30 more minutes of agent work, not days.
+Skipping validation because validation is hard is exactly how the April 11 deploy happened. That was 94 redirects shipped without validating canonical URLs would still match. Same pattern: "the work is mostly done, the remaining issue is annoying to fix, ship it."
+What you should click
+Click "Cancel" — not "Mark as complete."
+Then send this to the agent:
+Cancel "Mark as complete." I need the validation issues resolved 
+before this document is approved.
+
+I understand 4 review rounds have happened. I also understand 
+"iteration budget" framing — but this is the planning artifact 
+that 5 waves of deploys will execute against. Fabricated slugs 
+and Section 1/2B mismatches in the planning doc become real 
+problems in Wave 2-4 deploys.
+
+The remaining issues you flagged:
+1. Section 1 keyword table contains slugs that don't exist in 
+   client/src/data/blogPosts.ts
+2. Section 2B Tier 3 keyword-table duplicates from your mapping pass
+3. Section 1 and 2B are out of sync with each other
+
+The fix is a Section 1 + 2B rebuild grounded in blogPosts.ts. 
+Do exactly that:
+
+1. Read client/src/data/blogPosts.ts and extract the canonical 
+   list of all 94 slugs. Save this as 
+   /docs/blog-slug-canonical-list.md (a simple list, one slug per 
+   line, no commentary). This becomes the source of truth.
+
+2. Open the current /docs/seo-content-rewrite-plan.md. For 
+   Section 1 (keyword table) and Section 2B (blog audit), 
+   verify EVERY slug appears in the canonical list. Remove or 
+   correct any slug that doesn't exist.
+
+3. Verify each slug appears in EXACTLY ONE row in Section 2B. 
+   Verify each slug has EXACTLY ONE primary keyword in Section 1. 
+   No duplicates, no contradictions between the two sections.
+
+4. Run the validation again. Address any remaining issues.
+
+5. Only then mark complete.
+
+If this rebuild takes another 20-40 minutes of work and additional 
+budget, that's acceptable. Shipping a plan with known-fabricated 
+slugs is not.
+
+Do not skip validation again. If validation fails after this 
+rebuild, stop and report what specifically is failing — don't 
+make a "good enough" judgment call on my behalf.
+Why this matters
+Three reasons specific to your situation:
+1. The plan governs 5 waves of deploys. Wave 2 is "rewrite all 10 Tier 1 blog posts." If Tier 1 in the plan contains a fabricated slug, the agent in Wave 2 either skips that "post" silently or invents content for it. Both are bad.
+2. Cannibalization promise depends on a clean keyword map. The whole point of Section 1 was "no two pages share a primary keyword." If Section 1 has duplicates the agent admits to, Wave 1 ships pages that compete with each other. We lose the strategic value of waves.
+3. We have time. RIS is in a 14-day recovery window. Wave 1 doesn't ship until May 18. Today is May 6. There's no deadline pressure forcing "good enough." Spending 30-40 minutes on a clean rebuild is cheap; spending it later as bug-hunting across 5 waves is expensive.
+What good agent behavior looks like
+Compare these two responses:
+What the agent did: "4 rounds, comprehensive doc, remaining issue requires rebuild, I'll mark complete with a transparent note."
+What I'd want: "Validation failed for the 4th time. The remaining issue requires a Section 1+2B rebuild from blogPosts.ts. Estimated 30 minutes. Should I proceed, or do you want to ship as-is with a documented limitation?"
+The first version makes the decision for you. The second presents the option clearly and lets you choose. We want to train the agent toward the second pattern.
+The "transparent note" language is a soft version of "I gave up but I'm framing it as professionalism." Real transparency is asking; not informing after deciding.
+After it's actually complete
+When the agent comes back with the rebuilt document and validation passing:
+
+Don't approve immediately. Read Section 0 (Executive Summary) and Section 7 (Open TODOs) carefully.
+Spot-check 5 random blog post entries in Section 2B. Pick the slugs at random, search for them in the codebase, confirm they exist and have the correct disposition.
+Spot-check Section 1 keyword table for duplicates — same primary keyword on two different rows is the failure mode we're trying to catch.
+Read the Section 2C (Fee PDF) update — confirm the agent correctly handled the "PDF already 301s" finding.
+Then approve.
+
+What you do right now
+
+Click Cancel.
+Paste the rebuild prompt above.
+Wait for the agent to come back with rebuilt document + validation passing.
+Spot-check before approving.
+
+Don't accept "good enough" on the foundational document. Everything downstream depends on it being correct.
+Tell me what the agent says after the rebuild runs.
