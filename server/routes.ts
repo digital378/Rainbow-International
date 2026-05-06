@@ -1266,6 +1266,154 @@ export async function registerRoutes(
     }
   });
 
+  // ── Marketing Live Dashboard (no-auth, aggregated data only) ──
+  app.get("/api/marketing/live", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    try {
+      const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
+      const parseN   = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[,\s%]/g, "")) || 0;
+
+      const [masterRows, rpsCrmRows, risCrmRows] = await Promise.all([
+        fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
+        fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
+        fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
+      ]);
+
+      // ── DM Overall → monthly combined totals + May weekly ──
+      const MONTH_MAP: Record<string, string> = {
+        JUNE: "Jun 25", JULY: "Jul 25", AUGUST: "Aug 25", SEPTEMBER: "Sep 25",
+        OCTOBER: "Oct 25", NOVEMBER: "Nov 25", DECEMBER: "Dec 25", JANUARY: "Jan 26",
+        FEBRUARY: "Feb 26", MARCH: "Mar 26", APRIL: "Apr 26", MAY: "May 26",
+      };
+      const monthlyTotals: any[] = [];
+      const mayWeeklyCombined: any[] = [];
+      let inMay = false;
+
+      for (const row of masterRows) {
+        const label = String(row[1] ?? "").trim();
+        if (!label) continue;
+        if (label.toUpperCase().startsWith("TOTAL")) break;
+        const monthVal = MONTH_MAP[label.toUpperCase()];
+        if (monthVal) {
+          inMay = monthVal === "May 26";
+          const leads = parseN(row[2]); const spend = parseINR(row[20]);
+          if (leads > 0 || spend > 0) {
+            monthlyTotals.push({ month: monthVal, leads, bookings: parseN(row[5]), walkins: parseN(row[6]), admissions: parseN(row[10]), meta: parseINR(row[18]), google: parseINR(row[19]), spend });
+          }
+          continue;
+        }
+        // May weekly: date patterns containing "/05" (May rows appear BEFORE the MAY monthly row)
+        if (label.includes("/") && (label.includes("/05") || inMay)) {
+          const leads = parseN(row[2]); const spend = parseINR(row[20]);
+          if (leads > 0 || spend > 0) {
+            mayWeeklyCombined.push({ week: label, leads, bookings: parseN(row[5]), walkins: parseN(row[6]), admissions: parseN(row[10]), spend });
+          }
+        }
+      }
+
+      // ── RPS CRM → branch-wise by month ──
+      const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
+      const rpsMonthBranch: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
+      const rpsCloseReasons: Record<string, number> = {};
+      const rpsStatusCount: Record<string, number> = {};
+      const rpsSourceCount: Record<string, number> = {};
+
+      for (const r of rpsCrmRows.slice(1)) {
+        if (!r[0] || !r[2]) continue;
+        const month = String(r[1] ?? "").trim();
+        const centre = String(r[6] ?? "").trim() || "Unassigned";
+        const status = String(r[7] ?? "OPEN").trim().toUpperCase();
+        const remark = String(r[8] ?? "").trim();
+        const source = String(r[10] ?? "Unknown").trim() || "Unknown";
+        if (!month) continue;
+        if (!rpsMonthBranch[month]) rpsMonthBranch[month] = {};
+        if (!rpsMonthBranch[month][centre]) rpsMonthBranch[month][centre] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
+        rpsMonthBranch[month][centre].leads++;
+        if (status === "WALKIN BOOKED") rpsMonthBranch[month][centre].bookings++;
+        if (status === "WALK-IN COMPLETED") rpsMonthBranch[month][centre].walkins++;
+        if (status === "ADM DONE") rpsMonthBranch[month][centre].admissions++;
+        if (status === "CLOSED" || status === "CLOSED AFTER WALKIN") {
+          rpsMonthBranch[month][centre].closed++;
+          if (remark) rpsCloseReasons[remark] = (rpsCloseReasons[remark] || 0) + 1;
+        }
+        rpsStatusCount[status] = (rpsStatusCount[status] || 0) + 1;
+        rpsSourceCount[source] = (rpsSourceCount[source] || 0) + 1;
+      }
+
+      const rpsByMonth = Object.keys(rpsMonthBranch)
+        .sort((a, b) => { const ai = MONTH_ORDER.indexOf(a), bi = MONTH_ORDER.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); })
+        .map(month => {
+          const branches = Object.entries(rpsMonthBranch[month])
+            .map(([centre, d]) => ({ centre, ...d }))
+            .filter(b => b.centre && b.centre !== "Unassigned")
+            .sort((a, b) => b.leads - a.leads);
+          const total = branches.reduce((a, b) => ({ leads:a.leads+b.leads, bookings:a.bookings+b.bookings, walkins:a.walkins+b.walkins, admissions:a.admissions+b.admissions, closed:a.closed+b.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
+          return { month, branches, total };
+        });
+
+      // ── RIS CRM → education-level groups by month ──
+      const GRADE_MAP: Record<string, string> = {};
+      for (const g of ["nursery","playgroup","junior kg","junior kg","senior kg","senior kg","kg"]) GRADE_MAP[g] = "Pre-Primary";
+      for (const g of ["class 1","class 2","class 3","class 4","class 5"]) GRADE_MAP[g] = "Primary";
+      for (const g of ["class 6","class 7","class 8"]) GRADE_MAP[g] = "Middle";
+      for (const g of ["class 9","class 10"]) GRADE_MAP[g] = "Secondary";
+      for (const g of ["class 11","class 11 science","class 11 commerce","class 11 humanities","11th","class 12","class 12 science","class 12 commerce","class 12 humanities"]) GRADE_MAP[g] = "Senior Secondary";
+
+      const risMonthGroup: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
+      const risCloseReasons: Record<string, number> = {};
+      const risStatusCount: Record<string, number> = {};
+      const risSourceCount: Record<string, number> = {};
+
+      for (const r of risCrmRows.slice(1)) {
+        if (!r[0] || !r[2]) continue;
+        const month = String(r[1] ?? "").trim();
+        const grade = String(r[5] ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+        const group = GRADE_MAP[grade];
+        if (!month || !group) continue;
+        const status = String(r[6] ?? "OPEN").trim().toUpperCase();
+        const remark = String(r[7] ?? "").trim();
+        const source = String(r[9] ?? "Unknown").trim() || "Unknown";
+        if (!risMonthGroup[month]) risMonthGroup[month] = {};
+        if (!risMonthGroup[month][group]) risMonthGroup[month][group] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
+        risMonthGroup[month][group].leads++;
+        if (status === "WALKIN BOOKED") risMonthGroup[month][group].bookings++;
+        if (status === "WALK-IN COMPLETED") risMonthGroup[month][group].walkins++;
+        if (status === "ADM DONE") risMonthGroup[month][group].admissions++;
+        if (status === "CLOSED") {
+          risMonthGroup[month][group].closed++;
+          if (remark) risCloseReasons[remark] = (risCloseReasons[remark] || 0) + 1;
+        }
+        risStatusCount[status] = (risStatusCount[status] || 0) + 1;
+        risSourceCount[source] = (risSourceCount[source] || 0) + 1;
+      }
+
+      const GROUP_ORDER_SRV = ["Pre-Primary","Primary","Middle","Secondary","Senior Secondary"];
+      const risByMonth = Object.keys(risMonthGroup)
+        .sort((a, b) => { const ai = MONTH_ORDER.indexOf(a), bi = MONTH_ORDER.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); })
+        .map(month => {
+          const groups = GROUP_ORDER_SRV
+            .filter(g => risMonthGroup[month][g])
+            .map(g => ({ group: g, ...risMonthGroup[month][g] }));
+          const total = groups.reduce((a, g) => ({ leads:a.leads+g.leads, bookings:a.bookings+g.bookings, walkins:a.walkins+g.walkins, admissions:a.admissions+g.admissions, closed:a.closed+g.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
+          return { month, groups, total };
+        });
+
+      const sortReasons = (map: Record<string, number>) =>
+        Object.entries(map).filter(([r]) => r.trim()).sort((a, b) => b[1] - a[1]).map(([reason, count]) => ({ reason, count }));
+
+      res.json({
+        generatedAt: new Date().toISOString(),
+        currentDayOfMonth: new Date().getDate(),
+        monthlyTotals,
+        mayWeeklyCombined,
+        rpsCrm: { byMonth: rpsByMonth, closedReasons: sortReasons(rpsCloseReasons), statusSummary: rpsStatusCount, bySource: rpsSourceCount },
+        risCrm: { byMonth: risByMonth, closedReasons: sortReasons(risCloseReasons), statusSummary: risStatusCount, bySource: risSourceCount },
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch live marketing data", error: err.message });
+    }
+  });
+
   // ── Google Sheets ─────────────────────────────────────────────
   const SHEET_IDS = {
     dmTracker: "1gzMAO-RyVFfz5hqANr8JApu-M6LwAftMyXnZD8_kjMw",

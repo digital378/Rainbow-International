@@ -5,28 +5,41 @@ import {
 } from "recharts";
 import {
   LAST_UPDATED,
-  TODAY_DATE,
+  TODAY_DATE as TODAY_DATE_STATIC,
   DAYS_IN_MAY,
   MIN_REVENUE_PER_ADM,
   MAY_IDX,
-  MONTHLY,
+  MONTHLY as MONTHLY_STATIC,
   ORGANIC_PRE_SPEND,
   LAST_YEAR,
   MAY_WEEKLY,
   SOCIAL,
   DEFAULT_FIXED,
-  CRM_RPS,
   type SegmentKey,
   type MetricSet,
   type MonthRow,
-  type CrmRow,
 } from "@shared/marketingData";
+
+/* ── Live data types ── */
+type LiveCrmEntry = { leads: number; bookings: number; walkins: number; admissions: number; closed: number };
+type LiveBranch = { centre: string } & LiveCrmEntry;
+type LiveGroup  = { group: string  } & LiveCrmEntry;
+type LiveRpsMonth = { month: string; branches: LiveBranch[]; total: LiveCrmEntry };
+type LiveRisMonth = { month: string; groups: LiveGroup[];    total: LiveCrmEntry };
+type LiveData = {
+  generatedAt: string;
+  currentDayOfMonth: number;
+  monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number; meta: number; google: number; spend: number }>;
+  mayWeeklyCombined: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number; spend: number }>;
+  rpsCrm: { byMonth: LiveRpsMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
+  risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
+};
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", CYAN = "#0891b2", PURPLE = "#7c3aed", SLATE = "#475569";
 
-const MAY_RIS_BASE = MONTHLY[MAY_IDX].ris;
-const MAY_RPS_BASE = MONTHLY[MAY_IDX].rps;
+const MAY_RIS_BASE = MONTHLY_STATIC[MAY_IDX].ris;
+const MAY_RPS_BASE = MONTHLY_STATIC[MAY_IDX].rps;
 
 /* ═══════════════════════════════════════════════════════════════════
    HELPERS
@@ -151,6 +164,13 @@ export default function Marketing() {
   const [brochureReqs, setBrochureReqs] = useState<BrochureReq[]>([]);
   const [brochureLoading, setBrochureLoading] = useState<boolean>(true);
 
+  /* Live data from Google Sheets */
+  const [liveData, setLiveData] = useState<LiveData | null>(null);
+  const [liveLoading, setLiveLoading] = useState<boolean>(true);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [rpsCrmMonth, setRpsCrmMonth] = useState<string>("");
+  const [risCrmMonth, setRisCrmMonth] = useState<string>("");
+
   useEffect(() => {
     document.title = "Marketing Dashboard | Rainbow International School";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
@@ -171,6 +191,22 @@ export default function Marketing() {
     return () => { cancelled = true; };
   }, []);
 
+  /* Live Google Sheets fetch — auto-refresh every 5 minutes */
+  useEffect(() => {
+    let cancelled = false;
+    const fetchLive = () => {
+      setLiveLoading(true);
+      fetch("/api/marketing/live")
+        .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+        .then((data: LiveData) => { if (!cancelled) { setLiveData(data); setLiveError(null); } })
+        .catch(err => { if (!cancelled) setLiveError(String(err)); })
+        .finally(() => { if (!cancelled) setLiveLoading(false); });
+    };
+    fetchLive();
+    const iv = setInterval(fetchLive, 5 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(iv); };
+  }, []);
+
   /* Reset cost inputs when segment changes */
   useEffect(() => {
     const def = DEFAULT_FIXED[segment];
@@ -179,10 +215,34 @@ export default function Marketing() {
 
   const monthlyFixed = salaryCost + crmCost + overheadCost;
 
+  /* ── Live MONTHLY override (only current month affected; spend kept from static for RIS/RPS) ── */
+  const TODAY_DATE = liveData?.currentDayOfMonth ?? TODAY_DATE_STATIC;
+  const DASH_TO_CRM: Record<string, string> = {
+    "Jun 25":"Jun-25","Jul 25":"Jul-25","Aug 25":"Aug-25","Sep 25":"Sep-25",
+    "Oct 25":"Oct-25","Nov 25":"Nov-25","Dec 25":"Dec-25","Jan 26":"Jan-26",
+    "Feb 26":"Feb-26","Mar 26":"Mar-26","Apr 26":"Apr-26","May 26":"May-26",
+  };
+  const MONTHLY_LIVE = useMemo<MonthRow[]>(() => {
+    if (!liveData?.monthlyTotals?.length) return MONTHLY_STATIC;
+    return MONTHLY_STATIC.map(row => {
+      const live = liveData.monthlyTotals.find(m => m.month === row.month);
+      if (!live) return row;
+      const crmKey = DASH_TO_CRM[row.month] ?? "";
+      const risMon = liveData.risCrm.byMonth.find(m => m.month === crmKey);
+      const rpsMon = liveData.rpsCrm.byMonth.find(m => m.month === crmKey);
+      return {
+        month: row.month,
+        combined: { leads: live.leads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google },
+        ris: risMon ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings, walkins: risMon.total.walkins, admissions: risMon.total.admissions } : row.ris,
+        rps: rpsMon ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings, walkins: rpsMon.total.walkins, admissions: rpsMon.total.admissions } : row.rps,
+      };
+    });
+  }, [liveData]);
+
   /* ── Memoized derived datasets ── */
-  const segmentRows = useMemo(() => MONTHLY.map(m => ({ month: m.month, ...getSegment(m, segment) })), [segment]);
-  const totals = useMemo(() => totalsFor(MONTHLY, segment), [segment]);
-  const totalMonths = MONTHLY.length;
+  const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({ month: m.month, ...getSegment(m, segment) })), [segment, MONTHLY_LIVE]);
+  const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
+  const totalMonths = MONTHLY_LIVE.length;
 
   const totalsLastYearSegment = useMemo(() => {
     if (segment === "combined") {
@@ -213,7 +273,7 @@ export default function Marketing() {
   /* TY Oct–May totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
   const TY_OCT_NOV_ADM = { combined: 21, ris: 12, rps: 9 }; // oct+nov 25 organic adm per segment
   const tyOctMayTotals = useMemo(() => {
-    const dec_may = totalsFor(MONTHLY, segment); // Dec 25 – May 26 (all 6 rows)
+    const dec_may = totalsFor(MONTHLY_LIVE, segment); // Dec 25 – May 26 (all 6 rows)
     return {
       leads:       dec_may.leads,       // Oct/Nov digital leads untracked; Dec-May only
       walkins:     dec_may.walkins,     // same
@@ -376,7 +436,7 @@ export default function Marketing() {
 
     /* RIS vs RPS specific */
     if (segment === "combined") {
-      const aprRis = MONTHLY[4].ris, aprRps = MONTHLY[4].rps;
+      const aprRis = MONTHLY_LIVE[4].ris, aprRps = MONTHLY_LIVE[4].rps;
       const risConv = (aprRis.admissions / aprRis.leads) * 100;
       const rpsConv = (aprRps.admissions / aprRps.leads) * 100;
       if (Math.abs(risConv - rpsConv) > 1) {
@@ -779,139 +839,285 @@ export default function Marketing() {
           </section>
         )}
 
-        {/* ───────── 7b. CRM Branch Performance (RPS centre-wise) ───────── */}
+        {/* ───────── 7b. Live CRM — RPS Centre-wise ───────── */}
         {(segment === "combined" || segment === "rps") && (
           <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
             <SectionTitle
-              title="CRM Branch Performance — RPS Centres"
-              sub="Centre-wise lead distribution, conversion & admissions (Jan – Apr 2026). RIS operates a single Brahmand centre."
-              badge="LIVE FROM CRM"
+              title="Live CRM Report — RPS Centre Performance"
+              sub={liveData
+                ? `Live from Google Sheets · synced ${new Date(liveData.generatedAt).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}`
+                : "Loading live data from Google Sheets…"}
+              badge="LIVE"
             />
-            {(() => {
-              /* Aggregate across the 4 months for centre rankings */
-              const centres = ["Aggarwal","Anand Nagar","Kasarvadavali","Hariniwas","Dhokali","Kalwa","Unassigned"];
-              const totals: Record<string, CrmRow> = Object.fromEntries(
-                centres.map(c => [c, { centre: c, leads: 0, bookings: 0, walkins: 0, admissions: 0 }])
-              );
-              CRM_RPS.forEach(m => m.rows.forEach(r => {
-                totals[r.centre].leads += r.leads;
-                totals[r.centre].bookings += r.bookings;
-                totals[r.centre].walkins += r.walkins;
-                totals[r.centre].admissions += r.admissions;
-              }));
-              const rows = centres.map(c => totals[c]);
-              const grandTotal = rows.reduce((a, r) => ({
-                centre: "Total", leads: a.leads + r.leads, bookings: a.bookings + r.bookings,
-                walkins: a.walkins + r.walkins, admissions: a.admissions + r.admissions,
-              }), { centre: "Total", leads: 0, bookings: 0, walkins: 0, admissions: 0 });
-              const maxLeads = Math.max(...rows.map(r => r.leads));
-              const maxAdm = Math.max(...rows.map(r => r.admissions));
-              const top = [...rows].filter(r => r.centre !== "Unassigned" && r.admissions > 0)
-                .sort((a, b) => (b.admissions / Math.max(b.leads, 1)) - (a.admissions / Math.max(a.leads, 1)))[0];
+            {liveLoading && !liveData && (
+              <div className="text-xs text-gray-400 py-6 text-center">Syncing with Google Sheets…</div>
+            )}
+            {liveError && !liveData && (
+              <div className="text-xs text-red-500 py-4">Could not load live data — {liveError}</div>
+            )}
+            {liveData && (() => {
+              const rpsMonths = liveData.rpsCrm.byMonth.map(m => m.month);
+              const allTabs = [...rpsMonths, "YTD"];
+              const selTab = rpsCrmMonth || rpsMonths[rpsMonths.length - 1] || "YTD";
+              const isYtd = selTab === "YTD";
+
+              let displayBranches: LiveBranch[];
+              if (isYtd) {
+                const agg: Record<string, LiveCrmEntry> = {};
+                liveData.rpsCrm.byMonth.forEach(m => m.branches.forEach(b => {
+                  if (!agg[b.centre]) agg[b.centre] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
+                  agg[b.centre].leads += b.leads; agg[b.centre].bookings += b.bookings;
+                  agg[b.centre].walkins += b.walkins; agg[b.centre].admissions += b.admissions; agg[b.centre].closed += b.closed;
+                }));
+                displayBranches = Object.entries(agg).map(([centre, d]) => ({ centre, ...d })).sort((a,b) => b.leads - a.leads);
+              } else {
+                displayBranches = liveData.rpsCrm.byMonth.find(m => m.month === selTab)?.branches ?? [];
+              }
+
+              const grandTotal = displayBranches.reduce((a,b) => ({ leads:a.leads+b.leads, bookings:a.bookings+b.bookings, walkins:a.walkins+b.walkins, admissions:a.admissions+b.admissions, closed:a.closed+b.closed }), { leads:0,bookings:0,walkins:0,admissions:0,closed:0 });
+              const maxLeads = Math.max(...displayBranches.map(b => b.leads), 1);
+              const maxAdm   = Math.max(...displayBranches.map(b => b.admissions), 1);
+              const top = [...displayBranches].filter(b => b.admissions > 0).sort((a,b) => (b.admissions/Math.max(b.leads,1)) - (a.admissions/Math.max(a.leads,1)))[0];
+              const totalClosed = liveData.rpsCrm.closedReasons.reduce((a,x) => a+x.count, 0);
+
               return (
                 <>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {allTabs.map(tab => (
+                      <button key={tab} onClick={() => setRpsCrmMonth(tab)}
+                        data-testid={`button-rps-month-${tab}`}
+                        className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors ${selTab===tab ? "bg-[#091a4f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs" data-testid="table-crm-branches">
                       <thead>
-                        <tr className="text-left text-gray-500 border-b">
+                        <tr className="text-left text-gray-500 border-b-2 border-gray-100">
                           <th className="py-2 pr-3 font-bold">Centre</th>
                           <th className="py-2 px-2 font-bold text-right">Leads</th>
                           <th className="py-2 px-2 font-bold text-right">Bookings</th>
                           <th className="py-2 px-2 font-bold text-right">Walk-ins</th>
                           <th className="py-2 px-2 font-bold text-right">Admissions</th>
-                          <th className="py-2 px-2 font-bold text-right">L→W %</th>
-                          <th className="py-2 px-2 font-bold text-right">L→Adm %</th>
-                          <th className="py-2 pl-2 font-bold text-right">W→Adm %</th>
+                          <th className="py-2 px-2 font-bold text-right">Closed</th>
+                          <th className="py-2 px-2 font-bold text-right">L→Adm%</th>
+                          <th className="py-2 pl-2 font-bold text-right">W→Adm%</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {rows.map(r => {
-                          const lw = r.leads ? (r.walkins / r.leads) * 100 : 0;
-                          const la = r.leads ? (r.admissions / r.leads) * 100 : 0;
-                          const wa = r.walkins ? (r.admissions / r.walkins) * 100 : 0;
-                          const isTop = top && r.centre === top.centre;
-                          const isUnassigned = r.centre === "Unassigned";
+                        {displayBranches.map((b, i) => {
+                          const la = b.leads ? (b.admissions/b.leads)*100 : 0;
+                          const wa = b.walkins ? (b.admissions/b.walkins)*100 : 0;
+                          const isTop = top?.centre === b.centre;
                           return (
-                            <tr key={r.centre} className={`border-b ${isTop ? "bg-amber-50" : isUnassigned ? "bg-red-50/40" : ""}`} data-testid={`row-crm-${r.centre.toLowerCase().replace(/\s+/g,"-")}`}>
+                            <tr key={b.centre} className={`border-b ${isTop ? "bg-amber-50" : i%2===0 ? "bg-gray-50/40" : ""}`}
+                              data-testid={`row-crm-${b.centre.toLowerCase().replace(/\s+/g,"-")}`}>
                               <td className="py-2 pr-3 font-bold" style={{ color: NAVY }}>
-                                {r.centre}
+                                {b.centre}
                                 {isTop && <span className="ml-2 text-[9px] font-bold uppercase bg-amber-400 text-[#091a4f] px-1.5 py-0.5 rounded">Top</span>}
-                                {isUnassigned && <span className="ml-2 text-[9px] font-bold uppercase bg-red-200 text-red-700 px-1.5 py-0.5 rounded">Unassigned</span>}
                               </td>
-                              <td className="py-2 px-2 text-right font-semibold">
+                              <td className="py-2 px-2 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <div className="w-12 h-1.5 bg-gray-100 rounded">
-                                    <div className="h-full rounded" style={{ width: `${(r.leads / maxLeads) * 100}%`, background: NAVY }} />
-                                  </div>
-                                  {num(r.leads)}
+                                  <div className="w-10 h-1.5 bg-gray-100 rounded"><div className="h-full rounded" style={{ width:`${(b.leads/maxLeads)*100}%`, background:NAVY }} /></div>
+                                  <span className="font-semibold">{b.leads}</span>
                                 </div>
                               </td>
-                              <td className="py-2 px-2 text-right">{num(r.bookings)}</td>
-                              <td className="py-2 px-2 text-right">{num(r.walkins)}</td>
+                              <td className="py-2 px-2 text-right">{b.bookings}</td>
+                              <td className="py-2 px-2 text-right">{b.walkins}</td>
                               <td className="py-2 px-2 text-right font-bold" style={{ color: GREEN }}>
                                 <div className="flex items-center justify-end gap-2">
-                                  <div className="w-12 h-1.5 bg-gray-100 rounded">
-                                    <div className="h-full rounded" style={{ width: `${(r.admissions / Math.max(maxAdm,1)) * 100}%`, background: GREEN }} />
-                                  </div>
-                                  {num(r.admissions)}
+                                  <div className="w-10 h-1.5 bg-gray-100 rounded"><div className="h-full rounded" style={{ width:`${(b.admissions/maxAdm)*100}%`, background:GREEN }} /></div>
+                                  {b.admissions}
                                 </div>
                               </td>
-                              <td className="py-2 px-2 text-right text-gray-600">{pct(lw)}</td>
-                              <td className="py-2 px-2 text-right font-bold" style={{ color: la >= 5 ? GREEN : la >= 2 ? AMBER : RED }}>{pct(la)}</td>
+                              <td className="py-2 px-2 text-right text-red-500">{b.closed}</td>
+                              <td className="py-2 px-2 text-right font-bold" style={{ color: la>=5?GREEN:la>=2?AMBER:RED }}>{pct(la)}</td>
                               <td className="py-2 pl-2 text-right text-gray-600">{pct(wa)}</td>
                             </tr>
                           );
                         })}
-                        <tr className="font-black border-t-2" style={{ color: NAVY }}>
-                          <td className="py-2 pr-3">Total (Jan–Apr)</td>
-                          <td className="py-2 px-2 text-right">{num(grandTotal.leads)}</td>
-                          <td className="py-2 px-2 text-right">{num(grandTotal.bookings)}</td>
-                          <td className="py-2 px-2 text-right">{num(grandTotal.walkins)}</td>
-                          <td className="py-2 px-2 text-right" style={{ color: GREEN }}>{num(grandTotal.admissions)}</td>
-                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads ? (grandTotal.walkins/grandTotal.leads)*100 : 0)}</td>
-                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads ? (grandTotal.admissions/grandTotal.leads)*100 : 0)}</td>
-                          <td className="py-2 pl-2 text-right">{pct(grandTotal.walkins ? (grandTotal.admissions/grandTotal.walkins)*100 : 0)}</td>
+                        <tr className="font-black border-t-2 border-gray-200 bg-gray-50/60">
+                          <td className="py-2 pr-3" style={{ color: NAVY }}>Total {isYtd ? "(YTD)" : selTab}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.leads}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.bookings}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.walkins}</td>
+                          <td className="py-2 px-2 text-right font-bold" style={{ color: GREEN }}>{grandTotal.admissions}</td>
+                          <td className="py-2 px-2 text-right text-red-500">{grandTotal.closed}</td>
+                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads?(grandTotal.admissions/grandTotal.leads)*100:0)}</td>
+                          <td className="py-2 pl-2 text-right">{pct(grandTotal.walkins?(grandTotal.admissions/grandTotal.walkins)*100:0)}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
 
-                  {/* Monthly trend per centre — admissions */}
-                  <div className="mt-5">
-                    <div className="text-xs font-bold text-gray-600 mb-2">Admissions by Centre — Monthly</div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="text-left text-gray-500 border-b">
-                            <th className="py-2 pr-3 font-bold">Centre</th>
-                            {CRM_RPS.map(m => <th key={m.month} className="py-2 px-2 font-bold text-right">{m.month}</th>)}
-                            <th className="py-2 pl-2 font-bold text-right">Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {centres.filter(c => c !== "Unassigned").map(c => {
-                            const cells = CRM_RPS.map(m => m.rows.find(r => r.centre === c)?.admissions ?? 0);
-                            const tot = cells.reduce((a, n) => a + n, 0);
-                            return (
-                              <tr key={c} className="border-b">
-                                <td className="py-2 pr-3 font-semibold" style={{ color: NAVY }}>{c}</td>
-                                {cells.map((n, i) => <td key={i} className="py-2 px-2 text-right">{n}</td>)}
-                                <td className="py-2 pl-2 text-right font-bold" style={{ color: GREEN }}>{tot}</td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
                   {top && (
                     <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs">
-                      <span className="font-black text-amber-900">★ Top performing centre: </span>
-                      <span className="text-amber-900">
-                        <strong>{top.centre}</strong> — {top.admissions} admissions on {top.leads} leads
-                        ({pct((top.admissions/top.leads)*100)} lead→admission rate).
-                      </span>
+                      <span className="font-black text-amber-900">★ Top centre: </span>
+                      <span className="text-amber-900"><strong>{top.centre}</strong> — {top.admissions} admissions on {top.leads} leads ({pct((top.admissions/Math.max(top.leads,1))*100)} lead→adm rate).</span>
+                    </div>
+                  )}
+
+                  {liveData.rpsCrm.closedReasons.length > 0 && (
+                    <div className="mt-5">
+                      <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Lead Reasons — RPS (YTD, {totalClosed} closed)</div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead><tr className="text-left text-gray-500 border-b">
+                            <th className="py-1.5 pr-2 font-bold w-6">#</th>
+                            <th className="py-1.5 pr-3 font-bold">Reason</th>
+                            <th className="py-1.5 px-2 font-bold text-right">Count</th>
+                            <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
+                          </tr></thead>
+                          <tbody>
+                            {liveData.rpsCrm.closedReasons.map((r, i) => (
+                              <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
+                                <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
+                                <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
+                                <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
+                                <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/totalClosed)*100)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+          </section>
+        )}
+
+        {/* ───────── 7c. Live CRM — RIS Education Level ───────── */}
+        {(segment === "combined" || segment === "ris") && (
+          <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+            <SectionTitle
+              title="Live CRM Report — RIS (by Education Level)"
+              sub={liveData
+                ? `Live from Google Sheets · synced ${new Date(liveData.generatedAt).toLocaleString("en-IN", {day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}`
+                : "Loading live data from Google Sheets…"}
+              badge="LIVE"
+            />
+            {liveLoading && !liveData && (
+              <div className="text-xs text-gray-400 py-6 text-center">Syncing with Google Sheets…</div>
+            )}
+            {liveData && (() => {
+              const risMonths = liveData.risCrm.byMonth.map(m => m.month);
+              const allTabs = [...risMonths, "YTD"];
+              const selTab = risCrmMonth || risMonths[risMonths.length - 1] || "YTD";
+              const isYtd = selTab === "YTD";
+              const GROUP_ORDER_UI = ["Pre-Primary","Primary","Middle","Secondary","Senior Secondary"];
+              const GROUP_COLORS: Record<string,string> = {
+                "Pre-Primary": "#7c3aed", "Primary": "#2563eb", "Middle": "#0891b2",
+                "Secondary": "#059669", "Senior Secondary": "#d97706",
+              };
+
+              let displayGroups: LiveGroup[];
+              if (isYtd) {
+                const agg: Record<string, LiveCrmEntry> = {};
+                liveData.risCrm.byMonth.forEach(m => m.groups.forEach(g => {
+                  if (!agg[g.group]) agg[g.group] = { leads:0,bookings:0,walkins:0,admissions:0,closed:0 };
+                  agg[g.group].leads += g.leads; agg[g.group].bookings += g.bookings;
+                  agg[g.group].walkins += g.walkins; agg[g.group].admissions += g.admissions; agg[g.group].closed += g.closed;
+                }));
+                displayGroups = GROUP_ORDER_UI.filter(g => agg[g]).map(g => ({ group:g, ...agg[g] }));
+              } else {
+                displayGroups = liveData.risCrm.byMonth.find(m => m.month === selTab)?.groups ?? [];
+              }
+
+              const grandTotal = displayGroups.reduce((a,g) => ({ leads:a.leads+g.leads, bookings:a.bookings+g.bookings, walkins:a.walkins+g.walkins, admissions:a.admissions+g.admissions, closed:a.closed+g.closed }), { leads:0,bookings:0,walkins:0,admissions:0,closed:0 });
+              const maxLeads = Math.max(...displayGroups.map(g => g.leads), 1);
+              const totalClosed = liveData.risCrm.closedReasons.reduce((a,x) => a+x.count, 0);
+
+              return (
+                <>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {allTabs.map(tab => (
+                      <button key={tab} onClick={() => setRisCrmMonth(tab)}
+                        data-testid={`button-ris-month-${tab}`}
+                        className={`px-3 py-1.5 rounded-md text-[11px] font-bold transition-colors ${selTab===tab ? "bg-[#091a4f] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs" data-testid="table-ris-crm-live">
+                      <thead>
+                        <tr className="text-left text-gray-500 border-b-2 border-gray-100">
+                          <th className="py-2 pr-3 font-bold">Level</th>
+                          <th className="py-2 px-2 font-bold text-right">Leads</th>
+                          <th className="py-2 px-2 font-bold text-right">Bookings</th>
+                          <th className="py-2 px-2 font-bold text-right">Walk-ins</th>
+                          <th className="py-2 px-2 font-bold text-right">Admissions</th>
+                          <th className="py-2 px-2 font-bold text-right">Closed</th>
+                          <th className="py-2 px-2 font-bold text-right">L→Adm%</th>
+                          <th className="py-2 pl-2 font-bold text-right">W→Adm%</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {displayGroups.map((g, i) => {
+                          const la = g.leads ? (g.admissions/g.leads)*100 : 0;
+                          const wa = g.walkins ? (g.admissions/g.walkins)*100 : 0;
+                          const color = GROUP_COLORS[g.group] || NAVY;
+                          return (
+                            <tr key={g.group} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}
+                              data-testid={`row-ris-crm-${g.group.toLowerCase().replace(/\s+/g,"-")}`}>
+                              <td className="py-2 pr-3 font-bold" style={{ color }}>{g.group}</td>
+                              <td className="py-2 px-2 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <div className="w-10 h-1.5 bg-gray-100 rounded"><div className="h-full rounded" style={{ width:`${(g.leads/maxLeads)*100}%`, background:color }} /></div>
+                                  <span className="font-semibold">{g.leads}</span>
+                                </div>
+                              </td>
+                              <td className="py-2 px-2 text-right">{g.bookings}</td>
+                              <td className="py-2 px-2 text-right">{g.walkins}</td>
+                              <td className="py-2 px-2 text-right font-bold text-green-700">{g.admissions}</td>
+                              <td className="py-2 px-2 text-right text-red-500">{g.closed}</td>
+                              <td className="py-2 px-2 text-right font-bold" style={{ color: la>=5?GREEN:la>=2?AMBER:RED }}>{pct(la)}</td>
+                              <td className="py-2 pl-2 text-right text-gray-600">{pct(wa)}</td>
+                            </tr>
+                          );
+                        })}
+                        <tr className="font-black border-t-2 border-gray-200 bg-gray-50/60">
+                          <td className="py-2 pr-3" style={{ color: NAVY }}>Total {isYtd ? "(YTD)" : selTab}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.leads}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.bookings}</td>
+                          <td className="py-2 px-2 text-right">{grandTotal.walkins}</td>
+                          <td className="py-2 px-2 text-right font-bold text-green-700">{grandTotal.admissions}</td>
+                          <td className="py-2 px-2 text-right text-red-500">{grandTotal.closed}</td>
+                          <td className="py-2 px-2 text-right">{pct(grandTotal.leads?(grandTotal.admissions/grandTotal.leads)*100:0)}</td>
+                          <td className="py-2 pl-2 text-right">{pct(grandTotal.walkins?(grandTotal.admissions/grandTotal.walkins)*100:0)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {liveData.risCrm.closedReasons.length > 0 && (
+                    <div className="mt-5">
+                      <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Lead Reasons — RIS (YTD, {totalClosed} closed)</div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead><tr className="text-left text-gray-500 border-b">
+                            <th className="py-1.5 pr-2 font-bold w-6">#</th>
+                            <th className="py-1.5 pr-3 font-bold">Reason</th>
+                            <th className="py-1.5 px-2 font-bold text-right">Count</th>
+                            <th className="py-1.5 pl-2 font-bold text-right">% closed</th>
+                          </tr></thead>
+                          <tbody>
+                            {liveData.risCrm.closedReasons.map((r, i) => (
+                              <tr key={r.reason} className={`border-b ${i%2===0?"bg-gray-50/40":""}`}>
+                                <td className="py-1.5 pr-2 text-gray-400">{i+1}</td>
+                                <td className="py-1.5 pr-3 text-gray-700">{r.reason}</td>
+                                <td className="py-1.5 px-2 text-right font-bold">{r.count}</td>
+                                <td className="py-1.5 pl-2 text-right text-gray-500">{pct((r.count/totalClosed)*100)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </>
@@ -1472,8 +1678,12 @@ export default function Marketing() {
         {/* Footer */}
         <div className="text-center text-xs text-gray-400 pb-6 pt-2 border-t border-gray-200">
           <div>This dashboard is strictly confidential — for internal management use only.</div>
-          <div className="mt-1">Data sourced from DM Performance Tracker (Nabeel sub-sheet) and DM Target-Wise Report (June 2025).</div>
-          <div className="mt-1">Last updated: {LAST_UPDATED} · Notes: May 2026 reflects partial month (3 of 31 days, May 1–3). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.</div>
+          <div className="mt-1">
+            Monthly performance data sourced live from the DM Overall master Google Sheet · CRM data sourced live from RPS CRM &amp; RIS CRM Google Sheets · auto-refreshes every 5 minutes.
+          </div>
+          <div className="mt-1">
+            Last updated: {liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED} · May 2026 reflects partial month ({TODAY_DATE} of 31 days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.
+          </div>
         </div>
       </div>
     </div>
