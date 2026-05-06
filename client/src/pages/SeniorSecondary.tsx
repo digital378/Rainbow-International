@@ -189,7 +189,6 @@ export default function SeniorSecondary() {
       />
 
       <main className="flex-grow">
-        <WaveOneSeoBlock pageId="senior-secondary" quickAnswer={SENIOR_QUICK_ANSWER} faqs={SENIOR_FAQS} />
 
         {/* ── Intro ──────────────────────────────────────────────── */}
         <section className="py-20 bg-white">
@@ -383,6 +382,7 @@ export default function SeniorSecondary() {
         </div>
 
         <ContactForm />
+        <WaveOneSeoBlock pageId="senior-secondary" quickAnswer={SENIOR_QUICK_ANSWER} faqs={SENIOR_FAQS} />
       </main>
       <Footer />
     </div>

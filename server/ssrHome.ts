@@ -454,22 +454,6 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
   <a href="/awards-achievements" class="btn-gold">View All Awards &rarr;</a>
 </section>
 
-<!-- Quick Answer + FAQ (AI-SEO block) -->
-<section style="background:#fff;padding:48px 0;border-bottom:1px solid #eef2f7">
-  <div class="container" style="max-width:880px">
-    <div style="background:#f8faff;border:1px solid #dbe7ff;border-radius:14px;padding:20px 22px;margin-bottom:24px">
-      <p style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#0d3b86;margin-bottom:8px">Quick Answer</p>
-      <p style="color:#1a1a2e;line-height:1.7;font-size:16px">Rainbow International School Thane is a CBSE-affiliated K-12 school in the Brahmand area of Thane, Maharashtra, founded in 2009 with a 3.5-acre campus. We offer Nursery to Class 12, with Science, Commerce and Humanities streams in Class 11-12, and admissions for the 2026-27 academic year are currently open.</p>
-    </div>
-    <h2 style="font-family:'Merriweather',serif;font-size:26px;font-weight:900;color:#091a4f;margin-bottom:16px">Parent FAQs</h2>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Is Rainbow International School Thane a CBSE school?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi, and follows the CBSE curriculum from Nursery through Class 12.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Where is Rainbow International School located in Thane?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">The school is on a 3.5-acre campus in the Brahmand area of Thane (Maharashtra), with school-managed transport covering Brahmand, Ghodbunder Road, Manpada and adjoining localities.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Which classes does the school cover?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Rainbow International School Thane is a K-12 school that covers Pre-Primary, Primary (Class 1-5), Secondary (Class 6-10) and Senior Secondary (Class 11-12) with Science, Commerce and Humanities streams.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Are admissions open for the 2026-27 academic year?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. CBSE admissions for 2026-27 are open for Nursery to Class 12, subject to seat availability per class.</p></details>
-    <details style="padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">How can I book a campus visit?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Parents can book a campus visit through the admission enquiry form on the website or by calling the admission desk during school hours.</p></details>
-  </div>
-</section>
-
 <!-- About Preview / Why Choose Us -->
 <section class="about-preview">
   <div class="container">
@@ -723,6 +707,22 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         <p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane, Maharashtra</p>
       </a>
     </div>
+  </div>
+</section>
+
+<!-- Quick Answer + FAQ (AI-SEO block) -->
+<section style="background:#fff;padding:48px 0;border-top:1px solid #eef2f7">
+  <div class="container" style="max-width:880px">
+    <div style="background:#f8faff;border:1px solid #dbe7ff;border-radius:14px;padding:20px 22px;margin-bottom:24px">
+      <p style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#0d3b86;margin-bottom:8px">Quick Answer</p>
+      <p style="color:#1a1a2e;line-height:1.7;font-size:16px">Rainbow International School Thane is a CBSE-affiliated K-12 school in the Brahmand area of Thane, Maharashtra, founded in 2009 with a 3.5-acre campus. We offer Nursery to Class 12, with Science, Commerce and Humanities streams in Class 11-12, and admissions for the 2026-27 academic year are currently open.</p>
+    </div>
+    <h2 style="font-family:'Merriweather',serif;font-size:26px;font-weight:900;color:#091a4f;margin-bottom:16px">Parent FAQs</h2>
+    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Is Rainbow International School Thane a CBSE school?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi, and follows the CBSE curriculum from Nursery through Class 12.</p></details>
+    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Where is Rainbow International School located in Thane?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">The school is on a 3.5-acre campus in the Brahmand area of Thane (Maharashtra), with school-managed transport covering Brahmand, Ghodbunder Road, Manpada and adjoining localities.</p></details>
+    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Which classes does the school cover?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Rainbow International School Thane is a K-12 school that covers Pre-Primary, Primary (Class 1-5), Secondary (Class 6-10) and Senior Secondary (Class 11-12) with Science, Commerce and Humanities streams.</p></details>
+    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Are admissions open for the 2026-27 academic year?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. CBSE admissions for 2026-27 are open for Nursery to Class 12, subject to seat availability per class.</p></details>
+    <details style="padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">How can I book a campus visit?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Parents can book a campus visit through the admission enquiry form on the website or by calling the admission desk during school hours.</p></details>
   </div>
 </section>
 

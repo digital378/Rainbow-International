@@ -129,7 +129,6 @@ export default function Amenities() {
       />
 
       <main className="flex-grow">
-        <WaveOneSeoBlock pageId="amenities" quickAnswer={AMENITIES_QUICK_ANSWER} faqs={AMENITIES_FAQS} />
 
         {/* Intro */}
         <div className="py-14" style={{ background: "#f8faff" }}>
@@ -187,6 +186,7 @@ export default function Amenities() {
         </section>
 
         <ContactForm />
+        <WaveOneSeoBlock pageId="amenities" quickAnswer={AMENITIES_QUICK_ANSWER} faqs={AMENITIES_FAQS} />
       </main>
       <Footer />
     </div>

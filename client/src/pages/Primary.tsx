@@ -170,7 +170,6 @@ export default function Primary() {
       />
 
       <main className="flex-grow">
-        <WaveOneSeoBlock pageId="primary" quickAnswer={PRIMARY_QUICK_ANSWER} faqs={PRIMARY_FAQS} />
 
         {/* ── Intro + Curriculum sidebar ─────────────────────────── */}
         <section className="py-20 bg-white">
@@ -407,6 +406,7 @@ export default function Primary() {
         </div>
 
         <ContactForm />
+        <WaveOneSeoBlock pageId="primary" quickAnswer={PRIMARY_QUICK_ANSWER} faqs={PRIMARY_FAQS} />
       </main>
       <Footer />
     </div>

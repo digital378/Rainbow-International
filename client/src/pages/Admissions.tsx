@@ -47,15 +47,6 @@ const documents = [
   "Caste / Category certificate (if applicable)",
 ];
 
-const faqs = [
-  { q: "When do admissions open for 2026–27?", a: "Admissions for the 2026–27 academic year are currently open. We recommend applying early as seats fill on a first-come, first-served basis." },
-  { q: "Is there an entrance test?", a: "For Nursery to Class 8, there is no written test — we conduct an informal interaction session. For Class 9 and above, a written assessment in core subjects is required." },
-  { q: "Can my child join mid-session?", a: "Mid-session admissions are available subject to seat availability. Contact our admissions office for current openings." },
-  { q: "What is the fee structure?", a: "Fee details are shared during the admission interaction. You can also visit our Fee Structure page or contact the admissions office at +91 82915 68972." },
-  { q: "Do you offer transport facilities?", a: "Yes, GPS-tracked school buses cover 30+ routes across Thane with a trained attendant on each bus." },
-  { q: "Is there a sibling discount?", a: "Yes, sibling concessions are available. Please discuss this during the admission process." },
-];
-
 export default function Admissions() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -82,7 +73,6 @@ export default function Admissions() {
       />
 
       <main className="flex-grow" role="main">
-        <WaveOneSeoBlock pageId="admissions" quickAnswer={ADMISSIONS_QUICK_ANSWER} faqs={ADMISSIONS_FAQS} />
         {/* CTA strip */}
         <div className="bg-white border-b border-gray-100" data-testid="section-cta-strip">
           <div className="container mx-auto px-4 max-w-5xl py-6 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -187,23 +177,6 @@ export default function Admissions() {
           </div>
         </section>
 
-        <section className="py-16 bg-gray-50" data-testid="section-faq">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">Admission FAQs</h2>
-            <div className="space-y-4">
-              {faqs.map((faq, i) => (
-                <details key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm group" data-testid={`faq-${i}`}>
-                  <summary className="px-6 py-4 cursor-pointer font-semibold text-[#091a4f] list-none flex items-center justify-between">
-                    {faq.q}
-                    <span className="text-amber-500 text-xl group-open:rotate-45 transition-transform">+</span>
-                  </summary>
-                  <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed">{faq.a}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section id="enquiry-form" className="py-16" data-testid="section-contact">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">Start Your Child's Journey</h2>
@@ -221,6 +194,7 @@ export default function Admissions() {
             <ContactForm />
           </div>
         </section>
+        <WaveOneSeoBlock pageId="admissions" quickAnswer={ADMISSIONS_QUICK_ANSWER} faqs={ADMISSIONS_FAQS} />
       </main>
       <Footer />
     </div>

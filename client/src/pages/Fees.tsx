@@ -61,7 +61,6 @@ export default function Fees() {
       />
 
       <main className="flex-grow" role="main">
-        <WaveOneSeoBlock pageId="fee-structure" quickAnswer={FEES_QUICK_ANSWER} faqs={FEES_FAQS} />
         <section className="py-16 bg-gradient-to-b from-white to-gray-50" data-testid="section-overview">
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">Fee Overview</h2>
@@ -129,23 +128,6 @@ export default function Fees() {
           </div>
         </section>
 
-        <section className="py-16" data-testid="section-faq">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">Fee-Related FAQs</h2>
-            <div className="space-y-4">
-              {faqs.map((faq, i) => (
-                <details key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm group" data-testid={`faq-${i}`}>
-                  <summary className="px-6 py-4 cursor-pointer font-semibold text-[#091a4f] list-none flex items-center justify-between">
-                    {faq.q}
-                    <span className="text-amber-500 text-xl group-open:rotate-45 transition-transform">+</span>
-                  </summary>
-                  <div className="px-6 pb-4 text-gray-600 text-sm leading-relaxed">{faq.a}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="py-16 bg-gray-50" data-testid="section-cta">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">Get the Complete Fee Schedule</h2>
@@ -158,6 +140,7 @@ export default function Fees() {
             <ContactForm />
           </div>
         </section>
+        <WaveOneSeoBlock pageId="fee-structure" quickAnswer={FEES_QUICK_ANSWER} faqs={FEES_FAQS} />
       </main>
       <Footer />
     </div>

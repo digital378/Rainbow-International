@@ -26,7 +26,6 @@ const DiscoverRainbow = lazy(() => import("@/components/home/DiscoverRainbow").t
 const Neighbourhood = lazy(() => import("@/components/home/Neighbourhood").then(m => ({ default: m.Neighbourhood })));
 const BeyondClassroomSection = lazy(() => import("@/components/home/BeyondClassroomSection").then(m => ({ default: m.BeyondClassroomSection })));
 const Testimonials = lazy(() => import("@/components/home/Testimonials").then(m => ({ default: m.Testimonials })));
-const HomeFAQ = lazy(() => import("@/components/home/HomeFAQ").then(m => ({ default: m.HomeFAQ })));
 const ContactForm = lazy(() => import("@/components/home/ContactForm").then(m => ({ default: m.ContactForm })));
 
 function SectionFallback() {
@@ -100,7 +99,6 @@ export default function Home() {
           <meta itemProp="url" content="https://rainbowinternationalschool.in" />
           <Hero />
           <AwardsStrip />
-          <WaveOneSeoBlock pageId="home" quickAnswer={HOME_QUICK_ANSWER} faqs={HOME_FAQS} />
           <LazyVisible minHeight={400}>
             <Suspense fallback={<SectionFallback />}>
               <AboutPreview />
@@ -136,16 +134,12 @@ export default function Home() {
               <Testimonials />
             </Suspense>
           </LazyVisible>
-          <LazyVisible minHeight={400}>
-            <Suspense fallback={<SectionFallback />}>
-              <HomeFAQ />
-            </Suspense>
-          </LazyVisible>
           <LazyVisible minHeight={600}>
             <Suspense fallback={<SectionFallback />}>
               <ContactForm />
             </Suspense>
           </LazyVisible>
+          <WaveOneSeoBlock pageId="home" quickAnswer={HOME_QUICK_ANSWER} faqs={HOME_FAQS} />
         </article>
       </main>
       <Footer />
