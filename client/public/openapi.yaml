@@ -1,0 +1,166 @@
+openapi: "3.0.0"
+info:
+  title: Rainbow Group Marketing API
+  description: >
+    Live marketing, CRM and operations data for Rainbow International School (RIS)
+    and Rainbow Preschools (RPS). Most endpoints require the ADMIN_TOKEN passed
+    as an API key in the X-Api-Key request header.
+  version: "1.0.0"
+servers:
+  - url: https://rainbowinternationalschool.in
+    description: Rainbow Group Production API
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+paths:
+  /api/marketing/live:
+    get:
+      operationId: getMarketingLive
+      summary: Live combined marketing metrics from Google Sheets
+      description: >
+        Returns live monthly totals (leads, bookings, walk-ins, admissions, ad spend)
+        for both RIS and RPS combined, sourced directly from the DM Overall master
+        Google Sheet. Also includes RPS branch-wise CRM, RIS education-level CRM,
+        closed-lead reasons for both, and May weekly breakdown. No authentication
+        required.
+      security: []
+      responses:
+        "200":
+          description: >
+            Aggregated live data including monthlyTotals, rpsCrm (byMonth, closedReasons),
+            risCrm (byMonth, closedReasons), mayWeeklyCombined, and currentDayOfMonth.
+
+  /api/sheets/crm:
+    get:
+      operationId: getSheetsCrm
+      summary: CRM lead summary by status, source, month and owner
+      description: >
+        Returns live lead counts from the RPS or RIS CRM Google Sheet aggregated
+        by status (ADM DONE, CLOSED, Open, WALKIN BOOKED, WALK-IN COMPLETED),
+        lead source, month, and lead owner. Optionally filter to a single month.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school CRM to query — ris for Rainbow International School, rps for Rainbow Preschools.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Optional case-insensitive substring filter on the Month column, e.g. "may",
+            "apr", "jan-26". Omit to return all months.
+      responses:
+        "200":
+          description: >
+            CRM summary with totalLeads, admissionsDone, closed, open, conversionRate,
+            and breakdowns by status, source, month, and lead owner.
+        "401":
+          description: Missing or invalid X-Api-Key header.
+        "500":
+          description: Google Sheets fetch error.
+
+  /api/sheets/master:
+    get:
+      operationId: getSheetsMaster
+      summary: Weekly funnel breakdown from the DM master tracker
+      description: >
+        Returns a week-by-week lead, walk-in and admission breakdown for a given
+        school and month, read directly from the DM master Google Sheet tabs.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school tab to fetch.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - may
+              - april
+              - feb
+          description: Month to retrieve. Defaults to may.
+      responses:
+        "200":
+          description: >
+            weeklyBreakdown array — each row has Date plus all columns from that
+            sheet tab (walk-ins, DM walk-ins, admissions, conversion rates, etc.).
+        "401":
+          description: Missing or invalid X-Api-Key header.
+        "500":
+          description: Google Sheets fetch error.
+
+  /api/sheets/targets:
+    get:
+      operationId: getSheetsTargets
+      summary: Branch or grade actuals vs monthly targets
+      description: >
+        RPS — returns per-branch actuals (leads, bookings, walk-ins, admissions,
+        conversion rates) alongside monthly targets from the Target Sheet.
+        RIS — returns per-grade actuals (Nursery through Class 12) from the
+        Target sheet tab.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school target sheet to fetch.
+      responses:
+        "200":
+          description: >
+            RPS: branches array with actuals and targets.
+            RIS: grades array with actuals only.
+        "401":
+          description: Missing or invalid X-Api-Key header.
+        "500":
+          description: Google Sheets fetch error.
+
+  /api/sheets/tasks:
+    get:
+      operationId: getSheetsTasks
+      summary: DM team key task tracker
+      description: >
+        Returns tasks from the Key Task sheet with assigned date, end date,
+        task name, owner, status, and remarks. Optionally filter by status.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Optional case-insensitive substring filter on status, e.g. "pending",
+            "completed". Omit to return all tasks.
+      responses:
+        "200":
+          description: >
+            tasks array plus summary counts (total, completed, pending).
+        "401":
+          description: Missing or invalid X-Api-Key header.
+        "500":
+          description: Google Sheets fetch error.

@@ -1628,13 +1628,13 @@ export async function registerRoutes(
     }
   });
 
-  // ── OpenAPI schema for ChatGPT custom action ──────────────
-  // GET /openapi.yaml — returns a valid OpenAPI 3.0 spec with the correct
-  // server URL inferred from the request host. Paste this URL into ChatGPT
-  // "Add actions → Import from URL": https://<your-domain>/openapi.yaml
+  // ── OpenAPI schema served as static file ──────────────────
+  // client/public/openapi.yaml is served by Vite (dev) and express.static (prod).
+  // ChatGPT "Add actions → Import from URL": https://rainbowinternationalschool.in/openapi.yaml
+  // This dynamic route is kept only as a fallback; the static file normally wins.
   app.get("/openapi.yaml", (req, res) => {
-    const proto = req.headers["x-forwarded-proto"] || "https";
-    const host  = req.headers["x-forwarded-host"] || req.headers.host || "localhost:5000";
+    const proto = "https";
+    const host  = "rainbowinternationalschool.in";
     const base  = `${proto}://${host}`;
     const yaml  = `openapi: "3.0.0"
 info:
