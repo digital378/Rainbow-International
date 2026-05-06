@@ -1,0 +1,102 @@
+Good — the agent did the rebuild properly this time. The verification numbers tell the story: 0 fabricated slugs, 94/94 unique rows, totals reconcile to 94, net 77 surviving posts. That's the discipline I was pushing for.
+Let me read what actually changed and what to do next.
+What's solid now
+The rebuild fixes the three concerns I raised:
+
+94 slugs canonical list extracted from source of truth (blogPosts.ts) and saved as a separate file. This becomes the reference document for every wave going forward.
+0 fabricated slugs — every slug in the plan exists in the codebase.
+Each non-redirect post has a unique primary keyword — cannibalization-free invariant verified programmatically.
+Disposition math checks out: 10+67+3+7+7 = 94 ✓
+Wave 4 410 list reconciled — the historical-brand KEEP posts no longer incorrectly listed for 410.
+
+The disposition mix is also reasonable. 67 IMPROVE, 7 each of 301 and 410, 10 KEEP, 3 MERGE — that distribution suggests the agent isn't being rewrite-happy. Most posts get small improvements; only the genuinely problematic ones get redirects/deletions.
+What I want you to verify before approving
+Three quick spot-checks. Open /docs/seo-content-rewrite-plan.md and /docs/blog-slug-canonical-list.md:
+Check 1: Random slug spot-check (3 minutes)
+Pick 5 slugs at random from blog-slug-canonical-list.md (open it, scroll, point your finger). For each:
+
+Find that slug in Section 2B
+Confirm it has a tier, disposition, and primary keyword assigned
+Confirm the disposition makes sense (high-traffic post = KEEP/IMPROVE, not 410)
+
+Check 2: Cluster reconciliation (3 minutes)
+The 5 cluster decisions (9-12) involve specific 301s. Verify:
+
+Screen-time cluster: are regulating-childrens-screen-time, smartphone-addiction-how-to-ensure-healthy-use-by-kids, using-gadgets-the-right-way all marked 301 → pillar?
+Rainbow-brand cluster: are top-reasons-choose-rainbow..., benefits-of-rainbow..., holistic-development-rainbow... all marked 301 → pillar?
+International admission cluster: are the 2 merge posts marked correctly?
+
+If the dispositions don't match the cluster decisions, flag it.
+Check 3: Disposition totals match (1 minute)
+Count the 410 candidates in Section 2B. The agent says 7 total (3 award posts + others). Confirm.
+On the agent's note about title/description rewrites
+The agent moved per-post title/description writing out of this planning doc into wave execution. "Writing 154 final title/description strings is Wave 2/3/4 implementation work, not planning work."
+This is partially defensible but worth pushing back on for Wave 1.
+For Wave 2, 3, 4 (blog posts) — agreed, drafting all 154 title/description strings during planning is overkill. They can be written wave-by-wave when the content is also being rewritten.
+For Wave 1 (6 commercial pages) — the titles and descriptions should be drafted in the planning doc. These 6 pages are the immediate next deploy. Their meta is what we'll review and approve before deploy. If they're not in the plan, where are they?
+Six pages, one title each (max 60 chars), one description each (150-158 chars). That's 12 strings total — maybe 30 minutes of careful work. Not punting that to "implementation" is reasonable.
+What to send back to the agent
+Rebuild verified. Numbers reconcile, no fabricated slugs, 
+cannibalization-free invariant holds. Good work.
+
+One amendment before this is final:
+
+For Wave 1 commercial pages (the 6 that ship May 18), the planning 
+doc must contain the actual proposed title and description strings, 
+not just keyword assignments. These are the strings I'll review and 
+approve before deploy. Without them, the planning doc isn't 
+deployment-ready for Wave 1.
+
+Wave 1 pages requiring full meta drafts:
+1. /
+2. /admissions
+3. /primary-section
+4. /senior-secondary-section
+5. /amenities
+6. /fee-structure
+
+For each, add to Section 2A:
+- Proposed title (≤60 chars, with char count)
+- Proposed meta description (150-158 chars, with char count)
+- Proposed H1
+- Confirmation that title is unique across the site
+- Confirmation that description is unique across the site
+
+For the other 35 commercial pages and 77 surviving blog posts, 
+keeping just the keyword/disposition assignment in the planning doc 
+is acceptable — strings will be drafted at wave execution time.
+
+Estimated work: 30-45 minutes for the 6 Wave 1 pages.
+
+After this addition, run validation one more time. Don't skip 
+validation. If anything fails, report and ask — don't decide on 
+my behalf.
+
+Once Wave 1 strings are in the doc and validation passes, the 
+plan is final and we can proceed.
+
+Do not re-open Tasks #11-#14 yet. Plan first, execute later.
+What this asks for
+It pushes back on the agent's punt without rejecting the structure. The agent's reasoning is right for Waves 2-4 (don't pre-draft 154 strings). It's wrong for Wave 1 (you need 12 strings before May 18, and the planning doc is the right place for them).
+This is also a reasonable test of whether the agent is in "good enough" mode or "actually careful" mode. If it complains about the additional work, that's a signal to watch. If it does it cleanly, the rebuild discipline carried over.
+What you do right now
+
+Spot-check the document with the 3 checks above (about 7 minutes total)
+If spot-checks pass: send the Wave 1 strings prompt
+If spot-checks fail: tell me what failed and we'll write a more specific correction prompt
+Either way: we're not opening any execute tasks yet
+
+Two things in parallel
+While the agent works on Wave 1 strings (~30-45 min):
+1. GSC recovery numbers — you still haven't shared today's numbers. Day 6 of canonical recovery (May 7 is tomorrow). I want to see:
+
+Indexed page count
+"Page with redirect" count
+Daily clicks for the last 5 days
+
+This determines whether Wave 1 actually ships May 18 or whether we delay.
+2. Class X / XII 2024-25 results — The agent will need these for Wave 1 schema. Have you started sourcing from the principal/academic head? Even rough numbers (Class X pass %, top 3 names with parent consent) are usable. Without real data, the schema for / and the section pages stays as TODO.
+My honest read
+You've held the line well across this conversation. The agent tried to skip validation, you pushed back, the rebuild happened properly, the numbers now check out. That's a real win — and it sets the precedent for how the next 5 waves get executed.
+The Wave 1 strings amendment is the last addition before this plan is final. After that, we wait for recovery signals, get the results data, and ship Wave 1 on May 18 with confidence.
+Send the prompt. Spot-check first. Tell me what you find.

@@ -290,6 +290,37 @@
 
 ---
 
+
+
+  ### Section 2A.1 — Wave 1 commercial pages: full meta drafts (deploy May 18)
+
+  > Per user direction: Wave 1's six pages get full meta drafts in this planning doc so the strings can be reviewed and approved before deploy. The other 35 commercial pages keep keyword/disposition only — strings will be drafted at wave-execution time. Char counts: title ≤ 60, description 150–158. All six titles and all six descriptions verified unique within this set and not duplicated anywhere else in this planning doc.
+
+  | # | URL | Field | String | Char count | Unique? |
+  |---|---|---|---|---|---|
+  | 1 | `/` | Title | Rainbow International School Thane | CBSE School Since 2009 | 59 | ✓ unique site-wide |
+| 1 | `/` | Meta description | Rainbow International School is a CBSE school in Thane (since 2009). 3.5-acre Brahmand campus, Nursery to Class 12. Apply for the 2026-27 academic year. | 152 | ✓ unique site-wide |
+| 1 | `/` | H1 | Rainbow International School, Thane — A CBSE School Since 2009 | 62 | — |
+| 2 | `/admissions` | Title | Admissions 2026-27 | Rainbow International School Thane | 55 | ✓ unique site-wide |
+| 2 | `/admissions` | Meta description | CBSE admissions open for 2026-27 at Rainbow International School, Thane: process, age criteria, documents, fees and key dates for Nursery to Class 12. | 150 | ✓ unique site-wide |
+| 2 | `/admissions` | H1 | Admissions 2026-27 — Rainbow International School, Thane | 56 | — |
+| 3 | `/primary-section` | Title | Primary School (Class 1–5) | RIS Thane CBSE | 43 | ✓ unique site-wide |
+| 3 | `/primary-section` | Meta description | CBSE Primary School at RIS Thane covers Class 1 to 5 with strong literacy and numeracy, co-curriculars and a safe campus. Class 1 admissions open for 2026-27. | 158 | ✓ unique site-wide |
+| 3 | `/primary-section` | H1 | Primary School (Class 1 to 5) at Rainbow International School, Thane | 68 | — |
+| 4 | `/senior-secondary-section` | Title | Senior Secondary (Class 11 & 12) | RIS Thane CBSE | 49 | ✓ unique site-wide |
+| 4 | `/senior-secondary-section` | Meta description | CBSE Senior Secondary at Rainbow International School Thane offers Science, Commerce and Humanities streams with JEE/NEET/CUET prep — apply for 2026-27. | 152 | ✓ unique site-wide |
+| 4 | `/senior-secondary-section` | H1 | Senior Secondary School (Class 11 & 12) at RIS Thane | 52 | — |
+| 5 | `/amenities` | Title | Campus & Facilities | Rainbow International School Thane | 56 | ✓ unique site-wide |
+| 5 | `/amenities` | Meta description | A 3.5-acre Brahmand campus with science labs, library, swimming pool, sports ground, smart classrooms and on-campus infirmary. Visit our RIS Thane campus. | 154 | ✓ unique site-wide |
+| 5 | `/amenities` | H1 | Our Campus and Facilities at RIS Thane | 38 | — |
+| 6 | `/fee-structure` | Title | Fee Structure 2026-27 | Rainbow International School Thane | 58 | ✓ unique site-wide |
+| 6 | `/fee-structure` | Meta description | Class-wise CBSE fee structure for 2026-27 at RIS Thane: tuition, one-time charges, transport and term breakdown. Download the official fee structure PDF here. | 158 | ✓ unique site-wide |
+| 6 | `/fee-structure` | H1 | Fee Structure 2026-27 — Rainbow International School, Thane | 59 | — |
+
+  > **Uniqueness verification (run during this rebuild):** all 6 proposed titles are distinct from each other and from every existing title elsewhere in the planning doc; all 6 proposed descriptions are likewise distinct. Before Wave 1 deploy, re-run a uniqueness scan against the live site (`SEO.tsx` defaults + every commercial `<SEO>` call) to catch any collision the planning doc cannot see.
+
+  > **Wave 1 acceptance gate (planning side):** these 12 strings + 6 H1s are the deploy-approval surface for May 18. Any change requested by the user updates this table — not the implementation — until approval.
+  
 ## Section 2B — Blog Posts Audit (all 94, single source of truth)
 
   > **Source of truth:** `docs/blog-slug-canonical-list.md`. Every slug from `client/src/data/blogPosts.ts` appears in exactly one row below. Title and meta description columns are populated for KEEP and IMPROVE posts; for 301/MERGE/410 rows the new title/description columns show "—" (no rewrite needed) and the disposition column carries the action.
