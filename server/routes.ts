@@ -1328,9 +1328,13 @@ export async function registerRoutes(
         if (!month) continue;
         if (!rpsMonthBranch[month]) rpsMonthBranch[month] = {};
         if (!rpsMonthBranch[month][centre]) rpsMonthBranch[month][centre] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
+        // Cumulative funnel: status is the CURRENT stage; leads who progressed to
+        // WALK-IN COMPLETED / ADM DONE / CLOSED AFTER WALKIN were once WALKIN BOOKED.
         rpsMonthBranch[month][centre].leads++;
-        if (status === "WALKIN BOOKED") rpsMonthBranch[month][centre].bookings++;
-        if (status === "WALK-IN COMPLETED") rpsMonthBranch[month][centre].walkins++;
+        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
+          rpsMonthBranch[month][centre].bookings++;
+        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
+          rpsMonthBranch[month][centre].walkins++;
         if (status === "ADM DONE") rpsMonthBranch[month][centre].admissions++;
         if (status === "CLOSED" || status === "CLOSED AFTER WALKIN") {
           rpsMonthBranch[month][centre].closed++;
@@ -1375,9 +1379,12 @@ export async function registerRoutes(
         const source = String(r[9] ?? "Unknown").trim() || "Unknown";
         if (!risMonthGroup[month]) risMonthGroup[month] = {};
         if (!risMonthGroup[month][group]) risMonthGroup[month][group] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
+        // Cumulative funnel for RIS (no "CLOSED AFTER WALKIN" status in RIS CRM)
         risMonthGroup[month][group].leads++;
-        if (status === "WALKIN BOOKED") risMonthGroup[month][group].bookings++;
-        if (status === "WALK-IN COMPLETED") risMonthGroup[month][group].walkins++;
+        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE"].includes(status))
+          risMonthGroup[month][group].bookings++;
+        if (["WALK-IN COMPLETED","ADM DONE"].includes(status))
+          risMonthGroup[month][group].walkins++;
         if (status === "ADM DONE") risMonthGroup[month][group].admissions++;
         if (status === "CLOSED") {
           risMonthGroup[month][group].closed++;

@@ -959,6 +959,61 @@ export default function Marketing() {
                     </div>
                   )}
 
+                  {/* Month-wise closed leads by centre */}
+                  {(() => {
+                    const months = liveData.rpsCrm.byMonth.map(m => m.month);
+                    // Collect all unique centres across all months
+                    const centreSet = new Set<string>();
+                    liveData.rpsCrm.byMonth.forEach(m => m.branches.forEach(b => centreSet.add(b.centre)));
+                    const centres = [...centreSet].sort();
+                    if (!months.length || !centres.length) return null;
+                    // Build matrix: centre → month → closed
+                    const matrix: Record<string, Record<string, number>> = {};
+                    centres.forEach(c => { matrix[c] = {}; });
+                    liveData.rpsCrm.byMonth.forEach(m => {
+                      m.branches.forEach(b => { matrix[b.centre][m.month] = b.closed; });
+                    });
+                    const rowTotals = (c: string) => months.reduce((s, mo) => s + (matrix[c][mo] || 0), 0);
+                    const colTotals = (mo: string) => centres.reduce((s, c) => s + (matrix[c][mo] || 0), 0);
+                    const grandClosedTotal = centres.reduce((s, c) => s + rowTotals(c), 0);
+                    return (
+                      <div className="mt-5">
+                        <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Leads by Centre — Monthly</div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="text-left text-gray-500 border-b">
+                                <th className="py-1.5 pr-3 font-bold">Centre</th>
+                                {months.map(mo => <th key={mo} className="py-1.5 px-2 font-bold text-right whitespace-nowrap">{mo}</th>)}
+                                <th className="py-1.5 pl-2 font-bold text-right text-red-600">YTD</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {centres.map((c, i) => {
+                                const tot = rowTotals(c);
+                                return (
+                                  <tr key={c} className={`border-b ${i%2===0?"bg-gray-50/30":""}`}>
+                                    <td className="py-1.5 pr-3 font-semibold" style={{ color: NAVY }}>{c}</td>
+                                    {months.map(mo => {
+                                      const v = matrix[c][mo] || 0;
+                                      return <td key={mo} className={`py-1.5 px-2 text-right ${v>0?"text-red-600 font-semibold":"text-gray-300"}`}>{v || "—"}</td>;
+                                    })}
+                                    <td className="py-1.5 pl-2 text-right font-black text-red-600">{tot}</td>
+                                  </tr>
+                                );
+                              })}
+                              <tr className="font-black border-t-2 border-gray-200 bg-red-50/40">
+                                <td className="py-1.5 pr-3 text-red-700">Total</td>
+                                {months.map(mo => <td key={mo} className="py-1.5 px-2 text-right text-red-700">{colTotals(mo)||"—"}</td>)}
+                                <td className="py-1.5 pl-2 text-right text-red-700">{grandClosedTotal}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   {liveData.rpsCrm.closedReasons.length > 0 && (
                     <div className="mt-5">
                       <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Lead Reasons — RPS (YTD, {totalClosed} closed)</div>
@@ -1094,6 +1149,64 @@ export default function Marketing() {
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Month-wise closed leads by education level */}
+                  {(() => {
+                    const months = liveData.risCrm.byMonth.map(m => m.month);
+                    const GROUP_ORDER_UI2 = ["Pre-Primary","Primary","Middle","Secondary","Senior Secondary"];
+                    const allGroups = GROUP_ORDER_UI2.filter(g =>
+                      liveData.risCrm.byMonth.some(m => m.groups.some(gr => gr.group === g))
+                    );
+                    if (!months.length || !allGroups.length) return null;
+                    const matrix: Record<string, Record<string, number>> = {};
+                    allGroups.forEach(g => { matrix[g] = {}; });
+                    liveData.risCrm.byMonth.forEach(m => {
+                      m.groups.forEach(gr => { matrix[gr.group][m.month] = gr.closed; });
+                    });
+                    const rowTotals = (g: string) => months.reduce((s, mo) => s + (matrix[g][mo] || 0), 0);
+                    const colTotals = (mo: string) => allGroups.reduce((s, g) => s + (matrix[g][mo] || 0), 0);
+                    const grandClosedTotal = allGroups.reduce((s, g) => s + rowTotals(g), 0);
+                    const GROUP_COLORS2: Record<string,string> = {
+                      "Pre-Primary":"#7c3aed","Primary":"#2563eb","Middle":"#0891b2",
+                      "Secondary":"#059669","Senior Secondary":"#d97706",
+                    };
+                    return (
+                      <div className="mt-5">
+                        <div className="text-xs font-black text-gray-500 mb-2 uppercase tracking-wider">Closed Leads by Education Level — Monthly</div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="text-left text-gray-500 border-b">
+                                <th className="py-1.5 pr-3 font-bold">Level</th>
+                                {months.map(mo => <th key={mo} className="py-1.5 px-2 font-bold text-right whitespace-nowrap">{mo}</th>)}
+                                <th className="py-1.5 pl-2 font-bold text-right text-red-600">YTD</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {allGroups.map((g, i) => {
+                                const tot = rowTotals(g);
+                                return (
+                                  <tr key={g} className={`border-b ${i%2===0?"bg-gray-50/30":""}`}>
+                                    <td className="py-1.5 pr-3 font-semibold" style={{ color: GROUP_COLORS2[g] || NAVY }}>{g}</td>
+                                    {months.map(mo => {
+                                      const v = matrix[g][mo] || 0;
+                                      return <td key={mo} className={`py-1.5 px-2 text-right ${v>0?"text-red-600 font-semibold":"text-gray-300"}`}>{v || "—"}</td>;
+                                    })}
+                                    <td className="py-1.5 pl-2 text-right font-black text-red-600">{tot}</td>
+                                  </tr>
+                                );
+                              })}
+                              <tr className="font-black border-t-2 border-gray-200 bg-red-50/40">
+                                <td className="py-1.5 pr-3 text-red-700">Total</td>
+                                {months.map(mo => <td key={mo} className="py-1.5 px-2 text-right text-red-700">{colTotals(mo)||"—"}</td>)}
+                                <td className="py-1.5 pl-2 text-right text-red-700">{grandClosedTotal}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {liveData.risCrm.closedReasons.length > 0 && (
                     <div className="mt-5">
