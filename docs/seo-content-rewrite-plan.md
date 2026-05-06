@@ -240,6 +240,25 @@
 ---
 
 
+
+
+  ### 1H — Local keyword expansion (secondary keywords on existing pages — NO new URLs)
+
+  > **Rule:** these locality terms are added as **secondary** keywords on existing pages only. No new locality landing pages. Terms must be woven naturally into body copy — no stuffing, no thin doorway sections.
+
+  | Locality term | Added as secondary keyword on (existing pages) |
+  |---|---|
+  | Hiranandani Estate | `/school-near-ghodbunder-road-thane`, `/`, `/contact-us` |
+  | Kasarvadavali | `/school-near-ghodbunder-road-thane`, `/contact-us` |
+  | Majiwada | `/school-near-manpada-thane`, `/`, `/contact-us` |
+  | Kolshet | `/school-near-manpada-thane`, `/contact-us` |
+  | Waghbil | `/school-near-ghodbunder-road-thane`, `/contact-us` |
+  | Patlipada | `/school-near-ghodbunder-road-thane`, `/contact-us` |
+
+  Existing locality terms that remain primary on their dedicated pages: Brahmand (`/school-near-brahmand-thane`), Ghodbunder Road (`/school-near-ghodbunder-road-thane`), Manpada (`/school-near-manpada-thane`).
+  
+---
+
 ## Section 2A — Commercial Pages Audit (41 pages)
 
 > All proposed titles ≤60 characters. All proposed descriptions 150–158 characters. Indian English throughout.
@@ -321,6 +340,149 @@
 
   > **Wave 1 acceptance gate (planning side):** these 12 strings + 6 H1s are the deploy-approval surface for May 18. Any change requested by the user updates this table — not the implementation — until approval.
   
+
+
+  ### Section 2A.2 — Wave 1 AI-SEO blocks (6 pages — drafts for review)
+
+  > **Per Decision 14 (added below):** AI-SEO additions follow the same 5-wave schedule as the rest of the plan. Drafts below are for the 6 Wave 1 pages only. The remaining 34 surviving commercial pages receive AI-SEO blocks in their already-scheduled waves.
+  >
+  > Each page gets:
+  > 1. A **Quick-Answer block** (40–60 words, parent-intent answer placed near the top of the page).
+  > 2. A **Parent-FAQ section** (4–6 Qs from the standard parent-question set).
+  > 3. **FAQPage schema** (JSON-LD), one per page, generated from the same FAQ content.
+  >
+  > Word counts for the QA blocks are validated below; FAQPage schema is generated mechanically at build time from the FAQ content (no separate review needed).
+  
+
+  #### 1. `/` — Quick Answer + FAQs
+
+  **Quick Answer (40 words):**
+  > Rainbow International School is a CBSE school in Thane (since 2009) on a 3.5-acre Brahmand campus. The school offers Nursery to Class 12, on-campus sports, science labs, library, transport and an infirmary. Admissions for the 2026-27 academic year are open.
+
+  **FAQs (5):**
+
+  1. **Q:** Is Rainbow International School a CBSE school in Thane?
+   **A:** Yes. RIS is a CBSE-affiliated school in Thane (Brahmand) running classes from Nursery to Class 12 since 2009. Affiliation number 1130661.
+2. **Q:** Which areas in Thane does the school serve?
+   **A:** The school primarily serves Brahmand, Ghodbunder Road, Manpada, Hiranandani Estate, Kasarvadavali, Majiwada, Kolshet, Waghbil and Patlipada with school-managed transport.
+3. **Q:** How can parents enquire for admission?
+   **A:** Parents can fill the online admission enquiry on the website, call the admission desk, or book an in-person campus visit at the Brahmand campus.
+4. **Q:** Does Rainbow International School offer senior secondary classes?
+   **A:** Yes. The school offers Class 11 and 12 with Science, Commerce and Humanities streams.
+5. **Q:** How can I see the fee structure?
+   **A:** The full class-wise fee structure for 2026-27 is available on the Fee Structure page; a downloadable PDF is also linked there.
+
+  **FAQPage schema:** generated at build from the 5 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+
+  #### 2. `/admissions` — Quick Answer + FAQs
+
+  **Quick Answer (45 words):**
+  > CBSE admissions for the 2026-27 academic year at Rainbow International School Thane are open for Nursery to Class 12. Parents can review the admission process, age criteria, documents required and fees, then submit an online enquiry or book a campus visit at the Brahmand campus.
+
+  **FAQs (6):**
+
+  1. **Q:** Are admissions open at Rainbow International School?
+   **A:** Yes. Admissions for 2026-27 are currently open for Nursery to Class 12, subject to seat availability per class.
+2. **Q:** How can I apply for school admission in Thane at RIS?
+   **A:** You can submit an online admission enquiry, call the admission desk or visit the Brahmand campus to complete the application process.
+3. **Q:** What documents are required for admission?
+   **A:** Birth certificate, previous school report card (where applicable), Aadhaar (parent and child), passport-size photographs and address proof.
+4. **Q:** What is the age criterion for Nursery and Class 1?
+   **A:** Indicative ranges follow CBSE/state norms; exact cut-off dates for the 2026-27 session are listed in the Admissions section and confirmed by the admission desk.
+5. **Q:** Can I book a campus visit before applying?
+   **A:** Yes. Campus visits can be booked through the admission enquiry form or by calling the admission desk during school hours.
+6. **Q:** Where can I see the fee structure?
+   **A:** The full class-wise fee structure is on the Fee Structure page, with a downloadable PDF.
+
+  **FAQPage schema:** generated at build from the 6 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+
+  #### 3. `/primary-section` — Quick Answer + FAQs
+
+  **Quick Answer (40 words):**
+  > The Primary School at Rainbow International School Thane covers Class 1 to Class 5 on the CBSE curriculum, with a strong foundation in literacy and numeracy, co-curricular activities and a safe, female-staff-led environment. Class 1 admissions for 2026-27 are open.
+
+  **FAQs (5):**
+
+  1. **Q:** Which classes are part of the Primary section?
+   **A:** Primary at RIS covers Class 1 through Class 5 on the CBSE curriculum.
+2. **Q:** Is the Primary curriculum CBSE-aligned?
+   **A:** Yes. The Primary curriculum is CBSE-aligned, with NCERT-based learning material.
+3. **Q:** How does RIS approach foundational literacy and numeracy?
+   **A:** The Primary programme emphasises foundational literacy and numeracy through structured reading, phonics and number-sense activities, in line with NEP 2020.
+4. **Q:** Are co-curricular activities part of the Primary day?
+   **A:** Yes. Music, art, physical education, library and activity periods are part of the regular Primary timetable.
+5. **Q:** How do I apply for Class 1 admission for 2026-27?
+   **A:** Submit the online admission enquiry or contact the admission desk; documents required are listed on the Admissions page.
+
+  **FAQPage schema:** generated at build from the 5 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+
+  #### 4. `/senior-secondary-section` — Quick Answer + FAQs
+
+  **Quick Answer (50 words):**
+  > Senior Secondary at Rainbow International School Thane covers CBSE Class 11 and Class 12 with Science, Commerce and Humanities streams, structured CBSE board preparation, career counselling for stream and college choice, and JEE, NEET and CUET prep support. Class 11 admissions for 2026-27 are now open at the Brahmand campus.
+
+  **FAQs (5):**
+
+  1. **Q:** Which streams are offered in Class 11 and 12?
+   **A:** Science, Commerce and Humanities streams are offered for Class 11 and 12 at RIS Thane.
+2. **Q:** Does the school support JEE, NEET and CUET preparation?
+   **A:** Yes, the school provides preparation guidance and study support for JEE, NEET and CUET alongside the regular CBSE curriculum.
+3. **Q:** How do I apply for Class 11 admission?
+   **A:** Class 11 applications open after Class 10 results. Submit the online enquiry on the Admissions page or contact the admission desk.
+4. **Q:** Where can I see senior secondary results?
+   **A:** Recent CBSE Class 12 results are highlighted on the Student Achievements page.
+5. **Q:** Is career counselling available for senior students?
+   **A:** Yes. Senior students receive structured career counselling for stream selection and college applications.
+
+  **FAQPage schema:** generated at build from the 5 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+
+  #### 5. `/amenities` — Quick Answer + FAQs
+
+  **Quick Answer (40 words):**
+  > Rainbow International School Thane has a 3.5-acre Brahmand campus with science labs, a library, smart classrooms, a swimming pool, a sports ground, an on-campus infirmary, paediatrician on call and CCTV-monitored safety. Parents can book a campus visit any school day.
+
+  **FAQs (5):**
+
+  1. **Q:** What sports facilities does the school have?
+   **A:** A sports ground, indoor sports area and a swimming pool, plus structured PE periods and inter-school participation.
+2. **Q:** Does the school have science labs and a library?
+   **A:** Yes — Physics, Chemistry and Biology labs, plus a central library available to all students.
+3. **Q:** What safety measures are in place on campus?
+   **A:** 160+ CCTV cameras, monitored entry/exit, female staff in the pre-primary block, on-campus infirmary, paediatrician on call and an ambulance arrangement.
+4. **Q:** Does the school provide transport?
+   **A:** Yes. School-managed transport covers Brahmand, Ghodbunder Road, Manpada and adjoining Thane localities; routes are confirmed at the time of admission.
+5. **Q:** Can parents tour the campus before admission?
+   **A:** Yes. Campus tours can be booked through the admission enquiry form or by calling the admission desk.
+
+  **FAQPage schema:** generated at build from the 5 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+
+  #### 6. `/fee-structure` — Quick Answer + FAQs
+
+  **Quick Answer (46 words):**
+  > The 2026-27 CBSE fee structure for Rainbow International School Thane is published class-by-class — covering tuition, one-time admission charges and term-wise breakdowns — with a downloadable official PDF. Transport fees are billed separately and confirmed at the time of admission based on the parent's chosen route.
+
+  **FAQs (5):**
+
+  1. **Q:** Where can I see the Rainbow International School fees?
+   **A:** The full class-wise fee structure for 2026-27 is on the Fee Structure page, with a downloadable PDF.
+2. **Q:** Are transport fees included in the tuition fee?
+   **A:** No. Transport fees are charged separately and are confirmed at admission based on route.
+3. **Q:** What payment modes are accepted?
+   **A:** Standard payment modes (online transfer, cheque) are accepted; details are shared during admission.
+4. **Q:** Are there any one-time charges?
+   **A:** Yes. One-time admission charges apply at the time of joining and are listed in the fee structure.
+5. **Q:** How do I get the fee structure for a specific class?
+   **A:** The class-wise fee table on the Fee Structure page covers Nursery to Class 12. Contact the admission desk for any clarifications.
+
+  **FAQPage schema:** generated at build from the 5 Q&A pairs above. Publisher / mainEntityOfPage = `Rainbow International School` (Organization schema, no Person schema).
+  
+---
+
 ## Section 2B — Blog Posts Audit (all 94, single source of truth)
 
   > **Source of truth:** `docs/blog-slug-canonical-list.md`. Every slug from `client/src/data/blogPosts.ts` appears in exactly one row below. Title and meta description columns are populated for KEEP and IMPROVE posts; for 301/MERGE/410 rows the new title/description columns show "—" (no rewrite needed) and the disposition column carries the action.
@@ -646,6 +808,40 @@ Pillar body expansion target: 2,500+ words. Combine unique angles from all four 
 ---
 
 
+
+
+  ### Section 3E — RIS ↔ RPS internal linking rules
+
+  > **Why this matters:** RIS (CBSE K-12) and RPS (preschool network) live in the same Rainbow Group ecosystem. Cross-links should support the parent journey (preschool → primary → senior secondary) without diluting RIS admission pages.
+
+  **Where RPS links are allowed (RIS → RPS):**
+
+  | Page / area | How |
+  |---|---|
+  | Homepage — controlled lower section | Single small "Group schools" or "Rainbow Preschools" mention |
+  | `/admissions` | Small supporting note for parents asking about preschool admissions |
+  | `/about-rainbow-international-school` | Group / parent-organisation context |
+  | `/rainbow-preschool-international` (existing summary) | Primary outbound to rainbowpreschools.com |
+  | Footer — "Group schools / related institutions" | Standard link |
+  | Blog posts about early years / preschool transition | Contextual, parent-journey only |
+
+  **Where RPS links must be avoided or minimized:**
+
+  - Hero / above-the-fold of any commercial page
+  - `/top-schools-in-thane` (CBSE intent)
+  - `/senior-secondary-section` (Class 11/12 intent)
+  - `/fee-structure` (transactional)
+  - Student Achievements / results pages
+  - Class 11 admission content
+  - `/contact-us` above-the-fold
+  - Main admission CTA blocks anywhere
+
+  **Allowed RPS anchor text:** "Rainbow Preschools", "preschool admissions", "preschools in Thane", "early years learning", "Rainbow Group preschool network".
+
+  **Banned RPS anchor text:** "CBSE school in Thane", "best CBSE school in Thane", "senior secondary school", "Class 11 admission", "school fees in Thane" (unless the destination is unambiguously the matching RIS page).
+  
+---
+
 ## Section 4 — Schema Recommendations Per Page Type
 
 ### School data to use throughout (verified)
@@ -696,6 +892,39 @@ Pillar body expansion target: 2,500+ words. Combine unique angles from all four 
 - Wave 1 pages: only deploy schema for which all required values are verified. Mark `Offer.price`, `aggregateRating`, `JobPosting`, `Person.author` as TODO until real values are received.
 - Validate every JSON-LD block with Google Rich Results Test before deploy.
 
+---
+
+
+
+  ### Section 4.1 — Schema allow / avoid rules
+
+  **Allowed schema types** (use where the data is genuine and relevant):
+  - `Organization`, `EducationalOrganization`, `School`
+  - `LocalBusiness` (where appropriate)
+  - `WebSite`, `WebPage`
+  - `BreadcrumbList`
+  - `FAQPage`
+  - `Article` (publisher = "Rainbow International School", **no** `author` set to a Person — use Organization)
+  - `ContactPoint`
+  - `ImageObject`
+
+  **Avoided schema types** (do not add):
+  - `Person` schema for blog authors / staff bylines
+  - `Review` schema unless genuine, attributable review data exists from an approved channel
+  - `AggregateRating` unless genuine, attributable review data exists from an approved channel
+  - Fake / fabricated reviewer or staff schema of any kind
+
+  > Existing visible person names on protected pages (`/chairpersons-note`, `/school-managing-committee`, `/academic-team`, `/about-rainbow-international-school`, `/cbse-mandatory-public-disclosures`, `/awards-achievements`) remain as **page content** but are not wrapped in `Person` schema.
+
+  ### Section 4.2 — Testimonials guidance
+
+  - Use parent **first name + initial only** (e.g., "Priya S., Parent"); never full names.
+  - No student names in testimonials.
+  - No fabricated star ratings; no fake "Google review" labels.
+  - Real Google review content may be used only if accessibly sourced (Google Business Profile / approved review export) and compliant with Google's terms — never scraped.
+  - No `Review` or `AggregateRating` schema unless real reviews are present.
+  - Existing testimonials on `/testimonials` are reviewed for compliance during their scheduled wave; nothing changes outside that schedule.
+  
 ---
 
 ## Section 5 — 5-Wave Rollout Calendar
@@ -911,6 +1140,23 @@ Run all checks before deploying any wave. Failure of any check = block deploy.
 
 ---
 
+
+
+  ### Section 6.1 — Wave 1 pre-deploy compliance checks (added per Decisions 13 + 14)
+
+  Before Wave 1 ships (May 18), verify on the 6 Wave 1 pages:
+
+  - [ ] Zero new person names introduced (grep against the protected-name allow-list).
+  - [ ] Zero `Person` schema added anywhere (`schema.org/Person` should appear only inside the existing protected-page content if at all — and only as visible text, not JSON-LD).
+  - [ ] Zero `Review` or `AggregateRating` JSON-LD added.
+  - [ ] All 6 Quick-Answer blocks present and within 40–60 words.
+  - [ ] All 6 FAQPage schema blocks valid (parse with Google Rich Results Test).
+  - [ ] RPS links audit: no RPS link in hero / above-the-fold of any of the 6 Wave 1 pages; if present on `/admissions`, it is the small supporting note and uses an allowed anchor text.
+  - [ ] No new locality landing pages created.
+  - [ ] All existing names on protected pages (`/chairpersons-note`, `/school-managing-committee`, `/academic-team`, `/about-rainbow-international-school`, `/cbse-mandatory-public-disclosures`, `/awards-achievements`) untouched.
+  
+---
+
 ## Section 7 — Open Decisions and TODOs
 
 ### 7.1 — The 12 strategic decisions (verbatim, as approved by user May 6, 2026)
@@ -1008,3 +1254,9 @@ Run all checks before deploying any wave. Failure of any check = block deploy.
 - Total clusters mapped: 5
 - Open TODOs: 10
 - Strategic flags surfaced: 5
+
+
+  > **Decision 13 (name preservation — verbatim):** Existing person names on `/chairpersons-note`, `/school-managing-committee`, `/academic-team`, `/about-rainbow-international-school`, `/cbse-mandatory-public-disclosures`, and `/awards-achievements` are preserved exactly as they appear today. No new person names are added anywhere else on the site. Blog author bylines (if any exist in code) are removed; publisher attribution is "Rainbow International School" via Organization schema. Names verified present in code: Mrs. Akila Balbale, Mrs. Vimlesh Sindhu, Ashwini Rasal, Amrita Pereira (and others on these protected pages).
+
+  > **Decision 14 (AI-SEO staggered — verbatim):** AI-SEO additions (quick-answer block + parent-FAQ block + FAQPage schema) follow the same 5-wave schedule as the rest of the plan. Wave 1 = 6 pages now (drafts in Section 2A.2); the remaining 34 surviving commercial pages receive AI-SEO blocks in their already-scheduled waves. Not applied site-wide in Wave 1 — keeps the first deploy review-friendly and recovery-safe.
+  
