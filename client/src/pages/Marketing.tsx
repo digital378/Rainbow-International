@@ -33,6 +33,8 @@ type LiveData = {
   mayWeeklyCombined: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number; spend: number }>;
   rpsCrm: { byMonth: LiveRpsMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
+  rpsSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
+  risSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
 };
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
@@ -231,11 +233,22 @@ export default function Marketing() {
       const crmKey = DASH_TO_CRM[row.month] ?? "";
       const risMon = liveData.risCrm.byMonth.find(m => m.month === crmKey);
       const rpsMon = liveData.rpsCrm.byMonth.find(m => m.month === crmKey);
+      // Per-school master sheet is source of truth for walkins/admissions (CRM lags current month)
+      const rpsSchool = liveData.rpsSchoolMonthly?.find(s => s.month === crmKey);
+      const risSchool = liveData.risSchoolMonthly?.find(s => s.month === crmKey);
       return {
         month: row.month,
         combined: { leads: live.leads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google },
-        ris: risMon ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings, walkins: risMon.total.walkins, admissions: risMon.total.admissions } : row.ris,
-        rps: rpsMon ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings, walkins: rpsMon.total.walkins, admissions: rpsMon.total.admissions } : row.rps,
+        ris: risMon
+          ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings,
+              walkins: risSchool ? risSchool.walkins : risMon.total.walkins,
+              admissions: risSchool ? risSchool.admissions : risMon.total.admissions }
+          : row.ris,
+        rps: rpsMon
+          ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings,
+              walkins: rpsSchool ? rpsSchool.walkins : rpsMon.total.walkins,
+              admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
+          : row.rps,
       };
     });
   }, [liveData]);

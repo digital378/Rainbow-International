@@ -1273,11 +1273,42 @@ export async function registerRoutes(
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       const parseN   = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[,\s%]/g, "")) || 0;
 
-      const [masterRows, rpsCrmRows, risCrmRows] = await Promise.all([
+      const [masterRows, rpsCrmRows, risCrmRows, rpsSchoolRows, risSchoolRows] = await Promise.all([
         fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
+        fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A:S"),
+        fetchSheetRange(SHEET_IDS.master, "DM RIS MAY' 26!A:S"),
       ]);
+
+      // ── Per-school master monthly totals (source of truth for walkins/admissions) ──
+      // The per-school May tabs contain monthly-level summary rows for all months
+      // (all-caps: DECEMBER, JANUARY … APRIL; in-progress month: MAY TOTAL)
+      const SCHOOL_MONTH_KEY: Record<string, string> = {
+        "AUGUST":"Aug-25","SEPTEMBER":"Sep-25","OCTOBER":"Oct-25","NOVEMBER":"Nov-25",
+        "DECEMBER":"Dec-25","JANUARY":"Jan-26","FEBRUARY":"Feb-26","MARCH":"Mar-26",
+        "APRIL":"Apr-26","MAY TOTAL":"May-26",
+      };
+      function parseSchoolRows(rows: string[][]): Array<{month:string;walkins:number;admissions:number}> {
+        const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
+        if (hIdx === -1) return [];
+        const header = rows[hIdx];
+        const wCol = header.findIndex(h => String(h).includes("Total Walkins"));
+        const aCol = header.findIndex(h => String(h).includes("Total Admissions"));
+        const seen = new Set<string>();
+        const result: Array<{month:string;walkins:number;admissions:number}> = [];
+        for (const row of rows.slice(hIdx + 1)) {
+          const dateStr = String(row[0] ?? "").trim().toUpperCase();
+          const crmKey  = SCHOOL_MONTH_KEY[dateStr];
+          if (crmKey && !seen.has(crmKey)) {
+            seen.add(crmKey);
+            result.push({ month: crmKey, walkins: parseInt(String(row[wCol]??0).replace(/[,\s]/g,""))||0, admissions: parseInt(String(row[aCol]??0).replace(/[,\s]/g,""))||0 });
+          }
+        }
+        return result;
+      }
+      const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
+      const risSchoolMonthly = parseSchoolRows(risSchoolRows);
 
       // ── DM Overall → monthly combined totals + May weekly ──
       const MONTH_MAP: Record<string, string> = {
@@ -1427,6 +1458,8 @@ export async function registerRoutes(
         mayWeeklyCombined,
         rpsCrm: { byMonth: rpsByMonth, closedReasons: sortReasons(rpsCloseReasons), statusSummary: rpsStatusCount, bySource: rpsSourceCount },
         risCrm: { byMonth: risByMonth, closedReasons: sortReasons(risCloseReasons), statusSummary: risStatusCount, bySource: risSourceCount },
+        rpsSchoolMonthly,
+        risSchoolMonthly,
       });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch live marketing data", error: err.message });
