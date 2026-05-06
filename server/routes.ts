@@ -1621,5 +1621,161 @@ export async function registerRoutes(
     }
   });
 
+  // ── OpenAPI schema for ChatGPT custom action ──────────────
+  // GET /openapi.yaml — returns a valid OpenAPI 3.0 spec with the correct
+  // server URL inferred from the request host. Paste this URL into ChatGPT
+  // "Add actions → Import from URL": https://<your-domain>/openapi.yaml
+  app.get("/openapi.yaml", (req, res) => {
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const host  = req.headers["x-forwarded-host"] || req.headers.host || "localhost:5000";
+    const base  = `${proto}://${host}`;
+    const yaml  = `openapi: "3.0.0"
+info:
+  title: Rainbow Group Marketing API
+  description: >
+    Live marketing, CRM and operations data for Rainbow International School (RIS)
+    and Rainbow Preschools (RPS). Protected endpoints require the ADMIN_TOKEN as
+    an API key in the X-Api-Key header.
+  version: "1.0.0"
+servers:
+  - url: ${base}
+    description: Rainbow Group API
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+paths:
+  /api/marketing/live:
+    get:
+      operationId: getMarketingLive
+      summary: Live combined marketing metrics from Google Sheets
+      description: >
+        Returns live monthly totals (leads, bookings, walk-ins, admissions, ad spend)
+        for both RIS and RPS combined, sourced directly from the DM Overall master
+        Google Sheet. Also includes RPS branch-wise CRM, RIS education-level CRM,
+        closed-lead reasons for both, and May weekly breakdown. No auth required.
+      security: []
+      responses:
+        "200":
+          description: >
+            Live aggregated data — monthly totals, RPS branch CRM, RIS grade CRM,
+            closed reasons, May weekly, and current day of month.
+
+  /api/sheets/crm:
+    get:
+      operationId: getSheetsCrm
+      summary: CRM lead summary by status, source, month and owner
+      description: >
+        Returns live lead counts from the RPS or RIS CRM Google Sheet, aggregated
+        by status (ADM DONE, CLOSED, Open…), lead source, month, and owner.
+        Optionally filter to a single month.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Which school's CRM to query.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Optional month filter (case-insensitive substring match), e.g. "may",
+            "apr", "jan". Omit for all months.
+      responses:
+        "200":
+          description: >
+            CRM summary with totalLeads, admissionsDone, closed, open,
+            conversionRate, and breakdowns by status, source, month, and owner.
+        "401":
+          description: Missing or invalid API key.
+
+  /api/sheets/master:
+    get:
+      operationId: getSheetsMaster
+      summary: Weekly funnel breakdown from the DM master tracker
+      description: >
+        Returns week-by-week lead → booking → walk-in → admission data for a
+        given school and month from the DM master Google Sheet.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Which school's tab to fetch.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [may, april, feb]
+          description: Month to retrieve. Defaults to may.
+      responses:
+        "200":
+          description: Weekly breakdown — leads, walk-ins, admissions, conversion rates.
+        "401":
+          description: Missing or invalid API key.
+
+  /api/sheets/targets:
+    get:
+      operationId: getSheetsTargets
+      summary: Branch/grade actuals vs targets from Google Sheets
+      description: >
+        RPS — returns per-branch actuals (leads, bookings, walk-ins, admissions,
+        conversion rates) alongside monthly targets.
+        RIS — returns per-grade actuals (Nursery through Class 12).
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [ris, rps]
+          description: Which school's target sheet to fetch.
+      responses:
+        "200":
+          description: Per-branch actuals vs monthly targets (RPS) or per-grade actuals (RIS).
+        "401":
+          description: Missing or invalid API key.
+
+  /api/sheets/tasks:
+    get:
+      operationId: getSheetsTasks
+      summary: Key task tracker from Google Sheets
+      description: >
+        Returns tasks from the Key Task sheet with assignee, due date, status
+        and remarks. Optionally filter by status.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Filter by task status (case-insensitive substring), e.g. "pending",
+            "completed". Omit for all tasks.
+      responses:
+        "200":
+          description: Task list with summary counts (total, completed, pending).
+        "401":
+          description: Missing or invalid API key.
+`;
+    res.setHeader("Content-Type", "text/yaml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=60");
+    res.send(yaml);
+  });
+
   return httpServer;
 }
