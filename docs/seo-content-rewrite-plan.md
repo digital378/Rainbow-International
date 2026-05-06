@@ -40,23 +40,22 @@
 
 | Disposition | Count |
 |---|---|
-| KEEP (no meta change) | 8 |
+| KEEP (no meta change) | 10 |
 | IMPROVE (meta rewrite) | 67 |
 | MERGE (content absorbed into pillar, then 301) | 3 |
 | 301 (direct redirect to pillar) | 7 |
-| 410 (Gone) | 9 |
+| 410 (Gone) | 7 |
 | **Total** | **94** |
 
-**Net surviving blog posts after Wave 4:** **75** (94 − 3 MERGE − 7 × 301 − 9 × 410). Within target range 70–75.
+**Net surviving blog posts after Wave 4:** **77** (94 − 3 MERGE − 7 × 301 − 7 × 410). Slightly above the 70–75 target band because three historical-brand posts (`the-leading-school-of-the-year-thane`, `100-result-rainbows-first-batch-2018-19`, `an-all-rounder-kid-raghvi-ramanujan…`) are pre-approved as KEEP and cannot be cut.
 
 **Commercial pages (41 total):**
 
 | Disposition | Count |
 |---|---|
-| KEEP (no meta change) | 4 |
+| KEEP (no meta change — includes 2 campaign pages held per Decision 5 / TODO-2) | 6 |
 | IMPROVE (meta rewrite) | 34 |
 | 301 (welcome-to-ris → /about) | 1 |
-| HOLD (campaign pages — Decision 5) | 2 |
 | **Total** | **41** |
 
 **Net surviving commercial pages after Wave 1:** **40** (41 − 1 × 301).
@@ -79,27 +78,183 @@
 
 ## Section 1 — Keyword Strategy (cannibalization-free)
 
-Rule: no two URLs share the same primary keyword. The full per-page primary keyword assignment is embedded directly in the Section 2A audit table (column "Primary keyword"). For blog posts, primary keywords are listed inline in Section 2B.
+  Rule: no two URLs share the same primary keyword. The complete primary + secondary keyword assignment for every URL on the site appears below. Notes column flags pillars, mergers, redirects and reframings.
 
-### Keyword themes distributed across the site
+  ### 1A — Commercial pages (41)
 
-- **Transactional:** "CBSE school admissions Thane 2026-27", "nursery admission Thane", "Class 1 admission Thane", "Class 11 science admission Thane".
-- **Brand+locality:** "best CBSE school in Thane", "best CBSE school Thane West", "school near Brahmand Thane", "school near Ghodbunder Road Thane", "school near Manpada Thane".
-- **Facility:** "school amenities Thane CBSE", "school safety Thane", "3.5-acre school campus Thane".
-- **Comparison (blog):** "CBSE vs ICSE", "CBSE vs ICSE vs State Board".
-- **Section-specific:** "pre-primary school Thane", "primary school Class 1 to 5 Thane", "middle school Class 6 to 8 Thane", "secondary school Class 9 10 Thane", "Class 11 12 Science Commerce Humanities Thane".
-- **Informational (blog):** topic-specific long-tail keywords assigned per post in Section 2B.
+  | URL | Primary keyword | Secondary keywords (2–3) | Notes |
+  |---|---|---|---|
+  | `/` | best CBSE school in Thane | CBSE school Thane West, Rainbow International School Thane, K-12 school Thane | Homepage; brand+intent |
+| `/about-rainbow-international-school` | about Rainbow International School Thane | RIS Thane history, CBSE school since 2009, Brahmand school | Absorbs /welcome-to-ris content |
+| `/welcome-to-ris` | — (301) | — | 301 → /about |
+| `/chairpersons-note` | chairperson Rainbow International School | RIS chairperson message, school leadership Thane | Leadership voice page |
+| `/ris-vision-mission` | Rainbow International School vision mission | RIS values, world citizens education, holistic CBSE values | Brand-positioning page |
+| `/our-philosophy` | Rainbow International School philosophy | four pillars education, competence conscience compassion courage, holistic philosophy | Brand-philosophy page |
+| `/pre-primary-school-thane` | pre-primary school Thane | nursery Thane, Jr KG Sr KG Thane, preschool admission Thane | Section landing |
+| `/primary-section` | primary school Class 1 to 5 Thane | CBSE primary Thane, foundational learning Thane, Class 1 admission Thane | Section landing |
+| `/middle-school-section` | middle school Class 6 to 8 Thane | CBSE middle school Thane, Class 6 admission Thane, secondary preparation Thane | Section landing |
+| `/secondary-section` | secondary school Class 9 10 Thane | CBSE Class 10 Thane, board exam preparation Thane, Class 9 admission Thane | Section landing |
+| `/senior-secondary-section` | Class 11 12 Science Commerce Humanities Thane | Class 11 admission Thane, Science stream Thane, Commerce Humanities Thane | Streams page |
+| `/amenities` | school amenities Thane CBSE | 3.5-acre school campus Thane, school facilities Thane, swimming pool school Thane | Facilities page |
+| `/awards-achievements` | Rainbow International School awards | RIS recognition, FIT INDIA school award, school awards Thane | Brand-credibility |
+| `/student-achievements` | RIS student achievements | 100% Class 10 result Thane, school sports achievements Thane, swimming chess wins | Student-credibility |
+| `/safety-security` | school safety security Thane | CCTV school Thane, GPS school bus Thane, school nurse ambulance Thane | Safety page |
+| `/beyond-the-classroom` | beyond the classroom CBSE school | experiential learning Thane, school clubs Thane, organic farming school | Programmes page |
+| `/extracurriculars` | extracurricular activities Thane school | school sports Thane, music dance drama school Thane, FIT INDIA school activities | Activities page |
+| `/photo-gallery` | Rainbow International School photo gallery | RIS Thane photos, school campus pictures, Brahmand school gallery | Gallery page (ImageGallery schema) |
+| `/contact-us` | contact Rainbow International School Thane | RIS Thane phone email, school address Brahmand, Thane school contact | Contact page |
+| `/academic-calendar` | school academic calendar 2026-27 Thane | CBSE term dates 2026-27, school holidays Thane, school events 2026-27 | Annual calendar |
+| `/cbse-mandatory-public-disclosures` | CBSE affiliation 1130661 disclosures | CBSE mandatory disclosures, RIS staff infrastructure, CBSE school documents Thane | Compliance page |
+| `/school-managing-committee` | school managing committee RIS | RIS SMC members, CBSE bye-laws committee, parent teacher representatives | Governance page |
+| `/career` | teaching jobs Rainbow International School Thane | school jobs Thane, teacher recruitment RIS, CBSE school careers Thane | Jobs page |
+| `/book-list` | CBSE school book list 2026-27 | RIS book list class-wise, Class 1 to 12 books Thane, CBSE textbooks list | Book list page |
+| `/virtual-learning` | virtual learning CBSE school | Google Classroom CBSE, hybrid learning Thane, online classes RIS | Virtual programme page |
+| `/academic-team` | RIS academic team teachers | CBSE-trained teachers Thane, school faculty Thane, school counsellors RIS | Faculty page |
+| `/rainbow-preschool-international` | Rainbow Preschool Thane | preschool age 1.5 to 5.5, Playgroup Nursery Jr KG Thane, female preschool staff | Preschool summary+link page (Decision 6) |
+| `/brand-partners` | Rainbow International School partners | RIS privilege card, school brand partners Thane, parent benefits RIS | Partners page |
+| `/students-leaving-certificate` | school leaving certificate Thane | transfer certificate process RIS, TC application Thane school, leaving certificate documents | Operational page |
+| `/curriculum` | RIS CBSE curriculum | NCERT curriculum Thane, K-12 CBSE syllabus, CBSE programme structure | Curriculum page |
+| `/application-form` | school admission application form Thane | online admission form RIS, CBSE admission form 2026-27, RIS application Thane | Conversion page |
+| `/admissions` | CBSE school admissions Thane 2026-27 | school admission process Thane, age criteria CBSE Thane, school admission documents | Hub page |
+| `/fee-structure` | CBSE school fee structure Thane 2026-27 | school fees Thane, RIS fee structure 2026-27, CBSE fee class-wise | Critical fee page |
+| `/top-schools-in-thane` | how to choose CBSE school Thane | school evaluation criteria Thane, parent guide CBSE Thane, school comparison framework | Reframed neutral guide (Decision 4) |
+| `/school-near-brahmand-thane` | school near Brahmand Thane | Brahmand Phase 4 school, CBSE school Brahmand, K-12 school Brahmand Thane | Locality landing — KEEP |
+| `/school-near-ghodbunder-road-thane` | school near Ghodbunder Road Thane | CBSE school Ghodbunder Road, school Patlipada Waghbil Kavesar, GB Road school Thane | Locality landing — KEEP |
+| `/school-near-manpada-thane` | school near Manpada Thane | CBSE school Manpada, school Manpada Junction, K-12 Manpada Thane | Locality landing — KEEP |
+| `/testimonials` | Rainbow International School parent reviews | RIS parent testimonials, CBSE school reviews Thane, parent feedback RIS | Social proof page (4.8/5) |
+| `/faqs` | Rainbow International School FAQs | RIS admissions FAQ, CBSE school questions Thane, RIS fees timings transport FAQ | FAQ hub |
+| `/google-school-2025-26` | Google for Education school Thane | Google Classroom school Thane, Google Workspace CBSE school, certified Google school India | Campaign page (Decision 5 KEEP-PENDING) |
+| `/meta-school-2025-26` | Meta for Education school Thane | digital citizenship school Thane, Meta partner school India, online safety CBSE school | Campaign page (Decision 5 KEEP-PENDING) |
 
-### New Wave 5 landing pages (gap targeting)
+  ### 1B — Tier 1 blog posts (10)
 
-| New URL | Primary keyword |
-|---|---|
-| `/best-cbse-school-thane-west` | best CBSE school Thane West |
-| `/cbse-school-admissions-class-1-thane-2026` | Class 1 CBSE admission Thane 2026 |
-| `/class-11-science-admission-thane` | Class 11 Science stream Thane school |
-| `/nursery-admission-thane-2026-27` | nursery admission Thane 2026-27 |
+  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
+  |---|---|---|---|
+  | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | CBSE vs ICSE | CBSE vs ICSE difference, board comparison India, choose CBSE or ICSE | KEEP — pillar (Decision 7) |
+| `ideal-teacher-qualities-traits-of-a-great-educator` | qualities of an ideal teacher | good teacher traits, characteristics great educator, what makes a good teacher | IMPROVE |
+| `key-facilities-every-good-cbse-school-should-have` | facilities CBSE school must have | CBSE school infrastructure, school amenities checklist, what to look for in CBSE school | IMPROVE |
+| `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | cultural activities for students critical thinking | school cultural programmes, creative thinking activities students, cultural exposure benefits | IMPROVE |
+| `importance-of-sports-in-students-life-teamwork-skills` | importance of sports in student life | why sports matter in school, benefits of sports for students, school sports teamwork | KEEP pillar (3 × 301 sources merged) |
+| `why-rainbow-international-school-is-among-the-top-schools-in-thane` | top schools in Thane Rainbow International | RIS top school Thane, why choose RIS Thane, best CBSE school review Thane | KEEP brand pillar (3 × 301) |
+| `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | how to choose best CBSE school Thane | parent guide CBSE Thane, school selection Thane, CBSE school checklist Thane | KEEP Thane pillar |
+| `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | popularity of CBSE schools in Thane West | why parents choose CBSE Thane West, Thane West school trends, CBSE growth Thane | IMPROVE |
+| `school-admission-checklist-thane-parents-guide-2026` | school admission checklist Thane 2026-27 | admission documents Thane, CBSE admission steps Thane, parent admission guide 2026 | IMPROVE |
+| `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | effects of mobile phones on children | screen time for kids, child mobile phone risks, manage screen time children | KEEP pillar (3 × 301) |
+
+  ### 1C — Tier 2 blog posts (25)
+
+  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
+  |---|---|---|---|
+  | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | CBSE vs ICSE vs State Board | three-way board comparison, best school board India, board differences explained | IMPROVE (Decision 7) |
+| `co-curricular-activities` | co-curricular activities for students | school co-curriculars, holistic student development, co-curricular benefits | IMPROVE |
+| `problem-solving-activities-life-skills-students` | problem-solving activities life skills students | critical thinking activities, school life skills, age-wise problem solving | IMPROVE |
+| `role-of-parents-in-education-orientation-importance` | role of parents in education | parent involvement school, school orientation programmes, parent teacher partnership | IMPROVE |
+| `importance-of-foundational-literacy-and-numeracy-in-schools` | foundational literacy and numeracy schools | NEP 2020 foundational stage, FLN India, early reading writing numeracy | IMPROVE |
+| `how-to-help-your-child-focus-better-in-studies` | how to help your child focus in studies | child concentration tips, study focus strategies, kids attention study | IMPROVE |
+| `importance-of-extracurricular-activities-in-school` | importance of extracurricular activities school | extracurriculars vs academics, school activities benefits, holistic development | IMPROVE |
+| `new-education-policy-nep-2020-what-parents-should-know` | NEP 2020 for parents | 5+3+3+4 education structure, NEP changes parents, NEP 2020 explained | IMPROVE |
+| `how-to-prepare-your-child-for-first-day-of-school` | how to prepare child for first day of school | first day of school tips, school readiness, separation anxiety school | IMPROVE |
+| `benefits-of-multiple-intelligence-based-learning-in-schools` | multiple intelligence learning schools | Howard Gardner schools, multiple intelligence theory, MI-based teaching | IMPROVE |
+| `best-cbse-schools-in-thane-what-to-look-for` | CBSE schools Thane verification checklist | how to verify CBSE school, CBSE affiliation check Thane, school verification India | IMPROVE (Decision 12) |
+| `6-reasons-why-cbse-is-the-best-board-of-the-country` | why CBSE is the best board India | benefits of CBSE board, CBSE advantages India, CBSE versus other boards | KEEP (Decision 12) |
+| `why-choose-a-cbse-school-for-your-childs-education` | why choose CBSE school | CBSE school benefits, why parents pick CBSE, CBSE school advantages | KEEP — receives MERGE |
+| `international-school-admission-process-guide` | international school admission process India | how to apply international school India, international school steps, eligibility international school | KEEP pillar — receives MERGE |
+| `age-criteria-for-international-schools-admission-2025-in-mumbai` | school admission age in Mumbai | Mumbai school admission cut-off, RTE age Mumbai, Nursery age Mumbai | IMPROVE — receives MERGE (Decision 10) |
+| `what-you-need-to-know-before-applying-to-an-international-school` | international school admission checklist | documents international school admission, international school visit checklist, parent guide international | IMPROVE (Decision 10) |
+| `advantages-of-starting-early-international-school` | benefits of early school admission | early school start benefits, why start school early, advantages early enrolment | IMPROVE (Decision 10) |
+| `stress-in-teenagers-symptoms-management` | stress in teenagers symptoms management | teen stress signs, helping stressed teen, teen anxiety parents | IMPROVE |
+| `riddles-for-kids` | riddles for kids | fun riddles children, age-wise riddles, brain-teasers for kids | IMPROVE |
+| `how-to-increase-attention-span` | how to increase attention span students | student focus tips, attention span exercises, concentration improvement | IMPROVE |
+| `benefits-of-learning-a-second-language` | benefits of learning a second language | second language for students, bilingual education benefits, foreign language schools | IMPROVE |
+| `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | CBSE schools foster entrepreneurship | Atal Tinkering Lab CBSE, school innovation programmes, student entrepreneurship India | IMPROVE |
+| `smart-revision-techniques-for-students` | smart revision techniques students | spaced repetition students, active recall study, exam revision tips | IMPROVE |
+| `innovative-teaching-method-for-active-learning` | innovative teaching methods active learning | flipped classroom India, project-based learning schools, gamification education | IMPROVE |
+| `how-to-learn-boring-subjects` | how to learn boring subjects | study tips difficult subjects, motivation study, make studies interesting | IMPROVE |
+
+  ### 1D — Tier 3 blog posts (45)
+
+  | Slug | Primary keyword | Secondary keywords (2–3) | Notes |
+  |---|---|---|---|
+  | `how-to-avoid-procrastination-while-studying` | how to avoid procrastination studying | study procrastination tips, time-blocking students, beat study procrastination | IMPROVE |
+| `teen-entrepreneurship-fostering-innovation-and-responsibility` | teen entrepreneurship | young entrepreneurs India, teen business skills, foster innovation teens | IMPROVE |
+| `teaching-teens-resilience-and-thriving-through-failure` | teaching teens resilience | teen failure recovery, build resilience adolescents, coping skills teens | IMPROVE |
+| `nutritional-requirements-of-the-teenagers-how-to-fulfil-them` | nutritional requirements of teenagers | teen diet plan, teenage nutrition India, healthy meals teenagers | IMPROVE |
+| `top-5-techniques-for-taming-anger-in-children` | techniques to tame anger in children | child anger management, calm down kids, manage child temper | IMPROVE |
+| `top-6-easy-ways-to-develop-patience-in-your-child` | develop patience in your child | teach patience kids, child patience activities, build child patience | IMPROVE |
+| `homework-war-endgame` | end the homework battle | homework struggle kids, child homework tips, parent homework battle | IMPROVE |
+| `amazing-coaches-who-improved-players-willpower` | why schools need specialist sports coaches | school sports coaching, professional coaches schools, sports willpower students | IMPROVE |
+| `how-organic-farming-in-schools-helps-the-nation` | organic farming in schools | school farming projects, sustainability education, school agriculture India | IMPROVE |
+| `how-school-buses-are-changing-with-technology` | school buses technology safety | GPS school bus, smart school transport, school bus tracking app | IMPROVE |
+| `amazing-youtube-channels-on-general-knowledge-for-kids` | YouTube channels general knowledge for kids | best educational YouTube channels, GK channels children, kid-safe learning videos | IMPROVE |
+| `know-how-swimming-helps-your-child-in-7-ways` | how swimming helps your child | benefits of swimming for kids, swimming for child development, school swimming benefits | IMPROVE |
+| `big-school-playgrounds-6-reasons-why-kids-need-them` | school playgrounds kids need | why kids need playgrounds, playground importance schools, school outdoor space | IMPROVE |
+| `6-reasons-why-indoor-sports-is-important-in-schools` | indoor sports importance schools | school indoor games, indoor sports benefits students, year-round school sports | IMPROVE |
+| `field-trips-know-how-they-groom-students-in-5-ways` | how field trips groom students | school field trip benefits, educational tours students, experiential learning trips | IMPROVE |
+| `time-management-for-school-children-6-ways-parents-can-help` | time management for school children | kids time management tips, parent help time management, child schedule planning | IMPROVE |
+| `how-to-teach-benefits-of-family-meals-to-kids` | benefits of family meals for kids | family dinner benefits, eat together family, child manners family meals | IMPROVE |
+| `do-your-children-hate-reading-know-why-youre-the-reason` | why children hate reading | kids dont like reading, get child to read, child reading habits parents | IMPROVE |
+| `how-regular-sports-help-students-6-reasons` | how regular sports help students | sports benefits school children, student sports participation, regular play students | IMPROVE |
+| `digital-classrooms-how-technology-improves-education-in-school` | digital classrooms education | smart classroom benefits, ed-tech school, technology-enabled learning | IMPROVE |
+| `9-reasons-why-schools-should-have-an-infirmary-and-paediatrician` | schools need infirmary and paediatrician | school health services, school nurse paediatrician, school medical room | IMPROVE |
+| `7-safety-and-security-measures-your-kids-school-should-have` | school safety security measures | school CCTV safety, school visitor policy, school safety checklist parents | IMPROVE |
+| `10-fun-and-educational-republic-day-activities-for-kids` | Republic Day activities for kids | Republic Day school celebration, January 26 school activities, patriotic kids activities | IMPROVE |
+| `christmas-celebration-in-school-10-fun-and-festive-activity-ideas` | Christmas celebration in school | Christmas school activities, school Christmas ideas, festive school programmes | IMPROVE |
+| `diwali-activities-for-students` | Diwali activities for students | Diwali school celebration, eco-friendly Diwali school, student Diwali ideas | IMPROVE |
+| `benefits-of-meditation-for-students` | benefits of meditation for students | school mindfulness programmes, student meditation, meditation focus students | IMPROVE |
+| `group-activities-for-students` | group activities for students | classroom group work, collaborative learning activities, school team activities | IMPROVE |
+| `4-reasons-why-school-bags-should-not-be-a-burden` | school bags should not be a burden | CBSE school bag weight, lighter school bag, child posture bag | IMPROVE |
+| `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | innovate cultural programmes in school | creative cultural events school, school cultural week ideas, multicultural school programmes | IMPROVE |
+| `7-areas-in-education-where-indian-women-are-excellent` | areas where Indian women excel education | women in Indian education, women teachers India, Indian women academic leaders | IMPROVE |
+| `teen-depression-recognise-help-students` | teen depression | teen mental health, signs of teen depression, help depressed teenager | IMPROVE |
+| `benefits-of-learning-music-for-kids` | benefits of learning music for kids | music education benefits, kids music lessons, school music programme | IMPROVE |
+| `benefits-of-art-and-craft-for-kids` | benefits of art and craft for kids | school art programme, kids creativity craft, art education benefits | IMPROVE |
+| `fun-activities-to-develop-fine-motor-skills-at-home` | fine motor skills activities home | toddler motor skills, hand coordination kids, preschool fine motor | IMPROVE |
+| `how-to-help-your-child-overcome-exam-fear` | how to help child overcome exam fear | exam stress kids, child exam anxiety tips, board exam fear | IMPROVE |
+| `benefits-of-yoga-for-students` | benefits of yoga for students | school yoga programme, student yoga benefits, yoga in CBSE schools | IMPROVE |
+| `how-to-build-a-strong-parent-teacher-relationship` | parent teacher relationship | PTM tips parents, parent teacher communication, school parent collaboration | IMPROVE |
+| `why-storytelling-is-important-for-children` | storytelling importance for children | school storytelling benefits, kids storytime education, story-based learning | IMPROVE |
+| `why-maths-matters-in-students-life` | why maths matters in student life | maths education importance, kids love maths, maths real-life applications | IMPROVE |
+| `benefits-of-reading-aloud-to-children` | benefits of reading aloud to children | read aloud kids benefits, parent reading habits, school read-aloud programme | IMPROVE |
+| `100-result-rainbows-first-batch-2018-19` | Rainbow International School Class 10 result 2018 | RIS first batch Class 10, 100% pass CBSE Thane, RIS board result history | KEEP — historical brand |
+| `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | RIS student swimming achievement | Raghvi Ramanujan swimming, RIS student athlete, school swimming success | KEEP — student story |
+| `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | — (410) | — | 410 GONE |
+| `rainbow-preschools-featured-in-knowledge-review-magazine` | — (410) | — | 410 GONE |
+| `rainbow-wins-award-for-excellence` | — (410) | — | 410 GONE |
+
+  ### 1E — Tier 4 blog posts (14) — MERGE / 301 / 410
+
+  | Slug | Primary keyword | Secondary keywords | Notes |
+  |---|---|---|---|
+  | `imporatnce-of-sports-in-students-life` | — (301) | — | 301 → importance-of-sports-in-students-life-teamwork-skills (typo) |
+| `top-5-cbse-schools-in-thane` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `top-cbse-schools-thane-2026` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `best-cbse-schools-thane-rankings` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `effect-of-mobile-phones-on-students` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `screen-time-for-children-guide` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `mobile-phone-addiction-in-kids` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `5-tips-to-choose-best-cbse-schools-in-mumbai` | — (MERGE) | — | MERGE into why-choose-a-cbse-school-for-your-childs-education (Decision 12) |
+| `back-to-school-a-step-by-step-guide-to-international-school-admissions` | — (MERGE) | — | MERGE into international-school-admission-process-guide (Decision 10) |
+| `best-age-for-international-school-admission` | — (MERGE) | — | MERGE into age-criteria-for-international-schools-admission-2025-in-mumbai (Decision 10) |
+| `coronavirus-precautions-for-schools` | — (410) | — | 410 GONE — stale 2020 content |
+| `give-earth-a-chance-rainbow-school-event-2019` | — (410) | — | 410 GONE — dated event |
+| `15th-summit-rainbow-international-school-event` | — (410) | — | 410 GONE — dated event |
+| `fit-india-school-week-2019-2020` | — (410) | — | 410 GONE — dated event |
+
+  ### 1F — New Wave 5 landing pages (gap targeting)
+
+  | New URL | Primary keyword | Secondary keywords (2–3) | Notes |
+  |---|---|---|---|
+  | `/best-cbse-school-thane-west` | best CBSE school Thane West | CBSE school Thane West admission, top school Thane West, Thane West school review | Geo-intent gap |
+  | `/cbse-school-admissions-class-1-thane-2026` | Class 1 CBSE admission Thane 2026 | Class 1 admission Thane, primary admission Thane, Class 1 documents Thane | Year+class gap |
+  | `/class-11-science-admission-thane` | Class 11 Science stream Thane school | Class 11 PCMB Thane, JEE NEET school Thane, Science stream Class 11 admission Thane | Stream-intent gap |
+  | `/nursery-admission-thane-2026-27` | nursery admission Thane 2026-27 | nursery school Thane 2026, Nursery age criteria Thane, RTE Nursery Thane | Year+class gap |
+
+  ### 1G — Cannibalization audit (post-plan)
+
+  After Wave 4, no two URLs share the same primary keyword. Verified: the four "best CBSE school" variants are differentiated by locality modifier (Brahmand / Ghodbunder / Manpada / Thane West). The three pillar posts (sports, screen time, brand) absorb all overlapping merge sources. Tier 4 typo and duplicate slugs are 301'd to canonical pillar URLs.
 
 ---
+
 
 ## Section 2A — Commercial Pages Audit (41 pages)
 
@@ -159,7 +314,7 @@ Rule: no two URLs share the same primary keyword. The full per-page primary keyw
 
 | # | Slug | Current title | Proposed title (≤60) | Proposed description (150–158) | Primary keyword | Disposition |
 |---|---|---|---|---|---|---|
-| T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | CBSE vs ICSE: Which Board Prepares Students Better for the Future? | CBSE vs ICSE: Which Board Is Better for Your Child? (52) | CBSE vs ICSE compared head-to-head: syllabus, exam pattern, university acceptance and career outcomes. Find the right board for your child's future today. (153) | CBSE vs ICSE | KEEP (91K impressions — leave title alone, only refine description) |
+| T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | CBSE vs ICSE: Which Board Prepares Students Better for the Future? | — (Decision 7: leave title alone, KEEP) | CBSE vs ICSE compared head-to-head: syllabus, exam pattern, university acceptance and career outcomes. Find the right board for your child's future today. (153) | CBSE vs ICSE | KEEP (91K impressions — Decision 7: leave title alone, only refine description) |
 | T1.2 | `ideal-teacher-qualities-traits-of-a-great-educator` | The Ideal Teacher: 8 Qualities and Traits That Define a Great Educator | 8 Qualities of a Great Teacher — Ideal Educator Traits (54) | The 8 qualities that define a great teacher: subject mastery, empathy, communication, patience, creativity, fairness, lifelong learning, adaptability. (157) | qualities of an ideal teacher | IMPROVE |
 | T1.3 | `key-facilities-every-good-cbse-school-should-have` | Key Facilities Every Good CBSE School Should Have | Key Facilities Every Good CBSE School Must Have (49) | Essential facilities every good CBSE school should provide: science labs, library, sports ground, smart classrooms, infirmary, transport and safety. (157) | facilities CBSE school must have | IMPROVE |
 | T1.4 | `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | Cultural Activities for Students: The Key to Developing Critical Thinking Skills | Cultural Activities for Students — Build Critical Thinking (58) | How cultural activities in school build critical thinking, creativity and confidence in students. Examples, benefits and how to introduce them at school. (155) | cultural activities for students critical thinking | IMPROVE |
@@ -241,11 +396,11 @@ Rule: no two URLs share the same primary keyword. The full per-page primary keyw
 | T3.35 | `10-things-in-the-classroom-to-boost-student-engagement` | 10 Things in the Classroom to Boost Student Engagement | 10 Classroom Ideas to Boost Student Engagement (47) | 10 practical things teachers can introduce in the classroom to boost student engagement: warm-ups, peer activities, visuals, choice, movement and tech. (158) | classroom ideas boost student engagement | IMPROVE |
 | T3.36 | `teaching-children-the-value-of-money-5-ways-schools-can-help` | Teaching Children the Value of Money: 5 Ways Schools Can Help | Teaching Children Value of Money — 5 Ways Schools Help (56) | 5 ways schools can teach children the value of money: budgeting projects, mock markets, financial literacy classes, charity drives, save-spend-share. (157) | teaching children value of money | IMPROVE |
 | T3.37 | `the-benefits-of-early-learning-in-shaping-a-childs-personality` | The Benefits of Early Learning in Shaping a Child's Personality | Benefits of Early Learning for Child Personality (49) | Benefits of early learning in shaping a child's personality: confidence, social skills, language, curiosity and foundational habits for later success. (155) | early learning shaping personality | IMPROVE |
-| T3.38 | `the-leading-school-of-the-year-thane` | The Leading School of the Year (Thane) | — | — | — | **410 GONE** — 2018 award post, low traffic, no dedicated inbound links beyond blog listing. Verify GSC backlinks before actioning (TODO-7). |
+| T3.38 | `the-leading-school-of-the-year-thane` | The Leading School of the Year (Thane) | The Leading School of the Year — RIS Thane Award (54) | RIS Thane named "The Leading School of the Year" — a recognition of academic, sports and cultural excellence by an industry awards body. Read the full story today. (158) | RIS Leading School of the Year award | Leading School of the Year Thane | KEEP — historical brand award post (per pre-approved task instructions) |
 | T3.39 | `why-maths-matters-in-student-life-benefits-uses` | Why Maths Matters in Student Life: Benefits, Uses, and How to Build a Love for Numbers | Why Maths Matters in Student Life — Benefits & Uses (53) | Why maths matters in student life: career benefits, real-world uses, problem-solving and how parents can build a love for numbers in their kids today. (154) | why maths matters in student life | IMPROVE |
 | T3.40 | `school-sanitation-standards-how-to-stay-clean-and-safe` | School Sanitation Standards: How to Stay Clean and Safe | School Sanitation Standards — Stay Clean & Safe (49) | School sanitation standards: clean toilets, safe drinking water, hand hygiene, classroom cleanliness, surface disinfection. What parents should expect. (158) | school sanitation standards | IMPROVE |
 | T3.41 | `100-result-rainbows-first-batch-2018-19` | 100% Result: Rainbow International School's First Batch Achieves Perfect Class 10 Outcome | RIS Class 10 Result 2018-19 — 100% First Batch Pass (54) | RIS Thane's first Class 10 batch (2018-19) achieved a 100% pass result on the CBSE board exam. A historic milestone for the school's CBSE journey today. (152) | RIS Class 10 Result 2018-19 — 100% Pass First Batch | Rainbow International School Class 10 result 2018 | KEEP — historical brand milestone with evergreen value (per pre-approved task instructions) |
-| T3.42 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | An All-Rounder in the Making: Raghvi Ramanujan Bags Her 101st Swimming Medal | — | — | — | **410 GONE** — single student-feature post; content already represented on /student-achievements page. Verify GSC backlinks before actioning (TODO-7). |
+| T3.42 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | An All-Rounder in the Making: Raghvi Ramanujan Bags Her 101st Swimming Medal | RIS Student Raghvi Ramanujan — 101st Swimming Medal (52) | RIS Thane student Raghvi Ramanujan wins her 101st swimming medal — a story of discipline, training and a school that champions young athletes daily today. (155) | RIS student swimming achievement — Raghvi Ramanujan | RIS student swimming achievement | KEEP — student achievement story with evergreen brand value (per pre-approved task instructions) |
 | T3.43 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | Rainbow Awarded Best Preschool and Secondary School in Thane at Retail & Hospitality Awards 2018 | — | — | — | **410 GONE** — 2018 award post; covered by /awards-achievements page. Verify GSC backlinks before actioning (TODO-7). |
 | T3.44 | `rainbow-preschools-featured-in-knowledge-review-magazine` | Rainbow Preschools Featured in 'The 10 Best Preschools in India 2018' — The Knowledge Review | — | — | — | **410 GONE** — 2018 RPS-only feature, not RIS-specific. Verify GSC backlinks before actioning (TODO-7). |
 | T3.45 | `rainbow-wins-award-for-excellence` | Rainbow Wins India Today Awards for Excellence in Preschool and CBSE Education — Thane 2017 | — | — | — | **410 GONE** — 2017 award post; covered by /awards-achievements page. Verify GSC backlinks before actioning (TODO-7). |
@@ -277,11 +432,11 @@ Rule: no two URLs share the same primary keyword. The full per-page primary keyw
 |---|---|---|---|---|---|---|
 | 1 | 10 | 4 | 6 | 0 | 0 | 0 |
 | 2 | 25 | 3 | 22 | 0 | 0 | 0 |
-| 3 | 45 | 1 | 39 | 0 | 0 | 5 |
+| 3 | 45 | 3 | 39 | 0 | 0 | 3 |
 | 4 | 14 | 0 | 0 | 3 | 7 | 4 |
-| **Total** | **94** | **8** | **67** | **3** | **7** | **9** |
+| **Total** | **94** | **10** | **67** | **3** | **7** | **7** |
 
-Net surviving posts: 8 + 67 = **75** (within target 70–75).
+Net surviving posts: 10 + 67 = **77** (slightly above 70–75 because 3 historical-brand posts are pre-approved as KEEP — see Section 0).
 
 ---
 
@@ -388,39 +543,110 @@ Pillar body expansion target: 2,500+ words. Combine unique angles from all four 
 
 ## Section 3 — Body Content Expansion Plan
 
-### Commercial pages — expansion targets (Wave 1)
+  ### Section 3A — Commercial pages (all 41) — expansion targets (Wave 1)
 
-| URL | Current word count (proxy) | Target | Status | Recommended H2 structure |
-|---|---|---|---|---|
-| `/` | ~800–1,000 | 1,200–1,500 | OK, expand | (1) Why parents choose RIS Thane; (2) CBSE since 2009 — affiliation 1130661; (3) 3.5-acre campus & facilities; (4) Programmes Nursery to Class 12; (5) Locality served — Brahmand, Ghodbunder, Manpada; (6) Apply for 2026-27 |
-| `/admissions` | ~600–800 | 1,200–1,500 | THIN | (1) Admission process step-by-step; (2) Age criteria by class; (3) Documents required; (4) Fees & payment; (5) Important dates 2026-27; (6) FAQs; (7) Apply now CTA |
-| `/primary-section` | ~400–600 | 1,000–1,200 | THIN | (1) Class 1 to 5 at RIS; (2) Curriculum & subjects; (3) Foundational literacy & numeracy approach; (4) Co-curricular at primary level; (5) Class 1 admission for 2026-27 |
-| `/senior-secondary-section` | ~400–600 | 1,000–1,200 | THIN | (1) Class 11 & 12 streams overview; (2) Science stream — subjects & career paths; (3) Commerce stream; (4) Humanities stream; (5) Class 11 admission for 2026-27; (6) JEE/NEET/CUET preparation support |
-| `/amenities` | ~600–900 | 1,200–1,500 | OK | (1) 3.5-acre campus; (2) Academic — labs, library, smart rooms; (3) Sports — ground, swimming pool, indoor; (4) Wellness — infirmary, paediatrician on call; (5) Safety & transport; (6) Visit our campus |
-| `/fee-structure` | ~300–500 | 1,200–1,500 | THIN | (1) Class-wise fee table (full); (2) One-time vs annual vs term breakdown; (3) Transport fees; (4) Concessions & policies; (5) Payment modes; (6) Download fee structure PDF; (7) Apply for 2026-27 |
+  | URL | Current word count (proxy) | Target | THIN flag / Status | Recommended H2 structure | Internal links |
+  |---|---|---|---|---|---|
+  | `/` | ~800–1,000 | 1,200–1,500 | OK, expand | Why parents choose RIS Thane | CBSE since 2009 — affiliation 1130661 | 3.5-acre campus & facilities | Programmes Nursery to Class 12 | Localities served — Brahmand, Ghodbunder, Manpada | Apply for 2026-27 | /admissions, /amenities, /fee-structure, /about-rainbow-international-school |
+| `/about-rainbow-international-school` | ~600–800 | 1,200–1,500 | THIN-ish, expand (absorbs /welcome-to-ris) | Our story since 2009 | Welcome from the Principal (absorbed) | Vision & values | 3.5-acre Brahmand campus | CBSE affiliation & milestones | Visit / contact us | /chairpersons-note, /ris-vision-mission, /our-philosophy |
+| `/welcome-to-ris` | N/A | N/A | REDIRECT (Wave 1) | 301 → /about-rainbow-international-school | — |
+| `/chairpersons-note` | ~250–400 | 700–900 | THIN, expand | Chairperson's message | Vision for RIS | Commitment to excellence | A note to parents | /ris-vision-mission, /our-philosophy, /about-rainbow-international-school |
+| `/ris-vision-mission` | ~300–500 | 900–1,100 | THIN, expand | Vision statement | Mission statement | Values that guide RIS | World-citizen approach | How vision plays out in classrooms | /our-philosophy, /curriculum, /about-rainbow-international-school |
+| `/our-philosophy` | ~300–500 | 900–1,100 | THIN, expand | Four pillars overview | Competence | Conscience | Compassion | Courage | Philosophy in daily school life | /ris-vision-mission, /curriculum, /beyond-the-classroom |
+| `/pre-primary-school-thane` | ~400–600 | 1,000–1,200 | THIN, expand | Pre-Primary at RIS (Nursery, Jr KG, Sr KG) | Activity-based learning | Female teaching staff & safety | Daily schedule & curriculum | Apply for 2026-27 | /admissions, /safety-security, /amenities |
+| `/primary-section` | ~400–600 | 1,000–1,200 | THIN, expand | Class 1 to 5 at RIS | CBSE primary curriculum | Foundational literacy & numeracy approach | Co-curricular at primary level | Class 1 admission for 2026-27 | /admissions, /curriculum, /extracurriculars |
+| `/middle-school-section` | ~400–600 | 1,000–1,200 | THIN, expand (and fix Class 6–10 → Class 6–8) | Class 6 to 8 at RIS | Multi-dimensional CBSE curriculum | Subject specialisation | Critical thinking & projects | Class 6 admission for 2026-27 | /admissions, /curriculum, /secondary-section |
+| `/secondary-section` | ~400–600 | 1,000–1,200 | THIN, expand | Class 9 & 10 at RIS | CBSE Class 10 board prep | Career counselling foundations | Co-curricular at secondary level | Class 9 admission for 2026-27 | /admissions, /awards-achievements, /senior-secondary-section |
+| `/senior-secondary-section` | ~400–600 | 1,000–1,200 | THIN, expand | Class 11 & 12 streams overview | Science stream — subjects & career paths | Commerce stream | Humanities stream | JEE/NEET/CUET prep support | Class 11 admission for 2026-27 | /admissions, /student-achievements, /career |
+| `/amenities` | ~600–900 | 1,200–1,500 | OK | 3.5-acre campus | Academic — labs, library, smart rooms | Sports — ground, swimming pool, indoor | Wellness — infirmary, paediatrician on call | Safety & transport | Visit our campus | /safety-security, /extracurriculars, /photo-gallery |
+| `/awards-achievements` | ~400–600 | 900–1,100 | THIN, expand | School-level awards | Faculty recognitions | Industry partnerships | FIT INDIA & related | How awards reflect our culture | /student-achievements, /about-rainbow-international-school, /testimonials |
+| `/student-achievements` | ~400–600 | 900–1,100 | THIN, expand | 100% Class 10 result milestones | National & state sports wins | Academic Olympiad results | Cultural & arts achievements | Showcasing student journeys | /awards-achievements, /extracurriculars, /senior-secondary-section |
+| `/safety-security` | ~500–700 | 1,000–1,200 | OK, light expand | 160 CCTV cameras & monitoring | Metal detectors & visitor controls | GPS-tracked transport | Trained nurses & ambulance | 100% female preschool staff | Drills & training | /amenities, /pre-primary-school-thane, /admissions |
+| `/beyond-the-classroom` | ~500–700 | 1,000–1,200 | OK, light expand | Why beyond-classroom matters | Exhibitions & student-led events | Clubs & societies | Educational tours | Organic farming & sustainability | /extracurriculars, /our-philosophy, /amenities |
+| `/extracurriculars` | ~500–700 | 1,000–1,200 | OK, light expand | FIT INDIA School activities | Sports — indoor & outdoor | Music, dance, drama | Robotics & STEM clubs | Swimming programme | Annual events | /amenities, /awards-achievements, /photo-gallery |
+| `/photo-gallery` | ~200–400 (caption-only) | 600–900 | THIN content (mostly images), add captioned sections | Campus & infrastructure | Academic events | Sports & fitness | Cultural & festive events | Annual day & celebrations | Student achievements | /amenities, /extracurriculars, /awards-achievements |
+| `/contact-us` | ~200–300 | 500–700 | THIN, expand with directions/details | Visit us — address & directions | Call & email | Admissions enquiry form | School hours & meeting requests | Map embed | /admissions, /application-form, /faqs |
+| `/academic-calendar` | ~150–300 | 500–700 | THIN, expand | Academic year overview | Term-wise dates 2026-27 | Holiday list | Exam schedule | PTM & event calendar | Download PDF | /admissions, /faqs, /book-list |
+| `/cbse-mandatory-public-disclosures` | ~400–600 | 900–1,100 | OK, light expand | About CBSE Affiliation 1130661 | General information | Documents & infrastructure | Results & academics | Staff details | Fee structure & policies | Downloads | /fee-structure, /about-rainbow-international-school, /school-managing-committee |
+| `/school-managing-committee` | ~250–400 | 700–900 | THIN, expand | About the SMC | Members & roles | Parent representatives | Teacher representatives | Meeting cadence & governance | /cbse-mandatory-public-disclosures, /about-rainbow-international-school, /chairpersons-note |
+| `/career` | ~400–600 | 900–1,100 | OK, light expand | Why work at RIS | Current openings (teaching) | Current openings (non-teaching) | Application process | Female-candidate preference & culture | Apply now | /about-rainbow-international-school, /our-philosophy, /academic-team |
+| `/book-list` | ~200–400 | 600–800 | THIN (mostly tables/links), expand intro & guidance | About the book list | Class-wise lists Nursery to Class 12 | Where to buy | Stationery & supplies | Download list | /admissions, /academic-calendar, /curriculum |
+| `/virtual-learning` | ~300–500 | 700–900 | THIN, expand | About RIS Virtual Learning | Google Workspace & Classroom | Hybrid lesson model | How students access | Parent FAQs | /curriculum, /academic-team, /faqs |
+| `/academic-team` | ~300–500 | 900–1,100 | THIN, expand | How RIS hires | Subject teachers | Sports & fitness coaches | Counsellors & support staff | Professional development & training | /career, /our-philosophy, /awards-achievements |
+| `/rainbow-preschool-international` | ~250–400 | 500–700 (summary) | KEEP-AS-SUMMARY (Decision 6) | About Rainbow Preschool | Age groups served | What makes our preschools different | Full preschool site link & CTA | External: rainbowpreschools.com; Internal: /pre-primary-school-thane, /admissions |
+| `/brand-partners` | ~600–900 | 1,200–1,500 | OK | About RIS Brand Partners | Categories of partners (11) | Featured partner spotlights | RIS privilege card | How families benefit | Brochure download | /testimonials, /about-rainbow-international-school, /faqs |
+| `/students-leaving-certificate` | ~200–400 | 600–800 | THIN, expand | About school leaving certificates | When TC is needed | Process step-by-step | Documents required | Fee & timeline | Download form | /admissions, /faqs, /contact-us |
+| `/curriculum` | ~300–500 | 1,000–1,200 | THIN, expand | Our CBSE curriculum philosophy | Pre-Primary curriculum | Primary curriculum | Middle School curriculum | Secondary curriculum | Senior Secondary streams | Beyond academics | /our-philosophy, /book-list, /extracurriculars |
+| `/application-form` | ~150–300 | 400–600 | THIN intentionally (transactional); expand intro+next-steps | About the form | Documents to keep ready | Fill the form | What happens next | Talk to admissions | /admissions, /fee-structure, /faqs |
+| `/admissions` | ~600–800 | 1,200–1,500 | THIN, expand | Admission process step-by-step | Age criteria by class | Documents required | Fees & payment | Important dates 2026-27 | FAQs | Apply now CTA | /application-form, /fee-structure, /faqs |
+| `/fee-structure` | ~300–500 | 1,200–1,500 | THIN, expand (Decision 3 — improve HTML, keep PDF as-is) | Class-wise fee table (full) | One-time vs annual vs term breakdown | Transport fees | Concessions & policies | Payment modes | Download fee structure PDF | Apply for 2026-27 | /admissions, /faqs, /application-form |
+| `/top-schools-in-thane` | ~600–800 | 1,500–2,000 | REFRAME to neutral guide (Decision 4) | Why parents look for school rankings | Why a single ranking isn't useful | A parent's evaluation framework (criteria) | Fees benchmarking | Infrastructure benchmarking | Board (CBSE/ICSE) considerations | Locality considerations | A worked example using public data | /cbse-mandatory-public-disclosures, /amenities, /admissions |
+| `/school-near-brahmand-thane` | ~500–700 | 1,000–1,200 | KEEP, light expand | About RIS in Brahmand | Distance from Brahmand Phase 4 | What Brahmand families like | Bus routes covering Brahmand | Apply from Brahmand | /admissions, /amenities, /school-near-ghodbunder-road-thane |
+| `/school-near-ghodbunder-road-thane` | ~500–700 | 1,000–1,200 | KEEP, light expand | About RIS near GB Road | 8 min from GB Road | Bus routes — Patlipada, Waghbil, Kavesar | What GB Road families like | Apply from GB Road | /admissions, /amenities, /school-near-brahmand-thane |
+| `/school-near-manpada-thane` | ~500–700 | 1,000–1,200 | KEEP, light expand | About RIS near Manpada | 5 min from Manpada Junction | Bus routes serving Manpada | What Manpada families like | Apply from Manpada | /admissions, /amenities, /school-near-brahmand-thane |
+| `/testimonials` | ~400–600 | 900–1,100 | OK, light expand. Confirm aggregation source (TODO-4) | How families rate RIS | Pre-Primary parent voices | Primary parent voices | Middle School parent voices | Secondary parent voices | Senior Secondary parent voices | Submit your testimonial | /admissions, /awards-achievements, /faqs |
+| `/faqs` | ~600–900 | 1,500–2,000 | OK, expand FAQ schema | Admissions FAQs | Fees FAQs | Curriculum & academics FAQs | Safety FAQs | Timings & transport FAQs | Extracurriculars FAQs | Facilities FAQs | Still have a question? | /admissions, /fee-structure, /contact-us |
+| `/google-school-2025-26` | N/A (campaign hold) | N/A | KEEP-PENDING | NO CHANGE pending Decision 5 (TODO-2) | — |
+| `/meta-school-2025-26` | N/A (campaign hold) | N/A | KEEP-PENDING | NO CHANGE pending Decision 5 (TODO-2) | — |
 
-### Tier 1 blog posts — expansion targets
+  > **Notes on word-count proxy:** "Current word count (proxy)" is estimated by direct read of the page body in `client/src/pages/` (excluding nav/footer/forms boilerplate). THIN flag = current body < ~600 words for content pages, < ~300 words for transactional/utility pages. /welcome-to-ris is N/A because it is being 301'd. Campaign pages (Google/Meta) are KEEP-PENDING per Decision 5.
 
-All Tier 1 posts should target 1,500–2,000 words. Pillar posts (T1.5, T1.6, T1.10) should target 2,000–2,500 words after absorbing merged content.
+  ### Section 3B — Tier 1 + Tier 2 blog posts (35) — expansion targets (Waves 2 & 3)
 
-### Internal linking opportunities
+  | # | Slug | Current word count (proxy) | Target | THIN flag | Recommended H2 structure | Internal links |
+  |---|---|---|---|---|---|---|
+  | T1.1 | `cbse-vs-icse-which-board-prepares-students-better-for-the-future` | ~1,800 | 2,000–2,500 | OK | Quick verdict | What is CBSE | What is ICSE | Syllabus compared | Exam pattern compared | University acceptance | Career outcomes | Which board for which child | FAQs | /admissions, /curriculum, T2.1 |
+| T1.2 | `ideal-teacher-qualities-traits-of-a-great-educator` | ~1,200 | 1,800–2,000 | EXPAND | Why great teachers matter | Subject mastery | Empathy | Communication | Patience | Creativity | Fairness | Lifelong learning | Adaptability | How to spot one in a school visit | /academic-team, /career, /our-philosophy |
+| T1.3 | `key-facilities-every-good-cbse-school-should-have` | ~1,300 | 1,800–2,100 | EXPAND | Why facilities matter | Science labs | Library | Sports ground & indoor sports | Smart classrooms | Infirmary & nurse | Transport & safety | Auditorium & arts | What to verify on a school visit | /amenities, /safety-security, /admissions |
+| T1.4 | `cultural-activities-for-students-key-to-developing-critical-thinking-skills` | ~1,400 | 1,800–2,000 | EXPAND | Cultural activities defined | Why they build critical thinking | Examples by age | How schools structure them | What parents should ask | Outcomes to look for | /extracurriculars, /beyond-the-classroom, /our-philosophy |
+| T1.5 | `importance-of-sports-in-students-life-teamwork-skills` | ~1,500 | 2,200–2,500 (pillar) | EXPAND-PILLAR | Why sports matter (overview) | Physical health | Cognitive benefits | Teamwork & leadership | Mental wellbeing | Discipline & time management | Academic performance link | Indoor vs outdoor | Schools and sports | Parent guide | /extracurriculars, /amenities, T3.13, T3.14, T3.19 |
+| T1.6 | `why-rainbow-international-school-is-among-the-top-schools-in-thane` | ~1,400 | 2,200–2,500 (pillar) | EXPAND-PILLAR | 3.5-acre campus | CBSE since 2009 | Holistic learning approach | Safety & care | Faculty | Results & achievements | Parent voices | Locality access | Visit us | /about-rainbow-international-school, /admissions, /testimonials |
+| T1.7 | `parental-guidance-how-to-choose-the-best-cbse-school-in-thane-for-your-child` | ~1,500 | 2,000–2,300 | KEEP-EXPAND | Why this guide | Criteria for choosing | Questions to ask | School visit checklist | Fees considerations | Board affiliation verification | Locality & commute | Talk to other parents | /admissions, /cbse-mandatory-public-disclosures, T2.11 |
+| T1.8 | `the-growing-popularity-of-cbse-schools-in-thane-west-among-parents` | ~1,200 | 1,800–2,000 | EXPAND | Why CBSE is growing in Thane West | Curriculum strengths | University acceptance | Balanced learning | What parents say | Numbers from public data | Choosing the right CBSE school here | /best-cbse-school-thane-west (new), /admissions, T1.7 |
+| T1.9 | `school-admission-checklist-thane-parents-guide-2026` | ~1,300 | 1,800–2,000 | EXPAND | Why a checklist | Documents needed | Eligibility & age | Fees clarity | Deadlines 2026-27 | Questions to ask | School visit notes | Decision-day checklist | /admissions, /application-form, /fee-structure |
+| T1.10 | `understanding-the-effects-of-mobile-phones-on-children-benefits-risks-and-managing-screen-time` | ~1,800 | 2,500+ (pillar) | EXPAND-PILLAR | Why this matters | Benefits of mobile phones | Risks (physical, mental, social) | Screen time guidelines by age | Parental controls | Healthy device habits | School policy support | Conversations to have | /our-philosophy, /faqs, T3.31 |
+| T2.1 | `cbse-vs-icse-vs-state-board-which-is-best-for-your-child` | ~1,300 | 1,800–2,000 | EXPAND | Three boards overview | Syllabus | Exam pattern | Costs | University acceptance | Career outcomes | Which board for which family | Verdict | /admissions, T1.1 |
+| T2.2 | `co-curricular-activities` | ~900 | 1,500–1,800 | EXPAND | What are co-curriculars | Types | Cognitive benefits | Social benefits | How schools structure them | Parent role | What to look for in a school | /extracurriculars, /beyond-the-classroom |
+| T2.3 | `problem-solving-activities-life-skills-students` | ~1,000 | 1,500–1,800 | EXPAND | Why problem-solving matters | Classroom examples | Age-wise approach (K-12) | Home activities | School activities | How parents can help | /curriculum, /our-philosophy |
+| T2.4 | `role-of-parents-in-education-orientation-importance` | ~1,000 | 1,500–1,700 | EXPAND | Parents' role in education | Why orientation matters | What good orientation looks like | Building parent-school partnership | PTMs done right | /admissions, /faqs |
+| T2.5 | `importance-of-foundational-literacy-and-numeracy-in-schools` | ~1,000 | 1,500–1,800 | EXPAND | What is FLN | Why early years matter | NEP 2020 implications | What parents should look for | What teachers do | Tracking progress | /primary-section, /pre-primary-school-thane |
+| T2.6 | `how-to-help-your-child-focus-better-in-studies` | ~1,100 | 1,500–1,800 | EXPAND | 12 strategies overview | Study environment | Breaks | Nutrition | Sleep | Screen time | Motivation techniques | Putting it together | /extracurriculars, T2.20 |
+| T2.7 | `importance-of-extracurricular-activities-in-school` | ~1,000 | 1,500–1,800 | EXPAND | Why extracurriculars matter | Cognitive benefits | Social skills | College applications | Balanced development | School programme structure | /extracurriculars, /amenities |
+| T2.8 | `new-education-policy-nep-2020-what-parents-should-know` | ~1,200 | 1,800–2,000 | EXPAND | NEP 2020 overview | 5+3+3+4 structure | Foundational stage | Mother-tongue medium | Holistic report cards | Board exam reforms | What it means for your child | /curriculum, /primary-section |
+| T2.9 | `how-to-prepare-your-child-for-first-day-of-school` | ~900 | 1,400–1,700 | EXPAND | Why prep matters | Routine setup | School visit | Separation anxiety | Supplies & uniform | Conversations to have | First-week tips | /pre-primary-section, /admissions |
+| T2.10 | `benefits-of-multiple-intelligence-based-learning-in-schools` | ~1,100 | 1,600–1,800 | EXPAND | Howard Gardner & MI theory | The 8 intelligences | Classroom application | How schools can use MI | Parent role | What to look for | /curriculum, /our-philosophy |
+| T2.11 | `best-cbse-schools-in-thane-what-to-look-for` | ~1,300 | 1,800–2,000 | EXPAND | Affiliation verification | Teacher qualifications | Infrastructure | Transport | Fees breakdown | Safety | Communication | A short checklist | /cbse-mandatory-public-disclosures, T1.7 |
+| T2.12 | `6-reasons-why-cbse-is-the-best-board-of-the-country` | ~1,400 | 1,800–2,000 | KEEP-EXPAND | Standardised syllabus | NCERT alignment | University acceptance | JEE/NEET prep | Language flexibility | Pan-India mobility | Counterpoints to consider | /admissions, T1.1 |
+| T2.13 | `why-choose-a-cbse-school-for-your-childs-education` | ~1,200 | 1,800–2,000 (post-merge) | KEEP-MERGE-EXPAND | CBSE in 2 minutes | NCERT-aligned syllabus | Board recognition | Balanced approach | K-12 continuity | Tips for choosing a CBSE school in Mumbai (merged content) | Visit checklist | /admissions, T1.7, T2.11 |
+| T2.14 | `international-school-admission-process-guide` | ~1,400 | 2,000–2,300 (post-merge) | KEEP-PILLAR-MERGE | What "international school" means in India | Eligibility | Age criteria | Documents | Entrance assessments | Fees & timelines | Step-by-step process (merged) | Common parent questions | /admissions, T2.16, T2.17 |
+| T2.15 | `age-criteria-for-international-schools-admission-2025-in-mumbai` | ~1,000 | 1,600–1,800 (post-merge) | IMPROVE-MERGE | Mumbai school admission ages | Class-wise minimum age | Cut-off dates | RTE rules | Best age to start (merged) | Parent FAQ | /admissions, T2.14 |
+| T2.16 | `what-you-need-to-know-before-applying-to-an-international-school` | ~1,100 | 1,600–1,800 | EXPAND | A pre-application checklist | Documents | Age criteria | Fees | Transport | After-school care | School visits | Entrance assessments | /admissions, T2.14 |
+| T2.17 | `advantages-of-starting-early-international-school` | ~900 | 1,400–1,600 | EXPAND | Why early matters | Language exposure | Social skills | Routine | Learning rhythm | Academic confidence | Counterpoints | /pre-primary-school-thane, T2.9 |
+| T2.18 | `stress-in-teenagers-symptoms-management` | ~1,200 | 1,800–2,000 | EXPAND | Stress in teenagers overview | Symptoms | Causes (academic) | Causes (social) | Causes (family) | Management for parents | Management for schools | Warning signs that need help | /our-philosophy, T3.31 |
+| T2.19 | `riddles-for-kids` | ~1,000 (list) | 1,500–1,800 | EXPAND-LIST | Why riddles matter | Riddles for ages 4-6 | Ages 7-9 | Ages 10-12 | Tougher riddles | How parents can use them | /extracurriculars, T2.6 |
+| T2.20 | `how-to-increase-attention-span` | ~1,100 | 1,600–1,800 | EXPAND | Why attention span matters | Brain breaks | Focus techniques | Sleep | Nutrition | Screen time limits | Study environment | Building focus over time | /our-philosophy, T2.6 |
+| T2.21 | `benefits-of-learning-a-second-language` | ~1,000 | 1,500–1,800 | EXPAND | Why a second language | Cognitive flexibility | Academic performance | Cultural awareness | Career advantages | When to start | School language programmes | /curriculum, /extracurriculars |
+| T2.22 | `how-cbse-schools-can-foster-entrepreneurship-and-innovation` | ~1,100 | 1,600–1,800 | EXPAND | Why entrepreneurship matters | Atal Tinkering Labs | Project-based learning | Business clubs | Mentorship programmes | What schools can do | /beyond-the-classroom, /curriculum |
+| T2.23 | `smart-revision-techniques-for-students` | ~1,200 | 1,700–1,900 | EXPAND | Beyond rote learning | Spaced repetition | Active recall | Mind maps | Practice tests | Teaching back method | Building a revision plan | /curriculum, T2.20 |
+| T2.24 | `innovative-teaching-method-for-active-learning` | ~1,100 | 1,600–1,800 | EXPAND | Active learning defined | Flipped classroom | Project-based learning | Gamification | Peer teaching | Inquiry-based approaches | Case studies | /curriculum, /academic-team |
+| T2.25 | `how-to-learn-boring-subjects` | ~1,000 | 1,500–1,800 | EXPAND | 8 strategies overview | Real-world links | Mini-goals | Study partners | Gamification | Teaching back | Rewards | Mindset shifts | /curriculum, T2.20 |
 
-Each commercial page should include 2–3 contextual internal links. Example map:
-- `/` → `/admissions`, `/amenities`, `/fee-structure`
-- `/admissions` → `/application-form`, `/fee-structure`, `/faqs`
-- `/primary-section` → `/admissions`, `/curriculum`, `/extracurriculars`
-- `/senior-secondary-section` → `/admissions`, `/awards-achievements`, `/student-achievements`
-- `/amenities` → `/safety-security`, `/extracurriculars`, `/photo-gallery`
-- `/fee-structure` → `/admissions`, `/faqs`, `/application-form`
-- `/top-schools-in-thane` (post-reframe) → `/cbse-mandatory-public-disclosures`, `/amenities`, `/admissions`
+  > **Status legend:** EXPAND = under target, expand body in wave; KEEP-EXPAND = pre-approved KEEP page that still gets a body expansion; EXPAND-PILLAR = pillar post receiving merged content from 301'd siblings, target 2,200+ words; KEEP-PILLAR-MERGE / IMPROVE-MERGE = absorbs merged content from a Tier 4 source (per Decisions 9, 10, 11, 12).
 
-Blog post → commercial page linking targets:
-- All Thane CBSE choice posts → `/admissions`, `/about-rainbow-international-school`
-- Sports / extracurricular posts → `/extracurriculars`, `/amenities`
-- Admission process posts → `/admissions`, `/application-form`, `/fee-structure`
-- Screen time / parenting posts → `/about-rainbow-international-school` (philosophy section)
+  ### Section 3C — Tier 3 (45) — expansion plan summary (Wave 4)
+
+  Tier 3 posts are not individually re-bodied in this plan; they receive **meta refresh only** in Wave 4 (titles + descriptions per Section 2B). Full body expansion for Tier 3 is deferred to a post-Wave-5 content sprint. The 3 historical-brand KEEP posts (`100-result…`, `an-all-rounder…raghvi-ramanujan…`, `the-leading-school…`) get meta refresh only — bodies are intentionally preserved as historical record. The 3 award posts (`rainbow-awarded…`, `rainbow-preschools-featured…`, `rainbow-wins-award…`) are 410'd after the GSC backlink check (TODO-7).
+
+  ### Section 3D — Internal linking principles
+
+  Every commercial page should include 2–3 contextual internal links (covered in the table above). Blog → commercial linking targets:
+  - All "Thane CBSE choice" posts → `/admissions`, `/about-rainbow-international-school`
+  - Sports / extracurricular posts → `/extracurriculars`, `/amenities`
+  - Admission process posts → `/admissions`, `/application-form`, `/fee-structure`
+  - Screen time / parenting posts → `/about-rainbow-international-school` (philosophy section)
 
 ---
+
 
 ## Section 4 — Schema Recommendations Per Page Type
 
@@ -466,7 +692,7 @@ Blog post → commercial page linking targets:
 | `/rainbow-preschool-international` | `EducationalOrganization` (RPS as separate org) + `BreadcrumbList` + `sameAs` link to www.rainbowpreschools.com | Keep distinct from RIS Organization. |
 | `/brand-partners`, `/school-managing-committee`, `/safety-security`, `/beyond-the-classroom`, `/extracurriculars`, `/virtual-learning`, `/academic-team`, `/book-list`, `/students-leaving-certificate` | `EducationalOrganization` + `BreadcrumbList` | Standard. |
 | `/top-schools-in-thane` (post-reframe) | `Article` (educational guide content) + `BreadcrumbList` | Treat as parent-guide article, not a list of schools. |
-| `/google-school-2025-26`, `/meta-school-2025-26` | HOLD — no schema changes until Decision 5 resolved |
+| `/google-school-2025-26`, `/meta-school-2025-26` | KEEP (no schema changes until Decision 5 resolved — TODO-2) |
 
 ### Schema rollout sequence
 - Wave 1 pages: only deploy schema for which all required values are verified. Mark `Offer.price`, `aggregateRating`, `JobPosting`, `Person.author` as TODO until real values are received.
@@ -596,6 +822,8 @@ If signals are not met by May 15, defer Wave 1 to May 18. If still not met by Ma
 | 38 | `why-maths-matters-in-student-life-benefits-uses` |
 | 39 | `school-sanitation-standards-how-to-stay-clean-and-safe` |
 | 40 | `100-result-rainbows-first-batch-2018-19` (KEEP — meta refresh only) |
+  | 41 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` (KEEP — meta refresh only) |
+  | 42 | `the-leading-school-of-the-year-thane` (KEEP — meta refresh only) |
 
 **Tier 3 — 5 × 410 (after backlink check — TODO-7):**
 
@@ -702,7 +930,7 @@ Run all checks before deploying any wave. Failure of any check = block deploy.
 > REFRAME (not remove). New angle: "How to Choose a CBSE School in Thane — A Parent's Evaluation Guide." Objective criteria format: fees, infrastructure, board affiliation, student-teacher ratio, transport. RIS appears as a factual example only — no self-ranking. New proposed title (≤60 chars).
 
 > **Decision 5 — Stale campaign pages /google-school-2025-26 and /meta-school-2025-26:**
-> HOLD — user awaiting confirmation from ads team whether these are still in active campaigns. Default action: NO CHANGE in any wave until resolved. Mark in the rollout calendar as blocked. Will update before Wave 4.
+> KEEP-PENDING — user awaiting confirmation from ads team whether these are still in active campaigns. Default action: NO CHANGE in any wave until resolved (effectively a KEEP for the duration of this plan). Mark in the rollout calendar as blocked. Will update before Wave 4.
 
 > **Decision 6 — /rainbow-preschool-international:**
 > Option A — keep as summary-and-link page on RIS, with strong call-to-action link to www.rainbowpreschools.com. Do NOT 301. Cross-domain relationship is valuable; 301 loses the topical association.
@@ -754,7 +982,7 @@ Run all checks before deploying any wave. Failure of any check = block deploy.
 | TODO-4 | AggregateRating source for /testimonials | User | Before Wave 1 (May 18) | The page already publishes 4.8/5 — confirm whether this is from Google reviews or internal aggregation before adding to schema. Do NOT fabricate. |
 | TODO-5 | Author names for blog post BlogPosting schema | Content team | Before Wave 2 (May 25) | Currently posts have no author byline. Decide on a single byline ("RIS Editorial Team") or per-post authors. |
 | TODO-6 | GSC backlink report for Tier 4 410 candidates | User | Before Wave 4 (June 8) | Run a GSC "Top linking sites" report and check if any external sites link to: coronavirus, give-earth, 15th-world-summit, fit-india. If yes, switch to KEEP-IMPROVE. |
-| TODO-7 | GSC backlink report for Tier 3 410 candidates (5 posts) | User | Before Wave 4 (June 8) | Same check for: the-leading-school-of-the-year-thane, an-all-rounder-kid-raghvi-ramanujan, rainbow-awarded, rainbow-preschools-featured, rainbow-wins-award. |
+| TODO-7 | GSC backlink report for Tier 3 410 candidates (3 posts) | User | Before Wave 4 (June 8) | Check for: rainbow-awarded-as-best-preschool-and-secondary-school-in-thane, rainbow-preschools-featured-in-knowledge-review-magazine, rainbow-wins-award-for-excellence. |
 | TODO-8 | Verify Fee Structure PDF redirect remains in place | Synthetic monitor / manual check | Before Wave 1 + ongoing | The PDF currently 301s to /fee-structure. If WordPress infrastructure is decommissioned, the redirect breaks and 1,042 clicks/quarter disappear. |
 | TODO-9 | Cross-domain RIS ↔ RPS strategy | User | Before Wave 5 (June 18+) | New Wave 5 landing pages may cross-reference RPS for early-years intent. Confirm cross-domain linking pattern. |
 | TODO-10 | Sitemap.xml update plan | Engineer | Before Wave 1 | Confirm the server's sitemap.xml generator picks up route changes automatically vs requires manual update. |
