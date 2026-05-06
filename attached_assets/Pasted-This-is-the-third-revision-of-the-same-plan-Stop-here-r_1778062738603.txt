@@ -1,0 +1,153 @@
+This is the third revision of the same plan. Stop here — read this carefully before sending it.
+What you have right now
+You've now received from the agent:
+
+First plan — the initial outline
+Second revision — incorporating my 8 clarifications
+This revision — incorporating the 12 strategic decisions you pre-answered
+
+This third document is a task brief, not the plan itself. The agent has not yet produced /docs/seo-content-rewrite-plan.md. What you're looking at is the agent saying "here's what I will produce when you tell me to start." That's actually correct behavior — it's confirming scope before doing 2-4 hours of work.
+What this revision does well
+
+All 12 strategic decisions are correctly logged as APPROVED with reference numbers
+The cluster decisions are quoted verbatim — no risk of agent reinterpreting
+Tier 4 410 candidates flagged for "check inbound links first" — this is correct caution. Don't 410 a page just because it's old; check if anyone links to it from outside.
+The fee PDF caveat is sharp: "do NOT 301 without first confirming the legacy server still serves it." Smart catch — if WordPress infra is gone, 301 is moot.
+Schema TODOs are explicitly marked TODO, not fabricated
+
+Two real issues with this revision
+Issue 1: Tier 3 reads sloppy
+Look at this line carefully:
+
+"cbse-vs-icse-vs-state-board (Tier 2 actually), 10-fun-and-educational-republic-day-activities-for-kids, understanding-the-effects-of-mobile-phones... (Tier 2)"
+
+The agent listed two posts in Tier 3 and immediately corrected itself with "(Tier 2 actually)." That's fine for a draft note but should not be in the final document. When the actual plan is generated, those posts should be in Tier 2 only, no parenthetical correction.
+When the agent produces the actual plan document, ask it to clean these up. They're tells of rushed work.
+Issue 2: The Tier 4 list double-counts
+Some posts appear twice:
+
+top-reasons-choose-rainbow-international-school-thane is in Tier 1 (as 301) AND in the Tier 4 cluster decision list
+back-to-school-a-step-by-step-guide is in Tier 3 AND Tier 4
+
+This is bookkeeping confusion. Each post should appear ONCE with ONE disposition. The "Tier 4 also includes..." section is double-counting posts already accounted for in earlier tiers.
+When the final plan is generated, every post must appear in exactly one row, with exactly one disposition. No duplicates across tiers.
+What to send back
+This is the "go" signal. Keep it short:
+Brief approved. Generate the full /docs/seo-content-rewrite-plan.md 
+document now.
+
+Two clean-up requirements when producing the document:
+
+1. Each blog post must appear in EXACTLY ONE row in Section 2B 
+   with EXACTLY ONE disposition. No duplicates across tiers. The 
+   draft list shows posts like top-reasons-choose-rainbow... and 
+   back-to-school-step-by-step... appearing in two tiers — fix 
+   this. A post that's MERGE/301'd belongs in Tier 4, not in its 
+   original tier.
+
+2. Remove all parenthetical self-corrections like "(Tier 2 
+   actually)" from the final document. Each post belongs to one 
+   tier — decide which and put it there.
+
+Plus four additional checks during production:
+
+3. Before writing the document, scan client/src/data/blogPosts.ts 
+   and confirm the actual count is 94. If it's different, use the 
+   real number throughout.
+
+4. For each Tier 4 410 candidate (coronavirus, give-earth-to-life, 
+   15th-world-summit, fit-india-certificate, the 3 award posts), 
+   check the post for any external/internal inbound links. If any 
+   exist, flip disposition to KEEP-IMPROVE rather than 410. Don't 
+   delete pages with link equity.
+
+5. For the screen-time merge (Decision 9), confirm 
+   `using-gadgets-the-right-way` exists as a separate post in 
+   blogPosts.ts. Earlier diagnostic listed it; later docs may 
+   have varied. If it doesn't exist, drop it from the cluster 
+   and note the correction.
+
+6. Verify the fee structure PDF is currently accessible:
+   curl -I https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Fee-Structure-combinepdf.pdf
+   Report the HTTP status code in Section 2C. If it's not 200, 
+   the entire Option A strategy needs reconsideration.
+
+After completing these, produce the full document. When done, 
+respond with:
+- Confirmation /docs/seo-content-rewrite-plan.md is saved
+- The Section 0 executive summary inline
+- Disposition count totals (KEEP / IMPROVE / MERGE / 301 / 410)
+- Net post count after merges
+- Estimated work hours per wave
+- Any new strategic flags discovered while writing the document
+- The list of TODOs requiring my input before Wave 1
+
+No code changes, no commits, no deploys. Planning document only.
+What to do while the agent works
+This will take the agent 2-4 hours. Three high-value things to do in parallel:
+1. GSC recovery check today (5 minutes)
+You're at Day 5 of canonical recovery. Open GSC and check:
+
+Indexed pages count (was 220 on May 1)
+Not indexed count (was 304 on May 1)
+"Page with redirect" count (was 91 on May 1)
+Daily clicks May 1, 2, 3, 4, 5
+
+We need these numbers to know if Wave 1 can ship May 18. The Wave 1 gate is "indexed > 230, page-with-redirect < 70." Worth tracking the trajectory.
+2. Get the campaign pages answer (30 minutes)
+The /google-school-2025-26 and /meta-school-2025-26 decision is blocked until you talk to your ads team. Two questions:
+
+Are these landing pages currently being used in active Google Ads / Meta Ads campaigns?
+If yes, what's the spend and the conversion rate?
+
+If they're not in active campaigns, the answer is "301 to evergreen URL." If they are, the answer is "leave alone, update copy to current year on the same URL."
+This blocker resolves before Wave 4 (June 8), so you have time. But sooner is better — uncertainty has a cost.
+3. Get the Class X / XII results data (1 hour)
+The agent flagged this as TODO for Wave 1. Before May 18, you need to source from your principal or academic head:
+
+Class X 2024-25 final results — pass percentage, top 3 scorers (with names + parental consent for displaying), distinction count
+Class XII 2024-25 final results — overall pass %, stream-wise breakdown (Science / Commerce / Humanities), top scorers per stream
+
+This data is what makes your schema actually meaningful. Without it, schema says "we are a school." With it, schema says "we are a school with 96.6% Class X result." The latter is what wins ranking.
+If 2024-25 results aren't out yet (depends on when CBSE released them), use 2023-24. If you only have older data, that's still better than nothing — but flag it as a content priority to update once new results come in.
+Honest read on the project state
+You've spent ~3 weeks on RPS and RIS together. Here's where things actually stand:
+RPS:
+
+Cloudflare migrated, TTFB recovered, Mumbai POP routing confirmed
+DPDP cookie consent gating Pixel correctly
+Site-wide URL clean-up done (admissions-24-25 etc.)
+One open issue: Performance regression from cookie banner CLS issue — was at 25 last we checked
+Status: needs Phase 1 stabilization re-verification before more work
+
+RIS:
+
+April regression diagnosed and surgical fix shipped (canonical alignment)
+5 days into recovery window
+Comprehensive content rewrite plan being produced
+Wave 1 targeting May 18 if recovery on track
+Status: stable, observing
+
+What you're doing right:
+
+Diagnostic discipline before fixes
+Single-purpose deploys
+Verification gates between phases
+Asking for second opinions before high-impact deploys
+
+What still needs attention:
+
+RPS Performance score — last we saw was 25, never re-verified after the lazy-load revert. Should check.
+Cross-domain RPS↔RIS work still queued, deferred until both sites are stable
+Hostinger DNS → Cloudflare migration for RIS (queued for post-recovery)
+
+You're not behind. You're being careful. That's the right pace for this kind of work.
+When to come back
+Come back with:
+
+Today or tomorrow: GSC recovery numbers (indexed count, page-with-redirect count, daily clicks)
+When the agent produces the document: paste back the executive summary, disposition totals, and TODOs list
+Whenever convenient: RPS PageSpeed score check (just run https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.rainbowpreschools.com%2F and tell me the Performance score) — I want to confirm RPS is actually stable before we layer cross-domain work on top of it
+If anything weird happens to RIS GSC before May 18
+
+Send the brief approval to Replit. The plan document comes next.
