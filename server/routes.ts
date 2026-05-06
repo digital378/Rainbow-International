@@ -1266,5 +1266,212 @@ export async function registerRoutes(
     }
   });
 
+  // ── Google Sheets ─────────────────────────────────────────────
+  const SHEET_IDS = {
+    dmTracker: "1gzMAO-RyVFfz5hqANr8JApu-M6LwAftMyXnZD8_kjMw",
+    rpsCrm:    "1t1_2SPI6--W-nCWc-lHHE-D4ee38WGFxiBsB5txI-CM",
+    risCrm:    "1zLIWutvJxwLyVBAK-vDlpEzNPV7c2RwutYC9Gn3yd2s",
+    master:    "1FjLbJbThU2wZCu7m0Y-GAzv6vTs8WdkVxBRBZh8QZqc",
+  };
+
+  async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const res = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
+    return (res.data.values || []) as string[][];
+  }
+
+  // 1. DM Team Task Tracker
+  app.get("/api/sheets/tasks", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    try {
+      const rows = await fetchSheetRange(SHEET_IDS.dmTracker, "Key Task!A:I");
+      const [header, ...data] = rows;
+      const statusFilter = typeof req.query.status === "string" ? req.query.status.toLowerCase() : "";
+      const tasks = data
+        .filter(r => r[2]) // must have a task name
+        .map(r => ({
+          assignedDate: r[0] || "",
+          endDate: r[1] || "",
+          task: r[2] || "",
+          owner: r[3] || "",
+          status: r[4] || "Pending",
+          remarks: r[8] || "",
+        }))
+        .filter(t => !statusFilter || t.status.toLowerCase().includes(statusFilter));
+      const summary = {
+        total: tasks.length,
+        completed: tasks.filter(t => t.status.toLowerCase() === "completed").length,
+        pending: tasks.filter(t => t.status.toLowerCase() === "pending").length,
+      };
+      res.json({ generatedAt: new Date().toISOString(), summary, tasks });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch tasks", error: err.message });
+    }
+  });
+
+  // 2. CRM Lead Summary
+  app.get("/api/sheets/crm", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const monthFilter = typeof req.query.month === "string" ? req.query.month.toLowerCase() : "";
+    try {
+      let rows: string[][];
+      if (account === "rps") {
+        rows = await fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K");
+      } else {
+        rows = await fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L");
+      }
+      const [, ...data] = rows; // skip header
+      const leads = data.filter(r => r[0] && r[2]); // must have date and parent name
+      const filtered = monthFilter
+        ? leads.filter(r => (r[1] || "").toLowerCase().includes(monthFilter))
+        : leads;
+
+      // Aggregate by status
+      const byStatus: Record<string, number> = {};
+      const bySource: Record<string, number> = {};
+      const byMonth: Record<string, number> = {};
+      const byOwner: Record<string, number> = {};
+      filtered.forEach(r => {
+        const status = r[account === "rps" ? 7 : 6] || "Open";
+        const source = r[account === "rps" ? 10 : 9] || "Unknown";
+        const month  = r[1] || "Unknown";
+        const owner  = r[account === "rps" ? 9 : 8] || "Unknown";
+        byStatus[status] = (byStatus[status] || 0) + 1;
+        bySource[source] = (bySource[source] || 0) + 1;
+        byMonth[month]   = (byMonth[month] || 0) + 1;
+        byOwner[owner]   = (byOwner[owner] || 0) + 1;
+      });
+
+      const admDone  = byStatus["ADM DONE"] || 0;
+      const closed   = byStatus["CLOSED"] || 0;
+      const total    = filtered.length;
+      const convRate = total > 0 ? parseFloat(((admDone / total) * 100).toFixed(1)) : 0;
+
+      res.json({
+        account: account.toUpperCase(),
+        monthFilter: monthFilter || "all months",
+        generatedAt: new Date().toISOString(),
+        summary: { totalLeads: total, admissionsDone: admDone, closed, open: total - admDone - closed, conversionRate: `${convRate}%` },
+        byStatus,
+        bySource,
+        byMonth,
+        byLeadOwner: byOwner,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch CRM data", error: err.message });
+    }
+  });
+
+  // 3. Master Weekly Funnel Data
+  app.get("/api/sheets/master", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const month   = typeof req.query.month === "string" ? req.query.month.toLowerCase() : "may";
+    try {
+      // Map to the correct tab name
+      const monthMap: Record<string, string> = {
+        may: "may", april: "apr", apr: "apr", feb: "feb", february: "feb",
+      };
+      const resolvedMonth = monthMap[month] || month;
+      let tabName: string;
+      if (account === "rps") {
+        tabName = resolvedMonth === "apr" ? "Total RPS Apr'26" : resolvedMonth === "feb" ? "DM RPS Feb' 26" : "DM RPS MAY' 26";
+      } else {
+        tabName = resolvedMonth === "apr" ? "Total RIS Apr'26" : resolvedMonth === "feb" ? "DM RIS Feb' 26" : "DM RIS MAY' 26";
+      }
+      const rows = await fetchSheetRange(SHEET_IDS.master, `${tabName}!A:S`);
+      // Find header row (row with "Date" or "Total Leads")
+      let headerIdx = rows.findIndex(r => r.some(c => c === "Date" || c === "Total Leads"));
+      if (headerIdx === -1) headerIdx = 1;
+      const header = rows[headerIdx];
+      const dataRows = rows.slice(headerIdx + 1).filter(r => r[0] && r[0] !== "");
+      const weekly = dataRows.map(r => {
+        const obj: Record<string, string> = {};
+        header.forEach((h, i) => { if (h) obj[h] = r[i] || "0"; });
+        return obj;
+      });
+      res.json({
+        account: account.toUpperCase(),
+        tab: tabName,
+        month: resolvedMonth,
+        generatedAt: new Date().toISOString(),
+        weeklyBreakdown: weekly,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch master data", error: err.message });
+    }
+  });
+
+  // 4. Targets vs Actuals by Branch/Grade
+  app.get("/api/sheets/targets", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    if (!requireAdminToken(req, res)) return;
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    try {
+      // RPS: Row1=section labels ("Jan Actual" / "Monthly Target"), Row2=col headers, Row3+=data
+      //   Cols A-H = actuals, Cols K-R = monthly targets (side by side)
+      // RIS: Row1=section label, Row2=col headers (Grade-based), Row3+=data (actuals only)
+      if (account === "rps") {
+        const rows = await fetchSheetRange(SHEET_IDS.rpsCrm, "Target Sheet!A1:R50");
+        const colHeaders = rows[1] || []; // Row 2
+        const dataRows   = rows.slice(2).filter(r => r[0] && r[0] !== "" && r[0] !== "Branch");
+        const merged = dataRows.map(r => ({
+          branch:                   r[0] || "",
+          // Actuals (Jan)
+          leadsActual:              r[1] || "0",
+          bookingsActual:           r[2] || "0",
+          walkinsActual:            r[3] || "0",
+          admissionsActual:         r[4] || "0",
+          leadToBookingActual:      r[5] || "0%",
+          bookingToWalkinActual:    r[6] || "0%",
+          walkinToAdmissionActual:  r[7] || "0%",
+          // Monthly Targets (col K=index10 onwards)
+          leadsTarget:              r[11] || "0",
+          bookingsTarget:           r[12] || "0",
+          walkinsTarget:            r[13] || "0",
+          admissionsTarget:         r[14] || "0",
+          leadToBookingTarget:      r[15] || "0%",
+          bookingToWalkinTarget:    r[16] || "0%",
+          walkinToAdmissionTarget:  r[17] || "0%",
+        }));
+        res.json({
+          account: "RPS",
+          generatedAt: new Date().toISOString(),
+          note: "Jan actuals vs monthly targets by branch. Conversion rates: lead→booking, booking→walkin, walkin→admission.",
+          branches: merged,
+        });
+      } else {
+        // RIS: by grade, actuals only
+        const rows = await fetchSheetRange(SHEET_IDS.risCrm, "Target sheet!A1:H50");
+        const dataRows = rows.slice(2).filter(r => r[0] && r[0] !== "" && r[0] !== "Grade");
+        const grades = dataRows.map(r => ({
+          grade:                   r[0] || "",
+          leadsActual:             r[1] || "0",
+          bookingsActual:          r[2] || "0",
+          walkinsActual:           r[3] || "0",
+          admissionsActual:        r[4] || "0",
+          leadToBookingActual:     r[5] || "0%",
+          bookingToWalkinActual:   r[6] || "0%",
+          walkinToAdmissionActual: r[7] || "0%",
+        }));
+        res.json({
+          account: "RIS",
+          generatedAt: new Date().toISOString(),
+          note: "Jan actuals by grade (Nursery → Class 12). No monthly target column in this sheet.",
+          grades,
+        });
+      }
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch targets", error: err.message });
+    }
+  });
+
   return httpServer;
 }
