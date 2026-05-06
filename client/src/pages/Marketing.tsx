@@ -350,7 +350,7 @@ export default function Marketing() {
   const fcRevenue = forecast.admissions * MIN_REVENUE_PER_ADM;
   const fcTrueRoi = roi(fcRevenue, forecast.spend + monthlyFixed);
   const fcConfidence = TODAY_DATE < 10 ? "Low" : TODAY_DATE < 22 ? "Medium" : "High";
-  const trendDirection = current.cpa < previous.spend / Math.max(previous.admissions, 1)
+  const trendDirection = cpa(current.spend, current.admissions) < cpa(previous.spend, previous.admissions)
     ? "Improving" : "Declining";
   void trendDirection; // suppress unused
 

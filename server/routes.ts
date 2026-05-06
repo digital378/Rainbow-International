@@ -1289,7 +1289,7 @@ export async function registerRoutes(
         "DECEMBER":"Dec-25","JANUARY":"Jan-26","FEBRUARY":"Feb-26","MARCH":"Mar-26",
         "APRIL":"Apr-26","MAY TOTAL":"May-26",
       };
-      function parseSchoolRows(rows: string[][]): Array<{month:string;walkins:number;admissions:number}> {
+      const parseSchoolRows = (rows: string[][]): Array<{month:string;walkins:number;admissions:number}> => {
         const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
         if (hIdx === -1) return [];
         const header = rows[hIdx];
@@ -1306,7 +1306,7 @@ export async function registerRoutes(
           }
         }
         return result;
-      }
+      };
       const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
       const risSchoolMonthly = parseSchoolRows(risSchoolRows);
 
