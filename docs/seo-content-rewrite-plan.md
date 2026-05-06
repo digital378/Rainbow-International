@@ -205,16 +205,16 @@
 | `4-reasons-why-school-bags-should-not-be-a-burden` | school bags should not be a burden | CBSE school bag weight, lighter school bag, child posture bag | IMPROVE |
 | `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | innovate cultural programmes in school | creative cultural events school, school cultural week ideas, multicultural school programmes | IMPROVE |
 | `7-areas-in-education-where-indian-women-are-excellent` | areas where Indian women excel education | women in Indian education, women teachers India, Indian women academic leaders | IMPROVE |
-| `teen-depression-recognise-help-students` | teen depression | teen mental health, signs of teen depression, help depressed teenager | IMPROVE |
-| `benefits-of-learning-music-for-kids` | benefits of learning music for kids | music education benefits, kids music lessons, school music programme | IMPROVE |
-| `benefits-of-art-and-craft-for-kids` | benefits of art and craft for kids | school art programme, kids creativity craft, art education benefits | IMPROVE |
-| `fun-activities-to-develop-fine-motor-skills-at-home` | fine motor skills activities home | toddler motor skills, hand coordination kids, preschool fine motor | IMPROVE |
-| `how-to-help-your-child-overcome-exam-fear` | how to help child overcome exam fear | exam stress kids, child exam anxiety tips, board exam fear | IMPROVE |
-| `benefits-of-yoga-for-students` | benefits of yoga for students | school yoga programme, student yoga benefits, yoga in CBSE schools | IMPROVE |
-| `how-to-build-a-strong-parent-teacher-relationship` | parent teacher relationship | PTM tips parents, parent teacher communication, school parent collaboration | IMPROVE |
-| `why-storytelling-is-important-for-children` | storytelling importance for children | school storytelling benefits, kids storytime education, story-based learning | IMPROVE |
-| `why-maths-matters-in-students-life` | why maths matters in student life | maths education importance, kids love maths, maths real-life applications | IMPROVE |
-| `benefits-of-reading-aloud-to-children` | benefits of reading aloud to children | read aloud kids benefits, parent reading habits, school read-aloud programme | IMPROVE |
+| `teen-depression-how-to-spot-and-cure-it` | teen depression | teen mental health, signs of teen depression, help depressed teenager | IMPROVE |
+| `benefits-of-meditation-for-students` | benefits of learning music for kids | music education benefits, kids music lessons, school music programme | IMPROVE |
+| `diwali-activities-for-students` | benefits of art and craft for kids | school art programme, kids creativity craft, art education benefits | IMPROVE |
+| `how-to-develop-fine-motor-skills-at-home` | fine motor skills activities home | toddler motor skills, hand coordination kids, preschool fine motor | IMPROVE |
+| `how-to-deal-with-anxiety-during-exams` | how to help child overcome exam fear | exam stress kids, child exam anxiety tips, board exam fear | IMPROVE |
+| `know-how-swimming-helps-your-child-in-7-ways` | benefits of yoga for students | school yoga programme, student yoga benefits, yoga in CBSE schools | IMPROVE |
+| `6-excellent-ideas-to-innovate-cultural-programmes-in-school` | parent teacher relationship | PTM tips parents, parent teacher communication, school parent collaboration | IMPROVE |
+| `10-things-in-the-classroom-to-boost-student-engagement` | storytelling importance for children | school storytelling benefits, kids storytime education, story-based learning | IMPROVE |
+| `why-maths-matters-in-student-life-benefits-uses` | why maths matters in student life | maths education importance, kids love maths, maths real-life applications | IMPROVE |
+| `do-your-children-hate-reading-know-why-youre-the-reason` | benefits of reading aloud to children | read aloud kids benefits, parent reading habits, school read-aloud programme | IMPROVE |
 | `100-result-rainbows-first-batch-2018-19` | Rainbow International School Class 10 result 2018 | RIS first batch Class 10, 100% pass CBSE Thane, RIS board result history | KEEP — historical brand |
 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` | RIS student swimming achievement | Raghvi Ramanujan swimming, RIS student athlete, school swimming success | KEEP — student story |
 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` | — (410) | — | 410 GONE |
@@ -226,19 +226,19 @@
   | Slug | Primary keyword | Secondary keywords | Notes |
   |---|---|---|---|
   | `imporatnce-of-sports-in-students-life` | — (301) | — | 301 → importance-of-sports-in-students-life-teamwork-skills (typo) |
-| `top-5-cbse-schools-in-thane` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `top-cbse-schools-thane-2026` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `best-cbse-schools-thane-rankings` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
-| `effect-of-mobile-phones-on-students` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
-| `screen-time-for-children-guide` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
-| `mobile-phone-addiction-in-kids` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `top-reasons-choose-rainbow-international-school-thane` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `holistic-development-rainbow-international-school` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `benefits-of-rainbow-international-school` | — (301) | — | 301 → why-rainbow-international-school-is-among-the-top-schools-in-thane (Decision 11) |
+| `smartphone-addiction-how-to-ensure-healthy-use-by-kids` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `using-gadgets-the-right-way` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
+| `regulating-childrens-screen-time` | — (301) | — | 301 → understanding-the-effects-of-mobile-phones-on-children (Decision 9) |
 | `5-tips-to-choose-best-cbse-schools-in-mumbai` | — (MERGE) | — | MERGE into why-choose-a-cbse-school-for-your-childs-education (Decision 12) |
 | `back-to-school-a-step-by-step-guide-to-international-school-admissions` | — (MERGE) | — | MERGE into international-school-admission-process-guide (Decision 10) |
 | `best-age-for-international-school-admission` | — (MERGE) | — | MERGE into age-criteria-for-international-schools-admission-2025-in-mumbai (Decision 10) |
-| `coronavirus-precautions-for-schools` | — (410) | — | 410 GONE — stale 2020 content |
-| `give-earth-a-chance-rainbow-school-event-2019` | — (410) | — | 410 GONE — dated event |
-| `15th-summit-rainbow-international-school-event` | — (410) | — | 410 GONE — dated event |
-| `fit-india-school-week-2019-2020` | — (410) | — | 410 GONE — dated event |
+| `coronavirus-the-new-monster-in-town` | — (410) | — | 410 GONE — stale 2020 content |
+| `give-earth-to-life-on-earth` | — (410) | — | 410 GONE — dated event |
+| `the-15th-world-education-summit` | — (410) | — | 410 GONE — dated event |
+| `fit-india-certificate-of-recognition` | — (410) | — | 410 GONE — dated event |
 
   ### 1F — New Wave 5 landing pages (gap targeting)
 
@@ -825,15 +825,15 @@ If signals are not met by May 15, defer Wave 1 to May 18. If still not met by Ma
   | 41 | `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming` (KEEP — meta refresh only) |
   | 42 | `the-leading-school-of-the-year-thane` (KEEP — meta refresh only) |
 
-**Tier 3 — 5 × 410 (after backlink check — TODO-7):**
+**Tier 3 — 3 × 410 (after backlink check — TODO-7):**
+
+> Reconciled with Section 2B Tier 3 KEEP rows. The three historical-brand posts (`the-leading-school-of-the-year-thane`, `100-result-rainbows-first-batch-2018-19`, `an-all-rounder-kid-raghvi-ramanujan-displays-exceptional-talent-in-swimming`) are explicitly KEEP per pre-approved task instructions and are NOT included in this 410 list.
 
 | # | Slug |
 |---|---|
-| 1 | `the-leading-school-of-the-year-thane` |
-| 2 | `100-result-rainbows-first-batch-2018-19` |
-| 3 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` |
-| 4 | `rainbow-preschools-featured-in-knowledge-review-magazine` |
-| 5 | `rainbow-wins-award-for-excellence` |
+| 1 | `rainbow-awarded-as-best-preschool-and-secondary-school-in-thane` |
+| 2 | `rainbow-preschools-featured-in-knowledge-review-magazine` |
+| 3 | `rainbow-wins-award-for-excellence` |
 
 **Tier 4 — 7 × 301:**
 
@@ -930,7 +930,9 @@ Run all checks before deploying any wave. Failure of any check = block deploy.
 > REFRAME (not remove). New angle: "How to Choose a CBSE School in Thane — A Parent's Evaluation Guide." Objective criteria format: fees, infrastructure, board affiliation, student-teacher ratio, transport. RIS appears as a factual example only — no self-ranking. New proposed title (≤60 chars).
 
 > **Decision 5 — Stale campaign pages /google-school-2025-26 and /meta-school-2025-26:**
-> KEEP-PENDING — user awaiting confirmation from ads team whether these are still in active campaigns. Default action: NO CHANGE in any wave until resolved (effectively a KEEP for the duration of this plan). Mark in the rollout calendar as blocked. Will update before Wave 4.
+> HOLD — user awaiting confirmation from ads team whether these are still in active campaigns. Default action: NO CHANGE in any wave until resolved. Mark in the rollout calendar as blocked. Will update before Wave 4.
+
+  > **Operational note (does not modify Decision 5):** for disposition-totals accounting in Sections 0 and 2A, these two pages are counted under KEEP because the default action is "no change in any wave." This is purely a counting choice and does not change the HOLD status from the verbatim decision.
 
 > **Decision 6 — /rainbow-preschool-international:**
 > Option A — keep as summary-and-link page on RIS, with strong call-to-action link to www.rainbowpreschools.com. Do NOT 301. Cross-domain relationship is valuable; 301 loses the topical association.
