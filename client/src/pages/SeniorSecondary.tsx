@@ -4,6 +4,18 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const SENIOR_QUICK_ANSWER =
+  "Senior Secondary at Rainbow International School Thane covers CBSE Class 11 and Class 12 with Science, Commerce and Humanities streams, structured CBSE board preparation, career counselling for stream and college choice, and JEE, NEET and CUET prep support. Class 11 admissions for 2026-27 are now open at the Brahmand campus.";
+
+const SENIOR_FAQS: WaveOneFaq[] = [
+  { q: "Which streams are offered in Class 11 and 12?", a: "Science, Commerce and Humanities streams are offered for Class 11 and 12 at RIS Thane." },
+  { q: "Does the school support JEE, NEET and CUET preparation?", a: "Yes, the school provides preparation guidance and study support for JEE, NEET and CUET alongside the regular CBSE curriculum." },
+  { q: "How do I apply for Class 11 admission?", a: "Class 11 applications open after Class 10 results. Submit the online enquiry on the Admissions page or contact the admission desk." },
+  { q: "Where can I see senior secondary results?", a: "Recent CBSE Class 12 results are highlighted on the Student Achievements page." },
+  { q: "Is career counselling available for senior students?", a: "Yes. Senior students receive structured career counselling for stream selection and college applications." },
+];
 
 // ── 3 Streams ─────────────────────────────────────────────────────
 const streams = [
@@ -137,9 +149,9 @@ export default function SeniorSecondary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Senior Secondary (Class 11–12)"
-        description="Rainbow International School's Senior Secondary Section (Class 11 & 12). Science, Humanities, and Commerce streams. CBSE affiliation number 1130661."
-        keywords="senior secondary school Thane, Class 11 12 CBSE Thane, science commerce humanities Thane school"
+        title="Senior Secondary (Class 11 & 12) | RIS Thane CBSE"
+        description="CBSE Senior Secondary at Rainbow International School Thane offers Science, Commerce and Humanities streams with JEE/NEET/CUET prep — apply for 2026-27."
+        keywords="senior secondary school in Thane, Class 11 admission Thane, Class 12 CBSE school in Thane, science stream school in Thane, commerce stream school in Thane, humanities school in Thane, CBSE senior secondary school near me"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section"
         ogImage="/images/home/academic/senior-secondary.jpg"
         breadcrumbs={[
@@ -149,18 +161,23 @@ export default function SeniorSecondary() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "EducationalOccupationalProgram",
-          "name": "Senior Secondary Section (Class 11–12)",
-          "description": "CBSE Senior Secondary (Class 11 & 12) with Science, Commerce, and Humanities streams at Rainbow International School, Thane. CBSE Affiliation No. 1130661.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-          "educationalProgramMode": "full-time",
-          "programPrerequisites": "Completion of Class 10 (CBSE)",
-          "hasCourse": [
-            { "@type": "Course", "name": "Science Stream (Class 11–12)", "description": "Physics, Chemistry, Biology/Mathematics, and electives." },
-            { "@type": "Course", "name": "Commerce Stream (Class 11–12)", "description": "Accountancy, Business Studies, Economics, and electives." },
-            { "@type": "Course", "name": "Humanities Stream (Class 11–12)", "description": "History, Political Science, Psychology, Sociology, and electives." }
-          ],
-          "url": "https://rainbowinternationalschool.in/senior-secondary-section"
+          "@graph": [
+            {
+              "@type": "EducationalOccupationalProgram",
+              "name": "Senior Secondary Section (Class 11–12)",
+              "description": "CBSE Senior Secondary (Class 11 & 12) with Science, Commerce, and Humanities streams at Rainbow International School, Thane. CBSE Affiliation No. 1130661.",
+              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "educationalProgramMode": "full-time",
+              "programPrerequisites": "Completion of Class 10 (CBSE)",
+              "hasCourse": [
+                { "@type": "Course", "name": "Science Stream (Class 11–12)", "description": "Physics, Chemistry, Biology/Mathematics, and electives." },
+                { "@type": "Course", "name": "Commerce Stream (Class 11–12)", "description": "Accountancy, Business Studies, Economics, and electives." },
+                { "@type": "Course", "name": "Humanities Stream (Class 11–12)", "description": "History, Political Science, Psychology, Sociology, and electives." }
+              ],
+              "url": "https://rainbowinternationalschool.in/senior-secondary-section"
+            },
+            buildFaqPageSchema(SENIOR_FAQS)
+          ]
         }}
       />
       <Navbar />
@@ -172,6 +189,7 @@ export default function SeniorSecondary() {
       />
 
       <main className="flex-grow">
+        <WaveOneSeoBlock pageId="senior-secondary" quickAnswer={SENIOR_QUICK_ANSWER} faqs={SENIOR_FAQS} />
 
         {/* ── Intro ──────────────────────────────────────────────── */}
         <section className="py-20 bg-white">

@@ -5,6 +5,18 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { Phone, IndianRupee, Shield, Bus, BookOpen, Stethoscope } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const FEES_QUICK_ANSWER =
+  "The 2026-27 CBSE fee structure for Rainbow International School Thane is published class-by-class — covering tuition, one-time admission charges and term-wise breakdowns — with a downloadable official PDF. Transport fees are billed separately and confirmed at the time of admission based on the parent's chosen route.";
+
+const FEES_FAQS: WaveOneFaq[] = [
+  { q: "Where can I see the Rainbow International School fees?", a: "The full class-wise fee structure for 2026-27 is on the Fee Structure page, with a downloadable PDF." },
+  { q: "Are transport fees included in the tuition fee?", a: "No. Transport fees are charged separately and are confirmed at admission based on route." },
+  { q: "What payment modes are accepted?", a: "Standard payment modes (online transfer, cheque) are accepted; details are shared during admission." },
+  { q: "Are there any one-time charges?", a: "Yes. One-time admission charges apply at the time of joining and are listed in the fee structure." },
+  { q: "How do I get the fee structure for a specific class?", a: "The class-wise fee table on the Fee Structure page covers Nursery to Class 12. Contact the admission desk for any clarifications." },
+];
 
 const inclusions = [
   { icon: BookOpen, title: "Tuition & Academics", desc: "All classroom instruction, lab sessions, library access, and digital learning resources." },
@@ -13,23 +25,16 @@ const inclusions = [
   { icon: Stethoscope, title: "Health & Wellness", desc: "On-campus infirmary with full-time nurse, visiting paediatrician, equipped ambulance." },
 ];
 
-const faqs = [
-  { q: "What is the fee payment schedule?", a: "Fees are payable in quarterly instalments. The exact schedule is shared at the time of admission confirmation." },
-  { q: "Are there sibling concessions?", a: "Yes, sibling discounts are available. Please discuss this with our admissions team during the interaction session." },
-  { q: "Is there a one-time admission fee?", a: "Yes, a one-time admission and registration fee is applicable at the time of joining. This is non-refundable." },
-  { q: "Are there additional charges for extracurriculars?", a: "Core extracurricular activities are included. Specialised programmes like advanced swimming coaching or competitive robotics may have a nominal additional fee." },
-  { q: "What payment methods are accepted?", a: "Fees can be paid via online bank transfer, UPI, demand draft, or cheque. Cash payments are not accepted." },
-  { q: "Is there a fee refund policy?", a: "Refund policies are governed by CBSE guidelines. Details are shared during the admission process." },
-];
+const faqs = FEES_FAQS;
 
 export default function Fees() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="CBSE School Fee Structure Thane 2026-27"
-        description="Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment. Contact admissions for exact fee schedule."
-        keywords="CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane, school fees near me Thane"
+        title="Fee Structure 2026-27 | Rainbow International School Thane"
+        description="Class-wise CBSE fee structure for 2026-27 at RIS Thane: tuition, one-time charges, transport and term breakdown. Download the official fee structure PDF here."
+        keywords="Rainbow International School fees, Rainbow International School Thane fees, CBSE school fees in Thane, school fees in Thane, school fee structure Thane, CBSE school fee structure near me"
         canonical="https://rainbowinternationalschool.in/fee-structure"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
@@ -44,14 +49,7 @@ export default function Fees() {
               "description": "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
               "url": "https://rainbowinternationalschool.in/fee-structure"
             },
-            {
-              "@type": "FAQPage",
-              "mainEntity": faqs.map(f => ({
-                "@type": "Question",
-                "name": f.q,
-                "acceptedAnswer": { "@type": "Answer", "text": f.a }
-              }))
-            }
+            buildFaqPageSchema(FEES_FAQS)
           ]
         }}
       />
@@ -63,6 +61,7 @@ export default function Fees() {
       />
 
       <main className="flex-grow" role="main">
+        <WaveOneSeoBlock pageId="fee-structure" quickAnswer={FEES_QUICK_ANSWER} faqs={FEES_FAQS} />
         <section className="py-16 bg-gradient-to-b from-white to-gray-50" data-testid="section-overview">
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">Fee Overview</h2>

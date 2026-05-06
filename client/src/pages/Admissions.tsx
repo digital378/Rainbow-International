@@ -5,6 +5,19 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { CheckCircle, Calendar, FileText, Phone, GraduationCap, MessageCircle } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const ADMISSIONS_QUICK_ANSWER =
+  "CBSE admissions for the 2026-27 academic year at Rainbow International School Thane are open for Nursery to Class 12. Parents can review the admission process, age criteria, documents required and fees, then submit an online enquiry or book a campus visit at the Brahmand campus.";
+
+const ADMISSIONS_FAQS: WaveOneFaq[] = [
+  { q: "Are admissions open at Rainbow International School?", a: "Yes. Admissions for 2026-27 are currently open for Nursery to Class 12, subject to seat availability per class." },
+  { q: "How can I apply for school admission in Thane at RIS?", a: "You can submit an online admission enquiry, call the admission desk or visit the Brahmand campus to complete the application process." },
+  { q: "What documents are required for admission?", a: "Birth certificate, previous school report card (where applicable), Aadhaar (parent and child), passport-size photographs and address proof." },
+  { q: "What is the age criterion for Nursery and Class 1?", a: "Indicative ranges follow CBSE/state norms; exact cut-off dates for the 2026-27 session are listed in the Admissions section and confirmed by the admission desk." },
+  { q: "Can I book a campus visit before applying?", a: "Yes. Campus visits can be booked through the admission enquiry form or by calling the admission desk during school hours." },
+  { q: "Where can I see the fee structure?", a: "The full class-wise fee structure is on the Fee Structure page, with a downloadable PDF." },
+];
 
 const ageData = [
   { grade: "Nursery", age: "2.5 years", by: "31st March" },
@@ -48,9 +61,9 @@ export default function Admissions() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="School Admissions 2026-27 Thane — Nursery to Class 12"
-        description="Admissions open at Rainbow International School, Thane for 2026-27. Nursery to Class 12, CBSE board. Apply online — age criteria, process, documents, and fee details."
-        keywords="school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission, school admission near me Thane, Class 11 admission Thane"
+        title="Admissions 2026-27 | Rainbow International School Thane"
+        description="CBSE admissions open for 2026-27 at Rainbow International School, Thane: process, age criteria, documents, fees and key dates for Nursery to Class 12."
+        keywords="school admission in Thane, CBSE school admission Thane, Rainbow International School admission, school admission near me, school admission 2026-27 Thane, Class 11 admission Thane, nursery admission Thane"
         canonical="https://rainbowinternationalschool.in/admissions"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
@@ -58,15 +71,7 @@ export default function Admissions() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": [
-            { "@type": "Question", "name": "When do admissions open for 2026–27?", "acceptedAnswer": { "@type": "Answer", "text": "Admissions for the 2026–27 academic year are currently open. We recommend applying early as seats fill on a first-come, first-served basis." } },
-            { "@type": "Question", "name": "Is there an entrance test?", "acceptedAnswer": { "@type": "Answer", "text": "For Nursery to Class 8, there is no written test — we conduct an informal interaction session. For Class 9 and above, a written assessment in core subjects is required." } },
-            { "@type": "Question", "name": "What is the age criteria for Nursery?", "acceptedAnswer": { "@type": "Answer", "text": "Nursery: 2.5 years, Jr KG: 3.5 years, Sr KG: 4.5 years, Class 1: 6 years — as on 31st March of the academic year, per CBSE norms." } },
-            { "@type": "Question", "name": "Can my child join mid-session?", "acceptedAnswer": { "@type": "Answer", "text": "Mid-session admissions are available subject to seat availability. Contact our admissions office for current openings." } },
-            { "@type": "Question", "name": "Do you offer transport facilities?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, GPS-tracked school buses cover 30+ routes across Thane with a trained attendant on each bus." } },
-            { "@type": "Question", "name": "Is there a sibling discount?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, sibling concessions are available. Please discuss this during the admission process." } }
-          ]
+          ...buildFaqPageSchema(ADMISSIONS_FAQS),
         }}
       />
       <Navbar />
@@ -77,6 +82,7 @@ export default function Admissions() {
       />
 
       <main className="flex-grow" role="main">
+        <WaveOneSeoBlock pageId="admissions" quickAnswer={ADMISSIONS_QUICK_ANSWER} faqs={ADMISSIONS_FAQS} />
         {/* CTA strip */}
         <div className="bg-white border-b border-gray-100" data-testid="section-cta-strip">
           <div className="container mx-auto px-4 max-w-5xl py-6 flex flex-col sm:flex-row items-center justify-center gap-4">

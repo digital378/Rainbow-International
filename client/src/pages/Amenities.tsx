@@ -4,6 +4,18 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const AMENITIES_QUICK_ANSWER =
+  "Rainbow International School Thane has a 3.5-acre Brahmand campus with science labs, a library, smart classrooms, a swimming pool, a sports ground, an on-campus infirmary, paediatrician on call and CCTV-monitored safety. Parents can book a campus visit any school day.";
+
+const AMENITIES_FAQS: WaveOneFaq[] = [
+  { q: "What sports facilities does the school have?", a: "A sports ground, indoor sports area and a swimming pool, plus structured PE periods and inter-school participation." },
+  { q: "Does the school have science labs and a library?", a: "Yes — Physics, Chemistry and Biology labs, plus a central library available to all students." },
+  { q: "What safety measures are in place on campus?", a: "160+ CCTV cameras, monitored entry/exit, female staff in the pre-primary block, on-campus infirmary, paediatrician on call and an ambulance arrangement." },
+  { q: "Does the school provide transport?", a: "Yes. School-managed transport covers Brahmand, Ghodbunder Road, Manpada and adjoining Thane localities; routes are confirmed at the time of admission." },
+  { q: "Can parents tour the campus before admission?", a: "Yes. Campus tours can be booked through the admission enquiry form or by calling the admission desk." },
+];
 
 const BASE = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09";
 const BASE2 = "https://rainbowinternationalschool.in/wp-content/uploads";
@@ -97,14 +109,18 @@ export default function Amenities() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Amenities & Facilities"
-        description="Rainbow International School offers world-class amenities including Amphitheatre, Music Room, Swimming Pool, Cricket Ground, Football Turf, Science Labs, Library, and Organic Farm in Thane."
-        keywords="Rainbow school amenities Thane, school facilities Thane, swimming pool school Thane, CBSE school facilities Thane"
+        title="Campus & Facilities | Rainbow International School Thane"
+        description="A 3.5-acre Brahmand campus with science labs, library, swimming pool, sports ground, smart classrooms and on-campus infirmary. Visit our RIS Thane campus."
+        keywords="CBSE school with sports facilities in Thane, school with playground in Thane, school with transport in Thane, school with science labs in Thane, school with library in Thane, school with digital classrooms in Thane, RIS Thane facilities"
         canonical="https://rainbowinternationalschool.in/amenities"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Amenities & Facilities", href: "https://rainbowinternationalschool.in/amenities" },
         ]}
+        jsonLd={{
+          "@context": "https://schema.org",
+          ...buildFaqPageSchema(AMENITIES_FAQS),
+        }}
       />
       <Navbar />
       <PageBanner
@@ -113,6 +129,7 @@ export default function Amenities() {
       />
 
       <main className="flex-grow">
+        <WaveOneSeoBlock pageId="amenities" quickAnswer={AMENITIES_QUICK_ANSWER} faqs={AMENITIES_FAQS} />
 
         {/* Intro */}
         <div className="py-14" style={{ background: "#f8faff" }}>

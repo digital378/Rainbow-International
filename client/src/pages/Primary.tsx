@@ -5,6 +5,18 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { BookOpen, Calculator, FlaskConical, Palette, Users } from "lucide-react";
+import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+
+const PRIMARY_QUICK_ANSWER =
+  "The Primary School at Rainbow International School Thane covers Class 1 to Class 5 on the CBSE curriculum, with a strong foundation in literacy and numeracy, co-curricular activities and a safe, female-staff-led environment. Class 1 admissions for 2026-27 are open.";
+
+const PRIMARY_FAQS: WaveOneFaq[] = [
+  { q: "Which classes are part of the Primary section?", a: "Primary at RIS covers Class 1 through Class 5 on the CBSE curriculum." },
+  { q: "Is the Primary curriculum CBSE-aligned?", a: "Yes. The Primary curriculum is CBSE-aligned, with NCERT-based learning material." },
+  { q: "How does RIS approach foundational literacy and numeracy?", a: "The Primary programme emphasises foundational literacy and numeracy through structured reading, phonics and number-sense activities, in line with NEP 2020." },
+  { q: "Are co-curricular activities part of the Primary day?", a: "Yes. Music, art, physical education, library and activity periods are part of the regular Primary timetable." },
+  { q: "How do I apply for Class 1 admission for 2026-27?", a: "Submit the online admission enquiry or contact the admission desk; documents required are listed on the Admissions page." },
+];
 
 // ── Sidebar curriculum ────────────────────────────────────────────
 const curriculum = [
@@ -123,9 +135,9 @@ export default function Primary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Primary Section (Class 1–5)"
-        description="Rainbow International School's Primary Section (Class 1 to 5) in Thane. Language, Math, Science, Creative & Interpersonal skills via CBSE curriculum. Admissions open."
-        keywords="primary school Thane, Class 1 to 5 CBSE school Thane, primary section Rainbow School"
+        title="Primary School (Class 1–5) | RIS Thane CBSE"
+        description="CBSE Primary School at RIS Thane covers Class 1 to 5 with strong literacy and numeracy, co-curriculars and a safe campus. Class 1 admissions open for 2026-27."
+        keywords="primary school Thane, Class 1 to 5 CBSE school Thane, primary section Rainbow School, CBSE primary school Brahmand"
         canonical="https://rainbowinternationalschool.in/primary-section"
         ogImage="/images/home/academic/primary-section.jpg"
         breadcrumbs={[
@@ -135,13 +147,18 @@ export default function Primary() {
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@type": "EducationalOccupationalProgram",
-          "name": "Primary Section (Class 1–5)",
-          "description": "CBSE-affiliated primary education for Class 1 to 5, covering Language, Mathematics, Science, Social Studies, and creative skills using Multiple Intelligence pedagogy.",
-          "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-          "educationalProgramMode": "full-time",
-          "programPrerequisites": "Completion of Pre-Primary / Age 6 years",
-          "url": "https://rainbowinternationalschool.in/primary-section"
+          "@graph": [
+            {
+              "@type": "EducationalOccupationalProgram",
+              "name": "Primary Section (Class 1–5)",
+              "description": "CBSE-affiliated primary education for Class 1 to 5, covering Language, Mathematics, Science, Social Studies, and creative skills using Multiple Intelligence pedagogy.",
+              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "educationalProgramMode": "full-time",
+              "programPrerequisites": "Completion of Pre-Primary / Age 6 years",
+              "url": "https://rainbowinternationalschool.in/primary-section"
+            },
+            buildFaqPageSchema(PRIMARY_FAQS)
+          ]
         }}
       />
       <Navbar />
@@ -153,6 +170,7 @@ export default function Primary() {
       />
 
       <main className="flex-grow">
+        <WaveOneSeoBlock pageId="primary" quickAnswer={PRIMARY_QUICK_ANSWER} faqs={PRIMARY_FAQS} />
 
         {/* ── Intro + Curriculum sidebar ─────────────────────────── */}
         <section className="py-20 bg-white">

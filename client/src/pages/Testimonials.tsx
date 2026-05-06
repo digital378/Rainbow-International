@@ -153,20 +153,6 @@ export default function TestimonialsPage() {
             postalCode: "400607",
             addressCountry: "IN",
           },
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: avgRating,
-            bestRating: "5",
-            worstRating: "1",
-            ratingCount: "1240",
-            reviewCount: "1240",
-          },
-          review: testimonials.slice(0, 5).map(t => ({
-            "@type": "Review",
-            author: { "@type": "Person", name: t.name },
-            reviewRating: { "@type": "Rating", ratingValue: t.rating, bestRating: 5 },
-            reviewBody: t.review,
-          })),
         }}
       />
       <ScrollProgress />

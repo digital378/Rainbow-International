@@ -1570,7 +1570,6 @@ const pages: PageSSRConfig[] = [
       name: "Rainbow International School",
       url: "https://rainbowinternationalschool.in",
       address: { "@type": "PostalAddress", streetAddress: "Cosmos Arcade, Brahmand Phase 4", addressLocality: "Thane", addressRegion: "Maharashtra", postalCode: "400607", addressCountry: "IN" },
-      aggregateRating: { "@type": "AggregateRating", ratingValue: "4.8", bestRating: "5", worstRating: "1", ratingCount: "1240", reviewCount: "1240" },
     },
     renderBody: renderTestimonials,
   },

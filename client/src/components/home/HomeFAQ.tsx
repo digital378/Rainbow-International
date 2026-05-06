@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
 const faqs = [
@@ -79,28 +79,6 @@ function FAQItem({ faq, index, isOpen, toggle }: { faq: typeof faqs[0]; index: n
 
 export function HomeFAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.id = "faq-schema";
-    script.textContent = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": f.a,
-        },
-      })),
-    });
-    const existing = document.getElementById("faq-schema");
-    if (existing) existing.remove();
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, []);
 
   return (
     <section className="py-24" style={{ background: "#f8fafc" }}>
