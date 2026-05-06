@@ -1,0 +1,27 @@
+Proceed with Option A.
+
+Do not abandon the existing 5-wave plan and do not create a new parallel planning structure. Keep docs/seo-content-rewrite-plan.md as the single source of truth.
+
+Do not create duplicate landing pages where existing URLs already serve the same intent. Optimize the existing URLs instead.
+
+Important clarification on person names:
+- Keep the Chairperson’s name exactly as it appears on /chairpersons-note.
+- Do not remove or rewrite the Chairperson’s name from that page.
+- For all other SEO/commercial/admission/blog optimization work, avoid adding new person names unless already present on protected KEEP pages.
+- Do not add author names, writer names, editor names, or Person schema.
+- Keep publisher/organization attribution as Rainbow International School.
+- Do not add Review or AggregateRating schema unless genuine review data exists.
+
+Please fold only the non-conflicting improvements into the existing plan:
+1. Add expanded keyword clusters, especially near-me/local variants such as Hiranandani Estate, Kasarvadavali, Majiwada, Kolshet, Waghbil, Patlipada, where relevant.
+2. Add these as secondary keywords to existing locality pages, not new duplicate pages.
+3. Add testimonial guidance: parent first name plus initial only, and only use real Google review content if available and compliant.
+4. Add no-Person-schema rule, except do not disturb /chairpersons-note content.
+5. Add AI SEO improvements through FAQ, quick-answer blocks, entity clarity, and parent-intent answers on existing approved pages.
+6. Strengthen internal linking with RPS only where it supports the parent journey and does not dilute RIS admission pages.
+7. Keep the existing cannibalization-free invariant: one keyword cluster, one primary page.
+8. Keep the existing deployment structure and go/no-go recovery checks.
+
+Do not create the 13 new docs. If additional detail is needed, add it inside the existing planning document or the existing canonical/blog mapping document.
+
+After updating the plan, show me a concise diff summary before implementation.

@@ -1,0 +1,678 @@
+You are working on the Rainbow International School website:
+https://rainbowinternationalschool.in/
+
+Project objective:
+Improve RIS SEO, local SEO, AI SEO, internal linking, parent enquiry conversion, and admission-focused visibility while protecting the existing approved SEO plan and avoiding new cannibalization.
+
+Important project direction:
+Do not abandon the existing SEO plan.
+Do not create a parallel plan.
+Do not create duplicate documents that conflict with the existing plan.
+Keep docs/seo-content-rewrite-plan.md as the single source of truth.
+
+If there is an existing supporting document such as docs/blog-slug-canonical-list.md, keep using it.
+Do not create 13 new planning documents.
+If new details are needed, add them into the existing planning document under clearly marked sections.
+
+Deployment structure:
+Follow the existing structured rollout already defined in docs/seo-content-rewrite-plan.md.
+Do not switch to a one-shot full-site deployment unless explicitly approved later.
+Respect the existing canonical recovery monitoring and go/no-go checks.
+
+Primary business goal:
+Increase organic admission enquiries and qualified parent leads for Rainbow International School by improving relevant ranking pages, especially for high-intent searches such as:
+- CBSE school near me
+- CBSE school in Thane
+- best CBSE school in Thane
+- top CBSE school in Thane
+- school admission in Thane
+- CBSE school admission in Thane
+- school fees in Thane
+- Rainbow International School fees
+- senior secondary school in Thane
+- Class 11 admission in Thane
+- school with facilities in Thane
+- school with transport in Thane
+
+Important ranking goal:
+Optimize all relevant pages to compete strongly for top 3 visibility where possible.
+Do not add ranking guarantees on the website.
+Build the site for maximum ranking potential through search intent match, local relevance, technical SEO, AI SEO, strong internal linking, schema, content clarity, and conversion actions.
+
+Critical anti-cannibalization rule:
+One keyword cluster must have one primary ranking page.
+Do not create duplicate landing pages if existing URLs already serve the same intent.
+Where an existing page exists, improve the existing page instead of creating a new URL.
+
+Do not create these new URLs if equivalent existing pages already exist:
+- /cbse-school-in-thane/ if /top-schools-in-thane is already the approved primary page
+- /school-admission-in-thane/ if /admissions is already the approved primary page
+- /senior-secondary-school-in-thane/ if /senior-secondary-section is already the approved primary page
+- /school-facilities-in-thane/ if /amenities is already the approved primary page
+- /cbse-school-near-me-thane/ if existing locality pages already cover near-me intent
+
+Use the approved existing primary pages instead:
+- /top-schools-in-thane for CBSE school / top school in Thane intent, if already approved in the current plan
+- /admissions for admission intent
+- /senior-secondary-section for senior secondary and Class 11/12 intent
+- /amenities for facilities intent
+- /school-near-brahmand-thane
+- /school-near-ghodbunder-road-thane
+- /school-near-manpada-thane
+
+Local keyword expansion:
+Add nearby locality keyword variants as secondary keywords only where relevant and natural.
+Do not create thin doorway pages.
+
+Locality terms to consider:
+- Thane
+- Brahmand
+- Ghodbunder Road
+- Manpada
+- Hiranandani Estate
+- Kasarvadavali
+- Majiwada
+- Kolshet
+- Waghbil
+- Patlipada
+
+Use these mainly on existing locality pages, contact page, homepage, and relevant commercial pages.
+Do not overuse them.
+
+Primary keyword clusters:
+1. CBSE / school discovery:
+- CBSE school near me
+- CBSE school in Thane
+- CBSE schools in Thane
+- best CBSE school in Thane
+- top CBSE school in Thane
+- best school in Thane
+- international school in Thane
+- school near me
+- best school near me
+
+2. Admission:
+- school admission in Thane
+- CBSE school admission in Thane
+- school admission near me
+- admission open CBSE school Thane
+- school admission 2026-27 Thane
+- Class 11 admission Thane
+- senior secondary admission Thane
+
+3. Fees:
+- Rainbow International School fees
+- Rainbow International School Thane fees
+- CBSE school fees in Thane
+- school fees in Thane
+- school fee structure Thane
+- CBSE school fee structure near me
+
+4. Senior secondary:
+- senior secondary school in Thane
+- Class 11 admission Thane
+- Class 12 CBSE school in Thane
+- science stream school in Thane
+- commerce stream school in Thane
+- humanities school in Thane
+- CBSE senior secondary school near me
+
+5. Facilities:
+- CBSE school with sports facilities in Thane
+- school with playground in Thane
+- school with transport in Thane
+- school with modern facilities in Thane
+- school with science labs in Thane
+- school with library in Thane
+- school with digital classrooms in Thane
+- school with co-curricular activities in Thane
+
+6. Trust and academic quality:
+- school with good academics in Thane
+- CBSE school with good results in Thane
+- best school for academics in Thane
+- safe school in Thane
+- school with parent communication in Thane
+- school with experienced teachers in Thane
+
+Update the existing keyword map inside docs/seo-content-rewrite-plan.md.
+Do not create a separate keyword-map document unless the current plan already requires it.
+
+Name usage rules:
+The previous “no person names anywhere” instruction is now revised.
+
+Allowed names:
+Keep existing names on the following pages exactly as they are:
+- /chairpersons-note
+- /school-managing-committee
+- /academic-team
+
+The following names and roles may be used where necessary and relevant, especially on School Managing Committee, Academic Team, Chairperson, governance, or official school profile pages:
+- Mrs. Akila Balbale — Proprietor, Rainbow International School; B.Com; Chairperson
+- Mrs. Vimlesh Sindhu — Principal; M.A., B.Ed.
+- Ashwini Rasal — Teacher Representative; M.Sc., B.Ed.; 9 Years
+- Amrita Pereira — Trustee Representative; B.Com, MBA; 15 Years
+
+Do not remove these names from existing approved pages.
+Do not rewrite these pages merely to remove names.
+Do not damage the current School Managing Committee or Academic Team pages.
+These names can remain as part of official school governance and academic credibility.
+
+Restricted name usage:
+Do not add new author names, writer names, editor names, reviewer names, random staff names, student names, or personal names in SEO content, blogs, metadata, schema, author boxes, or article bylines unless already present on an approved KEEP page or explicitly provided by management.
+
+Protected pages:
+The following page types must remain accurate and should not be stripped of official names:
+- Chairperson’s note
+- School Managing Committee
+- Academic Team
+- Official governance pages
+- Existing approved historical/student-achievement pages if already marked KEEP in the plan
+
+Author rule:
+For blogs and articles:
+- Do not display author names.
+- Remove “Written by,” “Posted by,” “Reviewed by,” or similar author fields if they show individual names.
+- Do not use Person schema for blog authors.
+- Use publisher as Rainbow International School.
+- If attribution is needed, use “Rainbow International School” only.
+
+Schema name rules:
+Allowed:
+- Organization schema
+- School schema
+- EducationalOrganization schema
+- LocalBusiness schema where appropriate
+- WebSite schema
+- WebPage schema
+- BreadcrumbList schema
+- FAQPage schema
+- Article schema with publisher as Rainbow International School
+- ContactPoint schema
+- ImageObject schema where useful
+
+Avoid:
+- Person schema for authors
+- Fake reviewer schema
+- Fake staff schema
+- Fake AggregateRating
+- Fake Review schema
+
+Official school leadership/team pages may contain visible person names as page content if already approved, but do not add Person schema unless specifically required and approved.
+
+Testimonials:
+If genuine Google Business Profile / Google review content is available through an approved source, it may be used carefully.
+Do not scrape Google in violation of policies.
+Do not claim a testimonial is from Google unless it is genuinely sourced from Google Business Profile or an approved review export.
+Do not add Review or AggregateRating schema unless genuine review data exists and is compliant.
+
+If placeholder testimonials are needed, use only parent first name plus initial:
+- Priya S., Parent
+- Amit R., Parent
+- Neha K., Parent
+
+Do not use full parent names unless provided and approved.
+Do not use student names in testimonials.
+Do not invent star ratings.
+Do not invent “Google review” labels.
+
+RIS and RPS internal linking:
+Internal linking between Rainbow International School and Rainbow Preschools must support Rainbow Group’s parent journey without confusing SEO intent.
+
+RIS is the K-12 / CBSE school.
+RPS is the preschool network.
+
+RIS-to-RPS linking objective:
+Use RIS-to-RPS links only where parent journey makes sense:
+- Parents looking for preschool admissions
+- Early years learning
+- Sibling admissions
+- Preschool to formal school transition
+- Rainbow Group education pathway
+
+RPS-to-RIS linking objective:
+RPS should link to RIS where parents may be planning future schooling:
+- Preschool to primary school transition
+- Continued schooling after preschool
+- CBSE school pathway
+- Rainbow Group education journey
+
+RIS pages where RPS links are allowed:
+- Homepage, in a controlled lower-page section
+- Admissions page, as a small supporting note
+- About / group page
+- Blog posts about early education or preschool transition
+- Footer under group schools or related institutions
+
+RIS pages where RPS links must be avoided or minimized:
+- High-conversion hero sections
+- /top-schools-in-thane
+- /senior-secondary-section
+- /fee-structure
+- Results page
+- Class 11 admission content
+- Contact page above the fold
+- Main admission CTA sections
+
+Do not allow RPS links to dilute RIS admissions.
+Do not use CBSE-focused anchor text for RPS pages.
+
+Allowed RPS anchor text:
+- Rainbow Preschools
+- preschool admissions
+- preschools in Thane
+- early years learning
+- Rainbow Group preschool network
+
+Avoid misleading RPS anchor text:
+- CBSE school in Thane
+- best CBSE school in Thane
+- senior secondary school
+- Class 11 admission
+- school fees in Thane, unless the destination is clearly relevant
+
+AI SEO / Answer Engine Optimization:
+Improve existing pages for AI search and answer engines.
+Do not create duplicate pages for AI SEO.
+
+Add to relevant approved pages:
+- Quick answer sections
+- Parent-focused FAQs
+- Clear definitions
+- Short answer blocks
+- Local context
+- Entity clarity
+- Structured headings
+- Schema where valid
+- Clear CTAs
+
+Example AI-ready answer for CBSE/top school page:
+Rainbow International School is a CBSE school in Thane offering structured academics, co-curricular exposure, school facilities, and admission support for parents looking for a trusted school environment.
+
+Example AI-ready answer for admissions page:
+Parents looking for school admission in Thane can enquire with Rainbow International School for class availability, fee details, campus visits, required documents, and admission guidance.
+
+Add FAQ questions naturally:
+- Is Rainbow International School a CBSE school in Thane?
+- How can I enquire for admission?
+- Does Rainbow International School offer senior secondary classes?
+- How can parents check the fee structure?
+- Does the school offer transport?
+- How can I book a campus visit?
+- What facilities are available at the school?
+- Which areas in Thane does the school serve?
+
+Content optimization rules:
+- Write for parents first.
+- Avoid keyword stuffing.
+- Avoid exaggerated claims unless verifiable.
+- Do not use “No. 1” unless there is proof.
+- Keep content simple, credible, and admission-focused.
+- Do not duplicate content across pages.
+- Maintain one H1 per page.
+- Use structured H2/H3 sections.
+- Include parent CTAs.
+- Include relevant internal links.
+- Include location relevance naturally.
+
+Commercial page requirements:
+Every priority commercial/admission page should include:
+- Clear H1
+- SEO title
+- Meta description
+- Self-referencing canonical
+- Parent-focused intro
+- Quick answer block
+- Admission CTA above the fold
+- Call CTA
+- WhatsApp CTA
+- Fee enquiry CTA where relevant
+- Campus visit CTA
+- FAQ section
+- Internal links to relevant pages
+- Schema where valid
+
+Priority pages to optimize:
+- Homepage
+- /admissions
+- /top-schools-in-thane
+- /fee-structure
+- /senior-secondary-section
+- /amenities
+- /contact-us
+- /school-managing-committee
+- /academic-team
+- /academic-calendar
+- /student-achievements
+- Results page or result-related HTML page
+- Locality pages:
+  - /school-near-brahmand-thane
+  - /school-near-ghodbunder-road-thane
+  - /school-near-manpada-thane
+- High-value blogs already identified in the current plan
+
+Homepage:
+Optimize for brand + CBSE + Thane + parent conversion.
+
+Suggested title:
+Rainbow International School Thane | CBSE School in Thane
+
+Suggested meta:
+Rainbow International School is a CBSE school in Thane offering academics, facilities, activities, transport, and admission support for parents.
+
+Required homepage sections:
+- Clear hero positioning
+- Admission CTA
+- Book campus visit CTA
+- Why parents choose RIS
+- CBSE curriculum
+- Academic strength
+- Senior secondary
+- Facilities
+- Results / achievements
+- Safety and transport
+- Parent testimonials
+- FAQ
+- Contact and directions
+- Controlled link to Rainbow Preschools lower on the page, if appropriate
+
+Admissions page:
+Optimize /admissions as the primary admission page.
+Do not create /school-admission-in-thane if /admissions is the approved primary page.
+
+Suggested title:
+School Admission in Thane | Rainbow International School
+
+Suggested meta:
+Explore school admission in Thane at Rainbow International School. Enquire for classes, fees, campus visit, documents, and admission support.
+
+Must include:
+- Classes available
+- Admission process
+- Documents required
+- Fee enquiry CTA
+- Campus visit CTA
+- Call / WhatsApp CTA
+- Parent FAQs
+- Internal links to fees, curriculum/top school page, senior secondary, amenities, contact
+
+Top schools / CBSE intent page:
+Optimize /top-schools-in-thane as the primary page for:
+- CBSE school in Thane
+- best CBSE school in Thane
+- top CBSE school in Thane
+- CBSE school near me
+
+Do not create /cbse-school-in-thane if /top-schools-in-thane is approved as the primary page.
+
+Suggested title:
+CBSE School in Thane | Rainbow International School
+
+Suggested meta:
+Explore Rainbow International School, a CBSE school in Thane offering academics, facilities, activities, transport, and admission support.
+
+Must include:
+- Why parents choose RIS
+- CBSE curriculum
+- Academic approach
+- Facilities
+- Safety
+- Transport
+- Student development
+- Results / achievements
+- Admission CTA
+- Fee enquiry CTA
+- FAQs
+- Links to admissions, fees, senior secondary, amenities, contact
+
+Fee page:
+Optimize existing fee page.
+Do not let outdated PDFs outrank the HTML fee page.
+
+Suggested title:
+Rainbow International School Fees | CBSE School Fees in Thane
+
+Suggested meta:
+Check Rainbow International School fee enquiry details for CBSE admissions in Thane. Connect with the admissions team for updated fee support.
+
+Rules:
+- Keep latest approved fee document only.
+- Noindex or redirect outdated PDFs if approved in the existing plan.
+- Use HTML fee page as the primary SEO page.
+- Include admission and contact CTAs.
+- Add FAQ.
+
+Senior secondary:
+Optimize /senior-secondary-section.
+Do not create /senior-secondary-school-in-thane if existing page is approved.
+
+Suggested title:
+Senior Secondary School in Thane | Class 11 Admission
+
+Suggested meta:
+Explore senior secondary education at Rainbow International School, Thane, with academic support, streams, facilities, and admission guidance.
+
+Must include:
+- Class 11 / Class 12 information
+- Streams if offered and verified
+- Subject combinations if available
+- Academic support
+- Board preparation
+- Results link
+- Admission CTA
+- Fee enquiry CTA
+- FAQs
+
+Amenities / facilities:
+Optimize /amenities.
+Do not create /school-facilities-in-thane if /amenities is approved.
+
+Suggested title:
+School Facilities in Thane | Rainbow International School
+
+Suggested meta:
+Explore Rainbow International School facilities in Thane, including classrooms, labs, sports, activities, safety, transport, and campus support.
+
+Must include:
+- Classrooms
+- Labs
+- Library
+- Sports
+- Transport
+- Safety
+- Activities
+- Campus experience
+- Gallery links
+- Admission CTA
+- FAQs
+
+Contact page:
+Optimize /contact-us.
+
+Suggested title:
+Rainbow International School Contact | CBSE School in Thane
+
+Suggested meta:
+Contact Rainbow International School in Thane for admissions, fees, campus visits, directions, and parent enquiries.
+
+Must include:
+- Address
+- Phone
+- WhatsApp
+- Map
+- Directions
+- Office timing if available
+- Admission enquiry form
+- Internal links to admissions and fee page
+- Local area mentions where natural
+
+School Managing Committee:
+Keep existing names and roles as they are.
+Do not remove names.
+Do not rewrite to remove official governance information.
+Improve only if required for formatting, accessibility, metadata, or internal linking.
+
+Allowed visible names include:
+- Mrs. Akila Balbale
+- Mrs. Vimlesh Sindhu
+- Ashwini Rasal
+- Amrita Pereira
+
+Academic Team:
+Keep existing academic team names as they are.
+Do not remove names.
+Do not rewrite to remove official team information.
+Improve only if required for formatting, accessibility, metadata, or internal linking.
+
+Chairperson’s Note:
+Keep the Chairperson’s name as it is.
+Do not remove it.
+Do not rewrite the page merely to remove person names.
+Improve only if required under the existing approved plan.
+
+Blog cleanup:
+Follow the existing blog decisions in docs/seo-content-rewrite-plan.md and docs/blog-slug-canonical-list.md.
+Do not reverse protected KEEP decisions.
+Do not strip names from protected KEEP historical/student-achievement posts if already approved to remain.
+Do not create new author names.
+Do remove author bylines where they are generic blog author fields and not part of the protected content.
+
+For retained blogs:
+- Improve title/meta if planned.
+- Add internal links to relevant commercial pages.
+- Add CTA to admissions or campus visit where relevant.
+- Add FAQ if useful.
+- Use Article schema with publisher Rainbow International School.
+- Avoid Person schema for authors.
+
+Internal linking:
+Strengthen RIS internal linking without over-optimization.
+
+Rules:
+- Homepage links to admissions, top school/CBSE page, fees, senior secondary, amenities, results, contact.
+- Admissions links to fees, top school page, senior secondary, amenities, contact.
+- Blogs link to relevant commercial pages.
+- Results link to admissions and senior secondary.
+- Amenities link to admissions and campus visit.
+- Fee page links to admissions and contact.
+- Contact page links to admissions and fees.
+- Locality pages link to admissions, contact, and top school page.
+- Use natural anchors.
+- Avoid excessive exact-match anchors.
+
+Recommended anchors:
+- CBSE school in Thane
+- school admission in Thane
+- Rainbow International School fees
+- senior secondary section
+- school facilities in Thane
+- book a campus visit
+- contact Rainbow International School
+- student achievements
+- academic results
+- school near Brahmand Thane
+- school near Ghodbunder Road Thane
+- school near Manpada Thane
+
+Technical SEO:
+Maintain:
+- Clean canonicals
+- Correct sitemap
+- Correct robots.txt
+- No redirect chains
+- No redirect loops
+- No broken internal links
+- No orphan priority pages
+- Consistent slash/no-slash URL format
+- Index only useful pages
+- Noindex thin archives, author archives, internal search, thank-you pages, duplicate campaign pages if applicable
+- Preserve high-performing URLs wherever possible
+
+Campaign pages:
+Audit:
+- /google-school-2025-26
+- /meta-school-2025-26
+
+If active in ads:
+- Keep live
+- Do not redirect without approval
+- Prevent SEO duplication through canonical/noindex if required
+
+If inactive:
+- Redirect to approved evergreen page as per current plan
+- Remove from sitemap
+- Update internal links
+
+PDF handling:
+Audit fee, result, book list, and academic calendar PDFs.
+Prefer HTML pages for SEO.
+Keep only current approved PDFs linked.
+Remove outdated PDFs from sitemap or redirect/noindex as per the current plan.
+Do not delete without checking traffic/relevance.
+
+Conversion tracking:
+Verify or implement tracking for:
+- Admission form submit
+- Call click
+- WhatsApp click
+- Fee download
+- Campus visit click
+- Apply now click
+- Directions click
+- RPS cross-link click
+- PDF download
+
+Suggested event names:
+- ris_admission_form_submit
+- ris_call_click
+- ris_whatsapp_click
+- ris_fee_download
+- ris_campus_visit_click
+- ris_apply_now_click
+- ris_directions_click
+- ris_rps_crosslink_click
+- ris_pdf_download
+
+QA before implementation:
+Before any live changes, confirm:
+1. Existing plan remains source of truth.
+2. No duplicate landing pages are being created.
+3. Existing approved URLs are being optimized.
+4. Chairperson’s name remains intact.
+5. School Managing Committee names remain intact.
+6. Academic Team names remain intact.
+7. No blog author/person schema is added.
+8. No fake reviews or ratings are added.
+9. RPS links are controlled and relevant.
+10. Canonicals are correct.
+11. Sitemap is clean.
+12. Robots.txt is correct.
+13. Redirects are mapped.
+14. Forms and CTAs work.
+15. Tracking works.
+16. Mobile layout works.
+17. Schema validates.
+18. No important page is noindexed.
+19. No protected KEEP page is damaged.
+20. Recovery monitoring/go-no-go process remains intact.
+
+Required update before implementation:
+Update docs/seo-content-rewrite-plan.md with only the non-conflicting improvements from this instruction:
+- Expanded keyword clusters
+- Locality keyword expansion
+- AI SEO improvements
+- Testimonial rule
+- Revised person-name rules
+- RPS cross-linking rules
+- No fake review/rating schema rule
+- No blog author/Person schema rule
+- Existing URL optimization instead of duplicate landing page creation
+
+Then show a concise diff summary before implementing.
+
+Final instruction:
+Do not execute a conflicting big-bang rewrite.
+Do not create duplicate SEO pages.
+Do not remove approved school leadership or team names.
+Do not add author names or fake review data.
+Strengthen the existing approved SEO plan so Rainbow International School can rank better for high-intent parent searches and convert more organic visitors into admission enquiries.
