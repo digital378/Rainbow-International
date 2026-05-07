@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Quote, MessageCircle } from "lucide-react";
 
 const testimonials = [
   {
@@ -61,16 +61,16 @@ export function Testimonials() {
   const visible = testimonials.slice(page * perPage, page * perPage + perPage);
 
   return (
-    <section className="py-24" style={{ background: "#f8fafc" }}>
+    <section className="py-20" style={{ background: "#f8fafc" }}>
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <div className="inline-block mb-4">
-              <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Testimonials</span>
+              <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Parents' Corner</span>
               <div className="w-8 h-0.5 bg-amber-400 mt-2" />
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">Parents' Corner</h2>
-            <p className="text-gray-500 text-[15px]">What parents say about us.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">What Parents Say About RIS</h2>
+            <p className="text-gray-500 text-[15px]">Authentic voices from our school community.</p>
           </div>
           <div className="flex items-center gap-3 bg-white px-5 py-3 border border-gray-100 shadow-sm rounded-full">
             <div className="flex">
@@ -81,7 +81,7 @@ export function Testimonials() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {visible.map((t, i) => {
             const globalIndex = page * perPage + i;
             return (
@@ -92,9 +92,7 @@ export function Testimonials() {
                 data-testid={`card-testimonial-${globalIndex}`}
               >
                 <Quote size={28} className="mb-3 flex-shrink-0 text-amber-200" />
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow italic">
-                  "{t.review}"
-                </p>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-grow italic">"{t.review}"</p>
                 <div className="flex items-center gap-3 border-t border-gray-100 pt-4">
                   <div
                     className="w-11 h-11 overflow-hidden border-2 border-amber-100 flex-shrink-0 flex items-center justify-center text-sm font-extrabold text-white"
@@ -103,9 +101,7 @@ export function Testimonials() {
                     {t.initials}
                   </div>
                   <div>
-                    <p className="font-extrabold text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${globalIndex}`}>
-                      {t.name}
-                    </p>
+                    <p className="font-extrabold text-gray-900 text-sm leading-none mb-1" data-testid={`text-testimonial-name-${globalIndex}`}>{t.name}</p>
                     <div className="flex">
                       {[1,2,3,4,5].map((s) => <Star key={s} size={11} className="fill-amber-400 text-amber-400" />)}
                     </div>
@@ -116,7 +112,8 @@ export function Testimonials() {
           })}
         </div>
 
-        <div className="flex items-center justify-center gap-4">
+        {/* Pagination */}
+        <div className="flex items-center justify-center gap-4 mb-10">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
@@ -137,13 +134,7 @@ export function Testimonials() {
                 className="transition-all duration-300 min-h-[44px] flex items-center"
                 style={{ padding: "17px 0" }}
               >
-                <span className="block" style={{
-                  width: i === page ? "28px" : "10px",
-                  height: "4px",
-                  background: i === page ? "#091a4f" : "#d1d5db",
-                  borderRadius: "2px",
-                  transition: "all 0.3s",
-                }} />
+                <span className="block" style={{ width: i === page ? "28px" : "10px", height: "4px", background: i === page ? "#091a4f" : "#d1d5db", borderRadius: "2px", transition: "all 0.3s" }} />
               </button>
             ))}
           </div>
@@ -157,6 +148,19 @@ export function Testimonials() {
           >
             <ChevronRight size={18} />
           </button>
+        </div>
+
+        {/* Counsellor CTA */}
+        <div className="text-center">
+          <a
+            href="/admissions"
+            className="group inline-flex items-center gap-2.5 px-8 py-3.5 font-bold text-[#091a4f] text-sm transition-all duration-300 hover:opacity-90 hover:shadow-lg"
+            style={{ background: "#fbbf24", borderRadius: "9999px" }}
+            data-testid="btn-speak-counsellor"
+          >
+            <MessageCircle size={16} />
+            Speak to an Admissions Counsellor
+          </a>
         </div>
       </div>
     </section>
