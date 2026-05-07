@@ -216,21 +216,22 @@ export default function Admissions() {
         className="relative min-h-[88vh] flex items-center overflow-hidden"
         data-testid="section-hero"
       >
-        {/* Solid dark navy base */}
-        <div className="absolute inset-0" style={{ zIndex: 0, background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 60%, #091a4f 100%)" }} />
-        {/* Student group photo — right-anchored, fades into dark on the left */}
-        <div className="absolute inset-0 hidden md:block" style={{ zIndex: 1 }}>
+        {/* Background image */}
+        <picture>
+          <source type="image/webp" media="(max-width: 768px)" srcSet="/images/students/hero-senior-secondary-mobile.webp" />
+          <source srcSet="/images/students/hero-senior-secondary.webp" type="image/webp" />
           <img
-            src="/images/students/admissions-students-group.png"
+            src="/images/students/hero-senior-secondary.jpg"
             alt="Rainbow International School Thane students"
+            width={1620} height={1080}
             loading="eager" decoding="async" fetchPriority="high"
-            className="absolute right-0 top-0 h-full w-auto max-w-[55%] object-cover object-left-top"
+            className="absolute inset-0 w-full h-full object-cover object-top"
+            style={{ zIndex: 0 }}
           />
-          {/* Fade the image into the navy on the left */}
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to right, #091a4f 0%, #0d3b86 35%, rgba(9,26,79,0.35) 65%, transparent 100%)" }} />
-        </div>
-        {/* Bottom vignette */}
-        <div className="absolute bottom-0 left-0 right-0 h-40" style={{ zIndex: 2, background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.85) 100%)" }} />
+        </picture>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0" style={{ zIndex: 1, background: "linear-gradient(135deg, rgba(9,26,79,0.93) 0%, rgba(13,59,134,0.85) 55%, rgba(9,26,79,0.78) 100%)" }} />
+        <div className="absolute bottom-0 left-0 right-0 h-32" style={{ zIndex: 1, background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 50%, #091a4f 100%)" }} />
         <div className="relative container mx-auto px-4 max-w-6xl py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center" style={{ zIndex: 2 }}>
           {/* Left copy */}
           <div className="text-white">
