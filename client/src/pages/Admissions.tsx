@@ -119,6 +119,40 @@ const PAGE_FAQS = [
   { q: "Are senior secondary streams available?",                      a: "Yes. Class 11 and 12 are offered in three CBSE streams: Science (PCM / PCB), Commerce, and Humanities, with JEE, NEET and CUET prep support." },
 ];
 
+// ── Sub-component ─────────────────────────────────────────────────────────────
+
+function GradeCard({ g }: { g: typeof gradeBlocks[0] }) {
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group" data-testid={`card-grade-${g.label.toLowerCase().replace(/\s+/g, "-")}`}>
+      <div className="h-48 overflow-hidden">
+        <img
+          src={g.img}
+          alt={`${g.label} at Rainbow International School Thane`}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      </div>
+      <div className="p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="inline-block text-xs font-extrabold px-3 py-1 rounded-full" style={{ background: g.color, color: g.accent }}>{g.label}</span>
+          <span className="text-xs text-gray-400">{g.classes}</span>
+        </div>
+        <p className="text-[#091a4f] font-semibold text-sm mb-1.5 italic">"{g.concern}"</p>
+        <p className="text-gray-500 text-sm leading-relaxed mb-4">{g.advantage}</p>
+        <a
+          href={g.href}
+          data-testid={`link-grade-${g.label.toLowerCase().replace(/\s+/g, "-")}`}
+          className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border-2 transition-all hover:opacity-80"
+          style={{ color: "#091a4f", borderColor: "#091a4f" }}
+        >
+          Learn more <ChevronRight className="w-3 h-3" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ── Form state ────────────────────────────────────────────────────────────────
 
 const emptyForm = { parentName: "", phone: "", studentName: "", gradeApplying: "", location: "", preferredDate: "", message: "" };
@@ -179,16 +213,26 @@ export default function Admissions() {
 
       {/* ── 1. HERO ──────────────────────────────────────────────────────── */}
       <section
-        className="relative min-h-[88vh] flex items-center"
-        style={{ background: "linear-gradient(135deg,#091a4f 0%,#0d3b86 60%,#1550b8 100%)" }}
+        className="relative min-h-[88vh] flex items-center overflow-hidden"
         data-testid="section-hero"
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: "url('/images/students/hero-senior-secondary.webp')" }}
-          aria-hidden="true"
-        />
-        <div className="relative container mx-auto px-4 max-w-6xl py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+        {/* Background image — same as home page */}
+        <picture>
+          <source type="image/webp" media="(max-width: 768px)" srcSet="/images/students/hero-senior-secondary-mobile.webp" />
+          <source srcSet="/images/students/hero-senior-secondary.webp" type="image/webp" />
+          <img
+            src="/images/students/hero-senior-secondary.jpg"
+            alt="Rainbow International School Thane students"
+            width={1620} height={1080}
+            loading="eager" decoding="async" fetchPriority="high"
+            className="absolute inset-0 w-full h-full object-cover object-top"
+            style={{ zIndex: 0 }}
+          />
+        </picture>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0" style={{ zIndex: 1, background: "linear-gradient(135deg, rgba(9,26,79,0.93) 0%, rgba(13,59,134,0.85) 55%, rgba(9,26,79,0.78) 100%)" }} />
+        <div className="absolute bottom-0 left-0 right-0 h-32" style={{ zIndex: 1, background: "linear-gradient(to bottom, transparent 0%, rgba(9,26,79,0.7) 50%, #091a4f 100%)" }} />
+        <div className="relative container mx-auto px-4 max-w-6xl py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center" style={{ zIndex: 2 }}>
           {/* Left copy */}
           <div className="text-white">
             <span className="inline-flex items-center gap-2 bg-amber-400 text-[#091a4f] text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">
@@ -372,24 +416,16 @@ export default function Admissions() {
             <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">Admissions by Grade</h2>
             <p className="text-gray-500 mt-3 max-w-md mx-auto">Find the right programme for where your child is today.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {gradeBlocks.map((g) => (
-              <div key={g.label} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group" data-testid={`card-grade-${g.label.toLowerCase().replace(/\s+/g, "-")}`}>
-                <div className="h-44 overflow-hidden">
-                  <img src={g.img} alt={`${g.label} at Rainbow International School Thane`} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="inline-block text-xs font-extrabold px-3 py-1 rounded-full" style={{ background: g.color, color: g.accent }}>{g.label}</span>
-                    <span className="text-xs text-gray-400">{g.classes}</span>
-                  </div>
-                  <p className="text-[#091a4f] font-semibold text-sm mb-1.5 italic">"{g.concern}"</p>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4">{g.advantage}</p>
-                  <a href={g.href} data-testid={`link-grade-${g.label.toLowerCase().replace(/\s+/g, "-")}`} className="inline-flex items-center gap-1.5 text-sm font-bold transition-colors" style={{ color: g.accent }}>
-                    Learn more <ChevronRight className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
+          {/* First 3 cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+            {gradeBlocks.slice(0, 3).map((g) => (
+              <GradeCard key={g.label} g={g} />
+            ))}
+          </div>
+          {/* Last 2 cards — centred */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+            {gradeBlocks.slice(3).map((g) => (
+              <GradeCard key={g.label} g={g} />
             ))}
           </div>
         </div>
