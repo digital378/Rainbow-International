@@ -2,7 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import { buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
 import {
   BookOpen, Calculator, FlaskConical, Palette, Users, Monitor, Languages,
   ShieldCheck, Heart, Trophy, Sparkles, MessageCircle, Phone, MapPin, ChevronRight,
@@ -38,9 +38,6 @@ const PRIMARY_FAQS: WaveOneFaq[] = [
   { q: "How can parents book a campus visit for the Primary Section?", a: "You can book a guided campus visit through the Admissions page, by WhatsApp or by calling the admissions desk. Visits include a walkthrough of the primary classrooms, library, activity areas and sports facilities." },
   { q: "What makes RIS a good CBSE primary school in Thane?", a: "Strong literacy and numeracy foundation, CBSE-aligned curriculum, activity-based classrooms, female-staff-led safe environment, integrated co-curriculars and a smooth transition to Middle School make RIS a trusted choice for parents in Thane." },
 ];
-
-const PRIMARY_QUICK_ANSWER =
-  "The Primary Section at Rainbow International School Thane covers Class 1 to Class 5 on the CBSE curriculum, with a strong foundation in literacy, numeracy, communication, values and co-curricular learning — in a safe, female-staff-led campus at Brahmand Phase 4. Class 1 to Class 5 admissions for 2026–27 are open subject to seat availability.";
 
 // ── Section data ──────────────────────────────────────────────────────────────
 const decisionCards = [
@@ -879,8 +876,6 @@ export default function Primary() {
           </div>
         </section>
 
-        {/* SEO sibling block (quick-answer paragraph for crawlers) */}
-        <WaveOneSeoBlock pageId="primary" quickAnswer={PRIMARY_QUICK_ANSWER} faqs={PRIMARY_FAQS} />
       </main>
 
       <Footer />
