@@ -166,8 +166,8 @@ export function HeroForm() {
               type="submit"
               disabled={isSubmitting}
               data-testid="button-hero-submit"
-              className="w-full py-3.5 font-bold text-[#091a4f] text-sm rounded-xl transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
-              style={{ background: "#fbbf24" }}
+              className="w-full py-3.5 font-bold text-white text-sm rounded-xl transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] disabled:opacity-60 flex items-center justify-center gap-2"
+              style={{ background: "linear-gradient(135deg, #091a4f 0%, #1a56db 100%)" }}
             >
               <CalendarCheck size={16} />
               {isSubmitting ? "Submitting…" : "Book a Campus Visit"}
@@ -180,7 +180,7 @@ export function HeroForm() {
               onClick={() => trackWhatsAppClick()}
               data-testid="button-hero-whatsapp"
               className="w-full py-3 font-bold text-white text-sm rounded-xl transition-all hover:opacity-90 hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2"
-              style={{ background: "#25D366" }}
+              style={{ background: "linear-gradient(135deg, #128c4b 0%, #25D366 100%)" }}
             >
               <MessageCircle size={17} />
               Chat on WhatsApp

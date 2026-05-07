@@ -86,8 +86,8 @@ function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
         <div className="flex items-center gap-2 flex-wrap mt-auto">
           <Link
             href={p.href}
-            className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border-2 transition-all hover:opacity-80"
-            style={{ color: p.accent, borderColor: p.accent }}
+            className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border-2 transition-all hover:bg-[#091a4f] hover:text-white"
+            style={{ color: "#091a4f", borderColor: "#091a4f" }}
             data-testid={`link-section-${index}`}
           >
             Explore <ArrowRight size={12} />
@@ -95,7 +95,7 @@ function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
           <a
             href="/admissions"
             className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all hover:opacity-80"
-            style={{ background: p.accent }}
+            style={{ background: "linear-gradient(135deg, #091a4f 0%, #1a56db 100%)" }}
             data-testid={`btn-enquire-grade-${index}`}
           >
             <MessageCircle size={12} />
