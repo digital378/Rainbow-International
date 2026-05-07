@@ -74,7 +74,7 @@ export default function ApplicationForm() {
       <PageBanner
         title="Application Form"
         subtitle="Admissions Open for Academic Year 2026–27"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Admissions", href: "/admissions" }, { label: "Application Form" }]}
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Admissions", href: "/admissions" }, { label: "Application Form" }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg"
       />
 

@@ -78,7 +78,7 @@ export default function ScheduleAppointment() {
       <PageBanner
         title="Schedule an Appointment"
         subtitle="We'd love to show you the Rainbow campus — book your visit today"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Schedule an Appointment" }]}
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Schedule an Appointment" }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg"
       />
 

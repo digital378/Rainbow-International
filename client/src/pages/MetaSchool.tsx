@@ -38,7 +38,7 @@ export default function MetaSchool() {
       <PageBanner
         title="Meta School 2025–26"
         subtitle="Rainbow International School — Meta for Education Partner"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Meta School 2025–26" }]}
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Meta School 2025–26" }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg"
       />
 

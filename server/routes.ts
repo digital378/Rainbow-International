@@ -1009,7 +1009,7 @@ export async function registerRoutes(
       const customer = client.Customer({
         customer_id: customerId,
         login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 
       const campaigns = await customer.query(`
@@ -1080,7 +1080,7 @@ export async function registerRoutes(
       const customer = client.Customer({
         customer_id: customerId,
         login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 
       const keywords = await customer.query(`

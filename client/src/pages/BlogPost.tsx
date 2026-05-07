@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useParams, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -9,7 +10,7 @@ import { Calendar, Tag, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react
 import { BlogThumb } from "@/components/home/BlogThumb";
 
 function renderInlineMarkdown(text: string) {
-  const parts: (string | JSX.Element)[] = [];
+  const parts: (string | React.ReactElement)[] = [];
   const regex = /\*\*(.+?)\*\*|\[(.+?)\]\((.+?)\)/g;
   let lastIndex = 0;
   let match: RegExpExecArray | null;

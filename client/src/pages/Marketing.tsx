@@ -796,7 +796,7 @@ export default function Marketing() {
                 const rpsMonths = liveData?.rpsCrm.byMonth.map(m => m.month) ?? [];
                 const risMonths = liveData?.risCrm.byMonth.map(m => m.month) ?? [];
                 const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
-                const allMonths = [...new Set([...rpsMonths, ...risMonths])].sort((a,b) => {
+                const allMonths = Array.from(new Set([...rpsMonths, ...risMonths])).sort((a,b) => {
                   const ai = MONTH_ORDER_UI.indexOf(a), bi = MONTH_ORDER_UI.indexOf(b);
                   return (ai<0?99:ai)-(bi<0?99:bi);
                 });
@@ -1026,7 +1026,7 @@ export default function Marketing() {
                     // Collect all unique centres across all months
                     const centreSet = new Set<string>();
                     liveData.rpsCrm.byMonth.forEach(m => m.branches.forEach(b => centreSet.add(b.centre)));
-                    const centres = [...centreSet].sort();
+                    const centres = Array.from(centreSet).sort();
                     if (!months.length || !centres.length) return null;
                     // Build matrix: centre → month → closed
                     const matrix: Record<string, Record<string, number>> = {};

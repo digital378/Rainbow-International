@@ -38,7 +38,7 @@ export default function GoogleSchool() {
       <PageBanner
         title="Google School 2025–26"
         subtitle="Rainbow International School — Certified Google for Education Partner"
-        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Google School 2025–26" }]}
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Google School 2025–26" }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-thane-student-aminities-elearning-classrooms-600x400-1.jpg"
       />
 
