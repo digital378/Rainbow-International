@@ -1,0 +1,124 @@
+Redesign and improve the Rainbow International School admissions page to increase parent enquiries, campus visit bookings, and completed admission applications.
+
+Page URL to improve:
+https://rainbowinternationalschool.in/application-form/
+
+Objective:
+Convert the current admissions page from a basic application form into a high-converting admissions landing page for Admissions Open 2026–27.
+
+Target audience:
+Parents in Thane and nearby areas looking for a reputed CBSE school for Nursery to Class 12.
+
+Key messaging:
+Rainbow International School is a CBSE-affiliated Nursery to Class 12 school in Thane, established in 2009, with a 3.5-acre campus, strong academics, sports facilities, safety focus, transport support, and a complete school experience.
+
+Required page structure:
+
+1. Hero section
+Create a strong top section with:
+- Headline: “Admissions Open 2026–27”
+- Sub-headline: “CBSE Affiliated School in Thane | Nursery to Class 12”
+- Short trust line: “Established in 2009 | 3.5-acre campus | 3,000+ students”
+- Primary CTA: “Book a Campus Visit”
+- Secondary CTA: “Apply Now”
+- Mobile CTA buttons: Call, WhatsApp, Book Visit
+
+2. Why choose RIS section
+Add 6 clear benefit cards:
+- CBSE-affiliated curriculum
+- Nursery to Class 12 education
+- 3.5-acre modern campus
+- Strong academics and co-curricular learning
+- Sports and activity infrastructure
+- Safe, parent-friendly school environment
+
+3. Admission journey section
+Show a simple 5-step process:
+- Submit enquiry/application
+- Counsellor call-back
+- Campus visit and counselling
+- Student interaction/document review
+- Admission confirmation and fee payment
+
+4. Grade-wise admissions section
+Create separate blocks for:
+- Pre-Primary
+- Primary
+- Middle School
+- Secondary School
+- Senior Secondary
+
+Each block should briefly mention the parent concern and RIS advantage.
+
+5. Documents required section
+Add a clean checklist:
+- Birth certificate
+- Student photographs
+- Parent photographs
+- Aadhaar/passport copy if applicable
+- Previous school report card
+- Transfer certificate, where applicable
+- Address proof
+
+6. Parent trust section
+Add space for:
+- Parent testimonials
+- Google review highlights
+- Campus photos
+- Student achievements
+- Safety and transport assurance
+
+7. FAQ section
+Add FAQs for:
+- Which board is RIS affiliated to?
+- Which classes are admissions open for?
+- What is the admission process?
+- Is transport available?
+- What documents are required?
+- Is there an admission interaction or assessment?
+- How can parents book a campus visit?
+- What are the school timings?
+- Are senior secondary streams available?
+
+8. Lead form improvement
+Keep the form simple and mobile-friendly.
+Required fields only:
+- Parent name
+- Mobile number
+- Child name
+- Grade applying for
+- Location
+- Preferred campus visit date
+- Message, optional
+
+After form submission, show:
+“Thank you. Our admissions counsellor will contact you shortly to guide you through the next step.”
+
+9. Mobile conversion requirements
+Add sticky buttons at the bottom of the mobile screen:
+- Call
+- WhatsApp
+- Book Visit
+- Apply Now
+
+10. SEO requirements
+Optimize for:
+- CBSE school in Thane
+- Admissions open in Thane
+- Best school in Thane
+- Nursery admission in Thane
+- Class 11 admission in Thane
+- International school in Thane
+
+Add FAQ schema, clear H1/H2 structure, compressed images, and fast-loading sections.
+
+11. Performance requirements
+Improve mobile speed by:
+- Reducing unused JavaScript
+- Compressing images
+- Lazy-loading gallery images
+- Avoiding heavy animations above the fold
+- Keeping the lead form fast and simple
+
+Expected final output:
+A polished, parent-friendly admissions landing page that builds trust, explains the admission process clearly, and increases enquiry submissions, WhatsApp clicks, phone calls, and campus visit bookings.
