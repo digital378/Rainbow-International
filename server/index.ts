@@ -19,6 +19,18 @@ app.get("/global-brand-associations", (req, res) => {
 });
 
 if (process.env.NODE_ENV === "production") {
+  // Block staging / non-production hosts from being indexed by search engines.
+  // Production canonical host is rainbowinternationalschool.in.
+  app.use((req, res, next) => {
+    const host = (req.hostname || "").toLowerCase();
+    const isProductionHost =
+      host === "rainbowinternationalschool.in" || host === "www.rainbowinternationalschool.in";
+    if (!isProductionHost) {
+      res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    }
+    next();
+  });
+
   app.use((req, res, next) => {
     const host = req.hostname;
     if (host && host.startsWith("www.") && host.includes("rainbowinternationalschool.in")) {

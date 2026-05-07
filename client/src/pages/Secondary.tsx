@@ -128,11 +128,12 @@ export default function Secondary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Secondary School in Thane | CBSE Class 9 & 10 | Rainbow International School"
-        description="Explore the Secondary School section at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and Class 10 with strong academics, board exam preparation, assessments, activities and holistic growth."
+        title="Secondary School in Thane | CBSE Class 9 & 10"
+        description="Explore Secondary School at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and 10 with academics, assessments and board preparation."
         keywords="secondary school in Thane, CBSE secondary school in Thane, best secondary school in Thane, Class 9 admission in Thane, Class 10 admission in Thane, CBSE board school for Class 10 in Thane, Class 10 board preparation Thane, secondary school near Hiranandani Estate, secondary school near Ghodbunder Road, secondary school near Brahmand Thane, secondary school near Manpada, secondary school near Kavesar, secondary school near Kolshet"
         canonical="https://rainbowinternationalschool.in/secondary-section"
         ogImage="/images/home/academic/secondary-section.jpg"
+        appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/secondary-section" },
@@ -142,10 +143,37 @@ export default function Secondary() {
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@type": "WebPage",
+              "@id": "https://rainbowinternationalschool.in/secondary-section#webpage",
+              "url": "https://rainbowinternationalschool.in/secondary-section",
+              "name": "Secondary School in Thane | CBSE Class 9 & 10",
+              "description": "CBSE-affiliated Secondary School (Class 9 and Class 10) at Rainbow International School, Thane.",
+              "inLanguage": "en-IN",
+              "isPartOf": { "@id": "https://rainbowinternationalschool.in/#website" },
+              "about": { "@id": "https://rainbowinternationalschool.in/#school" },
+            },
+            {
+              "@type": ["EducationalOrganization", "School"],
+              "@id": "https://rainbowinternationalschool.in/#school",
+              "name": "Rainbow International School",
+              "url": "https://rainbowinternationalschool.in/",
+              "telephone": "+91 82915 68972",
+              "email": "info@rainbowinternationalschool.in",
+              "sameAs": ["https://maps.app.goo.gl/mfJjMMkksCkcXzMCA"],
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
+                "addressLocality": "Thane West",
+                "addressRegion": "Maharashtra",
+                "postalCode": "400607",
+                "addressCountry": "IN",
+              },
+            },
+            {
               "@type": "EducationalOccupationalProgram",
               "name": "Secondary School (Class 9–10)",
               "description": "CBSE-affiliated secondary school education for Class 9 and Class 10 in Thane, with structured board preparation, regular assessments, doubt-clearing and academic mentoring.",
-              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "provider": { "@id": "https://rainbowinternationalschool.in/#school" },
               "educationalProgramMode": "full-time",
               "programPrerequisites": "Completion of Middle School / Class 8",
               "url": "https://rainbowinternationalschool.in/secondary-section",
@@ -168,7 +196,7 @@ export default function Secondary() {
             <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
           </span>
           <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
-            Secondary School in Thane <br className="hidden sm:block" /><span style={{ color: AMBER_LIGHT }}>Class 9 and Class 10</span>
+            Secondary School in Thane <span className="text-white/40 font-normal">|</span> <span style={{ color: AMBER_LIGHT }}>Class 9 and Class 10</span>
           </h1>
           <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">Building subject mastery, exam confidence, discipline and future readiness during the crucial board preparation years.</p>
           <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">A CBSE-aligned Secondary School experience for Class 9 and Class 10 with strong academics, structured assessment, teacher guidance, co-curricular balance and preparation for higher studies.</p>

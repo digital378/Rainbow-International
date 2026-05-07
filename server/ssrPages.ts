@@ -4,7 +4,8 @@ function e(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function seoTitle(t: string): string {
+function seoTitle(t: string, appendSiteName: boolean = true): string {
+  if (!appendSiteName) return t;
   return t.includes("Rainbow International") ? t : `${t} | Rainbow International School`;
 }
 
@@ -19,6 +20,7 @@ interface PageSSRConfig {
   breadcrumbs: { name: string; url: string }[];
   jsonLd: Record<string, unknown>;
   renderBody: () => string;
+  appendSiteName?: boolean;
 }
 
 function shell(cfg: PageSSRConfig): string {
@@ -38,12 +40,12 @@ function shell(cfg: PageSSRConfig): string {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>${e(seoTitle(cfg.title))}</title>
+<title>${e(seoTitle(cfg.title, cfg.appendSiteName))}</title>
 <meta name="description" content="${e(cfg.description)}"/>
 <meta name="keywords" content="${e(cfg.keywords)}"/>
 <meta name="robots" content="index, follow"/>
 <link rel="canonical" href="${e(cfg.canonical)}"/>
-<meta property="og:title" content="${e(seoTitle(cfg.title))}"/>
+<meta property="og:title" content="${e(seoTitle(cfg.title, cfg.appendSiteName))}"/>
 <meta property="og:description" content="${e(cfg.description)}"/>
 <meta property="og:url" content="${e(cfg.canonical)}"/>
 <meta property="og:type" content="website"/>
@@ -1347,8 +1349,9 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/middle-school-section",
-    title: "Middle School in Thane — Class 6 to 8 CBSE | Rainbow International School",
-    description: "Middle school section (Class 6–8) at Rainbow International School, Thane. CBSE curriculum, project-based learning, science labs, MUN, robotics.",
+    appendSiteName: false,
+    title: "Middle School in Thane | CBSE Class 6 to 8",
+    description: "Explore Middle School at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to 8 with academics, activities, safety and holistic learning.",
     keywords: "middle school Thane, Class 6 to 8 CBSE Thane, best middle school Thane, CBSE school Class 6 7 8 Thane",
     canonical: "https://rainbowinternationalschool.in/middle-school-section",
     breadcrumbs: [
@@ -1360,8 +1363,9 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/secondary-section",
-    title: "Secondary School in Thane — Class 9 & 10 CBSE | Rainbow International School",
-    description: "Secondary section (Class 9–10) at Rainbow International School, Thane. CBSE board exam prep, mock tests, career counselling, outstanding results.",
+    appendSiteName: false,
+    title: "Secondary School in Thane | CBSE Class 9 & 10",
+    description: "Explore Secondary School at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and 10 with academics, assessments and board preparation.",
     keywords: "secondary school Thane, Class 9 10 CBSE Thane, CBSE board exam school Thane, Class 10 school Thane",
     canonical: "https://rainbowinternationalschool.in/secondary-section",
     breadcrumbs: [
@@ -1373,8 +1377,9 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/senior-secondary-section",
-    title: "Senior Secondary in Thane — Class 11 & 12 Science Commerce Humanities | Rainbow International School",
-    description: "Senior secondary (Class 11–12) at Rainbow International School, Thane. Science, Commerce, Humanities streams. JEE, NEET, CUET preparation. CBSE board.",
+    appendSiteName: false,
+    title: "Senior Secondary in Thane | CBSE Class 11 & 12",
+    description: "Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and 12 with board preparation and career readiness.",
     keywords: "senior secondary school Thane, Class 11 12 Thane, Science Commerce Humanities Thane, CBSE Class 12 school Thane, JEE NEET school Thane",
     canonical: "https://rainbowinternationalschool.in/senior-secondary-section",
     breadcrumbs: [

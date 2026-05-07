@@ -140,11 +140,12 @@ export default function MiddleSchool() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Middle School in Thane | CBSE Class 6 to 8 | Rainbow International School"
-        description="Explore the Middle School section at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to Class 8 with strong academics, confidence building, activities, safety and holistic learning."
+        title="Middle School in Thane | CBSE Class 6 to 8"
+        description="Explore Middle School at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to 8 with academics, activities, safety and holistic learning."
         keywords="middle school in Thane, CBSE middle school in Thane, best middle school in Thane, Class 6 admission in Thane, Class 7 admission in Thane, Class 8 admission in Thane, middle school near Hiranandani Estate, middle school near Ghodbunder Road, middle school near Brahmand Phase 4, middle school near Manpada, middle school near Kavesar, middle school near Kolshet"
         canonical="https://rainbowinternationalschool.in/middle-school-section"
         ogImage="/images/home/academic/middle-section.jpg"
+        appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/middle-school-section" },
@@ -154,10 +155,37 @@ export default function MiddleSchool() {
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@type": "WebPage",
+              "@id": "https://rainbowinternationalschool.in/middle-school-section#webpage",
+              "url": "https://rainbowinternationalschool.in/middle-school-section",
+              "name": "Middle School in Thane | CBSE Class 6 to 8",
+              "description": "CBSE-affiliated Middle School (Class 6 to Class 8) at Rainbow International School, Thane.",
+              "inLanguage": "en-IN",
+              "isPartOf": { "@id": "https://rainbowinternationalschool.in/#website" },
+              "about": { "@id": "https://rainbowinternationalschool.in/#school" },
+            },
+            {
+              "@type": ["EducationalOrganization", "School"],
+              "@id": "https://rainbowinternationalschool.in/#school",
+              "name": "Rainbow International School",
+              "url": "https://rainbowinternationalschool.in/",
+              "telephone": "+91 82915 68972",
+              "email": "info@rainbowinternationalschool.in",
+              "sameAs": ["https://maps.app.goo.gl/mfJjMMkksCkcXzMCA"],
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
+                "addressLocality": "Thane West",
+                "addressRegion": "Maharashtra",
+                "postalCode": "400607",
+                "addressCountry": "IN",
+              },
+            },
+            {
               "@type": "EducationalOccupationalProgram",
               "name": "Middle School (Class 6–8)",
               "description": "CBSE-affiliated middle school education for Class 6 to Class 8 in Thane, covering English, Mathematics, Science, Social Science, Hindi, Marathi, Computer Studies and co-curricular learning.",
-              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "provider": { "@id": "https://rainbowinternationalschool.in/#school" },
               "educationalProgramMode": "full-time",
               "programPrerequisites": "Completion of Primary / Class 5",
               "url": "https://rainbowinternationalschool.in/middle-school-section",
@@ -180,7 +208,7 @@ export default function MiddleSchool() {
             <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
           </span>
           <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
-            Middle School in Thane <br className="hidden sm:block" /><span style={{ color: AMBER_LIGHT }}>Class 6 to Class 8</span>
+            Middle School in Thane <span className="text-white/40 font-normal">|</span> <span style={{ color: AMBER_LIGHT }}>Class 6 to Class 8</span>
           </h1>
           <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">Building academic confidence, independent thinking, communication skills and strong subject foundations for the middle years.</p>
           <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">A CBSE-aligned Middle School experience for Class 6 to Class 8 with structured academics, activity-based learning, values, sports, technology exposure and a safe learning environment.</p>

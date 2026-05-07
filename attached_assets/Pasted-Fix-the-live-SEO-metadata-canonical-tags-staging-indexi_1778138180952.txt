@@ -1,0 +1,232 @@
+Fix the live SEO metadata, canonical tags, staging indexing, and mobile performance issues for these three Rainbow International School pages:
+
+1. https://rainbowinternationalschool.in/middle-school-section
+2. https://rainbowinternationalschool.in/secondary-section
+3. https://rainbowinternationalschool.in/senior-secondary-section
+
+Do not redesign the pages again unless required. Preserve the current page layouts and content. Fix only the SEO, indexing, speed, schema, CTA and validation issues listed below.
+
+1. Meta titles
+
+Ensure each page has a unique meta title under 65 characters.
+
+Use these exact meta titles:
+
+Middle School:
+Middle School in Thane | CBSE Class 6 to 8
+
+Secondary School:
+Secondary School in Thane | CBSE Class 9 & 10
+
+Senior Secondary:
+Senior Secondary in Thane | CBSE Class 11 & 12
+
+Important:
+Do not allow these pages to inherit the generic home page title.
+Do not add “Rainbow International School” to the meta title because it may exceed the ideal length.
+
+2. Meta descriptions
+
+Ensure each page has a unique meta description between 140 and 160 characters where possible.
+
+Use these exact meta descriptions:
+
+Middle School:
+Explore Middle School at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to 8 with academics, activities, safety and holistic learning.
+
+Secondary School:
+Explore Secondary School at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and 10 with academics, assessments and board preparation.
+
+Senior Secondary:
+Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and 12 with board preparation and career readiness.
+
+3. H1 tags
+
+Confirm each page has one H1 only.
+
+Use these exact H1 tags:
+
+Middle School:
+Middle School in Thane | Class 6 to Class 8
+
+Secondary School:
+Secondary School in Thane | Class 9 and Class 10
+
+Senior Secondary:
+Senior Secondary School in Thane | Class 11 and Class 12
+
+4. Canonical tags
+
+Add or confirm canonical tags for the production pages.
+
+Middle School canonical:
+https://rainbowinternationalschool.in/middle-school-section
+
+Secondary School canonical:
+https://rainbowinternationalschool.in/secondary-section
+
+Senior Secondary canonical:
+https://rainbowinternationalschool.in/senior-secondary-section
+
+5. Staging indexing fix
+
+Fix staging indexing urgently.
+
+For all pages on staging.rainbowinternationalschool.in:
+- Add meta robots: noindex, nofollow
+- Remove staging URLs from sitemap
+- Ensure production sitemap only contains live rainbowinternationalschool.in URLs
+- If staging pages must remain accessible, ensure they are not indexable
+- Add canonical to the live production URL where technically appropriate
+
+6. Grade isolation validation
+
+Confirm strict grade isolation.
+
+Middle School page must focus only on:
+- Class 6
+- Class 7
+- Class 8
+
+Secondary School page must focus only on:
+- Class 9
+- Class 10
+
+Senior Secondary page must focus only on:
+- Class 11
+- Class 12
+
+Do not mix grade groups across pages except for small progression links such as:
+- Explore Secondary School
+- Explore Senior Secondary
+- Explore Admissions
+
+7. Schema validation
+
+Check and fix structured data on all three pages.
+
+Each page should include:
+- WebPage schema
+- EducationalOrganization or School schema
+- Breadcrumb schema
+- FAQ schema, if FAQ section is present
+
+Schema must match the correct grade level:
+- Middle School: Class 6 to Class 8
+- Secondary School: Class 9 and Class 10
+- Senior Secondary: Class 11 and Class 12
+
+Use accurate school details:
+School name:
+Rainbow International School
+
+Location:
+Brahmand Phase 4, Thane, Maharashtra
+
+Board:
+CBSE
+
+8. Mobile performance fix
+
+Current mobile performance is still weak and must be improved.
+
+Current approximate scores:
+- Middle School: around 60
+- Secondary School: around 66
+- Senior Secondary: around 59
+
+Target:
+- Mobile performance score: 85+
+- LCP below 2.5 seconds
+- FCP below 1.8 seconds
+- CLS below 0.1
+
+Main issue:
+Unused JavaScript is around 295–296 KiB on these pages.
+
+Required performance actions:
+- Reduce unused JavaScript
+- Remove unnecessary scripts and plugins from these pages
+- Defer non-critical JavaScript
+- Compress all images
+- Convert images to WebP
+- Use responsive image sizes
+- Lazy-load below-the-fold images
+- Preload only the hero image
+- Avoid heavy sliders and large background images
+- Remove heavy animations
+- Minify CSS and JavaScript
+- Optimize fonts
+- Avoid unnecessary font weights
+- Ensure images have fixed width and height to prevent layout shift
+
+9. Mobile UX validation
+
+Confirm the mobile layout works properly on all three pages.
+
+Check:
+- No horizontal scrolling
+- Hero headline readable on mobile
+- CTA buttons stack cleanly
+- Trust chips do not overflow badly
+- Cards are one-column on mobile
+- FAQ accordions open smoothly
+- Sticky mobile CTA remains visible
+- Floating WhatsApp/chat button does not overlap sticky CTA
+- Header does not consume too much vertical screen space
+- Tap targets are large enough
+
+10. CTA validation
+
+Confirm all CTA buttons work correctly.
+
+Track and test:
+- Enquire button
+- Book Campus Visit button
+- WhatsApp button
+- Call button
+- Get Directions button
+- Check Transport Availability button
+- Admissions page button
+- Fee structure button
+- Related academic section button
+
+All admissions and enquiry CTAs should route to the correct Admissions page or relevant section.
+
+11. GA4 and GTM tracking
+
+Ensure these events are tracked through GA4 and Google Tag Manager:
+
+- Enquire for grade group click
+- Enquire for this Class click
+- Book Campus Visit click
+- WhatsApp click
+- Call click
+- Get Directions click
+- Check Transport Availability click
+- FAQ interaction
+- Admissions page click
+- Fee structure click
+- Related academic section click
+- Stream card click on Senior Secondary page, if applicable
+
+12. Final validation checklist
+
+After changes, confirm:
+
+- Each page has a unique meta title under 65 characters
+- Each page has a unique meta description
+- Each page has one H1 only
+- Canonical tags are correct
+- Staging pages are noindex, nofollow
+- Staging URLs are removed from sitemap
+- Production sitemap contains only live URLs
+- FAQ schema is valid
+- Breadcrumb schema is valid
+- Grade isolation is correct
+- Mobile sticky CTA works
+- WhatsApp, call, enquiry and book visit buttons work
+- No horizontal scroll on mobile
+- Pages render correctly on desktop and mobile
+- No unrelated files are modified
+- TypeScript/build check passes

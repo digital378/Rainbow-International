@@ -152,11 +152,12 @@ export default function SeniorSecondary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Senior Secondary School in Thane | CBSE Class 11 & 12 | Rainbow International School"
-        description="Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and Class 12 with focused academics, board preparation, stream guidance, career readiness and holistic growth."
+        title="Senior Secondary in Thane | CBSE Class 11 & 12"
+        description="Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and 12 with board preparation and career readiness."
         keywords="senior secondary school in Thane, CBSE senior secondary school in Thane, best senior secondary school in Thane, Class 11 admission in Thane, Class 12 admission in Thane, Science stream school in Thane, Commerce stream school in Thane, Humanities stream school in Thane, Class 12 board preparation school in Thane, senior secondary near Hiranandani Estate, senior secondary near Ghodbunder Road, senior secondary near Brahmand Thane, senior secondary near Manpada, senior secondary near Kavesar, senior secondary near Kolshet"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section"
         ogImage="/images/home/academic/senior-secondary.jpg"
+        appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
@@ -166,10 +167,37 @@ export default function SeniorSecondary() {
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@type": "WebPage",
+              "@id": "https://rainbowinternationalschool.in/senior-secondary-section#webpage",
+              "url": "https://rainbowinternationalschool.in/senior-secondary-section",
+              "name": "Senior Secondary in Thane | CBSE Class 11 & 12",
+              "description": "CBSE-affiliated Senior Secondary (Class 11 and Class 12) at Rainbow International School, Thane — Science, Commerce and Humanities.",
+              "inLanguage": "en-IN",
+              "isPartOf": { "@id": "https://rainbowinternationalschool.in/#website" },
+              "about": { "@id": "https://rainbowinternationalschool.in/#school" },
+            },
+            {
+              "@type": ["EducationalOrganization", "School"],
+              "@id": "https://rainbowinternationalschool.in/#school",
+              "name": "Rainbow International School",
+              "url": "https://rainbowinternationalschool.in/",
+              "telephone": "+91 82915 68972",
+              "email": "info@rainbowinternationalschool.in",
+              "sameAs": ["https://maps.app.goo.gl/mfJjMMkksCkcXzMCA"],
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
+                "addressLocality": "Thane West",
+                "addressRegion": "Maharashtra",
+                "postalCode": "400607",
+                "addressCountry": "IN",
+              },
+            },
+            {
               "@type": "EducationalOccupationalProgram",
               "name": "Senior Secondary (Class 11–12)",
               "description": "CBSE-affiliated senior secondary education for Class 11 and Class 12 in Thane, with Science, Commerce and Humanities streams, structured board preparation and career guidance.",
-              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
+              "provider": { "@id": "https://rainbowinternationalschool.in/#school" },
               "educationalProgramMode": "full-time",
               "programPrerequisites": "Completion of Class 10 / CBSE AISSE",
               "url": "https://rainbowinternationalschool.in/senior-secondary-section",
@@ -193,7 +221,7 @@ export default function SeniorSecondary() {
             <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
           </span>
           <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
-            Senior Secondary School in Thane <br className="hidden sm:block" /><span style={{ color: AMBER_LIGHT }}>Class 11 and Class 12</span>
+            Senior Secondary School in Thane <span className="text-white/40 font-normal">|</span> <span style={{ color: AMBER_LIGHT }}>Class 11 and Class 12</span>
           </h1>
           <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">Preparing students for board success, career choices, higher education and life beyond school.</p>
           <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">A CBSE-aligned Senior Secondary experience for Class 11 and Class 12 with focused academics, stream guidance, board preparation, career readiness, leadership exposure and a supportive learning environment.</p>

@@ -14,10 +14,11 @@ interface SEOProps {
   robots?: string;
   breadcrumbs?: BreadcrumbItem[];
   jsonLd?: Record<string, unknown>;
+  appendSiteName?: boolean;
 }
 
-export function SEO({ title, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd }: SEOProps) {
-  const fullTitle = title.includes("Rainbow International") ? title : `${title} | Rainbow International School`;
+export function SEO({ title, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd, appendSiteName = true }: SEOProps) {
+  const fullTitle = !appendSiteName || title.includes("Rainbow International") ? title : `${title} | Rainbow International School`;
   const defaultImage = "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg";
 
   useEffect(() => {
