@@ -1,390 +1,570 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
-import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import { buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import {
+  BookOpen, Calculator, FlaskConical, TrendingUp, Heart, Briefcase,
+  ShieldCheck, Sparkles, MessageCircle, Phone, MapPin, ChevronRight, GraduationCap,
+  ClipboardCheck, Bus, ArrowRight, CheckCircle2, Compass, Brain, Lightbulb,
+  Target, BookMarked, Award, RefreshCw, Clock, Trophy, Users, Rocket,
+} from "lucide-react";
+import { useState } from "react";
+import { trackCallClick, trackWhatsAppClick, trackDirectionsClick, trackEvent } from "@/lib/analytics";
 
-const SENIOR_QUICK_ANSWER =
-  "Senior Secondary at Rainbow International School Thane covers CBSE Class 11 and Class 12 with Science, Commerce and Humanities streams, structured CBSE board preparation, career counselling for stream and college choice, and JEE, NEET and CUET prep support. Class 11 admissions for 2026-27 are now open at the Brahmand campus.";
+const NAVY = "#091a4f";
+const NAVY_MID = "#0d3b86";
+const AMBER = "#d97706";
+const AMBER_LIGHT = "#f59e0b";
 
-const SENIOR_FAQS: WaveOneFaq[] = [
-  { q: "Which streams are offered in Class 11 and 12?", a: "Science, Commerce and Humanities streams are offered for Class 11 and 12 at RIS Thane." },
-  { q: "Does the school support JEE, NEET and CUET preparation?", a: "Yes, the school provides preparation guidance and study support for JEE, NEET and CUET alongside the regular CBSE curriculum." },
-  { q: "How do I apply for Class 11 admission?", a: "Class 11 applications open after Class 10 results. Submit the online enquiry on the Admissions page or contact the admission desk." },
-  { q: "Where can I see senior secondary results?", a: "Recent CBSE Class 12 results are highlighted on the Student Achievements page." },
-  { q: "Is career counselling available for senior students?", a: "Yes. Senior students receive structured career counselling for stream selection and college applications." },
+const WHATSAPP_URL = "https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20Senior%20Secondary%20%28Class%2011%26%2012%29%20admission%20at%20Rainbow%20International%20School.";
+const PHONE = "+912225976097";
+const DIRECTIONS_URL = "https://maps.google.com/?q=Rainbow+International+School+Brahmand+Phase+4+Thane";
+
+const FAQS: WaveOneFaq[] = [
+  { q: "Which classes are included in the Senior Secondary section at Rainbow International School?", a: "Our Senior Secondary section covers Class 11 and Class 12, following the CBSE curriculum and leading up to the CBSE Class 12 board examination." },
+  { q: "Is the Senior Secondary section CBSE-aligned?", a: "Yes. The Senior Secondary section is CBSE-affiliated and prepares students for the CBSE All India Senior School Certificate Examination (Class 12 board exam)." },
+  { q: "Which streams are available for Class 11 and Class 12?", a: "RIS offers Science, Commerce and Humanities streams for Class 11 and Class 12. Final stream and subject combinations are confirmed by the admissions team based on availability for each batch." },
+  { q: "What subjects are offered in Class 11?", a: "Science: Physics, Chemistry, Mathematics or Biology, English, Hindi (Core) and Computer Science. Commerce: Mathematics, Economics, Business Studies, Accountancy, English and Computer Science. Humanities: Psychology, Economics, History, Political Science, English and additional electives. Final electives are confirmed at admission." },
+  { q: "How does RIS support Class 12 board exam preparation?", a: "Through structured CBSE board preparation — concept clarity, regular assessments, pre-board exams, revision plans aligned to CBSE sample papers, doubt-clearing sessions and individual academic mentoring." },
+  { q: "How does RIS help students choose the right stream?", a: "Through stream and career counselling — students and parents discuss aptitude, interests, future pathways and subject combinations before stream selection at the start of Class 11." },
+  { q: "Does RIS provide career guidance or higher education orientation?", a: "Yes. Senior Secondary students receive career awareness sessions, higher education orientation, college and entrance exam guidance, and support for stream-aligned career pathways." },
+  { q: "Are co-curricular activities available for Senior Secondary students?", a: "Yes. Sports, fitness, clubs, student leadership roles, events, competitions and value-based activities continue in the Senior Secondary timetable to balance academics with growth." },
+  { q: "How are Class 11 and Class 12 students assessed?", a: "Through continuous evaluation — class participation, assignments, projects and practical work, periodic tests, pre-board or board-oriented assessments, revision performance, teacher observation and regular parent updates." },
+  { q: "Is transport available for Senior Secondary students?", a: "Yes. School transport covers Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet, Pokhran Road and nearby Thane areas. Please confirm route availability with the admissions team." },
+  { q: "Is RIS convenient for Class 11 and Class 12 admissions near Hiranandani Estate?", a: "Yes. Our Brahmand Phase 4 campus is easily reachable from Hiranandani Estate, with transport available on this route for Senior Secondary students." },
+  { q: "Is RIS convenient for Senior Secondary admissions near Ghodbunder Road?", a: "Yes. Many of our Class 11 and 12 families travel along Ghodbunder Road, and transport routes cover this corridor." },
+  { q: "How can students enquire for Class 11 admission?", a: "Submit the admission enquiry on the Admissions page, WhatsApp us, or call the admissions desk. Class 11 admissions typically open after Class 10 board results — please confirm dates with the team." },
+  { q: "How can students enquire for Class 12 admission?", a: "Class 12 admissions are subject to seat availability and stream fit. Please connect with the admissions team to discuss the next steps." },
+  { q: "How can parents book a campus visit for Senior Secondary?", a: "Book a guided campus visit through the Admissions page, by WhatsApp or by calling the admissions desk. Visits include a walkthrough of senior classrooms, science labs, library and activity spaces." },
+  { q: "What makes RIS a good Senior Secondary School in Thane?", a: "Focused CBSE academics, stream and career guidance, structured board preparation, leadership exposure, balanced co-curriculars and a supportive learning environment make RIS a trusted choice for Class 11 and 12 students in Thane." },
 ];
 
-// ── 3 Streams ─────────────────────────────────────────────────────
+const decisionCards = [
+  { icon: GraduationCap, title: "Focused CBSE Academic Preparation", body: "Concept-led teaching across stream subjects aligned to the CBSE Class 12 syllabus." },
+  { icon: Compass, title: "Stream and Subject Guidance", body: "Counselling-led stream selection with subject combinations matched to student aspirations." },
+  { icon: Target, title: "Board Exam Readiness", body: "Periodic tests, pre-boards, revision plans and CBSE sample-paper practice for Class 12." },
+  { icon: Rocket, title: "Career and Higher Education Orientation", body: "Awareness sessions, college guidance and entrance-exam-aligned planning." },
+  { icon: Users, title: "Leadership and Communication Skills", body: "Student council, presentations, clubs and events that grow real-world confidence." },
+  { icon: Heart, title: "Supportive Teachers and Learning Environment", body: "Mentor-style teachers, individual academic support and a calm, focused campus." },
+];
+
+const journey = [
+  { grade: "Class 11", body: "Students build strong foundations in their selected stream, adjust to higher academic expectations, strengthen study routines and begin career-oriented thinking." },
+  { grade: "Class 12", body: "Students focus on board exam preparation, revision, assessments, higher education readiness, confidence, discipline and future planning." },
+];
+
+const gradeAdmissions = [
+  { grade: "Class 11", title: "Class 11 Admission in Thane", body: "A crucial year for stream selection, academic foundation, career direction and building the right study habits for Senior Secondary success." },
+  { grade: "Class 12", title: "Class 12 Admission in Thane", body: "Focused preparation for board examinations, revision, assessments, confidence building and higher education readiness." },
+];
+
 const streams = [
   {
-    stream: "Commerce",
-    color: "#fff7e0", accent: "#d97706", border: "#fde68a",
-    icon: (
-      <svg viewBox="0 0 80 80" fill="none" className="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
-        <rect x="8" y="24" width="48" height="38" rx="4" stroke="#d97706" strokeWidth="2.5"/>
-        <line x1="8" y1="34" x2="56" y2="34" stroke="#d97706" strokeWidth="2.5"/>
-        <circle cx="60" cy="52" r="16" fill="#fffbeb" stroke="#d97706" strokeWidth="2.5"/>
-        <line x1="60" y1="44" x2="60" y2="60" stroke="#d97706" strokeWidth="2"/>
-        <line x1="52" y1="52" x2="68" y2="52" stroke="#d97706" strokeWidth="2"/>
-        <path d="M16 42 L20 38 L24 44 L28 40 L32 46" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-    subjects: ["Hindi (Core)", "Mathematics", "Economics", "Business Studies", "Accountancy", "Computer Science"],
+    name: "Science Stream",
+    description: "For students interested in science, technology, medicine, engineering, research or applied sciences.",
+    suitable: "Aspiring engineers, doctors, researchers and applied science professionals.",
+    direction: "Physics, Chemistry, Mathematics or Biology, English, Hindi (Core), Computer Science.",
+    skills: "Analytical thinking, scientific reasoning, problem-solving, lab skills.",
+    pathways: "Engineering (JEE), Medical (NEET), Pure Sciences, Research, CUET-based programs.",
+    color: "#e0edff", accent: NAVY_MID, icon: FlaskConical,
   },
   {
-    stream: "Science",
-    color: "#e0edff", accent: "#0d3b86", border: "#bfdbfe",
-    icon: (
-      <svg viewBox="0 0 80 80" fill="none" className="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
-        <path d="M28 12 L28 38 L12 62 Q10 66 14 68 H66 Q70 66 68 62 L52 38 L52 12" stroke="#0d3b86" strokeWidth="2.5" strokeLinejoin="round"/>
-        <line x1="22" y1="12" x2="58" y2="12" stroke="#0d3b86" strokeWidth="2.5"/>
-        <circle cx="36" cy="52" r="5" fill="#dbeafe" stroke="#0d3b86" strokeWidth="2"/>
-        <circle cx="50" cy="58" r="3" fill="#dbeafe" stroke="#0d3b86" strokeWidth="2"/>
-      </svg>
-    ),
-    subjects: ["Hindi (Core)", "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science"],
+    name: "Commerce Stream",
+    description: "For students interested in business, finance, entrepreneurship, accounting, economics or management.",
+    suitable: "Aspiring CAs, finance professionals, business leaders and economists.",
+    direction: "Mathematics, Economics, Business Studies, Accountancy, English, Computer Science.",
+    skills: "Quantitative reasoning, financial literacy, business thinking, communication.",
+    pathways: "B.Com, BBA, CA, CFA, Economics, Management, CUET-based programs.",
+    color: "#fff7e0", accent: AMBER, icon: TrendingUp,
   },
   {
-    stream: "Humanities",
-    color: "#fdf2f8", accent: "#be185d", border: "#fbcfe8",
-    icon: (
-      <svg viewBox="0 0 80 80" fill="none" className="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
-        <path d="M40 20 C20 20 12 32 12 44 C12 58 26 68 40 68 C54 68 68 58 68 44 C68 32 60 20 40 20Z" stroke="#be185d" strokeWidth="2.5"/>
-        <path d="M28 36 C28 30 36 26 40 30 C44 26 52 30 52 36 C52 44 40 52 40 52 C40 52 28 44 28 36Z" fill="#fce7f3" stroke="#be185d" strokeWidth="2"/>
-      </svg>
-    ),
-    subjects: ["Hindi (Core)", "Psychology", "Economics", "History", "Political Science", "Computer Science", "Fine Arts"],
+    name: "Humanities Stream",
+    description: "For students interested in social sciences, communication, psychology, law, design, civil services or liberal arts.",
+    suitable: "Aspiring lawyers, psychologists, civil servants, designers and liberal arts students.",
+    direction: "Psychology, Economics, History, Political Science, English, Computer Science, Fine Arts.",
+    skills: "Critical thinking, writing, research, communication, social awareness.",
+    pathways: "Law (CLAT), BA, Psychology, Mass Comm, Design (NIFT/NID), UPSC, CUET-based programs.",
+    color: "#fdf2f8", accent: "#be185d", icon: BookOpen,
   },
 ];
 
-// ── Curriculum Philosophy ─────────────────────────────────────────
-const philosophy = [
-  {
-    title: "Creativity",
-    desc: "Development of creative ideas & ways of thinking",
-    color: "#e0edff", textColor: "#0d3b86",
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="20" r="8" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="20" y1="4" x2="20" y2="8" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="20" y1="32" x2="20" y2="36" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="4" y1="20" x2="8" y2="20" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="32" y1="20" x2="36" y2="20" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="8.69" y1="8.69" x2="11.52" y2="11.52" stroke="#0d3b86" strokeWidth="2"/>
-        <line x1="28.48" y1="28.48" x2="31.31" y2="31.31" stroke="#0d3b86" strokeWidth="2"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Excellence",
-    desc: "Multidimensional curriculum to excel in all aspects of school life",
-    color: "#fff3e0", textColor: "#b45309",
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="14" r="8" stroke="#b45309" strokeWidth="2"/>
-        <path d="M12 22 L8 36 L20 28 L32 36 L28 22" stroke="#b45309" strokeWidth="2"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Curiosity",
-    desc: "Intellectual stimulation for developing talent & maturity of mind",
-    color: "#e0f7f0", textColor: "#047857",
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="16" r="8" stroke="#047857" strokeWidth="2"/>
-        <line x1="20" y1="24" x2="20" y2="30" stroke="#047857" strokeWidth="2"/>
-        <circle cx="20" cy="34" r="2" fill="#047857"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Personality",
-    desc: "Character building through opportunities for leadership",
-    color: "#f3e0ff", textColor: "#6d28d9",
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-9 h-9" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="11" r="5" stroke="#6d28d9" strokeWidth="2"/>
-        <path d="M10 34 C10 26 30 26 30 34" stroke="#6d28d9" strokeWidth="2"/>
-        <line x1="20" y1="16" x2="20" y2="26" stroke="#6d28d9" strokeWidth="2"/>
-        <line x1="14" y1="21" x2="26" y2="21" stroke="#6d28d9" strokeWidth="2"/>
-      </svg>
-    ),
-  },
+const boardSupport = [
+  { icon: Lightbulb, title: "Structured Study Planning" },
+  { icon: ClipboardCheck, title: "Regular Assessments" },
+  { icon: RefreshCw, title: "Revision Support" },
+  { icon: MessageCircle, title: "Doubt Clarification" },
+  { icon: BookMarked, title: "Practice Tests" },
+  { icon: Clock, title: "Time Management" },
+  { icon: TrendingUp, title: "Teacher Feedback" },
+  { icon: Heart, title: "Parent Communication" },
+  { icon: Award, title: "Confidence Building" },
 ];
 
-// ── Teaching Methodology (Senior Secondary specific) ──────────────
-const methodology = [
-  {
-    title: "Experiential Learning Programmes",
-    desc: "Unique International Experiential Learning Certificate Programs, integrated throughout year-round coursework & offered exclusively to our Grade 11 students.",
-    img: "/images/home/academic/senior-2.jpg",
-    color: "#e0edff", accent: "#0d3b86",
-  },
-  {
-    title: "Career Counselling",
-    desc: "A Career Guidance Programme powered by Proventus, an Overseas Education Company. Customised workshops for aspirants with individual focus when making life-altering decisions.",
-    img: "/images/home/academic/senior-3.jpg",
-    color: "#fff7e0", accent: "#d97706",
-  },
-  {
-    title: "Foreign Language Classes",
-    desc: "Our Foreign Language Skill Development Programme presents one of the most relevant languages of the current era — French — adding to students' global readiness.",
-    img: "/images/home/academic/senior-4.jpg",
-    color: "#e0f7f0", accent: "#047857",
-  },
-  {
-    title: "Summer Internship Programme",
-    desc: "Industry expert workshops, lectures, and internship opportunities carefully structured by experienced mentors for students during their Senior Secondary years.",
-    img: "/images/home/academic/senior-section.jpg",
-    color: "#fdf2f8", accent: "#be185d",
-  },
+const careerCards = [
+  { icon: Compass, title: "Stream Selection Support", body: "Guidance to choose the stream that matches aptitude and aspirations.", color: "#e0edff", accent: NAVY_MID },
+  { icon: Briefcase, title: "Career Awareness", body: "Exposure to career paths, professions and future industries.", color: "#fff7e0", accent: AMBER },
+  { icon: MessageCircle, title: "Communication & Presentation", body: "Public speaking, debates and presentations for real-world readiness.", color: "#e0f7f0", accent: "#059669" },
+  { icon: BookMarked, title: "Research & Project Work", body: "Stream-linked projects that build research and analytical skills.", color: "#fdf2f8", accent: "#be185d" },
+  { icon: Users, title: "Leadership Exposure", body: "Student council, prefects, club leadership and event organising.", color: "#f3e0ff", accent: "#7c3aed" },
+  { icon: Rocket, title: "Future Readiness", body: "College, entrance exam and career-pathway orientation.", color: "#e0f2fe", accent: "#0369a1" },
 ];
+
+const beyondAcademics = [
+  { icon: Trophy, title: "Sports & Fitness" },
+  { icon: Sparkles, title: "Clubs & Activities" },
+  { icon: Users, title: "Student Leadership" },
+  { icon: Award, title: "Events & Competitions" },
+  { icon: Heart, title: "Values & Responsibility" },
+  { icon: ShieldCheck, title: "Emotional Balance & Confidence" },
+];
+
+const evaluationPoints = [
+  "Class participation",
+  "Assignments",
+  "Projects and practical work",
+  "Periodic tests",
+  "Pre-board / board-oriented assessments",
+  "Revision performance",
+  "Teacher observation",
+  "Parent updates",
+  "Student counselling and guidance",
+];
+
+const futureCards = [
+  { title: "Board Examination Readiness", body: "A structured Class 12 prep system that builds calmness and clarity.", icon: Award },
+  { title: "Higher Education Planning", body: "Course discovery, entrance exam awareness and college shortlisting.", icon: GraduationCap },
+  { title: "Career Direction", body: "Stream-aligned career counselling and future pathways.", icon: Compass },
+  { title: "Confidence & Independence", body: "Self-management, decision-making and personal growth.", icon: Rocket },
+];
+
+const localities = ["Hiranandani Estate", "Ghodbunder Road", "Brahmand Thane", "Manpada", "Kavesar", "Kolshet"];
+const grades = ["Class 11", "Class 12"];
+
+function ctaTrack(label: string) {
+  trackEvent("senior_cta_click", "senior_secondary", label);
+}
 
 export default function SeniorSecondary() {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Senior Secondary (Class 11 & 12) | RIS Thane CBSE"
-        description="CBSE Senior Secondary at Rainbow International School Thane offers Science, Commerce and Humanities streams with JEE/NEET/CUET prep — apply for 2026-27."
-        keywords="senior secondary school in Thane, Class 11 admission Thane, Class 12 CBSE school in Thane, science stream school in Thane, commerce stream school in Thane, humanities school in Thane, CBSE senior secondary school near me"
+        title="Senior Secondary School in Thane | CBSE Class 11 & 12 | Rainbow International School"
+        description="Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and Class 12 with focused academics, board preparation, stream guidance, career readiness and holistic growth."
+        keywords="senior secondary school in Thane, CBSE senior secondary school in Thane, best senior secondary school in Thane, Class 11 admission in Thane, Class 12 admission in Thane, Science stream school in Thane, Commerce stream school in Thane, Humanities stream school in Thane, Class 12 board preparation school in Thane, senior secondary near Hiranandani Estate, senior secondary near Ghodbunder Road, senior secondary near Brahmand Thane, senior secondary near Manpada, senior secondary near Kavesar, senior secondary near Kolshet"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section"
         ogImage="/images/home/academic/senior-secondary.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
-          { name: "Senior Secondary (Class 11-12)", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
+          { name: "Senior Secondary (Class 11–12)", href: "https://rainbowinternationalschool.in/senior-secondary-section" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
             {
               "@type": "EducationalOccupationalProgram",
-              "name": "Senior Secondary Section (Class 11–12)",
-              "description": "CBSE Senior Secondary (Class 11 & 12) with Science, Commerce, and Humanities streams at Rainbow International School, Thane. CBSE Affiliation No. 1130661.",
+              "name": "Senior Secondary (Class 11–12)",
+              "description": "CBSE-affiliated senior secondary education for Class 11 and Class 12 in Thane, with Science, Commerce and Humanities streams, structured board preparation and career guidance.",
               "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
               "educationalProgramMode": "full-time",
-              "programPrerequisites": "Completion of Class 10 (CBSE)",
-              "hasCourse": [
-                { "@type": "Course", "name": "Science Stream (Class 11–12)", "description": "Physics, Chemistry, Biology/Mathematics, and electives." },
-                { "@type": "Course", "name": "Commerce Stream (Class 11–12)", "description": "Accountancy, Business Studies, Economics, and electives." },
-                { "@type": "Course", "name": "Humanities Stream (Class 11–12)", "description": "History, Political Science, Psychology, Sociology, and electives." }
-              ],
-              "url": "https://rainbowinternationalschool.in/senior-secondary-section"
+              "programPrerequisites": "Completion of Class 10 / CBSE AISSE",
+              "url": "https://rainbowinternationalschool.in/senior-secondary-section",
             },
-            buildFaqPageSchema(SENIOR_FAQS)
-          ]
+            buildFaqPageSchema(FAQS),
+          ],
         }}
       />
       <Navbar />
-      <PageBanner
-        title="Senior Secondary Section"
-        subtitle="Class 11 & 12"
-        breadcrumb={[{ label: "Senior Secondary Section" }]}
-        bgImage="/images/home/academic/senior-secondary.jpg"
-      />
+
+      {/* HERO */}
+      <section className="relative w-full overflow-hidden" style={{ minHeight: "min(78vh, 720px)" }} data-testid="section-hero">
+        <picture>
+          <source media="(max-width: 768px)" srcSet="/images/students/hero-senior-secondary-mobile.webp" type="image/webp" />
+          <source srcSet="/images/students/hero-senior-secondary.webp" type="image/webp" />
+          <img src="/images/students/hero-senior-secondary.jpg" alt="Senior secondary students at Rainbow International School Thane" className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" decoding="async" />
+        </picture>
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.78) 60%, rgba(9,26,79,0.65) 100%)" }} />
+        <div className="relative z-10 container mx-auto px-4 max-w-6xl py-20 md:py-28 lg:py-32 flex flex-col">
+          <span className="inline-flex self-start items-center gap-2 text-[11px] font-extrabold tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: AMBER_LIGHT, color: NAVY }} data-testid="badge-admissions-open">
+            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
+          </span>
+          <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
+            Senior Secondary School in Thane <br className="hidden sm:block" /><span style={{ color: AMBER_LIGHT }}>Class 11 and Class 12</span>
+          </h1>
+          <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">Preparing students for board success, career choices, higher education and life beyond school.</p>
+          <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">A CBSE-aligned Senior Secondary experience for Class 11 and Class 12 with focused academics, stream guidance, board preparation, career readiness, leadership exposure and a supportive learning environment.</p>
+          <div className="flex flex-wrap gap-2 mt-6 max-w-3xl">
+            {["CBSE-Aligned Senior Secondary", "Class 11 and Class 12", "Science · Commerce · Humanities", "Board Exam Preparation", "Career & Higher Education Readiness"].map((t) => (
+              <span key={t} className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm" style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)" }}>
+                <CheckCircle2 className="w-3 h-3" /> {t}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3 mt-8">
+            <a href="/admissions" onClick={() => ctaTrack("hero_enquire_class_11_12")} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white shadow-lg hover:opacity-90 transition-opacity" style={{ background: AMBER }} data-testid="button-hero-enquire">
+              Enquire for Class 11–12 <ArrowRight className="w-4 h-4" />
+            </a>
+            <a href="/admissions#campus-visit" onClick={() => ctaTrack("hero_campus_visit")} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-hero-campus-visit">
+              Book a Campus Visit
+            </a>
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hero_whatsapp"); trackWhatsAppClick({ sourcePage: "senior_hero" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity" data-testid="button-hero-whatsapp">
+              <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
 
       <main className="flex-grow">
-
-        {/* ── Intro ──────────────────────────────────────────────── */}
-        <section className="py-20 bg-white">
+        {/* WHY STUDENTS */}
+        <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-
-              {/* Left — intro text */}
-              <div className="lg:col-span-2 space-y-5">
-                <div>
-                  <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-3" style={{ background: "#eef5ff", color: "#0d3b86" }}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                    Career Pathways
-                  </span>
-                  <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Senior Secondary Section</h2>
-                  <p className="text-base text-gray-500 font-semibold mt-1">(Class 11 – 12)</p>
-                </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Through a rigorous accreditation process, RIS has been affiliated to the CBSE Board for <strong>Science, Commerce and Humanities</strong> streams.
-                </p>
-                <p className="text-gray-600 leading-relaxed">
-                  Details of our affiliation can be found through our affiliation number: <strong>1130661</strong>. We offer a slew of subject options for our students to choose from, to ensure their education is customised around what their exact career plans are, and to provide the flexibility to explore alternatives that are rarely offered elsewhere.
-                </p>
-
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <img
-                    src="/images/home/academic/senior-3.jpg"
-                    alt="Senior Secondary girls studying together at Rainbow International School"
-                    className="rounded-3xl w-full object-cover h-48"
-                    width={512}
-                    height={384}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
-                  <img
-                    src="/images/students/senior-secondary-group.webp"
-                    alt="Senior Secondary students in blazers posing for group photo at Rainbow International School"
-                    className="rounded-3xl w-full object-cover h-48"
-                    width={800}
-                    height={533}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
-                </div>
-
-                {/* Curriculum box — 3 streams */}
-                <div className="rounded-3xl border-2 border-amber-300 overflow-hidden mt-6">
-                  <div className="px-6 py-4" style={{ background: "#fffbeb" }}>
-                    <h3 className="font-black text-lg" style={{ color: "#92400e" }}>Curriculum</h3>
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>Why RIS for Senior Secondary</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Why Students Choose RIS for Senior Secondary</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {decisionCards.map((c, i) => {
+                const Icon = c.icon;
+                return (
+                  <div key={i} className="rounded-2xl p-6 bg-white border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all" data-testid={`card-decision-${i}`}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "#eef5ff" }}><Icon className="w-6 h-6" style={{ color: NAVY_MID }} /></div>
+                    <h3 className="font-extrabold text-base mb-1.5" style={{ color: NAVY }}>{c.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{c.body}</p>
                   </div>
-                  <div className="divide-y divide-amber-100">
-                    {streams.map((s, i) => (
-                      <div key={i} className="flex items-start gap-5 px-6 py-6 bg-white">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: s.color }}>
-                          {s.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-black text-lg mb-0.5" style={{ color: s.accent }}>{s.stream}</h4>
-                          <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: s.accent }}>
-                            Mandatory English (Core)
-                          </p>
-                          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-2">
-                            Any Four Subjects Mentioned Below:
-                          </p>
-                          <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
-                            {s.subjects.map((sub, j) => (
-                              <li key={j} className="flex items-center gap-1.5 text-sm text-gray-600">
-                                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.accent }} />
-                                {sub}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-10">
+              <a href="/admissions" onClick={() => ctaTrack("why_explore_admissions")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: NAVY }} data-testid="button-explore-admissions">
+                Explore Admissions for Class 11–12 <ChevronRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
 
-              {/* Right — admission CTA */}
-              <div className="space-y-6">
-                <div className="rounded-3xl border-2 border-amber-400 p-6 text-center" style={{ background: "#fffbeb" }}>
-                  <p className="text-sm font-black uppercase tracking-wide mb-3" style={{ color: "#b45309" }}>
-                    Admissions are Open for the Academic Year 2026–27
-                  </p>
-                  <a href="#contact" className="inline-block font-bold py-2.5 px-7 rounded-full text-white transition-opacity hover:opacity-90" style={{ background: "#f97316" }}>
-                    Enquire Now
+        {/* JOURNEY */}
+        <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>The Senior Secondary Learning Journey at RIS</h2>
+              <p className="text-gray-600 mt-3">From Class 11 stream foundations to focused Class 12 board preparation.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {journey.map((j, i) => (
+                <div key={j.grade} className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7 relative overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full opacity-10" style={{ background: i === 0 ? NAVY_MID : AMBER }} />
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center text-white font-black shadow-lg mb-4" style={{ background: i === 0 ? NAVY_MID : AMBER }}>{j.grade.replace("Class ", "")}</div>
+                  <h3 className="font-extrabold text-xl mb-2" style={{ color: NAVY }}>{j.grade}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{j.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-12">
+              <a href="/admissions" onClick={() => ctaTrack("journey_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: AMBER }} data-testid="button-journey-enquire">
+                Enquire for Senior Secondary Admissions <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* GRADE ADMISSIONS */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#fff7e0", color: AMBER }}>Grade-Wise Admissions</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Class 11 and Class 12 Admissions at RIS</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {gradeAdmissions.map((g, i) => (
+                <div key={g.grade} className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all p-7 flex flex-col" data-testid={`card-grade-${i}`}>
+                  <span className="inline-block self-start text-[11px] font-extrabold px-3 py-1 rounded-full mb-3" style={{ background: NAVY, color: "#fff" }}>{g.grade}</span>
+                  <h3 className="font-extrabold text-lg mb-2" style={{ color: NAVY }}>{g.title}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed flex-grow">{g.body}</p>
+                  <a href="/admissions" onClick={() => ctaTrack(`grade_enquire_${g.grade.toLowerCase().replace(" ", "_")}`)} className="inline-flex items-center gap-1.5 text-xs font-extrabold mt-5 self-start px-4 py-2 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ color: NAVY, borderColor: NAVY }} data-testid={`button-grade-${i}`}>
+                    Enquire for this Class <ChevronRight className="w-3 h-3" />
                   </a>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                {/* Stream highlights */}
-                <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="px-5 py-4" style={{ background: "#0d3b86" }}>
-                    <h3 className="text-white font-black">Streams Offered</h3>
-                  </div>
-                  <div className="divide-y divide-gray-100">
-                    {streams.map((s, i) => (
-                      <div key={i} className="flex items-center gap-3 px-5 py-3.5 bg-white">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: s.color }}>
-                          <span className="w-3 h-3 rounded-full" style={{ background: s.accent }} />
-                        </div>
-                        <div>
-                          <p className="font-black text-sm" style={{ color: s.accent }}>{s.stream}</p>
-                          <p className="text-xs text-gray-400">Class 11 & 12</p>
-                        </div>
+        {/* STREAMS */}
+        <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Streams and Subject Options</h2>
+              <p className="text-gray-600 mt-3">Three streams for Class 11 and 12 — Science, Commerce and Humanities. Final subject combinations are confirmed by the admissions team.</p>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {streams.map((s, i) => {
+                const Icon = s.icon;
+                return (
+                  <div key={s.name} className="rounded-3xl bg-white border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col" data-testid={`card-stream-${i}`} onClick={() => ctaTrack(`stream_card_${s.name.toLowerCase().replace(/\s+/g, "_")}`)}>
+                    <div className="p-6" style={{ background: s.color }}>
+                      <div className="w-14 h-14 rounded-2xl bg-white/70 flex items-center justify-center mb-3"><Icon className="w-7 h-7" style={{ color: s.accent }} /></div>
+                      <h3 className="font-black text-xl" style={{ color: s.accent }}>{s.name}</h3>
+                      <p className="text-sm text-gray-700 mt-2">{s.description}</p>
+                    </div>
+                    <div className="p-6 space-y-3 flex-grow">
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: s.accent }}>Suitable for</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{s.suitable}</p>
                       </div>
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: s.accent }}>Subject direction</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{s.direction}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: s.accent }}>Skills developed</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{s.skills}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-extrabold uppercase tracking-widest mb-1" style={{ color: s.accent }}>Future pathways</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{s.pathways}</p>
+                      </div>
+                    </div>
+                    <div className="px-6 pb-6">
+                      <a href="/admissions" className="inline-flex items-center gap-1.5 text-xs font-extrabold px-4 py-2 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ color: s.accent, borderColor: s.accent }}>
+                        Enquire for this stream <ChevronRight className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* BOARD SUPPORT */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#fff7e0", color: AMBER }}>Board Year</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Board Exam Preparation and Academic Support</h2>
+              <p className="text-gray-600 mt-3">A structured, supportive system for Class 12 — with calmness, clarity and consistent practice.</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-5">
+              {boardSupport.map((b, i) => {
+                const Icon = b.icon;
+                return (
+                  <div key={b.title} className="rounded-2xl p-5 md:p-6 border border-gray-100 shadow-sm bg-gradient-to-br from-white to-[#fffbeb] hover:shadow-md transition-shadow" data-testid={`card-board-${i}`}>
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style={{ background: AMBER_LIGHT }}><Icon className="w-5 h-5 text-white" /></div>
+                    <h3 className="font-extrabold text-sm md:text-base" style={{ color: NAVY }}>{b.title}</h3>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* CAREER READINESS */}
+        <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Preparing Students for Higher Education and Careers</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {careerCards.map((c, i) => {
+                const Icon = c.icon;
+                return (
+                  <div key={c.title} className="rounded-2xl p-6 bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow" data-testid={`card-career-${i}`}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: c.color }}><Icon className="w-6 h-6" style={{ color: c.accent }} /></div>
+                    <h3 className="font-extrabold text-base mb-2" style={{ color: c.accent }}>{c.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{c.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* BEYOND ACADEMICS */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Beyond Academics in Senior Secondary</h2>
+              <p className="text-gray-600 mt-3">Sports, leadership, events and values that shape well-rounded students.</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {beyondAcademics.map((b, i) => {
+                const Icon = b.icon;
+                return (
+                  <div key={b.title} className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 text-center hover:shadow-md transition-shadow" data-testid={`card-beyond-${i}`}>
+                    <div className="w-11 h-11 mx-auto rounded-xl flex items-center justify-center mb-3" style={{ background: "#eef5ff" }}><Icon className="w-5 h-5" style={{ color: NAVY_MID }} /></div>
+                    <p className="font-extrabold text-xs md:text-sm" style={{ color: NAVY }}>{b.title}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* EVALUATION */}
+        <section className="py-16 md:py-20" style={{ background: NAVY }}>
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: AMBER_LIGHT, color: NAVY }}>Continuous Evaluation</span>
+              <h2 className="text-2xl md:text-4xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>How We Track Senior Secondary Progress</h2>
+              <p className="text-white/80 mt-3 text-sm md:text-base">A structured framework that supports steady academic growth and confident board readiness.</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+              {evaluationPoints.map((pt, i) => (
+                <div key={pt} className="rounded-xl p-4 text-center backdrop-blur-sm border" style={{ background: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.15)" }} data-testid={`evaluation-${i}`}>
+                  <CheckCircle2 className="w-5 h-5 mx-auto mb-2" style={{ color: AMBER_LIGHT }} />
+                  <p className="text-white text-xs md:text-sm font-bold leading-tight">{pt}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-10">
+              <a href="/admissions" onClick={() => ctaTrack("evaluation_speak_counsellor")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ background: AMBER, color: "#fff" }} data-testid="button-speak-counsellor">
+                Speak to Our Senior Secondary Counsellor <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FUTURE PATHWAYS */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>From School to Future Pathways</h2>
+              <p className="text-gray-600 mt-3">Senior Secondary at RIS is designed to help students move confidently toward higher education, competitive pathways, career choices and life beyond school.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {futureCards.map((t, i) => {
+                const Icon = t.icon;
+                return (
+                  <div key={t.title} className="rounded-2xl p-6 bg-gradient-to-br from-white to-[#f8faff] border border-gray-100 shadow-sm hover:shadow-md transition-shadow" data-testid={`card-future-${i}`}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: NAVY }}><Icon className="w-6 h-6 text-white" /></div>
+                    <h3 className="font-extrabold text-base mb-2" style={{ color: NAVY }}>{t.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{t.body}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-center mt-10">
+              <a href="/admissions" onClick={() => ctaTrack("future_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: AMBER }} data-testid="button-future-enquire">
+                Enquire for Class 11–12 <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* HYPERLOCAL */}
+        <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}><MapPin className="w-3 h-3" /> Local to Thane</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Senior Secondary Admissions Near You in Thane</h2>
+              <p className="text-gray-600 mt-3 text-sm md:text-base">Rainbow International School is located at Brahmand Phase 4, Thane and is easily accessible for parents and students looking for Class 11 and Class 12 admission near Hiranandani Estate, Ghodbunder Road, Brahmand, Manpada, Kavesar, Kolshet, Pokhran Road, Patlipada and nearby areas.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {localities.map((loc, i) => (
+                <div key={loc} className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5" data-testid={`locality-${i}`}>
+                  <div className="flex items-center gap-2 mb-3"><MapPin className="w-4 h-4" style={{ color: AMBER }} /><h3 className="font-extrabold text-base" style={{ color: NAVY }}>Near {loc}</h3></div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {grades.map((g) => (
+                      <a key={g} href="/admissions" onClick={() => ctaTrack(`hyperlocal_${g}_${loc}`.toLowerCase().replace(/\s+/g, "_"))} className="inline-block text-[11px] font-bold px-2.5 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ background: "#f8faff", color: NAVY_MID, borderColor: "#dbe7ff" }}>
+                        {g} admission
+                      </a>
                     ))}
                   </div>
                 </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-3 mt-10">
+              <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hyperlocal_directions"); trackDirectionsClick({ sourcePage: "senior_hyperlocal" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: NAVY }} data-testid="button-get-directions">
+                <MapPin className="w-4 h-4" /> Get Directions
+              </a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hyperlocal_transport"); trackWhatsAppClick({ sourcePage: "senior_hyperlocal_transport" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ color: NAVY, borderColor: NAVY }} data-testid="button-check-transport">
+                <Bus className="w-4 h-4" /> Check Transport Availability
+              </a>
+              <a href="/admissions" onClick={() => ctaTrack("hyperlocal_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: AMBER }} data-testid="button-hyperlocal-enquire">
+                Enquire for Senior Secondary Admissions <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FINAL CTA */}
+        <section className="py-16 md:py-20">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="rounded-3xl p-8 md:p-12 text-center relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_MID} 100%)` }}>
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20" style={{ background: AMBER_LIGHT }} />
+              <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: AMBER_LIGHT }} />
+              <div className="relative z-10">
+                <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>Admissions 2026–27</span>
+                <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>Looking for Class 11 or Class 12 Admission?</h2>
+                <p className="text-white/85 max-w-2xl mx-auto mb-7 text-sm md:text-base">Explore Senior Secondary at Rainbow International School and speak to our admissions team for stream availability, campus visit and admission guidance.</p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <a href="/admissions" onClick={() => ctaTrack("final_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: AMBER }} data-testid="button-final-enquire">
+                    Enquire for Class 11–12 <ArrowRight className="w-4 h-4" />
+                  </a>
+                  <a href="/admissions#campus-visit" onClick={() => ctaTrack("final_campus_visit")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-final-campus-visit">
+                    Book a Campus Visit
+                  </a>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("final_whatsapp"); trackWhatsAppClick({ sourcePage: "senior_final" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity" data-testid="button-final-whatsapp">
+                    <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+                  </a>
+                  <a href={`tel:${PHONE}`} onClick={() => { ctaTrack("final_call"); trackCallClick({ phone: PHONE, sourcePage: "senior_final" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-final-call">
+                    <Phone className="w-4 h-4" /> Call Admissions
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── Curriculum Philosophy ──────────────────────────────── */}
-        <section className="py-20" style={{ background: "#f8faff" }}>
-          <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Curriculum Philosophy</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {philosophy.map((p, i) => (
-                <div key={i} className="rounded-3xl p-6 border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow flex flex-col gap-4">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: p.color }}>
-                    {p.icon}
+        {/* FAQ */}
+        <section className="py-16 md:py-20 bg-white">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Frequently Asked Questions About Senior Secondary at RIS</h2>
+              <p className="text-gray-600 mt-3">Quick answers about Class 11 and Class 12 admissions, streams, board prep, transport and more.</p>
+            </div>
+            <div className="space-y-3">
+              {FAQS.map((f, i) => {
+                const isOpen = openFaq === i;
+                return (
+                  <div key={i} className="rounded-2xl border border-gray-200 bg-white overflow-hidden" data-testid={`faq-${i}`}>
+                    <button type="button" onClick={() => { setOpenFaq(isOpen ? null : i); trackEvent("faq_interaction", "senior_faq", `q${i}_${!isOpen ? "open" : "close"}`); }} className="w-full px-5 py-4 flex items-center justify-between gap-4 text-left hover:bg-gray-50 transition-colors" aria-expanded={isOpen}>
+                      <span className="font-extrabold text-sm md:text-base" style={{ color: NAVY }}>{f.q}</span>
+                      <ChevronRight className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-90" : ""}`} style={{ color: AMBER }} />
+                    </button>
+                    {isOpen && (<div className="px-5 pb-5 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-4">{f.a}</div>)}
                   </div>
-                  <div>
-                    <h3 className="font-black text-base mb-2" style={{ color: p.textColor }}>{p.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{p.desc}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
+      </main>
 
-        {/* ── Teaching Methodology ───────────────────────────────── */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Teaching Methodology</h2>
+      <Footer />
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              {methodology.map((m, i) => (
-                <div key={i} className="flex flex-col gap-3">
-                  <div className="rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100">
-                    <img
-                      src={m.img}
-                      alt={m.title}
-                      className="w-full h-full object-cover"
-                      width={400}
-                      height={300}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-sm leading-snug" style={{ color: "#0d3b86" }}>{m.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{m.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Evaluation Strategy */}
-            <div className="max-w-lg mx-auto rounded-3xl border-2 border-amber-300 p-8 text-center" style={{ background: "#fffbeb" }}>
-              <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: "#fef3c7" }}>
-                <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="6" y="4" width="28" height="34" rx="3" stroke="#d97706" strokeWidth="2"/>
-                  <line x1="12" y1="13" x2="28" y2="13" stroke="#d97706" strokeWidth="2"/>
-                  <line x1="12" y1="19" x2="28" y2="19" stroke="#d97706" strokeWidth="2"/>
-                  <line x1="12" y1="25" x2="20" y2="25" stroke="#d97706" strokeWidth="2"/>
-                  <path d="M24 28 L26 31 L31 24" stroke="#d97706" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h3 className="font-black text-xl mb-1" style={{ color: "#92400e" }}>Evaluation Strategy</h3>
-              <p className="text-sm font-bold mb-3" style={{ color: "#b45309" }}>Formal Examination</p>
-              <p className="text-sm text-gray-600">2 Summative Assessment Tests: one at the end of each semester</p>
-              <p className="text-sm text-gray-600 mt-1">4 Formative Assessment Tests: two tests per semester to assess on-going learning</p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA strip ──────────────────────────────────────────── */}
-        <div className="py-14 text-center" style={{ background: "#091a4f" }}>
-          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2026–27</p>
-          <a href="#contact" className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
-            Enquire Now
+      {/* Sticky Mobile CTA */}
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-gray-200 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]" data-testid="mobile-cta-bar">
+        <div className="grid grid-cols-4 divide-x divide-gray-200">
+          <a href={`tel:${PHONE}`} onClick={() => { ctaTrack("sticky_call"); trackCallClick({ phone: PHONE, sourcePage: "senior_sticky" }); }} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
+            <Phone className="w-4 h-4" style={{ color: NAVY }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Call</span>
+          </a>
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("sticky_whatsapp"); trackWhatsAppClick({ sourcePage: "senior_sticky" }); }} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
+            <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>WhatsApp</span>
+          </a>
+          <a href="/admissions" onClick={() => ctaTrack("sticky_enquire")} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
+            <ClipboardCheck className="w-4 h-4" style={{ color: AMBER }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Enquire</span>
+          </a>
+          <a href="/admissions#campus-visit" onClick={() => ctaTrack("sticky_book_visit")} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
+            <Compass className="w-4 h-4" style={{ color: NAVY_MID }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Book Visit</span>
           </a>
         </div>
-
-        <ContactForm />
-        <WaveOneSeoBlock pageId="senior-secondary" quickAnswer={SENIOR_QUICK_ANSWER} faqs={SENIOR_FAQS} />
-      </main>
-      <Footer />
+      </div>
+      <div className="h-14 lg:hidden" aria-hidden="true" />
     </div>
   );
 }
