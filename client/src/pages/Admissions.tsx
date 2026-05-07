@@ -187,10 +187,11 @@ export default function Admissions() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Admissions Open 2026–27 | CBSE School in Thane | Rainbow International School"
-        description="Apply for admission to Rainbow International School Thane — CBSE-affiliated, Nursery to Class 12, established 2009, 3.5-acre Brahmand campus. Book a campus visit today."
-        keywords="CBSE school in Thane admissions, nursery admission Thane, best school in Thane, admissions open Thane 2026-27, Class 11 admission Thane, international school Thane, Rainbow International School admission"
+        title="Admissions Open 2026–27 | CBSE School in Thane"
+        description="Admissions open at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire, book a campus visit or apply today."
+        keywords="admissions open in Thane, CBSE school admission in Thane, Nursery admission in Thane, Class 1 admission in Thane, Class 11 admission in Thane, school admission near me, CBSE school admission 2026-27"
         canonical="https://rainbowinternationalschool.in/admissions"
+        appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Admissions 2026-27", href: "https://rainbowinternationalschool.in/admissions" },

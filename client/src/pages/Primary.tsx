@@ -151,11 +151,12 @@ export default function Primary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Primary School in Thane | CBSE Class 1 to 5 | Rainbow International School"
-        description="Explore the Primary Section at Rainbow International School, a CBSE-affiliated school in Thane for Class 1 to Class 5 with strong academics, literacy, numeracy, activities, safety and holistic learning."
-        keywords="primary school in Thane, CBSE primary school in Thane, best primary school in Thane, Class 1 admission in Thane, Class 2 admission in Thane, Class 3 admission in Thane, Class 4 admission in Thane, Class 5 admission in Thane, primary school near Hiranandani Estate, primary school near Ghodbunder Road, primary school near Brahmand Phase 4, primary school near Manpada, primary school near Kavesar, primary school near Kolshet"
+        title="Primary School in Thane | CBSE Class 1 to 5"
+        description="Explore Primary School at Rainbow International School, a CBSE school in Thane for Class 1 to 5 with academics, activities, safety and care."
+        keywords="primary school in Thane, CBSE primary school in Thane, best primary school in Thane, Class 1 admission in Thane, Class 2 admission in Thane, Class 3 admission in Thane, Class 4 admission in Thane, Class 5 admission in Thane, Class 1 admission near Hiranandani Estate, Class 1 admission near Ghodbunder Road, Class 5 admission near Brahmand Thane"
         canonical="https://rainbowinternationalschool.in/primary-section"
         ogImage="/images/home/academic/primary-section.jpg"
+        appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/primary-section" },

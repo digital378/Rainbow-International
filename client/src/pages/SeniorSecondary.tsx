@@ -153,7 +153,7 @@ export default function SeniorSecondary() {
       <ScrollProgress />
       <SEO
         title="Senior Secondary in Thane | CBSE Class 11 & 12"
-        description="Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and 12 with board preparation and career readiness."
+        description="Explore Senior Secondary at Rainbow International School, a CBSE school in Thane for Class 11 and 12 with board preparation and career readiness."
         keywords="senior secondary school in Thane, CBSE senior secondary school in Thane, best senior secondary school in Thane, Class 11 admission in Thane, Class 12 admission in Thane, Science stream school in Thane, Commerce stream school in Thane, Humanities stream school in Thane, Class 12 board preparation school in Thane, senior secondary near Hiranandani Estate, senior secondary near Ghodbunder Road, senior secondary near Brahmand Thane, senior secondary near Manpada, senior secondary near Kavesar, senior secondary near Kolshet"
         canonical="https://rainbowinternationalschool.in/senior-secondary-section"
         ogImage="/images/home/academic/senior-secondary.jpg"

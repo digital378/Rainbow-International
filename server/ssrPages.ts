@@ -304,113 +304,407 @@ function renderPrePrimary(): string {
 function renderPrimary(): string {
   return `
 <div class="section">
-<h2>Primary Section — Class 1 to 5</h2>
-<p>The Primary Section at Rainbow International School builds a strong academic foundation while nurturing curiosity, creativity, and confidence. Our CBSE-aligned curriculum is delivered through experiential, project-based, and collaborative learning methods.</p>
+<h2>Primary School in Thane for Class 1 to Class 5</h2>
+<p>The Primary School at Rainbow International School in Thane is where children build the foundations that shape their entire academic journey. Spanning Class 1 to Class 5, our CBSE-aligned primary programme nurtures strong literacy and numeracy, sparks scientific curiosity, encourages creative expression, and helps young learners develop confidence, kindness and independence. Our Brahmand Phase 4 campus offers dedicated primary classrooms, age-appropriate libraries, science discovery spaces, art studios, music rooms and a generous outdoor play area where Class 1 to Class 5 children move, explore and learn every single day.</p>
 
-<h2>Curriculum</h2>
-<p>Subjects include English, Hindi, Mathematics, Environmental Science (EVS), Computer Science, Art, Music, and Physical Education. The curriculum integrates the Multiple Intelligence framework to address diverse learning styles.</p>
+<h2>Why Parents Choose Rainbow for the Primary Years</h2>
+<p>Parents from Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar and Kolshet choose Rainbow International School because the primary years are not treated as a passive stretch between Pre-Primary and Middle School. They are treated as a defining stage of childhood. Our class teachers stay with the same group of children for an extended period, building the kind of trust that helps a child speak up, ask questions, attempt new things and recover from small setbacks with grace.</p>
+<p>Class strength in the primary section is kept reasonable so that every child is known by name, by interest and by learning style. Our primary teachers are CBSE-trained and continue to attend regular professional development workshops on phonics, mental mathematics, language acquisition, child psychology, classroom management and digital pedagogy. The result is a primary school in Thane that feels personal, safe and academically serious at the same time.</p>
 
-<h2>Key Features</h2>
-<ul>
-<li>Smart classrooms with interactive whiteboards</li>
-<li>Dedicated science and computer labs</li>
-<li>Library with 10,000+ age-appropriate books</li>
-<li>Activity-based learning and project work</li>
-<li>Regular assessments with detailed progress reports</li>
-<li>Personalised attention with low teacher-student ratio</li>
-</ul>
+<h2>Subjects and Learning Areas — Class 1 to 5</h2>
+<p>The Class 1 to Class 5 curriculum at Rainbow International School covers English, Hindi, Marathi, Mathematics, Environmental Science (EVS), Computer Awareness, Art and Craft, Music, Dance, General Knowledge, Value Education and Physical Education. Each subject is delivered through a combination of textbook learning, hands-on activities, audio-visual stories, classroom games and outdoor experiences so that children move, talk, build and reflect — not just listen.</p>
+<p>Languages are taught with a balance of phonics, sight words, listening practice and oral expression. Mathematics is grounded in concrete materials, visual models and real-life scenarios before moving to symbolic work. EVS connects classroom learning to the world around the child — family, neighbourhood, transport, food, water, plants, animals and seasons — building a curious, observant mindset.</p>
 
-<h2>Extracurriculars</h2>
-<p>Primary students participate in swimming, skating, football, cricket, art, music, dance, drama, yoga, and robotics. Inter-house and inter-school competitions build confidence and teamwork.</p>
+<h2>Class 1 to Class 5 Learning Journey</h2>
 
-<p>Explore our <a href="/pre-primary-school-thane">Pre-Primary</a> or <a href="/middle-school-section">Middle School</a> sections.</p>
+<h3>Class 1 — The First Big Step</h3>
+<p>Class 1 is a gentle but important transition from Pre-Primary. Children are introduced to formal reading, writing and number work through phonics-based language learning, sight-word reading, simple journaling, mental maths drills and pattern recognition. The classroom keeps a play-friendly tone with circle time, rhymes and movement breaks so that the school day still feels joyful.</p>
+
+<h3>Class 2 — Building Reading Stamina</h3>
+<p>In Class 2, children read longer passages, write short paragraphs and begin understanding place value, basic shapes and EVS topics around the family, neighbourhood and seasons. Group work, library visits and "show and tell" activities build oral confidence in both English and Hindi.</p>
+
+<h3>Class 3 — Curious Investigators</h3>
+<p>Class 3 marks the start of structured note-taking, library borrowing, science observation activities and elementary problem-solving in mathematics. Children learn to organise their ideas, follow simple research steps and present what they have learned to peers, building early communication and collaboration skills.</p>
+
+<h3>Class 4 — Independent Learners</h3>
+<p>By Class 4, students take on more responsibility for homework planning, project research and self-checking of work. The mathematics curriculum strengthens fractions, decimals, multiplication and division, while EVS expands into geography, civic life, healthy living and the environment around them.</p>
+
+<h3>Class 5 — Ready for Middle School</h3>
+<p>Class 5 prepares children for the jump to Middle School. Subjects become more concept-driven, written work becomes more structured, and study skills like time management, reading comprehension and exam preparation are introduced gently. By the end of Class 5, students are confident readers, clear writers and curious thinkers, ready for the wider canvas of Class 6.</p>
+
+<h2>Literacy and Numeracy Development</h2>
+<p>Strong literacy is the engine of every other subject. Our primary literacy plan combines phonics, guided reading, library reading, journal writing, oral storytelling, vocabulary games and creative writing prompts. Children read both for skill and for pleasure, choosing books from a primary library curated for their age and interests.</p>
+<p>For numeracy, we follow a concrete-pictorial-abstract approach. Concepts begin with physical objects — counters, blocks, coins, measuring cups — move to drawings and diagrams, and then to symbolic notation. Daily mental maths, weekly problem-solving challenges and themed maths weeks make number work joyful rather than stressful, and help children see mathematics as a way of thinking, not just a list of procedures.</p>
+
+<h2>Classroom Experience</h2>
+<p>Primary classrooms at Rainbow International School are bright, child-centred spaces. Each classroom has a smart panel for digital lessons, a reading corner with rotating books, a display board where students' work is celebrated, and flexible seating that allows quick movement between individual work, pair work and group work. Wherever possible, learning extends outside the classroom — to the school library, organic farm, art studio, music room or the open-air amphitheatre.</p>
+
+<h2>Assessment and Student Progress</h2>
+<p>Assessment in the primary years is continuous, supportive and feedback-rich rather than rank-driven. Teachers use a mix of class observations, oral questioning, short written tasks, group projects and term-end assessments to build a clear picture of each child's progress. Parents receive structured progress reports that describe both academic achievement and social-emotional growth, along with personalised teacher comments and goals for the next term.</p>
+<p>Parent-teacher meetings are scheduled at regular intervals and are designed as two-way conversations — not just one-way report sharing. Parents are encouraged to share home observations, learning concerns and aspirations so that the school's plan and the home routine can stay aligned.</p>
+
+<h2>Safe and Supportive Primary Environment</h2>
+<p>Safety in the primary years is non-negotiable. Our campus is monitored by 200+ CCTV cameras, with controlled entry and trained security personnel at every gate. The primary wing has its own dedicated washrooms, supervised lunch areas, hygiene routines and trained female attendants on every floor. A full-time school nurse and a visiting paediatrician are available on campus, and an equipped ambulance is on standby for emergencies.</p>
+<p>For families using school transport, every bus is GPS-tracked, fitted with CCTV and a speed governor, and accompanied by a trained female attendant. Pick-up and drop are managed with parent verification at every stop, and routes cover the entire Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Pokhran Road, Kavesar, Kolshet and Majiwada belt.</p>
+
+<h2>Hyperlocal Primary Admissions in Thane</h2>
+
+<h3>Class 1 admission near Hiranandani Estate</h3>
+<p>Hiranandani Estate families often look for a CBSE primary school within a short drive of home. Rainbow International School is approximately five minutes away and is a popular Class 1, Class 2 and Class 3 admission choice for Hiranandani Estate parents who want academic depth and a calm, caring environment for their children.</p>
+
+<h3>Class 1 admission near Ghodbunder Road</h3>
+<p>Families along Ghodbunder Road — Patlipada, Waghbil, Owale and the wider GB Road corridor — choose Rainbow for the combination of a CBSE primary curriculum, modern facilities and dedicated bus routes that make the daily commute predictable and safe.</p>
+
+<h3>Class 5 admission near Brahmand Thane</h3>
+<p>Brahmand Phase 1 to 4 parents enjoy walking-distance access. Class 5 admission near Brahmand is especially popular because parents want continuity into our Middle School and Secondary sections without having to change schools, friends or routines.</p>
+
+<h3>Primary admissions near Manpada, Kavesar and Kolshet</h3>
+<p>Class 1 to Class 5 admissions from Manpada, Kavesar, Kolshet and Pokhran Road are supported by dedicated bus routes and a Saturday-morning campus tour slot for working parents who cannot easily visit on weekdays.</p>
+
+<h2>Frequently Asked Questions about the Primary Section</h2>
+
+<h3>What is the class strength in Primary?</h3>
+<p>We keep primary class sections at a reasonable size to ensure every child is known by name, by interest and by learning need. The exact strength for the upcoming academic year is shared at the time of admission.</p>
+
+<h3>Which board does the Primary Section follow?</h3>
+<p>The Primary Section follows the CBSE curriculum, with age-appropriate adaptations for Class 1 to Class 5. We also integrate value education, life skills and arts into the weekly timetable so that learning is balanced.</p>
+
+<h3>Are homework loads manageable?</h3>
+<p>Yes. Primary homework is designed to reinforce classroom learning without overwhelming children. We follow a balanced homework policy that respects family time, outdoor play and rest.</p>
+
+<h3>Do you support children moving from another board or city?</h3>
+<p>Absolutely. Children joining from ICSE, IB or state board schools, or from another city or country, are supported with a short orientation, bridge-learning activities where needed, and a classroom buddy to help them settle in quickly.</p>
+
+<h3>Are there enough activities outside academics?</h3>
+<p>Primary students participate in art, music, dance, drama, yoga, swimming, skating, football, cricket, basketball, robotics taster sessions, library reading clubs and seasonal celebrations. There is something for every child to enjoy and try.</p>
+
+<h3>How do parents track progress?</h3>
+<p>Parents receive structured progress reports each term, regular notes from class teachers, and dedicated parent-teacher meetings. The school is also responsive to parent queries via the official communication channels.</p>
+
+<h3>How do I apply for a Class 1 to Class 5 seat?</h3>
+<p>Call +91 82915 68972 or fill the enquiry form. Our admissions team will book a campus visit and walk you through the application, interaction and confirmation steps.</p>
+
+<h3>What languages are taught in the Primary Section?</h3>
+<p>English is the medium of instruction. Hindi and Marathi are taught as additional languages from the early primary years onwards, in line with CBSE guidelines and the Maharashtra state requirement.</p>
+
+<h3>Is there a Saturday class or campus visit option?</h3>
+<p>The school follows a weekday timetable. For working parents, campus visits and admission counselling are available on Saturday mornings between 9:30 AM and 1:00 PM by prior appointment.</p>
+
+<h2>Parent Decision Checklist</h2>
+<p>Choosing a primary school is a long-term decision. We encourage every family to walk the campus, meet a class teacher, see a working classroom, ask about library and lab access, understand assessment philosophy, check transport routes and discuss any specific concerns about their child. Rainbow International School welcomes detailed conversations because we know that the right fit between the child, the family and the school is what makes the primary years successful.</p>
+
+<p>Ready to explore further? Visit our <a href="/pre-primary-school-thane">Pre-Primary section</a>, our <a href="/middle-school-section">Middle School</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
 </div>`;
 }
 
 function renderMiddleSchool(): string {
   return `
 <div class="section">
-<h2>Middle School Section — Class 6 to 8</h2>
-<p>The Middle School years at Rainbow International School are a critical bridge between primary learning and secondary academics. Our programme deepens subject knowledge while developing analytical thinking, research skills, and independent learning habits.</p>
+<h2>Middle School in Thane for Class 6 to Class 8</h2>
+<p>The Middle School at Rainbow International School in Thane is where children move from being curious primary learners to confident, self-directed students ready for the academic depth of secondary school. Spanning Class 6, Class 7 and Class 8, our CBSE Middle School in Thane combines a strong subject foundation with structured study skills, age-appropriate technology, sport, the arts and a rich social environment. Located on a 3.5-acre campus in Brahmand Phase 4, the Middle School wing includes science laboratories, computer and robotics rooms, a senior library, an amphitheatre, sports grounds and dedicated discussion zones for project work.</p>
 
-<h2>Subjects Offered</h2>
-<p>English, Hindi, Sanskrit/French (third language), Mathematics, Science, Social Science, Computer Science, Art, Music, and Physical Education.</p>
+<h2>Why Parents Choose Rainbow for Middle School</h2>
+<p>Parents from Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar and Kolshet choose Rainbow International School for Class 6, Class 7 and Class 8 because middle school is treated as a stage in its own right rather than a holding pattern between primary school and the board years. Class teachers and subject teachers work as a coordinated team — sharing observations about each child, planning interventions early, and celebrating growth in academics, character and confidence.</p>
+<p>Our middle school faculty is CBSE-trained and continually upskilled in subject mastery, formative assessment, classroom management and student wellbeing. Class strength is kept reasonable so that students get attention, feedback and the chance to participate in every lesson, rather than blending into a large crowd.</p>
 
-<h2>Academic Approach</h2>
-<ul>
-<li>CBSE-aligned curriculum with experiential learning</li>
-<li>Fully equipped Physics, Chemistry, and Biology labs</li>
-<li>Computer lab with modern systems</li>
-<li>Project-based assessments and collaborative learning</li>
-<li>Career awareness and skill development programmes</li>
-<li>Regular parent-teacher interactions</li>
-</ul>
+<h2>Class 6 to Class 8 Learning Journey</h2>
+
+<h3>Class 6 — Stepping into Middle School</h3>
+<p>Class 6 is a transition year. Students adjust to multiple subject teachers, longer class periods, more complex notebooks and more independent homework planning. We support this transition with a structured orientation, a personal organiser, regular study skills sessions and close communication between class teachers and parents in the first term.</p>
+
+<h3>Class 7 — Building Subject Depth</h3>
+<p>In Class 7, students go deeper into English literature and language, Hindi, a third language (Sanskrit or French), Mathematics, Science, Social Science and Computer Science. Project work becomes more analytical, with research, citation and presentation expectations. Co-curricular leadership opportunities — class representative roles, house event coordination, club leadership — also begin to open up.</p>
+
+<h3>Class 8 — Preparing for the Board Years</h3>
+<p>Class 8 is a stepping stone into the Class 9–10 board years. The curriculum focuses on conceptual clarity, application-based problem solving and careful study habits. Students choose options for senior co-curricular tracks, attend early career-awareness sessions, and learn how to plan their term, balance subjects and prepare effectively for assessments.</p>
+
+<h2>Subject Foundation and Skill Development</h2>
+<p>The Class 6 to Class 8 curriculum at Rainbow International School covers English, Hindi, a third language (Sanskrit or French), Mathematics, Science, Social Science, Computer Science, Art and Music, Physical Education and Value Education. Subject teachers integrate inquiry, group work, lab investigations and digital tools so that students learn by doing, not just by memorising. Cross-subject themes — sustainability, technology, citizenship, design thinking — are introduced through projects that pull together skills from multiple disciplines.</p>
+
+<h2>Classroom Learning Approach</h2>
+<p>Middle school classrooms at Rainbow are interactive and discussion-friendly. Smart panels are used for visual lessons, simulations and short videos that bring concepts to life. Students take notes, work in pairs or small groups, present findings and answer open-ended questions. Science classes are supported by hands-on lab sessions in our Physics, Chemistry, Biology and Computer labs. Mathematics integrates problem-solving competitions, mental maths challenges and real-world applications.</p>
+
+<h2>Academic Support and Progress Tracking</h2>
+<p>Middle school students receive regular formative feedback, periodic assessments, mid-term and term-end examinations. Subject teachers identify gaps early and offer doubt-clearing sessions, supplementary worksheets and targeted revision plans. A coordinated mentor system pairs every student with a faculty mentor who tracks academic progress, attendance, behaviour and wellbeing across the year.</p>
+<p>Parents receive detailed progress reports along with personalised comments. Parent-teacher meetings are scheduled at structured intervals, and the school maintains open communication channels for any concern that needs immediate attention.</p>
+
+<h2>Preparing Students for Secondary School</h2>
+<p>By the end of Class 8, our students are not just academically prepared for the secondary board years — they are mentally, emotionally and socially ready. They have built study habits, learned to manage their own time, presented in front of audiences, worked in teams, faced failure and tried again, and developed strong relationships with teachers and peers. This middle school experience is what makes the jump to Class 9 and Class 10 board exam preparation feel like a natural next step rather than a sudden shock.</p>
 
 <h2>Beyond the Classroom</h2>
-<p>Students engage in MUN, science exhibitions, robotics, coding, inter-school debates, sports tournaments, field trips, and community service. Leadership opportunities through student council and house captaincy prepare them for senior school.</p>
+<p>Middle school students take part in Model United Nations, inter-school debates, science and maths exhibitions, robotics and coding clubs, sports tournaments, dance and music performances, art exhibitions, environmental drives and community service initiatives. Leadership opportunities through the student council and house system give them platforms to plan events, run activities and represent the school.</p>
 
-<p>Explore our <a href="/primary-section">Primary</a> or <a href="/secondary-section">Secondary</a> sections.</p>
+<h2>Hyperlocal Middle School Admissions in Thane</h2>
+
+<h3>Class 6 admission near Hiranandani Estate</h3>
+<p>Hiranandani Estate families looking for a CBSE middle school in Thane often choose Rainbow because the campus is just five minutes away and offers continuity from Class 6 right through to Class 12 under one roof.</p>
+
+<h3>Class 7 admission near Ghodbunder Road</h3>
+<p>For families along Ghodbunder Road — Patlipada, Waghbil, Owale, Kavesar and Kolshet — Class 6, Class 7 and Class 8 admissions at Rainbow are supported by dedicated bus routes that make the daily commute predictable and safe.</p>
+
+<h3>Class 8 admission near Brahmand Thane</h3>
+<p>Brahmand Phase 1 to 4 parents enjoy walking-distance access to the campus. Class 8 admission near Brahmand is particularly popular because families want their children to settle into the school well before the board years begin.</p>
+
+<h3>Middle school admissions near Manpada and Pokhran Road</h3>
+<p>Class 6 to Class 8 admissions from Manpada, Pokhran Road and the Majiwada belt are common at Rainbow. Bus routes, Saturday tour slots and a flexible counselling schedule make it easy for working parents to evaluate the school fit.</p>
+
+<h2>Frequently Asked Questions about Middle School</h2>
+
+<h3>Which board does the Middle School follow?</h3>
+<p>Class 6 to Class 8 follow the CBSE curriculum with strong emphasis on conceptual learning, language proficiency, mathematics, sciences and social sciences.</p>
+
+<h3>What third language is offered in Class 6 to Class 8?</h3>
+<p>Students can typically choose between Sanskrit and French as the third language. The choice is finalised during the admission interaction and at the start of the academic year.</p>
+
+<h3>How is academic progress tracked in middle school?</h3>
+<p>Through continuous classroom observations, periodic tests, mid-term and term-end assessments, and structured parent-teacher meetings. Teachers also share informal feedback to parents whenever needed.</p>
+
+<h3>Are middle school students given leadership opportunities?</h3>
+<p>Yes. Students take part in the student council, house events, club leadership, MUN, debates, sports captaincy and community service initiatives.</p>
+
+<h3>Is there academic support for students who join from another school?</h3>
+<p>Yes. Students transferring from other schools, boards or cities are supported with a short orientation, subject-readiness check and a classroom buddy to help them settle in.</p>
+
+<h3>What sports and activities are available?</h3>
+<p>Swimming, skating, football, cricket, basketball, athletics, table tennis, chess, dance, music, drama, art, robotics and a wide range of clubs.</p>
+
+<h3>How do I apply for a Class 6, Class 7 or Class 8 seat?</h3>
+<p>Call +91 82915 68972 or fill the enquiry form. Our admissions team will book a campus visit and walk you through the application, interaction and confirmation steps.</p>
+
+<h3>Are there bridge classes for students transferring mid-year?</h3>
+<p>Yes. Students joining Class 6, Class 7 or Class 8 mid-year are supported with a short bridge plan in core subjects so that they can catch up with classroom pace without feeling overwhelmed.</p>
+
+<h3>How does the school handle subject doubts and weak areas?</h3>
+<p>Subject teachers offer doubt-clearing slots, after-school study clinics and worksheet-based revision for students who need extra support. Mentors monitor progress and coordinate the right level of help.</p>
+
+<h3>Is technology integrated into middle school learning?</h3>
+<p>Yes. Smart panels in classrooms, lab software, coding sessions, robotics tasters and curated online resources are part of the regular middle school experience, used as tools to deepen understanding rather than replace teachers.</p>
+
+<h2>Daily Rhythm in the Middle School</h2>
+<p>A typical Class 6 to Class 8 day at Rainbow International School begins with morning assembly, a thought for the day and a short physical warm-up. Subject periods are paced to match attention spans, with planned movement breaks, a structured lunch, library or lab slots and dedicated time for sport, music, art or club activities. Homework is planned in coordination across subjects so that no single evening becomes overloaded, and weekend assignments are kept reasonable so families can spend time together.</p>
+
+<h2>Mentor and House System</h2>
+<p>Every middle school student is part of a house — a smaller community within the school that competes in academics, sport, arts and service. Houses give students friends across grades, mentors among seniors, and many opportunities to take on responsibility — anything from organising a quiz to coordinating a sports event. Each student also has a faculty mentor who tracks academic progress, attendance, behaviour, friendships and overall wellbeing.</p>
+
+<h2>Transport and Daily Commute</h2>
+<p>Middle school students typically use the school bus service. Buses are GPS-tracked, fitted with CCTV and a speed governor, and staffed with a trained female attendant. Routes cover Brahmand Phase 1 to 4, Hiranandani Estate, Manpada, Pokhran Road, Patlipada, Waghbil, Owale, Kavesar, Kolshet, Majiwada and Dhokali, with morning pick-up and afternoon drop coordinated to the school timetable.</p>
+
+<h2>Why Middle School Matters</h2>
+<p>The Class 6 to Class 8 years are when a child's relationship with learning, with peers and with their own confidence is shaped for life. A strong middle school experience builds curiosity, resilience and the ability to ask good questions, while a weak one leaves gaps that later board years struggle to fix. Rainbow International School treats these years with the seriousness they deserve, blending academic depth with personal care so that students reach Class 9 ready to take on the board years with confidence and calm.</p>
+
+<h2>Parent Decision Checklist</h2>
+<p>If you are choosing a CBSE middle school in Thane for Class 6, Class 7 or Class 8, we encourage you to visit the campus, observe a classroom in session, talk to a subject teacher, ask about study load and homework policy, see the labs and library, check the bus route from your area and discuss any specific learning needs your child may have. Rainbow International School welcomes these detailed conversations because the right fit makes the middle school years deeply rewarding.</p>
+
+<p>Explore our <a href="/primary-section">Primary section</a>, our <a href="/secondary-section">Secondary section</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
 </div>`;
 }
 
 function renderSecondary(): string {
   return `
 <div class="section">
-<h2>Secondary Section — Class 9 & 10</h2>
-<p>The Secondary Section at Rainbow International School prepares students for the CBSE Class 10 Board Examinations with a rigorous, structured academic programme complemented by comprehensive co-curricular development.</p>
+<h2>Secondary School in Thane for Class 9 and Class 10</h2>
+<p>The Secondary School at Rainbow International School in Thane is designed for serious academic growth without losing the warmth and balance that families value across the rest of our K–12 journey. Class 9 and Class 10 students follow a rigorous CBSE programme that prepares them for the Class 10 board examination, while continuing to enjoy sport, the arts, leadership opportunities and meaningful friendships. Our Brahmand Phase 4 campus offers fully equipped Physics, Chemistry, Biology and Computer laboratories, a senior library, dedicated discussion rooms, a digital classroom infrastructure and quiet study zones for focused work.</p>
 
-<h2>Subjects</h2>
-<p>English, Hindi, Mathematics, Science (Physics, Chemistry, Biology), Social Science (History, Geography, Political Science, Economics), Computer Applications / Information Technology, and Physical Education.</p>
+<h2>Why Parents Choose Rainbow for Secondary School</h2>
+<p>Parents from Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar and Kolshet choose Rainbow International School for Class 9 and Class 10 because they want a CBSE secondary school in Thane that takes academic outcomes seriously without making children anxious. Our subject teachers are experienced board-class educators, and they work alongside academic mentors, counsellors and house mentors so that every student feels supported as the syllabus, study load and stakes increase.</p>
+<p>Class strength is managed to ensure that every Class 9 and Class 10 student gets enough teacher attention, feedback on written work and one-on-one doubt-clearing time. The result is a secondary school environment that is structured, calm and quietly ambitious.</p>
 
-<h2>Board Exam Preparation</h2>
-<ul>
-<li>Structured study plans aligned to CBSE syllabus</li>
-<li>Regular practice tests and mock examinations</li>
-<li>Dedicated remedial and enrichment classes</li>
-<li>Previous year paper analysis and exam strategy workshops</li>
-<li>Personal mentoring and academic counselling</li>
-</ul>
+<h2>Class 9 and Class 10 Learning Journey</h2>
 
-<h2>Results</h2>
-<p>Rainbow International School has consistently delivered outstanding Class 10 Board results, with students scoring above 95% and many achieving perfect scores in individual subjects. Our first batch (2018–19) achieved a 100% pass rate.</p>
+<h3>Class 9 — Setting the Foundation for Boards</h3>
+<p>Class 9 is the year when students build the conceptual depth, study habits and time management that will carry them through the Class 10 board exam. Subject teachers introduce the full board syllabus structure, expected answer formats and the rhythm of unit tests, mid-terms and term-end exams. Students learn to make their own notes, plan revision, attempt past papers and analyse their own mistakes.</p>
 
-<h2>Career Guidance</h2>
-<p>From Class 9, students receive structured career counselling to help them choose the right stream — Science, Commerce, or Humanities — for Class 11.</p>
+<h3>Class 10 — Board Year Focus</h3>
+<p>Class 10 is the board year. The academic plan is built around regular practice tests, full-syllabus mock examinations, periodic doubt-clearing sessions, structured revision cycles and personalised feedback. Subject teachers track each student's progress in detail, and the school's pastoral team supports stress management, sleep, screen-time balance and exam-day strategy.</p>
 
-<p>Explore our <a href="/middle-school-section">Middle School</a> or <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
+<h2>Board Exam Readiness</h2>
+<p>Our CBSE Class 10 board preparation in Thane is more than just a series of tests. It is a year-long plan with clear weekly milestones, formative feedback, exam-style practice and personal mentoring. Students learn how to read questions carefully, structure answers, manage time in the exam hall, and stay composed under pressure. Mock examinations are conducted in conditions that closely mirror the real board environment so that exam day feels familiar rather than overwhelming.</p>
+
+<h2>Subject Focus</h2>
+<p>The CBSE Class 9 and Class 10 curriculum at Rainbow includes English, Hindi or other second language as per CBSE options, Mathematics, Science (Physics, Chemistry, Biology), Social Science (History, Geography, Political Science and Economics), Computer Applications or Information Technology and Physical Education. Lab work is given strong emphasis in Class 9 and Class 10 so that scientific concepts are felt, observed and understood — not memorised abstractly.</p>
+
+<h2>Study Discipline and Academic Support</h2>
+<p>We help students build study discipline through structured timetables, weekly subject planners, daily revision habits, and quiet on-campus study slots. Teachers offer additional support for students who need extra help, and enrichment for students who want to go deeper in particular subjects. Doubt-clearing sessions, after-school study clinics and one-on-one mentor check-ins are regular fixtures of the secondary school calendar.</p>
+
+<h2>Assessment and Feedback</h2>
+<p>Assessment in Class 9 and Class 10 follows the CBSE pattern — periodic tests, mid-term assessments, full-length pre-board examinations and the final board examination in Class 10. Each assessment is followed by detailed feedback, both written and verbal. Parents receive structured progress reports and are invited for parent-teacher meetings where teachers, mentors and counsellors share a complete picture of the child's academic and personal growth.</p>
+
+<h2>Preparing Students for Senior Secondary</h2>
+<p>From Class 9 onwards, students attend structured stream-selection sessions to help them think about Class 11 — Science, Commerce or Humanities — based on their aptitude, interests and career direction. Career awareness sessions, alumni interactions, college pathway briefings and one-on-one counselling help students and parents make a confident, informed stream choice rather than a rushed one in the weeks after the Class 10 results are declared.</p>
+
+<h2>Beyond Academics</h2>
+<p>Even in the board years, Rainbow students continue with sport, music, drama, dance, art, debate, MUN, robotics and community service. We believe that a strong board year is built on balance — academic focus combined with physical activity, creative expression, social connection and adequate rest. Leadership opportunities through the student council, house captaincy and event coordination help Class 9 and Class 10 students grow into well-rounded young adults.</p>
+
+<h2>Hyperlocal Secondary Admissions in Thane</h2>
+
+<h3>Class 9 admission near Hiranandani Estate</h3>
+<p>Hiranandani Estate families looking for a CBSE secondary school in Thane choose Rainbow for the combination of board-year rigour, structured pastoral support and a quick five-minute drive to campus.</p>
+
+<h3>Class 10 admission near Ghodbunder Road</h3>
+<p>For Patlipada, Waghbil, Owale, Kavesar and Kolshet families along Ghodbunder Road, Class 10 transfer admissions are evaluated on a case-by-case basis subject to seat availability, CBSE transfer norms and a brief subject-readiness assessment.</p>
+
+<h3>Class 10 admission near Brahmand Thane</h3>
+<p>Brahmand Phase 1 to 4 families enjoy walking-distance access to the campus, which means students save commute time during the board year — extra time that can be used for study, revision, sport or rest.</p>
+
+<h3>Secondary admissions near Manpada and Pokhran Road</h3>
+<p>Class 9 admissions from Manpada, Pokhran Road and the Majiwada belt are supported by dedicated bus routes and a Saturday-morning campus tour slot for working parents.</p>
+
+<h2>Frequently Asked Questions about Secondary School</h2>
+
+<h3>Which board do Class 9 and Class 10 follow?</h3>
+<p>Class 9 and Class 10 follow the CBSE curriculum, with the Class 10 board examination conducted as per CBSE schedule and pattern.</p>
+
+<h3>How is board exam preparation structured?</h3>
+<p>Through a year-long plan that includes structured study schedules, periodic tests, full pre-board examinations, doubt-clearing sessions and personalised feedback for every student.</p>
+
+<h3>Do you offer Class 10 transfer admissions?</h3>
+<p>Class 10 admissions are considered on a case-by-case basis subject to seat availability, CBSE transfer norms and a short subject-readiness assessment.</p>
+
+<h3>What career and stream guidance is offered in Class 9 and Class 10?</h3>
+<p>Students attend structured stream-selection sessions, career awareness workshops and one-on-one counselling so that the Class 11 stream choice — Science, Commerce or Humanities — is well informed.</p>
+
+<h3>How do you handle exam stress and student wellbeing?</h3>
+<p>Through pastoral support, mentor check-ins, counsellor sessions, balanced co-curricular activity and a strong focus on sleep, screen time and physical activity.</p>
+
+<h3>What activities are available beyond academics?</h3>
+<p>Sport, music, drama, dance, art, debate, MUN, robotics, leadership and community service — even in the board years.</p>
+
+<h3>How do I apply for Class 9 or Class 10?</h3>
+<p>Call +91 82915 68972 or use the enquiry form. Our admissions team will arrange a campus visit, the subject-readiness assessment and the next steps.</p>
+
+<h3>How are practicals handled in Class 9 and Class 10?</h3>
+<p>Practical sessions in Physics, Chemistry, Biology and Information Technology follow the CBSE-prescribed list of experiments. Students maintain a structured lab record, attempt practical examinations and viva voce, and learn the discipline of careful, accurate, safe lab work.</p>
+
+<h3>Are coaching-style remedial sessions available?</h3>
+<p>The school offers in-house remedial and enrichment sessions for students who need extra help or who want to go beyond the syllabus. These are run by Rainbow's own subject teachers, not external coaching providers.</p>
+
+<h3>How does the school communicate with parents in the board year?</h3>
+<p>Through structured progress reports after every assessment, parent-teacher meetings at planned intervals, mentor calls or emails when needed, and a clear official channel for any concern. Parents are kept informed of academic progress and wellbeing across the year.</p>
+
+<h2>Daily Rhythm in the Secondary School</h2>
+<p>A typical Class 9 or Class 10 day begins with morning assembly, a brief reflection and a short physical activity. Periods are scheduled to balance theory-heavy subjects with lab sessions, language work, sport, music and quiet study. Lunch is supervised, and the afternoon includes co-curricular activities, library hours or extra study slots based on the day. Homework is coordinated across subjects so that no single evening becomes overloaded, and the school encourages a healthy balance of study, rest, sleep and physical activity.</p>
+
+<h2>Mentor and House System</h2>
+<p>Every Class 9 and Class 10 student is part of a house and is paired with a faculty mentor. Mentors track academic progress, attendance, friendships and wellbeing, and act as the first point of contact for parents on any non-routine matter. Houses give students leadership opportunities — captaining a sport, leading a debate team, coordinating a community service drive — that build the kind of confidence which transcripts alone cannot capture.</p>
+
+<h2>Transport and Daily Commute</h2>
+<p>Secondary students typically use the school bus service. Buses are GPS-tracked, fitted with CCTV and a speed governor, and staffed with a trained female attendant. Routes cover Brahmand Phase 1 to 4, Hiranandani Estate, Manpada, Pokhran Road, Patlipada, Waghbil, Owale, Kavesar, Kolshet, Majiwada and Dhokali, with morning pick-up and afternoon drop carefully coordinated to the school timetable so that students arrive ready and reach home safely.</p>
+
+<h2>Wellbeing in the Board Year</h2>
+<p>The Class 10 board year can feel intense for students and families. Rainbow International School puts active effort into wellbeing — a structured study plan, healthy sleep advice, screen-time discipline, regular physical activity, counsellor support and short mindfulness sessions. We work with parents to keep the home environment supportive, and we discourage the unnecessary "always studying" pressure that often does more harm than good.</p>
+
+<h2>Parent Decision Checklist</h2>
+<p>If you are choosing a CBSE secondary school in Thane for Class 9 or Class 10, we encourage you to visit the campus, observe a classroom, see the science labs, talk to a subject teacher about board preparation, ask about pre-board strategy, check transport availability from your area and understand how the school supports students who need extra help. Rainbow International School welcomes these detailed conversations because a well-informed family choice is the strongest start to the board years.</p>
+
+<p>Explore our <a href="/middle-school-section">Middle School</a>, our <a href="/senior-secondary-section">Senior Secondary section</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
 </div>`;
 }
 
 function renderSeniorSecondary(): string {
   return `
 <div class="section">
-<h2>Senior Secondary Section — Class 11 & 12</h2>
-<p>Rainbow International School offers a comprehensive Senior Secondary programme with three streams — Science, Commerce, and Humanities — preparing students for CBSE Class 12 Board Examinations and competitive entrance tests.</p>
+<h2>Senior Secondary School in Thane for Class 11 and Class 12</h2>
+<p>The Senior Secondary School at Rainbow International School in Thane is where students take ownership of their future. Class 11 and Class 12 are the years when academic depth, board-exam readiness, career direction and personal identity all come together. Our CBSE Senior Secondary programme offers Science, Commerce and Humanities streams with carefully chosen subject combinations, structured board preparation, integrated competitive exam orientation, and dedicated career and college counselling. The Brahmand Phase 4 campus provides advanced Physics, Chemistry, Biology and Computer laboratories, a senior library, smart classrooms, quiet study zones and discussion spaces designed for senior learners.</p>
 
-<h2>Streams & Subjects</h2>
+<h2>Why Students Choose Rainbow for Senior Secondary</h2>
+<p>Students and parents from Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar and Kolshet choose Rainbow International School for Class 11 and Class 12 because they want a CBSE senior secondary school in Thane that combines academic seriousness with personal mentoring. Our senior secondary faculty includes experienced subject specialists in Physics, Chemistry, Mathematics, Biology, Accountancy, Business Studies, Economics, English, History, Political Science and other CBSE-prescribed subjects. Each student is paired with a faculty mentor who tracks academic progress, attendance, wellbeing and career direction across the two-year journey.</p>
+
+<h2>Class 11 and Class 12 Learning Journey</h2>
+
+<h3>Class 11 — Building Subject Mastery</h3>
+<p>Class 11 is the year when students transition from a wide Class 10 syllabus to a focused stream-based study. The first term is dedicated to building strong concept foundations, study habits, lab discipline and self-driven note-making. Periodic tests, mid-term and term-end examinations help students benchmark their progress, identify weak areas and plan revision.</p>
+
+<h3>Class 12 — Board and Career Year</h3>
+<p>Class 12 is the board year and the year of major career decisions. The academic calendar combines completion of the syllabus, multiple rounds of revision, full pre-board examinations, doubt-clearing sessions, board-exam strategy workshops and personalised feedback. Alongside the board preparation, students receive intensive career and higher-education counselling for Indian and international university pathways.</p>
+
+<h2>Stream and Subject Guidance</h2>
+
 <h3>Science Stream</h3>
-<p>Physics, Chemistry, Mathematics / Biology, English, Physical Education / Computer Science</p>
+<p>Subjects include English, Physics, Chemistry, Mathematics or Biology, with options such as Computer Science, Informatics Practices, Physical Education or another elective. The Science stream is designed for students preparing for engineering, medical, design, architecture, pure sciences, data analytics and emerging technology pathways.</p>
 
 <h3>Commerce Stream</h3>
-<p>Accountancy, Business Studies, Economics, English, Mathematics / Informatics Practices</p>
+<p>Subjects include English, Accountancy, Business Studies, Economics, with options of Mathematics or Informatics Practices and additional electives such as Physical Education. The Commerce stream supports students aiming for chartered accountancy, finance, banking, business management, economics, law, entrepreneurship and related fields.</p>
 
 <h3>Humanities Stream</h3>
-<p>History, Political Science, Economics / Psychology, English, Physical Education / Sociology</p>
+<p>Subjects include English, History, Political Science, Economics or Psychology, with additional options such as Physical Education or Sociology depending on availability. The Humanities stream is ideal for students drawn to law, journalism, design, public policy, civil services, psychology, social sciences, literature and the liberal arts.</p>
 
-<h2>Key Features</h2>
-<ul>
-<li>Advanced Physics, Chemistry, Biology, and Computer labs</li>
-<li>Experienced faculty with subject expertise</li>
-<li>Competitive exam preparation (JEE, NEET, CUET, CLAT)</li>
-<li>Career counselling and college application support</li>
-<li>Internship and industry exposure opportunities</li>
-<li>Regular mock tests and performance analytics</li>
-</ul>
+<h2>Board Exam Preparation</h2>
+<p>Our CBSE Class 12 board preparation in Thane is structured around clear weekly milestones, regular formative assessments, full-syllabus pre-board examinations and structured revision cycles. Students learn how to read complex questions, structure answers within the prescribed word limits, manage time in the examination hall and avoid common board-exam mistakes. Subject teachers offer detailed paper-by-paper feedback so that students can improve quickly between mocks.</p>
 
-<h2>Beyond Academics</h2>
-<p>Senior students participate in MUN, debate, leadership programmes, community service, inter-school competitions, and career fairs. Class 12 students receive dedicated college counselling.</p>
+<h2>Career and Higher Education Readiness</h2>
+<p>Senior secondary students receive structured career counselling, aptitude assessments and pathway guidance for Indian universities, central university admissions through CUET, professional courses, design schools, law schools and international undergraduate options. We orient students to common competitive exams — JEE, NEET, CUET, CLAT, NIFT, NID, NATA and others — and help them plan their preparation alongside the school timetable. College application support, recommendation letters, statement of purpose feedback and interview preparation are part of the Class 12 calendar.</p>
 
-<p>Explore our <a href="/secondary-section">Secondary Section</a> or <a href="/admissions">apply for admission</a>.</p>
+<h2>Student Leadership and Confidence</h2>
+<p>Class 11 and Class 12 students lead the school's student council, house events, MUN delegations, inter-school competitions, science exhibitions and community service initiatives. Mentoring junior students, organising events and representing the school in external forums help them build the confidence, communication and leadership skills that universities and employers value.</p>
+
+<h2>Assessment and Academic Tracking</h2>
+<p>Senior secondary assessment includes periodic class tests, unit assessments, mid-term examinations, full pre-board examinations, practical assessments and the final CBSE Class 12 board examination. Each assessment is followed by detailed analysis — both subject-wise and skill-wise — and discussed with students and parents. Mentor check-ins ensure that academic, emotional and career-readiness conversations happen continuously, not just at the end of the year.</p>
+
+<h2>Hyperlocal Senior Secondary Admissions in Thane</h2>
+
+<h3>Class 11 admission near Hiranandani Estate</h3>
+<p>Hiranandani Estate families seeking a CBSE Class 11 admission in Thane often choose Rainbow for the combination of strong stream options, structured board-year planning, career counselling and a five-minute campus commute.</p>
+
+<h3>Class 12 admission near Ghodbunder Road</h3>
+<p>Class 12 admissions for students relocating along Ghodbunder Road — Patlipada, Waghbil, Owale, Kavesar and Kolshet — are considered case-by-case, subject to subject availability and CBSE transfer norms.</p>
+
+<h3>Class 12 admission near Brahmand Thane</h3>
+<p>Brahmand Phase 1 to 4 families benefit from walking-distance access to the campus, which is especially valuable in the demanding Class 12 board year when commute time matters.</p>
+
+<h3>Class 11 Science, Commerce and Humanities admissions in Thane</h3>
+<p>Stream-specific admissions for Class 11 Science, Class 11 Commerce and Class 11 Humanities open every year after Class 10 board results, with stream-selection counselling offered to all applicants and confirmed students.</p>
+
+<h2>Frequently Asked Questions about Senior Secondary</h2>
+
+<h3>Which streams are offered for Class 11 and Class 12?</h3>
+<p>Science, Commerce and Humanities, with CBSE-aligned subject combinations and selected electives.</p>
+
+<h3>How is Class 12 board preparation structured?</h3>
+<p>Through a year-long plan with periodic tests, full pre-board examinations, structured revision cycles, doubt-clearing sessions and personalised mentor feedback.</p>
+
+<h3>Do you offer support for JEE, NEET, CUET and other competitive exams?</h3>
+<p>The school orients students to competitive exam patterns, integrates concept clarity, exam-style practice and time-management skills into senior secondary teaching, and works alongside students preparing for JEE, NEET, CUET, CLAT and similar examinations.</p>
+
+<h3>What kind of career counselling is offered?</h3>
+<p>Aptitude assessments, one-on-one career conversations, university pathway briefings, application support and interview preparation across Indian and international undergraduate routes.</p>
+
+<h3>Are Class 12 transfer admissions available?</h3>
+<p>Class 12 admissions are considered on a case-by-case basis subject to CBSE transfer guidelines, subject availability and the student's previous record.</p>
+
+<h3>How is student wellbeing handled in the board year?</h3>
+<p>Through dedicated mentors, counsellor support, balanced co-curricular activity and structured advice on sleep, study load, screen time and stress management.</p>
+
+<h3>How do I apply for Class 11 or Class 12?</h3>
+<p>Call +91 82915 68972 or fill the enquiry form. Our senior secondary admissions team will arrange a campus visit, stream counselling and the next steps.</p>
+
+<h3>How are practicals handled in Class 11 and Class 12?</h3>
+<p>Practicals in Physics, Chemistry, Biology, Computer Science, Informatics Practices and other lab-based subjects follow the CBSE-prescribed format. Students maintain detailed lab records, complete project work, attempt practical examinations and viva voce as per the board pattern.</p>
+
+<h3>What kind of mentor support do senior students receive?</h3>
+<p>Each student is paired with a faculty mentor who tracks academic performance, attendance, wellbeing and career direction. Mentors are the first point of contact for parents on any non-routine matter and coordinate doubt-clearing or counselling support when needed.</p>
+
+<h3>Are project work and internships part of the senior secondary experience?</h3>
+<p>Project work is integral to the CBSE Class 11 and Class 12 curriculum. Where appropriate, the school encourages students to take up short internships, volunteering opportunities, research projects and community service initiatives that strengthen their college and career readiness.</p>
+
+<h2>Daily Rhythm in the Senior Secondary School</h2>
+<p>A typical Class 11 or Class 12 day begins with assembly, reflection and a short physical activity. Periods are scheduled to balance lecture-heavy subjects, lab sessions, focused problem-solving slots and quiet study time. Lunch is supervised, and the afternoon may include doubt-clearing sessions, library research, club work or sport. Homework, project work and revision are coordinated across subjects to keep the load balanced. Students learn to manage their own timetable, prioritise tasks and take ownership of their preparation.</p>
+
+<h2>Career and University Readiness</h2>
+<p>Career readiness in Class 11 and Class 12 includes structured guidance for Indian university applications, central university admissions through CUET, professional courses such as engineering, medical, law, design, architecture, chartered accountancy and management, as well as international undergraduate applications. Students receive support with personal essays, statements of purpose, recommendation letters, interview preparation and standardised test orientation. The school maintains an updated awareness of evolving university expectations so that students are guided with current, accurate information.</p>
+
+<h2>Wellbeing in the Senior Secondary Years</h2>
+<p>The senior secondary years can feel demanding. Rainbow International School pays active attention to student wellbeing through balanced timetables, mentor check-ins, counsellor support, physical activity and a clear focus on healthy sleep, nutrition and screen-time discipline. We work with parents to keep the home environment supportive and to avoid the kind of unbroken pressure that affects both performance and confidence.</p>
+
+<h2>Transport and Daily Commute</h2>
+<p>Senior secondary students typically use the school bus service. Buses are GPS-tracked, fitted with CCTV and a speed governor, and staffed with a trained female attendant. Routes cover Brahmand Phase 1 to 4, Hiranandani Estate, Manpada, Pokhran Road, Patlipada, Waghbil, Owale, Kavesar, Kolshet, Majiwada and Dhokali. Some Class 11 and Class 12 students choose to use family transport in the board year so they can manage personalised study schedules, and the campus parking and pick-up zones support both options safely.</p>
+
+<h2>Why Senior Secondary Matters</h2>
+<p>Class 11 and Class 12 are the years that translate a decade of schooling into a future direction. The choices students make about subjects, study habits, mentoring relationships and competitive exam preparation in these two years shape the kind of universities they reach, the careers they build and the confidence they carry into adult life. Rainbow International School treats this stage with the seriousness it deserves, while protecting the warmth, balance and personal mentoring that have defined the rest of the school journey.</p>
+
+<h2>Parent and Student Decision Checklist</h2>
+<p>If you are choosing a CBSE senior secondary school in Thane for Class 11 or Class 12, we encourage you to visit the campus, talk to subject teachers in your stream of interest, see the labs, understand the pre-board and board preparation plan, ask about career counselling and university support, and discuss any specific aspirations or concerns. Rainbow International School welcomes these detailed conversations because the right fit between the student, the family and the school makes the senior secondary years truly transformative.</p>
+
+<p>Explore our <a href="/secondary-section">Secondary section</a>, learn more about <a href="/admissions">2026–27 admissions</a>, or call us at <strong>+91 82915 68972</strong>.</p>
 </div>`;
 }
 
@@ -552,48 +846,115 @@ function renderSafety(): string {
 function renderAdmissions(): string {
   return `
 <div class="section">
-<h2>Admissions 2026–27</h2>
-<p>Admissions are now open at Rainbow International School, Thane for the academic year 2026–27. We welcome applications for all classes from Nursery to Class 12 (CBSE).</p>
+<h2>Admissions Open 2026–27 at Rainbow International School, Thane</h2>
+<p>Admissions are now open at Rainbow International School, a CBSE school in Thane, for the 2026–27 academic year. We are accepting applications across all grades — Nursery, Junior KG, Senior KG, Class 1 through Class 8, Class 9, Class 10, Class 11 (Science, Commerce and Humanities) and Class 12. Whether you are looking for a Nursery seat near Hiranandani Estate, a Class 1 admission near Brahmand Phase 4, a Class 6 transfer from another school in Thane, or a Class 11 stream change after Class 10 results, our admissions team will guide you through every step with clarity and care.</p>
+<p>Rainbow International School has been part of the Thane parent community since 2009. Over the years, more than 3,000 students from Brahmand, Manpada, Pokhran Road, Dhokali, Hiranandani Estate, Patlipada, Waghbil, Kavesar, Owale, Kolshet and surrounding neighbourhoods have called this 3.5-acre campus their school home. The 2026–27 admission cycle continues that tradition, offering a CBSE-aligned, future-ready learning environment from Nursery to Class 12 under one roof.</p>
 
-<h2>Why Choose Rainbow International School?</h2>
-<ul>
-<li>3.5-acre campus in Brahmand Phase 4, Thane</li>
-<li>CBSE-affiliated (No. 1130661) — Nursery to Class 12</li>
-<li>3,000+ students, 200+ dedicated educators</li>
-<li>Multiple Intelligence-based pedagogy</li>
-<li>30+ extracurricular activities</li>
-<li>Award-winning school — Best School in Thane (multiple years)</li>
-</ul>
-
-<h2>Admission Process</h2>
+<h2>Admission Process Overview</h2>
+<p>Our admission process is designed to be simple, transparent and parent-friendly. We do not believe in entrance hurdles for young learners. Instead, we focus on getting to know each child and family so we can welcome them into the right grade with the right support from day one.</p>
 <ol>
-<li><strong>Step 1 — Submit Application:</strong> Fill the online application form with your child's details and preferred class.</li>
-<li><strong>Step 2 — Interaction Session:</strong> Attend a one-on-one interaction with our academic team. Class 9+ requires a written assessment.</li>
-<li><strong>Step 3 — Document Verification:</strong> Submit original documents including birth certificate, Aadhaar, TC, and report cards.</li>
-<li><strong>Step 4 — Confirmation:</strong> Complete fee payment and receive admission confirmation.</li>
+<li><strong>Step 1 — Enquiry & Campus Visit:</strong> Begin with a phone enquiry on +91 82915 68972 or fill the online enquiry form. Our admissions counsellor will share the prospectus and help you book a campus visit at a time that suits your family.</li>
+<li><strong>Step 2 — Submit the Application Form:</strong> Complete the application form online or on campus, providing your child's grade, date of birth, current school details and parent contact information.</li>
+<li><strong>Step 3 — Interaction Session:</strong> A friendly, age-appropriate interaction with our academic team helps us understand your child's strengths, interests and learning style. For Class 9 and above, a written subject-readiness assessment is included.</li>
+<li><strong>Step 4 — Document Verification:</strong> Submit the original birth certificate, Aadhaar, Transfer Certificate (where applicable) and the last two years of report cards or progress reports.</li>
+<li><strong>Step 5 — Confirmation & Onboarding:</strong> Once the seat is offered, complete the fee formalities and receive your welcome kit, uniform list, transport route confirmation and class teacher introduction before the academic year begins.</li>
 </ol>
 
-<h2>Age Criteria</h2>
-<ul>
-<li><strong>Nursery:</strong> 2.5 years (as on 31st March)</li>
-<li><strong>Jr KG:</strong> 3.5 years</li>
-<li><strong>Sr KG:</strong> 4.5 years</li>
-<li><strong>Class 1:</strong> 6 years</li>
-<li><strong>Class 2–8:</strong> Age appropriate as per CBSE norms</li>
-<li><strong>Class 9+:</strong> Written assessment required</li>
-</ul>
+<h2>Grade-wise Admissions — Nursery to Class 12</h2>
+
+<h3>Nursery, Junior KG and Senior KG Admissions in Thane</h3>
+<p>Pre-Primary admissions are typically the most sought-after seats every year. We offer Nursery, Junior KG and Senior KG admissions for children aged 2.5 years and above as on 31st March 2026. The Pre-Primary wing operates with a 100% female teaching team, dedicated nap and play zones, age-appropriate furniture, and a play-based curriculum that gently builds early language, numeracy, motor and social skills.</p>
+
+<h3>Class 1 to Class 5 Admissions in Thane</h3>
+<p>Primary admissions for Class 1, Class 2, Class 3, Class 4 and Class 5 are open for 2026–27. The primary years build strong literacy, numeracy and inquiry foundations through experiential learning, daily reading, mental maths, EVS investigations, art, music, sports and computer literacy. New entrants from other Thane schools are supported with a friendly orientation week and a bridge-learning plan where needed.</p>
+
+<h3>Class 6 to Class 8 Admissions in Thane</h3>
+<p>Class 6, Class 7 and Class 8 admissions welcome students moving from another school or progressing from our own primary section. The middle school curriculum deepens subject knowledge in English, Hindi, Mathematics, Science, Social Science and a third language (Sanskrit or French), with strong emphasis on study skills, project work and confidence building.</p>
+
+<h3>Class 9 and Class 10 Admissions in Thane</h3>
+<p>Class 9 admissions and limited Class 10 admissions are available for the 2026–27 session. Students appear for a brief written assessment in core subjects to help us plan academic support. Once admitted, students follow a structured CBSE Class 10 board preparation programme that includes regular tests, doubt-clearing classes and exam strategy workshops.</p>
+
+<h3>Class 11 and Class 12 Admissions in Thane</h3>
+<p>Senior Secondary admissions for Class 11 are open across Science, Commerce and Humanities streams. Class 12 admissions are considered on a case-by-case basis subject to subject availability and CBSE transfer norms. Stream selection counselling is offered to every Class 10 student so that the choice is based on aptitude and aspiration, not pressure.</p>
 
 <h2>Documents Required</h2>
 <ul>
-<li>Birth Certificate (original + photocopy)</li>
-<li>Aadhaar Card of child and parent</li>
-<li>Transfer Certificate from previous school</li>
-<li>Report card / mark sheet of last 2 years</li>
-<li>4 passport-size photographs</li>
-<li>Address proof and medical fitness certificate</li>
+<li>Birth certificate (original and one photocopy)</li>
+<li>Aadhaar card of the child and at least one parent</li>
+<li>Transfer Certificate from the previous school (mandatory for Class 1 onwards if joining mid-stream)</li>
+<li>Report cards or progress reports of the last two academic years</li>
+<li>Four recent passport-size photographs of the child</li>
+<li>Address proof — passport, electricity bill, rent agreement or Aadhaar with current address</li>
+<li>Medical fitness certificate including immunisation record</li>
+<li>For Class 11 admissions, the Class 10 mark sheet is required at the time of confirmation</li>
 </ul>
 
-<p>Contact our admissions desk at <strong>+91 82915 68972</strong> or <a href="/application-form">apply online</a>.</p>
+<h2>Age Criteria for 2026–27</h2>
+<ul>
+<li><strong>Nursery:</strong> 2.5 years as on 31st March 2026</li>
+<li><strong>Junior KG:</strong> 3.5 years as on 31st March 2026</li>
+<li><strong>Senior KG:</strong> 4.5 years as on 31st March 2026</li>
+<li><strong>Class 1:</strong> 6 years as on 31st March 2026</li>
+<li><strong>Class 2 to Class 8:</strong> Age-appropriate progression as per CBSE norms</li>
+<li><strong>Class 9 and Class 10:</strong> Subject to written assessment and seat availability</li>
+<li><strong>Class 11:</strong> Based on Class 10 board results and stream preference</li>
+</ul>
+
+<h2>Why a Campus Visit Matters</h2>
+<p>Choosing a school is one of the most important decisions a family makes. We strongly encourage every parent to visit the Rainbow International School campus before confirming admission. A campus visit lets you see our 3.5-acre Brahmand Phase 4 facility in person — the smart classrooms, science and computer labs, library, swimming pool, skating rink, sports grounds, amphitheatre, organic farm, infirmary and cafeteria. You will also meet members of our academic team, see students at work, and get a feel for the warmth and energy of the school community.</p>
+<p>Campus visits can be scheduled on weekdays between 9:30 AM and 4:30 PM and on Saturdays between 9:30 AM and 1:00 PM. Walk-ins are welcome but a prior appointment ensures dedicated time with our admissions counsellor.</p>
+
+<h2>Parent Counselling and Support</h2>
+<p>We understand that every family has unique questions — about curriculum, fees, transport, special learning needs, language transitions, sports, extracurriculars or stream choices. Our admissions team and academic coordinators are available to answer these questions in detail, in person or over a phone call. For families relocating to Thane from another city or country, we offer relocation support, settling-in advice and a buddy system in the classroom to help your child feel at home quickly.</p>
+
+<h2>Transport and Location Support</h2>
+<p>Rainbow International School operates a fleet of GPS-tracked, CCTV-equipped buses across more than 30 routes covering Brahmand Phase 1 to 4, Hiranandani Estate, Manpada, Pokhran Road, Dhokali, Patlipada, Waghbil, Kavesar, Owale, Kolshet, Majiwada and other Thane neighbourhoods. Each bus has a trained female attendant, a speed governor and a real-time tracking system that parents can access during pick-up and drop windows. Route confirmation is part of the admission onboarding process.</p>
+
+<h2>Hyperlocal Admissions — Find a Seat Near You</h2>
+<p>Many of our families come from neighbourhoods within a 15-minute commute. If you are searching for "school admission near me" in Thane, here is how Rainbow International School fits into your locality.</p>
+
+<h3>Admissions near Brahmand Thane</h3>
+<p>Brahmand Phase 1 to Phase 4 families enjoy walking-distance access to the campus. Nursery, Class 1, Class 5, Class 8 and Class 11 admissions from Brahmand are particularly common because parents value the short, safe daily commute for their children.</p>
+
+<h3>Admissions near Hiranandani Estate</h3>
+<p>Hiranandani Estate is just a five-minute drive from campus. We see strong demand for Nursery admissions, Class 1 admissions and Class 6 admissions from Hiranandani Estate families looking for a CBSE option close to home.</p>
+
+<h3>Admissions near Ghodbunder Road</h3>
+<p>Families along the Ghodbunder Road corridor — Patlipada, Waghbil, Kavesar, Owale and Kolshet — are served by dedicated bus routes. Class 1 admission near Ghodbunder Road and Class 11 stream admissions are popular every year.</p>
+
+<h3>Admissions near Manpada and Pokhran Road</h3>
+<p>Manpada Junction is a five-minute drive from the campus. Pre-Primary, Primary and Senior Secondary admissions from Manpada and the Pokhran Road area benefit from our morning and afternoon shuttle slots.</p>
+
+<h3>Admissions near Kavesar and Kolshet</h3>
+<p>Kavesar and Kolshet families typically choose Rainbow for the combination of CBSE curriculum, K-12 continuity and reliable transport. Class 5, Class 8 and Class 9 transfer admissions from these neighbourhoods are common.</p>
+
+<h2>Frequently Asked Questions about Admissions</h2>
+
+<h3>When do admissions open for 2026–27?</h3>
+<p>Admissions for the 2026–27 academic year are open now. Pre-Primary and Class 1 seats fill the fastest, so we recommend submitting your enquiry as early as possible.</p>
+
+<h3>Is there an entrance test for Nursery or Class 1?</h3>
+<p>No. There is no formal entrance test for Pre-Primary or Class 1. Instead, we hold a friendly interaction with the child and parents to understand readiness and family expectations.</p>
+
+<h3>Do you accept mid-year transfers?</h3>
+<p>Mid-year transfers are considered on a case-by-case basis, subject to seat availability in the relevant grade and CBSE transfer guidelines.</p>
+
+<h3>How do I book a campus visit?</h3>
+<p>Call +91 82915 68972 or use the enquiry form on the website. Our admissions team will confirm a slot within working hours.</p>
+
+<h3>Are sibling concessions available?</h3>
+<p>Yes, sibling concessions are offered. Details are shared during the admission interaction.</p>
+
+<h3>What is the medium of instruction?</h3>
+<p>The medium of instruction is English, with Hindi and Marathi taught as second and third languages as per CBSE norms. French and Sanskrit are offered as third-language options in middle school.</p>
+
+<h3>Do you provide transport from my area?</h3>
+<p>We operate routes across Brahmand, Hiranandani Estate, Manpada, Pokhran Road, Dhokali, Patlipada, Waghbil, Kavesar, Owale, Kolshet, Majiwada and surrounding areas. Confirm your route during the admission visit.</p>
+
+<h3>How do I begin the admission process?</h3>
+<p>Call +91 82915 68972, write to info@rainbowinternationalschool.in, or use the application form on this page. We will guide you through enquiry, campus visit, interaction and confirmation.</p>
+
+<p>Ready to begin? <a href="/application-form">Start your 2026–27 application</a> or call us at <strong>+91 82915 68972</strong>. You can also explore our <a href="/primary-section">Primary</a>, <a href="/middle-school-section">Middle</a>, <a href="/secondary-section">Secondary</a> and <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
 </div>`;
 }
 
@@ -1336,13 +1697,14 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/primary-section",
-    title: "Primary School in Thane — Class 1 to 5 CBSE | Rainbow International School",
-    description: "Primary section (Class 1–5) at Rainbow International School, Thane. CBSE curriculum, smart classrooms, experiential learning, 30+ extracurriculars.",
+    appendSiteName: false,
+    title: "Primary School in Thane | CBSE Class 1 to 5",
+    description: "Explore Primary School at Rainbow International School, a CBSE school in Thane for Class 1 to 5 with academics, activities, safety and care.",
     keywords: "primary school Thane, Class 1 to 5 CBSE Thane, best primary school Thane, CBSE primary Thane",
     canonical: "https://rainbowinternationalschool.in/primary-section",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Primary Section", url: "https://rainbowinternationalschool.in/primary-section" },
+      { name: "Primary School in Thane | Class 1 to Class 5", url: "https://rainbowinternationalschool.in/primary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Primary Section", educationalLevel: "Primary" } },
     renderBody: renderPrimary,
@@ -1351,12 +1713,12 @@ const pages: PageSSRConfig[] = [
     path: "/middle-school-section",
     appendSiteName: false,
     title: "Middle School in Thane | CBSE Class 6 to 8",
-    description: "Explore Middle School at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to 8 with academics, activities, safety and holistic learning.",
+    description: "Explore Middle School at Rainbow International School, a CBSE school in Thane for Class 6 to 8 with academics, activities and confidence building.",
     keywords: "middle school Thane, Class 6 to 8 CBSE Thane, best middle school Thane, CBSE school Class 6 7 8 Thane",
     canonical: "https://rainbowinternationalschool.in/middle-school-section",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Middle School", url: "https://rainbowinternationalschool.in/middle-school-section" },
+      { name: "Middle School in Thane | CBSE Class 6 to 8", url: "https://rainbowinternationalschool.in/middle-school-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Middle School Section", educationalLevel: "Middle School" } },
     renderBody: renderMiddleSchool,
@@ -1365,12 +1727,12 @@ const pages: PageSSRConfig[] = [
     path: "/secondary-section",
     appendSiteName: false,
     title: "Secondary School in Thane | CBSE Class 9 & 10",
-    description: "Explore Secondary School at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and 10 with academics, assessments and board preparation.",
+    description: "Explore Secondary School at Rainbow International School, a CBSE school in Thane for Class 9 and 10 with academics and board preparation.",
     keywords: "secondary school Thane, Class 9 10 CBSE Thane, CBSE board exam school Thane, Class 10 school Thane",
     canonical: "https://rainbowinternationalschool.in/secondary-section",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Secondary Section", url: "https://rainbowinternationalschool.in/secondary-section" },
+      { name: "Secondary School in Thane | CBSE Class 9 & 10", url: "https://rainbowinternationalschool.in/secondary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Secondary Section", educationalLevel: "Secondary" } },
     renderBody: renderSecondary,
@@ -1379,12 +1741,12 @@ const pages: PageSSRConfig[] = [
     path: "/senior-secondary-section",
     appendSiteName: false,
     title: "Senior Secondary in Thane | CBSE Class 11 & 12",
-    description: "Explore Senior Secondary at Rainbow International School, a CBSE-affiliated school in Thane for Class 11 and 12 with board preparation and career readiness.",
+    description: "Explore Senior Secondary at Rainbow International School, a CBSE school in Thane for Class 11 and 12 with board preparation and career readiness.",
     keywords: "senior secondary school Thane, Class 11 12 Thane, Science Commerce Humanities Thane, CBSE Class 12 school Thane, JEE NEET school Thane",
     canonical: "https://rainbowinternationalschool.in/senior-secondary-section",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Senior Secondary", url: "https://rainbowinternationalschool.in/senior-secondary-section" },
+      { name: "Senior Secondary in Thane | CBSE Class 11 & 12", url: "https://rainbowinternationalschool.in/senior-secondary-section" },
     ],
     jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Senior Secondary Section", educationalLevel: "Senior Secondary" } },
     renderBody: renderSeniorSecondary,
@@ -1443,13 +1805,14 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/admissions",
-    title: "School Admissions 2026-27 Thane — Nursery to Class 12 | Rainbow International School",
-    description: "Admissions open at Rainbow International School, Thane for 2026-27. Nursery to Class 12, CBSE board. Age criteria, process, documents, and fee details.",
+    appendSiteName: false,
+    title: "Admissions Open 2026–27 | CBSE School in Thane",
+    description: "Admissions open at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire, book a campus visit or apply today.",
     keywords: "school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission",
     canonical: "https://rainbowinternationalschool.in/admissions",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Admissions 2026-27", url: "https://rainbowinternationalschool.in/admissions" },
+      { name: "Admissions Open 2026–27 | CBSE School in Thane", url: "https://rainbowinternationalschool.in/admissions" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAdmissions,

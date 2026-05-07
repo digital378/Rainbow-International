@@ -141,7 +141,7 @@ export default function MiddleSchool() {
       <ScrollProgress />
       <SEO
         title="Middle School in Thane | CBSE Class 6 to 8"
-        description="Explore Middle School at Rainbow International School, a CBSE-affiliated school in Thane for Class 6 to 8 with academics, activities, safety and holistic learning."
+        description="Explore Middle School at Rainbow International School, a CBSE school in Thane for Class 6 to 8 with academics, activities and confidence building."
         keywords="middle school in Thane, CBSE middle school in Thane, best middle school in Thane, Class 6 admission in Thane, Class 7 admission in Thane, Class 8 admission in Thane, middle school near Hiranandani Estate, middle school near Ghodbunder Road, middle school near Brahmand Phase 4, middle school near Manpada, middle school near Kavesar, middle school near Kolshet"
         canonical="https://rainbowinternationalschool.in/middle-school-section"
         ogImage="/images/home/academic/middle-section.jpg"

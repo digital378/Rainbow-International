@@ -19,8 +19,8 @@ function renderHomeSSR(): string {
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');gtag('config','AW-18140772845');</script>
-<title>Best CBSE School Near You in Thane | Nursery to Class 12</title>
-<meta name="description" content="Admissions open at Rainbow International School, a CBSE-affiliated Nursery to Class 12 school in Thane with a 3.5-acre campus, strong academics, sports, safety and holistic learning." />
+<title>Best CBSE School in Thane | Nursery to Class 12</title>
+<meta name="description" content="Rainbow International School is a CBSE school in Thane for Nursery to Class 12 with academics, sports, safety, transport and holistic learning." />
 <meta name="keywords" content="best CBSE school in Thane, CBSE school near me Thane, top CBSE school Thane, K-12 school in Thane, best school in Thane, top rated school Thane, CBSE school admissions Thane 2026-27, Rainbow International School Thane, nursery admission Thane" />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="https://rainbowinternationalschool.in/" />

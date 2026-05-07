@@ -1,0 +1,285 @@
+Audit and fix live SEO metadata, rendered content depth, schema, canonical tags and page-level SEO across RIS pages. Do not rely only on local preview. Validate against deployed live URLs after changes.
+
+Pages to audit and fix:
+1. https://rainbowinternationalschool.in/
+2. https://rainbowinternationalschool.in/application-form
+3. https://rainbowinternationalschool.in/primary-section
+4. https://rainbowinternationalschool.in/middle-school-section
+5. https://rainbowinternationalschool.in/secondary-section
+6. https://rainbowinternationalschool.in/senior-secondary-section
+
+Critical issue:
+The home page meta title is currently too long:
+“Best CBSE School Near You in Thane | Nursery to Class 12 | Rainbow International School”
+
+This is around 87 characters and must be shortened.
+
+Meta title rule:
+Every page must have a unique meta title under 60–65 characters.
+
+Meta description rule:
+Every page must have a unique meta description around 140–160 characters where possible.
+
+Do not allow pages to inherit the generic home page fallback title:
+“Best CBSE school in thane near me - Rainbow International”
+
+Use these exact meta titles:
+
+Home:
+Best CBSE School in Thane | Nursery to Class 12
+
+Admissions:
+Admissions Open 2026–27 | CBSE School in Thane
+
+Primary:
+Primary School in Thane | CBSE Class 1 to 5
+
+Middle:
+Middle School in Thane | CBSE Class 6 to 8
+
+Secondary:
+Secondary School in Thane | CBSE Class 9 & 10
+
+Senior Secondary:
+Senior Secondary in Thane | CBSE Class 11 & 12
+
+Use these exact meta descriptions:
+
+Home:
+Rainbow International School is a CBSE school in Thane for Nursery to Class 12 with academics, sports, safety, transport and holistic learning.
+
+Admissions:
+Admissions open at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire, book a campus visit or apply today.
+
+Primary:
+Explore Primary School at Rainbow International School, a CBSE school in Thane for Class 1 to 5 with academics, activities, safety and care.
+
+Middle:
+Explore Middle School at Rainbow International School, a CBSE school in Thane for Class 6 to 8 with academics, activities and confidence building.
+
+Secondary:
+Explore Secondary School at Rainbow International School, a CBSE school in Thane for Class 9 and 10 with academics and board preparation.
+
+Senior Secondary:
+Explore Senior Secondary at Rainbow International School, a CBSE school in Thane for Class 11 and 12 with board preparation and career readiness.
+
+Rendered word count requirement:
+Each page must have at least 1,800+ rendered, indexable words.
+
+Minimum rendered word count targets:
+- Home page: 1,800+ words
+- Admissions page: 1,800+ words
+- Primary Section page: 1,800+ words
+- Middle School page: 1,800+ words
+- Secondary School page: 1,800+ words
+- Senior Secondary page: 1,800+ words
+
+Important:
+Rendered word count means visible/indexable text available to users and search engines after the page renders. Do not count hidden keyword stuffing, schema-only content, meta tags, scripts, navigation menus, footer links or repeated boilerplate.
+
+Content quality rules:
+- Do not add filler content.
+- Do not keyword-stuff.
+- Do not repeat the same paragraphs across pages.
+- Each page must have unique, useful, parent-friendly content.
+- Content should answer parent intent clearly.
+- Use natural keyword placement.
+- Keep paragraphs short and scannable.
+- Use H2/H3 headings, cards, FAQs, comparison blocks, local relevance sections and parent decision sections.
+- Ensure all content remains readable on mobile.
+
+Page-specific content expansion guidance:
+
+1. Home page
+Expand content to 1,800+ words by adding useful sections such as:
+- Why RIS is considered among the best CBSE schools in Thane
+- Nursery to Class 12 learning journey
+- Campus, safety and transport advantages
+- Academic and co-curricular balance
+- Parent trust and school experience
+- Local relevance for Thane families
+- Short admissions routing section
+- FAQs for parents searching for CBSE schools in Thane
+
+Target keywords:
+- Best CBSE school in Thane
+- CBSE school in Thane
+- CBSE school near me
+- Nursery to Class 12 school in Thane
+- Top CBSE school in Thane
+- School in Brahmand Thane
+- School near Hiranandani Estate
+- School near Ghodbunder Road
+
+2. Admissions page
+Expand content to 1,800+ words by adding useful sections such as:
+- Admissions Open 2026–27
+- Admission process overview
+- Grade-wise admissions from Nursery to Class 12
+- Documents required
+- Campus visit importance
+- Parent counselling support
+- Transport and location support
+- FAQs on admission, age criteria, process and campus visit
+
+Target keywords:
+- Admissions open in Thane
+- CBSE school admission in Thane
+- Nursery admission in Thane
+- Class 1 admission in Thane
+- Class 11 admission in Thane
+- School admission near me
+- CBSE school admission 2026–27
+
+3. Primary Section page
+Expand content to 1,800+ words by adding useful sections such as:
+- Primary School in Thane for Class 1 to Class 5
+- Why parents choose RIS for primary years
+- Subjects and learning areas
+- Class 1 to Class 5 learning journey
+- Grade-wise admission intent section
+- Literacy and numeracy development
+- Classroom experience
+- Assessment and student progress
+- Safe and supportive primary environment
+- Hyperlocal grade-wise admission section
+- FAQs
+
+Target keywords:
+- Primary school in Thane
+- CBSE primary school in Thane
+- Class 1 admission in Thane
+- Class 2 admission in Thane
+- Class 3 admission in Thane
+- Class 4 admission in Thane
+- Class 5 admission in Thane
+- Class 1 admission near Hiranandani Estate
+- Class 1 admission near Ghodbunder Road
+- Class 5 admission near Brahmand Thane
+
+4. Middle School page
+Expand content to 1,800+ words by adding useful sections such as:
+- Middle School in Thane for Class 6 to Class 8
+- Why parents choose RIS for middle school
+- Class 6 to Class 8 learning journey
+- Grade-wise admissions for Class 6, Class 7 and Class 8
+- Subject foundation and skill development
+- Classroom learning approach
+- Academic support and progress tracking
+- Preparing students for secondary school
+- Hyperlocal grade-wise admission section
+- FAQs
+
+Target keywords:
+- Middle school in Thane
+- CBSE middle school in Thane
+- Class 6 admission in Thane
+- Class 7 admission in Thane
+- Class 8 admission in Thane
+- Class 6 admission near Hiranandani Estate
+- Class 7 admission near Ghodbunder Road
+- Class 8 admission near Brahmand Thane
+
+5. Secondary School page
+Expand content to 1,800+ words by adding useful sections such as:
+- Secondary School in Thane for Class 9 and Class 10
+- Why parents choose RIS for secondary school
+- Class 9 and Class 10 learning journey
+- Board exam readiness
+- Subject focus
+- Study discipline and academic support
+- Assessment and feedback
+- Preparing students for senior secondary
+- Hyperlocal grade-wise admission section
+- FAQs
+
+Target keywords:
+- Secondary school in Thane
+- CBSE secondary school in Thane
+- Class 9 admission in Thane
+- Class 10 admission in Thane
+- CBSE Class 10 board preparation in Thane
+- Class 9 admission near Hiranandani Estate
+- Class 10 admission near Ghodbunder Road
+- Class 10 admission near Brahmand Thane
+
+6. Senior Secondary page
+Expand content to 1,800+ words by adding useful sections such as:
+- Senior Secondary School in Thane for Class 11 and Class 12
+- Why students choose RIS for senior secondary
+- Class 11 and Class 12 learning journey
+- Stream and subject guidance
+- Board exam preparation
+- Career and higher education readiness
+- Student leadership and confidence
+- Assessment and academic tracking
+- Hyperlocal grade-wise admission section
+- FAQs
+
+Target keywords:
+- Senior secondary school in Thane
+- CBSE senior secondary school in Thane
+- Class 11 admission in Thane
+- Class 12 admission in Thane
+- Class 11 Science admission in Thane, if applicable
+- Class 11 Commerce admission in Thane, if applicable
+- Class 11 Humanities admission in Thane, if applicable
+- Class 11 admission near Hiranandani Estate
+- Class 12 admission near Ghodbunder Road
+- Class 12 admission near Brahmand Thane
+
+Validation requirements:
+After fixes, generate a page-by-page audit table showing:
+
+- URL
+- Meta title
+- Meta title character count
+- Meta description
+- Meta description character count
+- H1
+- Number of H1 tags
+- Canonical URL
+- Robots tag
+- Rendered word count
+- Whether rendered word count is 1,800+
+- Whether FAQ schema is present
+- Whether breadcrumb schema is present
+- Whether page has duplicate title/description
+- Whether page passes grade isolation rules
+- Whether page has live production URL only
+
+Canonical requirements:
+Each page must self-canonicalize to its correct production URL.
+
+Staging requirements:
+- Staging URLs must not appear in sitemap.
+- Staging must remain noindex/noindex-protected if accessible.
+- Do not reintroduce staging links anywhere.
+
+Schema requirements:
+Add or validate:
+- WebPage schema
+- EducationalOrganization or School schema
+- Breadcrumb schema
+- FAQ schema where FAQ exists
+
+Mobile and UX requirements:
+- Page content must be readable on mobile.
+- No horizontal scrolling.
+- Sticky mobile CTA must not overlap chat button.
+- CTA buttons must be clear and tappable.
+- FAQ accordions must work smoothly.
+- Sections should not become too long visually; use accordions, cards and tabs where needed.
+
+Technical performance:
+Do not worsen page speed while adding 1,800+ words.
+Optimize images, lazy-load below-the-fold media, reduce unused JavaScript, and keep the content HTML indexable.
+
+Final instruction:
+After deployment, validate live URLs using:
+- Browser source
+- SEO browser extension
+- Google Search Console URL Inspection
+- Rendered word count tool or crawler
+
+Do not mark the task complete unless all six pages show correct live metadata and at least 1,800+ rendered indexable words.

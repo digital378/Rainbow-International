@@ -129,7 +129,7 @@ export default function Secondary() {
       <ScrollProgress />
       <SEO
         title="Secondary School in Thane | CBSE Class 9 & 10"
-        description="Explore Secondary School at Rainbow International School, a CBSE-affiliated school in Thane for Class 9 and 10 with academics, assessments and board preparation."
+        description="Explore Secondary School at Rainbow International School, a CBSE school in Thane for Class 9 and 10 with academics and board preparation."
         keywords="secondary school in Thane, CBSE secondary school in Thane, best secondary school in Thane, Class 9 admission in Thane, Class 10 admission in Thane, CBSE board school for Class 10 in Thane, Class 10 board preparation Thane, secondary school near Hiranandani Estate, secondary school near Ghodbunder Road, secondary school near Brahmand Thane, secondary school near Manpada, secondary school near Kavesar, secondary school near Kolshet"
         canonical="https://rainbowinternationalschool.in/secondary-section"
         ogImage="/images/home/academic/secondary-section.jpg"
