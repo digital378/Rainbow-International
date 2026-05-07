@@ -1,0 +1,216 @@
+Redesign and optimize the Rainbow International School home page to improve admission enquiries, campus visit bookings, WhatsApp conversations, and parent trust.
+
+Page URL:
+https://rainbowinternationalschool.in/
+
+Primary objective:
+Improve the current home page without changing the core brand identity. The page should look premium, load faster, and clearly guide parents toward enquiry, WhatsApp, campus visit booking, and admission application.
+
+Target audience:
+Parents in Thane and nearby areas searching for a reputed CBSE school from Nursery to Class 12.
+
+Core positioning:
+Rainbow International School is a CBSE-affiliated Nursery to Class 12 school in Thane, established in 2009, with a 3.5-acre campus, strong academics, sports, safety, co-curricular exposure, transport support, and a parent-friendly school environment.
+
+Important current-page reference:
+The current page already has a premium blue theme, student background image, admissions open top bar, phone number, location, enquiry button, quick admission enquiry form, WhatsApp CTA, and trust cards such as Since 2009, 3.5 Acres, CBSE Affiliation, and student count. Retain the premium visual direction, but improve conversion clarity, content hierarchy, speed, and SEO.
+
+1. Hero section
+
+Keep the current premium blue theme, but improve the headline and call-to-action structure.
+
+Use H1:
+Best CBSE School in Thane | Nursery to Class 12
+
+Hero supporting line:
+Admissions Open 2026–27 at Rainbow International School.
+
+Brand support line:
+A CBSE-affiliated K–12 school with a 3.5-acre campus, strong academics, sports, safety, and holistic learning.
+
+Show trust cards clearly:
+- CBSE Affiliated
+- Established Since 2009
+- 3.5-Acre Campus
+- Nursery to Class 12
+- Strong Academic & Co-curricular Learning
+
+Important:
+If using “50K+ happy students”, clarify whether it means alumni/students impacted. If it is not current active student strength, label it as:
+“50K+ Students Impacted”
+or replace it with a verified current number.
+
+2. CTA hierarchy
+
+Make the primary CTA:
+Book a Campus Visit
+
+Make the secondary CTA:
+Apply Now
+
+Keep WhatsApp as a high-visibility CTA:
+Chat on WhatsApp
+
+On desktop, add “Book a Campus Visit” prominently in the hero section, not only on mobile.
+
+Recommended desktop hero CTA order:
+- Book a Campus Visit
+- Apply Now
+- Chat on WhatsApp
+
+Recommended mobile sticky CTA:
+- Call
+- WhatsApp
+- Book Visit
+- Apply Now
+
+3. Quick admission enquiry form
+
+Keep the form above the fold on desktop.
+
+Form heading:
+Quick Admission Enquiry
+
+Subtext:
+Our admissions counsellor will call you shortly.
+
+Form fields:
+- Parent Name
+- Phone Number
+- Child’s Name
+- Grade Applying For
+- Location
+- Preferred Campus Visit Date, optional
+- Email Address, optional
+
+After form submission, show this message:
+Thank you. Our admissions counsellor will contact you shortly to guide you through the next step.
+
+4. Admission journey section
+
+Add a section below the hero titled:
+Your Admission Journey at RIS
+
+Show 5 simple steps:
+- Submit enquiry
+- Counsellor call-back
+- Campus visit
+- Student interaction and document review
+- Admission confirmation
+
+5. Why choose RIS section
+
+Add 6 clear benefit cards:
+- CBSE curriculum from Nursery to Class 12
+- Strong academic foundation
+- Sports and activity infrastructure
+- Safe and caring campus environment
+- Experienced teaching team
+- Transport and parent communication support
+
+6. Grade-wise parent pathway section
+
+Create separate cards for:
+- Pre-Primary
+- Primary
+- Middle School
+- Secondary School
+- Senior Secondary
+
+Each card should include:
+- One parent concern
+- One RIS advantage
+- One CTA: Enquire for this Grade
+
+7. Parent trust section
+
+Add a section for:
+- Parent testimonials
+- Google review highlights
+- Student achievements
+- Campus photos
+- Safety and transport assurance
+
+Use real parent-friendly language. Avoid generic claims.
+
+8. Campus experience section
+
+Show real visuals of:
+- Classrooms
+- Sports areas
+- Labs
+- Library
+- Activities
+- Events
+- Transport and safety systems
+
+Keep images compressed and fast-loading.
+
+9. FAQ section
+
+Add FAQs on the home page:
+- Which board is RIS affiliated to?
+- Which classes are admissions open for?
+- What is the admission process?
+- Is transport available?
+- How can parents book a campus visit?
+- What documents are required for admission?
+- Is there an interaction or assessment?
+- What are the school timings?
+
+Add FAQ schema for SEO.
+
+10. SEO requirements
+
+Optimize the home page for:
+- CBSE school in Thane
+- Best CBSE school in Thane
+- Best CBSE school near you in Thane
+- Admissions open in Thane
+- Nursery admission in Thane
+- Class 11 admission in Thane
+- K–12 school in Thane
+
+Use proper H1, H2, meta title, meta description, image alt tags, and internal links.
+
+Use this H1:
+Best CBSE School in Thane | Nursery to Class 12
+
+Use this meta title:
+Best CBSE School Near You in Thane | Nursery to Class 12
+
+Use this meta description:
+Admissions open at Rainbow International School, a CBSE-affiliated Nursery to Class 12 school in Thane with a 3.5-acre campus, strong academics, sports, safety and holistic learning.
+
+11. Speed and technical improvements
+
+Improve mobile performance score from around 70 to 85+.
+
+Required technical actions:
+- Reduce unused JavaScript
+- Remove unnecessary plugins and scripts from the home page
+- Compress all images and serve in WebP format
+- Lazy-load below-the-fold images
+- Avoid heavy sliders above the fold
+- Preload the hero image carefully
+- Keep the enquiry form lightweight
+- Minify CSS and JavaScript
+- Use caching and CDN
+- Improve Core Web Vitals, especially LCP and FCP
+
+12. Tracking requirements
+
+Set up tracking for:
+- Form submission
+- Call click
+- WhatsApp click
+- Book Visit click
+- Apply Now click
+- Grade-wise enquiry click
+- Prospectus download, if available
+- Campus visit date selected
+
+Use Google Analytics 4 and Google Tag Manager events.
+
+Expected final output:
+A premium, fast-loading, mobile-first home page that builds parent trust within the first screen and increases admission enquiries, WhatsApp conversations, application submissions, and campus visit bookings.
