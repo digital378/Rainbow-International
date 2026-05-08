@@ -18,6 +18,17 @@ export function serveStatic(app: Express) {
     setHeaders(res, filePath) {
       if (filePath.endsWith(".html")) {
         res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
+        return;
+      }
+      const base = path.basename(filePath).toLowerCase();
+      if (
+        base === "robots.txt" ||
+        base === "sitemap.xml" ||
+        base === "llms.txt" ||
+        base === "llms-full.txt" ||
+        base === "openapi.yaml"
+      ) {
+        res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
       }
     },
   }));
