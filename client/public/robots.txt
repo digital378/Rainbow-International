@@ -31,10 +31,6 @@ Allow: /
 Disallow: /api/
 Disallow: /ad-google
 Disallow: /ad-google/
-Disallow: /RIS
-Disallow: /ris
-Disallow: /declaration
-Disallow: /book-list
 Disallow: /ssr-demo/
 
 Host: https://rainbowinternationalschool.in
