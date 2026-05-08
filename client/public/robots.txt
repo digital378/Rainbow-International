@@ -35,6 +35,6 @@ Disallow: /ssr-demo/
 
 Sitemap: https://rainbowinternationalschool.in/sitemap.xml
 
-# AI/LLM discovery
-LLMs.txt: https://rainbowinternationalschool.in/llms.txt
-LLMs-Full.txt: https://rainbowinternationalschool.in/llms-full.txt
+# AI/LLM discovery (informational only — non-standard fields removed)
+# LLMs.txt: https://rainbowinternationalschool.in/llms.txt
+# LLMs-Full.txt: https://rainbowinternationalschool.in/llms-full.txt
