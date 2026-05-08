@@ -33,8 +33,6 @@ Disallow: /ad-google
 Disallow: /ad-google/
 Disallow: /ssr-demo/
 
-Host: https://rainbowinternationalschool.in
-
 Sitemap: https://rainbowinternationalschool.in/sitemap.xml
 
 # AI/LLM discovery
