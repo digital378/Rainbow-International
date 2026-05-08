@@ -29,8 +29,8 @@ Allow: /
 User-agent: *
 Allow: /
 Disallow: /api/
-Disallow: /ad
 Disallow: /ad-google
+Disallow: /ad-google/
 Disallow: /RIS
 Disallow: /ris
 Disallow: /declaration

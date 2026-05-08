@@ -1,0 +1,66 @@
+URGENT SEO FIX: Google Search Console says important RIS pages are "Blocked by robots.txt".
+
+Website: https://rainbowinternationalschool.in/
+
+Issue:
+Google Search Console URL Inspection for:
+https://rainbowinternationalschool.in/admissions
+
+shows:
+- URL is not on Google
+- Page is not indexed: Blocked by robots.txt
+- Crawl allowed? No: blocked by robots.txt
+- Page fetch: Failed: Blocked by robots.txt
+
+But the page meta robots tag is correct:
+- INDEX, FOLLOW
+- Canonical: https://rainbowinternationalschool.in/admissions
+
+So the issue is coming from robots.txt, not the page meta tag.
+
+Task:
+Fix robots.txt immediately so Googlebot can crawl and index all public RIS pages.
+
+Required actions:
+1. Locate where robots.txt is generated or stored in this project.
+2. Check if robots.txt currently contains any blocking rule such as:
+   - Disallow: /
+   - Disallow: /admissions
+   - Disallow: /*
+   - User-agent: Googlebot with Disallow rules
+   - User-agent: Googlebot Smartphone with Disallow rules
+3. Remove any rule that blocks Googlebot or all crawlers from crawling public pages.
+4. Create/update robots.txt to allow crawling of all public pages.
+
+Use this robots.txt unless there is a strong technical reason not to:
+
+User-agent: *
+Allow: /
+
+Sitemap: https://rainbowinternationalschool.in/sitemap.xml
+
+5. Make sure these pages are crawlable and not blocked:
+   - https://rainbowinternationalschool.in/
+   - https://rainbowinternationalschool.in/admissions
+   - https://rainbowinternationalschool.in/primary-section
+   - https://rainbowinternationalschool.in/senior-secondary-section
+   - https://rainbowinternationalschool.in/amenities
+   - https://rainbowinternationalschool.in/fee-structure
+   - https://rainbowinternationalschool.in/contact-us
+   - https://rainbowinternationalschool.in/blogs
+
+6. Do not change page design, content, routing, meta titles, meta descriptions, canonical tags, or schema unless absolutely required for robots.txt/sitemap access.
+7. Check if sitemap.xml exists and is publicly accessible at:
+   https://rainbowinternationalschool.in/sitemap.xml
+8. If sitemap.xml is missing or broken, create/fix it so it includes all important public pages.
+9. Ensure robots.txt is available at:
+   https://rainbowinternationalschool.in/robots.txt
+10. After fixing, provide a short report with:
+   - Files changed
+   - Old robots.txt issue found
+   - Final robots.txt content
+   - Sitemap status
+   - Confirmation that public pages are not blocked from crawling
+
+Very important:
+Do not make broad code changes. Only fix robots.txt and sitemap access required for Google indexing.
