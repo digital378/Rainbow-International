@@ -5,7 +5,7 @@
    When monthly numbers change, edit them HERE only.
    ═══════════════════════════════════════════════════════════════════ */
 
-export const LAST_UPDATED = "May 4, 2026";
+export const LAST_UPDATED = "May 9, 2026";
 export const TODAY_DATE = 3;
 export const DAYS_IN_MAY = 31;
 export const MIN_REVENUE_PER_ADM = 90000;
@@ -61,9 +61,9 @@ export const MONTHLY: MonthRow[] = [
   },
   {
     month: "May 26",
-    combined: { leads: 47, bookings: 10, walkins: 6, admissions: 1, spend: 27623, meta: 7632, google: 19991 },
-    ris:      { leads: 27, bookings: 7,  walkins: 3, admissions: 0, spend: 13378, meta: 2808, google: 10570 },
-    rps:      { leads: 20, bookings: 3,  walkins: 3, admissions: 1, spend: 14245, meta: 4824, google: 9421  },
+    combined: { leads: 47, bookings: 10, walkins: 6, admissions: 1, spend: 50318, meta: 15208, google: 35110 },
+    ris:      { leads: 27, bookings: 7,  walkins: 3, admissions: 0, spend: 22964, meta: 3883,  google: 19081 },
+    rps:      { leads: 20, bookings: 3,  walkins: 3, admissions: 1, spend: 27354, meta: 11325, google: 16029 },
   },
 ];
 
