@@ -15,7 +15,7 @@ const generalInfo = [
   { label: "Complete Address with PIN Code", value: "Brahmand Phase 4, Opp. TMC Water Tank, Kolshet Rd, Thane, Maharashtra – 400607" },
   { label: "Principal Name & Qualification", value: "Mrs. Vimlesh Sindhu / MA B.Ed" },
   { label: "Email ID", value: "vimlesh@rainbowpreschools.com" },
-  { label: "Contact Details (Mobile)", value: "(022) 6910 5000 / 87799 04288" },
+  { label: "Contact Details", value: "(022) 6910 5000 / 87799 04288" },
 ];
 
 const documents: { label: string; href: string; fileName: string }[] = [
@@ -34,7 +34,6 @@ const academicDocs: { label: string; href: string; fileName: string }[] = [
   { label: "Annual Academic Calendar", href: GDRIVE_VIEW("1TEcAUNV7Um6_1iSaGxcybOCJRPEaenFq"), fileName: "Academic-Calendar-25-26.pdf" },
   { label: "List of School Management Committee (SMC)", href: GDRIVE_VIEW("1oh_2PLZVLaO9OBXI65t0GZIOhPyimZSQ"), fileName: "School-Managing-Committee-Members-AY-2024-25.pdf" },
   { label: "List of Parents Teachers Association (PTA) Members", href: GDRIVE_VIEW("1h4wYsy2htv3JdTaDPCGgAESbFuTgtuSJ"), fileName: "PTA-List-AY-2024-25.pdf" },
-  { label: "Book List for 2026-27", href: "/Book-List-2026-27.pdf", fileName: "Book-List-2026-27.pdf" },
 ];
 
 const classXResults = [
@@ -279,7 +278,7 @@ export default function CbseDisclosures() {
               </div>
             </Link>
             <Link
-              href="/book-list"
+              href="/Book-List-2026-27.pdf"
               className="flex items-center gap-3 p-5 rounded-2xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
               data-testid="link-booklist"
             >
