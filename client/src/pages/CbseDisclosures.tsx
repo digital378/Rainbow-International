@@ -25,7 +25,7 @@ const documents: { label: string; href: string; fileName: string }[] = [
   { label: "Copy of No Objection Certificate (NOC) issued if applicable by the State Govt. / UT", href: GDRIVE_VIEW("1g1EGFW1-bxxHvTgF0c_L2LPCOF3301_U"), fileName: "NOC-Merged.pdf" },
   { label: "Copies of Recognition Certificate under RTE Act 2009 and its Renewal if Applicable", href: GDRIVE_VIEW("1cR1Yz_uVyZXqQozEW4gdg9h__Egbhp1S"), fileName: "RTE-combinepdf.pdf" },
   { label: "Copy of Valid Building Safety Certificate as per the National Building Code", href: GDRIVE_VIEW("1zXyfAyhgAJpiSPsACdNqjsIayGpB9x33"), fileName: "Building-Safety-Certificate-2025-26.pdf" },
-  { label: "Copy of Valid Fire Safety Certificate issued by the Competent Authority", href: GDRIVE_VIEW("1IOW3kcrgbbTZJCXQI_nUrhi1PBuajxN6"), fileName: "Fire-Safety-Certificate-2024-25.pdf" },
+  { label: "Copy of Valid Fire Safety Certificate issued by the Competent Authority", href: "/Fire-Safety-Certificate-2025-26.pdf", fileName: "Fire-Safety-Certificate-2025-26.pdf" },
   { label: "Copy of the DEO Certificate submitted by the School for Affiliation / Upgradation / Extension of Affiliation or Self Certification by the School", href: GDRIVE_VIEW("1efCCqNiaqg1Imx3bWePzmjYm9Qi2i2h8"), fileName: "Self-Certification-Proforma.pdf" },
   { label: "Copies of Valid Water, Health, Sanitation Certificates", href: GDRIVE_VIEW("166xkM9t8olMO5pX0a8wPHRGXi4va46pI"), fileName: "Water-Sanitation-Certificate-2025-26.pdf" },
 ];
@@ -34,7 +34,7 @@ const academicDocs: { label: string; href: string; fileName: string }[] = [
   { label: "Annual Academic Calendar", href: GDRIVE_VIEW("1TEcAUNV7Um6_1iSaGxcybOCJRPEaenFq"), fileName: "Academic-Calendar-25-26.pdf" },
   { label: "List of School Management Committee (SMC)", href: GDRIVE_VIEW("1oh_2PLZVLaO9OBXI65t0GZIOhPyimZSQ"), fileName: "School-Managing-Committee-Members-AY-2024-25.pdf" },
   { label: "List of Parents Teachers Association (PTA) Members", href: GDRIVE_VIEW("1h4wYsy2htv3JdTaDPCGgAESbFuTgtuSJ"), fileName: "PTA-List-AY-2024-25.pdf" },
-  { label: "Last Three Year Result of the Board Examination as per Applicability", href: GDRIVE_VIEW("1Jlbx_DNtPZVLb2uyaQStwMYKm926i3iM"), fileName: "Results-of-Last-Three-Years.pdf" },
+  { label: "Book List for 2026-27", href: "/Book-List-2026-27.pdf", fileName: "Book-List-2026-27.pdf" },
 ];
 
 const classXResults = [
@@ -50,15 +50,16 @@ const classXResults = [
 const classXIIResults = [
   { year: "2022-23", registered: 14, passed: 14, pct: "65.88%", remarks: "100% Result" },
   { year: "2023-24", registered: 220, passed: 220, pct: "76.77%", remarks: "99% Result" },
-  { year: "2024-25", registered: 337, passed: 336, pct: "73.43%", remarks: "—" },
+  { year: "2024-25", registered: 337, passed: 335, pct: "73.43%", remarks: "99% Results" },
 ];
 
 const staffInfo = [
   { label: "Principal", value: "1" },
-  { label: "Total Number of Teachers", value: "81" },
-  { label: "A. PGT", value: "23" },
-  { label: "B. TGT", value: "27" },
-  { label: "C. PRT", value: "31" },
+  { label: "Total Number of Teachers", value: "112" },
+  { label: "A. PGT", value: "30" },
+  { label: "B. TGT", value: "31" },
+  { label: "C. PRT", value: "40" },
+  { label: "D. Other", value: "13" },
   { label: "Teachers Section Ratio", value: "1:3" },
   { label: "Details of Special Education", value: "Mrs. Sai Rasai" },
   { label: "Details of Counsellor and Wellness Teacher", value: "Ms. Nazneen Thawali" },
