@@ -32,6 +32,7 @@ const documents: { label: string; href: string; fileName: string }[] = [
 
 const academicDocs: { label: string; href: string; fileName: string }[] = [
   { label: "Annual Academic Calendar", href: GDRIVE_VIEW("1TEcAUNV7Um6_1iSaGxcybOCJRPEaenFq"), fileName: "Academic-Calendar-25-26.pdf" },
+  { label: "List of Teaching Staff", href: GDRIVE_VIEW("1TwI-ZRHfBEt8AdqRtpuOUO0bmL1BJ9My"), fileName: "List-of-Teaching-Staff.pdf" },
   { label: "List of School Management Committee (SMC)", href: GDRIVE_VIEW("1oh_2PLZVLaO9OBXI65t0GZIOhPyimZSQ"), fileName: "School-Managing-Committee-Members-AY-2024-25.pdf" },
   { label: "List of Parents Teachers Association (PTA) Members", href: GDRIVE_VIEW("1h4wYsy2htv3JdTaDPCGgAESbFuTgtuSJ"), fileName: "PTA-List-AY-2024-25.pdf" },
 ];
@@ -238,7 +239,7 @@ export default function CbseDisclosures() {
           </div>
 
           <div>
-            <SectionTitle letter="C" title="Results and Academics" />
+            <SectionTitle letter="C" title="Academic Details & Results" />
             <DocumentTable rows={academicDocs} />
 
             <h3 className="text-lg font-black text-gray-900 mt-8 mb-3 uppercase tracking-wide">Result — Class X</h3>
