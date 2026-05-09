@@ -277,8 +277,10 @@ export default function CbseDisclosures() {
                 <p className="text-xs text-gray-500 mt-0.5">View the school's official declaration document</p>
               </div>
             </Link>
-            <Link
+            <a
               href="/Book-List-2026-27.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 p-5 rounded-2xl border border-gray-100 shadow-sm bg-white hover:shadow-md transition-shadow"
               data-testid="link-booklist"
             >
@@ -289,7 +291,7 @@ export default function CbseDisclosures() {
                 <p className="font-black text-sm" style={{ color: "#b45309" }}>Book List 2026–27</p>
                 <p className="text-xs text-gray-500 mt-0.5">View the complete book list for all classes</p>
               </div>
-            </Link>
+            </a>
           </div>
 
           <div className="p-6 rounded-2xl border border-gray-100 flex items-start gap-3" style={{ background: "#f8faff" }}>
