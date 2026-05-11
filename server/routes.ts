@@ -1383,11 +1383,14 @@ export async function registerRoutes(
       const rpsByMonth = Object.keys(rpsMonthBranch)
         .sort((a, b) => { const ai = MONTH_ORDER.indexOf(a), bi = MONTH_ORDER.indexOf(b); return (ai<0?99:ai)-(bi<0?99:bi); })
         .map(month => {
-          const branches = Object.entries(rpsMonthBranch[month])
-            .map(([centre, d]) => ({ centre, ...d }))
+          const allEntries = Object.entries(rpsMonthBranch[month])
+            .map(([centre, d]) => ({ centre, ...d }));
+          // Total includes ALL leads (Unassigned + named centres) — matches sheet row count
+          const total = allEntries.reduce((a, b) => ({ leads:a.leads+b.leads, bookings:a.bookings+b.bookings, walkins:a.walkins+b.walkins, admissions:a.admissions+b.admissions, closed:a.closed+b.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
+          // Display table shows named centres only (Unassigned rows have no actionable centre info)
+          const branches = allEntries
             .filter(b => b.centre && b.centre !== "Unassigned")
             .sort((a, b) => b.leads - a.leads);
-          const total = branches.reduce((a, b) => ({ leads:a.leads+b.leads, bookings:a.bookings+b.bookings, walkins:a.walkins+b.walkins, admissions:a.admissions+b.admissions, closed:a.closed+b.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
           const closedReasons = Object.entries(rpsMonthReasons[month] || {}).filter(([r]) => r.trim()).sort((a,b) => b[1]-a[1]).map(([reason,count]) => ({reason,count}));
           return { month, branches, total, closedReasons };
         });
