@@ -42,6 +42,22 @@ components:
         overhead: { type: integer }
 
 paths:
+  /api/debug/headers:
+    get:
+      operationId: debugHeaders
+      summary: Echo request headers back (no auth required)
+      description: >
+        Returns all request headers as received by the server. Used to verify
+        which headers ChatGPT is actually sending. No authentication required.
+      security: []
+      responses:
+        "200":
+          description: Headers as seen by the server
+          content:
+            application/json:
+              schema:
+                type: object
+
   /api/marketing/export:
     get:
       operationId: getMarketingData

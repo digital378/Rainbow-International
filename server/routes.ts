@@ -491,10 +491,26 @@ export async function registerRoutes(
     },
   );
 
+  // ── Debug endpoint — logs all request headers (no auth required) ─────────
+  app.get("/api/debug/headers", (req, res) => {
+    const safe = { ...req.headers };
+    // Mask any token values partially so they're not fully exposed in logs
+    for (const k of Object.keys(safe)) {
+      const v = safe[k] as string;
+      if (typeof v === "string" && v.length > 8 &&
+          (k.includes("key") || k.includes("auth") || k.includes("token"))) {
+        safe[k] = v.slice(0, 4) + "****" + v.slice(-4);
+      }
+    }
+    console.log("[debug/headers]", JSON.stringify(safe));
+    res.json({ method: req.method, path: req.path, query: req.query, headers: safe });
+  });
+
   // ── Marketing dashboard JSON export (token-protected) ─────
   // GET /api/marketing/export
-  //   Header: Authorization: Bearer <ADMIN_TOKEN>   (preferred — does not log)
-  //   Query : ?token=<ADMIN_TOKEN>                  (convenient but logged)
+  //   Header: X-Api-Key: <ADMIN_TOKEN>
+  //   Header: Authorization: Bearer <ADMIN_TOKEN>
+  //   Query : ?token=<ADMIN_TOKEN>
   // Returns the full Marketing dashboard dataset for ChatGPT / external analysis.
   app.get("/api/marketing/export", async (req, res) => {
     try {
@@ -506,6 +522,12 @@ export async function registerRoutes(
       const xApiKey = typeof req.headers["x-api-key"] === "string" ? req.headers["x-api-key"] : "";
       const queryToken = typeof req.query.token === "string" ? req.query.token : "";
       const presented = xApiKey || headerToken || queryToken;
+      // Auth debug log — masked so no secrets in logs
+      console.log("[export] ua=" + (req.headers["user-agent"] || "").slice(0, 60) +
+        " x-api-key=" + (xApiKey ? xApiKey.slice(0,4)+"****" : "NONE") +
+        " auth-header=" + (headerToken ? headerToken.slice(0,4)+"****" : "NONE") +
+        " token-query=" + (queryToken ? queryToken.slice(0,4)+"****" : "NONE") +
+        " headers=" + Object.keys(req.headers).join(","));
       const safeEq = (a: string, b: string) => {
         const ab = Buffer.from(a, "utf8");
         const bb = Buffer.from(b, "utf8");
@@ -513,6 +535,7 @@ export async function registerRoutes(
         return timingSafeEqual(ab, bb);
       };
       if (!presented || !safeEq(presented, adminToken)) {
+        console.log("[export] 401 — no valid key presented");
         return res.status(401).json({ message: "Unauthorized" });
       }
       const data = await import("@shared/marketingData");
