@@ -1,9 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { timingSafeEqual } from "node:crypto";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { storage } from "./storage";
+import { OPENAPI_YAML } from "./openapiSpec";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
@@ -1842,10 +1841,9 @@ paths:
   // sometimes lags behind client/public/ during deployment. The dynamic route
   // reads the file directly so ChatGPT always gets the current spec.
   app.get("/openapi.yaml", (_req, res) => {
-    const src = path.resolve(process.cwd(), "openapi.yaml");
     res.setHeader("Content-Type", "text/yaml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
-    res.send(readFileSync(src, "utf-8"));
+    res.send(OPENAPI_YAML);
   });
 
   return httpServer;
