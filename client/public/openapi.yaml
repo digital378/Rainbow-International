@@ -2,18 +2,39 @@ openapi: 3.1.0
 info:
   title: Rainbow Group Marketing API
   version: 1.0.0
-  description: Live marketing data for Rainbow International School (RIS) and Rainbow Preschools (RPS).
+  description: >
+    Live marketing, CRM and operations data for Rainbow International School (RIS)
+    and Rainbow Preschools (RPS). Protected endpoints require the ADMIN_TOKEN as
+    an API key in the X-Api-Key header. /api/marketing/live requires no auth.
+
 servers:
   - url: https://rainbowinternationalschool.in
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
 paths:
   /api/marketing/export:
     get:
       operationId: getMarketingData
       summary: Full marketing dashboard data for RIS and RPS
-      description: Returns enquiries, events, callback requests, blog posts, admissions info, and SEO metadata.
+      description: >
+        Returns enquiries, events, callback requests, blog posts, admissions info,
+        and SEO metadata. Requires X-Api-Key header with the ADMIN_TOKEN value.
+      security:
+        - ApiKeyAuth: []
       responses:
         "200":
           description: Marketing data export
+        "401":
+          description: Missing or invalid API key.
 
   /api/marketing/live:
     get:
@@ -39,6 +60,8 @@ paths:
         Returns live lead counts from the RPS or RIS CRM Google Sheet aggregated
         by status (ADM DONE, CLOSED, Open, WALKIN BOOKED, WALK-IN COMPLETED),
         lead source, month, and lead owner. Optionally filter to a single month.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -64,6 +87,8 @@ paths:
       operationId: getSheetsMaster
       summary: Weekly funnel breakdown from the DM master tracker
       description: Returns week-by-week lead, walk-in and admission data from the DM master Google Sheet.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -92,6 +117,8 @@ paths:
       description: >
         RPS — per-branch actuals (leads, bookings, walk-ins, admissions) alongside monthly targets.
         RIS — per-grade actuals (Nursery through Class 12).
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -111,6 +138,8 @@ paths:
       operationId: getSheetsTasks
       summary: DM team key task tracker
       description: Returns tasks from the Key Task sheet with assignee, due date, status and remarks.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: status
           in: query
@@ -129,6 +158,8 @@ paths:
       operationId: getSearchConsoleQueries
       summary: Top search queries from Google Search Console
       description: Returns the top 25 queries by clicks for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -148,6 +179,8 @@ paths:
       operationId: getSearchConsolePages
       summary: Top pages from Google Search Console
       description: Returns the top performing pages for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -166,6 +199,8 @@ paths:
       operationId: getPageSpeedData
       summary: PageSpeed Insights for a given URL
       description: Returns Core Web Vitals and performance scores for a URL.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: url
           in: query
@@ -191,6 +226,8 @@ paths:
       operationId: getGoogleAdsCampaigns
       summary: Google Ads campaign performance
       description: Returns spend, impressions, clicks, and conversions for all active campaigns.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -210,6 +247,8 @@ paths:
       operationId: getGoogleAdsKeywords
       summary: Google Ads keyword performance
       description: Returns top keywords by spend with clicks, impressions, and conversion data.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
@@ -228,6 +267,8 @@ paths:
       operationId: getMetaAdsCampaigns
       summary: Meta (Facebook/Instagram) Ads campaign performance
       description: Returns spend, reach, impressions, clicks, and leads for all active Meta campaigns.
+      security:
+        - ApiKeyAuth: []
       parameters:
         - name: account
           in: query
