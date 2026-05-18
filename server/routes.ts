@@ -1677,9 +1677,11 @@ export async function registerRoutes(
   });
 
   // ── OpenAPI schema served as static file ──────────────────
-  // client/public/openapi.yaml is served by Vite (dev) and express.static (prod).
-  // ChatGPT "Add actions → Import from URL": https://rainbowinternationalschool.in/openapi.yaml
-  // This dynamic route is kept only as a fallback; the static file normally wins.
+  // client/public/openapi.yaml is the single source of truth, served by Vite
+  // (dev) and express.static (prod). Do not re-add a dynamic /openapi.yaml route
+  // here — it shadows the static file and drifts out of sync, which broke the
+  // ChatGPT custom GPT in May 2026 (spec missing /api/marketing/export).
+  /* DISABLED dynamic /openapi.yaml route — kept commented for history only.
   app.get("/openapi.yaml", (req, res) => {
     const proto = "https";
     const host  = "rainbowinternationalschool.in";
@@ -1831,6 +1833,7 @@ paths:
     res.setHeader("Cache-Control", "public, max-age=60");
     res.send(yaml);
   });
+  */
 
   return httpServer;
 }
