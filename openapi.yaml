@@ -47,6 +47,8 @@ paths:
             application/json:
               schema:
                 type: object
+                additionalProperties:
+                  type: string
 
   /api/marketing/export:
     get:
