@@ -17,8 +17,8 @@ components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      in: header
-      name: X-Api-Key
+      in: query
+      name: token
   schemas:
     FunnelMetrics:
       type: object
