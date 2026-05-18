@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
   title: Rainbow Group Marketing API
   version: 1.0.0
@@ -196,9 +196,108 @@ paths:
       security: []
       responses:
         "200":
-          description: >
-            Aggregated live data — monthlyTotals, rpsCrm (byMonth, closedReasons),
-            risCrm (byMonth, closedReasons), mayWeeklyCombined, currentDayOfMonth.
+          description: Live aggregated data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt: { type: string, format: date-time }
+                  currentDayOfMonth: { type: integer }
+                  monthlyTotals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        leads: { type: integer }
+                        bookings: { type: integer }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
+                        spend: { type: integer }
+                        meta: { type: integer }
+                        google: { type: integer }
+                  mayWeeklyCombined:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week: { type: string }
+                        leads: { type: integer }
+                        bookings: { type: integer }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
+                        spend: { type: integer }
+                  rpsCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month: { type: string }
+                            total:
+                              type: object
+                              properties:
+                                leads: { type: integer }
+                                bookings: { type: integer }
+                                walkins: { type: integer }
+                                admissions: { type: integer }
+                                closed: { type: integer }
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason: { type: string }
+                            count: { type: integer }
+                      statusSummary:
+                        type: object
+                        additionalProperties: { type: integer }
+                      bySource:
+                        type: object
+                        additionalProperties: { type: integer }
+                  risCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month: { type: string }
+                            total:
+                              type: object
+                              properties:
+                                leads: { type: integer }
+                                bookings: { type: integer }
+                                walkins: { type: integer }
+                                admissions: { type: integer }
+                                closed: { type: integer }
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason: { type: string }
+                            count: { type: integer }
+                  rpsSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
+                  risSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
 
   /api/sheets/crm:
     get:
