@@ -4,21 +4,12 @@ info:
   version: 1.0.0
   description: >
     Live marketing, CRM and operations data for Rainbow International School (RIS)
-    and Rainbow Preschools (RPS). Protected endpoints require the ADMIN_TOKEN as
-    an API key in the X-Api-Key header. /api/marketing/live requires no auth.
+    and Rainbow Preschools (RPS). All endpoints are public — no authentication required.
 
 servers:
   - url: https://rainbowinternationalschool.in
 
-security:
-  - ApiKeyAuth: []
-
 components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: query
-      name: token
   schemas:
     FunnelMetrics:
       type: object
@@ -49,7 +40,6 @@ paths:
       description: >
         Returns all request headers as received by the server. Used to verify
         which headers ChatGPT is actually sending. No authentication required.
-      security: []
       responses:
         "200":
           description: Headers as seen by the server
@@ -66,7 +56,6 @@ paths:
         Returns monthly lead, booking, walk-in, admission and ad spend data
         for both Rainbow International School (RIS) and Rainbow Preschools (RPS).
         No authentication required.
-      security: []
       responses:
         "200":
           description: Marketing data export
