@@ -25,8 +25,7 @@ export function serveStatic(app: Express) {
         base === "robots.txt" ||
         base === "sitemap.xml" ||
         base === "llms.txt" ||
-        base === "llms-full.txt" ||
-        base === "openapi.yaml"
+        base === "llms-full.txt"
       ) {
         res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
       }

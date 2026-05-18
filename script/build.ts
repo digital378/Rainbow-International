@@ -38,11 +38,6 @@ async function buildAll() {
   console.log("building client...");
   await viteBuild();
 
-  // Remove openapi.yaml from dist/public so express.static doesn't serve a stale
-  // copy. The dynamic /openapi.yaml route in server/routes.ts reads the file
-  // directly from client/public/ and always serves the latest spec.
-  await rm("dist/public/openapi.yaml", { force: true });
-
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
   const allDeps = [
