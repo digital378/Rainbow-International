@@ -507,7 +507,7 @@ export async function registerRoutes(
   });
 
   // ── Marketing dashboard JSON export (public, no auth required) ─────────
-  // GET /api/marketing/export
+  // GET /api/marketing/export — v2 public
   // Returns aggregated school marketing metrics for ChatGPT / external analysis.
   // Data is read-only and identical to the public dashboard — no PII involved.
   app.get("/api/marketing/export", async (req, res) => {
