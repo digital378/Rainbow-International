@@ -19,6 +19,27 @@ components:
       type: apiKey
       in: header
       name: X-Api-Key
+  schemas:
+    FunnelMetrics:
+      type: object
+      properties:
+        leads: { type: integer }
+        bookings: { type: integer }
+        walkins: { type: integer }
+        admissions: { type: integer }
+    LastYearMetrics:
+      type: object
+      properties:
+        spend: { type: integer }
+        leads: { type: integer }
+        walkins: { type: integer }
+        admissions: { type: integer }
+    FixedCosts:
+      type: object
+      properties:
+        salary: { type: integer }
+        crm: { type: integer }
+        overhead: { type: integer }
 
 paths:
   /api/marketing/export:
@@ -33,6 +54,133 @@ paths:
       responses:
         "200":
           description: Marketing data export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  lastUpdated:
+                    type: string
+                  todayDate:
+                    type: integer
+                  daysInMay:
+                    type: integer
+                  minRevenuePerAdmission:
+                    type: integer
+                  monthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        combined:
+                          type: object
+                          properties:
+                            leads: { type: integer }
+                            bookings: { type: integer }
+                            walkins: { type: integer }
+                            admissions: { type: integer }
+                            spend: { type: integer }
+                            meta: { type: integer }
+                            google: { type: integer }
+                        ris:
+                          type: object
+                          properties:
+                            leads: { type: integer }
+                            bookings: { type: integer }
+                            walkins: { type: integer }
+                            admissions: { type: integer }
+                            spend: { type: integer }
+                            meta: { type: integer }
+                            google: { type: integer }
+                        rps:
+                          type: object
+                          properties:
+                            leads: { type: integer }
+                            bookings: { type: integer }
+                            walkins: { type: integer }
+                            admissions: { type: integer }
+                            spend: { type: integer }
+                            meta: { type: integer }
+                            google: { type: integer }
+                  organicPreSpend:
+                    type: object
+                    properties:
+                      combined: { $ref: "#/components/schemas/FunnelMetrics" }
+                      ris: { $ref: "#/components/schemas/FunnelMetrics" }
+                      rps: { $ref: "#/components/schemas/FunnelMetrics" }
+                  lastYear:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        ris: { $ref: "#/components/schemas/LastYearMetrics" }
+                        rps: { $ref: "#/components/schemas/LastYearMetrics" }
+                  mayWeekly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week: { type: string }
+                        risLeads: { type: integer }
+                        risAdm: { type: integer }
+                        risWalk: { type: integer }
+                        risBook: { type: integer }
+                        rpsLeads: { type: integer }
+                        rpsAdm: { type: integer }
+                        rpsWalk: { type: integer }
+                        rpsBook: { type: integer }
+                  social:
+                    type: object
+                    properties:
+                      ris:
+                        type: object
+                        properties:
+                          instaFollowers: { type: integer }
+                          fbFollowers: { type: integer }
+                          ytViews: { type: integer }
+                          websiteClicks: { type: integer }
+                      rps:
+                        type: object
+                        properties:
+                          instaFollowers: { type: integer }
+                          fbFollowers: { type: integer }
+                          ytViews: { type: integer }
+                          websiteClicks: { type: integer }
+                  defaultFixedCosts:
+                    type: object
+                    properties:
+                      combined: { $ref: "#/components/schemas/FixedCosts" }
+                      ris: { $ref: "#/components/schemas/FixedCosts" }
+                      rps: { $ref: "#/components/schemas/FixedCosts" }
+                  crmRps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month: { type: string }
+                        rows:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              centre: { type: string }
+                              leads: { type: integer }
+                              bookings: { type: integer }
+                              walkins: { type: integer }
+                              admissions: { type: integer }
+                        total:
+                          type: object
+                          properties:
+                            centre: { type: string }
+                            leads: { type: integer }
+                            bookings: { type: integer }
+                            walkins: { type: integer }
+                            admissions: { type: integer }
         "401":
           description: Missing or invalid API key.
 
