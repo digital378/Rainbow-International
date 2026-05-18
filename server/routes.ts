@@ -753,7 +753,7 @@ export async function registerRoutes(
   // ── /api/search-console/* — ChatGPT-friendly aliases with ?account=ris|rps ──
   app.get("/api/search-console/queries", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     const auth = getAuthenticatedClient();
     if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
     const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
@@ -781,7 +781,7 @@ export async function registerRoutes(
 
   app.get("/api/search-console/pages", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     const auth = getAuthenticatedClient();
     if (!auth) return res.status(503).json({ message: "Google not connected. Visit /auth/google to connect." });
     const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
@@ -954,7 +954,7 @@ export async function registerRoutes(
 
   app.get("/api/google-ads/campaigns", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
 
     const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
     if (!devToken) return res.status(503).json({ message: "Google Ads developer token not configured. Apply at ads.google.com → Tools → API Centre." });
@@ -1025,7 +1025,7 @@ export async function registerRoutes(
 
   app.get("/api/google-ads/keywords", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
 
     const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
     if (!devToken) return res.status(503).json({ message: "Google Ads developer token not configured" });
@@ -1113,7 +1113,7 @@ export async function registerRoutes(
 
   app.get("/api/meta-ads/campaigns", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
 
     const token = process.env.META_ADS_TOKEN;
     if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
@@ -1177,7 +1177,7 @@ export async function registerRoutes(
 
   app.get("/api/meta-ads/insights", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
 
     const token = process.env.META_ADS_TOKEN;
     if (!token) return res.status(503).json({ message: "Meta Ads token not configured. Add META_ADS_TOKEN secret." });
@@ -1450,7 +1450,7 @@ export async function registerRoutes(
   // 1. DM Team Task Tracker
   app.get("/api/sheets/tasks", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     try {
       const rows = await fetchSheetRange(SHEET_IDS.dmTracker, "Key Task!A:I");
       const [header, ...data] = rows;
@@ -1480,7 +1480,7 @@ export async function registerRoutes(
   // 2. CRM Lead Summary
   app.get("/api/sheets/crm", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
     const monthFilter = typeof req.query.month === "string" ? req.query.month.toLowerCase() : "";
     try {
@@ -1535,7 +1535,7 @@ export async function registerRoutes(
   // 3. Master Weekly Funnel Data
   app.get("/api/sheets/master", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
     const month   = typeof req.query.month === "string" ? req.query.month.toLowerCase() : "may";
     try {
@@ -1576,7 +1576,7 @@ export async function registerRoutes(
   // 4. Targets vs Actuals by Branch/Grade
   app.get("/api/sheets/targets", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    if (!requireAdminToken(req, res)) return;
+
     const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
     try {
       // RPS: Row1=section labels ("Jan Actual" / "Monthly Target"), Row2=col headers, Row3+=data
