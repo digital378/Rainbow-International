@@ -1,0 +1,36 @@
+The problem is not proven to be the API key yet. The error is happening at the Custom GPT action/API call layer, and the strongest evidence points to the deployed OpenAPI spec still being stale or unsupported, not the backend endpoint itself.
+
+Here is the exact issue:
+
+The live action call to getMarketingData is still failing with:
+
+ClientResponseError
+
+That means ChatGPT’s action client received an HTTP-level failure while calling the operation. It does not give us enough detail here to say “API key is wrong.”
+
+From the uploaded fix notes, the previous diagnosis was that production was still serving an old OpenAPI spec. The document says the production spec was stale at 9,147 bytes, while the correct build was 15,292 bytes, and later confirms that the stale deployed spec was still showing openapi: 3.1.0 instead of the intended 3.0.3.
+
+The second uploaded file shows the currently pasted OpenAPI spec still starts with:
+
+openapi: 3.1.0
+
+That is important because the earlier fix note itself says ChatGPT Custom GPT actions likely need OpenAPI 3.0.x, not 3.1.0.
+
+So the likely problem is:
+
+The schema being used by ChatGPT is still old or incompatible.
+
+Not the API key.
+
+What needs fixing exactly:
+
+Update the live /openapi.yaml to OpenAPI 3.0.3, not 3.1.0.
+The currently shared spec still shows 3.1.0, which contradicts the fix note.
+Add proper schema objects under the 200 responses.
+In the pasted spec, /api/marketing/export only says description: Marketing data export and does not define a response body schema. That can break or weaken ChatGPT action parsing.
+Confirm the deployment is serving the latest code, not stale static files.
+The fix note says the real issue was deployment serving old files because production was not picking up the latest committed/deployed version. It specifically mentions stale static openapi.yaml, deployment build cache/state, and the need to push/deploy the correct version.
+Only check/change the API key after confirming the schema is live and correct.
+API key issues usually show 401 or 403. Here, the main evidence points to schema/deployment mismatch, especially because the operation with no parameters is failing and the pasted spec still shows the older 3.1.0.
+
+My recommendation: do not change the API key first. Update and redeploy the OpenAPI schema first. Then re-import/update the GPT action. After that, test /api/marketing/export directly. If direct endpoint testing returns 401, then the key/header setup needs fixing. If direct testing works but GPT still fails, the action schema/import is still the problem.
