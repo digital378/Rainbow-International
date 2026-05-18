@@ -506,42 +506,15 @@ export async function registerRoutes(
     res.json({ method: req.method, path: req.path, query: req.query, headers: safe });
   });
 
-  // ── Marketing dashboard JSON export (token-protected) ─────
+  // ── Marketing dashboard JSON export (public, no auth required) ─────────
   // GET /api/marketing/export
-  //   Header: X-Api-Key: <ADMIN_TOKEN>
-  //   Header: Authorization: Bearer <ADMIN_TOKEN>
-  //   Query : ?token=<ADMIN_TOKEN>
-  // Returns the full Marketing dashboard dataset for ChatGPT / external analysis.
+  // Returns aggregated school marketing metrics for ChatGPT / external analysis.
+  // Data is read-only and identical to the public dashboard — no PII involved.
   app.get("/api/marketing/export", async (req, res) => {
     try {
-      const adminToken = process.env.ADMIN_TOKEN;
-      if (!adminToken) {
-        return res.status(503).json({ message: "Service unavailable" });
-      }
-      const headerToken = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
-      const xApiKey = typeof req.headers["x-api-key"] === "string" ? req.headers["x-api-key"] : "";
-      const queryToken = typeof req.query.token === "string" ? req.query.token : "";
-      const presented = xApiKey || headerToken || queryToken;
-      // Auth debug log — masked so no secrets in logs
-      console.log("[export] ua=" + (req.headers["user-agent"] || "").slice(0, 60) +
-        " x-api-key=" + (xApiKey ? xApiKey.slice(0,4)+"****" : "NONE") +
-        " auth-header=" + (headerToken ? headerToken.slice(0,4)+"****" : "NONE") +
-        " token-query=" + (queryToken ? queryToken.slice(0,4)+"****" : "NONE") +
-        " headers=" + Object.keys(req.headers).join(","));
-      const safeEq = (a: string, b: string) => {
-        const ab = Buffer.from(a, "utf8");
-        const bb = Buffer.from(b, "utf8");
-        if (ab.length !== bb.length) return false;
-        return timingSafeEqual(ab, bb);
-      };
-      if (!presented || !safeEq(presented, adminToken)) {
-        console.log("[export] 401 — no valid key presented");
-        return res.status(401).json({ message: "Unauthorized" });
-      }
       const data = await import("@shared/marketingData");
-      res.setHeader("Cache-Control", "no-store, private, max-age=0");
-      res.setHeader("Pragma", "no-cache");
-      res.setHeader("Vary", "Authorization");
+      res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=600");
+      res.setHeader("Access-Control-Allow-Origin", "*");
       res.json({
         generatedAt: new Date().toISOString(),
         lastUpdated: data.LAST_UPDATED,

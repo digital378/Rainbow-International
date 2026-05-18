@@ -63,10 +63,10 @@ paths:
       operationId: getMarketingData
       summary: Full marketing dashboard data for RIS and RPS
       description: >
-        Returns enquiries, events, callback requests, blog posts, admissions info,
-        and SEO metadata. Requires X-Api-Key header with the ADMIN_TOKEN value.
-      security:
-        - ApiKeyAuth: []
+        Returns monthly lead, booking, walk-in, admission and ad spend data
+        for both Rainbow International School (RIS) and Rainbow Preschools (RPS).
+        No authentication required.
+      security: []
       responses:
         "200":
           description: Marketing data export
