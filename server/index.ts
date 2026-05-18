@@ -9,6 +9,20 @@ const httpServer = createServer(app);
 
 app.use(compression());
 
+// CORS — allow ChatGPT custom GPT actions (and any other API consumer) to call
+// /api/* endpoints cross-origin. Sensitive endpoints are still protected by
+// ADMIN_TOKEN; this only removes the browser-level CORS block.
+app.use("/api", (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Api-Key");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 app.get("/__repl_health", (_req, res) => {
   res.status(200).send("OK");
 });
