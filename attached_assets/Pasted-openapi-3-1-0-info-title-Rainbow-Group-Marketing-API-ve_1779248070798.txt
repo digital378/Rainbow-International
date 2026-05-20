@@ -1,0 +1,650 @@
+openapi: 3.1.0
+info:
+  title: Rainbow Group Marketing API
+  version: 1.0.0
+  description: >
+    Live marketing, CRM and operations data for Rainbow International School (RIS) and Rainbow Preschools (RPS). All
+    endpoints are public — no authentication required.
+servers:
+  - url: https://rainbowinternationalschool.in
+components:
+  schemas:
+    FunnelMetrics:
+      type: object
+      properties:
+        leads:
+          type: integer
+        bookings:
+          type: integer
+        walkins:
+          type: integer
+        admissions:
+          type: integer
+    LastYearMetrics:
+      type: object
+      properties:
+        spend:
+          type: integer
+        leads:
+          type: integer
+        walkins:
+          type: integer
+        admissions:
+          type: integer
+    FixedCosts:
+      type: object
+      properties:
+        salary:
+          type: integer
+        crm:
+          type: integer
+        overhead:
+          type: integer
+paths:
+  /api/debug/headers:
+    get:
+      operationId: debugHeaders
+      summary: Echo request headers back (no auth required)
+      description: >
+        Returns all request headers as received by the server. Used to verify which headers ChatGPT is actually sending.
+        No authentication required.
+      responses:
+        "200":
+          description: Headers as seen by the server
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/marketing/export:
+    get:
+      operationId: getMarketingData
+      summary: Full marketing dashboard data for RIS and RPS
+      description: >
+        Returns monthly lead, booking, walk-in, admission and ad spend data for both Rainbow International School (RIS)
+        and Rainbow Preschools (RPS). No authentication required.
+      responses:
+        "200":
+          description: Marketing data export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  lastUpdated:
+                    type: string
+                  todayDate:
+                    type: integer
+                  daysInMay:
+                    type: integer
+                  minRevenuePerAdmission:
+                    type: integer
+                  monthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        combined:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                        ris:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                        rps:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                  organicPreSpend:
+                    type: object
+                    properties:
+                      combined:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                      ris:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                      rps:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                  lastYear:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        ris:
+                          $ref: "#/components/schemas/LastYearMetrics"
+                        rps:
+                          $ref: "#/components/schemas/LastYearMetrics"
+                  mayWeekly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week:
+                          type: string
+                        risLeads:
+                          type: integer
+                        risAdm:
+                          type: integer
+                        risWalk:
+                          type: integer
+                        risBook:
+                          type: integer
+                        rpsLeads:
+                          type: integer
+                        rpsAdm:
+                          type: integer
+                        rpsWalk:
+                          type: integer
+                        rpsBook:
+                          type: integer
+                  social:
+                    type: object
+                    properties:
+                      ris:
+                        type: object
+                        properties:
+                          instaFollowers:
+                            type: integer
+                          fbFollowers:
+                            type: integer
+                          ytViews:
+                            type: integer
+                          websiteClicks:
+                            type: integer
+                      rps:
+                        type: object
+                        properties:
+                          instaFollowers:
+                            type: integer
+                          fbFollowers:
+                            type: integer
+                          ytViews:
+                            type: integer
+                          websiteClicks:
+                            type: integer
+                  defaultFixedCosts:
+                    type: object
+                    properties:
+                      combined:
+                        $ref: "#/components/schemas/FixedCosts"
+                      ris:
+                        $ref: "#/components/schemas/FixedCosts"
+                      rps:
+                        $ref: "#/components/schemas/FixedCosts"
+                  crmRps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        rows:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              centre:
+                                type: string
+                              leads:
+                                type: integer
+                              bookings:
+                                type: integer
+                              walkins:
+                                type: integer
+                              admissions:
+                                type: integer
+                        total:
+                          type: object
+                          properties:
+                            centre:
+                              type: string
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+        "401":
+          description: Missing or invalid API key.
+  /api/marketing/live:
+    get:
+      operationId: getMarketingLive
+      summary: Live combined marketing metrics from Google Sheets
+      description: >
+        Returns live monthly totals (leads, bookings, walk-ins, admissions, ad spend) for both RIS and RPS combined.
+        Also includes RPS branch-wise CRM, RIS education-level CRM, closed-lead reasons, and May weekly breakdown. No
+        authentication required.
+      security: []
+      responses:
+        "200":
+          description: Live aggregated data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  currentDayOfMonth:
+                    type: integer
+                  monthlyTotals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        leads:
+                          type: integer
+                        bookings:
+                          type: integer
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                        spend:
+                          type: integer
+                        meta:
+                          type: integer
+                        google:
+                          type: integer
+                  mayWeeklyCombined:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week:
+                          type: string
+                        leads:
+                          type: integer
+                        bookings:
+                          type: integer
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                        spend:
+                          type: integer
+                  rpsCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month:
+                              type: string
+                            total:
+                              type: object
+                              properties:
+                                leads:
+                                  type: integer
+                                bookings:
+                                  type: integer
+                                walkins:
+                                  type: integer
+                                admissions:
+                                  type: integer
+                                closed:
+                                  type: integer
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason:
+                              type: string
+                            count:
+                              type: integer
+                      statusSummary:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                      bySource:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                  risCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month:
+                              type: string
+                            total:
+                              type: object
+                              properties:
+                                leads:
+                                  type: integer
+                                bookings:
+                                  type: integer
+                                walkins:
+                                  type: integer
+                                admissions:
+                                  type: integer
+                                closed:
+                                  type: integer
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason:
+                              type: string
+                            count:
+                              type: integer
+                  rpsSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                  risSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+  /api/sheets/crm:
+    get:
+      operationId: getSheetsCrm
+      summary: CRM lead summary by status, source, month and owner
+      description: >
+        Returns live lead counts from the RPS or RIS CRM Google Sheet aggregated by status (ADM DONE, CLOSED, Open,
+        WALKIN BOOKED, WALK-IN COMPLETED), lead source, month, and lead owner. Optionally filter to a single month.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school CRM — ris for Rainbow International School, rps for Rainbow Preschools.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional month filter e.g. "may", "apr", "jan-26". Omit for all months.
+      responses:
+        "200":
+          description: CRM summary with totals and breakdowns by status, source, month, and owner.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/sheets/master:
+    get:
+      operationId: getSheetsMaster
+      summary: Weekly funnel breakdown from the DM master tracker
+      description: Returns week-by-week lead, walk-in and admission data from the DM master Google Sheet.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school tab to fetch.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - may
+              - april
+              - feb
+          description: Month to retrieve. Defaults to may.
+      responses:
+        "200":
+          description: Week-by-week leads, walk-ins, admissions, conversion rates.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/sheets/targets:
+    get:
+      operationId: getSheetsTargets
+      summary: Branch or grade actuals vs monthly targets
+      description: >
+        RPS — per-branch actuals (leads, bookings, walk-ins, admissions) alongside monthly targets. RIS — per-grade
+        actuals (Nursery through Class 12).
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school target sheet to fetch.
+      responses:
+        "200":
+          description: Per-branch actuals vs targets (RPS) or per-grade actuals (RIS).
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/sheets/tasks:
+    get:
+      operationId: getSheetsTasks
+      summary: DM team key task tracker
+      description: Returns tasks from the Key Task sheet with assignee, due date, status and remarks.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by status e.g. "pending", "completed". Omit for all tasks.
+      responses:
+        "200":
+          description: Task list with summary counts (total, completed, pending).
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/search-console/queries:
+    get:
+      operationId: getSearchConsoleQueries
+      summary: Top search queries from Google Search Console
+      description: Returns the top 25 queries by clicks for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school's Search Console property.
+      responses:
+        "200":
+          description: Top queries with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/search-console/pages:
+    get:
+      operationId: getSearchConsolePages
+      summary: Top pages from Google Search Console
+      description: Returns the top performing pages for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+      responses:
+        "200":
+          description: Top pages with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/pagespeed:
+    get:
+      operationId: getPageSpeedData
+      summary: PageSpeed Insights for a given URL
+      description: Returns Core Web Vitals and performance scores for a URL.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Full URL to test e.g. https://rainbowinternationalschool.in
+        - name: strategy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - mobile
+              - desktop
+          description: Device strategy. Defaults to mobile.
+      responses:
+        "200":
+          description: Performance score, LCP, FID, CLS, and other Core Web Vitals.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/google-ads/campaigns:
+    get:
+      operationId: getGoogleAdsCampaigns
+      summary: Google Ads campaign performance
+      description: Returns spend, impressions, clicks, and conversions for all active campaigns.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Filter by school. Omit for all accounts.
+      responses:
+        "200":
+          description: Campaign list with spend, impressions, clicks, conversions.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/google-ads/keywords:
+    get:
+      operationId: getGoogleAdsKeywords
+      summary: Google Ads keyword performance
+      description: Returns top keywords by spend with clicks, impressions, and conversion data.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+      responses:
+        "200":
+          description: Keyword performance data.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/meta-ads/campaigns:
+    get:
+      operationId: getMetaAdsCampaigns
+      summary: Meta (Facebook/Instagram) Ads campaign performance
+      description: Returns spend, reach, impressions, clicks, and leads for all active Meta campaigns.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Filter by school. Omit for all accounts.
+      responses:
+        "200":
+          description: Meta campaign performance data.
+        "401":
+          description: Missing or invalid X-Api-Key.

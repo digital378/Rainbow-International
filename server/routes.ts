@@ -967,9 +967,10 @@ export async function registerRoutes(
     if (!client) return res.status(503).json({ message: "Google Ads not configured" });
 
     try {
+      const mccId = (process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "").replace(/-/g, "") || customerId;
       const customer = client.Customer({
         customer_id: customerId,
-        login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
+        login_customer_id: mccId,
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 
@@ -1038,9 +1039,10 @@ export async function registerRoutes(
     if (!client) return res.status(503).json({ message: "Google Ads not configured" });
 
     try {
+      const mccId = (process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "").replace(/-/g, "") || customerId;
       const customer = client.Customer({
         customer_id: customerId,
-        login_customer_id: process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "6478938011",
+        login_customer_id: mccId,
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 

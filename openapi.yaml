@@ -453,8 +453,6 @@ paths:
       operationId: getPageSpeedData
       summary: PageSpeed Insights for a given URL
       description: Returns Core Web Vitals and performance scores for a URL.
-      security:
-        - ApiKeyAuth: []
       parameters:
         - name: url
           in: query
@@ -472,16 +470,16 @@ paths:
       responses:
         "200":
           description: Performance score, LCP, FID, CLS, and other Core Web Vitals.
-        "401":
-          description: Missing or invalid X-Api-Key.
 
   /api/google-ads/campaigns:
     get:
       operationId: getGoogleAdsCampaigns
-      summary: Google Ads campaign performance
-      description: Returns spend, impressions, clicks, and conversions for all active campaigns.
-      security:
-        - ApiKeyAuth: []
+      summary: Google Ads campaign performance (Basic Access — live data)
+      description: >
+        Returns spend, impressions, clicks, CTR, avg CPC, conversions, and cost-per-conversion
+        for all enabled Google Ads campaigns over the last 30 days. Use account=ris for Rainbow
+        International School or account=rps for Rainbow Preschools. Requires Basic Access
+        (approved May 2026) — up to 15,000 operations/day.
       parameters:
         - name: account
           in: query
@@ -489,20 +487,75 @@ paths:
           schema:
             type: string
             enum: [ris, rps]
-          description: Filter by school. Omit for all accounts.
+            default: ris
+          description: >
+            Which school account to query. ris = Rainbow International School,
+            rps = Rainbow Preschools. Defaults to ris.
       responses:
         "200":
-          description: Campaign list with spend, impressions, clicks, conversions.
-        "401":
-          description: Missing or invalid X-Api-Key.
+          description: Active campaigns with performance metrics for the last 30 days.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                    example: RIS
+                  customerId:
+                    type: string
+                    description: Google Ads customer ID used for the query.
+                  period:
+                    type: string
+                    example: last 30 days
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Google Ads campaign ID.
+                        name:
+                          type: string
+                        type:
+                          type: string
+                          description: >
+                            Advertising channel type (SEARCH, DISPLAY, VIDEO, PERFORMANCE_MAX, etc.)
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Total spend in INR (cost_micros / 1,000,000).
+                        conversions:
+                          type: number
+                          description: Total conversions attributed to this campaign.
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage (e.g. 3.45 = 3.45%).
+                        avgCpc:
+                          type: number
+                          description: Average cost per click in INR.
+                        costPerConversion:
+                          type: number
+                          nullable: true
+                          description: Cost per conversion in INR. Null if no conversions.
+        "503":
+          description: Google Ads credentials not configured on the server.
 
   /api/google-ads/keywords:
     get:
       operationId: getGoogleAdsKeywords
-      summary: Google Ads keyword performance
-      description: Returns top keywords by spend with clicks, impressions, and conversion data.
-      security:
-        - ApiKeyAuth: []
+      summary: Google Ads top keywords by spend (last 30 days)
+      description: >
+        Returns the top 25 active keywords by spend with clicks, impressions, CTR, avg CPC,
+        conversions, quality score, and match type. Use account=ris or account=rps to select
+        the school's Google Ads account.
       parameters:
         - name: account
           in: query
@@ -510,29 +563,148 @@ paths:
           schema:
             type: string
             enum: [ris, rps]
+            default: ris
+          description: Which school account to query. Defaults to ris.
       responses:
         "200":
-          description: Keyword performance data.
-        "401":
-          description: Missing or invalid X-Api-Key.
+          description: Top keywords with spend and performance data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  period:
+                    type: string
+                    example: last 30 days
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  keywords:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        keyword:
+                          type: string
+                        matchType:
+                          type: string
+                          description: EXACT, PHRASE, or BROAD.
+                        qualityScore:
+                          type: integer
+                          nullable: true
+                          description: Google Quality Score 1–10. Null if not yet assigned.
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Total spend in INR.
+                        conversions:
+                          type: number
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage.
+                        avgCpc:
+                          type: number
+                          description: Average cost per click in INR.
+        "503":
+          description: Google Ads credentials not configured on the server.
 
   /api/meta-ads/campaigns:
     get:
       operationId: getMetaAdsCampaigns
-      summary: Meta (Facebook/Instagram) Ads campaign performance
-      description: Returns spend, reach, impressions, clicks, and leads for all active Meta campaigns.
-      security:
-        - ApiKeyAuth: []
+      summary: Meta (Facebook/Instagram) Ads campaign performance (last 30 days)
+      description: >
+        Returns spend, reach, impressions, clicks, CTR, CPC, leads, landing page views,
+        and cost-per-lead for all active Meta campaigns. Use account=ris to filter to
+        Rainbow International School campaigns, account=rps for Rainbow Preschools,
+        or omit (all) to get every campaign across both brands.
       parameters:
         - name: account
           in: query
           required: false
           schema:
             type: string
-            enum: [ris, rps]
-          description: Filter by school. Omit for all accounts.
+            enum: [ris, rps, all]
+            default: all
+          description: >
+            Filter campaigns by brand name. ris = school campaigns, rps = preschool
+            campaigns, all = every campaign on the account.
       responses:
         "200":
-          description: Meta campaign performance data.
-        "401":
-          description: Missing or invalid X-Api-Key.
+          description: Meta campaign performance data for the last 30 days.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  period:
+                    type: string
+                    example: last_30d
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  total:
+                    type: object
+                    properties:
+                      campaigns:
+                        type: integer
+                      spend:
+                        type: number
+                      impressions:
+                        type: integer
+                      clicks:
+                        type: integer
+                      leads:
+                        type: integer
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                          description: ACTIVE, PAUSED, etc.
+                        objective:
+                          type: string
+                          description: LEAD_GENERATION, LINK_CLICKS, etc.
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Spend in INR.
+                        reach:
+                          type: integer
+                        frequency:
+                          type: number
+                          description: Average number of times each person saw the ad.
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage.
+                        cpc:
+                          type: number
+                          description: Cost per click in INR.
+                        leads:
+                          type: integer
+                          description: Form submissions / lead actions.
+                        landingPageViews:
+                          type: integer
+                        costPerLead:
+                          type: number
+                          nullable: true
+                          description: Cost per lead in INR. Null if no leads.
+        "503":
+          description: Meta Ads token or account ID not configured on the server.
