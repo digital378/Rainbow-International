@@ -593,10 +593,10 @@ paths:
       operationId: getGoogleAdsCampaigns
       summary: Google Ads campaign performance (Basic Access — live data)
       description: >
-        Returns spend, impressions, clicks, CTR, avg CPC, conversions, and cost-per-conversion
-        for all enabled Google Ads campaigns over the last 30 days. Use account=ris for Rainbow
-        International School or account=rps for Rainbow Preschools. Requires Basic Access
-        (approved May 2026) — up to 15,000 operations/day.
+        Live Google Ads data: spend, impressions, clicks, CTR, CPC, conversions, and
+        cost-per-conversion for all enabled campaigns (last 30 days). Use account=ris
+        for Rainbow International School or account=rps for Rainbow Preschools.
+        Basic Access tier — up to 15,000 operations/day.
       parameters:
         - name: account
           in: query
