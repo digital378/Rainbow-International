@@ -47,8 +47,23 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties:
-                  type: string
+                properties:
+                  method:
+                    type: string
+                    description: HTTP method of the request
+                  path:
+                    type: string
+                    description: Request path
+                  query:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Query string parameters
+                  headers:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: All request headers as key-value strings
 
   /api/marketing/export:
     get:

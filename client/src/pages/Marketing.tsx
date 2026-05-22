@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart, Bar, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ComposedChart, Area,
@@ -197,21 +197,22 @@ export default function Marketing() {
     return () => { cancelled = true; };
   }, []);
 
-  /* Live Google Sheets fetch — auto-refresh every 5 minutes */
+  /* Live Google Sheets fetch — auto-refresh every 5 minutes, also manual */
+  const cancelledRef = useRef(false);
+  const fetchLive = useCallback(() => {
+    setLiveLoading(true);
+    fetch("/api/marketing/live")
+      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+      .then((data: LiveData) => { if (!cancelledRef.current) { setLiveData(data); setLiveError(null); } })
+      .catch(err => { if (!cancelledRef.current) setLiveError(String(err)); })
+      .finally(() => { if (!cancelledRef.current) setLiveLoading(false); });
+  }, []);
   useEffect(() => {
-    let cancelled = false;
-    const fetchLive = () => {
-      setLiveLoading(true);
-      fetch("/api/marketing/live")
-        .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-        .then((data: LiveData) => { if (!cancelled) { setLiveData(data); setLiveError(null); } })
-        .catch(err => { if (!cancelled) setLiveError(String(err)); })
-        .finally(() => { if (!cancelled) setLiveLoading(false); });
-    };
+    cancelledRef.current = false;
     fetchLive();
     const iv = setInterval(fetchLive, 5 * 60 * 1000);
-    return () => { cancelled = true; clearInterval(iv); };
-  }, []);
+    return () => { cancelledRef.current = true; clearInterval(iv); };
+  }, [fetchLive]);
 
   /* Reset cost inputs when segment changes */
   useEffect(() => {
@@ -507,6 +508,20 @@ export default function Marketing() {
         </div>
         <div className="flex items-center gap-4 text-[11px] text-blue-200">
           <span>True CPA includes salaries + CRM + overhead ({inr(monthlyFixed)}/mo)</span>
+          <button
+            onClick={fetchLive}
+            disabled={liveLoading}
+            data-testid="button-refresh-live"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-400 text-[#091a4f] font-bold text-[11px] uppercase tracking-wide hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg
+              className={`w-3 h-3 ${liveLoading ? "animate-spin" : ""}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {liveLoading ? "Syncing…" : "Refresh"}
+          </button>
         </div>
       </div>
 
