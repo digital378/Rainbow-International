@@ -728,6 +728,225 @@ paths:
         "503":
           description: Google Ads credentials not configured on the server.
 
+  /api/google-ads/campaign-settings:
+    get:
+      operationId: getGoogleAdsCampaignSettings
+      summary: Google Ads campaign configuration — bidding, budget, status
+      description: >
+        Campaign config for all campaigns (enabled and paused): type, bidding strategy,
+        daily budget, delivery method, start/end date. No date filter — returns all
+        campaigns regardless of spend. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema: { type: string, enum: [ris, rps], default: ris }
+      responses:
+        "200":
+          description: Campaign config including budget and bidding strategy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account: { type: string }
+                  customerId: { type: string }
+                  generatedAt: { type: string, format: date-time }
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        status: { type: string }
+                        type: { type: string }
+                        biddingStrategy: { type: string }
+                        startDate: { type: string, nullable: true }
+                        endDate: { type: string, nullable: true }
+                        dailyBudget: { type: number, nullable: true }
+                        deliveryMethod: { type: string, nullable: true }
+
+  /api/google-ads/ad-groups:
+    get:
+      operationId: getGoogleAdsAdGroups
+      summary: Google Ads ad group performance for current month
+      description: >
+        Ad group spend, clicks, impressions, CTR, CPC, and conversions for the current
+        calendar month. Shows all ad groups with spend > 0. Useful for seeing whether
+        setup is branch-wise, theme-wise, or generic. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema: { type: string, enum: [ris, rps], default: ris }
+      responses:
+        "200":
+          description: Ad groups with performance metrics for current month.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account: { type: string }
+                  customerId: { type: string }
+                  period: { type: string }
+                  generatedAt: { type: string, format: date-time }
+                  adGroups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId: { type: string }
+                        campaignName: { type: string }
+                        campaignStatus: { type: string }
+                        adGroupId: { type: string }
+                        adGroupName: { type: string }
+                        adGroupStatus: { type: string }
+                        type: { type: string }
+                        impressions: { type: integer }
+                        clicks: { type: integer }
+                        spend: { type: number }
+                        conversions: { type: number }
+                        ctr: { type: number }
+                        avgCpc: { type: number }
+
+  /api/google-ads/ads:
+    get:
+      operationId: getGoogleAdsAds
+      summary: Google Ads ad copy, landing pages, and performance
+      description: >
+        Ad-level data for current month: ad type, final landing page URLs, RSA
+        headlines and descriptions, plus impressions, clicks, spend, conversions,
+        and CTR. Shows all ads with spend > 0. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema: { type: string, enum: [ris, rps], default: ris }
+      responses:
+        "200":
+          description: Ads with copy, landing pages, and performance for current month.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account: { type: string }
+                  customerId: { type: string }
+                  period: { type: string }
+                  generatedAt: { type: string, format: date-time }
+                  ads:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId: { type: string }
+                        campaignName: { type: string }
+                        adGroupId: { type: string }
+                        adGroupName: { type: string }
+                        adId: { type: string }
+                        adStatus: { type: string }
+                        adType: { type: string }
+                        finalUrls:
+                          type: array
+                          items: { type: string }
+                        headlines:
+                          type: array
+                          items: { type: string }
+                        descriptions:
+                          type: array
+                          items: { type: string }
+                        impressions: { type: integer }
+                        clicks: { type: integer }
+                        spend: { type: number }
+                        conversions: { type: number }
+                        ctr: { type: number }
+
+  /api/google-ads/locations:
+    get:
+      operationId: getGoogleAdsLocations
+      summary: Google Ads geographic targeting (location and proximity criteria)
+      description: >
+        Returns all LOCATION and PROXIMITY campaign criteria — the geographic areas
+        each campaign is targeting or excluding. Includes geo_target_constant for
+        city lookups and proximity radius/coordinates. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema: { type: string, enum: [ris, rps], default: ris }
+      responses:
+        "200":
+          description: Location and proximity targeting criteria per campaign.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account: { type: string }
+                  customerId: { type: string }
+                  generatedAt: { type: string, format: date-time }
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId: { type: string }
+                        campaignName: { type: string }
+                        criterionId: { type: string }
+                        type: { type: string, description: LOCATION or PROXIMITY }
+                        isNegative: { type: boolean }
+                        geoTargetConstant: { type: string, nullable: true }
+                        proximity:
+                          type: object
+                          nullable: true
+                          properties:
+                            radius: { type: number }
+                            radiusUnits: { type: string }
+                            cityName: { type: string, nullable: true }
+                            latMicro: { type: integer, nullable: true }
+                            lngMicro: { type: integer, nullable: true }
+
+  /api/google-ads/conversion-actions:
+    get:
+      operationId: getGoogleAdsConversionActions
+      summary: Google Ads conversion actions setup and tracking configuration
+      description: >
+        Lists all conversion actions configured in the account: name, status, type,
+        category (form submit, call, WhatsApp click, etc.), origin, counting type,
+        and whether included in the campaign's conversions metric.
+        Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema: { type: string, enum: [ris, rps], default: ris }
+      responses:
+        "200":
+          description: All conversion actions with tracking setup details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account: { type: string }
+                  customerId: { type: string }
+                  generatedAt: { type: string, format: date-time }
+                  conversionActions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        status: { type: string }
+                        type: { type: string }
+                        category: { type: string }
+                        origin: { type: string }
+                        countingType: { type: string }
+                        includeInConversionsMetric: { type: boolean }
+
   /api/meta-ads/campaigns:
     get:
       operationId: getMetaAdsCampaigns

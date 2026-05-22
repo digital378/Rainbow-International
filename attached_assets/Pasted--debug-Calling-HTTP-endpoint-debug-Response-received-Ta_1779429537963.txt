@@ -1,0 +1,1090 @@
+[debug] Calling HTTP endpoint
+[debug] Response received
+Talked to rainbowinternationalschool.in
+Thought for 1m 41s
+RPS Paid Ads Performance: Meta vs Google
+
+Data used: Google Ads and Meta Ads platform data for the last 30 days, plus RPS CRM data for May 2026 till 22 May 2026.
+
+1. Platform Performance Summary
+Metric	Meta Ads	Google Ads
+Spend	₹56,283	₹8,203
+Impressions	17,25,913	23,217
+Clicks	14,492	1,053
+CTR	0.84% blended	4.54%
+Avg CPC	₹3.88 blended	₹7.79
+Platform Leads / Conversions	83 leads	5.5 conversions
+Platform Cost per Lead / Conversion	₹678	₹1,496
+2. CRM Outcome Comparison: May 2026
+CRM Metric	Meta	Google
+Actual CRM Leads	60	48
+Admissions Done	2	2
+Walk-ins Booked	24	19
+Walk-ins Completed	2	3
+Open Leads	16	9
+Closed Leads	14	14
+Admission Conversion from CRM Leads	3.3%	4.2%
+Walk-in Pipeline: Booked + Completed	26	22
+Indicative Cost per CRM Lead	₹938	₹171
+Which Channel Is Doing Better?
+
+Google Ads is currently doing better for efficiency and lead intent.
+Although Google has a higher CPC than Meta, it is generating stronger search-intent traffic, a much higher CTR, and a much lower indicative cost per CRM lead. Google also matched Meta on admissions with far lower spend.
+
+Meta Ads is doing better for reach, visibility, and lead volume, but not for cost efficiency.
+Meta generated 60 CRM leads versus Google’s 48, but with almost 7 times the spend. Meta’s role should be brand visibility, parent recall, remarketing, and lead generation support, not the primary admissions-conversion channel in its current setup.
+
+Key Observations
+Google spend is too low compared to performance.
+Google delivered 48 CRM leads at only ₹8,203 spend. This is a strong signal to scale search campaigns.
+Meta has high reach but weak cost efficiency.
+Meta spent ₹56,283 and delivered 60 CRM leads. The cost per CRM lead is high because budget is spread across lead, awareness, and traffic campaigns.
+Tracking mismatch needs correction.
+Google Ads shows only 5.5 platform conversions, but CRM shows 48 Google leads for May 2026. This means Google conversion tracking is likely under-reporting or not aligned with CRM lead capture.
+Both channels are weak at final admission conversion.
+Meta and Google each delivered only 2 admissions. The bigger issue is not only lead generation; it is counselling, follow-up, walk-in completion, and fee/fit objection handling.
+Recommended Next Course of Action
+1. Shift budget towards Google Search immediately
+
+For the next 10–15 days, increase Google budget gradually and monitor daily lead quality. Suggested split:
+
+Channel	Suggested Budget Share
+Google Search	55%–60%
+Meta Lead Ads	25%–30%
+Meta Remarketing	10%
+Testing / Creatives	5%
+
+Do not cut Meta completely because it supports parent awareness, but reduce broad awareness/traffic spends unless they are feeding remarketing or branch-specific campaigns.
+
+2. Restructure Meta campaigns
+
+Pause or reduce spends on campaigns that generate clicks or reach without admissions movement. Focus Meta on:
+
+Branch-wise lead campaigns for Aggarwal, Hariniwas, Kalwa, Dhokali, Kasarvadavali, and Anand Nagar.
+Parent testimonial creatives.
+“Book a School Visit” creatives instead of generic admission enquiry.
+Retargeting parents who clicked, opened forms, messaged, or visited landing pages.
+3. Scale Google with high-intent keywords
+
+Google should focus on keywords such as:
+
+preschool near me
+playgroup admission near me
+nursery admission Thane
+preschool in Dhokali / Kalwa / Kasarvadavali / Hariniwas / Anand Nagar
+best preschool near me
+
+Avoid very broad keywords that attract non-parent or job-related queries.
+
+4. Fix conversion tracking urgently
+
+Google Ads conversion count is much lower than CRM Google lead count. The team should check:
+
+Website form conversion tracking
+Call tracking
+WhatsApp click tracking
+Thank-you page event
+CRM source tagging
+UTM mapping for Google and Meta
+
+Without this, campaign optimisation will remain inaccurate.
+
+5. Improve admission conversion from both sources
+
+The current issue is that both Meta and Google are producing leads, but admissions are low. Action needed:
+
+Call every new lead within 5 minutes.
+Convert booked walk-ins into completed walk-ins with reminder calls and WhatsApp location sharing.
+Re-open the 25 open leads immediately: 16 Meta and 9 Google.
+Prioritise all walk-in booked leads for same-day confirmation.
+Create a “fee objection” counselling script because high fees and location are appearing as closure reasons.
+Branch heads should personally call hot leads where walk-in is booked but not completed.
+Final Recommendation
+
+Google Ads should be treated as the primary performance channel for admissions. Meta should be used as a volume, awareness, and remarketing channel.
+
+For the next 15 days, I recommend increasing Google Search spend, tightening Meta to only lead and remarketing campaigns, and running a daily CRM review of open, walk-in booked, and completed walk-in leads. The immediate objective should be to convert the existing 25 open leads and 43 walk-in booked leads into campus visits and admissions.
+
+Thought for 7s
+
+You need to upgrade your Google Ads integration from campaign performance only to campaign configuration + performance.
+
+Below is the practical developer path.
+
+1. Start by checking your current endpoint
+
+Your current endpoint is likely doing something similar to:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc,
+  metrics.cost_per_conversion
+FROM campaign
+WHERE campaign.status = 'ENABLED'
+  AND segments.date DURING LAST_30_DAYS
+
+That is why only the live campaign is visible.
+
+You need to remove the enabled-only filter and add separate GAQL queries for campaign settings, location criteria, ad groups, keywords, ads, landing pages, and conversion actions. Google Ads API is structured around resources such as customer, campaign, ad group, ad group ad, and criteria, and these resources are queried through GoogleAdsService.
+
+2. First fix: include paused campaigns with spend
+
+Create or update your campaign performance endpoint like this:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc,
+  metrics.cost_per_conversion
+FROM campaign
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+Do not filter only campaign.status = ENABLED.
+
+Then in code, filter campaigns where:
+
+metrics.cost_micros > 0
+
+This will show:
+
+Enabled campaigns, paused campaigns, and any campaign that spent during the month.
+
+3. Add campaign setup endpoint
+
+Create a new endpoint:
+
+GET /api/google-ads/campaign-settings?account=rps
+
+Use this GAQL:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  campaign.bidding_strategy_type,
+  campaign.start_date,
+  campaign.end_date,
+  campaign.optimization_goal_setting.optimization_goal_types,
+  campaign_budget.amount_micros,
+  campaign_budget.delivery_method
+FROM campaign
+ORDER BY campaign.name
+
+This will give you:
+
+Campaign type, bidding strategy, start/end date, daily budget, optimization goal, and status.
+
+4. Add geography / radius targeting endpoint
+
+Create:
+
+GET /api/google-ads/locations?account=rps
+
+Use campaign_criterion, because campaign-level targeting criteria are stored there. Google’s API hierarchy uses campaign/ad group criteria to define targeting such as locations and keywords.
+
+Use this GAQL:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign_criterion.criterion_id,
+  campaign_criterion.type,
+  campaign_criterion.negative,
+  campaign_criterion.location.geo_target_constant,
+  campaign_criterion.proximity.address.street_address,
+  campaign_criterion.proximity.address.city_name,
+  campaign_criterion.proximity.address.province_name,
+  campaign_criterion.proximity.address.postal_code,
+  campaign_criterion.proximity.geo_point.latitude_in_micro_degrees,
+  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees,
+  campaign_criterion.proximity.radius,
+  campaign_criterion.proximity.radius_units
+FROM campaign_criterion
+WHERE campaign_criterion.type IN ('LOCATION', 'PROXIMITY')
+
+Important: for LOCATION, Google may return a geo_target_constant resource name instead of a readable city name. You may need an additional lookup using geo_target_constant.
+
+Add this lookup:
+
+SELECT
+  geo_target_constant.resource_name,
+  geo_target_constant.id,
+  geo_target_constant.name,
+  geo_target_constant.country_code,
+  geo_target_constant.target_type,
+  geo_target_constant.status
+FROM geo_target_constant
+WHERE geo_target_constant.resource_name IN (...)
+
+Your final response should map location IDs to readable names such as Thane, Kalwa, Mumbai, etc.
+
+5. Add ad group endpoint
+
+Create:
+
+GET /api/google-ads/ad-groups?account=rps
+
+GAQL:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group.status,
+  ad_group.type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc
+FROM ad_group
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+This will show whether the setup is branch-wise, theme-wise, broad-match, location-wise, or only one generic ad group.
+
+6. Add keyword and match type endpoint
+
+Your current keyword endpoint returned blank, so either the campaign has no standard search keywords exposed, or the query/filter is wrong.
+
+Create:
+
+GET /api/google-ads/keywords?account=rps
+
+Use keyword_view, which is the Google Ads reporting resource for keyword-level data.
+
+GAQL:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group.status,
+  ad_group_criterion.criterion_id,
+  ad_group_criterion.status,
+  ad_group_criterion.keyword.text,
+  ad_group_criterion.keyword.match_type,
+  ad_group_criterion.quality_info.quality_score,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc
+FROM keyword_view
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+Do not filter only enabled keywords initially. Pull all statuses first, then filter in your app.
+
+7. Add ads and landing page endpoint
+
+Create:
+
+GET /api/google-ads/ads?account=rps
+
+Use ad_group_ad. Google’s API support forum also confirms that final URLs are available through ad_group_ad.ad.final_urls.
+
+GAQL:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group_ad.ad.id,
+  ad_group_ad.status,
+  ad_group_ad.ad.type,
+  ad_group_ad.ad.final_urls,
+  ad_group_ad.ad.responsive_search_ad.headlines,
+  ad_group_ad.ad.responsive_search_ad.descriptions,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr
+FROM ad_group_ad
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+This will show:
+
+Landing page URL, ad copy, active/paused ads, and which ads spent money.
+
+8. Add conversion action endpoint
+
+Create:
+
+GET /api/google-ads/conversion-actions?account=rps
+
+GAQL:
+
+SELECT
+  conversion_action.id,
+  conversion_action.name,
+  conversion_action.status,
+  conversion_action.type,
+  conversion_action.category,
+  conversion_action.origin,
+  conversion_action.counting_type,
+  conversion_action.include_in_conversions_metric
+FROM conversion_action
+ORDER BY conversion_action.name
+
+This will tell us whether the campaign is optimizing for form submit, calls, WhatsApp click, page view, imported CRM conversion, or another action.
+
+9. Confirm authentication and permissions
+
+Make sure your Google Ads integration has:
+
+Requirement	What to check
+Google Ads manager account	Required for API access
+Developer token	Required
+OAuth refresh token	Required
+Scope	https://www.googleapis.com/auth/adwords
+Customer ID	RPS: 5665438033
+Access level	Standard or Admin preferred
+
+Google confirms that API use needs a Google Ads manager account and developer token.
+
+10. Update your plugin/tool manifest
+
+Right now I can call only:
+
+getGoogleAdsCampaigns
+getGoogleAdsKeywords
+
+Add these functions:
+
+getGoogleAdsCampaignSettings
+getGoogleAdsLocations
+getGoogleAdsAdGroups
+getGoogleAdsAds
+getGoogleAdsConversionActions
+getGoogleAdsCampaignsAllStatuses
+
+Return JSON in this structure:
+
+{
+  "account": "RPS",
+  "customerId": "5665438033",
+  "period": "2026-05-01 to 2026-05-22",
+  "generatedAt": "ISO_DATE",
+  "campaigns": []
+}
+
+For locations:
+
+{
+  "account": "RPS",
+  "customerId": "5665438033",
+  "generatedAt": "ISO_DATE",
+  "locations": [
+    {
+      "campaignId": "",
+      "campaignName": "",
+      "criterionType": "LOCATION or PROXIMITY",
+      "negative": false,
+      "locationName": "",
+      "geoTargetId": "",
+      "radius": "",
+      "radiusUnits": "",
+      "latitude": "",
+      "longitude": ""
+    }
+  ]
+}
+11. Test in this order
+
+Start with these tests:
+
+Campaigns all statuses
+Campaign settings
+Locations
+Ad groups
+Keywords
+Ads and final URLs
+Conversion actions
+
+Once these work, ask me:
+
+“Pull full RPS Google Ads setup audit.”
+
+Then I will be able to report the current setup, geography, radius, branch targeting, keywords, match types, landing pages, conversion actions, paused campaign spend, and recommended fixes.
+
+what do i do from here?
+Thought for 6s
+
+You are already in the right place. Your developer token is active with Basic Access, so you do not need to upgrade access just to fetch campaign setup details. Basic Access can make API requests for production accounts and supports up to 15,000 operations per day, which is enough for this reporting use case.
+
+What you need to do now is not inside this Google Ads screen. The next work is in your Google Cloud OAuth setup and backend API queries.
+
+Step 1: Copy the developer token
+
+On this screen, click View token under Developer token.
+
+Copy the token and store it in your backend environment file:
+
+GOOGLE_ADS_DEVELOPER_TOKEN=your_developer_token_here
+
+Do not expose this token in frontend code.
+
+Step 2: Confirm OAuth scope in Google Cloud
+
+Go to Google Cloud Console for the project used by your BOT/integration.
+
+Open:
+
+APIs & Services > OAuth consent screen > Data Access / Scopes
+
+Confirm this scope is added:
+
+https://www.googleapis.com/auth/adwords
+
+This is the Google Ads API OAuth scope.
+
+Step 3: Confirm you have OAuth client credentials
+
+In Google Cloud Console, open:
+
+APIs & Services > Credentials
+
+You should have:
+
+GOOGLE_ADS_CLIENT_ID=
+GOOGLE_ADS_CLIENT_SECRET=
+GOOGLE_ADS_REFRESH_TOKEN=
+
+If you already have a live campaign performance endpoint working, you likely already have these. So you may only need to update the queries, not redo OAuth.
+
+Step 4: Update your existing campaign endpoint first
+
+Your current endpoint seems to be filtering only enabled campaigns. Change it so it pulls all campaigns with spend this month, including paused campaigns.
+
+Use GAQL like this:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc,
+  metrics.cost_per_conversion
+FROM campaign
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+Then in your code, return rows where:
+
+Number(row.metrics.costMicros || 0) > 0
+
+This will solve the issue of campaigns that ran earlier this month but are currently paused.
+
+Step 5: Add a campaign settings endpoint
+
+Create this backend route:
+
+GET /api/google-ads/campaign-settings?account=rps
+
+Use:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  campaign.bidding_strategy_type,
+  campaign.start_date,
+  campaign.end_date,
+  campaign_budget.amount_micros,
+  campaign_budget.delivery_method
+FROM campaign
+ORDER BY campaign.name
+
+This will allow me to see campaign type, budget, bidding strategy, and status.
+
+Step 6: Add the geography targeting endpoint
+
+Create:
+
+GET /api/google-ads/locations?account=rps
+
+Use:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign_criterion.criterion_id,
+  campaign_criterion.type,
+  campaign_criterion.negative,
+  campaign_criterion.location.geo_target_constant,
+  campaign_criterion.proximity.address.city_name,
+  campaign_criterion.proximity.address.province_name,
+  campaign_criterion.proximity.address.postal_code,
+  campaign_criterion.proximity.geo_point.latitude_in_micro_degrees,
+  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees,
+  campaign_criterion.proximity.radius,
+  campaign_criterion.proximity.radius_units
+FROM campaign_criterion
+WHERE campaign_criterion.type IN ('LOCATION', 'PROXIMITY')
+
+This is the key endpoint for identifying exact geography targeting, radius targeting, and branch-wise targeting.
+
+Step 7: Add ad group, keyword, ad, and conversion endpoints
+
+Add these routes:
+
+GET /api/google-ads/ad-groups?account=rps
+GET /api/google-ads/keywords?account=rps
+GET /api/google-ads/ads?account=rps
+GET /api/google-ads/conversion-actions?account=rps
+
+Use these resources:
+
+Route	Google Ads API resource
+/ad-groups	ad_group
+/keywords	keyword_view
+/ads	ad_group_ad
+/conversion-actions	conversion_action
+
+For the keyword endpoint, use:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  ad_group.id,
+  ad_group.name,
+  ad_group_criterion.keyword.text,
+  ad_group_criterion.keyword.match_type,
+  ad_group_criterion.status,
+  ad_group_criterion.quality_info.quality_score,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions
+FROM keyword_view
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+Step 8: Update the ChatGPT action/plugin schema
+
+Currently I can call only limited tools such as campaign performance and keywords. Add these functions to your action/plugin schema:
+
+getGoogleAdsCampaignsAllStatuses
+getGoogleAdsCampaignSettings
+getGoogleAdsLocations
+getGoogleAdsAdGroups
+getGoogleAdsAds
+getGoogleAdsConversionActions
+
+Once these are exposed to me, I can directly answer:
+
+Current campaign setup
+Geography targeting
+Radius targeting
+Branch-wise targeting
+Bidding strategy
+Ad group structure
+Keyword list
+Match type
+Landing page URLs
+Conversion action names
+Paused campaigns with spend
+Step 9: Keep the current Basic Access
+
+Do not apply for Standard Access right now unless you need much higher API volume. Google’s documentation says Basic Access allows production account API requests and up to 15,000 operations per day.
+
+Your immediate gap is backend query coverage, not Google Ads API access level.
+
+Give me the links as well and tell me in detail what to do in each screen step by step
+Thought for 7s
+
+Yes. From the screen you shared, you are already in the correct Google Ads Manager Account > API Center screen.
+
+Your next steps are divided into three parts:
+
+Google Ads API Center – copy developer token
+Google Cloud Console – confirm OAuth and API access
+Backend code – add the missing Google Ads API queries and expose them to this BOT
+
+Official references: Google Ads API developer token guide, OAuth scope guide, quick start, and location targeting documentation are here:
+
+Part A: Google Ads API Center screen
+
+You are here now:
+
+Google Ads > Admin > API Center
+
+Step 1: Copy the Developer Token
+
+On your current screen:
+
+Click View token under Developer token.
+Copy the token.
+Save it in your backend .env file.
+
+Use:
+
+GOOGLE_ADS_DEVELOPER_TOKEN=your_developer_token_here
+
+Do not put this token in frontend code.
+
+Your screen shows Access level: Basic Access. That is fine for now. Basic Access is enough for this reporting requirement unless you exceed Google’s operation limits. Google’s developer token is required for every Google Ads API call.
+
+Part B: Google Cloud Console setup
+
+Open Google Cloud Console:
+
+Link: https://console.cloud.google.com/
+
+Use the same Google account that controls your Google Ads API project.
+
+Step 2: Select the correct project
+
+At the top-left of Google Cloud Console:
+
+Click the project dropdown.
+Select the project used for your Rainbow BOT / Google Ads integration.
+If you are unsure which project is used, check your backend .env for the current GOOGLE_ADS_CLIENT_ID.
+Step 3: Enable Google Ads API
+
+Go to:
+
+Google Cloud Console > APIs & Services > Library
+
+Direct link:
+
+https://console.cloud.google.com/apis/library
+
+Then:
+
+Search Google Ads API.
+Open Google Ads API.
+Click Enable if it is not already enabled.
+
+If your current campaign performance endpoint is already working, this is probably already enabled.
+
+Step 4: Configure OAuth consent screen
+
+Go to:
+
+APIs & Services > OAuth consent screen
+
+Direct link:
+
+https://console.cloud.google.com/apis/credentials/consent
+
+Check these fields:
+
+Field	What to use
+App name	Rainbow Ads Reporting / Rainbow Group BOT
+User support email	digital@rainbowinternationalschool.in
+App logo	Optional
+Developer contact email	Your developer/admin email
+
+Then go to the Scopes section.
+
+Add this scope:
+
+https://www.googleapis.com/auth/adwords
+
+Google Ads API uses this OAuth scope for access.
+
+Save the consent screen.
+
+Step 5: Create or verify OAuth Client ID
+
+Go to:
+
+APIs & Services > Credentials
+
+Direct link:
+
+https://console.cloud.google.com/apis/credentials
+
+You need an OAuth 2.0 Client ID.
+
+If it already exists, open it and copy:
+
+GOOGLE_ADS_CLIENT_ID=
+GOOGLE_ADS_CLIENT_SECRET=
+
+If it does not exist:
+
+Click Create Credentials.
+Select OAuth client ID.
+Application type: choose Web application if your backend handles OAuth callback, or Desktop app if you are generating a refresh token manually.
+Name it: Rainbow Google Ads API Client.
+Create.
+Copy the Client ID and Client Secret.
+
+Save in backend:
+
+GOOGLE_ADS_CLIENT_ID=your_client_id
+GOOGLE_ADS_CLIENT_SECRET=your_client_secret
+Step 6: Generate or confirm Refresh Token
+
+You need a refresh token so your backend can access Google Ads without logging in every time.
+
+If your current Google Ads performance endpoint already works, you likely already have:
+
+GOOGLE_ADS_REFRESH_TOKEN=
+
+If not, generate one using Google’s OAuth flow.
+
+Google’s OAuth documentation explains that offline access is used to get a refresh token for server-side/background access.
+
+Your backend should store:
+
+GOOGLE_ADS_REFRESH_TOKEN=your_refresh_token
+Part C: Backend environment variables
+
+Your backend should have these values:
+
+GOOGLE_ADS_DEVELOPER_TOKEN=
+GOOGLE_ADS_CLIENT_ID=
+GOOGLE_ADS_CLIENT_SECRET=
+GOOGLE_ADS_REFRESH_TOKEN=
+
+GOOGLE_ADS_LOGIN_CUSTOMER_ID=647893981
+GOOGLE_ADS_RPS_CUSTOMER_ID=5665438033
+GOOGLE_ADS_RIS_CUSTOMER_ID=647893981
+
+Important note:
+
+From your screenshot, the manager account appears to be:
+
+647-893-9811
+
+For Google Ads API, remove hyphens:
+
+6478939811
+
+Earlier RPS customer ID shown by your connector was:
+
+5665438033
+
+So in API calls:
+
+Purpose	ID
+Manager login customer ID	6478939811
+RPS customer ID	5665438033
+
+If the live account is RIS instead of RPS, use the relevant customer ID for RIS.
+
+Part D: Fix current endpoint to include paused campaigns
+
+Your current endpoint is only returning the enabled campaign:
+
+High_Conversion_Location_18may26
+
+That means your backend is probably filtering:
+
+campaign.status = 'ENABLED'
+
+Remove that filter.
+
+Add endpoint
+GET /api/google-ads/campaigns-all-statuses?account=rps
+GAQL query
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc,
+  metrics.cost_per_conversion
+FROM campaign
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+In code, filter only campaigns with spend:
+
+const campaignsWithSpend = rows.filter(row =>
+  Number(row.metrics?.costMicros || 0) > 0
+);
+
+This will return:
+
+Enabled campaigns, paused campaigns, campaigns that spent earlier this month.
+
+Part E: Add campaign setup endpoint
+
+This gives campaign type, bidding strategy, budget, start date, end date.
+
+Endpoint
+GET /api/google-ads/campaign-settings?account=rps
+GAQL
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  campaign.bidding_strategy_type,
+  campaign.start_date,
+  campaign.end_date,
+  campaign_budget.amount_micros,
+  campaign_budget.delivery_method
+FROM campaign
+ORDER BY campaign.name
+
+This is what will let me answer:
+
+What campaign type is running?
+Is it Search, Performance Max, Display, etc.?
+What bidding strategy is used?
+What is the daily budget?
+Is it enabled or paused?
+Part F: Add location and radius targeting endpoint
+
+This is the most important missing piece for your question on geography targeting.
+
+Google Ads location targeting is handled using campaign targeting criteria. Google’s documentation confirms that campaigns can target geographical regions and each targetable location has a criterion ID.
+
+Endpoint
+GET /api/google-ads/locations?account=rps
+GAQL
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign_criterion.criterion_id,
+  campaign_criterion.type,
+  campaign_criterion.negative,
+  campaign_criterion.location.geo_target_constant,
+  campaign_criterion.proximity.address.street_address,
+  campaign_criterion.proximity.address.city_name,
+  campaign_criterion.proximity.address.province_name,
+  campaign_criterion.proximity.address.postal_code,
+  campaign_criterion.proximity.geo_point.latitude_in_micro_degrees,
+  campaign_criterion.proximity.geo_point.longitude_in_micro_degrees,
+  campaign_criterion.proximity.radius,
+  campaign_criterion.proximity.radius_units
+FROM campaign_criterion
+WHERE campaign_criterion.type IN ('LOCATION', 'PROXIMITY')
+
+This will show:
+
+Field	Meaning
+LOCATION	City/state/pincode type targeting
+PROXIMITY	Radius targeting
+negative = true	Excluded location
+radius	Radius distance
+radius_units	KM / miles
+latitude / longitude	Exact radius center
+
+For normal location targets, Google may return:
+
+geoTargetConstants/xxxx
+
+So you also need to map the geo target constant to the readable location name.
+
+Use a lookup query or Google’s GeoTargetConstantService. Google states that each targetable location is identified by a criterion ID and can be looked up using geo target constants.
+
+Part G: Add ad group endpoint
+Endpoint
+GET /api/google-ads/ad-groups?account=rps
+GAQL
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group.status,
+  ad_group.type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc
+FROM ad_group
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+This will show whether the campaign structure is:
+
+Branch-wise
+Location-wise
+Keyword theme-wise
+Generic single ad group
+Broad match setup
+Part H: Add keyword and match type endpoint
+
+Your current keyword endpoint returned blank. Add a proper keyword_view query.
+
+Endpoint
+GET /api/google-ads/keywords?account=rps
+GAQL
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group.status,
+  ad_group_criterion.criterion_id,
+  ad_group_criterion.status,
+  ad_group_criterion.keyword.text,
+  ad_group_criterion.keyword.match_type,
+  ad_group_criterion.quality_info.quality_score,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr,
+  metrics.average_cpc
+FROM keyword_view
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+Google’s keyword reporting resource is keyword_view.
+
+This will show:
+
+Keyword text
+Match type
+Status
+Quality score
+Spend
+Clicks
+Conversions
+Part I: Add ads and landing page endpoint
+Endpoint
+GET /api/google-ads/ads?account=rps
+GAQL
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  ad_group.id,
+  ad_group.name,
+  ad_group_ad.ad.id,
+  ad_group_ad.status,
+  ad_group_ad.ad.type,
+  ad_group_ad.ad.final_urls,
+  ad_group_ad.ad.responsive_search_ad.headlines,
+  ad_group_ad.ad.responsive_search_ad.descriptions,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions,
+  metrics.ctr
+FROM ad_group_ad
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+This will show:
+
+Landing page URL
+Ad type
+Headlines
+Descriptions
+Which ads spent money
+Which ads converted
+Part J: Add conversion action endpoint
+
+This will show what Google Ads is counting as a conversion.
+
+Endpoint
+GET /api/google-ads/conversion-actions?account=rps
+GAQL
+SELECT
+  conversion_action.id,
+  conversion_action.name,
+  conversion_action.status,
+  conversion_action.type,
+  conversion_action.category,
+  conversion_action.origin,
+  conversion_action.counting_type,
+  conversion_action.include_in_conversions_metric
+FROM conversion_action
+ORDER BY conversion_action.name
+
+This will help identify whether Google is tracking:
+
+Form submit
+Phone call
+WhatsApp click
+Page view
+Imported CRM conversion
+Lead form
+Website conversion
+Part K: Add these functions to the BOT action/plugin schema
+
+Right now I can call only limited Google Ads tools.
+
+Add these functions:
+
+getGoogleAdsCampaignsAllStatuses
+getGoogleAdsCampaignSettings
+getGoogleAdsLocations
+getGoogleAdsAdGroups
+getGoogleAdsKeywords
+getGoogleAdsAds
+getGoogleAdsConversionActions
+
+Once these are exposed, I can answer exactly:
+
+What setup is currently live?
+What geography is targeted?
+Is it radius targeting?
+Is it branch-wise targeting?
+Which ad groups are active?
+Which keywords and match types are running?
+Which landing page is used?
+Which conversion action is being optimized?
+Which paused campaigns spent money this month?
+Recommended order of work
+
+Do it in this order:
+
+Priority	Task
+1	Copy developer token from API Center
+2	Confirm OAuth scope in Google Cloud
+3	Remove enabled-only filter from campaign endpoint
+4	Add all-status campaign performance endpoint
+5	Add campaign settings endpoint
+6	Add location/radius endpoint
+7	Add ad group endpoint
+8	Add keyword endpoint
+9	Add ads/final URL endpoint
+10	Add conversion action endpoint
+11	Update BOT schema/actions
+12	Ask me to run full Google Ads audit
+
+Once you complete only steps 3 to 6, I will already be able to answer the main question about current campaign setup and geography targeting.

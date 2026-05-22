@@ -952,6 +952,29 @@ export async function registerRoutes(
     return null;
   }
 
+  /** Returns current-month date range as YYYY-MM-DD strings for GAQL BETWEEN. */
+  function gaMonthRange(): { start: string; end: string } {
+    const now = new Date();
+    const y = now.getUTCFullYear();
+    const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(now.getUTCDate()).padStart(2, "0");
+    return { start: `${y}-${m}-01`, end: `${y}-${m}-${d}` };
+  }
+
+  /** Shared: build a Google Ads Customer context for a given account slug. */
+  async function getGoogleAdsCustomer(account: string) {
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return null;
+    const client = await getGoogleAdsClient();
+    if (!client) return null;
+    const mccId = (process.env.GOOGLE_ADS_CUSTOMER_ID_MCC || "").replace(/-/g, "") || customerId;
+    return client.Customer({
+      customer_id: customerId,
+      login_customer_id: mccId,
+      refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
+    });
+  }
+
   app.get("/api/google-ads/campaigns", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
 
@@ -974,12 +997,15 @@ export async function registerRoutes(
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 
+      const range = gaMonthRange();
       const campaigns = await customer.query(`
         SELECT
           campaign.id,
           campaign.name,
           campaign.status,
           campaign.advertising_channel_type,
+          campaign.bidding_strategy_type,
+          campaign.start_date,
           metrics.impressions,
           metrics.clicks,
           metrics.cost_micros,
@@ -988,31 +1014,35 @@ export async function registerRoutes(
           metrics.average_cpc,
           metrics.cost_per_conversion
         FROM campaign
-        WHERE campaign.status = 'ENABLED'
-          AND segments.date DURING LAST_30_DAYS
+        WHERE segments.date BETWEEN '${range.start}' AND '${range.end}'
         ORDER BY metrics.cost_micros DESC
-        LIMIT 20
+        LIMIT 50
       `);
 
-      const rows = campaigns.map((c: any) => ({
-        id: c.campaign.id,
-        name: c.campaign.name,
-        type: c.campaign.advertising_channel_type,
-        impressions: c.metrics.impressions,
-        clicks: c.metrics.clicks,
-        spend: parseFloat((c.metrics.cost_micros / 1_000_000).toFixed(2)),
-        conversions: parseFloat((c.metrics.conversions || 0).toFixed(1)),
-        ctr: parseFloat((c.metrics.ctr * 100).toFixed(2)),
-        avgCpc: parseFloat((c.metrics.average_cpc / 1_000_000).toFixed(2)),
-        costPerConversion: c.metrics.cost_per_conversion > 0
-          ? parseFloat((c.metrics.cost_per_conversion / 1_000_000).toFixed(2))
-          : null,
-      }));
+      const rows = campaigns
+        .filter((c: any) => (c.metrics.cost_micros || 0) > 0)
+        .map((c: any) => ({
+          id: c.campaign.id,
+          name: c.campaign.name,
+          status: c.campaign.status,
+          type: c.campaign.advertising_channel_type,
+          biddingStrategy: c.campaign.bidding_strategy_type,
+          startDate: c.campaign.start_date,
+          impressions: c.metrics.impressions,
+          clicks: c.metrics.clicks,
+          spend: parseFloat((c.metrics.cost_micros / 1_000_000).toFixed(2)),
+          conversions: parseFloat((c.metrics.conversions || 0).toFixed(1)),
+          ctr: parseFloat(((c.metrics.ctr || 0) * 100).toFixed(2)),
+          avgCpc: parseFloat(((c.metrics.average_cpc || 0) / 1_000_000).toFixed(2)),
+          costPerConversion: (c.metrics.cost_per_conversion || 0) > 0
+            ? parseFloat((c.metrics.cost_per_conversion / 1_000_000).toFixed(2))
+            : null,
+        }));
 
       res.json({
         account: account.toUpperCase(),
         customerId,
-        period: "last 30 days",
+        period: `${range.start} to ${range.end}`,
         generatedAt: new Date().toISOString(),
         campaigns: rows,
       });
@@ -1046,8 +1076,15 @@ export async function registerRoutes(
         refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
       });
 
+      const range = gaMonthRange();
       const keywords = await customer.query(`
         SELECT
+          campaign.id,
+          campaign.name,
+          ad_group.id,
+          ad_group.name,
+          ad_group_criterion.criterion_id,
+          ad_group_criterion.status,
           ad_group_criterion.keyword.text,
           ad_group_criterion.keyword.match_type,
           ad_group_criterion.quality_info.quality_score,
@@ -1058,30 +1095,35 @@ export async function registerRoutes(
           metrics.ctr,
           metrics.average_cpc
         FROM keyword_view
-        WHERE campaign.status = 'ENABLED'
-          AND ad_group.status = 'ENABLED'
-          AND ad_group_criterion.status = 'ENABLED'
-          AND segments.date DURING LAST_30_DAYS
+        WHERE segments.date BETWEEN '${range.start}' AND '${range.end}'
         ORDER BY metrics.cost_micros DESC
-        LIMIT 25
+        LIMIT 50
       `);
 
-      const rows = keywords.map((k: any) => ({
-        keyword: k.ad_group_criterion.keyword.text,
-        matchType: k.ad_group_criterion.keyword.match_type,
-        qualityScore: k.ad_group_criterion.quality_info?.quality_score || null,
-        impressions: k.metrics.impressions,
-        clicks: k.metrics.clicks,
-        spend: parseFloat((k.metrics.cost_micros / 1_000_000).toFixed(2)),
-        conversions: parseFloat((k.metrics.conversions || 0).toFixed(1)),
-        ctr: parseFloat((k.metrics.ctr * 100).toFixed(2)),
-        avgCpc: parseFloat((k.metrics.average_cpc / 1_000_000).toFixed(2)),
-      }));
+      const rows = keywords
+        .filter((k: any) => (k.metrics.cost_micros || 0) > 0)
+        .map((k: any) => ({
+          campaignId: k.campaign.id,
+          campaignName: k.campaign.name,
+          adGroupId: k.ad_group.id,
+          adGroupName: k.ad_group.name,
+          criterionId: k.ad_group_criterion.criterion_id,
+          status: k.ad_group_criterion.status,
+          keyword: k.ad_group_criterion.keyword.text,
+          matchType: k.ad_group_criterion.keyword.match_type,
+          qualityScore: k.ad_group_criterion.quality_info?.quality_score || null,
+          impressions: k.metrics.impressions,
+          clicks: k.metrics.clicks,
+          spend: parseFloat((k.metrics.cost_micros / 1_000_000).toFixed(2)),
+          conversions: parseFloat((k.metrics.conversions || 0).toFixed(1)),
+          ctr: parseFloat(((k.metrics.ctr || 0) * 100).toFixed(2)),
+          avgCpc: parseFloat(((k.metrics.average_cpc || 0) / 1_000_000).toFixed(2)),
+        }));
 
       res.json({
         account: account.toUpperCase(),
         customerId,
-        period: "last 30 days",
+        period: `${range.start} to ${range.end}`,
         generatedAt: new Date().toISOString(),
         keywords: rows,
       });
@@ -1090,6 +1132,227 @@ export async function registerRoutes(
       const detail = JSON.stringify(err, Object.getOwnPropertyNames(err)).slice(0, 800);
       const status = reason === "ACCESS_TOKEN_SCOPE_INSUFFICIENT" ? 403 : 500;
       res.status(status).json({ message: "Google Ads keyword query failed", reason, detail });
+    }
+  });
+
+  // ── Google Ads: Campaign Settings (config, bidding, budget) ──
+  app.get("/api/google-ads/campaign-settings", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+    const customer = await getGoogleAdsCustomer(account);
+    if (!customer) return res.status(503).json({ message: "Google Ads not configured" });
+    try {
+      const rows = await customer.query(`
+        SELECT
+          campaign.id,
+          campaign.name,
+          campaign.status,
+          campaign.advertising_channel_type,
+          campaign.bidding_strategy_type,
+          campaign.start_date,
+          campaign.end_date,
+          campaign_budget.amount_micros,
+          campaign_budget.delivery_method
+        FROM campaign
+        ORDER BY campaign.name
+        LIMIT 50
+      `);
+      res.json({
+        account: account.toUpperCase(), customerId,
+        generatedAt: new Date().toISOString(),
+        campaigns: rows.map((r: any) => ({
+          id: r.campaign.id,
+          name: r.campaign.name,
+          status: r.campaign.status,
+          type: r.campaign.advertising_channel_type,
+          biddingStrategy: r.campaign.bidding_strategy_type,
+          startDate: r.campaign.start_date || null,
+          endDate: r.campaign.end_date || null,
+          dailyBudget: r.campaign_budget?.amount_micros
+            ? parseFloat((r.campaign_budget.amount_micros / 1_000_000).toFixed(2)) : null,
+          deliveryMethod: r.campaign_budget?.delivery_method || null,
+        })),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads campaign-settings query failed", reason: err?.reason || err?.message });
+    }
+  });
+
+  // ── Google Ads: Ad Groups ──────────────────────────────────────
+  app.get("/api/google-ads/ad-groups", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+    const customer = await getGoogleAdsCustomer(account);
+    if (!customer) return res.status(503).json({ message: "Google Ads not configured" });
+    try {
+      const range = gaMonthRange();
+      const rows = await customer.query(`
+        SELECT
+          campaign.id, campaign.name, campaign.status,
+          ad_group.id, ad_group.name, ad_group.status, ad_group.type,
+          metrics.impressions, metrics.clicks, metrics.cost_micros,
+          metrics.conversions, metrics.ctr, metrics.average_cpc
+        FROM ad_group
+        WHERE segments.date BETWEEN '${range.start}' AND '${range.end}'
+        ORDER BY metrics.cost_micros DESC
+        LIMIT 50
+      `);
+      res.json({
+        account: account.toUpperCase(), customerId,
+        period: `${range.start} to ${range.end}`,
+        generatedAt: new Date().toISOString(),
+        adGroups: rows.map((r: any) => ({
+          campaignId: r.campaign.id, campaignName: r.campaign.name, campaignStatus: r.campaign.status,
+          adGroupId: r.ad_group.id, adGroupName: r.ad_group.name, adGroupStatus: r.ad_group.status,
+          type: r.ad_group.type,
+          impressions: r.metrics.impressions, clicks: r.metrics.clicks,
+          spend: parseFloat((r.metrics.cost_micros / 1_000_000).toFixed(2)),
+          conversions: parseFloat((r.metrics.conversions || 0).toFixed(1)),
+          ctr: parseFloat(((r.metrics.ctr || 0) * 100).toFixed(2)),
+          avgCpc: parseFloat(((r.metrics.average_cpc || 0) / 1_000_000).toFixed(2)),
+        })),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads ad-groups query failed", reason: err?.reason || err?.message });
+    }
+  });
+
+  // ── Google Ads: Ads (copy + landing pages) ────────────────────
+  app.get("/api/google-ads/ads", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+    const customer = await getGoogleAdsCustomer(account);
+    if (!customer) return res.status(503).json({ message: "Google Ads not configured" });
+    try {
+      const range = gaMonthRange();
+      const rows = await customer.query(`
+        SELECT
+          campaign.id, campaign.name, campaign.status,
+          ad_group.id, ad_group.name,
+          ad_group_ad.ad.id, ad_group_ad.status, ad_group_ad.ad.type,
+          ad_group_ad.ad.final_urls,
+          ad_group_ad.ad.responsive_search_ad.headlines,
+          ad_group_ad.ad.responsive_search_ad.descriptions,
+          metrics.impressions, metrics.clicks, metrics.cost_micros,
+          metrics.conversions, metrics.ctr
+        FROM ad_group_ad
+        WHERE segments.date BETWEEN '${range.start}' AND '${range.end}'
+        ORDER BY metrics.cost_micros DESC
+        LIMIT 50
+      `);
+      res.json({
+        account: account.toUpperCase(), customerId,
+        period: `${range.start} to ${range.end}`,
+        generatedAt: new Date().toISOString(),
+        ads: rows.map((r: any) => ({
+          campaignId: r.campaign.id, campaignName: r.campaign.name, campaignStatus: r.campaign.status,
+          adGroupId: r.ad_group.id, adGroupName: r.ad_group.name,
+          adId: r.ad_group_ad.ad?.id, adStatus: r.ad_group_ad.status, adType: r.ad_group_ad.ad?.type,
+          finalUrls: r.ad_group_ad.ad?.final_urls || [],
+          headlines: (r.ad_group_ad.ad?.responsive_search_ad?.headlines || []).map((h: any) => h.text).filter(Boolean),
+          descriptions: (r.ad_group_ad.ad?.responsive_search_ad?.descriptions || []).map((d: any) => d.text).filter(Boolean),
+          impressions: r.metrics.impressions, clicks: r.metrics.clicks,
+          spend: parseFloat((r.metrics.cost_micros / 1_000_000).toFixed(2)),
+          conversions: parseFloat((r.metrics.conversions || 0).toFixed(1)),
+          ctr: parseFloat(((r.metrics.ctr || 0) * 100).toFixed(2)),
+        })),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads ads query failed", reason: err?.reason || err?.message });
+    }
+  });
+
+  // ── Google Ads: Location Targeting ────────────────────────────
+  app.get("/api/google-ads/locations", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+    const customer = await getGoogleAdsCustomer(account);
+    if (!customer) return res.status(503).json({ message: "Google Ads not configured" });
+    try {
+      const rows = await customer.query(`
+        SELECT
+          campaign.id, campaign.name, campaign.status,
+          campaign_criterion.criterion_id, campaign_criterion.type,
+          campaign_criterion.negative,
+          campaign_criterion.location.geo_target_constant,
+          campaign_criterion.proximity.radius,
+          campaign_criterion.proximity.radius_units,
+          campaign_criterion.proximity.address.city_name,
+          campaign_criterion.proximity.address.street_address,
+          campaign_criterion.proximity.geo_point.latitude_in_micro_degrees,
+          campaign_criterion.proximity.geo_point.longitude_in_micro_degrees
+        FROM campaign_criterion
+        WHERE campaign_criterion.type IN ('LOCATION', 'PROXIMITY')
+        LIMIT 100
+      `);
+      res.json({
+        account: account.toUpperCase(), customerId,
+        generatedAt: new Date().toISOString(),
+        locations: rows.map((r: any) => ({
+          campaignId: r.campaign.id, campaignName: r.campaign.name, campaignStatus: r.campaign.status,
+          criterionId: r.campaign_criterion.criterion_id,
+          type: r.campaign_criterion.type,
+          isNegative: r.campaign_criterion.negative,
+          geoTargetConstant: r.campaign_criterion.location?.geo_target_constant || null,
+          proximity: r.campaign_criterion.proximity ? {
+            radius: r.campaign_criterion.proximity.radius,
+            radiusUnits: r.campaign_criterion.proximity.radius_units,
+            cityName: r.campaign_criterion.proximity.address?.city_name || null,
+            streetAddress: r.campaign_criterion.proximity.address?.street_address || null,
+            latMicro: r.campaign_criterion.proximity.geo_point?.latitude_in_micro_degrees || null,
+            lngMicro: r.campaign_criterion.proximity.geo_point?.longitude_in_micro_degrees || null,
+          } : null,
+        })),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads locations query failed", reason: err?.reason || err?.message });
+    }
+  });
+
+  // ── Google Ads: Conversion Actions ────────────────────────────
+  app.get("/api/google-ads/conversion-actions", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const account = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const customerId = resolveCustomerId(account);
+    if (!customerId) return res.status(400).json({ message: "Invalid account. Use account=ris or account=rps" });
+    const customer = await getGoogleAdsCustomer(account);
+    if (!customer) return res.status(503).json({ message: "Google Ads not configured" });
+    try {
+      const rows = await customer.query(`
+        SELECT
+          conversion_action.id, conversion_action.name,
+          conversion_action.status, conversion_action.type,
+          conversion_action.category, conversion_action.origin,
+          conversion_action.counting_type,
+          conversion_action.include_in_conversions_metric
+        FROM conversion_action
+        ORDER BY conversion_action.name
+        LIMIT 50
+      `);
+      res.json({
+        account: account.toUpperCase(), customerId,
+        generatedAt: new Date().toISOString(),
+        conversionActions: rows.map((r: any) => ({
+          id: r.conversion_action.id,
+          name: r.conversion_action.name,
+          status: r.conversion_action.status,
+          type: r.conversion_action.type,
+          category: r.conversion_action.category,
+          origin: r.conversion_action.origin,
+          countingType: r.conversion_action.counting_type,
+          includeInConversionsMetric: r.conversion_action.include_in_conversions_metric,
+        })),
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Google Ads conversion-actions query failed", reason: err?.reason || err?.message });
     }
   });
 
