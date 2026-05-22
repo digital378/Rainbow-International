@@ -26,6 +26,7 @@ type LiveBranch = { centre: string } & LiveCrmEntry;
 type LiveGroup  = { group: string  } & LiveCrmEntry;
 type LiveRpsMonth = { month: string; branches: LiveBranch[]; total: LiveCrmEntry; closedReasons: Array<{reason:string;count:number}> };
 type LiveRisMonth = { month: string; groups: LiveGroup[];    total: LiveCrmEntry; closedReasons: Array<{reason:string;count:number}> };
+type LiveSpendEntry = { month: string; salaries: number; meta: number; google: number; adSpend: number };
 type LiveData = {
   generatedAt: string;
   currentDayOfMonth: number;
@@ -35,6 +36,8 @@ type LiveData = {
   risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   rpsSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
   risSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
+  risSpend: LiveSpendEntry[];
+  rpsSpend: LiveSpendEntry[];
 };
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
@@ -236,19 +239,30 @@ export default function Marketing() {
       // Per-school master sheet is source of truth for walkins/admissions (CRM lags current month)
       const rpsSchool = liveData.rpsSchoolMonthly?.find(s => s.month === crmKey);
       const risSchool = liveData.risSchoolMonthly?.find(s => s.month === crmKey);
+      // Live Meta/Google spend from the "Digital Marketing Spend Analysis" table in each school tab
+      const risSpendLive = liveData.risSpend?.find(s => s.month === row.month);
+      const rpsSpendLive = liveData.rpsSpend?.find(s => s.month === row.month);
+
+      const risBase: MetricSet = risMon
+        ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings,
+            walkins: risSchool ? risSchool.walkins : risMon.total.walkins,
+            admissions: risSchool ? risSchool.admissions : risMon.total.admissions }
+        : row.ris;
+      const rpsBase: MetricSet = rpsMon
+        ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings,
+            walkins: rpsSchool ? rpsSchool.walkins : rpsMon.total.walkins,
+            admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
+        : row.rps;
+
       return {
         month: row.month,
         combined: { leads: live.leads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google },
-        ris: risMon
-          ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings,
-              walkins: risSchool ? risSchool.walkins : risMon.total.walkins,
-              admissions: risSchool ? risSchool.admissions : risMon.total.admissions }
-          : row.ris,
-        rps: rpsMon
-          ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings,
-              walkins: rpsSchool ? rpsSchool.walkins : rpsMon.total.walkins,
-              admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
-          : row.rps,
+        ris: risSpendLive && risSpendLive.adSpend > 0
+          ? { ...risBase, meta: risSpendLive.meta, google: risSpendLive.google, spend: risSpendLive.adSpend }
+          : risBase,
+        rps: rpsSpendLive && rpsSpendLive.adSpend > 0
+          ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
+          : rpsBase,
       };
     });
   }, [liveData]);

@@ -1236,12 +1236,14 @@ export async function registerRoutes(
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       const parseN   = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[,\s%]/g, "")) || 0;
 
-      const [masterRows, rpsCrmRows, risCrmRows, rpsSchoolRows, risSchoolRows] = await Promise.all([
+      const [masterRows, rpsCrmRows, risCrmRows, rpsSchoolRows, risSchoolRows, risSpendRaw, rpsSpendRaw] = await Promise.all([
         fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
         fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A:S"),
         fetchSheetRange(SHEET_IDS.master, "DM RIS MAY' 26!A:S"),
+        fetchSheetRange(SHEET_IDS.master, "DM RIS MAY' 26!A140:R210"),
+        fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A140:R210"),
       ]);
 
       // ── Per-school master monthly totals (source of truth for walkins/admissions) ──
@@ -1272,6 +1274,54 @@ export async function registerRoutes(
       };
       const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
       const risSchoolMonthly = parseSchoolRows(risSchoolRows);
+
+      // ── Per-school Meta/Google spend from the "DIGITAL MARKETING SPEND ANALYSIS" table ──
+      // Both "DM RIS MAY' 26" and "DM RPS MAY' 26" tabs contain this table after the weekly rows.
+      // Month names in the table: "June"…"December" (2025), "January"…"May" (2026).
+      const SPEND_MONTH_MAP: Record<string, string> = {
+        "June":"Jun 25","July":"Jul 25","August":"Aug 25","September":"Sep 25",
+        "October":"Oct 25","November":"Nov 25","December":"Dec 25",
+        "January":"Jan 26","February":"Feb 26","March":"Mar 26","April":"Apr 26","May":"May 26",
+      };
+      const parseSpendRows = (rows: string[][]): Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> => {
+        // Find header row: must contain both "meta" and "google" (partial, case-insensitive)
+        const hIdx = rows.findIndex(r => {
+          const cells = r.map(c => String(c).trim().toLowerCase());
+          return cells.some(c => c.includes("meta")) && cells.some(c => c.includes("google"));
+        });
+        if (hIdx === -1) return [];
+        const header = rows[hIdx];
+        const metaCol   = header.findIndex(h => String(h).trim().toLowerCase().includes("meta"));
+        const googleCol = header.findIndex(h => String(h).trim().toLowerCase().includes("google"));
+        const salaryCol = header.findIndex(h => String(h).trim().toLowerCase().includes("salar"));
+        if (metaCol === -1 || googleCol === -1) return [];
+
+        const afterHeader = rows.slice(hIdx + 1);
+
+        // Dynamically detect which column holds month names (some sheets have Month at col B, not col A)
+        let monthCol = 0;
+        for (const row of afterHeader.slice(0, 10)) {
+          for (let ci = 0; ci < row.length; ci++) {
+            if (SPEND_MONTH_MAP[String(row[ci] ?? "").trim()]) { monthCol = ci; break; }
+          }
+          if (monthCol > 0) break;
+        }
+
+        const result: Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> = [];
+        for (const row of afterHeader) {
+          const rawMonth = String(row[monthCol] ?? "").trim();
+          if (!rawMonth) continue;
+          if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
+          const mapped = SPEND_MONTH_MAP[rawMonth];
+          if (!mapped) continue;
+          const meta   = parseINR(row[metaCol]);
+          const google = parseINR(row[googleCol]);
+          result.push({ month: mapped, salaries: salaryCol >= 0 ? parseINR(row[salaryCol]) : 0, meta, google, adSpend: meta + google });
+        }
+        return result;
+      };
+      const risSpend = parseSpendRows(risSpendRaw);
+      const rpsSpend = parseSpendRows(rpsSpendRaw);
 
       // ── DM Overall → monthly combined totals + May weekly ──
       const MONTH_MAP: Record<string, string> = {
@@ -1426,6 +1476,8 @@ export async function registerRoutes(
         risCrm: { byMonth: risByMonth, closedReasons: sortReasons(risCloseReasons), statusSummary: risStatusCount, bySource: risSourceCount },
         rpsSchoolMonthly,
         risSchoolMonthly,
+        risSpend,
+        rpsSpend,
       });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch live marketing data", error: err.message });
