@@ -326,14 +326,10 @@ paths:
       operationId: getSheetsCrmRows
       summary: Raw CRM lead rows for precise date+source calculations
       description: >
-        Returns every individual lead row from the RPS or RIS CRM Google Sheet with
-        column names taken directly from the sheet header (e.g. "Enquiry Date", "Source",
-        "Status", "Centre", "Month", "Lead Owner"). Use this endpoint whenever you need
-        to count or analyse leads by a specific date and source combination — for example,
-        "how many Google leads on 20-May-26". All filters are applied server-side.
-        The response also includes quickCount breakdowns (bySource, byStatus, byDate)
-        computed over the filtered set so you don't need to iterate rows for totals.
-        Use /api/sheets/crm for pre-aggregated monthly summaries instead.
+        Raw CRM lead rows with original column headers (Enquiry Date, Source, Status,
+        Centre, Month, Lead Owner). Use for date+source counts e.g. "Google leads on
+        20-May-26". Includes quickCount totals (bySource, byStatus, byDate).
+        For monthly summaries use /api/sheets/crm.
       parameters:
         - name: account
           in: query
