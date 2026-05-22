@@ -1,0 +1,75 @@
+I will pull the seven Google Ads datasets for RPS in order, then combine the media metrics into one admission-focused diagnosis.
+
+[debug] Calling HTTP endpoint
+{
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/google-ads/campaigns",
+  "operation": "getGoogleAdsCampaigns",
+  "operation_hash": "81f6a1bb661d074071fc795fc878d56ddbfaaa4b",
+  "is_consequential": false,
+  "params": {
+    "account": "rps"
+  }
+}
+[debug] Response received
+Stopped talking to App
+
+The first Google Ads campaign-level call for RPS failed at the API layer. I will continue with the remaining six checks so we can see whether the issue is limited to one endpoint or the account connection overall.
+
+[debug] Calling HTTP endpoint
+{
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/google-ads/campaign-settings",
+  "operation": "getGoogleAdsCampaignSettings",
+  "operation_hash": "09bc51ccecc03b2425159296c6ce33adba18c964",
+  "is_consequential": false,
+  "params": {
+    "account": "rps"
+  }
+}
+[debug] Response received
+Stopped talking to App
+
+The campaign, keyword, and settings endpoints have all returned the same API error for account rps. I will still run the ad group, ad, location, and conversion-action checks to complete the requested sequence.
+
+[debug] Calling HTTP endpoint
+{
+  "domain": "rainbowinternationalschool.in",
+  "method": "get",
+  "path": "/api/google-ads/conversion-actions",
+  "operation": "getGoogleAdsConversionActions",
+  "operation_hash": "41786779f28531726359e66398ba36c47276cb14",
+  "is_consequential": false,
+  "params": {
+    "account": "rps"
+  }
+}
+[debug] Response received
+Stopped talking to App
+Thought for 52s
+
+I ran all 7 requested Google Ads checks for account=rps, one by one.
+
+#	Operation	Status
+1	getGoogleAdsCampaigns	Failed: ClientResponseError
+2	getGoogleAdsKeywords	Failed: ClientResponseError
+3	getGoogleAdsCampaignSettings	Failed: ClientResponseError
+4	getGoogleAdsAdGroups	Failed: ClientResponseError
+5	getGoogleAdsAds	Failed: ClientResponseError
+6	getGoogleAdsLocations	Failed: ClientResponseError
+7	getGoogleAdsConversionActions	Failed: ClientResponseError
+
+Because all seven API calls failed, I could not retrieve the RPS Google Ads data for this month. Therefore, I cannot accurately report:
+
+Total spend this month
+Campaigns or keywords spending without conversions
+Active ad copy and landing page performance
+Location targeting setup
+Conversion action configuration
+Whether conversion tracking is correctly set up
+
+Operational reading: Since every Google Ads endpoint failed for account=rps, this looks more like an account/API access, authentication, customer ID, permission, or backend connector issue rather than a campaign-performance issue.
+
+Immediate next action: Please ask the technical/API team to verify the RPS Google Ads connector, especially account mapping, API credentials, access permissions, and whether the RPS Google Ads customer ID is correctly configured. Once the API returns data, I can give the full optimisation summary campaign-wise and keyword-wise.

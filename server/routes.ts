@@ -1150,11 +1150,10 @@ export async function registerRoutes(
           campaign.status,
           campaign.advertising_channel_type,
           campaign.bidding_strategy_type,
-          campaign.start_date,
-          campaign.end_date,
           campaign_budget.amount_micros,
           campaign_budget.delivery_method
         FROM campaign
+        WHERE campaign.status IN ('ENABLED', 'PAUSED')
         ORDER BY campaign.name
         LIMIT 50
       `);
@@ -1167,15 +1166,15 @@ export async function registerRoutes(
           status: r.campaign.status,
           type: r.campaign.advertising_channel_type,
           biddingStrategy: r.campaign.bidding_strategy_type,
-          startDate: r.campaign.start_date || null,
-          endDate: r.campaign.end_date || null,
           dailyBudget: r.campaign_budget?.amount_micros
             ? parseFloat((r.campaign_budget.amount_micros / 1_000_000).toFixed(2)) : null,
           deliveryMethod: r.campaign_budget?.delivery_method || null,
         })),
       });
     } catch (err: any) {
-      res.status(500).json({ message: "Google Ads campaign-settings query failed", reason: err?.reason || err?.message });
+      const reason = err?.reason || err?.message || "Unknown";
+      const detail = JSON.stringify(err, Object.getOwnPropertyNames(err)).slice(0, 600);
+      res.status(500).json({ message: "Google Ads campaign-settings query failed", reason, detail });
     }
   });
 
