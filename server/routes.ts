@@ -1004,15 +1004,12 @@ export async function registerRoutes(
           campaign.name,
           campaign.status,
           campaign.advertising_channel_type,
-          campaign.bidding_strategy_type,
-          campaign.start_date,
           metrics.impressions,
           metrics.clicks,
           metrics.cost_micros,
           metrics.conversions,
           metrics.ctr,
-          metrics.average_cpc,
-          metrics.cost_per_conversion
+          metrics.average_cpc
         FROM campaign
         WHERE segments.date BETWEEN '${range.start}' AND '${range.end}'
         ORDER BY metrics.cost_micros DESC
@@ -1021,23 +1018,25 @@ export async function registerRoutes(
 
       const rows = campaigns
         .filter((c: any) => (c.metrics.cost_micros || 0) > 0)
-        .map((c: any) => ({
-          id: c.campaign.id,
-          name: c.campaign.name,
-          status: c.campaign.status,
-          type: c.campaign.advertising_channel_type,
-          biddingStrategy: c.campaign.bidding_strategy_type,
-          startDate: c.campaign.start_date,
-          impressions: c.metrics.impressions,
-          clicks: c.metrics.clicks,
-          spend: parseFloat((c.metrics.cost_micros / 1_000_000).toFixed(2)),
-          conversions: parseFloat((c.metrics.conversions || 0).toFixed(1)),
-          ctr: parseFloat(((c.metrics.ctr || 0) * 100).toFixed(2)),
-          avgCpc: parseFloat(((c.metrics.average_cpc || 0) / 1_000_000).toFixed(2)),
-          costPerConversion: (c.metrics.cost_per_conversion || 0) > 0
-            ? parseFloat((c.metrics.cost_per_conversion / 1_000_000).toFixed(2))
-            : null,
-        }));
+        .map((c: any) => {
+          const spend = parseFloat((c.metrics.cost_micros / 1_000_000).toFixed(2));
+          const conversions = parseFloat((c.metrics.conversions || 0).toFixed(1));
+          return {
+            id: c.campaign.id,
+            name: c.campaign.name,
+            status: c.campaign.status,
+            type: c.campaign.advertising_channel_type,
+            impressions: c.metrics.impressions,
+            clicks: c.metrics.clicks,
+            spend,
+            conversions,
+            ctr: parseFloat(((c.metrics.ctr || 0) * 100).toFixed(2)),
+            avgCpc: parseFloat(((c.metrics.average_cpc || 0) / 1_000_000).toFixed(2)),
+            costPerConversion: conversions > 0
+              ? parseFloat((spend / conversions).toFixed(2))
+              : null,
+          };
+        });
 
       res.json({
         account: account.toUpperCase(),

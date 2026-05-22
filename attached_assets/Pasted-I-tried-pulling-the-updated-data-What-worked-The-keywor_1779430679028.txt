@@ -1,0 +1,85 @@
+I tried pulling the updated data.
+
+What worked
+
+The keywords endpoint is now working and is pulling current-month data for RPS.
+
+Period: 1 May–22 May 2026
+Campaign visible in keyword data: TOP1_Leads_26-27
+Ad group: Preschool
+
+Keyword	Impressions	Clicks	Spend	Conversions	CTR	Avg CPC	Quality Score
+international preschool	3,625	258	₹7,856.57	0	7.12%	₹30.45	NA
+Preschool near me	1,354	87	₹2,234.97	2	6.43%	₹25.69	2
+Billabong High International School Thane	111	8	₹377.25	0	7.21%	₹47.16	NA
+Best daycare near me	323	13	₹352.02	0	4.02%	₹27.08	5
+Rainbow Preschool Thane	321	14	₹284.27	0	4.36%	₹20.30	7
+best preschool in thane	678	18	₹275.84	0	2.65%	₹15.32	3
+best preschools	395	11	₹241.37	0	2.78%	₹21.94	NA
+daycare in thane	358	11	₹174.79	0	3.07%	₹15.89	NA
+Orchids International School Thane	120	5	₹172.39	0	4.17%	₹34.48	1
+best start preschool	196	3	₹103.70	0	1.53%	₹34.57	NA
+best prek	129	1	₹34.80	0	0.78%	₹34.80	NA
+Nursery admission in Thane	144	1	₹34.47	0	0.69%	₹34.47	NA
+play schools in india	318	3	₹21.54	0	0.94%	₹7.18	NA
+Immediate keyword insight
+
+Only “Preschool near me” has generated conversions: 2 conversions from ₹2,234.97 spend.
+
+The highest spend keyword, “international preschool,” has spent ₹7,856.57 with 0 conversions. This needs immediate review. Either pause, reduce bid, or move it into a tighter exact/phrase setup with better ad copy and landing-page relevance.
+
+Competitor keywords like Billabong High International School Thane and Orchids International School Thane are spending but not converting. Keep them only if the intent is competitor conquesting; otherwise, reduce priority.
+
+What failed
+
+The campaign endpoint failed after your update.
+
+Error returned:
+
+Google Ads campaign query failed
+request_id: zYJUacdPxevk9Ys3EhtiGQ
+
+This means the GPT action reached your endpoint, but your backend’s Google Ads campaign query failed internally.
+
+Likely issue in campaign endpoint
+
+Since keywords are working, OAuth, developer token, customer ID, and account access are fine.
+
+The campaign endpoint issue is likely one of these:
+
+A GAQL field in /api/google-ads/campaigns is incompatible with the campaign resource.
+segments.date is used but not valid with one of the selected fields.
+One metric field is returning null or unsupported in your Google Ads API version.
+Date range is being injected incorrectly.
+cost_per_conversion is causing a divide-by-zero or null-handling issue.
+Developer check
+
+Temporarily simplify /api/google-ads/campaigns to this query first:
+
+SELECT
+  campaign.id,
+  campaign.name,
+  campaign.status,
+  campaign.advertising_channel_type,
+  metrics.impressions,
+  metrics.clicks,
+  metrics.cost_micros,
+  metrics.conversions
+FROM campaign
+WHERE segments.date BETWEEN '2026-05-01' AND '2026-05-22'
+ORDER BY metrics.cost_micros DESC
+
+Once this works, add fields back one by one:
+
+metrics.ctr
+metrics.average_cpc
+campaign.bidding_strategy_type
+campaign.start_date
+
+Avoid metrics.cost_per_conversion initially and calculate it in your own code:
+
+costPerConversion =
+  conversions > 0 ? spend / conversions : null;
+Current conclusion
+
+The new keyword endpoint is successfully exposing deeper setup data. The campaign endpoint needs debugging, and I still cannot call the five new endpoints from my available tool list yet. Once those new operations are exposed to the GPT action runtime, I should be able to pull campaign settings, ad groups, ads, locations, and conversion actions directly.
