@@ -1534,6 +1534,87 @@ export async function registerRoutes(
     }
   });
 
+  // 2b. CRM Raw Rows — every lead row with named columns for ChatGPT date+source calculations
+  app.get("/api/sheets/crm/rows", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+
+    const account      = typeof req.query.account === "string" ? req.query.account.toLowerCase() : "rps";
+    const dateFilter   = typeof req.query.date   === "string" ? req.query.date.toLowerCase()   : "";
+    const sourceFilter = typeof req.query.source === "string" ? req.query.source.toLowerCase() : "";
+    const statusFilter = typeof req.query.status === "string" ? req.query.status.toLowerCase() : "";
+    const monthFilter  = typeof req.query.month  === "string" ? req.query.month.toLowerCase()  : "";
+    const centreFilter = typeof req.query.centre === "string" ? req.query.centre.toLowerCase() : "";
+
+    try {
+      let rows: string[][];
+      if (account === "rps") {
+        rows = await fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K");
+      } else {
+        rows = await fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L");
+      }
+
+      const [headerRow, ...dataRows] = rows;
+      const headers = (headerRow || []).map(h => (h || "").trim());
+
+      // Map each row to a named object using actual sheet column headers
+      const allLeads = dataRows
+        .filter(r => r[0] && r[2]) // must have date and parent name columns populated
+        .map(r => {
+          const obj: Record<string, string> = {};
+          headers.forEach((h, i) => { if (h) obj[h] = (r[i] || "").trim(); });
+          return obj;
+        });
+
+      // Dynamically locate filter columns from the actual header names
+      const findHeader = (kw: string) =>
+        headers.find(h => h.toLowerCase().includes(kw)) || "";
+
+      const dateKey   = findHeader("date");
+      const sourceKey = findHeader("source");
+      const statusKey = findHeader("status");
+      const monthKey  = findHeader("month");
+      const centreKey = findHeader("centre") || findHeader("branch");
+
+      let filtered = allLeads;
+      if (dateFilter)   filtered = filtered.filter(r => (r[dateKey]   || "").toLowerCase().includes(dateFilter));
+      if (sourceFilter) filtered = filtered.filter(r => (r[sourceKey] || "").toLowerCase().includes(sourceFilter));
+      if (statusFilter) filtered = filtered.filter(r => (r[statusKey] || "").toLowerCase().includes(statusFilter));
+      if (monthFilter)  filtered = filtered.filter(r => (r[monthKey]  || "").toLowerCase().includes(monthFilter));
+      if (centreFilter) filtered = filtered.filter(r => (r[centreKey] || "").toLowerCase().includes(centreFilter));
+
+      // Quick aggregate counts on the filtered set — useful at-a-glance without iterating rows
+      const bySource: Record<string, number> = {};
+      const byStatus: Record<string, number> = {};
+      const byDate:   Record<string, number> = {};
+      filtered.forEach(r => {
+        const src = r[sourceKey] || "Unknown";
+        const sts = r[statusKey] || "Unknown";
+        const dt  = r[dateKey]   || "Unknown";
+        bySource[src] = (bySource[src] || 0) + 1;
+        byStatus[sts] = (byStatus[sts] || 0) + 1;
+        byDate[dt]    = (byDate[dt]    || 0) + 1;
+      });
+
+      res.json({
+        account: account.toUpperCase(),
+        filters: {
+          date:   dateFilter   || "all",
+          source: sourceFilter || "all",
+          status: statusFilter || "all",
+          month:  monthFilter  || "all",
+          centre: centreFilter || "all",
+        },
+        generatedAt: new Date().toISOString(),
+        totalRows: filtered.length,
+        columns: headers.filter(h => h),
+        quickCount: { bySource, byStatus, byDate },
+        rows: filtered,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch CRM rows", error: err.message });
+    }
+  });
+
   // 3. Master Weekly Funnel Data
   app.get("/api/sheets/master", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
