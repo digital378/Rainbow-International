@@ -1,0 +1,76 @@
+I will verify the current API health directly instead of relying only on earlier failures. I will check the main Rainbow data, CRM, marketing, ads, SEO, website-speed, and RPS endpoints, then separate working vs failing operations.
+
+[debug] Calling HTTP endpoint
+[debug] Response received
+Stopped talking to App
+
+The basic health/debug call plus the two main marketing-data endpoints are failing with ClientResponseError. I will test the CRM/sheets and ad-platform endpoints next to see whether the whole API layer is down or only selected routes.
+
+[debug] Calling HTTP endpoint
+[debug] Response received
+Stopped talking to App
+
+CRM, master-sheet, target-sheet, and Search Console checks are also failing. I will test one Google Ads endpoint, one Meta endpoint, and the separate Rainbow Preschools API to complete the health picture.
+
+[debug] Calling HTTP endpoint
+[debug] Response received
+Stopped talking to App
+[debug] Calling HTTP endpoint
+[debug] Response received
+Stopped talking to App
+Thought for 1m 15s
+
+Based on live checks just run, no Rainbow API operation returned data successfully in this session.
+
+Currently working
+API / Operation	Status
+None verified	No successful response received
+Currently not working / returning ClientResponseError
+Core / health
+Operation	Status
+debugHeaders	Failed
+getMarketingData	Failed
+getMarketingLive	Failed
+CRM / Sheets
+Operation	Status
+getSheetsCrmRows	Failed earlier
+getSheetsCrm	Failed
+getSheetsMaster	Failed
+getSheetsTargets	Failed
+Google Ads
+
+All seven Google Ads checks failed earlier for account=rps:
+
+Operation	Status
+getGoogleAdsCampaigns	Failed
+getGoogleAdsKeywords	Failed
+getGoogleAdsCampaignSettings	Failed
+getGoogleAdsAdGroups	Failed
+getGoogleAdsAds	Failed
+getGoogleAdsLocations	Failed
+getGoogleAdsConversionActions	Failed
+Meta Ads
+Operation	Status
+getMetaAdsCampaigns	Failed
+SEO / Search Console
+Operation	Status
+getSearchConsoleQueries	Failed
+Website Speed
+Operation	Status
+getPageSpeedData	Failed earlier
+Rainbow Preschools separate API
+Operation	Status
+www.rainbowpreschools.com getRpsData	Failed
+Conclusion
+
+This does not look like an issue with one report or one account such as only RPS Google Ads. Since even the basic debugHeaders call is failing, the likely issue is at the API gateway / plugin / server response / authentication / routing layer.
+
+Recommended technical checks:
+
+Confirm whether the API server is live and reachable.
+Check API gateway logs for ClientResponseError.
+Verify authentication headers and token handling.
+Confirm route mappings for both:
+rainbowinternationalschool.in
+www.rainbowpreschools.com
+Test one endpoint directly outside ChatGPT using Postman or server logs.

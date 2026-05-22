@@ -1,0 +1,68 @@
+This action plan is correct. I would follow it exactly, with one important refinement:
+
+Do not re-import the full 14-endpoint schema immediately after debugHeaders works.
+First create a small stable schema with only the safest endpoints, then expand in batches. This will isolate whether one bad operation is breaking the full action.
+
+Recommended sequence:
+
+Delete the current action completely.
+Add a fresh action.
+Set:
+Authentication: None
+Privacy Policy URL: https://rainbowinternationalschool.in/privacy-and-cookie-policy
+Paste only the minimal debugHeaders schema.
+Click Update.
+Test debugHeaders.
+
+If debugHeaders works, then the domain, privacy policy, authentication, and ChatGPT action connection are fine.
+
+Then add endpoints in this order:
+
+Batch 1: Core data
+
+getMarketingData
+getMarketingLive
+getSheetsCrm
+getSheetsCrmRows
+
+Batch 2: Sheets
+
+getSheetsMaster
+getSheetsTargets
+getSheetsTasks
+
+Batch 3: SEO / PageSpeed
+
+getSearchConsoleQueries
+getSearchConsolePages
+getPageSpeedData
+
+Batch 4: Ads
+
+getMetaAdsCampaigns
+getGoogleAdsCampaigns
+getGoogleAdsKeywords
+
+Batch 5: New Google Ads endpoints
+
+getGoogleAdsCampaignSettings
+getGoogleAdsAdGroups
+getGoogleAdsAds
+getGoogleAdsLocations
+getGoogleAdsConversionActions
+
+Since Replit has already flagged campaign-settings as a known issue, I would keep getGoogleAdsCampaignSettings out of the schema temporarily until that backend query is fixed. A route returning server-side errors should not ideally break the full GPT action, but in practice, it can make testing and action validation unstable.
+
+Also check these before saving the full action:
+
+Every operation has a unique operationId.
+Every response has application/json.
+All required parameters have clear types and enums where applicable.
+No endpoint response schema is overly complex or inconsistent.
+Avoid OpenAPI features ChatGPT may not handle well, such as very deep nested schemas, oneOf, anyOf, circular references, or nullable ambiguity.
+Ensure the OpenAPI file is served with a clean YAML response, not HTML or redirect content.
+Test the schema in the GPT editor after every batch, not only at the end.
+
+Best final instruction to Replit:
+
+Please temporarily remove or isolate getGoogleAdsCampaignSettings from the production OpenAPI schema until its backend query is fixed. Then provide either a minimal debug-only schema or a staged schema split into batches so we can identify whether ChatGPT is failing due to action configuration or one problematic endpoint definition.
