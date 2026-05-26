@@ -2454,6 +2454,25 @@ export async function registerRoutes(
         monthBreakdown,
         leadTemperature,
         heatGrid: heatGridArr,
+        liveCheckins: await (async () => {
+          try {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const [todayCounts, todayRecent, last7Days] = await Promise.all([
+              storage.getTodayCheckinCounts(),
+              storage.listCheckins(todayStart),
+              storage.getDailyCheckinCounts(7),
+            ]);
+            return {
+              todayTotal: todayCounts.reduce((s, r) => s + r.count, 0),
+              byRa: todayCounts.sort((a, b) => b.count - a.count),
+              recent: todayRecent.slice(0, 20),
+              last7Days,
+            };
+          } catch {
+            return { todayTotal: 0, byRa: [], recent: [], last7Days: [] };
+          }
+        })(),
       });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch sales data", error: err.message });
@@ -2636,11 +2655,12 @@ paths:
     if (!adminToken) return res.status(503).json({ message: "Admin token not configured" });
     const authHeader = req.headers.authorization || "";
     const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-    const tokenBuf = Buffer.from(adminToken);
-    const inputBuf = Buffer.alloc(tokenBuf.length);
-    inputBuf.write(bearer.slice(0, tokenBuf.length));
+    // Reject immediately if lengths differ (timing-safe compare requires equal-length buffers)
+    if (!bearer || bearer.length !== adminToken.length) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     try {
-      if (!timingSafeEqual(tokenBuf, inputBuf)) throw new Error();
+      if (!timingSafeEqual(Buffer.from(adminToken), Buffer.from(bearer))) throw new Error();
     } catch {
       return res.status(401).json({ message: "Unauthorized" });
     }

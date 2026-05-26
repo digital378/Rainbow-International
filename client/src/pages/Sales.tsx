@@ -57,6 +57,12 @@ type SalesData = {
   };
   counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
   conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
+  liveCheckins: {
+    todayTotal: number;
+    byRa: Array<{ raName: string; raBranch: string; count: number }>;
+    recent: Array<{ id: string; raName: string; raBranch: string; parentName: string; studentName: string; grade: string; submittedAt: string }>;
+    last7Days: Array<{ date: string; count: number }>;
+  };
   leadTemperature: { hot: number; warm: number; cold: number; provisional: number; open: number };
   heatGrid: Array<{
     counselor: string;
@@ -162,12 +168,6 @@ function ChartCard({ title, children, testId }: { title: string; children: React
   );
 }
 
-type LiveCheckinsData = {
-  total: number;
-  byRa: Array<{ raName: string; raBranch: string; count: number }>;
-  recent: Array<{ id: string; raName: string; raBranch: string; parentName: string; studentName: string; grade: string; submittedAt: string }>;
-};
-
 /* ── Main Dashboard ────────────────────────────────────── */
 function SalesDashboard() {
   const [data, setData] = useState<SalesData | null>(null);
@@ -175,15 +175,7 @@ function SalesDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>("YTD");
-  const [liveCheckins, setLiveCheckins] = useState<LiveCheckinsData | null>(null);
   const cancelled = useRef(false);
-
-  const fetchLiveCheckins = useCallback(() => {
-    fetch("/api/walkin/today")
-      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
-      .then((d: LiveCheckinsData) => { if (!cancelled.current) setLiveCheckins(d); })
-      .catch(() => {});
-  }, []);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -194,8 +186,7 @@ function SalesDashboard() {
       })
       .catch((e) => { if (!cancelled.current) setError(String(e)); })
       .finally(() => { if (!cancelled.current) setLoading(false); });
-    fetchLiveCheckins();
-  }, [fetchLiveCheckins]);
+  }, []);
 
   useEffect(() => {
     document.title = "Sales Dashboard | Rainbow International School";
@@ -314,57 +305,88 @@ function SalesDashboard() {
         </div>
 
         {/* Today's Walk-ins — Live QR Check-in Widget */}
-        <div>
-          <SectionTitle sub="Live QR check-ins via walkin form · DB only · resets at midnight">Today's Walk-ins (QR Check-in)</SectionTitle>
-          {liveCheckins === null ? (
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-sm text-slate-400">Loading live check-ins…</div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Total KPI */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-amber-400 flex flex-col gap-1">
-                <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: SLATE }}>Today's Total Check-ins</div>
-                <div className="text-4xl font-black" style={{ color: NAVY }}>{liveCheckins.total}</div>
-                <div className="text-xs text-slate-400">QR scans since midnight</div>
-                <a href="/admin/ras" className="mt-2 text-xs font-semibold underline" style={{ color: AMBER }}>Manage RA QR Codes →</a>
-              </div>
+        {data.liveCheckins && (() => {
+          const lc = data.liveCheckins;
+          const todayStr = new Date().toISOString().slice(0, 10);
+          // Build full 7-day array (fill missing days with 0)
+          const last7: Array<{ date: string; count: number; isToday: boolean }> = [];
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const key = d.toISOString().slice(0, 10);
+            const found = lc.last7Days.find(r => r.date === key);
+            const label = d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric" });
+            last7.push({ date: label, count: found?.count || 0, isToday: key === todayStr });
+          }
+          return (
+            <div>
+              <SectionTitle sub="Live QR check-ins via walk-in form · DB only · resets at midnight">Today's Walk-ins (QR Check-in)</SectionTitle>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total KPI */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-amber-400 flex flex-col gap-1" data-testid="kpi-live-checkins-today">
+                  <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: SLATE }}>Today's QR Check-ins</div>
+                  <div className="text-4xl font-black" style={{ color: NAVY }}>{lc.todayTotal}</div>
+                  <div className="text-xs text-slate-400">Scans since midnight · DB</div>
+                  <a href="/admin/ras" className="mt-2 text-xs font-semibold underline" style={{ color: AMBER }}>Manage RA Profiles →</a>
+                </div>
 
-              {/* Per-RA breakdown */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-                <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>By Counsellor</div>
-                {liveCheckins.byRa.length === 0 ? (
-                  <div className="text-xs text-slate-400">No check-ins today yet</div>
-                ) : (
-                  <div className="space-y-2">
-                    {liveCheckins.byRa.sort((a, b) => b.count - a.count).map(r => (
-                      <div key={r.raName} className="flex items-center gap-2" data-testid={`live-ra-${r.raName}`}>
-                        <div className="flex-1 text-xs font-medium text-slate-700 truncate">{r.raName}</div>
-                        <div className="text-xs text-slate-400">{r.raBranch}</div>
-                        <div className="text-sm font-black tabular-nums" style={{ color: NAVY }}>{r.count}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                {/* Per-RA breakdown */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                  <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>By Counsellor (Today)</div>
+                  {lc.byRa.length === 0 ? (
+                    <div className="text-xs text-slate-400">No check-ins today yet</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {lc.byRa.map(r => (
+                        <div key={r.raName} className="flex items-center gap-2" data-testid={`live-ra-${r.raName}`}>
+                          <div className="flex-1 text-xs font-medium text-slate-700 truncate">{r.raName}</div>
+                          <div className="text-xs text-slate-400">{r.raBranch}</div>
+                          <div className="text-sm font-black tabular-nums" style={{ color: NAVY }}>{r.count}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-              {/* Recent submissions */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-                <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Recent Today</div>
-                {liveCheckins.recent.length === 0 ? (
-                  <div className="text-xs text-slate-400">No check-ins today yet</div>
-                ) : (
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {liveCheckins.recent.slice(0, 8).map(r => (
-                      <div key={r.id} className="text-xs border-b border-slate-50 pb-1.5">
-                        <div className="font-semibold text-slate-700">{r.parentName} <span className="text-slate-400 font-normal">for {r.studentName}</span></div>
-                        <div className="text-slate-400">{r.grade} · {r.raName} · {new Date(r.submittedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
-                      </div>
-                    ))}
+                {/* 7-day sparkline */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200" data-testid="chart-live-checkins-7day">
+                  <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Last 7 Days</div>
+                  <div style={{ width: "100%", height: 120 }}>
+                    <ResponsiveContainer>
+                      <BarChart data={last7} barSize={18}>
+                        <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+                        <YAxis tick={{ fontSize: 9 }} allowDecimals={false} width={20} />
+                        <Tooltip formatter={(v: number) => [v, "Check-ins"]} />
+                        <Bar dataKey="count" name="Check-ins" radius={[3, 3, 0, 0]}>
+                          {last7.map((entry, idx) => (
+                            <Cell key={idx} fill={entry.isToday ? AMBER : NAVY} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                )}
+                  <div className="text-[10px] text-slate-400 mt-1">Amber = today · Navy = past days</div>
+                </div>
+
+                {/* Recent submissions */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                  <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Recent Today</div>
+                  {lc.recent.length === 0 ? (
+                    <div className="text-xs text-slate-400">No check-ins today yet</div>
+                  ) : (
+                    <div className="space-y-2 max-h-36 overflow-y-auto">
+                      {lc.recent.slice(0, 8).map(r => (
+                        <div key={r.id} className="text-xs border-b border-slate-50 pb-1.5">
+                          <div className="font-semibold text-slate-700">{r.parentName} <span className="text-slate-400 font-normal">for {r.studentName}</span></div>
+                          <div className="text-slate-400">{r.grade} · {r.raName} · {new Date(r.submittedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          );
+        })()}
 
         {/* Source-wise Admissions */}
         {activeAdmBySource.length > 0 && (

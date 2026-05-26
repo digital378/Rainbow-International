@@ -41,6 +41,7 @@ export interface IStorage {
   createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin>;
   listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]>;
   getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
+  getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>>;
 }
 
 export class DbStorage implements IStorage {
@@ -158,6 +159,22 @@ export class DbStorage implements IStorage {
       .from(walkinCheckins)
       .where(gte(walkinCheckins.submittedAt, todayStart))
       .groupBy(walkinCheckins.raName, walkinCheckins.raBranch);
+    return rows;
+  }
+
+  async getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>> {
+    const since = new Date();
+    since.setDate(since.getDate() - (days - 1));
+    since.setHours(0, 0, 0, 0);
+    const rows = await db
+      .select({
+        date: sql<string>`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`,
+        count: sql<number>`cast(count(*) as int)`,
+      })
+      .from(walkinCheckins)
+      .where(gte(walkinCheckins.submittedAt, since))
+      .groupBy(sql`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`)
+      .orderBy(sql`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`);
     return rows;
   }
 }
