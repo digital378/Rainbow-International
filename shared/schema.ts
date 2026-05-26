@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -138,3 +138,51 @@ export const insertBrochureRequestSchema = createInsertSchema(brochureRequests).
 
 export type InsertBrochureRequest = z.infer<typeof insertBrochureRequestSchema>;
 export type BrochureRequest = typeof brochureRequests.$inferSelect;
+
+// ── RA Walk-in QR Check-in System ─────────────────────────────
+export const ras = pgTable("ras", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  branch: text("branch").notNull().default("Main"),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertRaSchema = createInsertSchema(ras).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  name: z.string().min(1, "RA name is required"),
+  slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+  branch: z.string().min(1, "Branch is required"),
+  active: z.boolean().optional().default(true),
+});
+
+export type InsertRa = z.infer<typeof insertRaSchema>;
+export type Ra = typeof ras.$inferSelect;
+
+export const walkinCheckins = pgTable("walkin_checkins", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  raId: varchar("ra_id").notNull().references(() => ras.id),
+  raName: text("ra_name").notNull(),
+  raBranch: text("ra_branch").notNull(),
+  parentName: text("parent_name").notNull(),
+  studentName: text("student_name").notNull(),
+  grade: text("grade").notNull(),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+});
+
+export const insertWalkinCheckinSchema = createInsertSchema(walkinCheckins).omit({
+  id: true,
+  submittedAt: true,
+  raName: true,
+  raBranch: true,
+}).extend({
+  parentName: z.string().min(1, "Parent name is required"),
+  studentName: z.string().min(1, "Student name is required"),
+  grade: z.string().min(1, "Grade is required"),
+});
+
+export type InsertWalkinCheckin = z.infer<typeof insertWalkinCheckinSchema>;
+export type WalkinCheckin = typeof walkinCheckins.$inferSelect;

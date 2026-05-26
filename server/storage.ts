@@ -1,6 +1,15 @@
-import { type Inquiry, type InsertInquiry, type Event, type InsertEvent, type CallbackRequest, type InsertCallbackRequest, type CareerApplication, type InsertCareerApplication, type BrochureRequest, type InsertBrochureRequest, inquiries, events, callbackRequests, careerApplications, brochureRequests } from "@shared/schema";
+import {
+  type Inquiry, type InsertInquiry,
+  type Event, type InsertEvent,
+  type CallbackRequest, type InsertCallbackRequest,
+  type CareerApplication, type InsertCareerApplication,
+  type BrochureRequest, type InsertBrochureRequest,
+  type Ra, type InsertRa,
+  type WalkinCheckin,
+  inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins,
+} from "@shared/schema";
 import { db } from "./db";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, gte, sql } from "drizzle-orm";
 
 export interface IStorage {
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
@@ -20,6 +29,18 @@ export interface IStorage {
 
   createBrochureRequest(req: InsertBrochureRequest): Promise<BrochureRequest>;
   getAllBrochureRequests(): Promise<BrochureRequest[]>;
+
+  // RA management
+  createRa(ra: InsertRa): Promise<Ra>;
+  updateRa(id: string, ra: Partial<InsertRa>): Promise<Ra | undefined>;
+  listRas(activeOnly?: boolean): Promise<Ra[]>;
+  getRaBySlug(slug: string): Promise<Ra | undefined>;
+  getRaById(id: string): Promise<Ra | undefined>;
+
+  // Walk-in check-ins
+  createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin>;
+  listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]>;
+  getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
 }
 
 export class DbStorage implements IStorage {
@@ -80,6 +101,64 @@ export class DbStorage implements IStorage {
 
   async getAllBrochureRequests(): Promise<BrochureRequest[]> {
     return await db.select().from(brochureRequests).orderBy(desc(brochureRequests.requestedAt));
+  }
+
+  // ── RA methods ─────────────────────────────────────────────
+  async createRa(ra: InsertRa): Promise<Ra> {
+    const [result] = await db.insert(ras).values(ra).returning();
+    return result;
+  }
+
+  async updateRa(id: string, raData: Partial<InsertRa>): Promise<Ra | undefined> {
+    const [result] = await db.update(ras).set(raData).where(eq(ras.id, id)).returning();
+    return result;
+  }
+
+  async listRas(activeOnly = false): Promise<Ra[]> {
+    if (activeOnly) {
+      return await db.select().from(ras).where(eq(ras.active, true)).orderBy(ras.name);
+    }
+    return await db.select().from(ras).orderBy(ras.name);
+  }
+
+  async getRaBySlug(slug: string): Promise<Ra | undefined> {
+    const [result] = await db.select().from(ras).where(eq(ras.slug, slug));
+    return result;
+  }
+
+  async getRaById(id: string): Promise<Ra | undefined> {
+    const [result] = await db.select().from(ras).where(eq(ras.id, id));
+    return result;
+  }
+
+  // ── Walk-in check-in methods ────────────────────────────────
+  async createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin> {
+    const [result] = await db.insert(walkinCheckins).values({ raId, raName, raBranch, parentName, studentName, grade }).returning();
+    return result;
+  }
+
+  async listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]> {
+    if (sinceDate) {
+      return await db.select().from(walkinCheckins)
+        .where(gte(walkinCheckins.submittedAt, sinceDate))
+        .orderBy(desc(walkinCheckins.submittedAt));
+    }
+    return await db.select().from(walkinCheckins).orderBy(desc(walkinCheckins.submittedAt));
+  }
+
+  async getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const rows = await db
+      .select({
+        raName: walkinCheckins.raName,
+        raBranch: walkinCheckins.raBranch,
+        count: sql<number>`cast(count(*) as int)`,
+      })
+      .from(walkinCheckins)
+      .where(gte(walkinCheckins.submittedAt, todayStart))
+      .groupBy(walkinCheckins.raName, walkinCheckins.raBranch);
+    return rows;
   }
 }
 

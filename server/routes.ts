@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { timingSafeEqual } from "node:crypto";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import multer from "multer";
@@ -2627,6 +2627,131 @@ paths:
     res.setHeader("Content-Type", "text/yaml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
     res.send(OPENAPI_YAML);
+  });
+
+  // ── RA Walk-in QR Check-in System ──────────────────────────────────────
+
+  function requireAdmin(req: any, res: any, next: any) {
+    const adminToken = process.env.ADMIN_TOKEN;
+    if (!adminToken) return res.status(503).json({ message: "Admin token not configured" });
+    const authHeader = req.headers.authorization || "";
+    const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    const tokenBuf = Buffer.from(adminToken);
+    const inputBuf = Buffer.alloc(tokenBuf.length);
+    inputBuf.write(bearer.slice(0, tokenBuf.length));
+    try {
+      if (!timingSafeEqual(tokenBuf, inputBuf)) throw new Error();
+    } catch {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  }
+
+  // Public: get RA info by slug (used by walkin form to display RA name)
+  app.get("/api/walkin/:slug/info", async (req, res) => {
+    try {
+      const ra = await storage.getRaBySlug(req.params.slug);
+      if (!ra || !ra.active) return res.status(404).json({ message: "RA not found or inactive" });
+      res.json({ id: ra.id, name: ra.name, branch: ra.branch });
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Public: submit walk-in check-in
+  app.post("/api/walkin/:slug", async (req, res) => {
+    try {
+      const ra = await storage.getRaBySlug(req.params.slug);
+      if (!ra || !ra.active) return res.status(404).json({ message: "RA not found or inactive" });
+      const { parentName, studentName, grade } = req.body;
+      if (!parentName?.trim() || !studentName?.trim() || !grade?.trim()) {
+        return res.status(400).json({ message: "parentName, studentName, and grade are required" });
+      }
+      const checkin = await storage.createCheckin(ra.id, ra.name, ra.branch, parentName.trim(), studentName.trim(), grade.trim());
+      console.log(`[walkin] Check-in: ${parentName} / ${studentName} (${grade}) → ${ra.name}`);
+      res.status(201).json({ success: true, id: checkin.id });
+    } catch {
+      res.status(500).json({ message: "Failed to record check-in" });
+    }
+  });
+
+  // Admin: list all RAs
+  app.get("/api/admin/ras", requireAdmin, async (_req, res) => {
+    try {
+      res.json(await storage.listRas());
+    } catch {
+      res.status(500).json({ message: "Failed to fetch RAs" });
+    }
+  });
+
+  // Admin: get single RA by slug (for QR card page)
+  app.get("/api/admin/ras/slug/:slug", requireAdmin, async (req, res) => {
+    try {
+      const ra = await storage.getRaBySlug(req.params.slug);
+      if (!ra) return res.status(404).json({ message: "RA not found" });
+      res.json(ra);
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Admin: list all submissions with optional ?since= filter
+  app.get("/api/admin/ras/submissions", requireAdmin, async (req, res) => {
+    try {
+      const since = req.query.since ? new Date(String(req.query.since)) : undefined;
+      res.json(await storage.listCheckins(since));
+    } catch {
+      res.status(500).json({ message: "Failed to fetch submissions" });
+    }
+  });
+
+  // Admin: create RA
+  app.post("/api/admin/ras", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertRaSchema.parse(req.body);
+      const existing = await storage.getRaBySlug(validated.slug);
+      if (existing) return res.status(409).json({ message: `Slug "${validated.slug}" is already taken` });
+      res.status(201).json(await storage.createRa(validated));
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to create RA" });
+    }
+  });
+
+  // Admin: update RA
+  app.put("/api/admin/ras/:id", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertRaSchema.partial().parse(req.body);
+      if (validated.slug) {
+        const existing = await storage.getRaBySlug(validated.slug);
+        if (existing && existing.id !== req.params.id) {
+          return res.status(409).json({ message: `Slug "${validated.slug}" is already taken` });
+        }
+      }
+      const ra = await storage.updateRa(req.params.id, validated);
+      if (!ra) return res.status(404).json({ message: "RA not found" });
+      res.json(ra);
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to update RA" });
+    }
+  });
+
+  // Sales: today's live check-in counts (no extra auth — same trust level as /api/sales/live)
+  app.get("/api/walkin/today", async (_req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    try {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const [counts, recent] = await Promise.all([
+        storage.getTodayCheckinCounts(),
+        storage.listCheckins(todayStart),
+      ]);
+      const total = counts.reduce((s, r) => s + r.count, 0);
+      res.json({ total, byRa: counts, recent: recent.slice(0, 30) });
+    } catch {
+      res.status(500).json({ message: "Failed to fetch today's check-ins" });
+    }
   });
 
   return httpServer;

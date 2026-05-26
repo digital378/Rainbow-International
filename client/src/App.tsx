@@ -58,6 +58,10 @@ const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunder
 const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
 const Marketing = lazy(() => import("@/pages/Marketing"));
 const Sales = lazy(() => import("@/pages/Sales"));
+const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
+const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
+const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
+const QRCard = lazy(() => import("@/pages/QRCard"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
@@ -123,6 +127,10 @@ function Router() {
       <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
       <Route path="/marketing" component={Marketing} />
       <Route path="/sales" component={Sales} />
+      <Route path="/walkin/:slug" component={WalkinForm} />
+      <Route path="/admin/ras/submissions" component={AdminSubmissions} />
+      <Route path="/admin/ras/:slug/qr" component={QRCard} />
+      <Route path="/admin/ras" component={AdminRAs} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>
