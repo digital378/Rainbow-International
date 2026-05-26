@@ -148,7 +148,80 @@ function SegmentToggle({ value, onChange }: { value: SegmentKey; onChange: (s: S
    MAIN
    ═══════════════════════════════════════════════════════════════════ */
 
+const MARKETING_PASSCODE = "8888";
+const MARKETING_AUTH_KEY = "ris_marketing_auth";
+
+function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    document.title = "Marketing Dashboard | Rainbow International School";
+    inputRef.current?.focus();
+  }, []);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code === MARKETING_PASSCODE) {
+      try { sessionStorage.setItem(MARKETING_AUTH_KEY, "1"); } catch {}
+      onSuccess();
+    } else {
+      setError(true);
+      setCode("");
+      setTimeout(() => setError(false), 600);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#091a4f" }} data-testid="passcode-gate">
+      <form
+        onSubmit={submit}
+        className={`w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-amber-400 ${error ? "animate-shake" : ""}`}
+        style={{ animation: error ? "shake 0.4s" : undefined }}
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-base">RIS</div>
+          <div>
+            <div className="font-black text-lg leading-tight text-[#091a4f]">Marketing Dashboard</div>
+            <div className="text-xs text-slate-500">Internal · Passcode required</div>
+          </div>
+        </div>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Enter passcode</label>
+        <input
+          ref={inputRef}
+          type="password"
+          inputMode="numeric"
+          autoComplete="off"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className={`w-full px-4 py-3 rounded-lg border-2 text-lg tracking-[0.5em] text-center font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 ${error ? "border-red-500 bg-red-50" : "border-slate-300"}`}
+          placeholder="••••"
+          data-testid="input-passcode"
+        />
+        {error && <div className="mt-2 text-sm text-red-600 text-center" data-testid="text-passcode-error">Incorrect passcode</div>}
+        <button
+          type="submit"
+          className="mt-5 w-full py-3 rounded-lg bg-[#091a4f] text-white font-bold hover:bg-[#0b2168] transition"
+          data-testid="button-unlock"
+        >
+          Unlock
+        </button>
+      </form>
+      <style>{`@keyframes shake {0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}`}</style>
+    </div>
+  );
+}
+
 export default function Marketing() {
+  const [authed, setAuthed] = useState<boolean>(() => {
+    try { return sessionStorage.getItem(MARKETING_AUTH_KEY) === "1"; } catch { return false; }
+  });
+  if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
+  return <MarketingDashboard />;
+}
+
+function MarketingDashboard() {
   const [segment, setSegment] = useState<SegmentKey>("combined");
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
