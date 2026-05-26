@@ -2092,9 +2092,9 @@ export async function registerRoutes(
         if (isEmptyRow(r)) continue;
         const name = norm(r[3]); if (!name) continue;
         const d = parseDate(r[1]);
-        const counselor = norm(r[8]) || "Unassigned";
-        const source = norm(r[9]) || "Unknown";
-        const status = upper(r[10]) || "OPEN";
+        const counselor = norm(r[7]) || "Unassigned";
+        const source = norm(r[8]) || "Unknown";
+        const status = upper(r[9]) || "OPEN";
         const grade = norm(r[4]) || "Unspecified";
         walkinsTotal++;
         if (d && monthKey(d) === curMonthKey) walkinsThisMonth++;
@@ -2120,19 +2120,22 @@ export async function registerRoutes(
         });
       }
 
-      // ── Admissions (RIS new, RPS, Integrated, Provisional) ─────
-      const admByMonth = new Map<string,{label:string; ris:number; rps:number; integrated:number; provisional:number}>();
+      // ── Admissions (RIS new, Rollover RPS→RIS, Integrated, Provisional) ─────
+      const admByMonth = new Map<string,{label:string; ris:number; rollover:number; integrated:number; provisional:number}>();
       const admByBranch = new Map<string,number>();
       const admByGrade  = new Map<string,number>();
       const admBySource = new Map<string,number>();
       const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; type:string; sortKey:number}> = [];
-      let risTot = 0, rpsTot = 0, intTot = 0, provTot = 0;
-      let risMo = 0, rpsMo = 0, intMo = 0, provMo = 0;
+      let risTot = 0, rolloverTot = 0, intTot = 0, provTot = 0;
+      let risMo = 0, rolloverMo = 0, intMo = 0, provMo = 0;
 
-      const bumpAdmMonth = (d: Date | null, kind: "ris"|"rps"|"integrated"|"provisional") => {
+      // Normalize branch names: strip "RPS " prefix for display
+      const normBranch = (b: string) => b.replace(/^RPS\s+/i, "").trim() || "Main";
+
+      const bumpAdmMonth = (d: Date | null, kind: "ris"|"rollover"|"integrated"|"provisional") => {
         if (!d) return;
         const mk = monthKey(d);
-        const cur = admByMonth.get(mk) || { label: monthLabel(d), ris:0, rps:0, integrated:0, provisional:0 };
+        const cur = admByMonth.get(mk) || { label: monthLabel(d), ris:0, rollover:0, integrated:0, provisional:0 };
         cur[kind]++;
         admByMonth.set(mk, cur);
       };
@@ -2158,7 +2161,7 @@ export async function registerRoutes(
         });
       }
 
-      // RPS Admissions: 0=Sr 1=Date 2=Month 3=AY 4=Name 5=Grade 6=Contact 7=Source 8=Counselor 9=Master 10=Branch
+      // Rollover Admissions (RPS Preschool → RIS School): 0=Sr 1=Date 2=Month 3=AY 4=Name 5=Grade 6=Contact 7=Source 8=Counselor 9=Master 10=Branch
       for (const r of rpsAdmRows) {
         if (isEmptyRow(r)) continue;
         const name = norm(r[4]); if (!name) continue;
@@ -2166,15 +2169,16 @@ export async function registerRoutes(
         const grade = norm(r[5]) || "Unspecified";
         const source = norm(r[7]) || "Unknown";
         const counselor = norm(r[8]) || "Unassigned";
-        const branch = norm(r[10]) || "RPS";
-        rpsTot++; if (d && monthKey(d) === curMonthKey) rpsMo++;
-        bumpAdmMonth(d, "rps");
-        incBy(admByBranch, `RPS ${branch}`);
+        const rawBranch = norm(r[10]);
+        const branch = normBranch(rawBranch) || "RPS";
+        rolloverTot++; if (d && monthKey(d) === curMonthKey) rolloverMo++;
+        bumpAdmMonth(d, "rollover");
+        incBy(admByBranch, `Rollover: ${branch}`);
         incBy(admByGrade, grade);
         incBy(admBySource, source);
         recentAdmissions.push({
           date: d ? d.toISOString().slice(0,10) : norm(r[1]),
-          name, grade, counselor, source, branch: `RPS ${branch}`, type: "RPS",
+          name, grade, counselor, source, branch: `Rollover: ${branch}`, type: "Rollover",
           sortKey: d ? d.getTime() : 0,
         });
       }
@@ -2247,8 +2251,8 @@ export async function registerRoutes(
         conversion: a.walkins ? Math.round(((a.admissions + a.provisional) / a.walkins) * 10000) / 100 : 0,
       })).sort((a,b) => b.admissions - a.admissions);
 
-      const admissionsTotal = risTot + rpsTot + intTot + provTot;
-      const admissionsThisMonth = risMo + rpsMo + intMo + provMo;
+      const admissionsTotal = risTot + rolloverTot + intTot + provTot;
+      const admissionsThisMonth = risMo + rolloverMo + intMo + provMo;
       const overallConversion = walkinsTotal ? Math.round((admissionsTotal / walkinsTotal) * 10000) / 100 : 0;
 
       res.json({
@@ -2258,8 +2262,8 @@ export async function registerRoutes(
           walkinsThisMonth,
           admissionsTotal,
           admissionsThisMonth,
-          admissions: { ris: risTot, rps: rpsTot, integrated: intTot, provisional: provTot },
-          admissionsMonth: { ris: risMo, rps: rpsMo, integrated: intMo, provisional: provMo },
+          admissions: { ris: risTot, rollover: rolloverTot, integrated: intTot, provisional: provTot },
+          admissionsMonth: { ris: risMo, rollover: rolloverMo, integrated: intMo, provisional: provMo },
           overallConversion,
           openEnquiries: (statusMap.get("OPEN") || 0) + (statusMap.get("FOLLOW UP") || 0) + (statusMap.get("FOLLOWUP") || 0),
           closedEnquiries: statusMap.get("CLOSED") || 0,

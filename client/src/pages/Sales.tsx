@@ -19,8 +19,8 @@ type SalesData = {
     walkinsThisMonth: number;
     admissionsTotal: number;
     admissionsThisMonth: number;
-    admissions: { ris: number; rps: number; integrated: number; provisional: number };
-    admissionsMonth: { ris: number; rps: number; integrated: number; provisional: number };
+    admissions: { ris: number; rollover: number; integrated: number; provisional: number };
+    admissionsMonth: { ris: number; rollover: number; integrated: number; provisional: number };
     overallConversion: number;
     openEnquiries: number;
     closedEnquiries: number;
@@ -33,7 +33,7 @@ type SalesData = {
     recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; status: string }>;
   };
   admissions: {
-    byMonth: Array<{ monthKey: string; month: string; ris: number; rps: number; integrated: number; provisional: number; total: number }>;
+    byMonth: Array<{ monthKey: string; month: string; ris: number; rollover: number; integrated: number; provisional: number; total: number }>;
     byBranch: Array<{ branch: string; count: number }>;
     byGrade: Array<{ grade: string; count: number }>;
     bySource: Array<{ source: string; count: number }>;
@@ -233,10 +233,10 @@ function SalesDashboard() {
 
         {/* Admissions split */}
         <div>
-          <SectionTitle sub="Breakdown by school / type">Admissions Split</SectionTitle>
+          <SectionTitle sub="All data is RIS — Rollover = RPS Preschool students joining RIS School">Admissions Split</SectionTitle>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KpiCard label="RIS New" value={fmt(kpis.admissions.ris)} sub={`${kpis.admissionsMonth.ris} this month`} testId="kpi-ris" />
-            <KpiCard label="RPS" value={fmt(kpis.admissions.rps)} sub={`${kpis.admissionsMonth.rps} this month`} accent={CYAN} testId="kpi-rps" />
+            <KpiCard label="RIS (New)" value={fmt(kpis.admissions.ris)} sub={`${kpis.admissionsMonth.ris} this month`} testId="kpi-ris" />
+            <KpiCard label="RPS → RIS Rollover" value={fmt(kpis.admissions.rollover)} sub={`${kpis.admissionsMonth.rollover} this month`} accent={CYAN} testId="kpi-rollover" />
             <KpiCard label="Integrated" value={fmt(kpis.admissions.integrated)} sub={`${kpis.admissionsMonth.integrated} this month`} accent={PURPLE} testId="kpi-int" />
             <KpiCard label="Provisional" value={fmt(kpis.admissions.provisional)} sub={`${kpis.admissionsMonth.provisional} this month`} accent={AMBER} testId="kpi-prov" />
           </div>
@@ -262,8 +262,8 @@ function SalesDashboard() {
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="ris" stackId="a" fill={NAVY} name="RIS" />
-                <Bar dataKey="rps" stackId="a" fill={CYAN} name="RPS" />
+                <Bar dataKey="ris" stackId="a" fill={NAVY} name="RIS New" />
+                <Bar dataKey="rollover" stackId="a" fill={CYAN} name="RPS→RIS Rollover" />
                 <Bar dataKey="integrated" stackId="a" fill={PURPLE} name="Integrated" />
                 <Bar dataKey="provisional" stackId="a" fill={AMBER} name="Provisional" />
               </BarChart>
@@ -428,9 +428,9 @@ function SalesDashboard() {
                       <td className="py-2 px-3">{r.counselor}</td>
                       <td className="py-2 px-3">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold" style={{
-                          background: r.type === "RIS" ? "#dbeafe" : r.type === "RPS" ? "#cffafe" : r.type === "Integrated" ? "#ede9fe" : "#fef3c7",
-                          color: r.type === "RIS" ? NAVY : r.type === "RPS" ? CYAN : r.type === "Integrated" ? PURPLE : AMBER,
-                        }}>{r.type}</span>
+                          background: r.type === "RIS" ? "#dbeafe" : r.type === "Rollover" ? "#cffafe" : r.type === "Integrated" ? "#ede9fe" : "#fef3c7",
+                          color: r.type === "RIS" ? NAVY : r.type === "Rollover" ? CYAN : r.type === "Integrated" ? PURPLE : AMBER,
+                        }}>{r.type === "Rollover" ? "RPS→RIS" : r.type}</span>
                       </td>
                     </tr>
                   ))}
