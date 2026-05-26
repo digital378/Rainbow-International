@@ -57,6 +57,7 @@ const SchoolNearBrahmand = lazy(() => import("@/pages/SchoolNearBrahmand"));
 const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunderRoad"));
 const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
 const Marketing = lazy(() => import("@/pages/Marketing"));
+const Sales = lazy(() => import("@/pages/Sales"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));

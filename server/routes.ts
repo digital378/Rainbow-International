@@ -1751,6 +1751,7 @@ export async function registerRoutes(
     rpsCrm:    "1t1_2SPI6--W-nCWc-lHHE-D4ee38WGFxiBsB5txI-CM",
     risCrm:    "1zLIWutvJxwLyVBAK-vDlpEzNPV7c2RwutYC9Gn3yd2s",
     master:    "1FjLbJbThU2wZCu7m0Y-GAzv6vTs8WdkVxBRBZh8QZqc",
+    sales:     "1R5evjW6gVYIB6nyR1dmIdiWp1qMTui4J9wQovmUkakw",
   };
 
   async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
@@ -2030,6 +2031,258 @@ export async function registerRoutes(
       }
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch targets", error: err.message });
+    }
+  });
+
+  // ── Sales Dashboard (Walkin Enquiries spreadsheet) ──────────────
+  // Aggregates all subsheets from the 2026-27 Walkin Enquiries workbook.
+  // Auto-updates: response is no-store; frontend polls every 5 minutes.
+  app.get("/api/sales/live", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    try {
+      const SID = SHEET_IDS.sales;
+      const [walkinRows, admRows, rpsAdmRows, intAdmRows, provAdmRows, convRows] = await Promise.all([
+        fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
+        fetchSheetRange(SID, "'New Admission List'!A2:N5000"),
+        fetchSheetRange(SID, "'RPS ADMISSIONS'!A2:L5000"),
+        fetchSheetRange(SID, "'INTEGRATED ADMISSIONS '!A2:N5000"),
+        fetchSheetRange(SID, "'Provisional Admission LIST'!A2:S5000"),
+        fetchSheetRange(SID, "'CONVERSION RATIO'!A4:R200"),
+      ]);
+
+      // ── helpers ────────────────────────────────────────────────
+      const norm = (s: any) => String(s ?? "").trim();
+      const upper = (s: any) => norm(s).toUpperCase();
+      const isEmptyRow = (r: any[]) => !r || r.every(c => norm(c) === "");
+      // Parse loose date strings ("19 Jun 25", "5-Jul-2025", "01.10.2025", "10/27/2025")
+      const parseDate = (s: any): Date | null => {
+        const v = norm(s); if (!v) return null;
+        const t = v.replace(/\./g, "/").replace(/\s+/g, " ");
+        // try direct
+        const d1 = new Date(t); if (!isNaN(d1.getTime()) && d1.getFullYear() > 2020 && d1.getFullYear() < 2030) return d1;
+        // try DD-MMM-YY / DD MMM YY
+        const m = t.match(/^(\d{1,2})[\s\-\/]([A-Za-z]{3,})[\s\-\/](\d{2,4})$/);
+        if (m) {
+          const y = m[3].length === 2 ? 2000 + +m[3] : +m[3];
+          const d2 = new Date(`${m[2]} ${m[1]}, ${y}`);
+          if (!isNaN(d2.getTime())) return d2;
+        }
+        return null;
+      };
+      const monthKey = (d: Date | null) => d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}` : "";
+      const monthLabel = (d: Date | null) => d ? d.toLocaleString("en-US", { month: "short", year: "2-digit" }) : "";
+      const incBy = (m: Map<string,number>, k: string) => { if (!k) return; m.set(k, (m.get(k) || 0) + 1); };
+      const sortByCount = (m: Map<string,number>) => Array.from(m, ([k,v]) => ({ key: k, count: v })).sort((a,b) => b.count - a.count);
+
+      const now = new Date();
+      const curMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+
+      // ── Walkins ────────────────────────────────────────────────
+      // Cols: 0=SrNo 1=Date 2=Month 3=Name 4=Grade 5=Gender 6=Section 7=Contact 8=Counsellor 9=Source 10=Status
+      const sourceMap = new Map<string,number>();
+      const statusMap = new Map<string,number>();
+      const gradeMap  = new Map<string,number>();
+      const walkinByMonth = new Map<string,{label:string; count:number}>();
+      type CounselorAgg = { walkins: number; admissions: number; closed: number; followup: number; provisional: number };
+      const counselorMap = new Map<string, CounselorAgg>();
+      const recentWalkins: Array<{date:string; name:string; grade:string; counselor:string; source:string; status:string; sortKey:number}> = [];
+      let walkinsTotal = 0, walkinsThisMonth = 0;
+
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[3]); if (!name) continue;
+        const d = parseDate(r[1]);
+        const counselor = norm(r[8]) || "Unassigned";
+        const source = norm(r[9]) || "Unknown";
+        const status = upper(r[10]) || "OPEN";
+        const grade = norm(r[4]) || "Unspecified";
+        walkinsTotal++;
+        if (d && monthKey(d) === curMonthKey) walkinsThisMonth++;
+        incBy(sourceMap, source);
+        incBy(statusMap, status);
+        incBy(gradeMap, grade);
+        if (d) {
+          const mk = monthKey(d);
+          const cur = walkinByMonth.get(mk) || { label: monthLabel(d), count: 0 };
+          cur.count++; walkinByMonth.set(mk, cur);
+        }
+        const ca = counselorMap.get(counselor) || { walkins: 0, admissions: 0, closed: 0, followup: 0, provisional: 0 };
+        ca.walkins++;
+        if (status.includes("ADMIS") && !status.includes("PROV")) ca.admissions++;
+        else if (status.includes("PROV")) ca.provisional++;
+        else if (status.includes("CLOSED")) ca.closed++;
+        else if (status.includes("FOLLOW")) ca.followup++;
+        counselorMap.set(counselor, ca);
+        recentWalkins.push({
+          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
+          name, grade, counselor, source, status,
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+
+      // ── Admissions (RIS new, RPS, Integrated, Provisional) ─────
+      const admByMonth = new Map<string,{label:string; ris:number; rps:number; integrated:number; provisional:number}>();
+      const admByBranch = new Map<string,number>();
+      const admByGrade  = new Map<string,number>();
+      const admBySource = new Map<string,number>();
+      const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; type:string; sortKey:number}> = [];
+      let risTot = 0, rpsTot = 0, intTot = 0, provTot = 0;
+      let risMo = 0, rpsMo = 0, intMo = 0, provMo = 0;
+
+      const bumpAdmMonth = (d: Date | null, kind: "ris"|"rps"|"integrated"|"provisional") => {
+        if (!d) return;
+        const mk = monthKey(d);
+        const cur = admByMonth.get(mk) || { label: monthLabel(d), ris:0, rps:0, integrated:0, provisional:0 };
+        cur[kind]++;
+        admByMonth.set(mk, cur);
+      };
+
+      // RIS New Admissions: 0=Sr 1=Date 2=? 3=Week 4=Month 5=Name 6=? 7=Grade 8=Contact 9=Source 10=Revisit/Spot 11=Branch 12=Counselor
+      for (const r of admRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[5]); if (!name) continue;
+        const d = parseDate(r[1]);
+        const grade = norm(r[7]) || "Unspecified";
+        const source = norm(r[9]) || "Unknown";
+        const branch = norm(r[11]) || "RIS Main";
+        const counselor = norm(r[12]) || "Unassigned";
+        risTot++; if (d && monthKey(d) === curMonthKey) risMo++;
+        bumpAdmMonth(d, "ris");
+        incBy(admByBranch, branch);
+        incBy(admByGrade, grade);
+        incBy(admBySource, source);
+        recentAdmissions.push({
+          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
+          name, grade, counselor, source, branch, type: "RIS",
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+
+      // RPS Admissions: 0=Sr 1=Date 2=Month 3=AY 4=Name 5=Grade 6=Contact 7=Source 8=Counselor 9=Master 10=Branch
+      for (const r of rpsAdmRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[4]); if (!name) continue;
+        const d = parseDate(r[1]);
+        const grade = norm(r[5]) || "Unspecified";
+        const source = norm(r[7]) || "Unknown";
+        const counselor = norm(r[8]) || "Unassigned";
+        const branch = norm(r[10]) || "RPS";
+        rpsTot++; if (d && monthKey(d) === curMonthKey) rpsMo++;
+        bumpAdmMonth(d, "rps");
+        incBy(admByBranch, `RPS ${branch}`);
+        incBy(admByGrade, grade);
+        incBy(admBySource, source);
+        recentAdmissions.push({
+          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
+          name, grade, counselor, source, branch: `RPS ${branch}`, type: "RPS",
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+
+      // Integrated Admissions: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=AY 6=Classes 7=Visited 8=Counselor 9=Subject 10=Master 11=Pendency 12=Cancellation 13=DateOfAdmission
+      for (const r of intAdmRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[3]); if (!name) continue;
+        const d = parseDate(r[13]) || parseDate(r[1]);
+        const grade = norm(r[4]) || "Unspecified";
+        const counselor = norm(r[8]) || "Unassigned";
+        intTot++; if (d && monthKey(d) === curMonthKey) intMo++;
+        bumpAdmMonth(d, "integrated");
+        incBy(admByBranch, "Integrated");
+        incBy(admByGrade, grade);
+        recentAdmissions.push({
+          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
+          name, grade, counselor, source: "Integrated", branch: "Integrated", type: "Integrated",
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+
+      // Provisional: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=Contact 6=Counselor 7=Source 8=Status 9=Revisit/Spot 10=Branch
+      for (const r of provAdmRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[3]); if (!name) continue;
+        const d = parseDate(r[1]);
+        const grade = norm(r[4]) || "Unspecified";
+        const source = norm(r[7]) || "Unknown";
+        const counselor = norm(r[6]) || "Unassigned";
+        const branch = norm(r[10]) || "RIS";
+        provTot++; if (d && monthKey(d) === curMonthKey) provMo++;
+        bumpAdmMonth(d, "provisional");
+        recentAdmissions.push({
+          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
+          name, grade, counselor, source, branch, type: "Provisional",
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+
+      // ── Conversion ratio (per-counselor authoritative) ─────────
+      // R4+ cols: 0=Sr 1=Name 2=Total 3=Open 4=Closed 5=Admission 6=Ratio%
+      const conversionRatio: Array<{counselor:string; enquiries:number; closed:number; open:number; admissions:number; ratio:number}> = [];
+      for (const r of convRows) {
+        if (isEmptyRow(r)) continue;
+        const nm = norm(r[1]); if (!nm || nm.toLowerCase().includes("name")) continue;
+        const enq = +norm(r[2]) || 0; if (!enq) continue;
+        conversionRatio.push({
+          counselor: nm,
+          enquiries: enq,
+          open: +norm(r[3]) || 0,
+          closed: +norm(r[4]) || 0,
+          admissions: +norm(r[5]) || 0,
+          ratio: Math.round((+norm(r[6]) || 0) * 100) / 100,
+        });
+      }
+
+      // ── shape outputs ──────────────────────────────────────────
+      const sortedMonths = (m: Map<string,any>) => Array.from(m.entries()).sort((a,b) => a[0].localeCompare(b[0]));
+      recentWalkins.sort((a,b) => b.sortKey - a.sortKey);
+      recentAdmissions.sort((a,b) => b.sortKey - a.sortKey);
+
+      const counselorLeaderboard = Array.from(counselorMap, ([name, a]) => ({
+        counselor: name,
+        walkins: a.walkins,
+        admissions: a.admissions,
+        provisional: a.provisional,
+        closed: a.closed,
+        followup: a.followup,
+        conversion: a.walkins ? Math.round(((a.admissions + a.provisional) / a.walkins) * 10000) / 100 : 0,
+      })).sort((a,b) => b.admissions - a.admissions);
+
+      const admissionsTotal = risTot + rpsTot + intTot + provTot;
+      const admissionsThisMonth = risMo + rpsMo + intMo + provMo;
+      const overallConversion = walkinsTotal ? Math.round((admissionsTotal / walkinsTotal) * 10000) / 100 : 0;
+
+      res.json({
+        generatedAt: new Date().toISOString(),
+        kpis: {
+          walkinsTotal,
+          walkinsThisMonth,
+          admissionsTotal,
+          admissionsThisMonth,
+          admissions: { ris: risTot, rps: rpsTot, integrated: intTot, provisional: provTot },
+          admissionsMonth: { ris: risMo, rps: rpsMo, integrated: intMo, provisional: provMo },
+          overallConversion,
+          openEnquiries: (statusMap.get("OPEN") || 0) + (statusMap.get("FOLLOW UP") || 0) + (statusMap.get("FOLLOWUP") || 0),
+          closedEnquiries: statusMap.get("CLOSED") || 0,
+        },
+        walkins: {
+          byMonth: sortedMonths(walkinByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, count: v.count })),
+          bySource: sortByCount(sourceMap).map(x => ({ source: x.key, count: x.count })),
+          byStatus: sortByCount(statusMap).map(x => ({ status: x.key, count: x.count })),
+          byGrade: sortByCount(gradeMap).map(x => ({ grade: x.key, count: x.count })),
+          recent: recentWalkins.slice(0, 25).map(({sortKey, ...rest}) => rest),
+        },
+        admissions: {
+          byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, ris: v.ris, rps: v.rps, integrated: v.integrated, provisional: v.provisional, total: v.ris+v.rps+v.integrated+v.provisional })),
+          byBranch: sortByCount(admByBranch).map(x => ({ branch: x.key, count: x.count })),
+          byGrade: sortByCount(admByGrade).map(x => ({ grade: x.key, count: x.count })),
+          bySource: sortByCount(admBySource).map(x => ({ source: x.key, count: x.count })),
+          recent: recentAdmissions.slice(0, 25).map(({sortKey, ...rest}) => rest),
+        },
+        counselorLeaderboard,
+        conversionRatio,
+      });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch sales data", error: err.message });
     }
   });
 
