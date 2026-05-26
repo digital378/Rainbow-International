@@ -2087,7 +2087,23 @@ export async function registerRoutes(
       type CounselorAgg = { walkins: number; admissions: number; closed: number; followup: number; provisional: number };
       const counselorMap = new Map<string, CounselorAgg>();
       const recentWalkins: Array<{date:string; name:string; grade:string; counselor:string; source:string; status:string; sortKey:number}> = [];
+      const closedSegmentMap = new Map<string,number>();
       let walkinsTotal = 0, walkinsThisMonth = 0;
+
+      // Maps raw "REASON OF CLOSING" (col 13) → curated segment name
+      const closedSegment = (raw: string): string => {
+        const r = raw.toLowerCase().trim();
+        if (!r) return "No Reason Recorded";
+        if (r.includes("relocat")) return "Location / Not in Catchment";
+        if (r.includes("distance")) return "Distance / Too Far";
+        if (r.includes("taken") || r.includes("same school") || r.includes("pre-school") || r.includes("pre- school") || r.includes("preschool")) return "Joined Another School";
+        if (r.includes("continu")) return "Joined Another School";
+        if (r.includes("finance")) return "Finance / Fees";
+        if (r.includes("board") || r.includes("icse") || r.includes("rte")) return "Board / Curriculum Preference";
+        if (r.includes("not interest") || r.includes("not respond")) return "Not Interested / Unresponsive";
+        if (r.includes("shift") || r.includes("saturday") || r.includes("morning") || r.includes("afternoon") || r.includes("day care")) return "Timing / Schedule";
+        return "Other";
+      };
 
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
@@ -2111,7 +2127,11 @@ export async function registerRoutes(
         ca.walkins++;
         if (status.includes("ADMIS") && !status.includes("PROV")) ca.admissions++;
         else if (status.includes("PROV")) ca.provisional++;
-        else if (status.includes("CLOSED")) ca.closed++;
+        else if (status.includes("CLOSED")) {
+          ca.closed++;
+          const seg = closedSegment(norm(r[13]));
+          closedSegmentMap.set(seg, (closedSegmentMap.get(seg) || 0) + 1);
+        }
         else if (status.includes("FOLLOW")) ca.followup++;
         counselorMap.set(counselor, ca);
         recentWalkins.push({
@@ -2120,6 +2140,7 @@ export async function registerRoutes(
           sortKey: d ? d.getTime() : 0,
         });
       }
+      const closedReasonSegments = sortByCount(closedSegmentMap).map(x => ({ segment: x.key, count: x.count }));
 
       // ── Admissions (New Admission List = single source of truth = 287 confirmed) ──
       // Cols: 0=Sr 1=Date 2=? 3=Week 4=Month 5=Name 6=? 7=Grade 8=Contact
@@ -2320,6 +2341,7 @@ export async function registerRoutes(
           byStatus: sortByCount(statusMap).map(x => ({ status: x.key, count: x.count })),
           byGrade: sortByCount(gradeMap).map(x => ({ grade: x.key, count: x.count })),
           recent: recentWalkins.slice(0, 25).map(({sortKey, ...rest}) => rest),
+          closedReasonSegments,
         },
         admissions: {
           byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, total: v.total })),

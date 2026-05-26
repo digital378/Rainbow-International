@@ -44,6 +44,7 @@ type SalesData = {
     byStatus: Array<{ status: string; count: number }>;
     byGrade: Array<{ grade: string; count: number }>;
     recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; status: string }>;
+    closedReasonSegments: Array<{ segment: string; count: number }>;
   };
   admissions: {
     byMonth: Array<{ monthKey: string; month: string; total: number }>;
@@ -493,6 +494,88 @@ function SalesDashboard() {
             </div>
           </div>
         )}
+
+        {/* Closed Reasons */}
+        {walkins.closedReasonSegments && walkins.closedReasonSegments.length > 0 && (() => {
+          const totalClosed = walkins.closedReasonSegments.reduce((s, x) => s + x.count, 0);
+          const SEGMENT_COLORS: Record<string, string> = {
+            "Location / Not in Catchment": "#7c3aed",
+            "Finance / Fees": "#dc2626",
+            "Joined Another School": "#ea580c",
+            "Distance / Too Far": "#0891b2",
+            "Not Interested / Unresponsive": "#64748b",
+            "Board / Curriculum Preference": "#2563eb",
+            "Timing / Schedule": "#d97706",
+            "No Reason Recorded": "#94a3b8",
+            "Other": "#6b7280",
+          };
+          return (
+            <div>
+              <SectionTitle sub={`${totalClosed} closed leads from Walkin Sheet · Reasons curated into segments`}>Why Leads Closed</SectionTitle>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                  <table className="w-full text-sm" data-testid="table-closed-reasons">
+                    <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+                      <tr>
+                        <th className="text-left py-3 px-4">Reason Segment</th>
+                        <th className="text-right py-3 px-4">Count</th>
+                        <th className="text-right py-3 px-4">%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {walkins.closedReasonSegments.map((s) => {
+                        const pctVal = Math.round((s.count / totalClosed) * 100);
+                        const color = SEGMENT_COLORS[s.segment] || "#6b7280";
+                        return (
+                          <tr key={s.segment} className="border-t border-slate-100 hover:bg-slate-50">
+                            <td className="py-2.5 px-4">
+                              <span className="inline-block w-2 h-2 rounded-full mr-2 flex-shrink-0 align-middle" style={{ background: color }} />
+                              <span className="font-medium text-slate-700">{s.segment}</span>
+                            </td>
+                            <td className="text-right py-2.5 px-4 tabular-nums font-bold" style={{ color }}>{s.count}</td>
+                            <td className="text-right py-2.5 px-4 tabular-nums text-slate-500">{pctVal}%</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t-2 border-slate-200 font-bold bg-slate-50">
+                        <td className="py-2.5 px-4 text-slate-600">Total Closed</td>
+                        <td className="text-right py-2.5 px-4 tabular-nums">{totalClosed}</td>
+                        <td className="text-right py-2.5 px-4 text-slate-400">100%</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                  <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>Segment Breakdown</div>
+                  <div className="space-y-3">
+                    {walkins.closedReasonSegments.map((s) => {
+                      const pctVal = Math.round((s.count / totalClosed) * 100);
+                      const color = SEGMENT_COLORS[s.segment] || "#6b7280";
+                      return (
+                        <div key={s.segment}>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-slate-600 font-medium truncate max-w-[200px]">{s.segment}</span>
+                            <span className="tabular-nums font-bold ml-2" style={{ color }}>{s.count} <span className="text-slate-400 font-normal">({pctVal}%)</span></span>
+                          </div>
+                          <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div className="h-full rounded-full transition-all" style={{ width: `${pctVal}%`, background: color }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {walkins.closedReasonSegments.find(s => s.segment === "No Reason Recorded") && (
+                    <div className="mt-4 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700">
+                      ⚠️ <strong>{walkins.closedReasonSegments.find(s => s.segment === "No Reason Recorded")!.count} leads</strong> closed with no reason recorded — counsellors should fill "REASON OF CLOSING" for accurate analysis.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Recent Tables */}
         <div className="grid md:grid-cols-2 gap-4">
