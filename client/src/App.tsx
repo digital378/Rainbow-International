@@ -122,6 +122,7 @@ function Router() {
       <Route path="/school-near-ghodbunder-road-thane" component={SchoolNearGhodbunderRoad} />
       <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
       <Route path="/marketing" component={Marketing} />
+      <Route path="/sales" component={Sales} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>
