@@ -2256,7 +2256,7 @@ export async function registerRoutes(
         gap: Math.max(0, (+norm(tgtRow[i + 1]) || 0) - (+norm(achRow[i + 1]) || 0)),
       }));
       const yearTarget = +norm(tgtRow[12]) || 0;
-      const yearAchieved = monthlyTargets.reduce((s, m) => s + m.achieved, 0);
+      const yearAchieved = admTotal;   // New Admission List is single source of truth
       const yearTargetGap = Math.max(0, yearTarget - yearAchieved);
 
       // ── MIS Dashboard (latest day's ops data) ─────────────────

@@ -243,17 +243,30 @@ function SalesDashboard() {
           </div>
         </div>
 
-        {/* MIS Dashboard Banner */}
-        {kpis.misDate && (
-          <div className="bg-white rounded-xl p-5 border-l-4 border-amber-400 shadow-sm flex flex-wrap gap-6 items-center">
-            <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">MIS Dashboard · as of {kpis.misDate}</div>
-              <div className="text-xs text-slate-400 mt-0.5">Daily operational tracker</div>
+        {/* Source-wise Admissions */}
+        {admissions.bySource.length > 0 && (
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+            <div className="flex items-baseline justify-between mb-4">
+              <div>
+                <div className="text-sm font-bold" style={{ color: NAVY }}>Admissions by Source · AY 2026-27</div>
+                <div className="text-xs text-slate-400 mt-0.5">All {kpis.admissionsTotal} confirmed admissions · New Admission List</div>
+              </div>
             </div>
-            <div className="flex gap-8 flex-wrap">
-              <div><div className="text-xs text-slate-500">Cumulative Walkins</div><div className="text-2xl font-black" style={{ color: NAVY }}>{fmt(kpis.misWalkins)}</div></div>
-              <div><div className="text-xs text-slate-500">Admissions (incl. Provisional)</div><div className="text-2xl font-black" style={{ color: GREEN }}>{fmt(kpis.misAdmissions)}</div></div>
-              <div><div className="text-xs text-slate-500">Target Gap Remaining</div><div className="text-2xl font-black" style={{ color: RED }}>{fmt(kpis.misTargetGap)}</div></div>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+              {admissions.bySource.map((s) => {
+                const pct = Math.round((s.count / kpis.admissionsTotal) * 100);
+                return (
+                  <div key={s.source} data-testid={`src-adm-${s.source}`}>
+                    <div className="flex justify-between text-xs mb-0.5">
+                      <span className="font-medium text-slate-700 truncate max-w-[160px]">{s.source}</span>
+                      <span className="tabular-nums font-bold ml-2" style={{ color: NAVY }}>{s.count} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: NAVY }} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
