@@ -84,6 +84,13 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
 
   const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 
+  useEffect(() => {
+    document.title = "RA Management | Rainbow International School";
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/admin/ras", { headers: { Authorization: `Bearer ${token}` } });

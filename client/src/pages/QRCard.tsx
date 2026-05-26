@@ -21,6 +21,13 @@ export default function QRCard() {
   const formUrl = `${window.location.origin}/walkin/${slug}`;
 
   useEffect(() => {
+    document.title = "QR Card | Rainbow International School";
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
+  useEffect(() => {
     const token = getToken();
     fetch(`/api/admin/ras/slug/${slug}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},

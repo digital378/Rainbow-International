@@ -25,6 +25,13 @@ export default function AdminSubmissions() {
   const [search, setSearch] = useState("");
   const [filterRa, setFilterRa] = useState("All");
 
+  useEffect(() => {
+    document.title = "Walk-in Submissions | Rainbow International School";
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     const token = getToken();
