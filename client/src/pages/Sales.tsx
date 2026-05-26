@@ -20,6 +20,8 @@ type SalesData = {
     admissionsTotal: number;
     admissionsThisMonth: number;
     provisionalCount: number;
+    provisionalRegular: number;
+    provisionalIntegrated: number;
     provisionalThisMonth: number;
     rpsRollover: number;
     overallConversion: number;
@@ -50,7 +52,7 @@ type SalesData = {
     bySource: Array<{ source: string; count: number }>;
     byCounselor: Array<{ counselor: string; count: number }>;
     recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string }>;
-    recentProvisional: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string }>;
+    recentProvisional: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string; type: string; coaching: string }>;
   };
   counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
   conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
@@ -227,7 +229,7 @@ function SalesDashboard() {
             <KpiCard label="Walkins (Total)" value={fmt(kpis.walkinsTotal)} sub={`${kpis.walkinsThisMonth} this month`} testId="kpi-walkins-total" />
             <KpiCard label="Admissions (Confirmed)" value={fmt(kpis.admissionsTotal)} sub={`${kpis.admissionsThisMonth} this month`} accent={GREEN} testId="kpi-admissions-total" />
             <KpiCard label="Conversion %" value={pct(kpis.overallConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
-            <KpiCard label="Provisional (Pending)" value={fmt(kpis.provisionalCount)} sub={`${kpis.provisionalThisMonth} this month · not yet confirmed`} accent={PURPLE} testId="kpi-provisional" />
+            <KpiCard label="Provisional (Pending)" value={fmt(kpis.provisionalCount)} sub={`${kpis.provisionalRegular} Regular · ${kpis.provisionalIntegrated} Integrated`} accent={PURPLE} testId="kpi-provisional" />
           </div>
 
           {/* KPIs Row 2 — Target & Ops */}
@@ -547,26 +549,35 @@ function SalesDashboard() {
         {/* Provisional pending */}
         {admissions.recentProvisional.length > 0 && (
           <div>
-            <SectionTitle sub="Students provisionally admitted · not yet confirmed in New Admission List">Provisional (Pending Confirmation)</SectionTitle>
+            <SectionTitle sub={`${kpis.provisionalRegular} Regular · ${kpis.provisionalIntegrated} Integrated · not yet confirmed in New Admission List`}>Provisional (Pending Confirmation)</SectionTitle>
             <div className="bg-white rounded-xl shadow-sm border border-purple-200 overflow-x-auto">
               <table className="w-full text-xs" data-testid="table-provisional">
                 <thead className="bg-purple-50 uppercase text-purple-700">
                   <tr>
+                    <th className="text-left py-2 px-3">Type</th>
                     <th className="text-left py-2 px-3">Date</th>
                     <th className="text-left py-2 px-3">Name</th>
                     <th className="text-left py-2 px-3">Grade</th>
                     <th className="text-left py-2 px-3">Counsellor</th>
-                    <th className="text-left py-2 px-3">Branch</th>
+                    <th className="text-left py-2 px-3">Source</th>
+                    <th className="text-left py-2 px-3">Coaching</th>
                   </tr>
                 </thead>
                 <tbody>
                   {admissions.recentProvisional.map((r, i) => (
                     <tr key={i} className="border-t border-purple-100">
+                      <td className="py-2 px-3">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{
+                          background: r.type === "Integrated" ? "#ede9fe" : "#f3e8ff",
+                          color: r.type === "Integrated" ? PURPLE : "#7e22ce",
+                        }}>{r.type}</span>
+                      </td>
                       <td className="py-2 px-3 tabular-nums whitespace-nowrap">{r.date}</td>
                       <td className="py-2 px-3 font-medium">{r.name}</td>
                       <td className="py-2 px-3">{r.grade}</td>
                       <td className="py-2 px-3">{r.counselor}</td>
-                      <td className="py-2 px-3">{r.branch}</td>
+                      <td className="py-2 px-3">{r.source}</td>
+                      <td className="py-2 px-3">{r.coaching || "—"}</td>
                     </tr>
                   ))}
                 </tbody>

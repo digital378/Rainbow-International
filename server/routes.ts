@@ -2044,7 +2044,7 @@ export async function registerRoutes(
       const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows] = await Promise.all([
         fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
         fetchSheetRange(SID, "'New Admission List'!A2:T500"),
-        fetchSheetRange(SID, "'Provisional Admission LIST'!A2:K200"),
+        fetchSheetRange(SID, "'Provisional Admission LIST'!A2:T200"),
         fetchSheetRange(SID, "'CONVERSION RATIO'!A4:R200"),
         fetchSheetRange(SID, "'RIS Target Sheet '!B13:N14"),   // achieved + target rows
         fetchSheetRange(SID, "'RIS Target Sheet '!B2:N2"),     // month header row
@@ -2198,20 +2198,36 @@ export async function registerRoutes(
       }
 
       // ── Provisional (pending confirmation, not yet in New Admission List) ──
-      // Cols: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=Contact 6=Counselor 7=Source 8=Status 10=Branch
-      let provTotal = 0, provThisMonth = 0;
-      const recentProvisional: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
+      // Sheet has two sections separated by a label row:
+      //   Row "REGULAR PROVISIONAL" → rows with Sr 1-4
+      //   Row "INTEGRATED PROVISIONAL" → rows with Sr 1-6
+      // Cols (data rows): 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=Contact
+      //                   6=Counselor 7=Source 8=Status 10=Branch 19=CoachingInstitute
+      let provRegular = 0, provIntegrated = 0, provThisMonth = 0;
+      let provSection: "Regular" | "Integrated" = "Regular";
+      const recentProvisional: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; type:string; coaching:string; sortKey:number}> = [];
       for (const r of provAdmRows) {
+        const sr = norm(r[0]);
+        if (!sr) continue;
+        // Section header or column header rows — not data rows
+        const srUpper = sr.toUpperCase();
+        if (srUpper.includes("PROVISIONAL") || srUpper.includes("SR NO") || isNaN(+sr)) {
+          if (srUpper.includes("INTEGRATED")) provSection = "Integrated";
+          continue;
+        }
         const name = norm(r[3]); if (!name) continue;
         const d = parseDate(r[1]);
         const grade = norm(r[4]) || "Unspecified";
         const counselor = norm(r[6]) || "Unassigned";
         const source = norm(r[7]) || "Unknown";
         const branch = normBranch(norm(r[10]));
-        provTotal++;
+        const coaching = norm(r[19]) || "";
+        if (provSection === "Regular") provRegular++;
+        else provIntegrated++;
         if (d && monthKey(d) === curMonthKey) provThisMonth++;
-        recentProvisional.push({ date: d ? d.toISOString().slice(0,10) : norm(r[1]), name, grade, counselor, source, branch, sortKey: d ? d.getTime() : 0 });
+        recentProvisional.push({ date: d ? d.toISOString().slice(0,10) : norm(r[1]), name, grade, counselor, source, branch, type: provSection, coaching, sortKey: d ? d.getTime() : 0 });
       }
+      const provTotal = provRegular + provIntegrated;
 
       // ── Conversion ratio (per-counselor authoritative) ─────────
       const conversionRatio: Array<{counselor:string; enquiries:number; closed:number; open:number; admissions:number; ratio:number}> = [];
@@ -2280,6 +2296,8 @@ export async function registerRoutes(
           admissionsTotal: admTotal,
           admissionsThisMonth: admThisMonth,
           provisionalCount: provTotal,
+          provisionalRegular: provRegular,
+          provisionalIntegrated: provIntegrated,
           provisionalThisMonth: provThisMonth,
           rpsRollover,
           overallConversion,
