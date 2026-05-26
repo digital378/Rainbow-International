@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
+  Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Area,
 } from "recharts";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
@@ -19,12 +19,23 @@ type SalesData = {
     walkinsThisMonth: number;
     admissionsTotal: number;
     admissionsThisMonth: number;
-    admissions: { ris: number; rollover: number; integrated: number; provisional: number };
-    admissionsMonth: { ris: number; rollover: number; integrated: number; provisional: number };
+    provisionalCount: number;
+    provisionalThisMonth: number;
+    rpsRollover: number;
     overallConversion: number;
     openEnquiries: number;
     closedEnquiries: number;
+    yearTarget: number;
+    yearAchieved: number;
+    yearTargetGap: number;
+    docsPending: number;
+    docsClear: number;
+    misDate: string;
+    misWalkins: number;
+    misAdmissions: number;
+    misTargetGap: number;
   };
+  monthlyTargets: Array<{ month: string; target: number; achieved: number; gap: number }>;
   walkins: {
     byMonth: Array<{ monthKey: string; month: string; count: number }>;
     bySource: Array<{ source: string; count: number }>;
@@ -33,13 +44,15 @@ type SalesData = {
     recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; status: string }>;
   };
   admissions: {
-    byMonth: Array<{ monthKey: string; month: string; ris: number; rollover: number; integrated: number; provisional: number; total: number }>;
+    byMonth: Array<{ monthKey: string; month: string; total: number }>;
     byBranch: Array<{ branch: string; count: number }>;
     byGrade: Array<{ grade: string; count: number }>;
     bySource: Array<{ source: string; count: number }>;
-    recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string; type: string }>;
+    byCounselor: Array<{ counselor: string; count: number }>;
+    recent: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string }>;
+    recentProvisional: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string }>;
   };
-  counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; conversion: number }>;
+  counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
   conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
 };
 
@@ -103,9 +116,9 @@ export default function Sales() {
 const fmt = (n: number) => n.toLocaleString("en-IN");
 const pct = (n: number) => `${n.toFixed(n >= 100 ? 0 : 1)}%`;
 
-function KpiCard({ label, value, sub, accent, testId }: { label: string; value: string | number; sub?: string; accent?: string; testId?: string }) {
+function KpiCard({ label, value, sub, accent, highlight, testId }: { label: string; value: string | number; sub?: string; accent?: string; highlight?: boolean; testId?: string }) {
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200" data-testid={testId}>
+    <div className={`bg-white rounded-xl p-5 shadow-sm border ${highlight ? "border-amber-400 border-2" : "border-slate-200"}`} data-testid={testId}>
       <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: SLATE }}>{label}</div>
       <div className="text-3xl font-black mt-1" style={{ color: accent || NAVY }}>{value}</div>
       {sub && <div className="text-xs mt-1 text-slate-500">{sub}</div>}
@@ -146,9 +159,7 @@ function SalesDashboard() {
     fetch("/api/sales/live")
       .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
       .then((d: SalesData) => {
-        if (!cancelled.current) {
-          setData(d); setError(null); setLastFetch(new Date());
-        }
+        if (!cancelled.current) { setData(d); setError(null); setLastFetch(new Date()); }
       })
       .catch((e) => { if (!cancelled.current) setError(String(e)); })
       .finally(() => { if (!cancelled.current) setLoading(false); });
@@ -184,7 +195,7 @@ function SalesDashboard() {
   }
   if (!data) return null;
 
-  const { kpis, walkins, admissions, counselorLeaderboard, conversionRatio } = data;
+  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio } = data;
 
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
@@ -202,47 +213,115 @@ function SalesDashboard() {
             {lastFetch ? `Updated: ${lastFetch.toLocaleTimeString()}` : ""}
             {loading && " · refreshing…"}
           </div>
-          <button
-            onClick={fetchData}
-            className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300"
-            data-testid="button-refresh"
-          >
-            Refresh
-          </button>
-          <button
-            onClick={() => { sessionStorage.removeItem(SALES_AUTH_KEY); window.location.reload(); }}
-            className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10"
-            data-testid="button-lock"
-          >
-            Lock
-          </button>
+          <button onClick={fetchData} className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300" data-testid="button-refresh">Refresh</button>
+          <button onClick={() => { sessionStorage.removeItem(SALES_AUTH_KEY); window.location.reload(); }} className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10" data-testid="button-lock">Lock</button>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto p-6 space-y-8">
-        {/* KPIs */}
-        <SectionTitle sub="Live from Google Sheets · auto-refresh every 5 min">Key Metrics</SectionTitle>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <KpiCard label="Walkins (Total)" value={fmt(kpis.walkinsTotal)} sub={`${kpis.walkinsThisMonth} this month`} testId="kpi-walkins-total" />
-          <KpiCard label="Admissions (Total)" value={fmt(kpis.admissionsTotal)} sub={`${kpis.admissionsThisMonth} this month`} accent={GREEN} testId="kpi-admissions-total" />
-          <KpiCard label="Conversion %" value={pct(kpis.overallConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
-          <KpiCard label="Open Enquiries" value={fmt(kpis.openEnquiries)} sub="Open + Follow up" accent={BLUE} testId="kpi-open" />
-          <KpiCard label="Closed Enquiries" value={fmt(kpis.closedEnquiries)} accent={RED} testId="kpi-closed" />
-          <KpiCard label="Provisional" value={fmt(kpis.admissions.provisional)} sub={`${kpis.admissionsMonth.provisional} this month`} accent={PURPLE} testId="kpi-provisional" />
-        </div>
 
-        {/* Admissions split */}
+        {/* KPIs Row 1 — Core Metrics */}
         <div>
-          <SectionTitle sub="All data is RIS — Rollover = RPS Preschool students joining RIS School">Admissions Split</SectionTitle>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KpiCard label="RIS (New)" value={fmt(kpis.admissions.ris)} sub={`${kpis.admissionsMonth.ris} this month`} testId="kpi-ris" />
-            <KpiCard label="RPS → RIS Rollover" value={fmt(kpis.admissions.rollover)} sub={`${kpis.admissionsMonth.rollover} this month`} accent={CYAN} testId="kpi-rollover" />
-            <KpiCard label="Integrated" value={fmt(kpis.admissions.integrated)} sub={`${kpis.admissionsMonth.integrated} this month`} accent={PURPLE} testId="kpi-int" />
-            <KpiCard label="Provisional" value={fmt(kpis.admissions.provisional)} sub={`${kpis.admissionsMonth.provisional} this month`} accent={AMBER} testId="kpi-prov" />
+          <SectionTitle sub="Live from Google Sheets · New Admission List is source of truth · auto-refresh every 5 min">Key Metrics</SectionTitle>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
+            <KpiCard label="Walkins (Total)" value={fmt(kpis.walkinsTotal)} sub={`${kpis.walkinsThisMonth} this month`} testId="kpi-walkins-total" />
+            <KpiCard label="Admissions (Confirmed)" value={fmt(kpis.admissionsTotal)} sub={`${kpis.admissionsThisMonth} this month`} accent={GREEN} testId="kpi-admissions-total" />
+            <KpiCard label="Conversion %" value={pct(kpis.overallConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
+            <KpiCard label="Provisional (Pending)" value={fmt(kpis.provisionalCount)} sub={`${kpis.provisionalThisMonth} this month · not yet confirmed`} accent={PURPLE} testId="kpi-provisional" />
+          </div>
+
+          {/* KPIs Row 2 — Target & Ops */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <KpiCard label="Year Target" value={fmt(kpis.yearTarget)} sub="Full AY 2026-27" testId="kpi-year-target" />
+            <KpiCard label="Year Achieved" value={fmt(kpis.yearAchieved)} sub="From Target Sheet" accent={GREEN} testId="kpi-year-achieved" />
+            <KpiCard label="Target Gap" value={fmt(kpis.yearTargetGap)} sub="Remaining to hit target" accent={RED} highlight testId="kpi-target-gap" />
+            <KpiCard label="RPS Rollover" value={fmt(kpis.rpsRollover)} sub="RPS preschool → RIS" accent={CYAN} testId="kpi-rps-rollover" />
+            <KpiCard label="Open Enquiries" value={fmt(kpis.openEnquiries)} sub="Open + Follow-up" accent={BLUE} testId="kpi-open" />
+            <KpiCard label="Docs Pending" value={fmt(kpis.docsPending)} sub={`${kpis.docsClear} clear · ${kpis.docsPending} outstanding`} accent={AMBER} testId="kpi-docs-pending" />
           </div>
         </div>
 
-        {/* Trends */}
+        {/* MIS Dashboard Banner */}
+        {kpis.misDate && (
+          <div className="bg-white rounded-xl p-5 border-l-4 border-amber-400 shadow-sm flex flex-wrap gap-6 items-center">
+            <div>
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">MIS Dashboard · as of {kpis.misDate}</div>
+              <div className="text-xs text-slate-400 mt-0.5">Daily operational tracker</div>
+            </div>
+            <div className="flex gap-8 flex-wrap">
+              <div><div className="text-xs text-slate-500">Cumulative Walkins</div><div className="text-2xl font-black" style={{ color: NAVY }}>{fmt(kpis.misWalkins)}</div></div>
+              <div><div className="text-xs text-slate-500">Admissions (incl. Provisional)</div><div className="text-2xl font-black" style={{ color: GREEN }}>{fmt(kpis.misAdmissions)}</div></div>
+              <div><div className="text-xs text-slate-500">Target Gap Remaining</div><div className="text-2xl font-black" style={{ color: RED }}>{fmt(kpis.misTargetGap)}</div></div>
+            </div>
+          </div>
+        )}
+
+        {/* Target vs Actual */}
+        <div>
+          <SectionTitle sub="Monthly admissions target vs achieved · From RIS Target Sheet">Target vs Actual — AY 2026-27</SectionTitle>
+          <div className="grid md:grid-cols-2 gap-4">
+            <ChartCard title="Monthly: Target vs Achieved" testId="chart-target-vs-actual">
+              <ComposedChart data={monthlyTargets}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="target" fill="#e2e8f0" name="Target" />
+                <Bar dataKey="achieved" fill={GREEN} name="Achieved" />
+                <Line type="monotone" dataKey="target" stroke={AMBER} strokeWidth={2} dot={false} name="Target Line" />
+              </ComposedChart>
+            </ChartCard>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+              <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>Month-by-Month Breakdown</div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs" data-testid="table-monthly-target">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 uppercase">
+                      <th className="text-left pb-2">Month</th>
+                      <th className="text-right pb-2">Target</th>
+                      <th className="text-right pb-2">Achieved</th>
+                      <th className="text-right pb-2">Gap</th>
+                      <th className="text-right pb-2">Hit?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyTargets.filter(m => m.target > 0).map((m) => (
+                      <tr key={m.month} className="border-t border-slate-100">
+                        <td className="py-1.5 font-medium">{m.month}</td>
+                        <td className="text-right py-1.5 tabular-nums">{m.target}</td>
+                        <td className="text-right py-1.5 tabular-nums font-bold" style={{ color: m.achieved > 0 ? GREEN : SLATE }}>{m.achieved}</td>
+                        <td className="text-right py-1.5 tabular-nums" style={{ color: m.gap > 0 ? RED : GREEN }}>{m.gap > 0 ? `-${m.gap}` : "✓"}</td>
+                        <td className="text-right py-1.5">
+                          {m.achieved > 0 ? (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: m.achieved >= m.target ? "#dcfce7" : "#fef3c7", color: m.achieved >= m.target ? GREEN : AMBER }}>
+                              {m.achieved >= m.target ? "✓ Met" : `${Math.round((m.achieved/m.target)*100)}%`}
+                            </span>
+                          ) : <span className="text-slate-300">—</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-slate-300 font-bold">
+                      <td className="pt-2">Total</td>
+                      <td className="text-right pt-2 tabular-nums">{kpis.yearTarget}</td>
+                      <td className="text-right pt-2 tabular-nums" style={{ color: GREEN }}>{kpis.yearAchieved}</td>
+                      <td className="text-right pt-2 tabular-nums" style={{ color: RED }}>-{kpis.yearTargetGap}</td>
+                      <td className="text-right pt-2">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: "#fef3c7", color: AMBER }}>
+                          {Math.round((kpis.yearAchieved / kpis.yearTarget) * 100)}%
+                        </span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Monthly Trends */}
         <div>
           <SectionTitle>Monthly Trends</SectionTitle>
           <div className="grid md:grid-cols-2 gap-4">
@@ -255,23 +334,19 @@ function SalesDashboard() {
                 <Line type="monotone" dataKey="count" stroke={NAVY} strokeWidth={2.5} dot={{ r: 4 }} name="Walkins" />
               </LineChart>
             </ChartCard>
-            <ChartCard title="Admissions by Month (stacked)" testId="chart-admissions-month">
-              <BarChart data={admissions.byMonth}>
+            <ChartCard title="Admissions by Month (Confirmed)" testId="chart-admissions-month">
+              <ComposedChart data={admissions.byMonth}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="ris" stackId="a" fill={NAVY} name="RIS New" />
-                <Bar dataKey="rollover" stackId="a" fill={CYAN} name="RPS→RIS Rollover" />
-                <Bar dataKey="integrated" stackId="a" fill={PURPLE} name="Integrated" />
-                <Bar dataKey="provisional" stackId="a" fill={AMBER} name="Provisional" />
-              </BarChart>
+                <Area type="monotone" dataKey="total" fill="#dcfce7" stroke={GREEN} strokeWidth={2} name="Admissions" />
+              </ComposedChart>
             </ChartCard>
           </div>
         </div>
 
-        {/* Source / Status / Grade */}
+        {/* Walkin Breakdowns */}
         <div>
           <SectionTitle>Walkin Breakdowns</SectionTitle>
           <div className="grid md:grid-cols-3 gap-4">
@@ -304,12 +379,12 @@ function SalesDashboard() {
           </div>
         </div>
 
-        {/* Admission breakdowns */}
+        {/* Admission Breakdowns */}
         <div>
-          <SectionTitle>Admission Breakdowns</SectionTitle>
+          <SectionTitle sub="Source: New Admission List (287 confirmed admissions)">Admission Breakdowns</SectionTitle>
           <div className="grid md:grid-cols-3 gap-4">
             <ChartCard title="Admissions by Source" testId="chart-adm-source">
-              <BarChart data={admissions.bySource.slice(0, 8)} layout="vertical">
+              <BarChart data={admissions.bySource.slice(0, 10)} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="source" tick={{ fontSize: 10 }} width={140} />
@@ -318,7 +393,7 @@ function SalesDashboard() {
               </BarChart>
             </ChartCard>
             <ChartCard title="Admissions by Grade" testId="chart-adm-grade">
-              <BarChart data={admissions.byGrade.slice(0, 10)} layout="vertical">
+              <BarChart data={admissions.byGrade.slice(0, 12)} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="grade" tick={{ fontSize: 10 }} width={120} />
@@ -340,14 +415,14 @@ function SalesDashboard() {
 
         {/* Counselor Leaderboard */}
         <div>
-          <SectionTitle sub="Derived from walkin status (Admission Done / Provisional / Closed / Follow up)">Counselor Leaderboard</SectionTitle>
+          <SectionTitle sub="Walkins & status from Walkin Sheet 26-27 · Confirmed admissions from New Admission List">Counselor Leaderboard</SectionTitle>
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
             <table className="w-full text-sm" data-testid="table-counselor">
               <thead className="bg-slate-50 text-xs uppercase text-slate-600">
                 <tr>
                   <th className="text-left py-3 px-4">Counsellor</th>
                   <th className="text-right py-3 px-3">Walkins</th>
-                  <th className="text-right py-3 px-3">Admissions</th>
+                  <th className="text-right py-3 px-3">Adm (Confirmed)</th>
                   <th className="text-right py-3 px-3">Provisional</th>
                   <th className="text-right py-3 px-3">Closed</th>
                   <th className="text-right py-3 px-3">Follow-up</th>
@@ -371,10 +446,10 @@ function SalesDashboard() {
           </div>
         </div>
 
-        {/* Authoritative conversion ratio sheet */}
+        {/* Authoritative Conversion Ratio */}
         {conversionRatio.length > 0 && (
           <div>
-            <SectionTitle sub="Direct from 'CONVERSION RATIO' sheet (Nursery to Grade 10)">Conversion Ratio (Authoritative)</SectionTitle>
+            <SectionTitle sub="Direct from 'CONVERSION RATIO' sheet">Conversion Ratio (Authoritative)</SectionTitle>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <table className="w-full text-sm" data-testid="table-conversion">
                 <thead className="bg-slate-50 text-xs uppercase text-slate-600">
@@ -407,7 +482,7 @@ function SalesDashboard() {
         {/* Recent Tables */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <SectionTitle sub="Latest 25">Recent Admissions</SectionTitle>
+            <SectionTitle sub="Latest 25 confirmed admissions">Recent Admissions</SectionTitle>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <table className="w-full text-xs" data-testid="table-recent-admissions">
                 <thead className="bg-slate-50 uppercase text-slate-600">
@@ -416,7 +491,7 @@ function SalesDashboard() {
                     <th className="text-left py-2 px-3">Name</th>
                     <th className="text-left py-2 px-3">Grade</th>
                     <th className="text-left py-2 px-3">Counsellor</th>
-                    <th className="text-left py-2 px-3">Type</th>
+                    <th className="text-left py-2 px-3">Source</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -427,10 +502,7 @@ function SalesDashboard() {
                       <td className="py-2 px-3">{r.grade}</td>
                       <td className="py-2 px-3">{r.counselor}</td>
                       <td className="py-2 px-3">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold" style={{
-                          background: r.type === "RIS" ? "#dbeafe" : r.type === "Rollover" ? "#cffafe" : r.type === "Integrated" ? "#ede9fe" : "#fef3c7",
-                          color: r.type === "RIS" ? NAVY : r.type === "Rollover" ? CYAN : r.type === "Integrated" ? PURPLE : AMBER,
-                        }}>{r.type === "Rollover" ? "RPS→RIS" : r.type}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">{r.source}</span>
                       </td>
                     </tr>
                   ))}
@@ -439,7 +511,7 @@ function SalesDashboard() {
             </div>
           </div>
           <div>
-            <SectionTitle sub="Latest 25">Recent Walkins</SectionTitle>
+            <SectionTitle sub="Latest 25 walkin enquiries">Recent Walkins</SectionTitle>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <table className="w-full text-xs" data-testid="table-recent-walkins">
                 <thead className="bg-slate-50 uppercase text-slate-600">
@@ -459,9 +531,9 @@ function SalesDashboard() {
                       <td className="py-2 px-3">{r.grade}</td>
                       <td className="py-2 px-3">{r.counselor}</td>
                       <td className="py-2 px-3">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold" style={{
-                          background: r.status.includes("ADMIS") ? "#dcfce7" : r.status.includes("CLOSED") ? "#fee2e2" : r.status.includes("FOLLOW") ? "#dbeafe" : "#fef3c7",
-                          color: r.status.includes("ADMIS") ? GREEN : r.status.includes("CLOSED") ? RED : r.status.includes("FOLLOW") ? BLUE : AMBER,
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold" style={{
+                          background: r.status.includes("ADMIS") ? "#dcfce7" : r.status.includes("CLOSED") ? "#fee2e2" : r.status.includes("PROV") ? "#ede9fe" : "#f1f5f9",
+                          color: r.status.includes("ADMIS") ? GREEN : r.status.includes("CLOSED") ? RED : r.status.includes("PROV") ? PURPLE : SLATE,
                         }}>{r.status}</span>
                       </td>
                     </tr>
@@ -472,8 +544,39 @@ function SalesDashboard() {
           </div>
         </div>
 
-        <div className="text-center text-xs text-slate-400 py-4">
-          Data source: 2026-27 Walkin Enquiries · Generated {new Date(data.generatedAt).toLocaleString()}
+        {/* Provisional pending */}
+        {admissions.recentProvisional.length > 0 && (
+          <div>
+            <SectionTitle sub="Students provisionally admitted · not yet confirmed in New Admission List">Provisional (Pending Confirmation)</SectionTitle>
+            <div className="bg-white rounded-xl shadow-sm border border-purple-200 overflow-x-auto">
+              <table className="w-full text-xs" data-testid="table-provisional">
+                <thead className="bg-purple-50 uppercase text-purple-700">
+                  <tr>
+                    <th className="text-left py-2 px-3">Date</th>
+                    <th className="text-left py-2 px-3">Name</th>
+                    <th className="text-left py-2 px-3">Grade</th>
+                    <th className="text-left py-2 px-3">Counsellor</th>
+                    <th className="text-left py-2 px-3">Branch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {admissions.recentProvisional.map((r, i) => (
+                    <tr key={i} className="border-t border-purple-100">
+                      <td className="py-2 px-3 tabular-nums whitespace-nowrap">{r.date}</td>
+                      <td className="py-2 px-3 font-medium">{r.name}</td>
+                      <td className="py-2 px-3">{r.grade}</td>
+                      <td className="py-2 px-3">{r.counselor}</td>
+                      <td className="py-2 px-3">{r.branch}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <div className="text-xs text-slate-400 text-center pb-4">
+          Data sourced from Google Sheets · Generated {new Date(data.generatedAt).toLocaleString()} · Internal use only
         </div>
       </div>
     </div>

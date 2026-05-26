@@ -2041,13 +2041,14 @@ export async function registerRoutes(
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
       const SID = SHEET_IDS.sales;
-      const [walkinRows, admRows, rpsAdmRows, intAdmRows, provAdmRows, convRows] = await Promise.all([
+      const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows] = await Promise.all([
         fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
-        fetchSheetRange(SID, "'New Admission List'!A2:N5000"),
-        fetchSheetRange(SID, "'RPS ADMISSIONS'!A2:L5000"),
-        fetchSheetRange(SID, "'INTEGRATED ADMISSIONS '!A2:N5000"),
-        fetchSheetRange(SID, "'Provisional Admission LIST'!A2:S5000"),
+        fetchSheetRange(SID, "'New Admission List'!A2:T500"),
+        fetchSheetRange(SID, "'Provisional Admission LIST'!A2:K200"),
         fetchSheetRange(SID, "'CONVERSION RATIO'!A4:R200"),
+        fetchSheetRange(SID, "'RIS Target Sheet '!B13:N14"),   // achieved + target rows
+        fetchSheetRange(SID, "'RIS Target Sheet '!B2:N2"),     // month header row
+        fetchSheetRange(SID, "'MIS DASHBOARD'!A4:E300"),       // daily MIS rows
       ]);
 
       // ── helpers ────────────────────────────────────────────────
@@ -2120,126 +2121,143 @@ export async function registerRoutes(
         });
       }
 
-      // ── Admissions (RIS new, Rollover RPS→RIS, Integrated, Provisional) ─────
-      const admByMonth = new Map<string,{label:string; ris:number; rollover:number; integrated:number; provisional:number}>();
+      // ── Admissions (New Admission List = single source of truth = 287 confirmed) ──
+      // Cols: 0=Sr 1=Date 2=? 3=Week 4=Month 5=Name 6=? 7=Grade 8=Contact
+      //       9=Source 10=Revisit 11=Branch 12=Counselor 16=Pendency
+      const normBranch = (b: string): string => {
+        const v = b.replace(/^RPS\s+/i, "").trim().toLowerCase();
+        const MAP: Record<string,string> = {
+          "na": "Main", "": "Main",
+          "agarwal": "Agarwal", "agrawal": "Agarwal", "agrawal ": "Agarwal",
+          "dhokali": "Dhokali",
+          "kasarwadavali": "Kasarwadavali",
+          "anandnagar": "Anand Nagar", "anand nagar": "Anand Nagar",
+          "hariniwas": "Hariniwas",
+          "kalwa": "Kalwa",
+          "ris": "Main",
+        };
+        return MAP[v] || b.trim() || "Main";
+      };
+      // Map text month names (from MONTH col) to YYYY-MM keys
+      const MONTH_KEYS: Record<string,string> = {
+        "oct":  "2025-10", "november":"2025-11", "nov":"2025-11",
+        "dec":  "2025-12", "january": "2026-01", "jan":"2026-01",
+        "feb":  "2026-02", "february":"2026-02",
+        "mar":  "2026-03", "march":   "2026-03",
+        "apr":  "2026-04", "april":   "2026-04",
+        "may":  "2026-05",
+        "jun":  "2026-06", "june":    "2026-06",
+        "jul":  "2026-07", "july":    "2026-07",
+        "aug":  "2026-08", "august":  "2026-08",
+        "sep":  "2026-09", "september":"2026-09",
+      };
+      const MONTH_LABELS: Record<string,string> = {
+        "2025-10":"Oct '25","2025-11":"Nov '25","2025-12":"Dec '25",
+        "2026-01":"Jan '26","2026-02":"Feb '26","2026-03":"Mar '26",
+        "2026-04":"Apr '26","2026-05":"May '26","2026-06":"Jun '26",
+        "2026-07":"Jul '26","2026-08":"Aug '26","2026-09":"Sep '26",
+      };
+
+      const admByMonth  = new Map<string,{label:string; total:number}>();
       const admByBranch = new Map<string,number>();
       const admByGrade  = new Map<string,number>();
       const admBySource = new Map<string,number>();
-      const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; type:string; sortKey:number}> = [];
-      let risTot = 0, rolloverTot = 0, intTot = 0, provTot = 0;
-      let risMo = 0, rolloverMo = 0, intMo = 0, provMo = 0;
+      const admByCounselor = new Map<string,number>();
+      const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
+      let admTotal = 0, admThisMonth = 0, rpsRollover = 0, docsClear = 0, docsPending = 0;
 
-      // Normalize branch names: strip "RPS " prefix for display
-      const normBranch = (b: string) => b.replace(/^RPS\s+/i, "").trim() || "Main";
-
-      const bumpAdmMonth = (d: Date | null, kind: "ris"|"rollover"|"integrated"|"provisional") => {
-        if (!d) return;
-        const mk = monthKey(d);
-        const cur = admByMonth.get(mk) || { label: monthLabel(d), ris:0, rollover:0, integrated:0, provisional:0 };
-        cur[kind]++;
-        admByMonth.set(mk, cur);
-      };
-
-      // RIS New Admissions: 0=Sr 1=Date 2=? 3=Week 4=Month 5=Name 6=? 7=Grade 8=Contact 9=Source 10=Revisit/Spot 11=Branch 12=Counselor
       for (const r of admRows) {
-        if (isEmptyRow(r)) continue;
-        const name = norm(r[5]); if (!name) continue;
+        const name = norm(r[5]); if (!name) continue;       // col 5 = student name
         const d = parseDate(r[1]);
+        const monthText = norm(r[4]).toLowerCase();
+        const mk = d ? monthKey(d) : (MONTH_KEYS[monthText] || "");
+        const label = mk ? (MONTH_LABELS[mk] || mk) : "";
         const grade = norm(r[7]) || "Unspecified";
         const source = norm(r[9]) || "Unknown";
-        const branch = norm(r[11]) || "RIS Main";
+        const rawBranch = norm(r[11]);
+        const branch = normBranch(rawBranch);
         const counselor = norm(r[12]) || "Unassigned";
-        risTot++; if (d && monthKey(d) === curMonthKey) risMo++;
-        bumpAdmMonth(d, "ris");
+        const pend = upper(r[16]);
+        admTotal++;
+        if (mk === curMonthKey) admThisMonth++;
+        if (source === "RPS Student") rpsRollover++;
+        if (pend === "CLEAR CASE" || pend === "CLEAR") docsClear++; else docsPending++;
+        if (mk) {
+          const cur = admByMonth.get(mk) || { label, total: 0 };
+          cur.total++; admByMonth.set(mk, cur);
+        }
         incBy(admByBranch, branch);
         incBy(admByGrade, grade);
         incBy(admBySource, source);
+        incBy(admByCounselor, counselor);
         recentAdmissions.push({
           date: d ? d.toISOString().slice(0,10) : norm(r[1]),
-          name, grade, counselor, source, branch, type: "RIS",
+          name, grade, counselor, source, branch,
           sortKey: d ? d.getTime() : 0,
         });
       }
 
-      // Rollover Admissions (RPS Preschool → RIS School): 0=Sr 1=Date 2=Month 3=AY 4=Name 5=Grade 6=Contact 7=Source 8=Counselor 9=Master 10=Branch
-      for (const r of rpsAdmRows) {
-        if (isEmptyRow(r)) continue;
-        const name = norm(r[4]); if (!name) continue;
-        const d = parseDate(r[1]);
-        const grade = norm(r[5]) || "Unspecified";
-        const source = norm(r[7]) || "Unknown";
-        const counselor = norm(r[8]) || "Unassigned";
-        const rawBranch = norm(r[10]);
-        const branch = normBranch(rawBranch) || "RPS";
-        rolloverTot++; if (d && monthKey(d) === curMonthKey) rolloverMo++;
-        bumpAdmMonth(d, "rollover");
-        incBy(admByBranch, `Rollover: ${branch}`);
-        incBy(admByGrade, grade);
-        incBy(admBySource, source);
-        recentAdmissions.push({
-          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
-          name, grade, counselor, source, branch: `Rollover: ${branch}`, type: "Rollover",
-          sortKey: d ? d.getTime() : 0,
-        });
-      }
-
-      // Integrated Admissions: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=AY 6=Classes 7=Visited 8=Counselor 9=Subject 10=Master 11=Pendency 12=Cancellation 13=DateOfAdmission
-      for (const r of intAdmRows) {
-        if (isEmptyRow(r)) continue;
-        const name = norm(r[3]); if (!name) continue;
-        const d = parseDate(r[13]) || parseDate(r[1]);
-        const grade = norm(r[4]) || "Unspecified";
-        const counselor = norm(r[8]) || "Unassigned";
-        intTot++; if (d && monthKey(d) === curMonthKey) intMo++;
-        bumpAdmMonth(d, "integrated");
-        incBy(admByBranch, "Integrated");
-        incBy(admByGrade, grade);
-        recentAdmissions.push({
-          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
-          name, grade, counselor, source: "Integrated", branch: "Integrated", type: "Integrated",
-          sortKey: d ? d.getTime() : 0,
-        });
-      }
-
-      // Provisional: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=Contact 6=Counselor 7=Source 8=Status 9=Revisit/Spot 10=Branch
+      // ── Provisional (pending confirmation, not yet in New Admission List) ──
+      // Cols: 0=Sr 1=Date 2=Month 3=Name 4=Grade 5=Contact 6=Counselor 7=Source 8=Status 10=Branch
+      let provTotal = 0, provThisMonth = 0;
+      const recentProvisional: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
       for (const r of provAdmRows) {
-        if (isEmptyRow(r)) continue;
         const name = norm(r[3]); if (!name) continue;
         const d = parseDate(r[1]);
         const grade = norm(r[4]) || "Unspecified";
-        const source = norm(r[7]) || "Unknown";
         const counselor = norm(r[6]) || "Unassigned";
-        const branch = norm(r[10]) || "RIS";
-        provTot++; if (d && monthKey(d) === curMonthKey) provMo++;
-        bumpAdmMonth(d, "provisional");
-        recentAdmissions.push({
-          date: d ? d.toISOString().slice(0,10) : norm(r[1]),
-          name, grade, counselor, source, branch, type: "Provisional",
-          sortKey: d ? d.getTime() : 0,
-        });
+        const source = norm(r[7]) || "Unknown";
+        const branch = normBranch(norm(r[10]));
+        provTotal++;
+        if (d && monthKey(d) === curMonthKey) provThisMonth++;
+        recentProvisional.push({ date: d ? d.toISOString().slice(0,10) : norm(r[1]), name, grade, counselor, source, branch, sortKey: d ? d.getTime() : 0 });
       }
 
       // ── Conversion ratio (per-counselor authoritative) ─────────
-      // R4+ cols: 0=Sr 1=Name 2=Total 3=Open 4=Closed 5=Admission 6=Ratio%
       const conversionRatio: Array<{counselor:string; enquiries:number; closed:number; open:number; admissions:number; ratio:number}> = [];
       for (const r of convRows) {
         if (isEmptyRow(r)) continue;
         const nm = norm(r[1]); if (!nm || nm.toLowerCase().includes("name")) continue;
         const enq = +norm(r[2]) || 0; if (!enq) continue;
         conversionRatio.push({
-          counselor: nm,
-          enquiries: enq,
-          open: +norm(r[3]) || 0,
-          closed: +norm(r[4]) || 0,
+          counselor: nm, enquiries: enq,
+          open: +norm(r[3]) || 0, closed: +norm(r[4]) || 0,
           admissions: +norm(r[5]) || 0,
           ratio: Math.round((+norm(r[6]) || 0) * 100) / 100,
         });
       }
 
-      // ── shape outputs ──────────────────────────────────────────
+      // ── Target Sheet (monthly target vs achieved) ──────────────
+      // targetAchRows[0] = achieved row (B13:N13), targetAchRows[1] = target row (B14:N14)
+      // Cols idx 1-11 = Oct-25 through Aug-26; idx 0=label, idx 12=Total
+      const TARGET_MONTHS = ["Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26","Aug-26"];
+      const achRow  = targetAchRows[0] || [];
+      const tgtRow  = targetAchRows[1] || [];
+      const monthlyTargets = TARGET_MONTHS.map((mo, i) => ({
+        month: mo,
+        target: +norm(tgtRow[i + 1]) || 0,
+        achieved: +norm(achRow[i + 1]) || 0,
+        gap: Math.max(0, (+norm(tgtRow[i + 1]) || 0) - (+norm(achRow[i + 1]) || 0)),
+      }));
+      const yearTarget = +norm(tgtRow[12]) || 0;
+      const yearAchieved = monthlyTargets.reduce((s, m) => s + m.achieved, 0);
+      const yearTargetGap = Math.max(0, yearTarget - yearAchieved);
+
+      // ── MIS Dashboard (latest day's ops data) ─────────────────
+      const misDateRows = misDashRows.filter((r: any[]) => r[0] && /\d{1,2}\.\d{2}\.\d{4}/.test(norm(r[0])) && norm(r[1]));
+      const lastMIS = misDateRows[misDateRows.length - 1] || [];
+      const misData = {
+        date: norm(lastMIS[0]) || "",
+        walkins: +norm(lastMIS[1]) || 0,
+        admissions: +norm(lastMIS[2]) || 0,
+        targetGap: +norm(lastMIS[3]) || 0,
+      };
+
+      // ── Shape outputs ──────────────────────────────────────────
       const sortedMonths = (m: Map<string,any>) => Array.from(m.entries()).sort((a,b) => a[0].localeCompare(b[0]));
       recentWalkins.sort((a,b) => b.sortKey - a.sortKey);
       recentAdmissions.sort((a,b) => b.sortKey - a.sortKey);
+      recentProvisional.sort((a,b) => b.sortKey - a.sortKey);
 
       const counselorLeaderboard = Array.from(counselorMap, ([name, a]) => ({
         counselor: name,
@@ -2248,26 +2266,36 @@ export async function registerRoutes(
         provisional: a.provisional,
         closed: a.closed,
         followup: a.followup,
+        admFromList: admByCounselor.get(name) || 0,
         conversion: a.walkins ? Math.round(((a.admissions + a.provisional) / a.walkins) * 10000) / 100 : 0,
-      })).sort((a,b) => b.admissions - a.admissions);
+      })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0);
 
-      const admissionsTotal = risTot + rolloverTot + intTot + provTot;
-      const admissionsThisMonth = risMo + rolloverMo + intMo + provMo;
-      const overallConversion = walkinsTotal ? Math.round((admissionsTotal / walkinsTotal) * 10000) / 100 : 0;
+      const overallConversion = walkinsTotal ? Math.round((admTotal / walkinsTotal) * 10000) / 100 : 0;
 
       res.json({
         generatedAt: new Date().toISOString(),
         kpis: {
           walkinsTotal,
           walkinsThisMonth,
-          admissionsTotal,
-          admissionsThisMonth,
-          admissions: { ris: risTot, rollover: rolloverTot, integrated: intTot, provisional: provTot },
-          admissionsMonth: { ris: risMo, rollover: rolloverMo, integrated: intMo, provisional: provMo },
+          admissionsTotal: admTotal,
+          admissionsThisMonth: admThisMonth,
+          provisionalCount: provTotal,
+          provisionalThisMonth: provThisMonth,
+          rpsRollover,
           overallConversion,
           openEnquiries: (statusMap.get("OPEN") || 0) + (statusMap.get("FOLLOW UP") || 0) + (statusMap.get("FOLLOWUP") || 0),
           closedEnquiries: statusMap.get("CLOSED") || 0,
+          yearTarget,
+          yearAchieved,
+          yearTargetGap,
+          docsPending,
+          docsClear,
+          misDate: misData.date,
+          misWalkins: misData.walkins,
+          misAdmissions: misData.admissions,
+          misTargetGap: misData.targetGap,
         },
+        monthlyTargets,
         walkins: {
           byMonth: sortedMonths(walkinByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, count: v.count })),
           bySource: sortByCount(sourceMap).map(x => ({ source: x.key, count: x.count })),
@@ -2276,11 +2304,13 @@ export async function registerRoutes(
           recent: recentWalkins.slice(0, 25).map(({sortKey, ...rest}) => rest),
         },
         admissions: {
-          byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, ris: v.ris, rps: v.rps, integrated: v.integrated, provisional: v.provisional, total: v.ris+v.rps+v.integrated+v.provisional })),
+          byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, total: v.total })),
           byBranch: sortByCount(admByBranch).map(x => ({ branch: x.key, count: x.count })),
           byGrade: sortByCount(admByGrade).map(x => ({ grade: x.key, count: x.count })),
           bySource: sortByCount(admBySource).map(x => ({ source: x.key, count: x.count })),
+          byCounselor: sortByCount(admByCounselor).map(x => ({ counselor: x.key, count: x.count })),
           recent: recentAdmissions.slice(0, 25).map(({sortKey, ...rest}) => rest),
+          recentProvisional: recentProvisional.slice(0, 10).map(({sortKey, ...rest}) => rest),
         },
         counselorLeaderboard,
         conversionRatio,
