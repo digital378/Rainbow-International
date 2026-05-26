@@ -1,0 +1,37 @@
+## Lead Temperature Progression  – Rainbow International School  (YTD Jun 25 → May 26)
+
+| Temperature | SOP Definition | # Leads | Share of Pipeline | Immediate Action |
+|-------------|----------------|---------|-------------------|------------------|
+| 🔴 **Hot (Admitted)** | Application, interview & full fee **received**. CRM status = **Admission Done**. | **287** | **34 %** | Issue welcome pack ➜ add to orientation list within 48 h. |
+| 🟣 **Provisional** | Application & interview **cleared**; **fee / docs pending** ≤ 7 days. CRM status = **Application Initiated**. | **4** | 0 % | Daily reminder SMS + counsellor call; escalate to Branch Head on day 5. |
+| 🟡 **Warm (Follow-up)** | At least one counselling/tour complete, parent **undecided**. Next follow-up booked within 24 h. | **31** | 4 % | Send personalised value email; second follow-up call ≤ 72 h; invite to next open-house. |
+| 🟢 **Open (New)** | New enquiry **not yet contacted**. CRM status = **New**. | **5** | 1 % | Call within 30 min, WhatsApp intro, book campus visit. |
+| 🔵 **Cold (Closed)** | Lead **lost / not interested / duplicate** after ≥ 3 attempts. CRM status = **Closed**. | **515** | 61 % | Tag lost-reason; add to quarterly re-nurture campaign. |
+
+### Counsellor Walk-in Totals (YTD)
+
+| Counsellor | Walk-ins Handled |
+|------------|------------------|
+| Srishti | **347** |
+| Sheetal | 113 |
+| Lavina | 101 |
+| Kavya | 97 |
+| Pradnya | 57 |
+| Anagha | 56 |
+| Shweta | 38 |
+| Swarika Ma’am | 28 |
+
+*Highlights*  
+- **Srishti** drives the largest volume and shows consistently high **Hot-lead months** (Nov 25, Dec 25, Jan 26).  
+- **Kavya** improved from zero activity to **39 warm leads in Mar 26** and **26 open leads in May 26** — priority for conversion support.  
+- **Sheetal & Lavina** maintain steady flow but have a higher proportion of **Cold** outcomes; schedule a coaching review on objection-handling.
+
+### Funnel Health Notes
+1. The **Hot : Warm ratio is 9 : 1**, indicating strong closing but limited middle-funnel stock; replenish with remarketing & counsellor callbacks.  
+2. **Cold leads exceed 60 %** of YTD traffic — activate lost-reason analysis and target the top two reversible reasons with fee-breakdown explainer mails.  
+3. Maintain SLA from the SOP:  
+   - New lead contact ≤ 30 min.  
+   - First follow-up on Warm leads ≤ 24 h; second ≤ 72 h.  
+   - Provisional leads closed within 7 days.
+
+> **Copy-paste this block into the “Lead Temperature Heatmap” commentary section of the dashboard.** It aligns with the Sales SOP states (“Hot/Provisional/Warm/Open/Cold”) and mirrors the figures displayed in the current heat-map screenshot.

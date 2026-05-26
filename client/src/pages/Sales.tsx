@@ -715,6 +715,119 @@ function SalesDashboard() {
                 <span>🟢 Green = mostly new open leads</span>
                 <span>Number = total walkins in that cell</span>
               </div>
+
+              {/* SOP Commentary Panel */}
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
+                {/* SOP Definitions table */}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100" style={{ background: NAVY }}>
+                    <div className="text-sm font-black text-white tracking-tight">Lead Temperature SOP — AY 2026-27</div>
+                    <div className="text-xs text-blue-200 mt-0.5">CRM status definitions & immediate actions</div>
+                  </div>
+                  <table className="w-full text-xs">
+                    <thead className="bg-slate-50 text-slate-500 uppercase">
+                      <tr>
+                        <th className="text-left py-2 px-3">Temperature</th>
+                        <th className="text-right py-2 px-3">Count</th>
+                        <th className="text-right py-2 px-3">Share</th>
+                        <th className="text-left py-2 px-3">Immediate Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        {
+                          icon: "🔴", label: "Hot (Admitted)", count: leadTemperature.hot, color: "#dc2626", bg: "#fef2f2",
+                          def: "Application, interview & full fee received. CRM = Admission Done.",
+                          action: "Issue welcome pack → add to orientation list within 48 h.",
+                        },
+                        {
+                          icon: "🟣", label: "Provisional", count: leadTemperature.provisional, color: "#7c3aed", bg: "#faf5ff",
+                          def: "Application & interview cleared; fee / docs pending ≤ 7 days. CRM = Application Initiated.",
+                          action: "Daily reminder SMS + counsellor call; escalate to Branch Head on day 5.",
+                        },
+                        {
+                          icon: "🟡", label: "Warm (Follow-up)", count: leadTemperature.warm, color: "#d97706", bg: "#fffbeb",
+                          def: "At least one counselling/tour complete, parent undecided. Next follow-up booked within 24 h.",
+                          action: "Personalised value email; second follow-up call ≤ 72 h; invite to next open-house.",
+                        },
+                        {
+                          icon: "🟢", label: "Open (New)", count: leadTemperature.open, color: "#059669", bg: "#f0fdf4",
+                          def: "New enquiry not yet contacted. CRM = New.",
+                          action: "Call within 30 min, WhatsApp intro, book campus visit.",
+                        },
+                        {
+                          icon: "🔵", label: "Cold (Closed)", count: leadTemperature.cold, color: "#2563eb", bg: "#eff6ff",
+                          def: "Lead lost / not interested / duplicate after ≥ 3 attempts. CRM = Closed.",
+                          action: "Tag lost-reason; add to quarterly re-nurture campaign.",
+                        },
+                      ].map(t => (
+                        <tr key={t.label} className="border-t border-slate-100 align-top" style={{ background: t.bg + "55" }}>
+                          <td className="py-2.5 px-3">
+                            <div className="font-bold" style={{ color: t.color }}>{t.icon} {t.label}</div>
+                            <div className="text-slate-500 mt-0.5 leading-relaxed">{t.def}</div>
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-black tabular-nums" style={{ color: t.color }}>{t.count}</td>
+                          <td className="py-2.5 px-3 text-right tabular-nums text-slate-500">{total > 0 ? Math.round(t.count / total * 100) : 0}%</td>
+                          <td className="py-2.5 px-3 text-slate-600 leading-relaxed">{t.action}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Funnel health + counselor highlights */}
+                <div className="flex flex-col gap-4">
+                  {/* Funnel Health */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div className="text-sm font-black mb-3" style={{ color: NAVY }}>Funnel Health Notes</div>
+                    <ol className="space-y-3 text-xs text-slate-700 list-none">
+                      <li className="flex gap-2">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px]" style={{ background: RED }}>1</span>
+                        <span>
+                          <strong>Hot : Warm ratio is {leadTemperature.warm > 0 ? Math.round(leadTemperature.hot / leadTemperature.warm) : "∞"} : 1</strong> — strong closing but limited middle-funnel stock; replenish with remarketing &amp; counsellor callbacks.
+                        </span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px]" style={{ background: BLUE }}>2</span>
+                        <span>
+                          <strong>Cold leads = {total > 0 ? Math.round(leadTemperature.cold / total * 100) : 0}% of YTD traffic</strong> — activate lost-reason analysis and target the top two reversible reasons with fee-breakdown explainer mails.
+                        </span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-[10px]" style={{ background: AMBER }}>3</span>
+                        <span>
+                          <strong>SLA targets to maintain:</strong> New lead contact ≤ 30 min · First follow-up on Warm leads ≤ 24 h; second ≤ 72 h · Provisional leads closed within 7 days.
+                        </span>
+                      </li>
+                    </ol>
+                  </div>
+                  {/* Counselor Highlights */}
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                    <div className="text-sm font-black mb-3" style={{ color: NAVY }}>Counsellor Highlights</div>
+                    <ul className="space-y-2 text-xs text-slate-700">
+                      {heatGrid.slice(0, 4).map((row, i) => {
+                        const hotPct = row.totals.total > 0 ? Math.round(row.totals.hot / row.totals.total * 100) : 0;
+                        const coldPct = row.totals.total > 0 ? Math.round(row.totals.cold / row.totals.total * 100) : 0;
+                        const badge = hotPct >= 40 ? { label: "Strong Closer", color: RED, bg: "#fef2f2" }
+                          : coldPct >= 60 ? { label: "Review Needed", color: BLUE, bg: "#eff6ff" }
+                          : { label: "Active", color: "#059669", bg: "#f0fdf4" };
+                        return (
+                          <li key={row.counselor} className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-slate-800">{i + 1}. {row.counselor}</span>
+                            <span className="flex items-center gap-2 text-slate-500">
+                              <span className="tabular-nums">{row.totals.total} walkins</span>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: badge.bg, color: badge.color }}>{badge.label}</span>
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-400">
+                      Badge logic: Strong Closer = ≥40% hot leads · Review Needed = ≥60% cold · Active otherwise
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })()}
