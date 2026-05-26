@@ -2088,12 +2088,23 @@ export async function registerRoutes(
       const counselorMap = new Map<string, CounselorAgg>();
       const recentWalkins: Array<{date:string; name:string; grade:string; counselor:string; source:string; status:string; sortKey:number}> = [];
       const closedSegmentMap = new Map<string,number>();
+      // Lead temperature classification
+      type HeatCell = { hot: number; warm: number; cold: number; provisional: number; open: number };
+      const heatGridMap = new Map<string, Map<string, HeatCell>>();
+      let tempHot = 0, tempWarm = 0, tempCold = 0, tempProvisional = 0, tempOpen = 0;
+      const leadTemp = (st: string): "hot"|"warm"|"cold"|"provisional"|"open" => {
+        if (st.includes("ADMIS") && !st.includes("PROV")) return "hot";
+        if (st.includes("PROV")) return "provisional";
+        if (st.includes("FOLLOW")) return "warm";
+        if (st.includes("CLOSED")) return "cold";
+        return "open";
+      };
       let walkinsTotal = 0, walkinsThisMonth = 0;
 
       // Maps raw "REASON OF CLOSING" (col 13) → curated segment name
       const closedSegment = (raw: string): string => {
         const r = raw.toLowerCase().trim();
-        if (!r) return "Admission Done";   // closed with no reason = admission completed
+        if (!r) return "No Reason Recorded";
         if (r.includes("relocat")) return "Location / Not in Catchment";
         if (r.includes("distance")) return "Distance / Too Far";
         if (r.includes("taken") || r.includes("same school") || r.includes("pre-school") || r.includes("pre- school") || r.includes("preschool")) return "Joined Another School";
@@ -2122,6 +2133,20 @@ export async function registerRoutes(
         const source = norm(r[8]) || "Unknown";
         const status = upper(r[9]) || "OPEN";
         const grade = norm(r[4]) || "Unspecified";
+        const temp = leadTemp(status);
+        if (temp === "hot") tempHot++;
+        else if (temp === "warm") tempWarm++;
+        else if (temp === "cold") tempCold++;
+        else if (temp === "provisional") tempProvisional++;
+        else tempOpen++;
+        if (d) {
+          const mk = monthKey(d);
+          const cgrid = heatGridMap.get(counselor) || new Map<string, HeatCell>();
+          const cell = cgrid.get(mk) || { hot:0, warm:0, cold:0, provisional:0, open:0 };
+          cell[temp]++;
+          cgrid.set(mk, cell);
+          heatGridMap.set(counselor, cgrid);
+        }
         walkinsTotal++;
         if (d && monthKey(d) === curMonthKey) walkinsThisMonth++;
         incBy(sourceMap, source);
@@ -2168,6 +2193,26 @@ export async function registerRoutes(
         }
       }
       const closedReasonSegments = sortByCount(closedSegmentMap).map(x => ({ segment: x.key, count: x.count }));
+
+      // Build heatmap grid: counselor × month cells
+      const heatGridArr = Array.from(heatGridMap.entries())
+        .map(([counselor, monthMap]) => {
+          const months = Array.from(monthMap.entries()).map(([mk, cell]) => ({
+            monthKey: mk,
+            hot: cell.hot, warm: cell.warm, cold: cell.cold,
+            provisional: cell.provisional, open: cell.open,
+            total: cell.hot + cell.warm + cell.cold + cell.provisional + cell.open,
+          }));
+          const totals = months.reduce((acc, m) => ({
+            hot: acc.hot + m.hot, warm: acc.warm + m.warm, cold: acc.cold + m.cold,
+            provisional: acc.provisional + m.provisional, open: acc.open + m.open,
+            total: acc.total + m.total,
+          }), { hot:0, warm:0, cold:0, provisional:0, open:0, total:0 });
+          return { counselor, months, totals };
+        })
+        .sort((a, b) => b.totals.total - a.totals.total)
+        .filter(c => c.totals.total >= 3);
+      const leadTemperature = { hot: tempHot, warm: tempWarm, cold: tempCold, provisional: tempProvisional, open: tempOpen };
 
       // ── Admissions (New Admission List = single source of truth = 287 confirmed) ──
       // Cols: 0=Sr 1=Date 2=? 3=Week 4=Month 5=Name 6=? 7=Grade 8=Contact
@@ -2407,6 +2452,8 @@ export async function registerRoutes(
         counselorLeaderboard,
         conversionRatio,
         monthBreakdown,
+        leadTemperature,
+        heatGrid: heatGridArr,
       });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch sales data", error: err.message });

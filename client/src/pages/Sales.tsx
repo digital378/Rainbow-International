@@ -57,6 +57,12 @@ type SalesData = {
   };
   counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
   conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
+  leadTemperature: { hot: number; warm: number; cold: number; provisional: number; open: number };
+  heatGrid: Array<{
+    counselor: string;
+    months: Array<{ monthKey: string; hot: number; warm: number; cold: number; provisional: number; open: number; total: number }>;
+    totals: { hot: number; warm: number; cold: number; provisional: number; open: number; total: number };
+  }>;
   monthBreakdown: Array<{
     monthKey: string; label: string;
     walkins: number; admissions: number; closed: number; provisional: number; followup: number;
@@ -206,7 +212,7 @@ function SalesDashboard() {
   }
   if (!data) return null;
 
-  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio, monthBreakdown } = data;
+  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio, monthBreakdown, leadTemperature, heatGrid } = data;
 
   // Active month data (filtered or YTD)
   const activeMonth = selectedMonth !== "YTD" ? monthBreakdown.find(m => m.monthKey === selectedMonth) : null;
@@ -552,7 +558,7 @@ function SalesDashboard() {
         {activeClosedSegs && activeClosedSegs.length > 0 && (() => {
           const totalClosed = activeClosedSegs.reduce((s, x) => s + x.count, 0);
           const SEGMENT_COLORS: Record<string, string> = {
-            "Admission Done": "#059669",
+            "No Reason Recorded": "#94a3b8",
             "Location / Not in Catchment": "#7c3aed",
             "Finance / Fees": "#dc2626",
             "Joined Another School": "#ea580c",
@@ -621,6 +627,93 @@ function SalesDashboard() {
                     })}
                   </div>
                 </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Lead Temperature Heatmap */}
+        {heatGrid.length > 0 && (() => {
+          // All month keys across all counselors
+          const allMks = Array.from(new Set(heatGrid.flatMap(r => r.months.map(m => m.monthKey)))).sort();
+          const mLabel = (mk: string) => monthBreakdown.find(m => m.monthKey === mk)?.label || mk;
+          // Max cell total for intensity scaling
+          const maxTotal = Math.max(...heatGrid.flatMap(r => r.months.map(m => m.total)), 1);
+          // Cell background: heat intensity based on hot+provisional ratio; cold biases blue
+          const cellBg = (cell: { hot:number; warm:number; cold:number; provisional:number; open:number; total:number } | undefined) => {
+            if (!cell || cell.total === 0) return { bg: "#f8fafc", text: "#cbd5e1" };
+            const hotRatio = (cell.hot + cell.provisional * 0.7) / cell.total;
+            const coldRatio = cell.cold / cell.total;
+            const intensity = Math.min(cell.total / maxTotal, 1);
+            if (hotRatio >= 0.5) return { bg: `rgba(220,38,38,${0.15 + intensity * 0.55})`, text: "#7f1d1d" };
+            if (hotRatio >= 0.25) return { bg: `rgba(245,158,11,${0.2 + intensity * 0.45})`, text: "#78350f" };
+            if (coldRatio >= 0.5) return { bg: `rgba(37,99,235,${0.12 + intensity * 0.35})`, text: "#1e3a8a" };
+            return { bg: `rgba(16,185,129,${0.12 + intensity * 0.35})`, text: "#064e3b" };
+          };
+          const total = leadTemperature.hot + leadTemperature.warm + leadTemperature.cold + leadTemperature.provisional + leadTemperature.open;
+          return (
+            <div>
+              <SectionTitle sub="Lead temperature by counselor × month · Hot=Admission, Warm=Follow-up, Cold=Closed, Open=New">Lead Temperature Heatmap</SectionTitle>
+              {/* Temperature summary pills */}
+              <div className="flex flex-wrap gap-3 mb-4">
+                {[
+                  { label: "🔴 Hot (Admitted)", count: leadTemperature.hot, color: "#dc2626", bg: "#fef2f2" },
+                  { label: "🟣 Provisional", count: leadTemperature.provisional, color: "#7c3aed", bg: "#faf5ff" },
+                  { label: "🟡 Warm (Follow-up)", count: leadTemperature.warm, color: "#d97706", bg: "#fffbeb" },
+                  { label: "🟢 Open (New)", count: leadTemperature.open, color: "#059669", bg: "#f0fdf4" },
+                  { label: "🔵 Cold (Closed)", count: leadTemperature.cold, color: "#2563eb", bg: "#eff6ff" },
+                ].map(t => (
+                  <div key={t.label} className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-semibold" style={{ background: t.bg, borderColor: t.color + "33", color: t.color }}>
+                    <span>{t.label}</span>
+                    <span className="font-black">{t.count}</span>
+                    <span className="font-normal text-xs opacity-70">({total > 0 ? Math.round(t.count/total*100) : 0}%)</span>
+                  </div>
+                ))}
+              </div>
+              {/* Heatmap grid */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+                <table className="text-xs border-collapse w-full" data-testid="table-heatmap">
+                  <thead>
+                    <tr>
+                      <th className="sticky left-0 bg-slate-50 z-10 py-2 px-3 text-left text-slate-500 font-semibold border-b border-r border-slate-200 whitespace-nowrap">Counsellor</th>
+                      {allMks.map(mk => (
+                        <th key={mk} className="py-2 px-2 text-center text-slate-500 font-semibold border-b border-slate-200 whitespace-nowrap min-w-[64px]">{mLabel(mk)}</th>
+                      ))}
+                      <th className="py-2 px-2 text-center text-slate-500 font-semibold border-b border-l border-slate-200 whitespace-nowrap">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {heatGrid.map((row) => {
+                      const cellMap = new Map(row.months.map(m => [m.monthKey, m]));
+                      return (
+                        <tr key={row.counselor} className="border-t border-slate-100">
+                          <td className="sticky left-0 bg-white z-10 py-2 px-3 font-semibold text-slate-700 border-r border-slate-100 whitespace-nowrap">{row.counselor}</td>
+                          {allMks.map(mk => {
+                            const cell = cellMap.get(mk);
+                            const { bg, text } = cellBg(cell);
+                            return (
+                              <td key={mk} className="py-1 px-1 text-center" style={{ background: bg }}>
+                                {cell && cell.total > 0 ? (
+                                  <div className="font-bold" style={{ color: text }}>{cell.total}</div>
+                                ) : (
+                                  <div className="text-slate-200">—</div>
+                                )}
+                              </td>
+                            );
+                          })}
+                          <td className="py-2 px-3 text-center font-black border-l border-slate-100" style={{ color: NAVY }}>{row.totals.total}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-4 text-xs text-slate-400">
+                <span>🔴 Red cell = high admission rate</span>
+                <span>🟡 Amber = active follow-ups</span>
+                <span>🔵 Blue = many closed/lost leads</span>
+                <span>🟢 Green = mostly new open leads</span>
+                <span>Number = total walkins in that cell</span>
               </div>
             </div>
           );
