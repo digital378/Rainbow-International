@@ -57,6 +57,13 @@ type SalesData = {
   };
   counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
   conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
+  monthBreakdown: Array<{
+    monthKey: string; label: string;
+    walkins: number; admissions: number; closed: number; provisional: number; followup: number;
+    admBySource: Array<{ source: string; count: number }>;
+    closedSegs: Array<{ segment: string; count: number }>;
+    counselors: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
+  }>;
 };
 
 /* ── Passcode Gate ─────────────────────────────────────── */
@@ -155,6 +162,7 @@ function SalesDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("YTD");
   const cancelled = useRef(false);
 
   const fetchData = useCallback(() => {
@@ -198,7 +206,18 @@ function SalesDashboard() {
   }
   if (!data) return null;
 
-  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio } = data;
+  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio, monthBreakdown } = data;
+
+  // Active month data (filtered or YTD)
+  const activeMonth = selectedMonth !== "YTD" ? monthBreakdown.find(m => m.monthKey === selectedMonth) : null;
+  const activeWalkins    = activeMonth ? activeMonth.walkins    : kpis.walkinsTotal;
+  const activeAdmissions = activeMonth ? activeMonth.admissions : kpis.admissionsTotal;
+  const activeClosed     = activeMonth ? activeMonth.closed     : (walkins.byStatus.find(s => s.status === "CLOSED")?.count || 0);
+  const activeFollowup   = activeMonth ? activeMonth.followup   : (walkins.byStatus.find(s => s.status.includes("FOLLOW"))?.count || 0);
+  const activeConversion = activeWalkins ? Math.round((activeAdmissions / activeWalkins) * 10000) / 100 : 0;
+  const activeLeaderboard  = activeMonth ? activeMonth.counselors   : counselorLeaderboard;
+  const activeClosedSegs   = activeMonth ? activeMonth.closedSegs   : walkins.closedReasonSegments;
+  const activeAdmBySource  = activeMonth ? activeMonth.admBySource  : admissions.bySource;
 
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
@@ -221,15 +240,44 @@ function SalesDashboard() {
         </div>
       </div>
 
+      {/* Month / YTD Filter Pill Bar */}
+      <div className="sticky top-0 z-10 border-b border-slate-200 shadow-sm" style={{ background: "#fff" }}>
+        <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide mr-1">Period:</span>
+          {["YTD", ...monthBreakdown.map(m => m.monthKey)].map((mk) => {
+            const label = mk === "YTD" ? "YTD (All)" : (monthBreakdown.find(m => m.monthKey === mk)?.label || mk);
+            const active = selectedMonth === mk;
+            return (
+              <button
+                key={mk}
+                onClick={() => setSelectedMonth(mk)}
+                data-testid={`filter-month-${mk}`}
+                className="px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                style={{
+                  background: active ? NAVY : "#f1f5f9",
+                  color: active ? "#fff" : "#475569",
+                  border: active ? `2px solid ${NAVY}` : "2px solid transparent",
+                }}
+              >{label}</button>
+            );
+          })}
+          {selectedMonth !== "YTD" && (
+            <span className="ml-2 text-xs text-amber-600 font-medium">
+              · Showing {monthBreakdown.find(m => m.monthKey === selectedMonth)?.label} only
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto p-6 space-y-8">
 
         {/* KPIs Row 1 — Core Metrics */}
         <div>
-          <SectionTitle sub="Live from Google Sheets · New Admission List is source of truth · auto-refresh every 5 min">Key Metrics</SectionTitle>
+          <SectionTitle sub={selectedMonth === "YTD" ? "Live from Google Sheets · New Admission List is source of truth · auto-refresh every 5 min" : `Filtered: ${monthBreakdown.find(m=>m.monthKey===selectedMonth)?.label} · Walkin Sheet data`}>Key Metrics</SectionTitle>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
-            <KpiCard label="Walkins (Total)" value={fmt(kpis.walkinsTotal)} sub={`${kpis.walkinsThisMonth} this month`} testId="kpi-walkins-total" />
-            <KpiCard label="Admissions (Confirmed)" value={fmt(kpis.admissionsTotal)} sub={`${kpis.admissionsThisMonth} this month`} accent={GREEN} testId="kpi-admissions-total" />
-            <KpiCard label="Conversion %" value={pct(kpis.overallConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
+            <KpiCard label="Walkins" value={fmt(activeWalkins)} sub={selectedMonth === "YTD" ? `${kpis.walkinsThisMonth} this month` : "This month"} testId="kpi-walkins-total" />
+            <KpiCard label="Admissions (Confirmed)" value={fmt(activeAdmissions)} sub={selectedMonth === "YTD" ? `${kpis.admissionsThisMonth} this month` : "From Walkin Sheet"} accent={GREEN} testId="kpi-admissions-total" />
+            <KpiCard label="Conversion %" value={pct(activeConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
             <KpiCard label="Provisional (Pending)" value={fmt(kpis.provisionalCount)} sub={`${kpis.provisionalRegular} Regular · ${kpis.provisionalIntegrated} Integrated`} accent={PURPLE} testId="kpi-provisional" />
           </div>
 
@@ -245,25 +293,30 @@ function SalesDashboard() {
         </div>
 
         {/* Source-wise Admissions */}
-        {admissions.bySource.length > 0 && (
+        {activeAdmBySource.length > 0 && (
           <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
             <div className="flex items-baseline justify-between mb-4">
               <div>
-                <div className="text-sm font-bold" style={{ color: NAVY }}>Admissions by Source · AY 2026-27</div>
-                <div className="text-xs text-slate-400 mt-0.5">All {kpis.admissionsTotal} confirmed admissions · New Admission List</div>
+                <div className="text-sm font-bold" style={{ color: NAVY }}>
+                  Admissions by Source{selectedMonth === "YTD" ? " · AY 2026-27" : ` · ${monthBreakdown.find(m=>m.monthKey===selectedMonth)?.label}`}
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  {selectedMonth === "YTD" ? `All ${kpis.admissionsTotal} confirmed admissions · New Admission List` : `${activeAdmissions} admissions this month · Walkin Sheet`}
+                </div>
               </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
-              {admissions.bySource.map((s) => {
-                const pct = Math.round((s.count / kpis.admissionsTotal) * 100);
+              {activeAdmBySource.map((s) => {
+                const total = activeAdmBySource.reduce((sum, x) => sum + x.count, 0);
+                const pctVal = total > 0 ? Math.round((s.count / total) * 100) : 0;
                 return (
                   <div key={s.source} data-testid={`src-adm-${s.source}`}>
                     <div className="flex justify-between text-xs mb-0.5">
                       <span className="font-medium text-slate-700 truncate max-w-[160px]">{s.source}</span>
-                      <span className="tabular-nums font-bold ml-2" style={{ color: NAVY }}>{s.count} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                      <span className="tabular-nums font-bold ml-2" style={{ color: NAVY }}>{s.count} <span className="text-slate-400 font-normal">({pctVal}%)</span></span>
                     </div>
                     <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: NAVY }} />
+                      <div className="h-full rounded-full" style={{ width: `${pctVal}%`, background: NAVY }} />
                     </div>
                   </div>
                 );
@@ -431,7 +484,7 @@ function SalesDashboard() {
 
         {/* Counselor Leaderboard */}
         <div>
-          <SectionTitle sub="Walkins & status from Walkin Sheet 26-27 · Confirmed admissions from New Admission List">Counselor Leaderboard</SectionTitle>
+          <SectionTitle sub={selectedMonth === "YTD" ? "Walkins & status from Walkin Sheet 26-27 · Confirmed admissions from New Admission List" : `Filtered: ${monthBreakdown.find(m=>m.monthKey===selectedMonth)?.label} · Walkin Sheet`}>Counselor Leaderboard</SectionTitle>
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
             <table className="w-full text-sm" data-testid="table-counselor">
               <thead className="bg-slate-50 text-xs uppercase text-slate-600">
@@ -446,7 +499,7 @@ function SalesDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {counselorLeaderboard.map((c) => (
+                {activeLeaderboard.map((c) => (
                   <tr key={c.counselor} className="border-t border-slate-100 hover:bg-slate-50" data-testid={`row-counselor-${c.counselor}`}>
                     <td className="py-2.5 px-4 font-semibold">{c.counselor}</td>
                     <td className="text-right py-2.5 px-3 tabular-nums">{c.walkins}</td>
@@ -496,9 +549,10 @@ function SalesDashboard() {
         )}
 
         {/* Closed Reasons */}
-        {walkins.closedReasonSegments && walkins.closedReasonSegments.length > 0 && (() => {
-          const totalClosed = walkins.closedReasonSegments.reduce((s, x) => s + x.count, 0);
+        {activeClosedSegs && activeClosedSegs.length > 0 && (() => {
+          const totalClosed = activeClosedSegs.reduce((s, x) => s + x.count, 0);
           const SEGMENT_COLORS: Record<string, string> = {
+            "Admission Done": "#059669",
             "Location / Not in Catchment": "#7c3aed",
             "Finance / Fees": "#dc2626",
             "Joined Another School": "#ea580c",
@@ -506,12 +560,12 @@ function SalesDashboard() {
             "Not Interested / Unresponsive": "#64748b",
             "Board / Curriculum Preference": "#2563eb",
             "Timing / Schedule": "#d97706",
-            "No Reason Recorded": "#94a3b8",
             "Other": "#6b7280",
           };
+          const periodLabel = selectedMonth === "YTD" ? "all year" : monthBreakdown.find(m => m.monthKey === selectedMonth)?.label;
           return (
             <div>
-              <SectionTitle sub={`${totalClosed} closed leads from Walkin Sheet · Reasons curated into segments`}>Why Leads Closed</SectionTitle>
+              <SectionTitle sub={`${totalClosed} closed leads · ${periodLabel} · Reasons curated into segments`}>Why Leads Closed</SectionTitle>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                   <table className="w-full text-sm" data-testid="table-closed-reasons">
@@ -523,7 +577,7 @@ function SalesDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {walkins.closedReasonSegments.map((s) => {
+                      {activeClosedSegs.map((s) => {
                         const pctVal = Math.round((s.count / totalClosed) * 100);
                         const color = SEGMENT_COLORS[s.segment] || "#6b7280";
                         return (
@@ -550,7 +604,7 @@ function SalesDashboard() {
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
                   <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>Segment Breakdown</div>
                   <div className="space-y-3">
-                    {walkins.closedReasonSegments.map((s) => {
+                    {activeClosedSegs.map((s) => {
                       const pctVal = Math.round((s.count / totalClosed) * 100);
                       const color = SEGMENT_COLORS[s.segment] || "#6b7280";
                       return (
@@ -566,11 +620,6 @@ function SalesDashboard() {
                       );
                     })}
                   </div>
-                  {walkins.closedReasonSegments.find(s => s.segment === "No Reason Recorded") && (
-                    <div className="mt-4 p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-700">
-                      ⚠️ <strong>{walkins.closedReasonSegments.find(s => s.segment === "No Reason Recorded")!.count} leads</strong> closed with no reason recorded — counsellors should fill "REASON OF CLOSING" for accurate analysis.
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

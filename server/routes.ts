@@ -2093,7 +2093,7 @@ export async function registerRoutes(
       // Maps raw "REASON OF CLOSING" (col 13) → curated segment name
       const closedSegment = (raw: string): string => {
         const r = raw.toLowerCase().trim();
-        if (!r) return "No Reason Recorded";
+        if (!r) return "Admission Done";   // closed with no reason = admission completed
         if (r.includes("relocat")) return "Location / Not in Catchment";
         if (r.includes("distance")) return "Distance / Too Far";
         if (r.includes("taken") || r.includes("same school") || r.includes("pre-school") || r.includes("pre- school") || r.includes("preschool")) return "Joined Another School";
@@ -2104,6 +2104,15 @@ export async function registerRoutes(
         if (r.includes("shift") || r.includes("saturday") || r.includes("morning") || r.includes("afternoon") || r.includes("day care")) return "Timing / Schedule";
         return "Other";
       };
+
+      // Per-month aggregation for client-side filtering
+      type MonthWalkinAgg = {
+        label: string;
+        walkins: number; admissions: number; closed: number; provisional: number; followup: number;
+        counselors: Map<string, CounselorAgg>;
+        closedSegs: Map<string, number>;
+      };
+      const monthWalkinMap = new Map<string, MonthWalkinAgg>();
 
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
@@ -2139,6 +2148,24 @@ export async function registerRoutes(
           name, grade, counselor, source, status,
           sortKey: d ? d.getTime() : 0,
         });
+        // Per-month aggregation
+        if (d) {
+          const mk = monthKey(d);
+          const mw = monthWalkinMap.get(mk) || { label: monthLabel(d), walkins:0, admissions:0, closed:0, provisional:0, followup:0, counselors: new Map(), closedSegs: new Map() };
+          mw.walkins++;
+          if (status.includes("ADMIS") && !status.includes("PROV")) mw.admissions++;
+          else if (status.includes("PROV")) mw.provisional++;
+          else if (status.includes("CLOSED")) { mw.closed++; const s2 = closedSegment(norm(r[13])); mw.closedSegs.set(s2, (mw.closedSegs.get(s2)||0)+1); }
+          else if (status.includes("FOLLOW")) mw.followup++;
+          const mca = mw.counselors.get(counselor) || { walkins:0, admissions:0, closed:0, followup:0, provisional:0 };
+          mca.walkins++;
+          if (status.includes("ADMIS") && !status.includes("PROV")) mca.admissions++;
+          else if (status.includes("PROV")) mca.provisional++;
+          else if (status.includes("CLOSED")) mca.closed++;
+          else if (status.includes("FOLLOW")) mca.followup++;
+          mw.counselors.set(counselor, mca);
+          monthWalkinMap.set(mk, mw);
+        }
       }
       const closedReasonSegments = sortByCount(closedSegmentMap).map(x => ({ segment: x.key, count: x.count }));
 
@@ -2184,6 +2211,7 @@ export async function registerRoutes(
       const admByGrade  = new Map<string,number>();
       const admBySource = new Map<string,number>();
       const admByCounselor = new Map<string,number>();
+      const admSourceByMonth = new Map<string, Map<string,number>>();  // mk → source → count
       const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
       let admTotal = 0, admThisMonth = 0, rpsRollover = 0, docsClear = 0, docsPending = 0;
 
@@ -2206,6 +2234,9 @@ export async function registerRoutes(
         if (mk) {
           const cur = admByMonth.get(mk) || { label, total: 0 };
           cur.total++; admByMonth.set(mk, cur);
+          const msm = admSourceByMonth.get(mk) || new Map<string,number>();
+          msm.set(source, (msm.get(source)||0)+1);
+          admSourceByMonth.set(mk, msm);
         }
         incBy(admByBranch, branch);
         incBy(admByGrade, grade);
@@ -2309,6 +2340,27 @@ export async function registerRoutes(
 
       const overallConversion = walkinsTotal ? Math.round((admTotal / walkinsTotal) * 10000) / 100 : 0;
 
+      // ── Per-month breakdown for client-side filtering ──────────
+      const monthBreakdown = Array.from(monthWalkinMap.entries())
+        .sort((a,b) => a[0].localeCompare(b[0]))
+        .map(([mk, mw]) => {
+          const admSrc = admSourceByMonth.get(mk);
+          return {
+            monthKey: mk, label: mw.label,
+            walkins: mw.walkins,
+            admissions: mw.admissions,
+            closed: mw.closed,
+            provisional: mw.provisional,
+            followup: mw.followup,
+            admBySource: admSrc ? sortByCount(admSrc).map(x => ({ source: x.key, count: x.count })) : [],
+            closedSegs: sortByCount(mw.closedSegs).map(x => ({ segment: x.key, count: x.count })),
+            counselors: Array.from(mw.counselors, ([name, c]) => ({
+              counselor: name, ...c, admFromList: 0,
+              conversion: c.walkins ? Math.round(((c.admissions + c.provisional) / c.walkins) * 10000) / 100 : 0,
+            })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0),
+          };
+        });
+
       res.json({
         generatedAt: new Date().toISOString(),
         kpis: {
@@ -2354,6 +2406,7 @@ export async function registerRoutes(
         },
         counselorLeaderboard,
         conversionRatio,
+        monthBreakdown,
       });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch sales data", error: err.message });
