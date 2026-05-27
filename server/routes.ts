@@ -1763,7 +1763,7 @@ export async function registerRoutes(
     return (res.data.values || []) as string[][];
   }
 
-  const WALKIN_SHEET_TAB = "Walkin Sheet 26-27";
+  const WALKIN_SHEET_TAB = process.env.WALKIN_SHEET_TAB || "RA Checkin";
 
   async function appendToWalkinSheet(checkin: {
     id: string; submittedAt: Date | string; raName: string; raBranch: string;

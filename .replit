@@ -49,6 +49,8 @@ SMTP_PORT = "587"
 ENQUIRY_MAIL_TO = "digital@rainbowinternationalschool.in"
 GOOGLE_ADS_CUSTOMER_ID_RIS = "7094092492"
 GOOGLE_ADS_CUSTOMER_ID_RPS = "5665438033"
+WALKIN_SHEET_ID = "1R5evjW6gVYIB6nyR1dmIdiWp1qMTui4J9wQovmUkakw"
+WALKIN_SHEET_TAB = "RA Checkin"
 
 [postMerge]
 path = "scripts/post-merge.sh"
