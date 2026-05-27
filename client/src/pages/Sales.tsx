@@ -566,11 +566,11 @@ function SalesDashboard() {
                 <Bar dataKey="count" fill={AMBER} />
               </BarChart>
             </ChartCard>
-            <ChartCard title="Admissions by Branch" testId="chart-adm-branch">
-              <BarChart data={admissions.byBranch.slice(0, 10)} layout="vertical">
+            <ChartCard title="Admissions by RA" testId="chart-adm-ra">
+              <BarChart data={admissions.byCounselor.slice(0, 15)} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="branch" tick={{ fontSize: 10 }} width={140} />
+                <YAxis type="category" dataKey="counselor" tick={{ fontSize: 10 }} width={140} />
                 <Tooltip />
                 <Bar dataKey="count" fill={CYAN} />
               </BarChart>
