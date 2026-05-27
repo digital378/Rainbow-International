@@ -626,7 +626,6 @@ function SalesDashboard() {
                     <th className="text-right py-3 px-3">Admissions</th>
                     <th className="text-right py-3 px-3">Provisional</th>
                     <th className="text-right py-3 px-3">Ratio %</th>
-                    <th className="text-right py-3 px-3">w/ Prov %</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -639,7 +638,6 @@ function SalesDashboard() {
                       <td className="text-right py-2.5 px-3 tabular-nums font-bold" style={{ color: GREEN }}>{c.admissions}</td>
                       <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: AMBER }}>{c.provisional || "—"}</td>
                       <td className="text-right py-2.5 px-3 tabular-nums font-bold" style={{ color: c.ratio >= 30 ? GREEN : c.ratio >= 15 ? AMBER : RED }}>{pct(c.ratio)}</td>
-                      <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: c.ratioWithProv >= 30 ? GREEN : c.ratioWithProv >= 15 ? AMBER : RED }}>{c.ratioWithProv ? pct(c.ratioWithProv) : "—"}</td>
                     </tr>
                   ))}
                 </tbody>
