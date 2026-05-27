@@ -2485,8 +2485,12 @@ export async function registerRoutes(
         heatGrid: heatGridArr,
         liveCheckins: await (async () => {
           try {
-            const todayStart = new Date();
-            todayStart.setHours(0, 0, 0, 0);
+            // IST midnight in UTC: IST = UTC+5:30, so IST midnight = UTC 18:30 previous day
+            const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+            const nowUTC = Date.now();
+            const istNow = new Date(nowUTC + IST_OFFSET_MS);
+            istNow.setUTCHours(0, 0, 0, 0);
+            const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
             const [todayCounts, todayRecent, last7Days] = await Promise.all([
               storage.getTodayCheckinCounts(),
               storage.listCheckins(todayStart),

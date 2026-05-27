@@ -169,8 +169,6 @@ export class DbStorage implements IStorage {
   }
 
   async getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
     const rows = await db
       .select({
         raName: walkinCheckins.raName,
@@ -178,7 +176,7 @@ export class DbStorage implements IStorage {
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(walkinCheckins)
-      .where(gte(walkinCheckins.submittedAt, todayStart))
+      .where(sql`submitted_at >= (CURRENT_DATE AT TIME ZONE 'Asia/Kolkata')`)
       .groupBy(walkinCheckins.raName, walkinCheckins.raBranch);
     return rows;
   }
