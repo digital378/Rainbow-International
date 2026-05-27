@@ -2070,7 +2070,7 @@ export async function registerRoutes(
         fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
         fetchSheetRange(SID, "'New Admission List'!A2:T500"),
         fetchSheetRange(SID, "'Provisional Admission LIST'!A2:T200"),
-        fetchSheetRange(SID, "'CONVERSION RATIO'!A4:R200"),
+        fetchSheetRange(SID, "'CONVERSION RATIO'!I4:Q200"),
         fetchSheetRange(SID, "'RIS Target Sheet '!B13:N14"),   // achieved + target rows
         fetchSheetRange(SID, "'RIS Target Sheet '!B2:N2"),     // month header row
         fetchSheetRange(SID, "'MIS DASHBOARD'!A4:E300"),       // daily MIS rows
@@ -2351,19 +2351,23 @@ export async function registerRoutes(
       }
       const provTotal = provRegular + provIntegrated;
 
-      // ── Conversion ratio (per-counselor authoritative) ─────────
-      const conversionRatio: Array<{counselor:string; enquiries:number; closed:number; open:number; admissions:number; ratio:number}> = [];
+      // ── Conversion ratio — SUMMARY section (Nursery to Grade 12 consolidated) ──
+      const conversionRatio: Array<{counselor:string; enquiries:number; open:number; closed:number; admissions:number; ratio:number; provisional:number; ratioWithProv:number}> = [];
       for (const r of convRows) {
         if (isEmptyRow(r)) continue;
-        const nm = norm(r[1]); if (!nm || nm.toLowerCase().includes("name")) continue;
+        const nm = norm(r[1]);
+        if (!nm || nm.toLowerCase().includes("name") || nm.toLowerCase() === "total") continue;
         const enq = +norm(r[2]) || 0; if (!enq) continue;
         conversionRatio.push({
           counselor: nm, enquiries: enq,
           open: +norm(r[3]) || 0, closed: +norm(r[4]) || 0,
           admissions: +norm(r[5]) || 0,
           ratio: Math.round((+norm(r[6]) || 0) * 100) / 100,
+          provisional: +norm(r[7]) || 0,
+          ratioWithProv: Math.round((+norm(r[8]) || 0) * 100) / 100,
         });
       }
+      conversionRatio.sort((a, b) => b.admissions - a.admissions);
 
       // ── Target Sheet (monthly target vs achieved) ──────────────
       // targetAchRows[0] = achieved row (B13:N13), targetAchRows[1] = target row (B14:N14)

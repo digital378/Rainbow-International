@@ -56,7 +56,7 @@ type SalesData = {
     recentProvisional: Array<{ date: string; name: string; grade: string; counselor: string; source: string; branch: string; type: string; coaching: string }>;
   };
   counselorLeaderboard: Array<{ counselor: string; walkins: number; admissions: number; provisional: number; closed: number; followup: number; admFromList: number; conversion: number }>;
-  conversionRatio: Array<{ counselor: string; enquiries: number; closed: number; open: number; admissions: number; ratio: number }>;
+  conversionRatio: Array<{ counselor: string; enquiries: number; open: number; closed: number; admissions: number; ratio: number; provisional: number; ratioWithProv: number }>;
   liveCheckins: {
     todayTotal: number;
     byRa: Array<{ raName: string; raBranch: string; count: number }>;
@@ -614,7 +614,7 @@ function SalesDashboard() {
         {/* Authoritative Conversion Ratio */}
         {conversionRatio.length > 0 && (
           <div>
-            <SectionTitle sub="Direct from 'CONVERSION RATIO' sheet">Conversion Ratio (Authoritative)</SectionTitle>
+            <SectionTitle sub="SUMMARY · Nursery to Grade 12 consolidated · sorted by admissions">Conversion Ratio (Authoritative)</SectionTitle>
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
               <table className="w-full text-sm" data-testid="table-conversion">
                 <thead className="bg-slate-50 text-xs uppercase text-slate-600">
@@ -624,7 +624,9 @@ function SalesDashboard() {
                     <th className="text-right py-3 px-3">Open</th>
                     <th className="text-right py-3 px-3">Closed</th>
                     <th className="text-right py-3 px-3">Admissions</th>
+                    <th className="text-right py-3 px-3">Provisional</th>
                     <th className="text-right py-3 px-3">Ratio %</th>
+                    <th className="text-right py-3 px-3">w/ Prov %</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -635,7 +637,9 @@ function SalesDashboard() {
                       <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: BLUE }}>{c.open}</td>
                       <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: RED }}>{c.closed}</td>
                       <td className="text-right py-2.5 px-3 tabular-nums font-bold" style={{ color: GREEN }}>{c.admissions}</td>
+                      <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: AMBER }}>{c.provisional || "—"}</td>
                       <td className="text-right py-2.5 px-3 tabular-nums font-bold" style={{ color: c.ratio >= 30 ? GREEN : c.ratio >= 15 ? AMBER : RED }}>{pct(c.ratio)}</td>
+                      <td className="text-right py-2.5 px-3 tabular-nums" style={{ color: c.ratioWithProv >= 30 ? GREEN : c.ratioWithProv >= 15 ? AMBER : RED }}>{c.ratioWithProv ? pct(c.ratioWithProv) : "—"}</td>
                     </tr>
                   ))}
                 </tbody>
