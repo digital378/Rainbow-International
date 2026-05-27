@@ -681,7 +681,7 @@ export async function registerRoutes(
     "https://www.googleapis.com/auth/webmasters.readonly",
     "https://www.googleapis.com/auth/analytics.readonly",
     "https://www.googleapis.com/auth/adwords",
-    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/spreadsheets",
   ];
 
   function getOAuthClient() {
@@ -1763,6 +1763,31 @@ export async function registerRoutes(
     return (res.data.values || []) as string[][];
   }
 
+  const WALKIN_SHEET_TAB = "Walkin Sheet 26-27";
+
+  async function appendToWalkinSheet(checkin: {
+    id: string; submittedAt: Date | string; raName: string; raBranch: string;
+    parentName: string; studentName: string; grade: string;
+  }): Promise<void> {
+    const sheetId = process.env.WALKIN_SHEET_ID;
+    if (!sheetId) throw new Error("WALKIN_SHEET_ID env var not set");
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const dt = new Date(checkin.submittedAt);
+    const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+    const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${WALKIN_SHEET_TAB}!A:G`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[dateStr, timeStr, checkin.raName, checkin.raBranch, checkin.parentName, checkin.studentName, checkin.grade]],
+      },
+    });
+  }
+
   // 1. DM Team Task Tracker
   app.get("/api/sheets/tasks", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
@@ -2690,8 +2715,39 @@ paths:
       const checkin = await storage.createCheckin(ra.id, ra.name, ra.branch, parentName.trim(), studentName.trim(), grade.trim());
       console.log(`[walkin] Check-in: ${parentName} / ${studentName} (${grade}) → ${ra.name}`);
       res.status(201).json({ success: true, id: checkin.id });
+      // Best-effort: sync to Google Sheets in the background (does not block or affect the response)
+      appendToWalkinSheet(checkin)
+        .then(() => storage.markCheckinSynced(checkin.id))
+        .catch(async (err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error(`[walkin] Sheet sync failed for ${checkin.id}: ${msg}`);
+          await storage.markCheckinSyncFailed(checkin.id, msg).catch(() => {});
+        });
     } catch {
       res.status(500).json({ message: "Failed to record check-in" });
+    }
+  });
+
+  // Admin: manually retry syncing all unsynced check-ins to Google Sheets
+  app.post("/api/admin/ras/sync-sheets", requireAdmin, async (_req, res) => {
+    try {
+      const rows = await storage.listUnsyncedCheckins();
+      let synced = 0;
+      let failed = 0;
+      for (const row of rows) {
+        try {
+          await appendToWalkinSheet(row);
+          await storage.markCheckinSynced(row.id);
+          synced++;
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          await storage.markCheckinSyncFailed(row.id, msg).catch(() => {});
+          failed++;
+        }
+      }
+      res.json({ total: rows.length, synced, failed });
+    } catch {
+      res.status(500).json({ message: "Sync failed" });
     }
   });
 

@@ -12,6 +12,8 @@ type Submission = {
   studentName: string;
   grade: string;
   submittedAt: string;
+  syncedToSheets: boolean;
+  sheetSyncError: string | null;
 };
 
 function getToken() {
@@ -24,6 +26,8 @@ export default function AdminSubmissions() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterRa, setFilterRa] = useState("All");
+  const [syncStatus, setSyncStatus] = useState<"idle" | "running" | "done" | "error">("idle");
+  const [syncResult, setSyncResult] = useState<{ total: number; synced: number; failed: number } | null>(null);
 
   useEffect(() => {
     document.title = "Walk-in Submissions | Rainbow International School";
@@ -48,6 +52,28 @@ export default function AdminSubmissions() {
 
   useEffect(() => { load(); }, [load]);
 
+  const handleSyncNow = async () => {
+    setSyncStatus("running");
+    setSyncResult(null);
+    const token = getToken();
+    try {
+      const res = await fetch("/api/admin/ras/sync-sheets", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        setSyncStatus("error");
+        return;
+      }
+      const data = await res.json();
+      setSyncResult(data);
+      setSyncStatus("done");
+      await load();
+    } catch {
+      setSyncStatus("error");
+    }
+  };
+
   const raNames = Array.from(new Set(rows.map(r => r.raName))).sort();
   const filtered = rows.filter(r => {
     const q = search.toLowerCase();
@@ -62,9 +88,9 @@ export default function AdminSubmissions() {
       d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
   };
 
-  // Today's count
   const todayStr = new Date().toDateString();
   const todayCount = rows.filter(r => new Date(r.submittedAt).toDateString() === todayStr).length;
+  const unsyncedCount = rows.filter(r => !r.syncedToSheets).length;
 
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
@@ -85,7 +111,7 @@ export default function AdminSubmissions() {
 
       <div className="max-w-5xl mx-auto p-6">
         {/* Summary KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
             <div className="text-xs font-semibold uppercase text-slate-400 tracking-wide">Total Check-ins</div>
             <div className="text-3xl font-black mt-1" style={{ color: NAVY }}>{rows.length.toLocaleString("en-IN")}</div>
@@ -98,6 +124,39 @@ export default function AdminSubmissions() {
             <div className="text-xs font-semibold uppercase text-slate-400 tracking-wide">RAs Active</div>
             <div className="text-3xl font-black mt-1" style={{ color: AMBER }}>{raNames.length}</div>
           </div>
+          <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+            <div className="text-xs font-semibold uppercase text-slate-400 tracking-wide">Pending Sync</div>
+            <div className="text-3xl font-black mt-1" style={{ color: unsyncedCount > 0 ? "#dc2626" : "#059669" }}>{unsyncedCount}</div>
+          </div>
+        </div>
+
+        {/* Sync to Sheets */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="font-semibold text-sm text-slate-800">Google Sheets Sync</div>
+            <div className="text-xs text-slate-500 mt-0.5">
+              Rows are synced automatically on each check-in. Use "Sync now" to retry any that failed.
+            </div>
+            {syncStatus === "done" && syncResult && (
+              <div className="text-xs mt-1 font-semibold" style={{ color: syncResult.failed > 0 ? "#dc2626" : "#059669" }} data-testid="text-sync-result">
+                {syncResult.total === 0
+                  ? "All rows already synced — nothing to do."
+                  : `Synced ${syncResult.synced} of ${syncResult.total} row(s)${syncResult.failed > 0 ? `, ${syncResult.failed} failed` : ""}.`}
+              </div>
+            )}
+            {syncStatus === "error" && (
+              <div className="text-xs mt-1 font-semibold text-red-600" data-testid="text-sync-error">Sync request failed — check server logs.</div>
+            )}
+          </div>
+          <button
+            onClick={handleSyncNow}
+            disabled={syncStatus === "running"}
+            data-testid="button-sync-sheets"
+            className="px-4 py-2 rounded-lg text-sm font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed transition-opacity"
+            style={{ background: NAVY }}
+          >
+            {syncStatus === "running" ? "Syncing…" : `Sync now${unsyncedCount > 0 ? ` (${unsyncedCount})` : ""}`}
+          </button>
         </div>
 
         {/* Filters */}
@@ -135,11 +194,12 @@ export default function AdminSubmissions() {
                   <th className="text-left py-3 px-4">Parent Name</th>
                   <th className="text-left py-3 px-4">Student Name</th>
                   <th className="text-left py-3 px-4">Grade</th>
+                  <th className="text-center py-3 px-4">Sheets</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-12 text-slate-400">No submissions found</td></tr>
+                  <tr><td colSpan={7} className="text-center py-12 text-slate-400">No submissions found</td></tr>
                 ) : filtered.map((r, i) => (
                   <tr key={r.id} className={`border-t border-slate-100 ${i % 2 === 0 ? "" : "bg-slate-50/50"}`} data-testid={`row-submission-${r.id}`}>
                     <td className="py-2.5 px-4 text-slate-500 tabular-nums text-xs whitespace-nowrap">{fmtDate(r.submittedAt)}</td>
@@ -148,6 +208,15 @@ export default function AdminSubmissions() {
                     <td className="py-2.5 px-4">{r.parentName}</td>
                     <td className="py-2.5 px-4">{r.studentName}</td>
                     <td className="py-2.5 px-4 text-slate-600">{r.grade}</td>
+                    <td className="py-2.5 px-4 text-center" data-testid={`status-sync-${r.id}`}>
+                      {r.syncedToSheets ? (
+                        <span title="Synced to Sheets" className="inline-block w-5 h-5 rounded-full bg-green-100 text-green-600 text-xs font-bold leading-5 text-center">✓</span>
+                      ) : r.sheetSyncError ? (
+                        <span title={r.sheetSyncError} className="inline-block w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs font-bold leading-5 text-center cursor-help">!</span>
+                      ) : (
+                        <span title="Pending sync" className="inline-block w-5 h-5 rounded-full bg-slate-100 text-slate-400 text-xs font-bold leading-5 text-center">–</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

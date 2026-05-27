@@ -171,6 +171,8 @@ export const walkinCheckins = pgTable("walkin_checkins", {
   studentName: text("student_name").notNull(),
   grade: text("grade").notNull(),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  syncedToSheets: boolean("synced_to_sheets").default(false).notNull(),
+  sheetSyncError: text("sheet_sync_error"),
 });
 
 export const insertWalkinCheckinSchema = createInsertSchema(walkinCheckins).omit({

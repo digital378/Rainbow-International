@@ -40,6 +40,9 @@ export interface IStorage {
   // Walk-in check-ins
   createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin>;
   listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]>;
+  listUnsyncedCheckins(): Promise<WalkinCheckin[]>;
+  markCheckinSynced(id: string): Promise<void>;
+  markCheckinSyncFailed(id: string, error: string): Promise<void>;
   getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
   getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>>;
 }
@@ -145,6 +148,24 @@ export class DbStorage implements IStorage {
         .orderBy(desc(walkinCheckins.submittedAt));
     }
     return await db.select().from(walkinCheckins).orderBy(desc(walkinCheckins.submittedAt));
+  }
+
+  async listUnsyncedCheckins(): Promise<WalkinCheckin[]> {
+    return await db.select().from(walkinCheckins)
+      .where(eq(walkinCheckins.syncedToSheets, false))
+      .orderBy(walkinCheckins.submittedAt);
+  }
+
+  async markCheckinSynced(id: string): Promise<void> {
+    await db.update(walkinCheckins)
+      .set({ syncedToSheets: true, sheetSyncError: null })
+      .where(eq(walkinCheckins.id, id));
+  }
+
+  async markCheckinSyncFailed(id: string, error: string): Promise<void> {
+    await db.update(walkinCheckins)
+      .set({ syncedToSheets: false, sheetSyncError: error })
+      .where(eq(walkinCheckins.id, id));
   }
 
   async getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
