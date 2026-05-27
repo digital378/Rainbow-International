@@ -223,7 +223,7 @@ function SalesDashboard() {
   // Active month data (filtered or YTD)
   const activeMonth = selectedMonth !== "YTD" ? monthBreakdown.find(m => m.monthKey === selectedMonth) : null;
   const activeWalkins    = activeMonth ? activeMonth.walkins    : kpis.walkinsTotal;
-  const activeAdmissions = activeMonth ? activeMonth.admissions : kpis.admissionsTotal;
+  const activeAdmissions = activeMonth ? (admissions.byMonth.find(m => m.monthKey === selectedMonth)?.total ?? 0) : kpis.admissionsTotal;
   const activeClosed     = activeMonth ? activeMonth.closed     : (walkins.byStatus.find(s => s.status === "CLOSED")?.count || 0);
   const activeFollowup   = activeMonth ? activeMonth.followup   : (walkins.byStatus.find(s => s.status.includes("FOLLOW"))?.count || 0);
   const activeConversion = activeWalkins ? Math.round((activeAdmissions / activeWalkins) * 10000) / 100 : 0;
@@ -288,7 +288,7 @@ function SalesDashboard() {
           <SectionTitle sub={selectedMonth === "YTD" ? "Live from Google Sheets · New Admission List is source of truth · auto-refresh every 5 min" : `Filtered: ${monthBreakdown.find(m=>m.monthKey===selectedMonth)?.label} · Walkin Sheet data`}>Key Metrics</SectionTitle>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 mb-4">
             <KpiCard label="Walkins" value={fmt(activeWalkins)} sub={selectedMonth === "YTD" ? `${kpis.walkinsThisMonth} this month` : "This month"} testId="kpi-walkins-total" />
-            <KpiCard label="Admissions (Confirmed)" value={fmt(activeAdmissions)} sub={selectedMonth === "YTD" ? `${kpis.admissionsThisMonth} this month` : "From Walkin Sheet"} accent={GREEN} testId="kpi-admissions-total" />
+            <KpiCard label="Admissions (Confirmed)" value={fmt(activeAdmissions)} sub={selectedMonth === "YTD" ? `${kpis.admissionsThisMonth} this month` : "From New Admission List"} accent={GREEN} testId="kpi-admissions-total" />
             <KpiCard label="Conversion %" value={pct(activeConversion)} sub="Admissions / Walkins" accent={AMBER} testId="kpi-conversion" />
             <KpiCard label="Provisional (Pending)" value={fmt(kpis.provisionalCount)} sub={`${kpis.provisionalRegular} Regular · ${kpis.provisionalIntegrated} Integrated`} accent={PURPLE} testId="kpi-provisional" />
           </div>
@@ -397,7 +397,7 @@ function SalesDashboard() {
                   Admissions by Source{selectedMonth === "YTD" ? " · AY 2026-27" : ` · ${monthBreakdown.find(m=>m.monthKey===selectedMonth)?.label}`}
                 </div>
                 <div className="text-xs text-slate-400 mt-0.5">
-                  {selectedMonth === "YTD" ? `All ${kpis.admissionsTotal} confirmed admissions · New Admission List` : `${activeAdmissions} admissions this month · Walkin Sheet`}
+                  {selectedMonth === "YTD" ? `All ${kpis.admissionsTotal} confirmed admissions · New Admission List` : `${activeAdmissions} admissions this month · New Admission List`}
                 </div>
               </div>
             </div>
