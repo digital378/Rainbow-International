@@ -2492,7 +2492,7 @@ export async function registerRoutes(
             istNow.setUTCHours(0, 0, 0, 0);
             const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
             const [todayCounts, todayRecent, last7Days] = await Promise.all([
-              storage.getTodayCheckinCounts(),
+              storage.getTodayCheckinCounts(todayStart),
               storage.listCheckins(todayStart),
               storage.getDailyCheckinCounts(7),
             ]);
@@ -2825,10 +2825,12 @@ paths:
   app.get("/api/walkin/today", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
+      const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+      const istNow = new Date(Date.now() + IST_OFFSET_MS);
+      istNow.setUTCHours(0, 0, 0, 0);
+      const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
       const [counts, recent] = await Promise.all([
-        storage.getTodayCheckinCounts(),
+        storage.getTodayCheckinCounts(todayStart),
         storage.listCheckins(todayStart),
       ]);
       const total = counts.reduce((s, r) => s + r.count, 0);

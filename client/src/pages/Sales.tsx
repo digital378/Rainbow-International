@@ -307,11 +307,12 @@ function SalesDashboard() {
         {/* Today's Walk-ins — Live QR Check-in Widget */}
         {data.liveCheckins && (() => {
           const lc = data.liveCheckins;
-          const todayStr = new Date().toISOString().slice(0, 10);
-          // Build full 7-day array (fill missing days with 0)
+          const IST_MS = 5.5 * 60 * 60 * 1000;
+          const todayStr = new Date(Date.now() + IST_MS).toISOString().slice(0, 10);
+          // Build full 7-day array (fill missing days with 0) — keys in IST to match server grouping
           const last7: Array<{ date: string; count: number; isToday: boolean }> = [];
           for (let i = 6; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
+            const d = new Date(Date.now() + IST_MS); d.setDate(d.getDate() - i);
             const key = d.toISOString().slice(0, 10);
             const found = lc.last7Days.find(r => r.date === key);
             const label = d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric" });

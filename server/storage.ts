@@ -43,7 +43,7 @@ export interface IStorage {
   listUnsyncedCheckins(): Promise<WalkinCheckin[]>;
   markCheckinSynced(id: string): Promise<void>;
   markCheckinSyncFailed(id: string, error: string): Promise<void>;
-  getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
+  getTodayCheckinCounts(since: Date): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
   getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>>;
 }
 
@@ -168,7 +168,7 @@ export class DbStorage implements IStorage {
       .where(eq(walkinCheckins.id, id));
   }
 
-  async getTodayCheckinCounts(): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
+  async getTodayCheckinCounts(since: Date): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
     const rows = await db
       .select({
         raName: walkinCheckins.raName,
@@ -176,7 +176,7 @@ export class DbStorage implements IStorage {
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(walkinCheckins)
-      .where(sql`submitted_at >= (CURRENT_DATE AT TIME ZONE 'Asia/Kolkata')`)
+      .where(gte(walkinCheckins.submittedAt, since))
       .groupBy(walkinCheckins.raName, walkinCheckins.raBranch);
     return rows;
   }
