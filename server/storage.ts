@@ -182,18 +182,20 @@ export class DbStorage implements IStorage {
   }
 
   async getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>> {
-    const since = new Date();
-    since.setDate(since.getDate() - (days - 1));
-    since.setHours(0, 0, 0, 0);
+    const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+    const istNow = new Date(Date.now() + IST_OFFSET_MS);
+    istNow.setDate(istNow.getDate() - (days - 1));
+    istNow.setUTCHours(0, 0, 0, 0);
+    const since = new Date(istNow.getTime() - IST_OFFSET_MS);
     const rows = await db
       .select({
-        date: sql<string>`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`,
+        date: sql<string>`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`,
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(walkinCheckins)
       .where(gte(walkinCheckins.submittedAt, since))
-      .groupBy(sql`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`)
-      .orderBy(sql`to_char(submitted_at AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`);
+      .groupBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`)
+      .orderBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`);
     return rows;
   }
 }
