@@ -2355,10 +2355,12 @@ export async function registerRoutes(
 
       // ── Conversion ratio — SUMMARY section (Nursery to Grade 12 consolidated) ──
       const conversionRatio: Array<{counselor:string; enquiries:number; open:number; closed:number; admissions:number; ratio:number; provisional:number; ratioWithProv:number}> = [];
+      const CONV_STATUS_LIKE = /ADMIS|CLOSED|FOLLOW[ -]?UP|NOT COUNTED|SEAT NOT|PROVISIONAL|WALKIN|GRAND TOTAL/i;
       for (const r of convRows) {
         if (isEmptyRow(r)) continue;
         const nm = norm(r[1]);
         if (!nm || nm.toLowerCase().includes("name") || nm.toLowerCase() === "total") continue;
+        if (CONV_STATUS_LIKE.test(nm)) continue;
         const enq = +norm(r[2]) || 0; if (!enq) continue;
         conversionRatio.push({
           counselor: nm, enquiries: enq,
