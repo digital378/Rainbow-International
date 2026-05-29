@@ -2155,8 +2155,7 @@ export async function registerRoutes(
         const name = norm(r[3]); if (!name) continue;
         const d = parseDate(r[1]);
         const counselorRaw = norm(r[7]);
-        const STATUS_LIKE = /^(ADMISSION DONE|PROVISIONAL ADMISSION DONE|CLOSED|FOLLOW[ -]?UP|NOT COUNTED AS WALKIN|SEAT NOT AVAILABLE|OPEN)$/i;
-        const isStatusAsCounselor = STATUS_LIKE.test(counselorRaw);
+        const isStatusAsCounselor = /ADMIS|CLOSED|FOLLOW[ -]?UP|NOT COUNTED|SEAT NOT|PROVISIONAL|WALKIN/i.test(counselorRaw);
         const counselor = (!isStatusAsCounselor && counselorRaw) ? counselorRaw : "Unassigned";
         const source = norm(r[8]) || "Unknown";
         const status = upper(r[9]) || "OPEN";
