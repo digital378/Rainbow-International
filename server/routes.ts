@@ -2154,7 +2154,10 @@ export async function registerRoutes(
         if (isEmptyRow(r)) continue;
         const name = norm(r[3]); if (!name) continue;
         const d = parseDate(r[1]);
-        const counselor = norm(r[7]) || "Unassigned";
+        const counselorRaw = norm(r[7]);
+        const STATUS_LIKE = /^(ADMISSION DONE|PROVISIONAL ADMISSION DONE|CLOSED|FOLLOW[ -]?UP|NOT COUNTED AS WALKIN|SEAT NOT AVAILABLE|OPEN)$/i;
+        const isStatusAsCounselor = STATUS_LIKE.test(counselorRaw);
+        const counselor = (!isStatusAsCounselor && counselorRaw) ? counselorRaw : "Unassigned";
         const source = norm(r[8]) || "Unknown";
         const status = upper(r[9]) || "OPEN";
         const grade = norm(r[4]) || "Unspecified";
@@ -2410,7 +2413,7 @@ export async function registerRoutes(
         followup: a.followup,
         admFromList: admByCounselor.get(name) || 0,
         conversion: a.walkins ? Math.round(((a.admissions + a.provisional) / a.walkins) * 10000) / 100 : 0,
-      })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0);
+      })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0 && c.counselor !== "Unassigned");
 
       const overallConversion = walkinsTotal ? Math.round((admTotal / walkinsTotal) * 10000) / 100 : 0;
 
@@ -2431,7 +2434,7 @@ export async function registerRoutes(
             counselors: Array.from(mw.counselors, ([name, c]) => ({
               counselor: name, ...c, admFromList: 0,
               conversion: c.walkins ? Math.round(((c.admissions + c.provisional) / c.walkins) * 10000) / 100 : 0,
-            })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0),
+            })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0 && c.counselor !== "Unassigned"),
           };
         });
 
