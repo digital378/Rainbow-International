@@ -3139,26 +3139,29 @@ paths:
       // ── Individual Conversion pivot (counselor leaderboard) ─────────────────
       // Pivot has per-branch sub-rows plus a "Name Total" aggregate row per counsellor.
       // We keep ONLY the "Total" rows (the real counsellor aggregate) and strip the suffix.
-      // Cols: 0=Counsellor 1=AdmDone(RPS) 2=AdmRIS 3=Closed 4=ClosedTransferRIS
-      //       5=FutureProspect 6=FutureProspect(dup) 7=InProcessAdm 8=Open 9=GrandTotal(unreliable)
-      // CONV% is computed from the actual data columns (not col 9 which is unreliable).
+      // Actual sheet columns (A3:K100):
+      //   0=Counsellor Name  1=SOURCE  2=Adm Done(RPS)  3=ADM done in RIS
+      //   4=Closed  5=Closed(Lead transfer to RIS)  6=Future Prospect  7=Future Prospect(dup)
+      //   8=In Process adm  9=Open  10=Grand Total
+      // NOTE: SOURCE (col 1) is blank on Total rows — previous mapping skipped it, causing
+      //       a 1-column offset that made admDone=0 and read Open as Grand Total (→ 3200% conv).
+      // Grand Total (r[10]) is verified correct: Dipisha=58, Aarti=29, Snehal=90 ✓
       type RpsCounAgg = { admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number };
       const counselorMap = new Map<string, RpsCounAgg>();
       for (const r of indConvRows) {
         if (isEmptyRow(r)) continue;
         const raw = norm(r[0]);
         if (!raw || raw.toLowerCase() === "grand total" || raw.toLowerCase().includes("counsellor")) continue;
-        // Only process "X Total" aggregate rows — skip sub-rows (per-branch breakdowns)
+        // Only process "X Total" aggregate rows — skip per-source/per-branch sub-rows
         if (!raw.toLowerCase().endsWith(" total")) continue;
         const cn = raw.replace(/ total$/i, "").trim();
-        const admDone       = toInt(r[1]);
-        const admRIS        = toInt(r[2]);
-        const closed        = toInt(r[3]) + toInt(r[4]);
-        const futureProspect= toInt(r[5]) + toInt(r[6]);
-        const inProcess     = toInt(r[7]);
-        const open          = toInt(r[8]);
-        // Compute total from actual data (col 9 Grand Total is unreliable in this pivot)
-        const total         = admDone + admRIS + closed + futureProspect + inProcess + open;
+        const admDone       = toInt(r[2]);   // Adm Done (RPS)
+        const admRIS        = toInt(r[3]);   // ADM done in RIS
+        const closed        = toInt(r[4]) + toInt(r[5]);  // Closed + Closed transfer RIS
+        const futureProspect= toInt(r[6]) + toInt(r[7]);  // Future Prospect × 2 cols
+        const inProcess     = toInt(r[8]);   // In Process adm
+        const open          = toInt(r[9]);   // Open
+        const total         = toInt(r[10]);  // Grand Total — verified reliable
         const cur = counselorMap.get(cn) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
         cur.admDone       += admDone;
         cur.admRIS        += admRIS;
@@ -3172,7 +3175,7 @@ paths:
       const counselorLeaderboard = Array.from(counselorMap, ([counselor, c]) => ({
         counselor, ...c,
         conversion: c.total > 0 ? Math.round(((c.admDone + c.admRIS) / c.total) * 1000) / 10 : 0,
-      })).filter(c => c.total > 0).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
+      })).filter(c => c.admDone + c.admRIS > 0 || c.total > 0).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
 
       // ── DM Tracker ──────────────────────────────────────────────────────────
       // Cols: 0=UniqueID 1=Date 2=Month 3=Branch 4=StudentName 5=Grade 6=AcadYear

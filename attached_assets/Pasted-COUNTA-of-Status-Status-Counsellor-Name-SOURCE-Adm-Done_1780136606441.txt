@@ -1,0 +1,135 @@
+COUNTA of  Status		 Status								
+Counsellor Name	SOURCE	Adm Done	ADM done in RIS	Closed	Closed (Lead transfer to RIS)	Future Prospect	Future Prospect 	In Process adm	Open	Grand Total
+ Neelanjali / Swamini Waradkar 	DM	1								1
+ Neelanjali / Swamini Waradkar  Total		1								1
+Aarti 	Direct Walkin	10		3					1	14
+	DM	4		9						13
+	EX- Parent	1								1
+	Sibling	1								1
+Aarti  Total		16		12					1	29
+Amruta	Direct Walkin	1								1
+	DM	4		7						11
+	Referral	5		1						6
+Amruta Total		10		8						18
+Amruta/ Snehal Shetty	Direct Walkin	1								1
+Amruta/ Snehal Shetty Total		1								1
+Asma Shaikh	Direct Walkin	3		4						7
+	DM	2		8						10
+	EX- Parent	1		1						2
+	Referral			1						1
+Asma Shaikh Total		6		14						20
+Bhumika jha 	Direct Walkin	6		7						13
+	DM	5		4						9
+	Referral	1								1
+	Telephonic 	2								2
+Bhumika jha  Total		14		11						25
+Dipisha Wagh	Direct Walkin	14		5				1		20
+	DM	11	1	16					1	29
+	Referral	5		2						7
+	Telephonic 	2								2
+Dipisha Wagh Total		32	1	23				1	1	58
+Dipisha Wagh 	DM			1						1
+Dipisha Wagh  Total				1						1
+Gauri Randhir	Direct Walkin	2		2						4
+	DM	4		1						5
+	EX- Parent	4								4
+	Referral	5								5
+	Sibling	2								2
+Gauri Randhir Total		17		3						20
+Gauri Randhir 	DM	1								1
+Gauri Randhir  Total		1								1
+Gauri Randhir / Prisha Uderani	DM			1						1
+Gauri Randhir / Prisha Uderani Total				1						1
+Madhuri	Direct Walkin	10		10		2				22
+	DM	12		13					3	28
+	EX- Parent	1								1
+	Referral	6		1						7
+	Sibling	1								1
+Madhuri Total		30		24		2			3	59
+Mahima Patel	Direct Walkin	5		7						12
+	DM	2		3						5
+Mahima Patel Total		7		10						17
+Mintu / Prisha Uderani	Direct Walkin	1								1
+Mintu / Prisha Uderani Total		1								1
+Neelanjali	Direct Walkin	14		5						19
+	DM	12		18					1	31
+	DM Online Enquriy	1							1	2
+	Referral	1								1
+	Sibling	1								1
+	Telephonic 	1								1
+Neelanjali Total		30		23					2	55
+Niharika J	Direct Walkin								1	1
+Niharika J Total									1	1
+Niharika Joshi	Direct Walkin								1	1
+Niharika Joshi Total									1	1
+Pooja Bohini	Direct Walkin								2	2
+	Sibling	1								1
+Pooja Bohini Total		1							2	3
+Preeti Nanda	Direct Walkin	4		2						6
+	DM	6		6	1					13
+	Referral	4		1						5
+Preeti Nanda Total		14		9	1					24
+Prisha Uderani	Direct Walkin	8		3						11
+	DM	5		2			2			9
+	EX- Parent	1								1
+	Referral	6								6
+	Sibling	2								2
+Prisha Uderani Total		22		5			2			29
+Priyanka	Direct Walkin	11		5					1	17
+	DM	7		10					3	20
+	EX- Parent	1								1
+	Referral	6		1						7
+	Sibling	3								3
+Priyanka Total		28		16					4	48
+Rajani	Direct Walkin	1								1
+	DM			2						2
+	Referral			1						1
+Rajani Total		1		3						4
+Rajani / Bhumika	Direct Walkin			5						5
+Rajani / Bhumika Total				5						5
+Rajani/Aarti	Direct Walkin			2						2
+	DM			1						1
+Rajani/Aarti Total				3						3
+Sheetal Gaikwad	Direct Walkin			1						1
+	DM			4			1			5
+Sheetal Gaikwad Total				5			1			6
+Shilpa Sikdar	Direct Walkin	10		3						13
+	DM	9		19			1		2	31
+	EX- Parent	1								1
+	Referral	7		1						8
+	Sibling			1						1
+Shilpa Sikdar Total		27		24			1		2	54
+Shilpa Sikdar/ Bhumika Jha 	Referral	1								1
+Shilpa Sikdar/ Bhumika Jha  Total		1								1
+Snehal Kadam	DM			3						3
+	Referral			1						1
+Snehal Kadam Total				4						4
+Snehal Kadam/ Swamini Waradkar	Direct Walkin	1								1
+Snehal Kadam/ Swamini Waradkar Total		1								1
+Snehal Kadam/Swamini Waradkar	Direct Walkin	1								1
+	DM	1								1
+Snehal Kadam/Swamini Waradkar Total		2								2
+Snehal Shetty	Brand Tie up	3								3
+	Direct Walkin	29		7						36
+	DM	18		18					2	38
+	DM Online Enquriy			1						1
+	EX- Parent	3								3
+	Referral	4								4
+	Sibling	4								4
+	Telephonic 	1								1
+Snehal Shetty Total		62		26					2	90
+Swamini Waradkar 	Direct Walkin	7								7
+	DM	16		13			1		3	33
+	DM Online Enquriy			1						1
+	EX- Parent	1								1
+	Referral	8		4						12
+	Sibling	4								4
+Swamini Waradkar  Total		36		18			1		3	58
+Swamini Waradkar/ Snehal Shetty	DM	1								1
+Swamini Waradkar/ Snehal Shetty Total		1								1
+Varija 	Direct Walkin	3		3						6
+	DM	2		2						4
+	Referral	3								3
+Varija  Total		8		5						13
+Grand Total		370	1	253	1	2	5	1	22	655
+										
