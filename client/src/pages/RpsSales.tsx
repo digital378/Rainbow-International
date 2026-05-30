@@ -939,13 +939,11 @@ function RpsDashboard() {
                       <div key={conf} className="rounded-xl p-4" style={{ background: bg }}>
                         <div className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color }}>{conf} Confidence · {Math.round(weight*100)}% weight</div>
                         <div className="text-3xl font-black" style={{ color }}>{totalCount} leads</div>
-                        <div className="text-lg font-black mt-1" style={{ color }}>{fmtL(totalRevConf)}</div>
-                        <div className="text-xs text-slate-500 mt-2">projected revenue</div>
                         <div className="mt-3 space-y-1">
                           {brRevs.map(b => (
                             <div key={b.branch} className="flex justify-between text-xs">
-                              <span className="text-slate-600">{b.branch} ({b.count})</span>
-                              <span className="font-semibold" style={{ color }}>{fmtL(b.revenue)}</span>
+                              <span className="text-slate-600">{b.branch}</span>
+                              <span className="font-semibold" style={{ color }}>{b.count}</span>
                             </div>
                           ))}
                         </div>
