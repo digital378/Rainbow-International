@@ -3137,22 +3137,36 @@ paths:
       }
 
       // ── Individual Conversion pivot (counselor leaderboard) ─────────────────
-      // A3 = first data row (A2 = header)
-      // Cols: 0=Counsellor 1=AdmDone 2=AdmRIS 3=Closed 4=ClosedTransferRIS
-      //       5=FutureProspect 6=FutureProspect(dup) 7=InProcessAdm 8=Open 9=GrandTotal
+      // Pivot has per-branch sub-rows plus a "Name Total" aggregate row per counsellor.
+      // We keep ONLY the "Total" rows (the real counsellor aggregate) and strip the suffix.
+      // Cols: 0=Counsellor 1=AdmDone(RPS) 2=AdmRIS 3=Closed 4=ClosedTransferRIS
+      //       5=FutureProspect 6=FutureProspect(dup) 7=InProcessAdm 8=Open 9=GrandTotal(unreliable)
+      // CONV% is computed from the actual data columns (not col 9 which is unreliable).
       type RpsCounAgg = { admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number };
       const counselorMap = new Map<string, RpsCounAgg>();
       for (const r of indConvRows) {
         if (isEmptyRow(r)) continue;
-        const cn = norm(r[0]); if (!cn || cn.toLowerCase() === "grand total" || cn.toLowerCase().includes("counsellor")) continue;
+        const raw = norm(r[0]);
+        if (!raw || raw.toLowerCase() === "grand total" || raw.toLowerCase().includes("counsellor")) continue;
+        // Only process "X Total" aggregate rows — skip sub-rows (per-branch breakdowns)
+        if (!raw.toLowerCase().endsWith(" total")) continue;
+        const cn = raw.replace(/ total$/i, "").trim();
+        const admDone       = toInt(r[1]);
+        const admRIS        = toInt(r[2]);
+        const closed        = toInt(r[3]) + toInt(r[4]);
+        const futureProspect= toInt(r[5]) + toInt(r[6]);
+        const inProcess     = toInt(r[7]);
+        const open          = toInt(r[8]);
+        // Compute total from actual data (col 9 Grand Total is unreliable in this pivot)
+        const total         = admDone + admRIS + closed + futureProspect + inProcess + open;
         const cur = counselorMap.get(cn) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
-        cur.admDone       += toInt(r[1]);
-        cur.admRIS        += toInt(r[2]);
-        cur.closed        += toInt(r[3]) + toInt(r[4]);
-        cur.futureProspect+= toInt(r[5]) + toInt(r[6]);
-        cur.inProcess     += toInt(r[7]);
-        cur.open          += toInt(r[8]);
-        cur.total         += toInt(r[9]);
+        cur.admDone       += admDone;
+        cur.admRIS        += admRIS;
+        cur.closed        += closed;
+        cur.futureProspect+= futureProspect;
+        cur.inProcess     += inProcess;
+        cur.open          += open;
+        cur.total         += total;
         counselorMap.set(cn, cur);
       }
       const counselorLeaderboard = Array.from(counselorMap, ([counselor, c]) => ({

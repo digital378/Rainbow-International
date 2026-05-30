@@ -1129,45 +1129,72 @@ function RpsDashboard() {
 
           {d.counselorLeaderboard.length > 0 && (
             <div>
-              <SectionTitle sub="From Individual Conversion pivot · sorted by total admissions">Full Counsellor Leaderboard</SectionTitle>
-              <div className="flex justify-end mb-2">
+              <div className="flex items-end justify-between mb-3">
+                <div>
+                  <SectionTitle sub="Individual Conversion pivot · sorted by admissions · Total rows only">Full Counsellor Leaderboard</SectionTitle>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Conv% = Admissions ÷ Total Leads &nbsp;·&nbsp; Total Leads = Adm + Closed + Open + In Progress
+                  </p>
+                </div>
                 <button className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
                   onClick={() => csvDownload("rps-leaderboard.csv",
-                    ["Counsellor","Adm(RPS)","Adm(RIS)","Total Adm","Closed","Open","In Process","Grand Total","Conv%"],
-                    d.counselorLeaderboard.map(c => [c.counselor,c.admDone,c.admRIS,c.admDone+c.admRIS,c.closed,c.open,c.inProcess,c.total,c.conversion]))}>
+                    ["#","Counsellor","Admissions","Closed","Open","In Progress","Total Leads","Conv%"],
+                    d.counselorLeaderboard.map((c,i) => [i+1,c.counselor,c.admDone+c.admRIS,c.closed,c.open,c.inProcess,c.total,c.conversion]))}>
                   ↓ Download CSV
                 </button>
               </div>
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase text-slate-600">
+                  <thead style={{ background: NAVY }} className="text-white text-xs uppercase">
                     <tr>
+                      <th className="text-center py-3 px-3 w-10">#</th>
                       <th className="text-left py-3 px-4">Counsellor</th>
-                      <th className="text-right py-3 px-3">Adm (RPS)</th>
-                      <th className="text-right py-3 px-3">Adm (RIS)</th>
-                      <th className="text-right py-3 px-3">Total</th>
+                      <th className="text-right py-3 px-3">Admissions</th>
                       <th className="text-right py-3 px-3">Closed</th>
                       <th className="text-right py-3 px-3">Open</th>
-                      <th className="text-right py-3 px-3">In Process</th>
-                      <th className="text-right py-3 px-3">Grand Total</th>
-                      <th className="text-right py-3 px-3">Conv%</th>
+                      <th className="text-right py-3 px-3">In Progress</th>
+                      <th className="text-right py-3 px-3">Total Leads</th>
+                      <th className="text-right py-3 px-3 min-w-[120px]">Conv%</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {d.counselorLeaderboard.map((c, i) => (
-                      <tr key={i} className={`border-t border-slate-100 ${i===0?"bg-amber-50":"hover:bg-slate-50"}`}>
-                        <td className="py-2 px-4 font-semibold">{c.counselor}</td>
-                        <td className="text-right py-2 px-3 tabular-nums font-bold" style={{ color: GREEN }}>{c.admDone||"—"}</td>
-                        <td className="text-right py-2 px-3 tabular-nums" style={{ color: CYAN }}>{c.admRIS||"—"}</td>
-                        <td className="text-right py-2 px-3 tabular-nums font-black" style={{ color: GREEN }}>{c.admDone+c.admRIS}</td>
-                        <td className="text-right py-2 px-3 tabular-nums" style={{ color: RED }}>{c.closed||"—"}</td>
-                        <td className="text-right py-2 px-3 tabular-nums" style={{ color: BLUE }}>{c.open||"—"}</td>
-                        <td className="text-right py-2 px-3 tabular-nums" style={{ color: AMBER }}>{c.inProcess||"—"}</td>
-                        <td className="text-right py-2 px-3 tabular-nums">{c.total}</td>
-                        <td className="text-right py-2 px-3 tabular-nums font-bold"
-                          style={{ color: c.conversion>=50?GREEN:c.conversion>=30?AMBER:RED }}>{pct(c.conversion)}</td>
-                      </tr>
-                    ))}
+                    {d.counselorLeaderboard.map((c, i) => {
+                      const totalAdm = c.admDone + c.admRIS;
+                      const convColor = c.conversion >= 50 ? GREEN : c.conversion >= 30 ? AMBER : RED;
+                      const rankEmoji = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
+                      return (
+                        <tr key={i} className={`border-t border-slate-100 ${i===0?"bg-amber-50":i<3?"bg-green-50/40":"hover:bg-slate-50"}`}>
+                          <td className="text-center py-3 px-3 text-slate-400 font-bold text-xs">
+                            {rankEmoji ?? <span className="text-slate-300">{i+1}</span>}
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-slate-800">{c.counselor}</td>
+                          <td className="text-right py-3 px-3 tabular-nums">
+                            <span className="inline-flex items-center gap-1 font-black text-base" style={{ color: GREEN }}>
+                              {totalAdm}
+                            </span>
+                            {c.admDone > 0 && c.admRIS > 0 && (
+                              <div className="text-[10px] text-slate-400 text-right">
+                                RPS {c.admDone} · RIS {c.admRIS}
+                              </div>
+                            )}
+                          </td>
+                          <td className="text-right py-3 px-3 tabular-nums font-semibold" style={{ color: RED }}>{c.closed || "—"}</td>
+                          <td className="text-right py-3 px-3 tabular-nums font-semibold" style={{ color: BLUE }}>{c.open || "—"}</td>
+                          <td className="text-right py-3 px-3 tabular-nums font-semibold" style={{ color: AMBER }}>{c.inProcess || "—"}</td>
+                          <td className="text-right py-3 px-3 tabular-nums text-slate-500">{c.total}</td>
+                          <td className="py-3 px-3">
+                            <div className="flex items-center gap-2 justify-end">
+                              <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                                <div className="h-full rounded-full" style={{ width: `${Math.min(c.conversion, 100)}%`, background: convColor }} />
+                              </div>
+                              <span className="tabular-nums font-bold text-xs min-w-[38px] text-right" style={{ color: convColor }}>
+                                {pct(c.conversion)}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
