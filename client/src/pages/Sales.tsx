@@ -175,6 +175,7 @@ function SalesDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>("YTD");
+  const [activeTab, setActiveTab] = useState<"overview"|"trends"|"analytics"|"counselors"|"recent">("overview");
   const cancelled = useRef(false);
 
   const fetchData = useCallback(() => {
@@ -281,7 +282,33 @@ function SalesDashboard() {
         </div>
       </div>
 
+      {/* Tab bar */}
+      <div className="sticky top-[45px] z-10 border-b border-slate-200 shadow-sm" style={{ background: NAVY }}>
+        <div className="max-w-7xl mx-auto px-6 flex gap-1 overflow-x-auto">
+          {([
+            ["overview",   "Overview"],
+            ["trends",     "Targets & Trends"],
+            ["analytics",  "Analytics"],
+            ["counselors", "Counselors"],
+            ["recent",     "Recent"],
+          ] as const).map(([id, label]) => (
+            <button key={id} onClick={() => setActiveTab(id)}
+              className="px-4 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2"
+              style={{
+                color: activeTab === id ? AMBER : "rgba(255,255,255,0.65)",
+                borderBottomColor: activeTab === id ? AMBER : "transparent",
+                background: "transparent",
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto p-6 space-y-8">
+
+        {/* ══ OVERVIEW ══════════════════════════════════════════════════════════ */}
+        {activeTab === "overview" && <>
 
         {/* KPIs Row 1 — Core Metrics */}
         <div>
@@ -422,6 +449,11 @@ function SalesDashboard() {
           </div>
         )}
 
+        </>}
+
+        {/* ══ TRENDS ════════════════════════════════════════════════════════════ */}
+        {activeTab === "trends" && <>
+
         {/* Target vs Actual */}
         <div>
           <SectionTitle sub="Monthly admissions target vs achieved · From RIS Target Sheet">Target vs Actual — AY 2026-27</SectionTitle>
@@ -512,6 +544,11 @@ function SalesDashboard() {
           </div>
         </div>
 
+        </>}
+
+        {/* ══ ANALYTICS ═════════════════════════════════════════════════════════ */}
+        {activeTab === "analytics" && <>
+
         {/* Walkin Breakdowns */}
         <div>
           <SectionTitle>Walkin Breakdowns</SectionTitle>
@@ -578,6 +615,11 @@ function SalesDashboard() {
             </ChartCard>
           </div>
         </div>
+
+        </>}
+
+        {/* ══ COUNSELORS ════════════════════════════════════════════════════════ */}
+        {activeTab === "counselors" && <>
 
         {/* Counselor Leaderboard */}
         <div>
@@ -925,6 +967,11 @@ function SalesDashboard() {
           );
         })()}
 
+        </>}
+
+        {/* ══ RECENT ════════════════════════════════════════════════════════════ */}
+        {activeTab === "recent" && <>
+
         {/* Recent Tables */}
         <div className="grid md:grid-cols-2 gap-4">
           <div>
@@ -1029,6 +1076,8 @@ function SalesDashboard() {
             </div>
           </div>
         )}
+
+        </>}
 
         <div className="text-xs text-slate-400 text-center pb-4">
           Data sourced from Google Sheets · Generated {new Date(data.generatedAt).toLocaleString()} · Internal use only
