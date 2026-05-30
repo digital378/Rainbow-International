@@ -1021,7 +1021,7 @@ function RpsDashboard() {
                           <td className="text-right tabular-nums font-bold" style={{ color: AMBER }}>{b.dm||"—"}</td>
                           <td className="text-right tabular-nums">{b.referral||"—"}</td>
                           <td className="text-right tabular-nums font-black" style={{ color: BLUE }}>{b.total}</td>
-                          <td className="text-right tabular-nums text-xs" style={{ color: GREEN }}>{b.dm ? fmtL(b.dm * feeFor(b.branch) * 0.5) : "—"}</td>
+                          <td className="text-right tabular-nums text-xs" style={{ color: GREEN }}>{b.dm ? fmtL(b.dm * feeFor(b.branch)) : "—"}</td>
                         </tr>
                       ))}
                       <tr className="border-t-2 border-slate-300 font-bold">
