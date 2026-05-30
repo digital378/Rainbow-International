@@ -3083,10 +3083,10 @@ paths:
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
         const coun = norm(r[10]); if (!coun || coun === "Unassigned") continue;
-        const st = upper(r[14]); if (!st) continue; // must have a status
         const lb = counselorLBMap.get(coun) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
-        lb.total++;
-        if (st === "ADM DONE")          lb.admDone++;
+        lb.total++; // count every row where counsellor name is present
+        const st = upper(r[14]);
+        if (st === "ADM DONE")             lb.admDone++;
         else if (st === "ADM DONE IN RIS") lb.admRIS++;
         else if (st.startsWith("CLOSED"))  lb.closed++;
         else if (st === "OPEN")            lb.open++;
