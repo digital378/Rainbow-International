@@ -1,0 +1,85 @@
+PROJECT
+=======
+Rainbow Preschools (RPS) — Sales & DM Performance Dashboard
+Academic Year: 26-27
+Goal of v2.3: fix metric bugs, deepen DM-pipeline analytics, and surface
+actionable cohort insights – all powered by a single Google Sheet.
+
+---------------------------------------------------------------------------
+1.  S T A C K   &   P R O J  S E T U P
+---------------------------------------------------------------------------
+• React 18 + Vite + Typescript
+• State: Zustand
+• Date lib: dayjs (UTC mode, timezone neutral)
+• Charts: Recharts v2
+• Styling: Tailwind v3 + headless-ui for popovers/dialogs
+• API: Google Sheets v4 with service-account creds (already in /secrets)
+• Caching: localStorage 5 min soft cache, hourly hard refresh
+• Tests: Vitest + React Testing Library + @testing-library/jest-dom
+• Code quality: ESLint airbnb, Prettier, Husky pre-commit
+Folder baseline
+src/
+ ├─ api/          (googleSheets.ts, cache.ts)
+ ├─ data/         (selectors.ts, models.ts)
+ ├─ utils/        (metrics.ts, cohort.ts)
+ ├─ store/        (leadsStore.ts, uiStore.ts)
+ ├─ components/   (KpiCard.tsx, Gauge.tsx, etc.)
+ ├─ pages/
+ │    ├─ Overview/
+ │    ├─ DeepAnalytics/
+ │    ├─ DmPipeline/
+ │    ├─ Branch/
+ │    └─ Counselors/
+ └─ tests/
+
+---------------------------------------------------------------------------
+2.  D A T A   S O U R C E S   &   M A P P I N G S
+---------------------------------------------------------------------------
+Sheet:  **RPS Walk-in report 2026-2027**
+
+Tab ➜  Required columns                ➜  Type → Notes
+--------------------------------------------------------------------------------
+Walkin Data
+  A  No.                                number
+  B  Enquiry Date                       date
+  C  Month                              text (e.g. “Oct 25”)
+  D  Branch                             enum
+  E  Student Name                       text
+  F  Grade                              enum (Nursery, Jr Kg, …)
+  G  Acad Year Enq                      enum (26-27…)
+  N  SOURCE                             enum (DM, Direct Walkin…)
+  O  Status                             enum (Adm Done, Open, In Process, Closed,
+                                           Future Prospect)
+  P  Admission Date                     date|blank
+  T  Unique ID                          text (already formula-generated)
+
+DM Tracker
+  A2:…  Imported view for SOURCE = “DM” only
+  H  Sales Confidence                   enum (High, Medium, Low)
+
+Branch Admissions
+  C  TargetAdm                          number per branch per month
+  D  TargetEnq                          number per branch per month
+
+Branch Open
+  Live open pipeline counts by branch (reference only)
+
+---------------------------------------------------------------------------
+3.  B U G  F I X  — Median / P90 Lead-Time
+---------------------------------------------------------------------------
+Issue (v2.1): median shows 0 days due to rows missing both dates or date-order
+errors.
+
+Implementation:
+```ts
+// utils/metrics.ts
+export function getLeadTimeStats(rows: LeadRow[]): {
+  median: number; p90: number; sample: number; total: number
+} {
+  const deltas = rows
+    .filter(r => r.enqDate && r.admDate && dayjs(r.admDate).isAfter(r.enqDate))
+    .map(r => dayjs(r.admDate).diff(r.enqDate, 'day'));
+  const median = d3.median(deltas) ?? 0;
+  const p90    = d3.quantile(deltas, 0.9) ?? 0;
+  return { median, p90, sample: deltas.length, total: rows.length };
+}
