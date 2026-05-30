@@ -3068,18 +3068,6 @@ paths:
         if (isAdm || isAdmRIS) cf.admitted++;
         counselorFunnelMap.set(counselor, cf);
 
-        // Counselor leaderboard (walkin-derived)
-        if (counselor !== "Unassigned") {
-          const lb = counselorLBMap.get(counselor) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
-          lb.total++;
-          if (isAdm)    lb.admDone++;
-          if (isAdmRIS) lb.admRIS++;
-          if (isClosed) lb.closed++;
-          if (isOpen)   lb.open++;
-          if (isInProc) lb.inProcess++;
-          if (isFuture) lb.futureProspect++;
-          counselorLBMap.set(counselor, lb);
-        }
 
         recentEnquiries.push({
           date: d ? `${d.getDate()} ${d.toLocaleString("en-US",{month:"short"})} ${String(d.getFullYear()).slice(2)}` : "",
@@ -3088,6 +3076,24 @@ paths:
         });
       }
       recentEnquiries.sort((a, b) => b.sortKey - a.sortKey);
+
+      // ── Counselor leaderboard — dedicated pass (does NOT gate on student name) ──
+      // The main walkin loop skips rows with empty student names; the pivot counts ALL rows
+      // where the counsellor column is filled. This separate pass matches the pivot's count.
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const coun = norm(r[10]); if (!coun || coun === "Unassigned") continue;
+        const st = upper(r[14]); if (!st) continue; // must have a status
+        const lb = counselorLBMap.get(coun) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
+        lb.total++;
+        if (st === "ADM DONE")          lb.admDone++;
+        else if (st === "ADM DONE IN RIS") lb.admRIS++;
+        else if (st.startsWith("CLOSED"))  lb.closed++;
+        else if (st === "OPEN")            lb.open++;
+        else if (st === "IN PROCESS ADM")  lb.inProcess++;
+        else if (st.startsWith("FUTURE"))  lb.futureProspect++;
+        counselorLBMap.set(coun, lb);
+      }
 
       // ── Lead time stats ─────────────────────────────────────────────────────
       leadDays.sort((a, b) => a - b);
