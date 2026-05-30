@@ -58,6 +58,7 @@ const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunder
 const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
 const Marketing = lazy(() => import("@/pages/Marketing"));
 const Sales = lazy(() => import("@/pages/Sales"));
+const RpsSales = lazy(() => import("@/pages/RpsSales"));
 const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
@@ -127,6 +128,7 @@ function Router() {
       <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
       <Route path="/marketing" component={Marketing} />
       <Route path="/sales" component={Sales} />
+      <Route path="/rps-sales" component={RpsSales} />
       <Route path="/walkin/:slug" component={WalkinForm} />
       <Route path="/admin/ras/submissions" component={AdminSubmissions} />
       <Route path="/admin/ras/:slug/qr" component={QRCard} />

@@ -2844,5 +2844,208 @@ paths:
     }
   });
 
+  // ── RPS Sales Dashboard ─────────────────────────────────────────────────────
+  app.get("/api/rps-sales/live", async (_req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    try {
+      const RPS_SID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
+      const [walkinRows, indConvRows, dmRows, misRows] = await Promise.all([
+        fetchSheetRange(RPS_SID, "'Walkin Data'!A2:U5000"),
+        fetchSheetRange(RPS_SID, "'Individual Conversion'!A3:K100"),
+        fetchSheetRange(RPS_SID, "'DM Tracker'!A2:Z5000"),
+        fetchSheetRange(RPS_SID, "'MIS DASHBOARD'!A5:D100"),
+      ]);
+
+      const norm  = (s: any) => String(s ?? "").trim();
+      const upper = (s: any) => norm(s).toUpperCase();
+      const isEmptyRow = (r: any[]) => !r || r.every(c => norm(c) === "");
+      const toInt = (s: any) => parseInt(norm(s).replace(/,/g, ""), 10) || 0;
+
+      const parseDate = (s: any): Date | null => {
+        const v = norm(s); if (!v) return null;
+        const t = v.replace(/\./g, "/").replace(/\s+/g, " ");
+        const d1 = new Date(t);
+        if (!isNaN(d1.getTime()) && d1.getFullYear() > 2020 && d1.getFullYear() < 2030) return d1;
+        const m = t.match(/^(\d{1,2})[\s\-\/]([A-Za-z]{3,})[\s\-\/](\d{2,4})$/);
+        if (m) {
+          const y = m[3].length === 2 ? 2000 + +m[3] : +m[3];
+          const d2 = new Date(`${m[2]} ${m[1]}, ${y}`);
+          if (!isNaN(d2.getTime())) return d2;
+        }
+        return null;
+      };
+      const mkKey   = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+      const mkLabel = (d: Date) => d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+
+      const now = new Date();
+      const curMK = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+
+      // ── Walkin Data ─────────────────────────────────────────────────────────
+      // Cols: 0=No 1=Date 2=Month 3=Branch 4=StudentName 5=Grade 6=AcadYear
+      //       7=MotherContact 8=FatherContact 9=Email 10=Counsellor
+      //       11=CounsellingRecorded 12=SchoolTour 13=SOURCE 14=Status
+      //       15=AdmDate 16=Remarks 17=ReasonForClosed 18=Trial 19=UniqueID 20=MIS
+      let totalEnq = 0, totalAdm = 0, totalAdmRIS = 0, openEnq = 0, closedTotal = 0, inProcess = 0, futureProspect = 0;
+      let thisMonthEnq = 0, thisMonthAdm = 0;
+
+      const byMonthMap  = new Map<string, { label: string; enquiries: number; admissions: number }>();
+      const byBranchMap = new Map<string, { enquiries: number; admissions: number; open: number; closed: number }>();
+      const bySourceMap = new Map<string, { enquiries: number; admissions: number }>();
+      const byGradeMap  = new Map<string, number>();
+      const closedReasonMap = new Map<string, number>();
+      type RpsRecent = { date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; sortKey: number };
+      const recentEnquiries: RpsRecent[] = [];
+
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[4]); if (!name) continue;
+        const d       = parseDate(r[1]);
+        const branch  = norm(r[3]) || "Unknown";
+        const source  = norm(r[13]) || "Unknown";
+        const statusRaw = upper(r[14]);
+        const grade   = norm(r[5]) || "Unspecified";
+        const reason  = norm(r[17]);
+
+        const isAdm    = statusRaw === "ADM DONE";
+        const isAdmRIS = statusRaw === "ADM DONE IN RIS";
+        const isClosed = statusRaw.startsWith("CLOSED");
+        const isOpen   = statusRaw === "OPEN";
+        const isInProc = statusRaw === "IN PROCESS ADM";
+        const isFuture = statusRaw.startsWith("FUTURE");
+
+        totalEnq++;
+        if (isAdm)    totalAdm++;
+        if (isAdmRIS) totalAdmRIS++;
+        if (isClosed) { closedTotal++; if (reason) closedReasonMap.set(reason, (closedReasonMap.get(reason)||0)+1); }
+        if (isOpen)   openEnq++;
+        if (isInProc) inProcess++;
+        if (isFuture) futureProspect++;
+
+        if (d) {
+          const mk = mkKey(d);
+          const mo = byMonthMap.get(mk) || { label: mkLabel(d), enquiries: 0, admissions: 0 };
+          mo.enquiries++;
+          if (isAdm || isAdmRIS) mo.admissions++;
+          byMonthMap.set(mk, mo);
+          if (mk === curMK) { thisMonthEnq++; if (isAdm || isAdmRIS) thisMonthAdm++; }
+        }
+
+        const br = byBranchMap.get(branch) || { enquiries: 0, admissions: 0, open: 0, closed: 0 };
+        br.enquiries++;
+        if (isAdm || isAdmRIS) br.admissions++;
+        if (isOpen || isInProc || isFuture) br.open++;
+        if (isClosed) br.closed++;
+        byBranchMap.set(branch, br);
+
+        const src = bySourceMap.get(source) || { enquiries: 0, admissions: 0 };
+        src.enquiries++;
+        if (isAdm || isAdmRIS) src.admissions++;
+        bySourceMap.set(source, src);
+
+        byGradeMap.set(grade, (byGradeMap.get(grade)||0)+1);
+
+        recentEnquiries.push({
+          date: d ? `${d.getDate()} ${d.toLocaleString("en-US",{month:"short"})} ${String(d.getFullYear()).slice(2)}` : "",
+          name, grade, branch, source, status: statusRaw,
+          counselor: norm(r[10]) || "—",
+          sortKey: d ? d.getTime() : 0,
+        });
+      }
+      recentEnquiries.sort((a, b) => b.sortKey - a.sortKey);
+
+      // ── Individual Conversion pivot (counselor leaderboard) ─────────────────
+      // A3 = first data row (A2 = header)
+      // Cols: 0=Counsellor 1=AdmDone 2=AdmRIS 3=Closed 4=ClosedTransferRIS
+      //       5=FutureProspect 6=FutureProspect(dup) 7=InProcessAdm 8=Open 9=GrandTotal
+      type RpsCounAgg = { admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number };
+      const counselorMap = new Map<string, RpsCounAgg>();
+      for (const r of indConvRows) {
+        if (isEmptyRow(r)) continue;
+        const cn = norm(r[0]); if (!cn || cn.toLowerCase() === "grand total" || cn.toLowerCase().includes("counsellor")) continue;
+        const cur = counselorMap.get(cn) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
+        cur.admDone       += toInt(r[1]);
+        cur.admRIS        += toInt(r[2]);
+        cur.closed        += toInt(r[3]) + toInt(r[4]);
+        cur.futureProspect+= toInt(r[5]) + toInt(r[6]);
+        cur.inProcess     += toInt(r[7]);
+        cur.open          += toInt(r[8]);
+        cur.total         += toInt(r[9]);
+        counselorMap.set(cn, cur);
+      }
+      const counselorLeaderboard = Array.from(counselorMap, ([counselor, c]) => ({
+        counselor, ...c,
+        conversion: c.total > 0 ? Math.round(((c.admDone + c.admRIS) / c.total) * 1000) / 10 : 0,
+      })).filter(c => c.total > 0).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
+
+      // ── DM Tracker pipeline ─────────────────────────────────────────────────
+      // Cols: 0=UniqueID 1=Date 2=Month 3=Branch 4=StudentName 5=Grade 6=AcadYear
+      //       7=MothersContact 8=FathersContact 9=Email 10=Counsellor 11=Source
+      //       12=EnqMode 13=AdmDate 14=AdmMonth 15=Remarks 16=DaysSinceVisit
+      //       17=AdmDeadline 18=Status(Admitted/Closed/Open) 19=DeadlineExt
+      //       20=SalesConfidence 21=DeadlineStatus 22=ConversionTimeline
+      let dmAdmitted = 0, dmOpen = 0, dmClosed = 0;
+      const dmByBranchMap    = new Map<string, { admitted: number; open: number; closed: number }>();
+      const dmConfidenceMap  = new Map<string, number>();
+
+      for (const r of dmRows) {
+        if (isEmptyRow(r)) continue;
+        const name   = norm(r[4]); if (!name) continue;
+        const status = norm(r[18]).toLowerCase();
+        const branch = norm(r[3]) || "Unknown";
+        const conf   = norm(r[20]) || "Unknown";
+
+        if (status === "admitted")    dmAdmitted++;
+        else if (status === "closed") dmClosed++;
+        else if (status === "open")   dmOpen++;
+        else continue;
+
+        const br = dmByBranchMap.get(branch) || { admitted:0, open:0, closed:0 };
+        if (status === "admitted")    br.admitted++;
+        else if (status === "closed") br.closed++;
+        else if (status === "open")   br.open++;
+        dmByBranchMap.set(branch, br);
+
+        if (status === "open" && conf && conf !== "Unknown")
+          dmConfidenceMap.set(conf, (dmConfidenceMap.get(conf)||0)+1);
+      }
+
+      // ── MIS History (cumulative running totals) ─────────────────────────────
+      // A5 = first data row; Cols: 0=Date(DD.MM.YYYY) 1=TotalWalkins 2=TotalAdm 3=TargetGap
+      const misHistory: Array<{ date: string; walkins: number; admissions: number; gap: number }> = [];
+      for (const r of misRows) {
+        if (isEmptyRow(r)) continue;
+        const date = norm(r[0]); if (!/\d{2}\.\d{2}\.\d{4}/.test(date)) continue;
+        const walkins = toInt(r[1]); if (!walkins) continue;
+        misHistory.push({ date, walkins, admissions: toInt(r[2]), gap: toInt(r[3]) });
+      }
+
+      // ── Shape output ────────────────────────────────────────────────────────
+      const byMonth  = Array.from(byMonthMap,  ([monthKey, v]) => ({ monthKey, ...v })).sort((a,b) => a.monthKey.localeCompare(b.monthKey));
+      const byBranch = Array.from(byBranchMap, ([branch, v]) => ({
+        branch, ...v, conversion: v.enquiries ? Math.round((v.admissions/v.enquiries)*1000)/10 : 0,
+      })).sort((a,b) => b.admissions - a.admissions);
+      const bySource = Array.from(bySourceMap, ([source, v]) => ({ source, ...v })).sort((a,b) => b.enquiries - a.enquiries);
+      const byGrade  = Array.from(byGradeMap,  ([grade, count]) => ({ grade, count })).sort((a,b) => b.count - a.count);
+      const closedReasons = Array.from(closedReasonMap, ([reason, count]) => ({ reason, count })).sort((a,b) => b.count - a.count).slice(0,12);
+      const overallConversion = totalEnq ? Math.round(((totalAdm + totalAdmRIS)/totalEnq)*1000)/10 : 0;
+
+      res.json({
+        generatedAt: new Date().toISOString(),
+        kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
+        byMonth, byBranch, bySource, byGrade, counselorLeaderboard, closedReasons,
+        recentEnquiries: recentEnquiries.slice(0, 20),
+        dmPipeline: {
+          admitted: dmAdmitted, open: dmOpen, closed: dmClosed,
+          byBranch: Array.from(dmByBranchMap, ([branch, v]) => ({ branch, ...v })).sort((a,b) => b.admitted - a.admitted),
+          byConfidence: Array.from(dmConfidenceMap, ([confidence, count]) => ({ confidence, count })).sort((a,b) => b.count - a.count),
+        },
+        misHistory: misHistory.slice(-30),
+      });
+    } catch (err: any) {
+      console.error("[rps-sales] error:", err?.message);
+      res.status(500).json({ message: err?.message || "Failed to load RPS sales data" });
+    }
+  });
+
   return httpServer;
 }
