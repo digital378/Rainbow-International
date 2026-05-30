@@ -1131,9 +1131,9 @@ function RpsDashboard() {
             <div>
               <div className="flex items-end justify-between mb-3">
                 <div>
-                  <SectionTitle sub="Individual Conversion pivot · sorted by admissions · Total rows only">Full Counsellor Leaderboard</SectionTitle>
+                  <SectionTitle sub="From Walkin Data · every enquiry row · sorted by admissions">Full Counsellor Leaderboard</SectionTitle>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Conv% = Admissions ÷ Total Leads &nbsp;·&nbsp; Total Leads = Adm + Closed + Open + In Progress
+                    Conv% = Admissions ÷ Total Enquiries &nbsp;·&nbsp; Total Enquiries = all leads assigned to counsellor
                   </p>
                 </div>
                 <button className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
