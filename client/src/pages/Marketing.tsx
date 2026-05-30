@@ -249,6 +249,7 @@ function MarketingDashboard() {
   const [rpsCrmMonth, setRpsCrmMonth] = useState<string>("");
   const [risCrmMonth, setRisCrmMonth] = useState<string>("");
   const [branchCompareMonth, setBranchCompareMonth] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"overview"|"whatif"|"crm"|"trends"|"summary">("overview");
 
   useEffect(() => {
     document.title = "Marketing Dashboard | Rainbow International School";
@@ -598,7 +599,33 @@ function MarketingDashboard() {
         </div>
       </div>
 
+      {/* ─── Tab bar ─── */}
+      <div className="sticky top-[53px] z-30 border-b border-white/10 shadow-md" style={{ background: NAVY }}>
+        <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
+          {([
+            ["overview", "Overview"],
+            ["whatif",   "What-If"],
+            ["crm",      "CRM"],
+            ["trends",   "Trends"],
+            ["summary",  "Summary"],
+          ] as const).map(([id, label]) => (
+            <button key={id} onClick={() => setActiveTab(id)}
+              className="px-4 py-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2"
+              style={{
+                color: activeTab === id ? AMBER : "rgba(255,255,255,0.65)",
+                borderBottomColor: activeTab === id ? AMBER : "transparent",
+                background: "transparent",
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+
+        {/* ══ OVERVIEW ══════════════════════════════════════════════════════════ */}
+        {activeTab === "overview" && <>
 
         {/* ───────── 1. PRIMARY KPI ROW ───────── */}
         <section>
@@ -741,6 +768,11 @@ function MarketingDashboard() {
           </div>
         </section>
 
+        </> /* end OVERVIEW */}
+
+        {/* ══ WHAT-IF ═══════════════════════════════════════════════════════════ */}
+        {activeTab === "whatif" && <>
+
         {/* ───────── 5. WHAT-IF CALCULATOR (with True ROI) ───────── */}
         <section className="bg-gradient-to-br from-[#091a4f] to-[#0d3b86] rounded-2xl p-6 text-white shadow-lg">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -843,6 +875,11 @@ function MarketingDashboard() {
             True ROI = (Revenue − Spend − {inr(monthlyFixed)} fixed cost) ÷ (Spend + Fixed) × 100.
           </div>
         </section>
+
+        </> /* end WHAT-IF */}
+
+        {/* ══ CRM ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === "crm" && <>
 
         {/* ───────── 6. CRM PERFORMANCE SNAPSHOT ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -1420,6 +1457,11 @@ function MarketingDashboard() {
           </section>
         )}
 
+        </> /* end CRM */}
+
+        {/* ══ TRENDS ════════════════════════════════════════════════════════════ */}
+        {activeTab === "trends" && <>
+
         {/* ───────── 8. Monthly Trend Charts (with True CPA + Funnel) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -1613,6 +1655,11 @@ function MarketingDashboard() {
             ))}
           </div>
         </section>
+
+        </> /* end TRENDS */}
+
+        {/* ══ SUMMARY ═══════════════════════════════════════════════════════════ */}
+        {activeTab === "summary" && <>
 
         {/* ───────── 12. Monthly Summary Table (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -1968,6 +2015,8 @@ function MarketingDashboard() {
             })}
           </div>
         </section>
+
+        </> /* end SUMMARY */}
 
         {/* Footer */}
         <div className="text-center text-xs text-gray-400 pb-6 pt-2 border-t border-gray-200">
