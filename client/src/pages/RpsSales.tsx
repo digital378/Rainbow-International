@@ -599,10 +599,10 @@ function RpsDashboard() {
           {d.dCohort.length > 0 && (
             <div>
               <SectionTitle sub="Weekly DM walk-in cohorts · conversion speed from D-Cohort tab">DM Weekly Cohort — Conversion Speed</SectionTitle>
-              <ChartCard title="DM conversions by speed tier per cohort week" height={320}>
-                <BarChart data={d.dCohort.slice(-16)} margin={{ top: 5, right: 20, left: 0, bottom: 40 }}>
+              <ChartCard title="DM conversions by speed tier per cohort week" height={340}>
+                <BarChart data={d.dCohort.slice(-16)} margin={{ top: 5, right: 20, left: 0, bottom: 60 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="week" tick={{ fontSize: 9 }} angle={-35} textAnchor="end" interval={0} />
+                  <XAxis dataKey="week" tick={{ fontSize: 8 }} angle={-50} textAnchor="end" interval={0} height={65} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip />
                   <Legend />
@@ -769,15 +769,6 @@ function RpsDashboard() {
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
                   <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Google Ads</div>
                   <div className="text-lg font-black" style={{ color: RED }}>{INR(mktMonth.google)}</div>
-                </div>
-              </div>
-            )}
-            {rev.paybackLabel && (
-              <div className="mt-3 p-3 rounded-lg flex items-center gap-2" style={{ background: GREEN + "15" }}>
-                <span className="text-2xl">✅</span>
-                <div>
-                  <span className="font-bold text-green-700">Payback achieved in <em>{rev.paybackLabel}</em></span>
-                  <span className="text-sm text-slate-600 ml-2">— cumulative net revenue turned positive</span>
                 </div>
               </div>
             )}
