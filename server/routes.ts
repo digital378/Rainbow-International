@@ -2844,6 +2844,24 @@ paths:
     }
   });
 
+  // ── RPS Marketing Monthly Spend (mock data, v2.4) ───────────────────────────
+  app.get("/api/marketing/monthly", (_req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    // Mock DM-campaign spend per month (academic year 26-27, Aug 25 – May 26)
+    res.json([
+      { monthKey: "2508", label: "Aug 25", spend: 320000 },
+      { monthKey: "2509", label: "Sep 25", spend: 450000 },
+      { monthKey: "2510", label: "Oct 25", spend: 385000 },
+      { monthKey: "2511", label: "Nov 25", spend: 520000 },
+      { monthKey: "2512", label: "Dec 25", spend: 410000 },
+      { monthKey: "2601", label: "Jan 26", spend: 580000 },
+      { monthKey: "2602", label: "Feb 26", spend: 640000 },
+      { monthKey: "2603", label: "Mar 26", spend: 560000 },
+      { monthKey: "2604", label: "Apr 26", spend: 480000 },
+      { monthKey: "2605", label: "May 26", spend: 390000 },
+    ]);
+  });
+
   // ── RPS Sales Dashboard ─────────────────────────────────────────────────────
   app.get("/api/rps-sales/live", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
