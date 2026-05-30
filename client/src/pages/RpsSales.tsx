@@ -951,19 +951,6 @@ function RpsDashboard() {
                     );
                   })}
                 </div>
-                <div className="rounded-lg p-4 bg-slate-50 border border-slate-200">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div>
-                      <span className="text-sm text-slate-600 font-semibold">Total Projected (weighted): </span>
-                      <span className="text-xl font-black" style={{ color: CYAN }}>{fmtL(rev.projectedRev)}</span>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-600 font-semibold">Total Unweighted (all open × avg fee): </span>
-                      <span className="text-lg font-bold" style={{ color: SLATE }}>{fmtL(d.dmPipeline.open * rev.avgFee)}</span>
-                    </div>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-2">Fee rule: Kalwa {INR(feeFor("Kalwa"))} · Others {INR(feeFor("default"))}</div>
-                </div>
               </div>
             )}
 
