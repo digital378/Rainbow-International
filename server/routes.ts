@@ -2895,6 +2895,15 @@ paths:
       const closedReasonMap = new Map<string, number>();
       type RpsRecent = { date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; sortKey: number };
       const recentEnquiries: RpsRecent[] = [];
+      // Lead time (enquiry → admission)
+      const leadDays: number[] = [];
+      // Ageing for open/in-process leads
+      let age0_7 = 0, age7_14 = 0, age15_30 = 0, age31_60 = 0, age60p = 0;
+      // Closed reason by month for heat-map
+      const closedByMonthReason = new Map<string, Map<string, number>>();
+      // Counselor funnel (from Walkin Data cols 11=CounsellingRecorded 12=SchoolTour)
+      type CounFunnel = { enquiries: number; counselled: number; toured: number; admitted: number };
+      const counselorFunnelMap = new Map<string, CounFunnel>();
 
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
@@ -2905,6 +2914,7 @@ paths:
         const statusRaw = upper(r[14]);
         const grade   = norm(r[5]) || "Unspecified";
         const reason  = norm(r[17]);
+        const counselor = norm(r[10]) || "Unassigned";
 
         const isAdm    = statusRaw === "ADM DONE";
         const isAdmRIS = statusRaw === "ADM DONE IN RIS";
@@ -2928,6 +2938,29 @@ paths:
           if (isAdm || isAdmRIS) mo.admissions++;
           byMonthMap.set(mk, mo);
           if (mk === curMK) { thisMonthEnq++; if (isAdm || isAdmRIS) thisMonthAdm++; }
+          // Lead time
+          if ((isAdm || isAdmRIS) && norm(r[15])) {
+            const admD = parseDate(r[15]);
+            if (admD) {
+              const days = Math.round((admD.getTime() - d.getTime()) / 86400000);
+              if (days >= 0 && days < 400) leadDays.push(days);
+            }
+          }
+          // Ageing for open leads
+          if (isOpen || isInProc || isFuture) {
+            const daysOld = Math.round((now.getTime() - d.getTime()) / 86400000);
+            if (daysOld < 7) age0_7++;
+            else if (daysOld < 15) age7_14++;
+            else if (daysOld < 31) age15_30++;
+            else if (daysOld < 61) age31_60++;
+            else age60p++;
+          }
+          // Closed reason by month
+          if (isClosed && reason) {
+            const rMap = closedByMonthReason.get(mk) || new Map();
+            rMap.set(reason, (rMap.get(reason)||0)+1);
+            closedByMonthReason.set(mk, rMap);
+          }
         }
 
         const br = byBranchMap.get(branch) || { enquiries: 0, admissions: 0, open: 0, closed: 0 };
@@ -2944,14 +2977,84 @@ paths:
 
         byGradeMap.set(grade, (byGradeMap.get(grade)||0)+1);
 
+        // Counselor funnel
+        const cf = counselorFunnelMap.get(counselor) || { enquiries:0, counselled:0, toured:0, admitted:0 };
+        cf.enquiries++;
+        if (norm(r[11]).toLowerCase() === "yes") cf.counselled++;
+        if (norm(r[12]).toLowerCase() === "yes") cf.toured++;
+        if (isAdm || isAdmRIS) cf.admitted++;
+        counselorFunnelMap.set(counselor, cf);
+
         recentEnquiries.push({
           date: d ? `${d.getDate()} ${d.toLocaleString("en-US",{month:"short"})} ${String(d.getFullYear()).slice(2)}` : "",
-          name, grade, branch, source, status: statusRaw,
-          counselor: norm(r[10]) || "—",
+          name, grade, branch, source, status: statusRaw, counselor,
           sortKey: d ? d.getTime() : 0,
         });
       }
       recentEnquiries.sort((a, b) => b.sortKey - a.sortKey);
+
+      // ── Lead time stats ─────────────────────────────────────────────────────
+      leadDays.sort((a, b) => a - b);
+      const ltMedian = leadDays.length ? leadDays[Math.floor(leadDays.length / 2)] : 0;
+      const ltP90    = leadDays.length ? leadDays[Math.floor(leadDays.length * 0.9)] : 0;
+      const ltBuckets = [
+        { bucket:"0-15d",  count: leadDays.filter(d=>d<16).length },
+        { bucket:"16-30d", count: leadDays.filter(d=>d>=16&&d<31).length },
+        { bucket:"31-60d", count: leadDays.filter(d=>d>=31&&d<61).length },
+        { bucket:"61-90d", count: leadDays.filter(d=>d>=61&&d<91).length },
+        { bucket:">90d",   count: leadDays.filter(d=>d>=91).length },
+      ].filter(b=>b.count>0);
+
+      // ── Ageing buckets ──────────────────────────────────────────────────────
+      const openActiveTotal = age0_7+age7_14+age15_30+age31_60+age60p;
+      const ageingBuckets = [
+        { bucket:"<7 days",    count:age0_7,   pct: openActiveTotal ? Math.round(age0_7/openActiveTotal*100)   : 0 },
+        { bucket:"7-14 days",  count:age7_14,  pct: openActiveTotal ? Math.round(age7_14/openActiveTotal*100)  : 0 },
+        { bucket:"15-30 days", count:age15_30, pct: openActiveTotal ? Math.round(age15_30/openActiveTotal*100) : 0 },
+        { bucket:"31-60 days", count:age31_60, pct: openActiveTotal ? Math.round(age31_60/openActiveTotal*100) : 0 },
+        { bucket:">60 days",   count:age60p,   pct: openActiveTotal ? Math.round(age60p/openActiveTotal*100)   : 0 },
+      ];
+
+      // ── Counselor funnel top 12 ─────────────────────────────────────────────
+      const counselorFunnel = Array.from(counselorFunnelMap, ([counselor, f]) => ({ counselor, ...f }))
+        .filter(c => c.enquiries > 2)
+        .sort((a, b) => b.admitted - a.admitted)
+        .slice(0, 12);
+
+      // ── Closed-reason trend heat-map ────────────────────────────────────────
+      const heatMonthKeys = Array.from(byMonthMap.keys()).sort();
+      const topReasons = Array.from(closedReasonMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([r])=>r);
+      const closedReasonTrend = {
+        months: heatMonthKeys.map(mk => byMonthMap.get(mk)?.label || mk),
+        monthKeys: heatMonthKeys,
+        data: topReasons.map(reason => ({
+          reason,
+          counts: Object.fromEntries(heatMonthKeys.map(mk => [mk, closedByMonthReason.get(mk)?.get(reason)||0])),
+        })),
+      };
+
+      // ── Forecast (linear regression on monthly admissions) ──────────────────
+      const sortedMoArr = Array.from(byMonthMap, ([mk, v]) => ({ mk, label: v.label, admissions: v.admissions }))
+        .sort((a,b) => a.mk.localeCompare(b.mk));
+      const regData = sortedMoArr.slice(-6);
+      let forecastSeries: Array<{ label: string; actual?: number; projected?: number }> = [];
+      if (regData.length >= 3) {
+        const n = regData.length;
+        const xs = regData.map((_, i) => i);
+        const ys = regData.map(m => m.admissions);
+        const sX = xs.reduce((s,x)=>s+x,0), sY = ys.reduce((s,y)=>s+y,0);
+        const sXY = xs.reduce((s,x,i)=>s+x*ys[i],0), sX2 = xs.reduce((s,x)=>s+x*x,0);
+        const b = (n*sXY-sX*sY)/(n*sX2-sX*sX||1);
+        const a = (sY-b*sX)/n;
+        forecastSeries = sortedMoArr.map(m => ({ label: m.label, actual: m.admissions }));
+        const lastMK = sortedMoArr[sortedMoArr.length-1].mk;
+        const [ly, lm] = lastMK.split("-").map(Number);
+        for (let i = 1; i <= 2; i++) {
+          const nm = lm+i; const ny = nm>12?ly+1:ly; const nml = nm>12?nm-12:nm;
+          const projLabel = new Date(ny,nml-1,1).toLocaleString("en-US",{month:"short",year:"2-digit"});
+          forecastSeries.push({ label: projLabel, projected: Math.max(0,Math.round(a+b*(n-1+i))) });
+        }
+      }
 
       // ── Individual Conversion pivot (counselor leaderboard) ─────────────────
       // A3 = first data row (A2 = header)
@@ -3040,6 +3143,11 @@ paths:
           byConfidence: Array.from(dmConfidenceMap, ([confidence, count]) => ({ confidence, count })).sort((a,b) => b.count - a.count),
         },
         misHistory: misHistory.slice(-30),
+        leadTime: { median: ltMedian, p90: ltP90, histogram: ltBuckets, sampleSize: leadDays.length },
+        ageingBuckets,
+        counselorFunnel,
+        closedReasonTrend,
+        forecastSeries,
       });
     } catch (err: any) {
       console.error("[rps-sales] error:", err?.message);

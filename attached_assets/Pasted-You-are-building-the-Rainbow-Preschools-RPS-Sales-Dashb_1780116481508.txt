@@ -1,0 +1,78 @@
+You are building the **Rainbow Preschools (RPS) Sales Dashboard – v2**.
+
+Data source
+-----------
+• A single Google Sheet named **“RPS Walk-in report 2026-2027”** (ID already shared in .env).  
+  - Primary tabs you must query:  ▸ Walkin Data  ▸ DM Tracker  ▸ Branch Admissions  ▸ Branch Open  
+• Use the **Google Sheets API v4** with service-account authentication stored in /secrets.  
+• Fetch data once per hour and cache in localStorage to keep the UI snappy.
+
+Tech stack
+----------
+• React 18 + Vite.  
+• Typescript everywhere.  
+• State: Zustand.  
+• Charting: Recharts v2 (no MUI).  
+• Styling: Tailwind CSS + headless-ui for dropdowns/toggles.  
+• Routing: React Router DOM.  
+• Lint/format: ESLint, Prettier, Husky pre-commit hook.
+
+New analytics & components
+--------------------------
+1. **Lead-to-Admission T-lead time**  
+   - Calculate median & 90th-percentile days from enquiry (Walkin Data-!B) to Adm Done date (Walkin Data-!P).  
+   - Display in KPI cards and a box-plot.
+
+2. **Ageing buckets for OPEN leads**  
+   - Buckets: \<7 days, 7-14, 15-30, 31-60, \>60.  
+   - Horizontal bar showing count & % of open enquiries in each bucket.
+
+3. **Sales-confidence pipeline waterfall** (DM Tracker)  
+   - Stack “High”, “Medium”, “Low” confidence counts and overlay $-value projection assuming ₹50 k revenue per admission.
+
+4. **Conversion funnel by counsellor**  
+   - Stacked bar: Enquiries → Walk-in Booked → Walk-in Completed → Adm Done.  
+   - Tooltip to show personal % at each stage.
+
+5. **Closed-reason trend heat-map**  
+   - Monthly matrix (rows = reasons, cols = months) with colour scale on counts.  
+   - Click a cell → side-drawer with underlying lead rows.
+
+6. **Forecast admissions**  
+   - Simple linear regression on the last 3 months’ admission totals to project next 60 days.  
+   - Display in a dotted line overlay on the “Monthly Trend” chart.
+
+7. **Dynamic branch targets**  
+   - Pull monthly target per branch from *Branch Admissions* tab (columns TargetEnq, TargetAdm).  
+   - Gauge component comparing actual vs target YTD.
+
+8. **Download centre report**  
+   - CSV export of any table / chart data via FileSaver.js.
+
+UI / UX details
+---------------
+• Dark-blue header stays. Replace KPI cards with a responsive Grid > lg:8 cols; each card animates count-ups.  
+• Each chart/card accepts a **month selector** (default “Current Academic Year”).  
+• Use responsive breakpoints so dashboard works on iPad (portrait).
+
+Folder layout
+-------------
+src/
+ ├─ api/          (sheets.ts, cache.ts)
+ ├─ components/   (KpiCard.tsx, AgeingChart.tsx, …)
+ ├─ pages/        (Dashboard.tsx, Branch.tsx, Counsellor.tsx)
+ ├─ hooks/        (useLeads.ts, useAdmissions.ts)
+ └─ store/        (pipelineStore.ts)
+
+Testing
+-------
+• Vitest + React Testing Library for at least:  
+  - API fetch & cache  
+  - Ageing-bucket calculation  
+  - Lead-time reducer
+
+Deliverables
+------------
+✓ Running dashboard on Replit web-preview  
+✓ README with `.env` sample and setup steps  
+✓ All code lint-clean and typed
