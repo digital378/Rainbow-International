@@ -31,7 +31,7 @@ const RPS_PASSCODE = "RPS8";
 const RPS_AUTH_KEY = "rps_sales_auth";
 
 /* ── Types ────────────────────────────────────────────────────────────────── */
-type MarketingMonth = { monthKey: string; label: string; spend: number };
+type MarketingMonth = { monthKey: string; label: string; salaries: number; meta: number; google: number; adSpend: number; total: number };
 
 type RpsData = {
   generatedAt: string;
@@ -44,6 +44,7 @@ type RpsData = {
   byMonth:  Array<{ monthKey: string; label: string; enquiries: number; admissions: number }>;
   byBranch: Array<{ branch: string; enquiries: number; admissions: number; open: number; closed: number; conversion: number }>;
   bySource: Array<{ source: string; enquiries: number; admissions: number }>;
+  monthlyDetail: Array<{ monthKey: string; label: string; enquiries: number; admissions: number; branches: Record<string, { enquiries: number; admissions: number }>; sources: Record<string, { enquiries: number; admissions: number }> }>;
   byGrade:  Array<{ grade: string; count: number }>;
   counselorLeaderboard: Array<{ counselor: string; admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number; conversion: number }>;
   closedReasons:   Array<{ reason: string; count: number }>;
@@ -190,8 +191,8 @@ function calcRevenue(d: RpsData, mktData: MarketingMonth[]) {
   const totalAdm    = recByBranch.reduce((s, b) => s + b.admissions, 0);
   const avgFee      = totalAdm > 0 ? totalRev / totalAdm : 85000;
 
-  // Marketing spend
-  const totalSpend  = mktData.reduce((s, m) => s + m.spend, 0);
+  // Marketing spend (salaries + ad spend)
+  const totalSpend  = mktData.reduce((s, m) => s + m.total, 0);
   const cac         = totalAdm > 0 ? totalSpend / totalAdm : 0;
   const roi         = totalSpend > 0 ? (totalRev - totalSpend) / totalSpend * 100 : 0;
 
@@ -209,8 +210,8 @@ function calcRevenue(d: RpsData, mktData: MarketingMonth[]) {
     return { ...b, spend, roi: brROI, cac: brCAC };
   });
 
-  // Monthly revenue trend joined with spend
-  const spendMap = Object.fromEntries(mktData.map(m => [m.monthKey, m.spend]));
+  // Monthly revenue trend joined with spend (monthKey "YYYY-MM" matches on both sides)
+  const spendMap = Object.fromEntries(mktData.map(m => [m.monthKey, m.total]));
   let cumNet = 0;
   let paybackLabel: string | null = null;
   const trend = d.byMonth.map(m => {
@@ -233,6 +234,7 @@ function RpsDashboard() {
   const [error,   setError]   = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<"overview"|"analytics"|"revenue"|"pipeline"|"counselors"|"leads">("overview");
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null); // null = All Time; value = monthKey "YYYY-MM"
   const cancelled = useRef(false);
 
   const fetchData = useCallback(() => {
@@ -281,6 +283,35 @@ function RpsDashboard() {
   const d = data!;
   const rev = calcRevenue(d, mktData);
 
+  // ── Month filter helpers ────────────────────────────────────────────────────
+  const monthDet = selectedMonth
+    ? (d.monthlyDetail || []).find(m => m.monthKey === selectedMonth) ?? null
+    : null;
+  const filtBranch = monthDet
+    ? Object.entries(monthDet.branches)
+        .map(([branch, v]) => ({ branch, ...v, open: 0, closed: 0, conversion: v.enquiries ? Math.round(v.admissions / v.enquiries * 1000) / 10 : 0 }))
+        .sort((a, b) => b.admissions - a.admissions)
+    : d.byBranch;
+  const filtSource = monthDet
+    ? Object.entries(monthDet.sources)
+        .map(([source, v]) => ({ source, ...v }))
+        .sort((a, b) => b.enquiries - a.enquiries)
+    : d.bySource;
+  const filtKpis = monthDet
+    ? { ...d.kpis, totalEnquiries: monthDet.enquiries, totalAdmissions: monthDet.admissions, totalAdmRIS: 0, openEnquiries: 0, closedTotal: 0, inProcess: 0, futureProspect: 0, overallConversion: monthDet.enquiries ? Math.round(monthDet.admissions / monthDet.enquiries * 1000) / 10 : 0, thisMonthEnquiries: monthDet.enquiries, thisMonthAdm: monthDet.admissions }
+    : d.kpis;
+  // Filter recent leads by month label (date format: "15 May 26"; label: "May 26")
+  const filtLeads = monthDet
+    ? d.recentEnquiries.filter(e => e.date.includes(monthDet.label))
+    : d.recentEnquiries.slice(0, 20);
+  // Month-specific revenue & spend (for Revenue tab filter view)
+  const mktMonth = selectedMonth ? mktData.find(m => m.monthKey === selectedMonth) : null;
+  const revMonthAdm  = monthDet?.admissions ?? 0;
+  const revMonthRev  = Math.round(revMonthAdm * rev.avgFee);
+  const revMonthSpnd = mktMonth ? mktMonth.total : 0;
+  const revMonthROI  = revMonthSpnd > 0 ? (revMonthRev - revMonthSpnd) / revMonthSpnd * 100 : 0;
+  const revMonthCAC  = revMonthAdm > 0 ? revMonthSpnd / revMonthAdm : 0;
+
   const TABS = [
     { id: "overview"   as const, label: "Overview"    },
     { id: "analytics"  as const, label: "Deep Analytics" },
@@ -318,39 +349,63 @@ function RpsDashboard() {
             </button>
           ))}
         </div>
+        {/* Month filter pills */}
+        <div className="max-w-7xl mx-auto mt-2 flex gap-1.5 overflow-x-auto pb-2 items-center">
+          <span className="text-xs text-slate-400 mr-1 whitespace-nowrap">Filter:</span>
+          <button onClick={() => setSelectedMonth(null)}
+            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${!selectedMonth ? "bg-white text-[#091a4f]" : "text-slate-400 hover:text-white hover:bg-white/10 border border-slate-600"}`}>
+            All Time
+          </button>
+          {(d.byMonth || []).map(m => (
+            <button key={m.monthKey} onClick={() => setSelectedMonth(selectedMonth === m.monthKey ? null : m.monthKey)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${selectedMonth === m.monthKey ? "bg-amber-400 text-[#091a4f]" : "text-slate-400 hover:text-white hover:bg-white/10 border border-slate-600"}`}>
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
 
         {/* ══ OVERVIEW ════════════════════════════════════════════════════════ */}
         {activeTab === "overview" && <>
+          {/* Month filter banner */}
+          {selectedMonth && monthDet && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: AMBER + "22", color: AMBER }}>
+              <span>📅 Showing data for <strong>{monthDet.label}</strong></span>
+              <button onClick={() => setSelectedMonth(null)} className="ml-auto text-xs underline opacity-70 hover:opacity-100">Clear filter</button>
+            </div>
+          )}
+
           {/* Funnel KPIs */}
           <div>
-            <SectionTitle sub="Rainbow Public School · all branches · 26-27">Key Performance Indicators</SectionTitle>
+            <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · filtered view` : "Rainbow Public School · all branches · 26-27"}>Key Performance Indicators</SectionTitle>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <KpiCard label="Total Enquiries"  value={fmt(d.kpis.totalEnquiries)} sub={`${d.kpis.thisMonthEnquiries} this month`} />
-              <KpiCard label="Admissions Done"  value={fmt(d.kpis.totalAdmissions + d.kpis.totalAdmRIS)} sub={`${d.kpis.totalAdmissions} RPS · ${d.kpis.totalAdmRIS} RIS`} accent={GREEN} highlight />
-              <KpiCard label="Conversion"       value={pct(d.kpis.overallConversion)} accent={d.kpis.overallConversion>=50?GREEN:d.kpis.overallConversion>=30?AMBER:RED} />
-              <KpiCard label="Open Enquiries"   value={fmt(d.kpis.openEnquiries)} sub={`${d.kpis.inProcess} in process`} accent={BLUE} />
-              <KpiCard label="Closed"           value={fmt(d.kpis.closedTotal)} accent={RED} />
+              <KpiCard label="Total Enquiries"  value={fmt(filtKpis.totalEnquiries)} sub={selectedMonth ? monthDet?.label : `${filtKpis.thisMonthEnquiries} this month`} />
+              <KpiCard label="Admissions Done"  value={fmt(filtKpis.totalAdmissions + filtKpis.totalAdmRIS)} sub={selectedMonth ? monthDet?.label : `${filtKpis.totalAdmissions} RPS · ${filtKpis.totalAdmRIS} RIS`} accent={GREEN} highlight />
+              <KpiCard label="Conversion"       value={pct(filtKpis.overallConversion)} accent={filtKpis.overallConversion>=50?GREEN:filtKpis.overallConversion>=30?AMBER:RED} />
+              <KpiCard label="Open Enquiries"   value={selectedMonth ? "—" : fmt(filtKpis.openEnquiries)} sub={selectedMonth ? "All-time only" : `${filtKpis.inProcess} in process`} accent={BLUE} />
+              <KpiCard label="Closed"           value={selectedMonth ? "—" : fmt(filtKpis.closedTotal)} sub={selectedMonth ? "All-time only" : undefined} accent={RED} />
             </div>
-            <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <KpiCard label="This Month Enquiries"  value={fmt(d.kpis.thisMonthEnquiries)} />
-              <KpiCard label="This Month Admissions" value={fmt(d.kpis.thisMonthAdm)} accent={GREEN} />
-              {d.leadTime.sampleSize > 0 && <KpiCard label="Median Lead Time" value={`${d.leadTime.median}d`} sub={`P90: ${d.leadTime.p90} days · ${d.leadTime.sampleSize} admits`} accent={AMBER} badge="enquiry→adm" />}
-              <KpiCard label="DM Median Conv." value={d.dmPipeline.convMedianDays ? `${d.dmPipeline.convMedianDays}d` : "—"} sub="DM visit → admission" accent={CYAN} />
-            </div>
+            {!selectedMonth && (
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <KpiCard label="This Month Enquiries"  value={fmt(d.kpis.thisMonthEnquiries)} />
+                <KpiCard label="This Month Admissions" value={fmt(d.kpis.thisMonthAdm)} accent={GREEN} />
+                {d.leadTime.sampleSize > 0 && <KpiCard label="Median Lead Time" value={`${d.leadTime.median}d`} sub={`P90: ${d.leadTime.p90} days · ${d.leadTime.sampleSize} admits`} accent={AMBER} badge="enquiry→adm" />}
+                <KpiCard label="DM Median Conv." value={d.dmPipeline.convMedianDays ? `${d.dmPipeline.convMedianDays}d` : "—"} sub="DM visit → admission" accent={CYAN} />
+              </div>
+            )}
           </div>
 
           {/* Revenue Summary (A) */}
           <div>
-            <SectionTitle sub="v2.4 · fee rules: ₹85k (default) · ₹60k (Kalwa) · mock marketing spend">Revenue Summary</SectionTitle>
+            <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · fee rules: ₹85k (default) · ₹60k (Kalwa)` : "v2.5 · fee rules: ₹85k (default) · ₹60k (Kalwa) · real marketing spend"}>Revenue Summary</SectionTitle>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <KpiCard label="Recognised Revenue" value={fmtL(rev.totalRev)}   accent={GREEN}  highlight sub={`${rev.totalAdm} admissions × avg ${fmtL(rev.avgFee)}`} />
-              <KpiCard label="Marketing Spend"    value={fmtL(rev.totalSpend)} accent={AMBER}  sub={`${mktData.length} months · mock data`} />
-              <KpiCard label="ROI"                value={`${Math.round(rev.roi)}%`} accent={rev.roi>=0?GREEN:RED} sub="(Revenue − Spend) / Spend" />
-              <KpiCard label="CAC"                value={INR(Math.round(rev.cac))} accent={rev.cac>80000?RED:AMBER} sub="Spend ÷ Admissions Done" />
-              <KpiCard label="Projected Pipeline" value={fmtL(rev.projectedRev)} accent={CYAN}  sub="Conf-weighted open DMs × fee" badge="open DM" />
+              <KpiCard label="Recognised Revenue" value={fmtL(selectedMonth ? revMonthRev  : rev.totalRev)}   accent={GREEN} highlight sub={selectedMonth ? `${revMonthAdm} adm × ${fmtL(rev.avgFee)}` : `${rev.totalAdm} adm × avg ${fmtL(rev.avgFee)}`} />
+              <KpiCard label="Marketing Spend"    value={fmtL(selectedMonth ? revMonthSpnd : rev.totalSpend)} accent={AMBER} sub={selectedMonth ? (mktMonth ? `Meta ₹${(mktMonth.meta/1000).toFixed(0)}k + Google ₹${(mktMonth.google/1000).toFixed(0)}k + Salary ₹${(mktMonth.salaries/1000).toFixed(0)}k` : "No spend data") : `${mktData.filter(m => m.total > 0).length} months · real data`} />
+              <KpiCard label="ROI"                value={`${Math.round(selectedMonth ? revMonthROI  : rev.roi)}%`} accent={(selectedMonth ? revMonthROI : rev.roi)>=0?GREEN:RED} sub="(Revenue − Spend) / Spend" />
+              <KpiCard label="CAC"                value={INR(Math.round(selectedMonth ? revMonthCAC  : rev.cac))} accent={(selectedMonth ? revMonthCAC : rev.cac)>80000?RED:AMBER} sub="Spend ÷ Admissions Done" />
+              <KpiCard label="Projected Pipeline" value={fmtL(rev.projectedRev)} accent={CYAN} sub="Conf-weighted open DMs × fee" badge="open DM" />
             </div>
           </div>
 
@@ -373,12 +428,12 @@ function RpsDashboard() {
           )}
 
           {/* Branch performance */}
-          {d.byBranch.length > 0 && (
+          {filtBranch.length > 0 && (
             <div>
-              <SectionTitle sub="All branches · enquiries, admissions, conversion">Branch Performance</SectionTitle>
+              <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · branches · enquiries, admissions` : "All branches · enquiries, admissions, conversion"}>Branch Performance</SectionTitle>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 <ChartCard title="Admissions vs Enquiries by Branch">
-                  <BarChart data={d.byBranch} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                  <BarChart data={filtBranch} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                     <XAxis type="number" tick={{ fontSize: 11 }} />
                     <YAxis type="category" dataKey="branch" tick={{ fontSize: 11 }} width={90} />
@@ -389,10 +444,10 @@ function RpsDashboard() {
                 </ChartCard>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
                   <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                    <span className="text-sm font-bold" style={{ color: NAVY }}>Branch Summary</span>
+                    <span className="text-sm font-bold" style={{ color: NAVY }}>Branch Summary{selectedMonth && monthDet ? ` · ${monthDet.label}` : ""}</span>
                     <button className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
-                      onClick={() => csvDownload("rps-branch.csv", ["Branch","Enquiries","Admissions","Open","Closed","Conv%"],
-                        d.byBranch.map(b => [b.branch,b.enquiries,b.admissions,b.open,b.closed,b.conversion]))}>↓ CSV</button>
+                      onClick={() => csvDownload("rps-branch.csv", ["Branch","Enquiries","Admissions","Conv%"],
+                        filtBranch.map(b => [b.branch,b.enquiries,b.admissions,b.conversion]))}>↓ CSV</button>
                   </div>
                   <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-xs uppercase text-slate-600">
@@ -400,19 +455,19 @@ function RpsDashboard() {
                         <th className="text-left py-2 px-4">Branch</th>
                         <th className="text-right py-2 px-3">Enq</th>
                         <th className="text-right py-2 px-3">Adm</th>
-                        <th className="text-right py-2 px-3">Open</th>
-                        <th className="text-right py-2 px-3">Closed</th>
+                        {!selectedMonth && <th className="text-right py-2 px-3">Open</th>}
+                        {!selectedMonth && <th className="text-right py-2 px-3">Closed</th>}
                         <th className="text-right py-2 px-3">Conv%</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {d.byBranch.map((b, i) => (
+                      {filtBranch.map((b, i) => (
                         <tr key={b.branch} className={`border-t border-slate-100 ${i===0?"bg-green-50":"hover:bg-slate-50"}`}>
                           <td className="py-2 px-4 font-semibold">{b.branch}</td>
                           <td className="text-right py-2 px-3 tabular-nums">{fmt(b.enquiries)}</td>
                           <td className="text-right py-2 px-3 tabular-nums font-bold" style={{ color: GREEN }}>{fmt(b.admissions)}</td>
-                          <td className="text-right py-2 px-3 tabular-nums" style={{ color: BLUE }}>{fmt(b.open)}</td>
-                          <td className="text-right py-2 px-3 tabular-nums" style={{ color: RED }}>{fmt(b.closed)}</td>
+                          {!selectedMonth && <td className="text-right py-2 px-3 tabular-nums" style={{ color: BLUE }}>{fmt(b.open)}</td>}
+                          {!selectedMonth && <td className="text-right py-2 px-3 tabular-nums" style={{ color: RED }}>{fmt(b.closed)}</td>}
                           <td className="text-right py-2 px-3 tabular-nums font-bold"
                             style={{ color: b.conversion>=50?GREEN:b.conversion>=30?AMBER:RED }}>{pct(b.conversion)}</td>
                         </tr>
@@ -426,9 +481,9 @@ function RpsDashboard() {
 
           {/* Source + Grade */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {d.bySource.length > 0 && (
-              <ChartCard title="Enquiries & Admissions by Source">
-                <BarChart data={d.bySource} margin={{ top: 5, right: 20, left: 0, bottom: 50 }}>
+            {filtSource.length > 0 && (
+              <ChartCard title={`Enquiries & Admissions by Source${selectedMonth && monthDet ? ` · ${monthDet.label}` : ""}`}>
+                <BarChart data={filtSource} margin={{ top: 5, right: 20, left: 0, bottom: 50 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis dataKey="source" tick={{ fontSize: 10 }} angle={-35} textAnchor="end" interval={0} />
                   <YAxis tick={{ fontSize: 11 }} />
@@ -664,16 +719,59 @@ function RpsDashboard() {
 
         {/* ══ REVENUE & ROI ═══════════════════════════════════════════════════ */}
         {activeTab === "revenue" && <>
+          {/* Month filter banner */}
+          {selectedMonth && monthDet && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: AMBER + "22", color: AMBER }}>
+              <span>📅 Showing revenue for <strong>{monthDet.label}</strong></span>
+              <button onClick={() => setSelectedMonth(null)} className="ml-auto text-xs underline opacity-70 hover:opacity-100">Clear filter</button>
+            </div>
+          )}
           {/* A – Revenue Summary */}
           <div>
-            <SectionTitle sub="Fee rules: Kalwa ₹60k · all others ₹85k · spend from mock marketing API">Revenue & ROI Summary</SectionTitle>
+            <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · fee rules: Kalwa ₹60k · others ₹85k · real marketing spend` : "Fee rules: Kalwa ₹60k · all others ₹85k · real marketing spend (salaries + Meta + Google)"}>Revenue & ROI Summary</SectionTitle>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              <KpiCard label="Recognised Revenue" value={fmtL(rev.totalRev)}   accent={GREEN}  highlight sub={INR(rev.totalRev)} />
-              <KpiCard label="Marketing Spend"    value={fmtL(rev.totalSpend)} accent={AMBER}  sub={INR(rev.totalSpend)} />
-              <KpiCard label="ROI"                value={`${Math.round(rev.roi)}%`} accent={rev.roi>=0?GREEN:RED} sub="(Rev − Spend) / Spend × 100" />
-              <KpiCard label="CAC (Cost/Admission)" value={INR(Math.round(rev.cac))} accent={rev.cac>80000?RED:AMBER} sub={`Target: ≤ ₹80,000`} />
-              <KpiCard label="Projected Pipeline" value={fmtL(rev.projectedRev)} accent={CYAN}  sub="Conf-weighted × fee per branch" />
+              <KpiCard label="Recognised Revenue" value={fmtL(selectedMonth ? revMonthRev  : rev.totalRev)}   accent={GREEN} highlight sub={INR(selectedMonth ? revMonthRev  : rev.totalRev)} />
+              <KpiCard label="Marketing Spend"    value={fmtL(selectedMonth ? revMonthSpnd : rev.totalSpend)} accent={AMBER} sub={selectedMonth ? (mktMonth ? `Meta+Google+Salary` : "No spend data") : `Salaries + Ad Spend · ${mktData.filter(m=>m.total>0).length} months`} />
+              <KpiCard label="ROI"                value={`${Math.round(selectedMonth ? revMonthROI : rev.roi)}%`} accent={(selectedMonth ? revMonthROI : rev.roi)>=0?GREEN:RED} sub="(Rev − Spend) / Spend × 100" />
+              <KpiCard label="CAC (Cost/Admission)" value={INR(Math.round(selectedMonth ? revMonthCAC : rev.cac))} accent={(selectedMonth ? revMonthCAC : rev.cac)>80000?RED:AMBER} sub={`Target: ≤ ₹80,000`} />
+              <KpiCard label="Projected Pipeline" value={fmtL(rev.projectedRev)} accent={CYAN} sub="Conf-weighted × fee per branch" />
             </div>
+            {/* Spend breakdown card */}
+            {!selectedMonth && mktData.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Total Salaries</div>
+                  <div className="text-lg font-black" style={{ color: NAVY }}>{fmtL(mktData.reduce((s,m)=>s+m.salaries,0))}</div>
+                  <div className="text-xs text-slate-400">{mktData.filter(m=>m.salaries>0).length} months</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Meta Ads</div>
+                  <div className="text-lg font-black" style={{ color: BLUE }}>{fmtL(mktData.reduce((s,m)=>s+m.meta,0))}</div>
+                  <div className="text-xs text-slate-400">Facebook / Instagram</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Google Ads</div>
+                  <div className="text-lg font-black" style={{ color: RED }}>{fmtL(mktData.reduce((s,m)=>s+m.google,0))}</div>
+                  <div className="text-xs text-slate-400">Search / Display</div>
+                </div>
+              </div>
+            )}
+            {selectedMonth && mktMonth && (
+              <div className="mt-3 grid grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Salaries</div>
+                  <div className="text-lg font-black" style={{ color: NAVY }}>{INR(mktMonth.salaries)}</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Meta Ads</div>
+                  <div className="text-lg font-black" style={{ color: BLUE }}>{INR(mktMonth.meta)}</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 text-center">
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">Google Ads</div>
+                  <div className="text-lg font-black" style={{ color: RED }}>{INR(mktMonth.google)}</div>
+                </div>
+              </div>
+            )}
             {rev.paybackLabel && (
               <div className="mt-3 p-3 rounded-lg flex items-center gap-2" style={{ background: GREEN + "15" }}>
                 <span className="text-2xl">✅</span>
@@ -1104,12 +1202,18 @@ function RpsDashboard() {
         {/* ══ RECENT LEADS ════════════════════════════════════════════════════ */}
         {activeTab === "leads" && (
           <div>
+            {selectedMonth && monthDet && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold mb-4" style={{ background: AMBER + "22", color: AMBER }}>
+                <span>📅 Showing enquiries for <strong>{monthDet.label}</strong> · {filtLeads.length} records</span>
+                <button onClick={() => setSelectedMonth(null)} className="ml-auto text-xs underline opacity-70 hover:opacity-100">Clear filter</button>
+              </div>
+            )}
             <div className="flex items-center justify-between mb-4">
-              <SectionTitle sub="20 most recent · sorted by date">Recent Enquiries</SectionTitle>
+              <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · ${filtLeads.length} enquiries` : "20 most recent · sorted by date"}>Recent Enquiries</SectionTitle>
               <button className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
                 onClick={() => csvDownload("rps-recent-leads.csv",
                   ["Date","Student","Grade","Branch","Counsellor","Source","Status"],
-                  d.recentEnquiries.map(e => [e.date,e.name,e.grade,e.branch,e.counselor,e.source,e.status]))}>
+                  filtLeads.map(e => [e.date,e.name,e.grade,e.branch,e.counselor,e.source,e.status]))}>
                 ↓ Download CSV
               </button>
             </div>
@@ -1127,7 +1231,7 @@ function RpsDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {d.recentEnquiries.map((e, i) => (
+                  {filtLeads.map((e, i) => (
                     <tr key={i} className="border-t border-slate-100 hover:bg-slate-50">
                       <td className="py-2 px-4 text-slate-500 text-xs whitespace-nowrap">{e.date}</td>
                       <td className="py-2 px-4 font-medium">{e.name}</td>
@@ -1150,7 +1254,7 @@ function RpsDashboard() {
         )}
 
         <div className="text-center text-xs text-slate-400 pb-6">
-          Auto-refreshes every 5 min · v2.4 · Revenue & ROI · Lead time bug fixed · Generated {d.generatedAt ? new Date(d.generatedAt).toLocaleString("en-IN") : "—"}
+          Auto-refreshes every 5 min · v2.5 · Month filter · Real marketing spend · Generated {d.generatedAt ? new Date(d.generatedAt).toLocaleString("en-IN") : "—"}
         </div>
       </div>
     </div>

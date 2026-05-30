@@ -2844,22 +2844,65 @@ paths:
     }
   });
 
-  // ── RPS Marketing Monthly Spend (mock data, v2.4) ───────────────────────────
-  app.get("/api/marketing/monthly", (_req, res) => {
+  // ── RPS Marketing Monthly Spend (real data from master sheet) ───────────────
+  app.get("/api/marketing/monthly", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
-    // Mock DM-campaign spend per month (academic year 26-27, Aug 25 – May 26)
-    res.json([
-      { monthKey: "2508", label: "Aug 25", spend: 320000 },
-      { monthKey: "2509", label: "Sep 25", spend: 450000 },
-      { monthKey: "2510", label: "Oct 25", spend: 385000 },
-      { monthKey: "2511", label: "Nov 25", spend: 520000 },
-      { monthKey: "2512", label: "Dec 25", spend: 410000 },
-      { monthKey: "2601", label: "Jan 26", spend: 580000 },
-      { monthKey: "2602", label: "Feb 26", spend: 640000 },
-      { monthKey: "2603", label: "Mar 26", spend: 560000 },
-      { monthKey: "2604", label: "Apr 26", spend: 480000 },
-      { monthKey: "2605", label: "May 26", spend: 390000 },
-    ]);
+    try {
+      const rows = await fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A140:R210");
+      const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
+      // Maps month name → { YYYY-MM key, short label }
+      const SPEND_MONTH_MAP: Record<string, { key: string; label: string }> = {
+        "June":      { key: "2025-06", label: "Jun 25" },
+        "July":      { key: "2025-07", label: "Jul 25" },
+        "August":    { key: "2025-08", label: "Aug 25" },
+        "September": { key: "2025-09", label: "Sep 25" },
+        "October":   { key: "2025-10", label: "Oct 25" },
+        "November":  { key: "2025-11", label: "Nov 25" },
+        "December":  { key: "2025-12", label: "Dec 25" },
+        "January":   { key: "2026-01", label: "Jan 26" },
+        "February":  { key: "2026-02", label: "Feb 26" },
+        "March":     { key: "2026-03", label: "Mar 26" },
+        "April":     { key: "2026-04", label: "Apr 26" },
+        "May":       { key: "2026-05", label: "May 26" },
+      };
+      // Find header row (must have both "meta" and "google")
+      const hIdx = rows.findIndex(r => {
+        const cells = r.map(c => String(c).trim().toLowerCase());
+        return cells.some(c => c.includes("meta")) && cells.some(c => c.includes("google"));
+      });
+      if (hIdx === -1) return res.json([]);
+      const header = rows[hIdx];
+      const metaCol   = header.findIndex(h => String(h).trim().toLowerCase().includes("meta"));
+      const googleCol = header.findIndex(h => String(h).trim().toLowerCase().includes("google"));
+      const salaryCol = header.findIndex(h => String(h).trim().toLowerCase().includes("salar"));
+      if (metaCol === -1 || googleCol === -1) return res.json([]);
+      const afterHeader = rows.slice(hIdx + 1);
+      // Detect which column holds month names
+      let monthCol = 0;
+      for (const row of afterHeader.slice(0, 10)) {
+        for (let ci = 0; ci < row.length; ci++) {
+          if (SPEND_MONTH_MAP[String(row[ci] ?? "").trim()]) { monthCol = ci; break; }
+        }
+        if (monthCol > 0) break;
+      }
+      const result: Array<{ monthKey: string; label: string; salaries: number; meta: number; google: number; adSpend: number; total: number }> = [];
+      for (const row of afterHeader) {
+        const rawMonth = String(row[monthCol] ?? "").trim();
+        if (!rawMonth) continue;
+        if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
+        const mapped = SPEND_MONTH_MAP[rawMonth];
+        if (!mapped) continue;
+        const meta     = parseINR(row[metaCol]);
+        const google   = parseINR(row[googleCol]);
+        const salaries = salaryCol >= 0 ? parseINR(row[salaryCol]) : 0;
+        const adSpend  = meta + google;
+        result.push({ monthKey: mapped.key, label: mapped.label, salaries, meta, google, adSpend, total: salaries + adSpend });
+      }
+      res.json(result);
+    } catch (err: any) {
+      console.error("[marketing/monthly] error:", err?.message);
+      res.status(500).json({ message: "Failed to fetch RPS marketing spend" });
+    }
   });
 
   // ── RPS Sales Dashboard ─────────────────────────────────────────────────────
@@ -2912,6 +2955,8 @@ paths:
       let thisMonthEnq = 0, thisMonthAdm = 0;
 
       const byMonthMap  = new Map<string, { label: string; enquiries: number; admissions: number }>();
+      type MonthDetail = { monthKey: string; label: string; enquiries: number; admissions: number; branches: Map<string, { enquiries: number; admissions: number }>; sources: Map<string, { enquiries: number; admissions: number }> };
+      const monthDetailMap = new Map<string, MonthDetail>();
       const byBranchMap = new Map<string, { enquiries: number; admissions: number; open: number; closed: number }>();
       const bySourceMap = new Map<string, { enquiries: number; admissions: number }>();
       const byGradeMap  = new Map<string, number>();
@@ -2956,10 +3001,22 @@ paths:
 
         if (d) {
           const mk = mkKey(d);
-          const mo = byMonthMap.get(mk) || { label: mkLabel(d), enquiries: 0, admissions: 0 };
+          const lbl = mkLabel(d);
+          const mo = byMonthMap.get(mk) || { label: lbl, enquiries: 0, admissions: 0 };
           mo.enquiries++;
           if (isAdm || isAdmRIS) mo.admissions++;
           byMonthMap.set(mk, mo);
+          // per-month branch+source detail (for month filter)
+          const det = monthDetailMap.get(mk) || { monthKey: mk, label: lbl, enquiries: 0, admissions: 0, branches: new Map(), sources: new Map() };
+          det.enquiries++;
+          if (isAdm || isAdmRIS) det.admissions++;
+          const detBr = det.branches.get(branch) || { enquiries: 0, admissions: 0 };
+          detBr.enquiries++; if (isAdm || isAdmRIS) detBr.admissions++;
+          det.branches.set(branch, detBr);
+          const detSrc = det.sources.get(source) || { enquiries: 0, admissions: 0 };
+          detSrc.enquiries++; if (isAdm || isAdmRIS) detSrc.admissions++;
+          det.sources.set(source, detSrc);
+          monthDetailMap.set(mk, det);
           if (mk === curMK) { thisMonthEnq++; if (isAdm || isAdmRIS) thisMonthAdm++; }
           // Lead time (v2.3 bug fix: strictly > 0 days, admDate must be after enqDate)
           if ((isAdm || isAdmRIS) && norm(r[15])) {
@@ -3268,11 +3325,18 @@ paths:
       const closedReasons = Array.from(closedReasonMap, ([reason, count]) => ({ reason, count })).sort((a,b) => b.count - a.count).slice(0,12);
       const overallConversion = totalEnq ? Math.round(((totalAdm + totalAdmRIS)/totalEnq)*1000)/10 : 0;
 
+      const monthlyDetail = Array.from(monthDetailMap.values()).map(det => ({
+        monthKey: det.monthKey, label: det.label, enquiries: det.enquiries, admissions: det.admissions,
+        branches: Object.fromEntries(Array.from(det.branches.entries()).map(([br, v]) => [br, v])),
+        sources:  Object.fromEntries(Array.from(det.sources.entries()).map(([src, v]) => [src, v])),
+      })).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+
       res.json({
         generatedAt: new Date().toISOString(),
         kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
         byMonth, byBranch, bySource, byGrade, counselorLeaderboard, closedReasons,
-        recentEnquiries: recentEnquiries.slice(0, 20),
+        monthlyDetail,
+        recentEnquiries: recentEnquiries.slice(0, 300),
         dmPipeline: {
           admitted: dmAdmitted, open: dmOpen, closed: dmClosed,
           convMedianDays: dmConvMedian,
