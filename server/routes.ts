@@ -2849,11 +2849,16 @@ paths:
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
       const RPS_SID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
-      const [walkinRows, indConvRows, dmRows, misRows] = await Promise.all([
+      const [walkinRows, indConvRows, dmRows, misRows, dCohortRows, branchClosedRows, branchAsmRows, branchOpenRows, branchWalkinRows] = await Promise.all([
         fetchSheetRange(RPS_SID, "'Walkin Data'!A2:U5000"),
         fetchSheetRange(RPS_SID, "'Individual Conversion'!A3:K100"),
-        fetchSheetRange(RPS_SID, "'DM Tracker'!A2:Z5000"),
+        fetchSheetRange(RPS_SID, "'DM Tracker'!A2:Z2000"),
         fetchSheetRange(RPS_SID, "'MIS DASHBOARD'!A5:D100"),
+        fetchSheetRange(RPS_SID, "'D-Cohort'!A1:I200"),
+        fetchSheetRange(RPS_SID, "'Branch Closed'!A1:C200"),
+        fetchSheetRange(RPS_SID, "'Branch Admissions'!A2:K10"),
+        fetchSheetRange(RPS_SID, "'Branch Open'!A2:G10"),
+        fetchSheetRange(RPS_SID, "'Branch Walkin'!A2:I10"),
       ]);
 
       const norm  = (s: any) => String(s ?? "").trim();
@@ -2938,12 +2943,12 @@ paths:
           if (isAdm || isAdmRIS) mo.admissions++;
           byMonthMap.set(mk, mo);
           if (mk === curMK) { thisMonthEnq++; if (isAdm || isAdmRIS) thisMonthAdm++; }
-          // Lead time
+          // Lead time (v2.3 bug fix: strictly > 0 days, admDate must be after enqDate)
           if ((isAdm || isAdmRIS) && norm(r[15])) {
             const admD = parseDate(r[15]);
             if (admD) {
               const days = Math.round((admD.getTime() - d.getTime()) / 86400000);
-              if (days >= 0 && days < 400) leadDays.push(days);
+              if (days > 0 && days < 400) leadDays.push(days);
             }
           }
           // Ageing for open leads
@@ -3080,22 +3085,34 @@ paths:
         conversion: c.total > 0 ? Math.round(((c.admDone + c.admRIS) / c.total) * 1000) / 10 : 0,
       })).filter(c => c.total > 0).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
 
-      // ── DM Tracker pipeline ─────────────────────────────────────────────────
+      // ── DM Tracker ──────────────────────────────────────────────────────────
       // Cols: 0=UniqueID 1=Date 2=Month 3=Branch 4=StudentName 5=Grade 6=AcadYear
       //       7=MothersContact 8=FathersContact 9=Email 10=Counsellor 11=Source
-      //       12=EnqMode 13=AdmDate 14=AdmMonth 15=Remarks 16=DaysSinceVisit
+      //       12=EnqMode 13=AdmDate 14=AdmMonth 15=Remarks 16=DaysSinceVisit(pre-computed)
       //       17=AdmDeadline 18=Status(Admitted/Closed/Open) 19=DeadlineExt
-      //       20=SalesConfidence 21=DeadlineStatus 22=ConversionTimeline
+      //       20=SalesConfidence 21=DeadlineStatus 22=ConversionTimeline(days)
       let dmAdmitted = 0, dmOpen = 0, dmClosed = 0;
       const dmByBranchMap    = new Map<string, { admitted: number; open: number; closed: number }>();
       const dmConfidenceMap  = new Map<string, number>();
+      // v2.3 additions
+      const dmConvTimes: number[] = [];   // days to convert (admitted only)
+      type DmCoun = { open: number; admitted: number; closed: number; totalConvDays: number };
+      const dmCounselorMap = new Map<string, DmCoun>();
+      // DM open ageing using pre-computed DaysSinceVisit (col 16)
+      let dmAge0_7 = 0, dmAge7_14 = 0, dmAge15_30 = 0, dmAge31_60 = 0, dmAge60p = 0;
+      // Confidence × branch matrix (open only)
+      type ConfBr = { branch: string; High: number; Medium: number; Low: number };
+      const dmConfBranchMap = new Map<string, ConfBr>();
 
       for (const r of dmRows) {
         if (isEmptyRow(r)) continue;
-        const name   = norm(r[4]); if (!name) continue;
-        const status = norm(r[18]).toLowerCase();
-        const branch = norm(r[3]) || "Unknown";
-        const conf   = norm(r[20]) || "Unknown";
+        const name     = norm(r[4]); if (!name) continue;
+        const status   = norm(r[18]).toLowerCase();
+        const branch   = norm(r[3]) || "Unknown";
+        const conf     = norm(r[20]) || "Unknown";
+        const counselor = norm(r[10]) || "Unassigned";
+        const daysSince = parseInt(norm(r[16])||"0", 10);
+        const convDays  = parseInt(norm(r[22])||"0", 10);
 
         if (status === "admitted")    dmAdmitted++;
         else if (status === "closed") dmClosed++;
@@ -3103,13 +3120,114 @@ paths:
         else continue;
 
         const br = dmByBranchMap.get(branch) || { admitted:0, open:0, closed:0 };
-        if (status === "admitted")    br.admitted++;
+        if (status === "admitted") { br.admitted++; if (convDays > 0) dmConvTimes.push(convDays); }
         else if (status === "closed") br.closed++;
-        else if (status === "open")   br.open++;
+        else if (status === "open")   { br.open++; }
         dmByBranchMap.set(branch, br);
 
-        if (status === "open" && conf && conf !== "Unknown")
-          dmConfidenceMap.set(conf, (dmConfidenceMap.get(conf)||0)+1);
+        if (conf && conf !== "Unknown")
+          dmConfidenceMap.set(conf, (dmConfidenceMap.get(conf)||0) + (status === "open" ? 1 : 0));
+
+        // Counselor DM breakdown
+        const dc = dmCounselorMap.get(counselor) || { open:0, admitted:0, closed:0, totalConvDays:0 };
+        if (status === "admitted") { dc.admitted++; if (convDays > 0) dc.totalConvDays += convDays; }
+        else if (status === "closed") dc.closed++;
+        else if (status === "open") dc.open++;
+        dmCounselorMap.set(counselor, dc);
+
+        // DM ageing for open records (using pre-computed DaysSinceVisit)
+        if (status === "open" && daysSince >= 0) {
+          if (daysSince < 7)       dmAge0_7++;
+          else if (daysSince < 15) dmAge7_14++;
+          else if (daysSince < 31) dmAge15_30++;
+          else if (daysSince < 61) dmAge31_60++;
+          else                     dmAge60p++;
+        }
+
+        // Confidence × branch matrix (open)
+        if (status === "open") {
+          const cb = dmConfBranchMap.get(branch) || { branch, High:0, Medium:0, Low:0 };
+          if (conf === "High") cb.High++;
+          else if (conf === "Medium") cb.Medium++;
+          else if (conf === "Low") cb.Low++;
+          dmConfBranchMap.set(branch, cb);
+        }
+      }
+
+      // DM derived stats
+      dmConvTimes.sort((a,b)=>a-b);
+      const dmConvMedian = dmConvTimes.length ? dmConvTimes[Math.floor(dmConvTimes.length/2)] : 0;
+      const dmOpenTotal  = dmAge0_7+dmAge7_14+dmAge15_30+dmAge31_60+dmAge60p;
+      const dmAgeing = [
+        { bucket:"<7 days",   count:dmAge0_7,   pct: dmOpenTotal?Math.round(dmAge0_7/dmOpenTotal*100):0 },
+        { bucket:"7-14 days", count:dmAge7_14,  pct: dmOpenTotal?Math.round(dmAge7_14/dmOpenTotal*100):0 },
+        { bucket:"15-30 days",count:dmAge15_30, pct: dmOpenTotal?Math.round(dmAge15_30/dmOpenTotal*100):0 },
+        { bucket:"31-60 days",count:dmAge31_60, pct: dmOpenTotal?Math.round(dmAge31_60/dmOpenTotal*100):0 },
+        { bucket:">60 days",  count:dmAge60p,   pct: dmOpenTotal?Math.round(dmAge60p/dmOpenTotal*100):0 },
+      ];
+      const dmCounselorStats = Array.from(dmCounselorMap, ([counselor, c]) => ({
+        counselor, ...c,
+        avgConvDays: c.admitted > 0 ? Math.round(c.totalConvDays / c.admitted) : 0,
+        total: c.open + c.admitted + c.closed,
+        conv: (c.open+c.admitted+c.closed) ? Math.round(c.admitted/(c.open+c.admitted+c.closed)*100) : 0,
+      })).filter(c => c.total > 0).sort((a,b) => b.admitted - a.admitted).slice(0, 12);
+
+      // ── D-Cohort (weekly DM conversion speed cohort) ─────────────────────────
+      // Col: 0=WeekStart 1=Walkins 2=AdmDone 3=Conv% 4=AvgDays 5=0-3d 6=4-7d 7=8-14d 8=15+d
+      type CohortRow = { week: string; walkins: number; admDone: number; convPct: number; avgDays: number; b0_3: number; b4_7: number; b8_14: number; b15p: number };
+      const dCohort: CohortRow[] = [];
+      for (const r of dCohortRows) {
+        if (isEmptyRow(r)) continue;
+        const week = norm(r[0]); if (!week || week === "Cohort Week Start") continue;
+        const walkins = toInt(r[1]); if (!walkins) continue;
+        dCohort.push({
+          week, walkins, admDone: toInt(r[2]),
+          convPct: parseFloat(norm(r[3]).replace("%","")) || 0,
+          avgDays: toInt(r[4]), b0_3: toInt(r[5]), b4_7: toInt(r[6]), b8_14: toInt(r[7]), b15p: toInt(r[8]),
+        });
+      }
+
+      // ── Branch Closed (reason × branch) ─────────────────────────────────────
+      // Cols: 0=Branch(may be blank for subsequent rows) 1=Reason 2=Count
+      type BranchClosed = { branch: string; reason: string; count: number };
+      const branchClosedList: BranchClosed[] = [];
+      let lastBranch = "";
+      for (const r of branchClosedRows) {
+        if (isEmptyRow(r)) continue;
+        const br = norm(r[0]); const reason = norm(r[1]); const count = toInt(r[2]);
+        if (!reason || !count) continue;
+        if (br) lastBranch = br;
+        if (lastBranch && lastBranch !== "BRANCH") branchClosedList.push({ branch: lastBranch, reason, count });
+      }
+
+      // ── Branch Admissions pivot (source breakdown per branch) ─────────────────
+      // Row 0 = ["BRANCH","Brand Tie up","Direct Walkin","DM","DM Online Enquiry","EX-Parent","Referral","Sibling","Telephonic","Grand Total"]
+      // Row 1+ = branch data
+      type BranchSrcAdm = { branch: string; brandTieup: number; directWalkin: number; dm: number; referral: number; sibling: number; total: number };
+      const branchSrcAdmList: BranchSrcAdm[] = [];
+      const baHeader = branchAsmRows[0] || [];
+      for (let i = 1; i < branchAsmRows.length; i++) {
+        const r = branchAsmRows[i];
+        const br = norm(r[0]); if (!br || br === "Grand Total") continue;
+        branchSrcAdmList.push({
+          branch: br, brandTieup: toInt(r[1]), directWalkin: toInt(r[2]),
+          dm: toInt(r[3]), referral: toInt(r[5]||"0"), sibling: toInt(r[6]||"0"),
+          total: toInt(r[baHeader.length - 1] || r[r.length-1]),
+        });
+      }
+
+      // ── Branch Open pivot (live open pipeline per branch) ─────────────────────
+      // Row 0 = ["BRANCH","Direct Walkin","DM","DM Online Enquiry","Referral","Grand Total"]
+      type BranchOpenRow = { branch: string; directWalkin: number; dm: number; referral: number; total: number };
+      const branchOpenList: BranchOpenRow[] = [];
+      const boHeader = branchOpenRows[0] || [];
+      for (let i = 1; i < branchOpenRows.length; i++) {
+        const r = branchOpenRows[i];
+        const br = norm(r[0]); if (!br || br === "Grand Total") continue;
+        branchOpenList.push({
+          branch: br, directWalkin: toInt(r[1]), dm: toInt(r[2]), referral: toInt(r[3]||"0"),
+          total: toInt(r[boHeader.length - 1] || r[r.length-1]),
+        });
       }
 
       // ── MIS History (cumulative running totals) ─────────────────────────────
@@ -3139,8 +3257,12 @@ paths:
         recentEnquiries: recentEnquiries.slice(0, 20),
         dmPipeline: {
           admitted: dmAdmitted, open: dmOpen, closed: dmClosed,
+          convMedianDays: dmConvMedian,
           byBranch: Array.from(dmByBranchMap, ([branch, v]) => ({ branch, ...v })).sort((a,b) => b.admitted - a.admitted),
-          byConfidence: Array.from(dmConfidenceMap, ([confidence, count]) => ({ confidence, count })).sort((a,b) => b.count - a.count),
+          byConfidence: Array.from(dmConfidenceMap, ([confidence, count]) => ({ confidence, count })).filter(x=>x.count>0).sort((a,b) => b.count - a.count),
+          ageing: dmAgeing,
+          counselors: dmCounselorStats,
+          confByBranch: Array.from(dmConfBranchMap.values()).sort((a,b) => (b.High+b.Medium+b.Low)-(a.High+a.Medium+a.Low)),
         },
         misHistory: misHistory.slice(-30),
         leadTime: { median: ltMedian, p90: ltP90, histogram: ltBuckets, sampleSize: leadDays.length },
@@ -3148,6 +3270,10 @@ paths:
         counselorFunnel,
         closedReasonTrend,
         forecastSeries,
+        dCohort,
+        branchClosedList,
+        branchSrcAdm: branchSrcAdmList,
+        branchOpenPipeline: branchOpenList,
       });
     } catch (err: any) {
       console.error("[rps-sales] error:", err?.message);

@@ -1,0 +1,92 @@
+PROJECT EXTENSION
+
+Dashboard version: v2.4 (build on v2.3 structure already in repo)
+
+Objective
+
+Surface revenue, cost and ROI metrics alongside DM-pipeline counts.
+
+Data inputs
+Google Sheet “RPS Walk-in report 2026-2027”
+• Walkin Data!D (Branch)
+• Walkin Data!O (Status — Adm Done / Open / Closed / …)
+• Walkin Data!P (Admission Date)
+• DM Tracker!H (Sales Confidence)
+Marketing spend
+• API endpoint /api/marketing/monthly → {month, spend₹} (mock JSON; adaptor in src/api/marketing.ts)
+Fee table (hard-coded constants)
+export const FEE_RULES: Record<string,{oneTime:number,annual:number}> = {
+  Kalwa   : { oneTime: 0,    annual: 60000 },
+  default : { oneTime: 5000, annual: 80000 },
+};
+Key revenue metrics
+Metric	Definition
+Recognised Revenue	Σ(one-time + annual) for Adm Done rows in range
+Projected Revenue	Σ expected revenue for OPEN DMs × confidence weight (High 70 %, Medium 40 %, Low 10 %)
+CAC	Marketing Spend / Adm Done
+ROI %	(Recognised Revenue − Spend) / Spend × 100
+Payback Months	Months until cumulative revenue ≥ cumulative spend
+UI components
+A • Revenue Summary (Overview)
+
+Recognised Revenue | Marketing Spend | ROI % | CAC | Projected Pipeline
+
+B • Revenue vs Spend Trend
+
+Monthly: green area (Revenue), orange bars (Spend), purple line (Cumulative Net)
+
+C • Branch Revenue Table
+
+Branch | Adm Done | Revenue | Spend | ROI % | CAC | Notes (Notes = red highlight if ROI % < 0 or CAC > ₹80 k)
+
+D • Payback Curve
+
+Line chart of cumulative net; dot at first ≥ 0 crossing.
+
+E • Pipeline Revenue Card (DM Pipeline)
+
+High = count × 70 % × fee, Medium = 40 %, Low = 10 %; fee per row via branch rule.
+
+Implementation notes
+
+helpers/calcRevenue.ts
+
+export function feeFor(branch:string){
+  return (FEE_RULES[branch]?.oneTime ?? FEE_RULES.default.oneTime) +
+         (FEE_RULES[branch]?.annual   ?? FEE_RULES.default.annual);
+}
+export function recognisedRevenue(leads:LeadRow[]){
+  return leads.filter(r=>r.status==='Adm Done')
+              .reduce((s,r)=>s+feeFor(r.branch),0);
+}
+export function projectedRevenue(openDm:LeadRow[]){
+  const w = {High:0.7, Medium:0.4, Low:0.1} as const;
+  return openDm.reduce((s,r)=>s+feeFor(r.branch)*w[r.salesConfidence],0);
+}
+
+selectors.ts
+getMonthlyRevenue(), getCumulativeNet()
+
+store/leadsStore.ts
+Add derived: recognisedRevenue, marketingSpend, roiPct, cac.
+
+Charts
+Recharts ComposedChart, LineChart with reference line y = 0.
+
+Tests (Vitest)
+feeFor, recognisedRevenue, ROI %.
+
+Formatting
+Use Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).
+
+Deploy checklist
+
+☑ ROI % positive for Aggarwal with sample data
+☑ CAC ≈ spend / adm
+☑ Payback dot shows only if net ≥ 0
+☑ Branch table highlights negative ROI
+☑ Pipeline card uses Kalwa fee rule
+
+README add
+
+v2.4 – Revenue & ROI: recognised + projected revenue, CAC, ROI %, payback curve, branch revenue table, confidence-weighted pipeline projection, fee logic (₹85 k vs Kalwa ₹60 k).
