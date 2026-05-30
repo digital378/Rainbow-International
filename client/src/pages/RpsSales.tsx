@@ -366,28 +366,52 @@ function RpsDashboard() {
             </div>
 
             {/* Status Pie */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-              <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Enquiry Status Breakdown</div>
-              <div style={{ width: "100%", height: 250 }}>
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie data={[
-                      { name: "Adm Done (RPS)", value: kpis.totalAdmissions },
-                      { name: "Adm Done (RIS)", value: kpis.totalAdmRIS },
-                      { name: "Open", value: kpis.openEnquiries },
-                      { name: "In Process", value: kpis.inProcess },
-                      { name: "Future Prospect", value: kpis.futureProspect },
-                      { name: "Closed", value: kpis.closedTotal },
-                    ].filter(x => x.value > 0)}
-                      cx="50%" cy="50%" outerRadius={90} dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent*100).toFixed(0)}%`} labelLine={false}>
-                      {[GREEN, CYAN, BLUE, AMBER, PURPLE, RED].map((c, i) => <Cell key={i} fill={c} />)}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => [fmt(+v)]} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            {(() => {
+              const pieData = [
+                { name: "Adm Done (RPS)", value: kpis.totalAdmissions, color: GREEN },
+                { name: "Adm Done (RIS)", value: kpis.totalAdmRIS, color: CYAN },
+                { name: "Open", value: kpis.openEnquiries, color: BLUE },
+                { name: "In Process", value: kpis.inProcess, color: AMBER },
+                { name: "Future Prospect", value: kpis.futureProspect, color: PURPLE },
+                { name: "Closed", value: kpis.closedTotal, color: RED },
+              ].filter(x => x.value > 0);
+              const total = pieData.reduce((s, x) => s + x.value, 0);
+              return (
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                  <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>Enquiry Status Breakdown</div>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    <div style={{ width: 220, height: 220, flexShrink: 0 }}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={90}
+                            dataKey="value" paddingAngle={2}>
+                            {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                          </Pie>
+                          <Tooltip formatter={(v: any, _: any, props: any) => [
+                            `${fmt(+v)} (${total ? Math.round(+v/total*100) : 0}%)`,
+                            props.payload?.name
+                          ]} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
+                      {pieData.map(item => (
+                        <div key={item.name} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: item.color + "15" }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: item.color }} />
+                            <span className="text-sm font-medium text-slate-700">{item.name}</span>
+                          </div>
+                          <div className="text-right ml-3">
+                            <span className="text-sm font-black" style={{ color: item.color }}>{fmt(item.value)}</span>
+                            <span className="text-xs text-slate-500 ml-1">({total ? Math.round(item.value/total*100) : 0}%)</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </>
         )}
 

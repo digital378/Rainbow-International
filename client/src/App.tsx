@@ -162,6 +162,7 @@ function PageViewTracker() {
 function DeferredExtras() {
   const [ready, setReady] = useState(false);
   const [isCoarsePointer, setIsCoarsePointer] = useState(true);
+  const [location] = useLocation();
 
   useEffect(() => {
     setIsCoarsePointer(window.matchMedia("(pointer: coarse)").matches);
@@ -170,11 +171,13 @@ function DeferredExtras() {
     idle(() => setReady(true));
   }, []);
 
+  const isSalesDashboard = location === "/rps-sales" || location === "/sales";
+
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
       {!isCoarsePointer && <RainbowCursor />}
-      <ChatBot />
+      {!isSalesDashboard && <ChatBot />}
     </Suspense>
   );
 }
