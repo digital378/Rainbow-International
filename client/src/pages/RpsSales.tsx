@@ -355,41 +355,41 @@ function RpsDashboard() {
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
       {/* Header */}
-      <div style={{ background: RED }} className="px-6 py-4">
+      <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)" }} className="px-6 py-5 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-sm">RPS</div>
+            <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-red-700 font-black text-sm shadow-sm">RPS</div>
             <div>
               <div className="text-white font-black text-lg leading-tight">RPS Sales Dashboard</div>
-              <div className="text-amber-300 text-xs">Rainbow Public School · 26-27 Academic Year · v2.4</div>
+              <div className="text-red-100 text-xs">Rainbow Public School · 26-27 Academic Year · v2.4</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {loading && <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />}
+            {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             <div className="text-right">
-              {lastFetch && <div className="text-xs text-slate-400">Updated {lastFetch.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>}
-              <button onClick={fetchData} disabled={loading} className="text-xs text-amber-300 hover:text-white transition">↻ Refresh</button>
+              {lastFetch && <div className="text-xs text-red-200">Updated {lastFetch.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>}
+              <button onClick={fetchData} disabled={loading} className="text-xs text-red-100 hover:text-white transition">↻ Refresh</button>
             </div>
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-4 flex gap-1 overflow-x-auto pb-1">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${activeTab === t.id ? "bg-amber-400 text-[#091a4f]" : "text-slate-300 hover:text-white hover:bg-white/10"}`}>
+              className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition ${activeTab === t.id ? "bg-white text-red-700 shadow-sm" : "text-red-100 hover:text-white hover:bg-white/15"}`}>
               {t.label}
             </button>
           ))}
         </div>
         {/* Month filter pills */}
-        <div className="max-w-7xl mx-auto mt-2 flex gap-1.5 overflow-x-auto pb-2 items-center">
-          <span className="text-xs text-slate-400 mr-1 whitespace-nowrap">Filter:</span>
+        <div className="max-w-7xl mx-auto mt-3 flex gap-1.5 overflow-x-auto pb-1 items-center">
+          <span className="text-xs text-red-200 mr-1 whitespace-nowrap">Filter:</span>
           <button onClick={() => setSelectedMonth(null)}
-            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${!selectedMonth ? "bg-white text-[#091a4f]" : "text-slate-400 hover:text-white hover:bg-white/10 border border-slate-600"}`}>
+            className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${!selectedMonth ? "bg-white text-red-700 shadow-sm" : "text-red-100 hover:text-white hover:bg-white/15 border border-white/30"}`}>
             All Time
           </button>
           {(d.byMonth || []).map(m => (
             <button key={m.monthKey} onClick={() => setSelectedMonth(selectedMonth === m.monthKey ? null : m.monthKey)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${selectedMonth === m.monthKey ? "bg-amber-400 text-[#091a4f]" : "text-slate-400 hover:text-white hover:bg-white/10 border border-slate-600"}`}>
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition ${selectedMonth === m.monthKey ? "bg-white text-red-700 shadow-sm" : "text-red-100 hover:text-white hover:bg-white/15 border border-white/30"}`}>
               {m.label}
             </button>
           ))}
