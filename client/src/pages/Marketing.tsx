@@ -1749,7 +1749,7 @@ function MarketingDashboard() {
         {/* ───────── 13b. YEAR-ON-YEAR MONTH COMPARISON (Dec-Apr) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title={`YoY Month-by-Month Comparison — Oct to Apr (${segmentLabel})`}
+            title={`YoY Month-by-Month Comparison — Oct to May (${segmentLabel})`}
             sub={
               segment === "combined"
                 ? `LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`
@@ -1791,6 +1791,7 @@ function MarketingDashboard() {
               { label: "Feb", ly: lyPick(4), ty: segmentRows[2] },
               { label: "Mar", ly: lyPick(5), ty: segmentRows[3] },
               { label: "Apr", ly: lyPick(6), ty: segmentRows[4] },
+              { label: "May", ly: lyPick(7), ty: segmentRows[5] },
             ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
             type Row = {
               label: string;

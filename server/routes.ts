@@ -1497,14 +1497,32 @@ export async function registerRoutes(
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       const parseN   = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[,\s%]/g, "")) || 0;
 
-      const [masterRows, rpsCrmRows, risCrmRows, rpsSchoolRows, risSchoolRows, risSpendRaw, rpsSpendRaw] = await Promise.all([
+      // Helper: try multiple tab-name variants for sheets whose apostrophe may be
+      // U+0027 (straight) or U+2019 (curly, as auto-inserted by Google Sheets).
+      const tryMayTab = async (school: "RPS" | "RIS", suffix: string): Promise<string[][]> => {
+        const candidates = [
+          `'DM ${school} MAY\u2019 26'${suffix}`,  // curly apostrophe, wrapped
+          `DM ${school} MAY\u2019 26${suffix}`,     // curly apostrophe, no wrap
+          `'DM ${school} MAY'' 26'${suffix}`,       // straight apostrophe, doubled
+        ];
+        for (const range of candidates) {
+          try { return await fetchSheetRange(SHEET_IDS.master, range); } catch { /* try next */ }
+        }
+        return [];
+      };
+
+      // CRM fetches (separate spreadsheets, always reliable) + master DM Overall
+      const [masterRows, rpsCrmRows, risCrmRows] = await Promise.all([
         fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
-        fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A:S"),
-        fetchSheetRange(SHEET_IDS.master, "DM RIS MAY' 26!A:S"),
-        fetchSheetRange(SHEET_IDS.master, "DM RIS MAY' 26!A140:R210"),
-        fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A140:R210"),
+      ]);
+      // School/spend fetches from the MAY master tab — graceful fallback to []
+      const [rpsSchoolRows, risSchoolRows, risSpendRaw, rpsSpendRaw] = await Promise.all([
+        tryMayTab("RPS", "!A:S"),
+        tryMayTab("RIS", "!A:S"),
+        tryMayTab("RIS", "!A140:R210"),
+        tryMayTab("RPS", "!A140:R210"),
       ]);
 
       // ── Per-school master monthly totals (source of truth for walkins/admissions) ──
@@ -1968,9 +1986,9 @@ export async function registerRoutes(
       const resolvedMonth = monthMap[month] || month;
       let tabName: string;
       if (account === "rps") {
-        tabName = resolvedMonth === "apr" ? "Total RPS Apr'26" : resolvedMonth === "feb" ? "DM RPS Feb' 26" : "DM RPS MAY' 26";
+        tabName = resolvedMonth === "apr" ? "Total RPS Apr'26" : resolvedMonth === "feb" ? "DM RPS Feb' 26" : "'DM RPS MAY'' 26'";
       } else {
-        tabName = resolvedMonth === "apr" ? "Total RIS Apr'26" : resolvedMonth === "feb" ? "DM RIS Feb' 26" : "DM RIS MAY' 26";
+        tabName = resolvedMonth === "apr" ? "Total RIS Apr'26" : resolvedMonth === "feb" ? "DM RIS Feb' 26" : "'DM RIS MAY'' 26'";
       }
       const rows = await fetchSheetRange(SHEET_IDS.master, `${tabName}!A:S`);
       // Find header row (row with "Date" or "Total Leads")
@@ -2848,7 +2866,16 @@ paths:
   app.get("/api/marketing/monthly", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
-      const rows = await fetchSheetRange(SHEET_IDS.master, "DM RPS MAY' 26!A140:R210");
+      // Try curly and straight apostrophe variants for the MAY tab name
+      const maySpendCandidates = [
+        "'DM RPS MAY\u2019 26'!A140:R210",
+        "DM RPS MAY\u2019 26!A140:R210",
+        "'DM RPS MAY'' 26'!A140:R210",
+      ];
+      let rows: string[][] = [];
+      for (const range of maySpendCandidates) {
+        try { rows = await fetchSheetRange(SHEET_IDS.master, range); break; } catch { /* try next */ }
+      }
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       // Maps month name → { YYYY-MM key, short label }
       const SPEND_MONTH_MAP: Record<string, { key: string; label: string }> = {
