@@ -1593,7 +1593,10 @@ export async function registerRoutes(
         "June":"Jun 25","July":"Jul 25","August":"Aug 25","September":"Sep 25",
         "October":"Oct 25","November":"Nov 25","December":"Dec 25",
         "January":"Jan 26","February":"Feb 26","March":"Mar 26","April":"Apr 26","May":"May 26",
+        "June26":"Jun 26", // sentinel key used internally when a 2nd June row is detected
       };
+      // Track whether we've already mapped a "June" (Jun 25); the next one is Jun 26
+      const spendSeenMonths = new Set<string>();
       const parseSpendRows = (rows: string[][]): Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> => {
         // Find header row: must contain both "meta" and "google" (partial, case-insensitive)
         const hIdx = rows.findIndex(r => {
@@ -1619,12 +1622,16 @@ export async function registerRoutes(
         }
 
         const result: Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> = [];
+        const seenInThisSheet = new Set<string>();
         for (const row of afterHeader) {
           const rawMonth = String(row[monthCol] ?? "").trim();
           if (!rawMonth) continue;
           if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
-          const mapped = SPEND_MONTH_MAP[rawMonth];
+          // If "June" appears a second time in the sheet, it's June 2026 not June 2025
+          const lookupKey = (rawMonth === "June" && seenInThisSheet.has("Jun 25")) ? "June26" : rawMonth;
+          const mapped = SPEND_MONTH_MAP[lookupKey];
           if (!mapped) continue;
+          seenInThisSheet.add(mapped);
           const meta   = parseINR(row[metaCol]);
           const google = parseINR(row[googleCol]);
           result.push({ month: mapped, salaries: salaryCol >= 0 ? parseINR(row[salaryCol]) : 0, meta, google, adSpend: meta + google });
@@ -1643,13 +1650,17 @@ export async function registerRoutes(
       const monthlyTotals: any[] = [];
       const mayWeeklyCombined: any[] = [];
       let inMay = false;
+      let passedMay = false; // tracks when we've seen the MAY row, so next JUNE = Jun 26
 
       for (const row of masterRows) {
         const label = String(row[1] ?? "").trim();
         if (!label) continue;
         if (label.toUpperCase().startsWith("TOTAL")) break;
-        const monthVal = MONTH_MAP[label.toUpperCase()];
+        let monthVal = MONTH_MAP[label.toUpperCase()];
+        // After seeing MAY (May 26), a subsequent JUNE row is June 2026, not June 2025
+        if (passedMay && label.toUpperCase() === "JUNE") monthVal = "Jun 26";
         if (monthVal) {
+          if (monthVal === "May 26") passedMay = true;
           inMay = monthVal === "May 26";
           const leads = parseN(row[2]); const spend = parseINR(row[20]);
           if (leads > 0 || spend > 0) {
@@ -1667,7 +1678,7 @@ export async function registerRoutes(
       }
 
       // ── RPS CRM → branch-wise by month ──
-      const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
+      const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"];
       const rpsMonthBranch: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
       const rpsCloseReasons: Record<string, number> = {};
       const rpsMonthReasons: Record<string, Record<string, number>> = {};

@@ -7,8 +7,10 @@ import {
   LAST_UPDATED,
   TODAY_DATE as TODAY_DATE_STATIC,
   DAYS_IN_MAY,
+  DAYS_IN_CURRENT_MONTH,
   MIN_REVENUE_PER_ADM,
   MAY_IDX,
+  CURRENT_IDX,
   MONTHLY as MONTHLY_STATIC,
   ORGANIC_PRE_SPEND,
   LAST_YEAR,
@@ -226,7 +228,7 @@ function MarketingDashboard() {
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
   const [calcSpend, setCalcSpend] = useState<number>(100000);
-  const [calcMonth, setCalcMonth] = useState<string>("May 26");
+  const [calcMonth, setCalcMonth] = useState<string>("Jun 26");
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
 
   /* Editable cost inputs — initialized from segment defaults */
@@ -302,12 +304,12 @@ function MarketingDashboard() {
     "Jun 25":"Jun-25","Jul 25":"Jul-25","Aug 25":"Aug-25","Sep 25":"Sep-25",
     "Oct 25":"Oct-25","Nov 25":"Nov-25","Dec 25":"Dec-25","Jan 26":"Jan-26",
     "Feb 26":"Feb-26","Mar 26":"Mar-26","Apr 26":"Apr-26","May 26":"May-26",
+    "Jun 26":"Jun-26",
   };
   const MONTHLY_LIVE = useMemo<MonthRow[]>(() => {
     if (!liveData?.monthlyTotals?.length) return MONTHLY_STATIC;
     return MONTHLY_STATIC.map(row => {
       const live = liveData.monthlyTotals.find(m => m.month === row.month);
-      if (!live) return row;
       const crmKey = DASH_TO_CRM[row.month] ?? "";
       const risMon = liveData.risCrm.byMonth.find(m => m.month === crmKey);
       const rpsMon = liveData.rpsCrm.byMonth.find(m => m.month === crmKey);
@@ -317,6 +319,9 @@ function MarketingDashboard() {
       // Live Meta/Google spend from the "Digital Marketing Spend Analysis" table in each school tab
       const risSpendLive = liveData.risSpend?.find(s => s.month === row.month);
       const rpsSpendLive = liveData.rpsSpend?.find(s => s.month === row.month);
+
+      // If DM Overall has no entry AND no CRM/school/spend data, keep static row as-is
+      if (!live && !risMon && !rpsMon && !rpsSchool && !risSchool && !risSpendLive && !rpsSpendLive) return row;
 
       const risBase: MetricSet = risMon
         ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings,
@@ -329,16 +334,20 @@ function MarketingDashboard() {
             admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
         : row.rps;
 
-      return {
-        month: row.month,
-        combined: { leads: live.leads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google },
-        ris: risSpendLive && risSpendLive.adSpend > 0
-          ? { ...risBase, meta: risSpendLive.meta, google: risSpendLive.google, spend: risSpendLive.adSpend }
-          : risBase,
-        rps: rpsSpendLive && rpsSpendLive.adSpend > 0
-          ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
-          : rpsBase,
-      };
+      // For combined: use DM Overall if available; otherwise derive from per-school data
+      const risOut: MetricSet = risSpendLive && risSpendLive.adSpend > 0
+        ? { ...risBase, meta: risSpendLive.meta, google: risSpendLive.google, spend: risSpendLive.adSpend }
+        : risBase;
+      const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
+        ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
+        : rpsBase;
+      const combinedOut: MetricSet = live
+        ? { leads: live.leads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
+        : { leads: risOut.leads + rpsOut.leads, bookings: risOut.bookings + rpsOut.bookings,
+            walkins: risOut.walkins + rpsOut.walkins, admissions: risOut.admissions + rpsOut.admissions,
+            spend: risOut.spend + rpsOut.spend, meta: risOut.meta + rpsOut.meta, google: risOut.google + rpsOut.google };
+
+      return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut };
     });
   }, [liveData]);
 
@@ -363,12 +372,12 @@ function MarketingDashboard() {
     return { instaFollowers: SOCIAL.ris.instaFollowers + SOCIAL.rps.instaFollowers, fbFollowers: SOCIAL.ris.fbFollowers + SOCIAL.rps.fbFollowers, ytViews: SOCIAL.ris.ytViews + SOCIAL.rps.ytViews, websiteClicks: SOCIAL.ris.websiteClicks + SOCIAL.rps.websiteClicks };
   }, [segment]);
 
-  const current = segmentRows[5]; // May (in progress)
-  const previous = segmentRows[4]; // April (final)
+  const current = segmentRows[CURRENT_IDX]; // Jun 26 (in progress)
+  const previous = segmentRows[MAY_IDX];    // May 26 (final)
 
-  /* May last year (index 7 = "May 25" in LAST_YEAR) */
+  /* June last year (index 8 = "Jun 25" in LAST_YEAR) */
   const mayLastYear = useMemo(() => {
-    const ly = LAST_YEAR[7]; // May 25
+    const ly = LAST_YEAR[8]; // Jun 25
     if (segment === "combined") return { spend: ly.ris.spend + ly.rps.spend, leads: ly.ris.leads + ly.rps.leads, walkins: ly.ris.walkins + ly.rps.walkins, admissions: ly.ris.admissions + ly.rps.admissions, bookings: 0 };
     return { ...ly[segment as "ris" | "rps"], bookings: 0 };
   }, [segment]);
@@ -385,9 +394,9 @@ function MarketingDashboard() {
     };
   }, [segment]);
 
-  /* LY Oct–May totals (LAST_YEAR indices 0–7: Oct 24 → May 25) */
+  /* LY Oct–Jun totals (LAST_YEAR indices 0–8: Oct 24 → Jun 25) */
   const lyOctMayTotals = useMemo(() => {
-    const slice = LAST_YEAR.slice(0, 8); // Oct 24 → May 25
+    const slice = LAST_YEAR.slice(0, 9); // Oct 24 → Jun 25
     if (segment === "combined") return slice.reduce((a, r) => ({
       spend:      a.spend      + r.ris.spend      + r.rps.spend,
       leads:      a.leads      + r.ris.leads      + r.rps.leads,
@@ -400,7 +409,7 @@ function MarketingDashboard() {
     }, { spend: 0, leads: 0, walkins: 0, admissions: 0 });
   }, [segment]);
 
-  /* Full-AY totals — Jun 2025 through May 2026 (reconciled with sheet's TOTAL TILL DATE) */
+  /* Full-AY totals — Jun 2025 through Jun 2026 YTD (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
   const ytdAdmissionsFull = totals.admissions + organic.admissions;
   const ytdLeadsFull     = totals.leads     + organic.leads;
@@ -427,8 +436,8 @@ function MarketingDashboard() {
   const ytdMarketingRoi = roi(ytdRevenue, totals.spend);
   const ytdTrueRoi = roi(ytdRevenue, totals.spend + monthlyFixed * totalMonths);
 
-  /* May Forecast (linear pace projection) */
-  const fcMul = DAYS_IN_MAY / TODAY_DATE;
+  /* June Forecast (linear pace projection) */
+  const fcMul = DAYS_IN_CURRENT_MONTH / TODAY_DATE;
   const forecast = {
     leads: Math.round(current.leads * fcMul), walkins: Math.round(current.walkins * fcMul),
     admissions: Math.round(current.admissions * fcMul), spend: Math.round(current.spend * fcMul),
@@ -522,10 +531,10 @@ function MarketingDashboard() {
         body: `${walkToAdm.toFixed(1)}% of walk-ins convert to admissions — above industry standard. Focus on driving more walk-ins to multiply admissions.` });
     }
 
-    /* May pace — only show when month is still running */
-    if (TODAY_DATE < DAYS_IN_MAY && forecast.leads < previous.leads * 0.95) {
-      arr.push({ severity: "warning", title: "May tracking below April",
-        body: `Forecasted May leads (${num(forecast.leads)}) projected below April (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_MAY - TODAY_DATE} days.` });
+    /* June pace — only show when month is still running */
+    if (TODAY_DATE < DAYS_IN_CURRENT_MONTH && forecast.leads < previous.leads * 0.95) {
+      arr.push({ severity: "warning", title: "June tracking below May",
+        body: `Forecasted June leads (${num(forecast.leads)}) projected below May (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_CURRENT_MONTH - TODAY_DATE} days.` });
     }
 
     /* YoY growth */
@@ -655,7 +664,7 @@ function MarketingDashboard() {
 
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
-          <SectionTitle title="Month-over-Month Comparison" sub={`May 2026 (in progress, ${TODAY_DATE} days) vs April 2026 (final)`} />
+          <SectionTitle title="Month-over-Month Comparison" sub={`June 2026 (in progress, ${TODAY_DATE} days) vs May 2026 (final)`} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
@@ -681,19 +690,19 @@ function MarketingDashboard() {
                     <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs Apr: {k.format(k.prev)}</div>
+                  <div className="text-[11px] text-gray-500 mt-1">vs May: {k.format(k.prev)}</div>
                 </div>
               );
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            May 2026 is in progress ({TODAY_DATE} days captured: May 1–3). Compares partial-May to final April — see Forecast section for projected month-end values.
+            June 2026 is in progress ({TODAY_DATE} days captured: June 1–{TODAY_DATE}). Compares partial-June to final May — see Forecast section for projected month-end values.
           </div>
         </section>
 
         {/* ───────── 3b. Year-over-Year Comparison ───────── */}
         <section>
-          <SectionTitle title="Year-over-Year Comparison" sub={`May 2026 (partial, ${TODAY_DATE} days) vs May 2025 (full month)`} />
+          <SectionTitle title="Year-over-Year Comparison" sub={`June 2026 (partial, ${TODAY_DATE} days) vs June 2025 (full month)`} />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
@@ -717,26 +726,26 @@ function MarketingDashboard() {
                     <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs May 25: {k.format(k.prev)}</div>
+                  <div className="text-[11px] text-gray-500 mt-1">vs Jun 25: {k.format(k.prev)}</div>
                 </div>
               );
             })}
           </div>
         </section>
 
-        {/* ───────── 4. May Forecast (with True CPA) ───────── */}
+        {/* ───────── 4. June Forecast (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title={TODAY_DATE >= DAYS_IN_MAY ? "May 2026 — Final Actuals" : "May 2026 Forecast (Projected Month-End)"}
-            sub={TODAY_DATE >= DAYS_IN_MAY ? `Month complete · All ${DAYS_IN_MAY} days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
+            title={TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "June 2026 — Final Actuals" : "June 2026 Forecast (Projected Month-End)"}
+            sub={TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? `Month complete · All ${DAYS_IN_CURRENT_MONTH} days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
             badge={`Confidence: ${fcConfidence}`}
           />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
             {[
-              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Leads" : "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
-              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Walk-ins" : "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
-              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Admissions" : "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
-              { label: TODAY_DATE >= DAYS_IN_MAY ? "Final Spend" : "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
+              { label: TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "Final Leads" : "Forecasted Leads", curr: current.leads, fc: forecast.leads, color: NAVY },
+              { label: TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "Final Walk-ins" : "Forecasted Walk-ins", curr: current.walkins, fc: forecast.walkins, color: CYAN },
+              { label: TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "Final Admissions" : "Forecasted Admissions", curr: current.admissions, fc: forecast.admissions, color: GREEN },
+              { label: TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "Final Spend" : "Forecasted Spend", curr: current.spend, fc: forecast.spend, color: RED, isMoney: true },
             ].map((k, i) => (
               <div key={i} className="rounded-xl border border-gray-100 p-3">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{k.label}</div>
@@ -927,14 +936,14 @@ function MarketingDashboard() {
           </div>
         </section>
 
-        {/* ───────── 7. May Branch Comparison + Channel ───────── */}
+        {/* ───────── 7. June Branch Comparison + Channel ───────── */}
         {segment === "combined" && (
           <section className="grid lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
               {(() => {
                 const rpsMonths = liveData?.rpsCrm.byMonth.map(m => m.month) ?? [];
                 const risMonths = liveData?.risCrm.byMonth.map(m => m.month) ?? [];
-                const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26"];
+                const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"];
                 const allMonths = Array.from(new Set([...rpsMonths, ...risMonths])).sort((a,b) => {
                   const ai = MONTH_ORDER_UI.indexOf(a), bi = MONTH_ORDER_UI.indexOf(b);
                   return (ai<0?99:ai)-(bi<0?99:bi);
@@ -1016,7 +1025,7 @@ function MarketingDashboard() {
             </div>
 
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <SectionTitle title="May 2026 — Channel Spend" sub="Meta vs Google ad investment (partial month)" />
+              <SectionTitle title="June 2026 — Channel Spend" sub="Meta vs Google ad investment (partial month)" />
               <div className="space-y-3">
                 <div className="rounded-xl p-4 text-white" style={{ background: "#1877f2" }}>
                   <div className="flex justify-between items-baseline">
@@ -1586,7 +1595,7 @@ function MarketingDashboard() {
               <div className="text-gray-700">Spend: <strong>{inr(totalsLastYearSegment.spend)}</strong> · Leads: <strong>{num(totalsLastYearSegment.leads)}</strong> · Admissions: <strong>{totalsLastYearSegment.admissions}</strong></div>
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
-              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Dec 25 – May 26)</div>
+              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Dec 25 – Jun 26)</div>
               <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
             </div>
           </div>
@@ -1595,7 +1604,7 @@ function MarketingDashboard() {
         {/* ───────── 10. May Weekly ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <SectionTitle title="May 2026 — Weekly Breakdown" sub={`Week-by-week leads, walk-ins, bookings, admissions (through ${LAST_UPDATED})`} />
+            <SectionTitle title="June 2026 — Weekly Breakdown" sub={`Week-by-week leads, walk-ins, bookings, admissions (through ${LAST_UPDATED})`} />
             <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
               {(["combined", "ris", "rps"] as const).map(t => (
                 <button key={t} onClick={() => setWeeklyTab(t)}
@@ -1791,7 +1800,8 @@ function MarketingDashboard() {
               { label: "Feb", ly: lyPick(4), ty: segmentRows[2] },
               { label: "Mar", ly: lyPick(5), ty: segmentRows[3] },
               { label: "Apr", ly: lyPick(6), ty: segmentRows[4] },
-              { label: "May", ly: lyPick(7), ty: segmentRows[5] },
+              { label: "May", ly: lyPick(7), ty: segmentRows[MAY_IDX] },
+              { label: "Jun", ly: lyPick(8), ty: segmentRows[CURRENT_IDX] },
             ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
             type Row = {
               label: string;
@@ -2026,7 +2036,7 @@ function MarketingDashboard() {
             Monthly performance data sourced live from the DM Overall master Google Sheet · CRM data sourced live from RPS CRM &amp; RIS CRM Google Sheets · auto-refreshes every 5 minutes.
           </div>
           <div className="mt-1">
-            Last updated: {liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED} · May 2026 reflects partial month ({TODAY_DATE} of 31 days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.
+            Last updated: {liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED} · June 2026 reflects partial month ({TODAY_DATE} of {DAYS_IN_CURRENT_MONTH} days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.
           </div>
         </div>
       </div>

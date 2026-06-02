@@ -5,11 +5,13 @@
    When monthly numbers change, edit them HERE only.
    ═══════════════════════════════════════════════════════════════════ */
 
-export const LAST_UPDATED = "May 9, 2026";
-export const TODAY_DATE = 3;
-export const DAYS_IN_MAY = 31;
+export const LAST_UPDATED = "June 2, 2026";
+export const TODAY_DATE = 2;
+export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
+export const DAYS_IN_CURRENT_MONTH = 30;  // June 2026 — current month (30 days)
 export const MIN_REVENUE_PER_ADM = 90000;
-export const MAY_IDX = 5;
+export const MAY_IDX = 5;      // May 26 — completed, index in MONTHLY
+export const CURRENT_IDX = 6;  // Jun 26 — current in-progress month, index in MONTHLY
 
 export type SegmentKey = "combined" | "ris" | "rps";
 export type MetricSet = {
@@ -64,6 +66,14 @@ export const MONTHLY: MonthRow[] = [
     combined: { leads: 313, bookings: 139, walkins: 85, admissions: 22, spend: 164434, meta: 46135, google: 118299 },
     ris:      { leads: 167, bookings: 78,  walkins: 53, admissions: 11, spend: 77004,  meta: 5459,  google: 71545 },
     rps:      { leads: 146, bookings: 61,  walkins: 32, admissions: 11, spend: 92434,  meta: 45680, google: 46754 },
+  },
+  {
+    /* June 2026 — in progress (2 days captured as of June 2).
+       Spend/leads/walkins from live Google Sheets; will be overridden by live API each load. */
+    month: "Jun 26",
+    combined: { leads: 18, bookings: 9, walkins: 4, admissions: 0, spend: 2154, meta: 694,  google: 1460 },
+    ris:      { leads: 6,  bookings: 2, walkins: 1, admissions: 0, spend: 504,  meta: 0,    google: 504  },
+    rps:      { leads: 12, bookings: 7, walkins: 3, admissions: 0, spend: 1650, meta: 694,  google: 956  },
   },
 ];
 
