@@ -3342,7 +3342,7 @@ paths:
         kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
         byMonth, byBranch, bySource, byGrade, counselorLeaderboard, closedReasons,
         monthlyDetail,
-        recentEnquiries: recentEnquiries.slice(0, 300),
+        recentEnquiries: recentEnquiries,
         dmPipeline: {
           admitted: dmAdmitted, open: dmOpen, closed: dmClosed,
           convMedianDays: dmConvMedian,

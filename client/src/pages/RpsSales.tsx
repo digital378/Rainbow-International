@@ -304,6 +304,31 @@ function RpsDashboard() {
   const filtLeads = monthDet
     ? d.recentEnquiries.filter(e => e.date.includes(monthDet.label))
     : d.recentEnquiries.slice(0, 20);
+  // Month-specific counsellor leaderboard computed from filtLeads
+  const monthLB = (selectedMonth && monthDet && filtLeads.length > 0)
+    ? (() => {
+        const map = new Map<string, { admDone: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number }>();
+        for (const e of filtLeads) {
+          const c = e.counselor; if (!c) continue;
+          const lb = map.get(c) || { admDone: 0, closed: 0, open: 0, inProcess: 0, futureProspect: 0, total: 0 };
+          lb.total++;
+          const st = e.status.toUpperCase();
+          if (st === "ADM DONE" || st === "ADM DONE IN RIS") lb.admDone++;
+          else if (st.startsWith("CLOSED")) lb.closed++;
+          else if (st === "OPEN") lb.open++;
+          else if (st === "IN PROCESS ADM") lb.inProcess++;
+          else if (st.startsWith("FUTURE")) lb.futureProspect++;
+          map.set(c, lb);
+        }
+        return Array.from(map, ([counselor, v]) => ({
+          counselor, admDone: v.admDone, admRIS: 0,
+          closed: v.closed, open: v.open, inProcess: v.inProcess,
+          futureProspect: v.futureProspect, total: v.total,
+          conversion: v.total > 0 ? Math.round(v.admDone / v.total * 1000) / 10 : 0,
+        })).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
+      })()
+    : null;
+
   // Month-specific revenue & spend (for Revenue tab filter view)
   const mktMonth = selectedMonth ? mktData.find(m => m.monthKey === selectedMonth) : null;
   const revMonthAdm  = monthDet?.admissions ?? 0;
@@ -1127,19 +1152,22 @@ function RpsDashboard() {
             </div>
           )}
 
-          {d.counselorLeaderboard.length > 0 && (
+          {(monthLB ?? d.counselorLeaderboard).length > 0 && (
             <div>
               <div className="flex items-end justify-between mb-3">
                 <div>
-                  <SectionTitle sub="From Walkin Data · every enquiry row · sorted by admissions">Full Counsellor Leaderboard</SectionTitle>
+                  <SectionTitle sub={monthLB ? `${monthDet!.label} · enquiries assigned to counsellor · sorted by admissions` : "From Walkin Data · every enquiry row · sorted by admissions"}>
+                    Full Counsellor Leaderboard{monthLB ? ` · ${monthDet!.label}` : ""}
+                  </SectionTitle>
                   <p className="text-[11px] text-slate-400 mt-1">
                     Conv% = Admissions ÷ Total Enquiries &nbsp;·&nbsp; Total Enquiries = all leads assigned to counsellor
+                    {monthLB && <span className="ml-2 px-1.5 py-0.5 rounded text-amber-700 font-semibold" style={{ background: AMBER + "22" }}>Filtered: {monthDet!.label}</span>}
                   </p>
                 </div>
                 <button className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
                   onClick={() => csvDownload("rps-leaderboard.csv",
                     ["#","Counsellor","Admissions","Closed","Open","In Progress","Total Leads","Conv%"],
-                    d.counselorLeaderboard.map((c,i) => [i+1,c.counselor,c.admDone+c.admRIS,c.closed,c.open,c.inProcess,c.total,c.conversion]))}>
+                    (monthLB ?? d.counselorLeaderboard).map((c,i) => [i+1,c.counselor,c.admDone+c.admRIS,c.closed,c.open,c.inProcess,c.total,c.conversion]))}>
                   ↓ Download CSV
                 </button>
               </div>
@@ -1158,7 +1186,7 @@ function RpsDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {d.counselorLeaderboard.map((c, i) => {
+                    {(monthLB ?? d.counselorLeaderboard).map((c, i) => {
                       const totalAdm = c.admDone + c.admRIS;
                       const convColor = c.conversion >= 50 ? GREEN : c.conversion >= 30 ? AMBER : RED;
                       const rankEmoji = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
