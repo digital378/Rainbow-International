@@ -1589,6 +1589,36 @@ export async function registerRoutes(
       const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
       const risSchoolMonthly = parseSchoolRows(risSchoolRows);
 
+      // ── Per-school weekly rows (for the weekly breakdown table) ──
+      // Reads weekly aggregate rows (date ranges like "01/06 - 07/06") from the current school tab.
+      const parseSchoolWeeklyRows = (rows: string[][]): Array<{week:string;leads:number;bookings:number;walkins:number;admissions:number}> => {
+        const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
+        if (hIdx === -1) return [];
+        const header = rows[hIdx];
+        const leadCol = header.findIndex(h => String(h).includes("Total Leads"));
+        const bookCol = header.findIndex(h => String(h).toLowerCase().includes("booking"));
+        const wCol    = header.findIndex(h => String(h).includes("Total Walkins"));
+        const aCol    = header.findIndex(h => String(h).includes("Total Admissions"));
+        const result: Array<{week:string;leads:number;bookings:number;walkins:number;admissions:number}> = [];
+        for (const row of rows.slice(hIdx + 1)) {
+          const label = String(row[1] ?? "").trim();
+          if (String(row[0] ?? "").toUpperCase().includes("DIGITAL") || label.toUpperCase().includes("DIGITAL")) break;
+          // Weekly aggregate rows have a date-range format: "01/06 - 07/06" (contains both "/" and "-")
+          if (label.includes("/") && label.includes("-")) {
+            result.push({
+              week: label,
+              leads:      parseInt(String(row[leadCol] ?? 0).replace(/[₹,\s]/g,"")) || 0,
+              bookings:   parseInt(String(row[bookCol] ?? 0).replace(/[₹,\s]/g,"")) || 0,
+              walkins:    parseInt(String(row[wCol]    ?? 0).replace(/[₹,\s]/g,"")) || 0,
+              admissions: parseInt(String(row[aCol]    ?? 0).replace(/[₹,\s]/g,"")) || 0,
+            });
+          }
+        }
+        return result;
+      };
+      const rpsWeekly = parseSchoolWeeklyRows(rpsSchoolRows);
+      const risWeekly = parseSchoolWeeklyRows(risSchoolRows);
+
       // ── Per-school Meta/Google spend from the "DIGITAL MARKETING SPEND ANALYSIS" table ──
       // Both "DM RIS MAY' 26" and "DM RPS MAY' 26" tabs contain this table after the weekly rows.
       // Month names in the table: "June"…"December" (2025), "January"…"May" (2026).
@@ -1822,6 +1852,8 @@ export async function registerRoutes(
         risCrm: { byMonth: risByMonth, closedReasons: sortReasons(risCloseReasons), statusSummary: risStatusCount, bySource: risSourceCount },
         rpsSchoolMonthly,
         risSchoolMonthly,
+        rpsWeekly,
+        risWeekly,
         risSpend,
         rpsSpend,
       });

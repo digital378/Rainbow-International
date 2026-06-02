@@ -34,6 +34,8 @@ type LiveData = {
   currentDayOfMonth: number;
   monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number; meta: number; google: number; spend: number }>;
   mayWeeklyCombined: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number; spend: number }>;
+  risWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
+  rpsWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   rpsCrm: { byMonth: LiveRpsMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   rpsSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
@@ -227,6 +229,7 @@ function MarketingDashboard() {
   const [segment, setSegment] = useState<SegmentKey>("combined");
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
+  const [weeklyMonth, setWeeklyMonth] = useState<string>("Jun 26");
   const [calcSpend, setCalcSpend] = useState<number>(100000);
   const [calcMonth, setCalcMonth] = useState<string>("Jun 26");
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
@@ -359,6 +362,24 @@ function MarketingDashboard() {
   const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({ month: m.month, ...getSegment(m, segment) })), [segment, MONTHLY_LIVE]);
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
+
+  type WeekRow = { week: string; leads: number; bookings: number; walkins: number; admissions: number };
+  const weeklyTableRows = useMemo((): WeekRow[] => {
+    const isMay = weeklyMonth === "May 26";
+    const monthMark = isMay ? "/05" : "/06";
+    if (weeklyTab === "ris") {
+      if (!isMay && liveData?.risWeekly?.length) return liveData.risWeekly;
+      return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.risLeads, bookings: w.risBook, walkins: w.risWalk, admissions: w.risAdm }));
+    }
+    if (weeklyTab === "rps") {
+      if (!isMay && liveData?.rpsWeekly?.length) return liveData.rpsWeekly;
+      return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.rpsLeads, bookings: w.rpsBook, walkins: w.rpsWalk, admissions: w.rpsAdm }));
+    }
+    // combined — use live mayWeeklyCombined filtered by month
+    const live = liveData?.mayWeeklyCombined.filter(w => w.week.includes(monthMark)) ?? [];
+    if (live.length) return live;
+    return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.risLeads + w.rpsLeads, bookings: w.risBook + w.rpsBook, walkins: w.risWalk + w.rpsWalk, admissions: w.risAdm + w.rpsAdm }));
+  }, [liveData, weeklyMonth, weeklyTab]);
 
   const totalsLastYearSegment = useMemo(() => {
     if (segment === "combined") {
@@ -1605,10 +1626,13 @@ function MarketingDashboard() {
           </div>
         </section>
 
-        {/* ───────── 10. May Weekly ───────── */}
+        {/* ───────── 10. Weekly Breakdown ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <SectionTitle title="June 2026 — Weekly Breakdown" sub={`Week-by-week leads, walk-ins, bookings, admissions (through ${LAST_UPDATED})`} />
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <SectionTitle
+              title={`${weeklyMonth} — Weekly Breakdown`}
+              sub={`Week-by-week leads, walk-ins, bookings, admissions (through ${LAST_UPDATED})`}
+            />
             <div className="flex rounded-lg overflow-hidden border border-gray-200 text-xs">
               {(["combined", "ris", "rps"] as const).map(t => (
                 <button key={t} onClick={() => setWeeklyTab(t)}
@@ -1616,6 +1640,16 @@ function MarketingDashboard() {
                   style={weeklyTab === t ? { background: t === "rps" ? CYAN : NAVY } : {}}>{t}</button>
               ))}
             </div>
+          </div>
+          {/* Month filter */}
+          <div className="flex gap-2 mb-4">
+            {(["May 26", "Jun 26"] as const).map(m => (
+              <button key={m} onClick={() => setWeeklyMonth(m)}
+                className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${weeklyMonth === m ? "text-white border-transparent" : "text-gray-500 border-gray-200 hover:border-gray-400"}`}
+                style={weeklyMonth === m ? { background: NAVY } : {}}>
+                {m === "May 26" ? "May 2026" : "June 2026"}
+              </button>
+            ))}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -1628,20 +1662,18 @@ function MarketingDashboard() {
                 <th className="text-center py-2 px-3 text-gray-500 font-semibold">Conversion</th>
               </tr></thead>
               <tbody>
-                {MAY_WEEKLY.map((w, i) => {
-                  const leads = weeklyTab === "ris" ? w.risLeads : weeklyTab === "rps" ? w.rpsLeads : w.risLeads + w.rpsLeads;
-                  const walk = weeklyTab === "ris" ? w.risWalk : weeklyTab === "rps" ? w.rpsWalk : w.risWalk + w.rpsWalk;
-                  const adm = weeklyTab === "ris" ? w.risAdm : weeklyTab === "rps" ? w.rpsAdm : w.risAdm + w.rpsAdm;
-                  const book = weeklyTab === "ris" ? w.risBook : weeklyTab === "rps" ? w.rpsBook : w.risBook + w.rpsBook;
-                  const conv = leads > 0 ? ((adm / leads) * 100).toFixed(1) : "—";
+                {weeklyTableRows.length === 0 ? (
+                  <tr><td colSpan={6} className="py-8 text-center text-gray-400 text-sm">No weekly data available</td></tr>
+                ) : weeklyTableRows.map((w, i) => {
+                  const conv = w.leads > 0 ? ((w.admissions / w.leads) * 100).toFixed(1) : "—";
                   return (
                     <tr key={i} className={`border-b border-gray-50 ${i % 2 === 0 ? "bg-gray-50/50" : ""}`}>
                       <td className="py-3 px-3 font-semibold text-gray-700">{w.week}</td>
-                      <td className="py-3 px-3 text-center font-bold" style={{ color: NAVY }}>{leads}</td>
-                      <td className="py-3 px-3 text-center font-bold text-amber-600">{book}</td>
-                      <td className="py-3 px-3 text-center font-bold text-cyan-700">{walk}</td>
-                      <td className="py-3 px-3 text-center font-bold text-green-700">{adm}</td>
-                      <td className="py-3 px-3 text-center"><span className={`px-2 py-0.5 rounded-md text-xs font-bold ${parseFloat(conv) > 5 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{conv}%</span></td>
+                      <td className="py-3 px-3 text-center font-bold" style={{ color: NAVY }}>{w.leads}</td>
+                      <td className="py-3 px-3 text-center font-bold text-amber-600">{w.bookings}</td>
+                      <td className="py-3 px-3 text-center font-bold text-cyan-700">{w.walkins}</td>
+                      <td className="py-3 px-3 text-center font-bold text-green-700">{w.admissions}</td>
+                      <td className="py-3 px-3 text-center"><span className={`px-2 py-0.5 rounded-md text-xs font-bold ${parseFloat(conv) > 5 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>{conv === "—" ? "—%" : `${conv}%`}</span></td>
                     </tr>
                   );
                 })}
