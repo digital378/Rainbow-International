@@ -48,7 +48,7 @@ type RpsData = {
   byGrade:  Array<{ grade: string; count: number }>;
   counselorLeaderboard: Array<{ counselor: string; admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number; conversion: number }>;
   closedReasons:   Array<{ reason: string; count: number }>;
-  recentEnquiries: Array<{ date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string }>;
+  recentEnquiries: Array<{ date: string; monthKey: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string }>;
   dmPipeline: {
     admitted: number; open: number; closed: number; convMedianDays: number;
     byBranch:     Array<{ branch: string; admitted: number; open: number; closed: number }>;
@@ -300,12 +300,12 @@ function RpsDashboard() {
   const filtKpis = monthDet
     ? { ...d.kpis, totalEnquiries: monthDet.enquiries, totalAdmissions: monthDet.admissions, totalAdmRIS: 0, openEnquiries: 0, closedTotal: 0, inProcess: 0, futureProspect: 0, overallConversion: monthDet.enquiries ? Math.round(monthDet.admissions / monthDet.enquiries * 1000) / 10 : 0, thisMonthEnquiries: monthDet.enquiries, thisMonthAdm: monthDet.admissions }
     : d.kpis;
-  // Filter recent leads by month label (date format: "15 May 26"; label: "May 26")
-  const filtLeads = monthDet
-    ? d.recentEnquiries.filter(e => e.date.includes(monthDet.label))
+  // Filter recent leads by exact monthKey (e.g. "2026-01") — avoids fragile date-string matching
+  const filtLeads = selectedMonth
+    ? d.recentEnquiries.filter(e => e.monthKey === selectedMonth)
     : d.recentEnquiries.slice(0, 20);
   // Month-specific counsellor leaderboard computed from filtLeads
-  const monthLB = (selectedMonth && monthDet && filtLeads.length > 0)
+  const monthLB = (selectedMonth && filtLeads.length > 0)
     ? (() => {
         const map = new Map<string, { admDone: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number }>();
         for (const e of filtLeads) {

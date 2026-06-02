@@ -2961,7 +2961,7 @@ paths:
       const bySourceMap = new Map<string, { enquiries: number; admissions: number }>();
       const byGradeMap  = new Map<string, number>();
       const closedReasonMap = new Map<string, number>();
-      type RpsRecent = { date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; sortKey: number };
+      type RpsRecent = { date: string; monthKey: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; sortKey: number };
       const recentEnquiries: RpsRecent[] = [];
       // Lead time (enquiry → admission)
       const leadDays: number[] = [];
@@ -3071,6 +3071,7 @@ paths:
 
         recentEnquiries.push({
           date: d ? `${d.getDate()} ${d.toLocaleString("en-US",{month:"short"})} ${String(d.getFullYear()).slice(2)}` : "",
+          monthKey: mk,
           name, grade, branch, source, status: statusRaw, counselor,
           sortKey: d ? d.getTime() : 0,
         });
