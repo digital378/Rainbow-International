@@ -66,7 +66,6 @@ CREATE TABLE "ras" (
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
 	"branch" text DEFAULT 'Main' NOT NULL,
-	"school" text DEFAULT 'RIS' NOT NULL,
 	"active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "ras_slug_unique" UNIQUE("slug")
@@ -77,7 +76,6 @@ CREATE TABLE "walkin_checkins" (
 	"ra_id" varchar NOT NULL,
 	"ra_name" text NOT NULL,
 	"ra_branch" text NOT NULL,
-	"school" text DEFAULT 'RIS' NOT NULL,
 	"parent_name" text NOT NULL,
 	"student_name" text NOT NULL,
 	"grade" text NOT NULL,

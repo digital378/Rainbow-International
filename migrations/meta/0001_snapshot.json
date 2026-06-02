@@ -1,6 +1,6 @@
 {
-  "id": "0fdfc26d-eb07-431f-95b9-2cfa9696cd90",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "ea6ef719-77ad-4081-b734-78502ac15aad",
+  "prevId": "0fdfc26d-eb07-431f-95b9-2cfa9696cd90",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -396,6 +396,13 @@
           "notNull": true,
           "default": "'Main'"
         },
+        "school": {
+          "name": "school",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'RIS'"
+        },
         "active": {
           "name": "active",
           "type": "boolean",
@@ -455,6 +462,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "school": {
+          "name": "school",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'RIS'"
         },
         "parent_name": {
           "name": "parent_name",
