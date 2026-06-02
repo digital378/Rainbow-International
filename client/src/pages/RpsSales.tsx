@@ -355,7 +355,7 @@ function RpsDashboard() {
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
       {/* Header */}
-      <div style={{ background: NAVY }} className="px-6 py-4">
+      <div style={{ background: RED }} className="px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-sm">RPS</div>
