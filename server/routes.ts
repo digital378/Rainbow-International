@@ -3071,7 +3071,7 @@ paths:
 
         recentEnquiries.push({
           date: d ? `${d.getDate()} ${d.toLocaleString("en-US",{month:"short"})} ${String(d.getFullYear()).slice(2)}` : "",
-          monthKey: mk,
+          monthKey: d ? mkKey(d) : "",
           name, grade, branch, source, status: statusRaw, counselor,
           sortKey: d ? d.getTime() : 0,
         });
