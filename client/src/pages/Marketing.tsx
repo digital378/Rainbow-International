@@ -344,13 +344,13 @@ function MarketingDashboard() {
       const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
-      // Leads & bookings always come from CRM (RIS+RPS sum); DM Overall only captures
-      // digitally-tracked leads and undercounts both fields vs the full CRM record.
-      const crmLeads    = risOut.leads    + rpsOut.leads;
-      const crmBookings = risOut.bookings + rpsOut.bookings;
+      // Leads come from CRM (most complete count). For combined:
+      //   bookings, walkins, admissions → DM Overall master sheet (live) — same authoritative source.
+      // Per-school (ris/rps) bookings stay CRM-derived.
+      const crmLeads = risOut.leads + rpsOut.leads;
       const combinedOut: MetricSet = live
-        ? { leads: crmLeads, bookings: crmBookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
-        : { leads: crmLeads, bookings: crmBookings,
+        ? { leads: crmLeads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
+        : { leads: crmLeads, bookings: risOut.bookings + rpsOut.bookings,
             walkins: risOut.walkins + rpsOut.walkins, admissions: risOut.admissions + rpsOut.admissions,
             spend: risOut.spend + rpsOut.spend, meta: risOut.meta + rpsOut.meta, google: risOut.google + rpsOut.google };
 
@@ -440,20 +440,22 @@ function MarketingDashboard() {
   const ytdLeadsFull     = totals.leads     + organic.leads;
   const ytdWalkinsFull   = totals.walkins   + organic.walkins;
 
-  /* Bookings organic uses live CRM for Jun–Nov 25 (Booked + Walk-in Completed + ADM Done + Closed After Walk-in).
-     CRM is the authoritative source for stage-based counts; DM-Overall figures overcount vs actual CRM stages. */
+  /* Organic bookings (Jun–Nov 25, pre-ad-spend period):
+     Combined → static ORGANIC_PRE_SPEND (from master sheet tallies, same source as walkins/admissions).
+     Per-school (RIS/RPS) → live CRM for accuracy. */
   const PRE_SPEND_CRM_MONTHS = ["Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25"];
   const organicBookingsCrm = useMemo(() => {
-    if (!liveData) return { combined: organic.bookings, ris: ORGANIC_PRE_SPEND.ris.bookings, rps: ORGANIC_PRE_SPEND.rps.bookings };
+    if (!liveData) return { ris: ORGANIC_PRE_SPEND.ris.bookings, rps: ORGANIC_PRE_SPEND.rps.bookings };
     const ris = (liveData.risCrm.byMonth ?? [])
       .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
       .reduce((s, m) => s + m.total.bookings, 0);
     const rps = (liveData.rpsCrm.byMonth ?? [])
       .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
       .reduce((s, m) => s + m.total.bookings, 0);
-    return { combined: ris + rps, ris, rps };
+    return { ris, rps };
   }, [liveData]);
-  const organicBookings = segment === "ris" ? organicBookingsCrm.ris : segment === "rps" ? organicBookingsCrm.rps : organicBookingsCrm.combined;
+  // Combined organic uses master-sheet static value; per-school uses CRM
+  const organicBookings = segment === "ris" ? organicBookingsCrm.ris : segment === "rps" ? organicBookingsCrm.rps : organic.bookings;
   const ytdBookingsFull  = totals.bookings  + organicBookings;
   /* All efficiency metrics use the full-AY admissions denominator */
   const admForCosts = ytdAdmissionsFull;
