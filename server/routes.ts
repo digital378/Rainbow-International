@@ -1905,6 +1905,29 @@ export async function registerRoutes(
     });
   }
 
+  // RPS walk-in check-ins sync to the RPS master sheet ("RA Checkin" tab)
+  const RPS_WALKIN_SHEET_ID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
+  async function appendToRpsWalkinSheet(checkin: {
+    id: string; submittedAt: Date | string; raName: string; raBranch: string;
+    parentName: string; studentName: string; grade: string;
+  }): Promise<void> {
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const dt = new Date(checkin.submittedAt);
+    const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+    const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: RPS_WALKIN_SHEET_ID,
+      range: `${WALKIN_SHEET_TAB}!A:G`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[dateStr, timeStr, checkin.raName, checkin.raBranch, checkin.parentName, checkin.studentName, checkin.grade]],
+      },
+    });
+  }
+
   // 1. DM Team Task Tracker
   app.get("/api/sheets/tasks", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
@@ -2613,9 +2636,9 @@ export async function registerRoutes(
             istNow.setUTCHours(0, 0, 0, 0);
             const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
             const [todayCounts, todayRecent, last7Days] = await Promise.all([
-              storage.getTodayCheckinCounts(todayStart),
-              storage.listCheckins(todayStart),
-              storage.getDailyCheckinCounts(7),
+              storage.getTodayCheckinCounts(todayStart, "RIS"),
+              storage.listCheckins(todayStart, "RIS"),
+              storage.getDailyCheckinCounts(7, "RIS"),
             ]);
             return {
               todayTotal: todayCounts.reduce((s, r) => s + r.count, 0),
@@ -2841,11 +2864,12 @@ paths:
       if (!parentName?.trim() || !studentName?.trim() || !grade?.trim()) {
         return res.status(400).json({ message: "parentName, studentName, and grade are required" });
       }
-      const checkin = await storage.createCheckin(ra.id, ra.name, ra.branch, parentName.trim(), studentName.trim(), grade.trim());
-      console.log(`[walkin] Check-in: ${parentName} / ${studentName} (${grade}) → ${ra.name}`);
+      const checkin = await storage.createCheckin(ra.id, ra.name, ra.branch, parentName.trim(), studentName.trim(), grade.trim(), ra.school);
+      console.log(`[walkin] Check-in (${ra.school}): ${parentName} / ${studentName} (${grade}) → ${ra.name}`);
       res.status(201).json({ success: true, id: checkin.id });
       // Best-effort: sync to Google Sheets in the background (does not block or affect the response)
-      appendToWalkinSheet(checkin)
+      const appendFn = checkin.school === "RPS" ? appendToRpsWalkinSheet : appendToWalkinSheet;
+      appendFn(checkin)
         .then(() => storage.markCheckinSynced(checkin.id))
         .catch(async (err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
@@ -2865,7 +2889,7 @@ paths:
       let failed = 0;
       for (const row of rows) {
         try {
-          await appendToWalkinSheet(row);
+          await (row.school === "RPS" ? appendToRpsWalkinSheet(row) : appendToWalkinSheet(row));
           await storage.markCheckinSynced(row.id);
           synced++;
         } catch (err: unknown) {
@@ -3500,6 +3524,27 @@ paths:
         branchClosedList,
         branchSrcAdm: branchSrcAdmList,
         branchOpenPipeline: branchOpenList,
+        liveCheckins: await (async () => {
+          try {
+            const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+            const istNow = new Date(Date.now() + IST_OFFSET_MS);
+            istNow.setUTCHours(0, 0, 0, 0);
+            const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
+            const [todayCounts, todayRecent, last7Days] = await Promise.all([
+              storage.getTodayCheckinCounts(todayStart, "RPS"),
+              storage.listCheckins(todayStart, "RPS"),
+              storage.getDailyCheckinCounts(7, "RPS"),
+            ]);
+            return {
+              todayTotal: todayCounts.reduce((s, r) => s + r.count, 0),
+              byRa: todayCounts.sort((a, b) => b.count - a.count),
+              recent: todayRecent.slice(0, 20),
+              last7Days,
+            };
+          } catch {
+            return { todayTotal: 0, byRa: [], recent: [], last7Days: [] };
+          }
+        })(),
       });
     } catch (err: any) {
       console.error("[rps-sales] error:", err?.message);

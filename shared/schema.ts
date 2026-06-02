@@ -145,6 +145,7 @@ export const ras = pgTable("ras", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   branch: text("branch").notNull().default("Main"),
+  school: text("school").notNull().default("RIS"),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -156,6 +157,7 @@ export const insertRaSchema = createInsertSchema(ras).omit({
   name: z.string().min(1, "RA name is required"),
   slug: z.string().min(1, "Slug is required").regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
   branch: z.string().min(1, "Branch is required"),
+  school: z.enum(["RIS", "RPS"]).optional().default("RIS"),
   active: z.boolean().optional().default(true),
 });
 
@@ -167,6 +169,7 @@ export const walkinCheckins = pgTable("walkin_checkins", {
   raId: varchar("ra_id").notNull().references(() => ras.id),
   raName: text("ra_name").notNull(),
   raBranch: text("ra_branch").notNull(),
+  school: text("school").notNull().default("RIS"),
   parentName: text("parent_name").notNull(),
   studentName: text("student_name").notNull(),
   grade: text("grade").notNull(),
@@ -180,6 +183,7 @@ export const insertWalkinCheckinSchema = createInsertSchema(walkinCheckins).omit
   submittedAt: true,
   raName: true,
   raBranch: true,
+  school: true,
 }).extend({
   parentName: z.string().min(1, "Parent name is required"),
   studentName: z.string().min(1, "Student name is required"),

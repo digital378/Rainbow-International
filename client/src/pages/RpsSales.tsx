@@ -7,7 +7,7 @@ import {
 
 /* ── Colours ──────────────────────────────────────────────────────────────── */
 const NAVY   = "#091a4f", AMBER  = "#f59e0b", GREEN  = "#059669", RED    = "#dc2626";
-const BLUE   = "#2563eb", CYAN   = "#0891b2", PURPLE = "#7c3aed", SLATE  = "#475569";
+const BLUE   = "#ef4444", CYAN   = "#0891b2", PURPLE = "#7c3aed", SLATE  = "#475569"; // BLUE remapped to red accent for RPS identity
 const PIE_COLORS = [NAVY, AMBER, GREEN, BLUE, CYAN, PURPLE, RED, SLATE, "#ea580c", "#0ea5e9", "#16a34a", "#a855f7"];
 
 /* ── Fee rules (v2.4) ─────────────────────────────────────────────────────── */
@@ -67,6 +67,12 @@ type RpsData = {
   branchClosedList: Array<{ branch: string; reason: string; count: number }>;
   branchSrcAdm:    Array<{ branch: string; brandTieup: number; directWalkin: number; dm: number; referral: number; sibling: number; total: number }>;
   branchOpenPipeline: Array<{ branch: string; directWalkin: number; dm: number; referral: number; total: number }>;
+  liveCheckins?: {
+    todayTotal: number;
+    byRa: Array<{ raName: string; raBranch: string; count: number }>;
+    recent: Array<{ id: string; raName: string; raBranch: string; parentName: string; studentName: string; grade: string; submittedAt: string }>;
+    last7Days: Array<{ date: string; count: number }>;
+  };
 };
 
 /* ── Passcode Gate ────────────────────────────────────────────────────────── */
@@ -421,6 +427,90 @@ function RpsDashboard() {
               </div>
             )}
           </div>
+
+          {/* Today's Walk-ins — Live QR Check-in Widget (RPS) */}
+          {d.liveCheckins && (() => {
+            const lc = d.liveCheckins;
+            const IST_MS = 5.5 * 60 * 60 * 1000;
+            const todayStr = new Date(Date.now() + IST_MS).toISOString().slice(0, 10);
+            const last7: Array<{ date: string; count: number; isToday: boolean }> = [];
+            for (let i = 6; i >= 0; i--) {
+              const dt = new Date(Date.now() + IST_MS); dt.setDate(dt.getDate() - i);
+              const key = dt.toISOString().slice(0, 10);
+              const found = lc.last7Days.find(r => r.date === key);
+              const label = dt.toLocaleDateString("en-IN", { weekday: "short", day: "numeric" });
+              last7.push({ date: label, count: found?.count || 0, isToday: key === todayStr });
+            }
+            return (
+              <div>
+                <SectionTitle sub="Live QR check-ins via RPS walk-in form · DB only · resets at midnight">Today's Walk-ins (QR Check-in)</SectionTitle>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Total KPI */}
+                  <div className="bg-white rounded-xl p-5 shadow-sm border-2 flex flex-col gap-1" style={{ borderColor: RED }} data-testid="kpi-live-checkins-today">
+                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: SLATE }}>Today's QR Check-ins</div>
+                    <div className="text-4xl font-black" style={{ color: NAVY }}>{lc.todayTotal}</div>
+                    <div className="text-xs text-slate-400">Scans since midnight · DB</div>
+                    <a href="/admin/ras" className="mt-2 text-xs font-semibold underline" style={{ color: RED }}>Manage RA Profiles →</a>
+                  </div>
+
+                  {/* Per-RA breakdown */}
+                  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                    <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>By Counsellor (Today)</div>
+                    {lc.byRa.length === 0 ? (
+                      <div className="text-xs text-slate-400">No check-ins today yet</div>
+                    ) : (
+                      <div className="space-y-2">
+                        {lc.byRa.map(r => (
+                          <div key={r.raName} className="flex items-center gap-2" data-testid={`live-ra-${r.raName}`}>
+                            <div className="flex-1 text-xs font-medium text-slate-700 truncate">{r.raName}</div>
+                            <div className="text-xs text-slate-400">{r.raBranch}</div>
+                            <div className="text-sm font-black tabular-nums" style={{ color: NAVY }}>{r.count}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 7-day sparkline */}
+                  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200" data-testid="chart-live-checkins-7day">
+                    <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Last 7 Days</div>
+                    <div style={{ width: "100%", height: 120 }}>
+                      <ResponsiveContainer>
+                        <BarChart data={last7} barSize={18}>
+                          <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+                          <YAxis tick={{ fontSize: 9 }} allowDecimals={false} width={20} />
+                          <Tooltip formatter={(v: number) => [v, "Check-ins"]} />
+                          <Bar dataKey="count" name="Check-ins" radius={[3, 3, 0, 0]}>
+                            {last7.map((entry, idx) => (
+                              <Cell key={idx} fill={entry.isToday ? RED : NAVY} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-1">Red = today · Navy = past days</div>
+                  </div>
+
+                  {/* Recent submissions */}
+                  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                    <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Recent Today</div>
+                    {lc.recent.length === 0 ? (
+                      <div className="text-xs text-slate-400">No check-ins today yet</div>
+                    ) : (
+                      <div className="space-y-2 max-h-36 overflow-y-auto">
+                        {lc.recent.slice(0, 8).map(r => (
+                          <div key={r.id} className="text-xs border-b border-slate-50 pb-1.5">
+                            <div className="font-semibold text-slate-700">{r.parentName} <span className="text-slate-400 font-normal">for {r.studentName}</span></div>
+                            <div className="text-slate-400">{r.grade} · {r.raName} · {new Date(r.submittedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Revenue Summary (A) */}
           <div>

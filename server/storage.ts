@@ -9,7 +9,7 @@ import {
   inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins,
 } from "@shared/schema";
 import { db } from "./db";
-import { desc, eq, gte, sql } from "drizzle-orm";
+import { desc, eq, gte, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
@@ -38,13 +38,13 @@ export interface IStorage {
   getRaById(id: string): Promise<Ra | undefined>;
 
   // Walk-in check-ins
-  createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin>;
-  listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]>;
+  createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string, school?: string): Promise<WalkinCheckin>;
+  listCheckins(sinceDate?: Date, school?: string): Promise<WalkinCheckin[]>;
   listUnsyncedCheckins(): Promise<WalkinCheckin[]>;
   markCheckinSynced(id: string): Promise<void>;
   markCheckinSyncFailed(id: string, error: string): Promise<void>;
-  getTodayCheckinCounts(since: Date): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
-  getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>>;
+  getTodayCheckinCounts(since: Date, school?: string): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
+  getDailyCheckinCounts(days: number, school?: string): Promise<Array<{ date: string; count: number }>>;
 }
 
 export class DbStorage implements IStorage {
@@ -136,18 +136,19 @@ export class DbStorage implements IStorage {
   }
 
   // ── Walk-in check-in methods ────────────────────────────────
-  async createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string): Promise<WalkinCheckin> {
-    const [result] = await db.insert(walkinCheckins).values({ raId, raName, raBranch, parentName, studentName, grade }).returning();
+  async createCheckin(raId: string, raName: string, raBranch: string, parentName: string, studentName: string, grade: string, school = "RIS"): Promise<WalkinCheckin> {
+    const [result] = await db.insert(walkinCheckins).values({ raId, raName, raBranch, school, parentName, studentName, grade }).returning();
     return result;
   }
 
-  async listCheckins(sinceDate?: Date): Promise<WalkinCheckin[]> {
-    if (sinceDate) {
-      return await db.select().from(walkinCheckins)
-        .where(gte(walkinCheckins.submittedAt, sinceDate))
-        .orderBy(desc(walkinCheckins.submittedAt));
-    }
-    return await db.select().from(walkinCheckins).orderBy(desc(walkinCheckins.submittedAt));
+  async listCheckins(sinceDate?: Date, school?: string): Promise<WalkinCheckin[]> {
+    const conds = [];
+    if (sinceDate) conds.push(gte(walkinCheckins.submittedAt, sinceDate));
+    if (school) conds.push(eq(walkinCheckins.school, school));
+    const where = conds.length ? and(...conds) : undefined;
+    return await db.select().from(walkinCheckins)
+      .where(where)
+      .orderBy(desc(walkinCheckins.submittedAt));
   }
 
   async listUnsyncedCheckins(): Promise<WalkinCheckin[]> {
@@ -168,7 +169,9 @@ export class DbStorage implements IStorage {
       .where(eq(walkinCheckins.id, id));
   }
 
-  async getTodayCheckinCounts(since: Date): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
+  async getTodayCheckinCounts(since: Date, school?: string): Promise<Array<{ raName: string; raBranch: string; count: number }>> {
+    const conds = [gte(walkinCheckins.submittedAt, since)];
+    if (school) conds.push(eq(walkinCheckins.school, school));
     const rows = await db
       .select({
         raName: walkinCheckins.raName,
@@ -176,24 +179,26 @@ export class DbStorage implements IStorage {
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(walkinCheckins)
-      .where(gte(walkinCheckins.submittedAt, since))
+      .where(and(...conds))
       .groupBy(walkinCheckins.raName, walkinCheckins.raBranch);
     return rows;
   }
 
-  async getDailyCheckinCounts(days: number): Promise<Array<{ date: string; count: number }>> {
+  async getDailyCheckinCounts(days: number, school?: string): Promise<Array<{ date: string; count: number }>> {
     const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
     const istNow = new Date(Date.now() + IST_OFFSET_MS);
     istNow.setDate(istNow.getDate() - (days - 1));
     istNow.setUTCHours(0, 0, 0, 0);
     const since = new Date(istNow.getTime() - IST_OFFSET_MS);
+    const conds = [gte(walkinCheckins.submittedAt, since)];
+    if (school) conds.push(eq(walkinCheckins.school, school));
     const rows = await db
       .select({
         date: sql<string>`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`,
         count: sql<number>`cast(count(*) as int)`,
       })
       .from(walkinCheckins)
-      .where(gte(walkinCheckins.submittedAt, since))
+      .where(and(...conds))
       .groupBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`)
       .orderBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`);
     return rows;

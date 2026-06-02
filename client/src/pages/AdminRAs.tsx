@@ -7,9 +7,14 @@ const GREEN = "#059669";
 const RED = "#dc2626";
 
 const ADMIN_AUTH_KEY = "ris_admin_auth";
-const BRANCHES = ["Main", "Agarwal", "Dhokali", "Kasarwadavali", "Anand Nagar", "Hariniwas"];
+const BLUE = "#2563eb";
+const SCHOOL_BRANCHES: Record<string, string[]> = {
+  RIS: ["Main", "Agarwal", "Dhokali", "Kasarwadavali", "Anand Nagar", "Hariniwas"],
+  RPS: ["Aggarwal", "Hariniwas", "Kalwa", "Kasarwadavli", "Anand Nagar", "Dhokali"],
+};
 
-type Ra = { id: string; name: string; slug: string; branch: string; active: boolean; createdAt: string };
+type School = "RIS" | "RPS";
+type Ra = { id: string; name: string; slug: string; branch: string; school: School; active: boolean; createdAt: string };
 
 function getToken() {
   try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
@@ -79,6 +84,7 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
 
   const [fName, setFName] = useState("");
   const [fSlug, setFSlug] = useState("");
+  const [fSchool, setFSchool] = useState<School>("RIS");
   const [fBranch, setFBranch] = useState("Main");
   const [fActive, setFActive] = useState(true);
 
@@ -101,12 +107,12 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
   useEffect(() => { load(); }, [load]);
 
   const openAdd = () => {
-    setEditRa(null); setFName(""); setFSlug(""); setFBranch("Main"); setFActive(true);
+    setEditRa(null); setFName(""); setFSlug(""); setFSchool("RIS"); setFBranch("Main"); setFActive(true);
     setFormError(""); setShowForm(true);
   };
 
   const openEdit = (ra: Ra) => {
-    setEditRa(ra); setFName(ra.name); setFSlug(ra.slug); setFBranch(ra.branch); setFActive(ra.active);
+    setEditRa(ra); setFName(ra.name); setFSlug(ra.slug); setFSchool(ra.school || "RIS"); setFBranch(ra.branch); setFActive(ra.active);
     setFormError(""); setShowForm(true);
   };
 
@@ -118,7 +124,7 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
     if (!/^[a-z0-9-]+$/.test(fSlug)) { setFormError("Slug must be lowercase letters, numbers and hyphens only"); return; }
     setSaving(true); setFormError("");
     try {
-      const body = { name: fName.trim(), slug: fSlug.trim(), branch: fBranch, active: fActive };
+      const body = { name: fName.trim(), slug: fSlug.trim(), school: fSchool, branch: fBranch, active: fActive };
       const url = editRa ? `/api/admin/ras/${editRa.id}` : "/api/admin/ras";
       const method = editRa ? "PUT" : "POST";
       const res = await fetch(url, { method, headers, body: JSON.stringify(body) });
@@ -200,11 +206,28 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
                   <div className="text-xs text-slate-400 mt-1">Lowercase letters, numbers and hyphens only</div>
                 </div>
                 <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">School</label>
+                  <div className="flex gap-2">
+                    {(["RIS", "RPS"] as School[]).map(s => (
+                      <button
+                        key={s} type="button"
+                        onClick={() => { setFSchool(s); setFBranch(SCHOOL_BRANCHES[s][0]); }}
+                        className="flex-1 px-3 py-2.5 rounded-lg border-2 text-sm font-bold transition"
+                        style={fSchool === s
+                          ? { background: s === "RPS" ? RED : BLUE, color: "#fff", borderColor: s === "RPS" ? RED : BLUE }
+                          : { background: "#fff", color: "#64748b", borderColor: "#e2e8f0" }}
+                        data-testid={`button-school-${s}`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Branch</label>
                   <select value={fBranch} onChange={e => setFBranch(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border-2 border-slate-200 text-sm focus:outline-none focus:border-amber-400 bg-white"
                     data-testid="select-ra-branch">
-                    {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+                    {SCHOOL_BRANCHES[fSchool].map(b => <option key={b} value={b}>{b}</option>)}
                   </select>
                 </div>
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -238,6 +261,7 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
               <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
                 <tr>
                   <th className="text-left py-3 px-4">RA Name</th>
+                  <th className="text-left py-3 px-4">School</th>
                   <th className="text-left py-3 px-4">Branch</th>
                   <th className="text-left py-3 px-4">Walk-in URL</th>
                   <th className="text-center py-3 px-4">Status</th>
@@ -248,6 +272,11 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
                 {ras.map(ra => (
                   <tr key={ra.id} className="border-t border-slate-100 hover:bg-slate-50" data-testid={`row-ra-${ra.slug}`}>
                     <td className="py-3 px-4 font-semibold text-slate-800">{ra.name}</td>
+                    <td className="py-3 px-4">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: (ra.school || "RIS") === "RPS" ? RED : BLUE }} data-testid={`badge-school-${ra.slug}`}>
+                        {ra.school || "RIS"}
+                      </span>
+                    </td>
                     <td className="py-3 px-4 text-slate-600">{ra.branch}</td>
                     <td className="py-3 px-4">
                       <code className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">/walkin/{ra.slug}</code>
