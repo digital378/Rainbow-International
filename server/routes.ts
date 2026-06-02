@@ -1677,6 +1677,27 @@ export async function registerRoutes(
         }
       }
 
+      // Fallback: if Jun 26 monthly row wasn't captured from DM Overall
+      // (monthly summary row uses formula cells that Google Sheets API may not evaluate),
+      // synthesise it from the June weekly rows that were already collected.
+      if (!monthlyTotals.some(m => m.month === "Jun 26")) {
+        const junWeeks = mayWeeklyCombined.filter(w => /\/06/.test(w.week));
+        if (junWeeks.length > 0) {
+          const junRis = risSpend.find(s => s.month === "Jun 26");
+          const junRps = rpsSpend.find(s => s.month === "Jun 26");
+          monthlyTotals.push({
+            month: "Jun 26",
+            leads:      junWeeks.reduce((s, w) => s + w.leads,       0),
+            bookings:   junWeeks.reduce((s, w) => s + w.bookings,    0),
+            walkins:    junWeeks.reduce((s, w) => s + w.walkins,     0),
+            admissions: junWeeks.reduce((s, w) => s + w.admissions,  0),
+            meta:   (junRis?.meta   ?? 0) + (junRps?.meta   ?? 0),
+            google: (junRis?.google ?? 0) + (junRps?.google ?? 0),
+            spend:  (junRis?.adSpend ?? 0) + (junRps?.adSpend ?? 0),
+          });
+        }
+      }
+
       // ── RPS CRM → branch-wise by month ──
       const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"];
       const rpsMonthBranch: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
