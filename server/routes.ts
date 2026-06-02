@@ -1786,11 +1786,38 @@ export async function registerRoutes(
 
       // ── RIS CRM → education-level groups by month ──
       const GRADE_MAP: Record<string, string> = {};
-      for (const g of ["nursery","playgroup","junior kg","junior kg","senior kg","senior kg","kg"]) GRADE_MAP[g] = "Pre-Primary";
-      for (const g of ["class 1","class 2","class 3","class 4","class 5"]) GRADE_MAP[g] = "Primary";
-      for (const g of ["class 6","class 7","class 8"]) GRADE_MAP[g] = "Middle";
-      for (const g of ["class 9","class 10"]) GRADE_MAP[g] = "Secondary";
-      for (const g of ["class 11","class 11 science","class 11 commerce","class 11 humanities","11th","class 12","class 12 science","class 12 commerce","class 12 humanities"]) GRADE_MAP[g] = "Senior Secondary";
+      // Pre-Primary: all common variants used in sheets and forms
+      for (const g of [
+        "nursery","playgroup","junior kg","senior kg","kg",
+        "jr. kg","jr kg","sr. kg","sr kg","lkg","ukg",
+        "pre-primary","pre primary","pp","jkg","skg",
+        "jr. k.g.","sr. k.g.","junior k.g.","senior k.g.",
+        "nursery / jr. kg","nur","nur/jr.kg",
+      ]) GRADE_MAP[g] = "Pre-Primary";
+      // Primary: Class 1–5 and Grade 1–5 variants
+      for (const g of ["class 1","class 2","class 3","class 4","class 5",
+        "grade 1","grade 2","grade 3","grade 4","grade 5",
+        "std 1","std 2","std 3","std 4","std 5",
+        "1st","2nd","3rd","4th","5th",
+      ]) GRADE_MAP[g] = "Primary";
+      // Middle: Class 6–8 and Grade 6–8 variants
+      for (const g of ["class 6","class 7","class 8",
+        "grade 6","grade 7","grade 8",
+        "std 6","std 7","std 8",
+        "6th","7th","8th",
+      ]) GRADE_MAP[g] = "Middle";
+      // Secondary: Class 9–10 and Grade 9–10 variants
+      for (const g of ["class 9","class 10",
+        "grade 9","grade 10",
+        "std 9","std 10",
+        "9th","10th",
+      ]) GRADE_MAP[g] = "Secondary";
+      // Senior Secondary: Class 11–12 and Grade 11–12 variants
+      for (const g of [
+        "class 11","class 11 science","class 11 commerce","class 11 humanities",
+        "class 12","class 12 science","class 12 commerce","class 12 humanities",
+        "11th","12th","grade 11","grade 12","std 11","std 12",
+      ]) GRADE_MAP[g] = "Senior Secondary";
 
       const risMonthGroup: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
       const risCloseReasons: Record<string, number> = {};
@@ -1802,21 +1829,25 @@ export async function registerRoutes(
         if (!r[0] || !r[2]) continue;
         const month = String(r[1] ?? "").trim();
         const grade = String(r[5] ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-        const group = GRADE_MAP[grade];
-        if (!month || !group) continue;
+        const group = GRADE_MAP[grade] || "Other";
+        if (!month) continue;
         const status = String(r[6] ?? "OPEN").trim().toUpperCase();
         const remark = String(r[7] ?? "").trim();
         const source = String(r[9] ?? "Unknown").trim() || "Unknown";
+        // Column K = "Walk-In Date" — if present on a CLOSED lead, it walked in before being closed
+        const hasWalkinDate = String(r[10] ?? "").trim().length > 0;
+        // Treat CLOSED+Walk-In Date as "CLOSED AFTER WALKIN" (RIS sheet doesn't use that label)
+        const effectiveStatus = (status === "CLOSED" && hasWalkinDate) ? "CLOSED AFTER WALKIN" : status;
         if (!risMonthGroup[month]) risMonthGroup[month] = {};
         if (!risMonthGroup[month][group]) risMonthGroup[month][group] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
         // Cumulative funnel for RIS — mirrors RPS logic exactly
         risMonthGroup[month][group].leads++;
-        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
+        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(effectiveStatus))
           risMonthGroup[month][group].bookings++;
-        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
+        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(effectiveStatus))
           risMonthGroup[month][group].walkins++;
-        if (status === "ADM DONE") risMonthGroup[month][group].admissions++;
-        if (status === "CLOSED" || status === "CLOSED AFTER WALKIN") {
+        if (effectiveStatus === "ADM DONE") risMonthGroup[month][group].admissions++;
+        if (effectiveStatus === "CLOSED" || effectiveStatus === "CLOSED AFTER WALKIN") {
           risMonthGroup[month][group].closed++;
           if (remark) {
             risCloseReasons[remark] = (risCloseReasons[remark] || 0) + 1;
@@ -1824,7 +1855,8 @@ export async function registerRoutes(
             risMonthReasons[month][remark] = (risMonthReasons[month][remark] || 0) + 1;
           }
         }
-        risStatusCount[status] = (risStatusCount[status] || 0) + 1;
+        // Use effectiveStatus so CLOSED+walkin-date shows as "CLOSED AFTER WALKIN" in status summary
+        risStatusCount[effectiveStatus] = (risStatusCount[effectiveStatus] || 0) + 1;
         risSourceCount[source] = (risSourceCount[source] || 0) + 1;
       }
 
@@ -1835,7 +1867,8 @@ export async function registerRoutes(
           const groups = GROUP_ORDER_SRV
             .filter(g => risMonthGroup[month][g])
             .map(g => ({ group: g, ...risMonthGroup[month][g] }));
-          const total = groups.reduce((a, g) => ({ leads:a.leads+g.leads, bookings:a.bookings+g.bookings, walkins:a.walkins+g.walkins, admissions:a.admissions+g.admissions, closed:a.closed+g.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
+          // Total counts ALL rows in the month (including "Other"/unrecognised grades)
+          const total = Object.values(risMonthGroup[month]).reduce((a, g) => ({ leads:a.leads+g.leads, bookings:a.bookings+g.bookings, walkins:a.walkins+g.walkins, admissions:a.admissions+g.admissions, closed:a.closed+g.closed }), { leads:0, bookings:0, walkins:0, admissions:0, closed:0 });
           const closedReasons = Object.entries(risMonthReasons[month] || {}).filter(([r]) => r.trim()).sort((a,b) => b[1]-a[1]).map(([reason,count]) => ({reason,count}));
           return { month, groups, total, closedReasons };
         });
