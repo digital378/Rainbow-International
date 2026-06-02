@@ -1497,33 +1497,63 @@ export async function registerRoutes(
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       const parseN   = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[,\s%]/g, "")) || 0;
 
-      // Helper: try multiple tab-name variants for sheets whose apostrophe may be
-      // U+0027 (straight) or U+2019 (curly, as auto-inserted by Google Sheets).
-      const tryMayTab = async (school: "RPS" | "RIS", suffix: string): Promise<string[][]> => {
-        const candidates = [
-          `'DM ${school} MAY\u2019 26'${suffix}`,  // curly apostrophe, wrapped
-          `DM ${school} MAY\u2019 26${suffix}`,     // curly apostrophe, no wrap
-          `'DM ${school} MAY'' 26'${suffix}`,       // straight apostrophe, doubled
-        ];
-        for (const range of candidates) {
-          try { return await fetchSheetRange(SHEET_IDS.master, range); } catch { /* try next */ }
-        }
-        return [];
+      // ── Dynamic current-month tab discovery ──────────────────────────────────────
+      // The master sheet has one tab per month named e.g. "DM RPS JUNE' 26".
+      // Fetch metadata once and cache it for this request, then search by school + month.
+      const MONTH_NAMES_UPPER = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE",
+        "JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+
+      let _masterTabs: string[] | null = null;
+      const getMasterTabs = async (): Promise<string[]> => {
+        if (_masterTabs) return _masterTabs;
+        try {
+          const auth = getAuthenticatedClient();
+          if (!auth) return (_masterTabs = []);
+          const { google: goog } = await import("googleapis");
+          const sheets = goog.sheets({ version: "v4", auth });
+          const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_IDS.master });
+          _masterTabs = (meta.data.sheets ?? []).map((s: any) => s.properties?.title ?? "");
+        } catch { _masterTabs = []; }
+        return _masterTabs!;
       };
 
-      // CRM fetches (separate spreadsheets, always reliable) + master DM Overall
-      const [masterRows, rpsCrmRows, risCrmRows] = await Promise.all([
+      // Find the most recent DM tab for a school (tries current month → up to 3 prior months)
+      const getCurrentSchoolTab = async (school: "RPS" | "RIS"): Promise<string | null> => {
+        const titles = await getMasterTabs();
+        const now = new Date();
+        for (let offset = 0; offset <= 3; offset++) {
+          const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+          const mon = MONTH_NAMES_UPPER[d.getMonth()];
+          const match = titles.find(t => t.toUpperCase().includes(`DM ${school}`) && t.toUpperCase().includes(mon));
+          if (match) return match;
+        }
+        return null;
+      };
+
+      // Quote a tab title for A1 notation: wrap in U+0027, double any internal U+0027
+      const quoteTab = (title: string, suffix: string) =>
+        `'${title.replace(/'/g, "''")}'${suffix}`;
+
+      // Fetch full school tab (A:T covers both summary section and spend analysis table)
+      const fetchSchoolTab = async (school: "RPS" | "RIS"): Promise<string[][]> => {
+        const tab = await getCurrentSchoolTab(school);
+        if (!tab) return [];
+        try { return await fetchSheetRange(SHEET_IDS.master, quoteTab(tab, "!A:T")); } catch { return []; }
+      };
+
+      // CRM + master + current-month school tabs — all fetched in parallel
+      const [masterRows, rpsCrmRows, risCrmRows, rpsAllRows, risAllRows] = await Promise.all([
         fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
+        fetchSchoolTab("RPS"),
+        fetchSchoolTab("RIS"),
       ]);
-      // School/spend fetches from the MAY master tab — graceful fallback to []
-      const [rpsSchoolRows, risSchoolRows, risSpendRaw, rpsSpendRaw] = await Promise.all([
-        tryMayTab("RPS", "!A:S"),
-        tryMayTab("RIS", "!A:S"),
-        tryMayTab("RIS", "!A140:R210"),
-        tryMayTab("RPS", "!A140:R210"),
-      ]);
+      // Both school summary rows and spend analysis come from the same full-tab fetch
+      const rpsSchoolRows = rpsAllRows;
+      const risSchoolRows = risAllRows;
+      const rpsSpendRaw   = rpsAllRows;
+      const risSpendRaw   = risAllRows;
 
       // ── Per-school master monthly totals (source of truth for walkins/admissions) ──
       // The per-school May tabs contain monthly-level summary rows for all months
@@ -1531,7 +1561,9 @@ export async function registerRoutes(
       const SCHOOL_MONTH_KEY: Record<string, string> = {
         "AUGUST":"Aug-25","SEPTEMBER":"Sep-25","OCTOBER":"Oct-25","NOVEMBER":"Nov-25",
         "DECEMBER":"Dec-25","JANUARY":"Jan-26","FEBRUARY":"Feb-26","MARCH":"Mar-26",
-        "APRIL":"Apr-26","MAY TOTAL":"May-26",
+        "APRIL":"Apr-26",
+        "MAY":"May-26","MAY TOTAL":"May-26",           // completed May (in June tab) or in-progress
+        "JUNE TOTAL":"Jun-26","JUNE":"Jun-26",          // in-progress June or completed
       };
       const parseSchoolRows = (rows: string[][]): Array<{month:string;walkins:number;admissions:number}> => {
         const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
@@ -2866,16 +2898,22 @@ paths:
   app.get("/api/marketing/monthly", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
-      // Try curly and straight apostrophe variants for the MAY tab name
-      const maySpendCandidates = [
-        "'DM RPS MAY\u2019 26'!A140:R210",
-        "DM RPS MAY\u2019 26!A140:R210",
-        "'DM RPS MAY'' 26'!A140:R210",
-      ];
+      // Discover exact RPS MAY tab name via spreadsheet metadata to avoid apostrophe escaping issues
       let rows: string[][] = [];
-      for (const range of maySpendCandidates) {
-        try { rows = await fetchSheetRange(SHEET_IDS.master, range); break; } catch { /* try next */ }
-      }
+      try {
+        const auth = getAuthenticatedClient();
+        if (auth) {
+          const { google: goog } = await import("googleapis");
+          const sheets = goog.sheets({ version: "v4", auth });
+          const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_IDS.master, fields: "sheets.properties.title" });
+          const titles = (meta.data.sheets ?? []).map((s: any) => s.properties?.title ?? "");
+          const rpsTab = titles.find((t: string) => t.toUpperCase().includes("DM RPS MAY"));
+          if (rpsTab) {
+            const quotedRange = `'${rpsTab.replace(/'/g, "''")}'!A140:R210`;
+            rows = await fetchSheetRange(SHEET_IDS.master, quotedRange);
+          }
+        }
+      } catch { /* fall through — rows stays [] */ }
       const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
       // Maps month name → { YYYY-MM key, short label }
       const SPEND_MONTH_MAP: Record<string, { key: string; label: string }> = {

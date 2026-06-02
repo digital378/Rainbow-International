@@ -61,9 +61,9 @@ export const MONTHLY: MonthRow[] = [
   },
   {
     month: "May 26",
-    combined: { leads: 47, bookings: 10, walkins: 6, admissions: 1, spend: 50318, meta: 15208, google: 35110 },
-    ris:      { leads: 27, bookings: 7,  walkins: 3, admissions: 0, spend: 22964, meta: 3883,  google: 19081 },
-    rps:      { leads: 20, bookings: 3,  walkins: 3, admissions: 1, spend: 27354, meta: 11325, google: 16029 },
+    combined: { leads: 313, bookings: 139, walkins: 85, admissions: 22, spend: 164434, meta: 46135, google: 118299 },
+    ris:      { leads: 167, bookings: 78,  walkins: 53, admissions: 11, spend: 77004,  meta: 5459,  google: 71545 },
+    rps:      { leads: 146, bookings: 61,  walkins: 32, admissions: 11, spend: 92434,  meta: 45680, google: 46754 },
   },
 ];
 
