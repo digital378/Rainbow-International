@@ -2967,16 +2967,18 @@ paths:
   });
 
   // Sales: today's live check-in counts (no extra auth — same trust level as /api/sales/live)
-  app.get("/api/walkin/today", async (_req, res) => {
+  app.get("/api/walkin/today", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
+      const schoolParam = typeof req.query.school === "string" ? req.query.school.toUpperCase() : undefined;
+      const school = schoolParam === "RIS" || schoolParam === "RPS" ? schoolParam : undefined;
       const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
       const istNow = new Date(Date.now() + IST_OFFSET_MS);
       istNow.setUTCHours(0, 0, 0, 0);
       const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
       const [counts, recent] = await Promise.all([
-        storage.getTodayCheckinCounts(todayStart),
-        storage.listCheckins(todayStart),
+        storage.getTodayCheckinCounts(todayStart, school),
+        storage.listCheckins(todayStart, school),
       ]);
       const total = counts.reduce((s, r) => s + r.count, 0);
       res.json({ total, byRa: counts, recent: recent.slice(0, 30) });
