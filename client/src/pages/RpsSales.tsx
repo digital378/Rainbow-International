@@ -7,7 +7,7 @@ import {
 
 /* ── Colours ──────────────────────────────────────────────────────────────── */
 const NAVY   = "#091a4f", AMBER  = "#f59e0b", GREEN  = "#059669", RED    = "#dc2626";
-const BLUE   = "#ef4444", CYAN   = "#0891b2", PURPLE = "#7c3aed", SLATE  = "#475569"; // BLUE remapped to red accent for RPS identity
+const BLUE   = "#dc2626", CYAN   = "#0891b2", PURPLE = "#7c3aed", SLATE  = "#475569"; // BLUE remapped to red (#dc2626) for RPS identity
 const PIE_COLORS = [NAVY, AMBER, GREEN, BLUE, CYAN, PURPLE, RED, SLATE, "#ea580c", "#0ea5e9", "#16a34a", "#a855f7"];
 
 /* ── Fee rules (v2.4) ─────────────────────────────────────────────────────── */
