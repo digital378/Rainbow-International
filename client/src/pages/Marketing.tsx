@@ -341,11 +341,13 @@ function MarketingDashboard() {
       const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
-      // Bookings always come from CRM (RIS+RPS sum); DM Overall tracks a subset and undercounts.
+      // Leads & bookings always come from CRM (RIS+RPS sum); DM Overall only captures
+      // digitally-tracked leads and undercounts both fields vs the full CRM record.
+      const crmLeads    = risOut.leads    + rpsOut.leads;
       const crmBookings = risOut.bookings + rpsOut.bookings;
       const combinedOut: MetricSet = live
-        ? { leads: live.leads, bookings: crmBookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
-        : { leads: risOut.leads + rpsOut.leads, bookings: crmBookings,
+        ? { leads: crmLeads, bookings: crmBookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
+        : { leads: crmLeads, bookings: crmBookings,
             walkins: risOut.walkins + rpsOut.walkins, admissions: risOut.admissions + rpsOut.admissions,
             spend: risOut.spend + rpsOut.spend, meta: risOut.meta + rpsOut.meta, google: risOut.google + rpsOut.google };
 
