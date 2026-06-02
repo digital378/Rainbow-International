@@ -2970,11 +2970,13 @@ paths:
       // Closed reason by month for heat-map
       const closedByMonthReason = new Map<string, Map<string, number>>();
       // Counselor funnel (from Walkin Data cols 11=CounsellingRecorded 12=SchoolTour)
-      type CounFunnel = { enquiries: number; counselled: number; toured: number; admitted: number };
+      type CounFunnel = { display: string; enquiries: number; counselled: number; toured: number; admitted: number };
       const counselorFunnelMap = new Map<string, CounFunnel>();
       // Counselor leaderboard — derived directly from Walkin Data (more accurate than pivot)
-      type CounLB = { admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number };
+      type CounLB = { display: string; admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number };
       const counselorLBMap = new Map<string, CounLB>();
+      // Title-case helper for merging name variants ("Snehal shetty" → "Snehal Shetty")
+      const toTitleCase = (s: string) => s.replace(/\b\w/g, c => c.toUpperCase());
 
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
@@ -3060,13 +3062,14 @@ paths:
 
         byGradeMap.set(grade, (byGradeMap.get(grade)||0)+1);
 
-        // Counselor funnel
-        const cf = counselorFunnelMap.get(counselor) || { enquiries:0, counselled:0, toured:0, admitted:0 };
+        // Counselor funnel — key is lowercase so "Snehal shetty" merges with "Snehal Shetty"
+        const cfKey = counselor.toLowerCase();
+        const cf = counselorFunnelMap.get(cfKey) || { display: toTitleCase(counselor), enquiries:0, counselled:0, toured:0, admitted:0 };
         cf.enquiries++;
         if (norm(r[11]).toLowerCase() === "yes") cf.counselled++;
         if (norm(r[12]).toLowerCase() === "yes") cf.toured++;
         if (isAdm || isAdmRIS) cf.admitted++;
-        counselorFunnelMap.set(counselor, cf);
+        counselorFunnelMap.set(cfKey, cf);
 
 
         recentEnquiries.push({
@@ -3083,8 +3086,9 @@ paths:
       // where the counsellor column is filled. This separate pass matches the pivot's count.
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
-        const coun = norm(r[10]); if (!coun || coun === "Unassigned") continue;
-        const lb = counselorLBMap.get(coun) || { admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
+        const coun = norm(r[10]); if (!coun || coun.toLowerCase() === "unassigned") continue;
+        const lbKey = coun.toLowerCase();
+        const lb = counselorLBMap.get(lbKey) || { display: toTitleCase(coun), admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };
         lb.total++; // count every row where counsellor name is present
         const st = upper(r[14]);
         if (st === "ADM DONE")             lb.admDone++;
@@ -3093,7 +3097,7 @@ paths:
         else if (st === "OPEN")            lb.open++;
         else if (st === "IN PROCESS ADM")  lb.inProcess++;
         else if (st.startsWith("FUTURE"))  lb.futureProspect++;
-        counselorLBMap.set(coun, lb);
+        counselorLBMap.set(lbKey, lb);
       }
 
       // ── Lead time stats ─────────────────────────────────────────────────────
@@ -3119,7 +3123,7 @@ paths:
       ];
 
       // ── Counselor funnel top 12 ─────────────────────────────────────────────
-      const counselorFunnel = Array.from(counselorFunnelMap, ([counselor, f]) => ({ counselor, ...f }))
+      const counselorFunnel = Array.from(counselorFunnelMap, ([, f]) => ({ counselor: f.display, enquiries: f.enquiries, counselled: f.counselled, toured: f.toured, admitted: f.admitted }))
         .filter(c => c.enquiries > 2)
         .sort((a, b) => b.admitted - a.admitted)
         .slice(0, 12);
@@ -3162,8 +3166,9 @@ paths:
       // ── Counselor leaderboard — built from Walkin Data (row-level, most accurate) ──
       // counselorLBMap was populated inside the walkin loop above.
       // Conv% = (admDone + admRIS) / total enquiries × 100
-      const counselorLeaderboard = Array.from(counselorLBMap, ([counselor, c]) => ({
-        counselor, ...c,
+      const counselorLeaderboard = Array.from(counselorLBMap, ([, c]) => ({
+        counselor: c.display, admDone: c.admDone, admRIS: c.admRIS, closed: c.closed,
+        open: c.open, inProcess: c.inProcess, futureProspect: c.futureProspect, total: c.total,
         conversion: c.total > 0 ? Math.round(((c.admDone + c.admRIS) / c.total) * 1000) / 10 : 0,
       })).filter(c => c.total > 0).sort((a, b) => (b.admDone + b.admRIS) - (a.admDone + a.admRIS));
 
