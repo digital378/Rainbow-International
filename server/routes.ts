@@ -1563,7 +1563,7 @@ export async function registerRoutes(
         "DECEMBER":"Dec-25","JANUARY":"Jan-26","FEBRUARY":"Feb-26","MARCH":"Mar-26",
         "APRIL":"Apr-26",
         "MAY":"May-26","MAY TOTAL":"May-26",           // completed May (in June tab) or in-progress
-        "JUNE TOTAL":"Jun-26","JUNE":"Jun-26",          // in-progress June or completed
+        "JUNE TOTAL":"Jun-26",                          // current-month June total; bare "JUNE" = June 2025 historical row, skip it
       };
       const parseSchoolRows = (rows: string[][]): Array<{month:string;walkins:number;admissions:number}> => {
         const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
@@ -1574,11 +1574,14 @@ export async function registerRoutes(
         const seen = new Set<string>();
         const result: Array<{month:string;walkins:number;admissions:number}> = [];
         for (const row of rows.slice(hIdx + 1)) {
-          const dateStr = String(row[0] ?? "").trim().toUpperCase();
-          const crmKey  = SCHOOL_MONTH_KEY[dateStr];
+          // In DM RIS/RPS school tabs the date label (e.g. "JUNE TOTAL") is in column B (row[1]).
+          // Column A (row[0]) is a blank marker column. Check B first, fall back to A.
+          const r1 = String(row[1] ?? "").trim().toUpperCase();
+          const r0 = String(row[0] ?? "").trim().toUpperCase();
+          const crmKey = SCHOOL_MONTH_KEY[r1] ?? SCHOOL_MONTH_KEY[r0];
           if (crmKey && !seen.has(crmKey)) {
             seen.add(crmKey);
-            result.push({ month: crmKey, walkins: parseInt(String(row[wCol]??0).replace(/[,\s]/g,""))||0, admissions: parseInt(String(row[aCol]??0).replace(/[,\s]/g,""))||0 });
+            result.push({ month: crmKey, walkins: parseInt(String(row[wCol]??0).replace(/[₹,\s]/g,""))||0, admissions: parseInt(String(row[aCol]??0).replace(/[₹,\s]/g,""))||0 });
           }
         }
         return result;

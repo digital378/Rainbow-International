@@ -72,9 +72,9 @@ export const MONTHLY: MonthRow[] = [
        Combined from DM Overall June weekly row (01/06–07/06).
        Will be overridden by live API each load. */
     month: "Jun 26",
-    combined: { leads: 10, bookings: 4, walkins: 5, admissions: 2, spend: 2155, meta: 694,  google: 1460 },
-    ris:      { leads: 1,  bookings: 0, walkins: 1, admissions: 0, spend: 504,  meta: 0,    google: 504  },
-    rps:      { leads: 9,  bookings: 4, walkins: 4, admissions: 0, spend: 1650, meta: 694,  google: 956  },
+    combined: { leads: 10, bookings: 4,  walkins: 5, admissions: 2, spend: 2154, meta: 694,  google: 1460 },
+    ris:      { leads: 6,  bookings: 2,  walkins: 2, admissions: 2, spend: 504,  meta: 0,    google: 504  },
+    rps:      { leads: 12, bookings: 7,  walkins: 3, admissions: 0, spend: 1650, meta: 694,  google: 956  },
   },
 ];
 
