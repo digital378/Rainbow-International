@@ -1809,14 +1809,14 @@ export async function registerRoutes(
         const source = String(r[9] ?? "Unknown").trim() || "Unknown";
         if (!risMonthGroup[month]) risMonthGroup[month] = {};
         if (!risMonthGroup[month][group]) risMonthGroup[month][group] = { leads:0, bookings:0, walkins:0, admissions:0, closed:0 };
-        // Cumulative funnel for RIS (no "CLOSED AFTER WALKIN" status in RIS CRM)
+        // Cumulative funnel for RIS — mirrors RPS logic exactly
         risMonthGroup[month][group].leads++;
-        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE"].includes(status))
+        if (["WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
           risMonthGroup[month][group].bookings++;
-        if (["WALK-IN COMPLETED","ADM DONE"].includes(status))
+        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status))
           risMonthGroup[month][group].walkins++;
         if (status === "ADM DONE") risMonthGroup[month][group].admissions++;
-        if (status === "CLOSED") {
+        if (status === "CLOSED" || status === "CLOSED AFTER WALKIN") {
           risMonthGroup[month][group].closed++;
           if (remark) {
             risCloseReasons[remark] = (risCloseReasons[remark] || 0) + 1;

@@ -438,8 +438,23 @@ function MarketingDashboard() {
   const organic = ORGANIC_PRE_SPEND[segment];
   const ytdAdmissionsFull = totals.admissions + organic.admissions;
   const ytdLeadsFull     = totals.leads     + organic.leads;
-  const ytdBookingsFull  = totals.bookings  + organic.bookings;
   const ytdWalkinsFull   = totals.walkins   + organic.walkins;
+
+  /* Bookings organic uses live CRM for Jun–Nov 25 (Booked + Walk-in Completed + ADM Done + Closed After Walk-in).
+     CRM is the authoritative source for stage-based counts; DM-Overall figures overcount vs actual CRM stages. */
+  const PRE_SPEND_CRM_MONTHS = ["Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25"];
+  const organicBookingsCrm = useMemo(() => {
+    if (!liveData) return { combined: organic.bookings, ris: ORGANIC_PRE_SPEND.ris.bookings, rps: ORGANIC_PRE_SPEND.rps.bookings };
+    const ris = (liveData.risCrm.byMonth ?? [])
+      .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
+      .reduce((s, m) => s + m.total.bookings, 0);
+    const rps = (liveData.rpsCrm.byMonth ?? [])
+      .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
+      .reduce((s, m) => s + m.total.bookings, 0);
+    return { combined: ris + rps, ris, rps };
+  }, [liveData]);
+  const organicBookings = segment === "ris" ? organicBookingsCrm.ris : segment === "rps" ? organicBookingsCrm.rps : organicBookingsCrm.combined;
+  const ytdBookingsFull  = totals.bookings  + organicBookings;
   /* All efficiency metrics use the full-AY admissions denominator */
   const admForCosts = ytdAdmissionsFull;
 
@@ -681,7 +696,7 @@ function MarketingDashboard() {
             <KpiCard label="CPA (Marketing)" value={inr(ytdMarketingCpa)} sub={`${inr(totals.spend)} ÷ ${num(admForCosts)} adm`} color={NAVY} tooltip="Total Meta + Google ad spend ÷ total admissions" />
             <KpiCard label="CPA (True)" value={inr(ytdTrueCpa)} sub={`+${(((ytdTrueCpa / Math.max(ytdMarketingCpa, 1)) - 1) * 100).toFixed(0)}% over marketing CPA`} color={RED} tooltip="(Ad spend + salaries × months) ÷ admissions" />
             <KpiCard label="Cost per Lead" value={inr(cpl(totals.spend, totals.leads))} sub="ad spend / leads" color={PURPLE} />
-            <KpiCard label="Cost per Booking" value={inr(cpb(totals.spend, totals.bookings))} sub="ad spend / bookings" color={AMBER} />
+            <KpiCard label="Cost per Booking" value={inr(cpb(totals.spend, ytdBookingsFull))} sub="ad spend / bookings" color={AMBER} />
             <KpiCard label="Cost per Walk-in" value={inr(cpw(totals.spend, totals.walkins))} sub="ad spend / walk-ins" color={CYAN} />
             <KpiCard label="Walk-in → Adm" value={pct(walkToAdm)} sub={`${num(admForCosts)} of ${num(ytdWalkinsFull)} walk-ins`} color={GREEN} />
           </div>
@@ -1736,13 +1751,13 @@ function MarketingDashboard() {
                 ))}
                 <tr className="font-black border-t-2 border-gray-300" style={{ background: `${NAVY}10` }}>
                   <td className="py-3 px-2" style={{ color: NAVY }}>TOTAL</td>
-                  <td className="py-3 px-2">{num(totals.leads)}</td>
-                  <td className="py-3 px-2">{num(totals.bookings)}</td>
-                  <td className="py-3 px-2">{num(totals.walkins)}</td>
-                  <td className="py-3 px-2 text-green-700">{totals.admissions}</td>
+                  <td className="py-3 px-2">{num(ytdLeadsFull)}</td>
+                  <td className="py-3 px-2">{num(ytdBookingsFull)}</td>
+                  <td className="py-3 px-2">{num(ytdWalkinsFull)}</td>
+                  <td className="py-3 px-2 text-green-700">{ytdAdmissionsFull}</td>
                   <td className="py-3 px-2">{inr(totals.spend)}</td>
-                  <td className="py-3 px-2">{inr(cpl(totals.spend, totals.leads))}</td>
-                  <td className="py-3 px-2">{inr(cpb(totals.spend, totals.bookings))}</td>
+                  <td className="py-3 px-2">{inr(cpl(totals.spend, ytdLeadsFull))}</td>
+                  <td className="py-3 px-2">{inr(cpb(totals.spend, ytdBookingsFull))}</td>
                   <td className="py-3 px-2">{inr(cpw(totals.spend, totals.walkins))}</td>
                   <td className="py-3 px-2 text-blue-700">{inr(ytdMarketingCpa)}</td>
                   <td className="py-3 px-2 text-red-600">{inr(ytdTrueCpa)}</td>
