@@ -468,7 +468,9 @@ function MarketingDashboard() {
     };
   }, [liveData]);
 
-  const organicPerSchool = segment === "ris" ? organicFromSchoolTab.ris : organicFromSchoolTab.rps;
+  // RIS: static ORGANIC_PRE_SPEND is the verified baseline (walkins=86 → CPW=₹1,815 ✓).
+  // RPS: school tab Aug–Nov is authoritative (Oct=2/Nov=7 admissions).
+  const organicPerSchool = segment === "ris" ? ORGANIC_PRE_SPEND.ris : organicFromSchoolTab.rps;
   // For combined: use static ORGANIC_PRE_SPEND (derived from DM Overall master sheet tallies)
   const organicAdmissions = segment === "combined" ? organic.admissions : organicPerSchool.admissions;
   const organicLeads      = segment === "combined" ? organic.leads      : organicPerSchool.leads;
@@ -1747,7 +1749,7 @@ function MarketingDashboard() {
 
         {/* ───────── 12. Monthly Summary Table (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <SectionTitle title={`Full Monthly Summary — AY 2025-26 (${segmentLabel})`} />
+          <SectionTitle title={`Full Monthly Summary — AY 2026-27 (${segmentLabel})`} />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr style={{ background: NAVY }} className="text-white">
@@ -1795,7 +1797,7 @@ function MarketingDashboard() {
 
         {/* ───────── 13. Last Year Summary Table ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <SectionTitle title="Last Year Summary — AY 2024-25" sub="RIS + RPS as on 13 June 2025 closing snapshot (always shows both branches)" />
+          <SectionTitle title="Last Year Summary — AY 2025-26" sub="RIS + RPS as on 13 June 2025 closing snapshot (always shows both branches)" />
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
