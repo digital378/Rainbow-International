@@ -1730,8 +1730,8 @@ function MarketingDashboard() {
             {[
               { platform: "Instagram", val: num(social.instaFollowers), label: "Followers", color: "#e1306c" },
               { platform: "Facebook", val: num(social.fbFollowers), label: "Followers", color: "#1877f2" },
-              { platform: "YouTube", val: num(social.ytViews), label: "Views (Apr 2026)", color: "#ff0000" },
-              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Clicks (27 Apr – 3 May)", color: GREEN },
+              { platform: "YouTube", val: num(social.ytViews), label: "Views (May 2026)", color: "#ff0000" },
+              { platform: "Website (GSC)", val: num(social.websiteClicks), label: "Clicks (May 2026)", color: GREEN },
             ].map(s => (
               <div key={s.platform} className="rounded-xl border border-gray-100 p-4">
                 <div className="font-bold text-sm text-gray-800">{s.platform}</div>
