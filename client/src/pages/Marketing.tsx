@@ -38,8 +38,8 @@ type LiveData = {
   rpsWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   rpsCrm: { byMonth: LiveRpsMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
-  rpsSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
-  risSchoolMonthly: Array<{ month: string; walkins: number; admissions: number }>;
+  rpsSchoolMonthly: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number }>;
+  risSchoolMonthly: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   risSpend: LiveSpendEntry[];
   rpsSpend: LiveSpendEntry[];
 };
@@ -326,14 +326,20 @@ function MarketingDashboard() {
       // If DM Overall has no entry AND no CRM/school/spend data, keep static row as-is
       if (!live && !risMon && !rpsMon && !rpsSchool && !risSchool && !risSpendLive && !rpsSpendLive) return row;
 
+      // School tab is source of truth for all per-school metrics (leads, bookings, walkins, admissions).
+      // CRM used only as fallback when school tab has no entry for the month.
       const risBase: MetricSet = risMon
-        ? { ...row.ris, leads: risMon.total.leads, bookings: risMon.total.bookings,
-            walkins: risSchool ? risSchool.walkins : risMon.total.walkins,
+        ? { ...row.ris,
+            leads:      risSchool && risSchool.leads      > 0 ? risSchool.leads      : risMon.total.leads,
+            bookings:   risSchool && risSchool.bookings   > 0 ? risSchool.bookings   : risMon.total.bookings,
+            walkins:    risSchool ? risSchool.walkins    : risMon.total.walkins,
             admissions: risSchool ? risSchool.admissions : risMon.total.admissions }
         : row.ris;
       const rpsBase: MetricSet = rpsMon
-        ? { ...row.rps, leads: rpsMon.total.leads, bookings: rpsMon.total.bookings,
-            walkins: rpsSchool ? rpsSchool.walkins : rpsMon.total.walkins,
+        ? { ...row.rps,
+            leads:      rpsSchool && rpsSchool.leads      > 0 ? rpsSchool.leads      : rpsMon.total.leads,
+            bookings:   rpsSchool && rpsSchool.bookings   > 0 ? rpsSchool.bookings   : rpsMon.total.bookings,
+            walkins:    rpsSchool ? rpsSchool.walkins    : rpsMon.total.walkins,
             admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
         : row.rps;
 
@@ -436,27 +442,43 @@ function MarketingDashboard() {
 
   /* Full-AY totals — Jun 2025 through Jun 2026 YTD (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
-  const ytdAdmissionsFull = totals.admissions + organic.admissions;
-  const ytdLeadsFull     = totals.leads     + organic.leads;
-  const ytdWalkinsFull   = totals.walkins   + organic.walkins;
 
-  /* Organic bookings (Jun–Nov 25, pre-ad-spend period):
-     Combined → static ORGANIC_PRE_SPEND (from master sheet tallies, same source as walkins/admissions).
-     Per-school (RIS/RPS) → live CRM for accuracy. */
-  const PRE_SPEND_CRM_MONTHS = ["Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25"];
-  const organicBookingsCrm = useMemo(() => {
-    if (!liveData) return { ris: ORGANIC_PRE_SPEND.ris.bookings, rps: ORGANIC_PRE_SPEND.rps.bookings };
-    const ris = (liveData.risCrm.byMonth ?? [])
-      .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
-      .reduce((s, m) => s + m.total.bookings, 0);
-    const rps = (liveData.rpsCrm.byMonth ?? [])
-      .filter(m => PRE_SPEND_CRM_MONTHS.includes(m.month))
-      .reduce((s, m) => s + m.total.bookings, 0);
-    return { ris, rps };
+  // Organic period (Jun–Nov 25): school tab Aug–Nov is authoritative for per-school metrics.
+  // Jun-25 and Jul-25 had negligible tracked activity; static ORGANIC_PRE_SPEND covers the full Jun–Nov total.
+  const PRE_SPEND_SCHOOL_MONTHS = ["Aug-25","Sep-25","Oct-25","Nov-25"];
+  const organicFromSchoolTab = useMemo(() => {
+    const fallback = {
+      ris: { leads: ORGANIC_PRE_SPEND.ris.leads, bookings: ORGANIC_PRE_SPEND.ris.bookings, walkins: ORGANIC_PRE_SPEND.ris.walkins, admissions: ORGANIC_PRE_SPEND.ris.admissions },
+      rps: { leads: ORGANIC_PRE_SPEND.rps.leads, bookings: ORGANIC_PRE_SPEND.rps.bookings, walkins: ORGANIC_PRE_SPEND.rps.walkins, admissions: ORGANIC_PRE_SPEND.rps.admissions },
+    };
+    if (!liveData) return fallback;
+    const sumSchool = (tab: typeof liveData.rpsSchoolMonthly, staticFallback: typeof ORGANIC_PRE_SPEND.rps) => {
+      const months = tab.filter(m => PRE_SPEND_SCHOOL_MONTHS.includes(m.month));
+      if (months.length === 0) return staticFallback;
+      return {
+        leads:      months.reduce((s, m) => s + m.leads, 0),
+        bookings:   months.reduce((s, m) => s + m.bookings, 0),
+        walkins:    months.reduce((s, m) => s + m.walkins, 0),
+        admissions: months.reduce((s, m) => s + m.admissions, 0),
+      };
+    };
+    return {
+      ris: sumSchool(liveData.risSchoolMonthly ?? [], ORGANIC_PRE_SPEND.ris),
+      rps: sumSchool(liveData.rpsSchoolMonthly ?? [], ORGANIC_PRE_SPEND.rps),
+    };
   }, [liveData]);
-  // Combined organic uses master-sheet static value; per-school uses CRM
-  const organicBookings = segment === "ris" ? organicBookingsCrm.ris : segment === "rps" ? organicBookingsCrm.rps : organic.bookings;
-  const ytdBookingsFull  = totals.bookings  + organicBookings;
+
+  const organicPerSchool = segment === "ris" ? organicFromSchoolTab.ris : organicFromSchoolTab.rps;
+  // For combined: use static ORGANIC_PRE_SPEND (derived from DM Overall master sheet tallies)
+  const organicAdmissions = segment === "combined" ? organic.admissions : organicPerSchool.admissions;
+  const organicLeads      = segment === "combined" ? organic.leads      : organicPerSchool.leads;
+  const organicWalkins    = segment === "combined" ? organic.walkins    : organicPerSchool.walkins;
+  const organicBookings   = segment === "combined" ? organic.bookings   : organicPerSchool.bookings;
+
+  const ytdAdmissionsFull = totals.admissions + organicAdmissions;
+  const ytdLeadsFull      = totals.leads      + organicLeads;
+  const ytdWalkinsFull    = totals.walkins    + organicWalkins;
+  const ytdBookingsFull   = totals.bookings   + organicBookings;
   /* All efficiency metrics use the full-AY admissions denominator */
   const admForCosts = ytdAdmissionsFull;
 

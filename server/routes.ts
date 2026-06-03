@@ -1565,14 +1565,16 @@ export async function registerRoutes(
         "MAY":"May-26","MAY TOTAL":"May-26",           // completed May (in June tab) or in-progress
         "JUNE TOTAL":"Jun-26",                          // current-month June total; bare "JUNE" = June 2025 historical row, skip it
       };
-      const parseSchoolRows = (rows: string[][]): Array<{month:string;walkins:number;admissions:number}> => {
+      const parseSchoolRows = (rows: string[][]): Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> => {
         const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
         if (hIdx === -1) return [];
         const header = rows[hIdx];
-        const wCol = header.findIndex(h => String(h).includes("Total Walkins"));
-        const aCol = header.findIndex(h => String(h).includes("Total Admissions"));
+        const leadCol = header.findIndex(h => String(h).includes("Total Leads"));
+        const bookCol = header.findIndex(h => String(h).toLowerCase().includes("booking"));
+        const wCol    = header.findIndex(h => String(h).includes("Total Walkins"));
+        const aCol    = header.findIndex(h => String(h).includes("Total Admissions"));
         const seen = new Set<string>();
-        const result: Array<{month:string;walkins:number;admissions:number}> = [];
+        const result: Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> = [];
         for (const row of rows.slice(hIdx + 1)) {
           // In DM RIS/RPS school tabs the date label (e.g. "JUNE TOTAL") is in column B (row[1]).
           // Column A (row[0]) is a blank marker column. Check B first, fall back to A.
@@ -1581,7 +1583,14 @@ export async function registerRoutes(
           const crmKey = SCHOOL_MONTH_KEY[r1] ?? SCHOOL_MONTH_KEY[r0];
           if (crmKey && !seen.has(crmKey)) {
             seen.add(crmKey);
-            result.push({ month: crmKey, walkins: parseInt(String(row[wCol]??0).replace(/[₹,\s]/g,""))||0, admissions: parseInt(String(row[aCol]??0).replace(/[₹,\s]/g,""))||0 });
+            const p = (v: unknown) => parseInt(String(v ?? 0).replace(/[₹,\s]/g,"")) || 0;
+            result.push({
+              month:      crmKey,
+              leads:      leadCol >= 0 ? p(row[leadCol]) : 0,
+              bookings:   bookCol >= 0 ? p(row[bookCol]) : 0,
+              walkins:    p(row[wCol]),
+              admissions: p(row[aCol]),
+            });
           }
         }
         return result;
