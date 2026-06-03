@@ -111,8 +111,8 @@ export const MAY_WEEKLY = [
 ];
 
 export const SOCIAL = {
-  ris: { instaFollowers: 5739,  fbFollowers: 9831,  ytViews: 8427, websiteClicks: 309 },
-  rps: { instaFollowers: 10570, fbFollowers: 12679, ytViews: 12679, websiteClicks: 82  },
+  ris: { instaFollowers: 5798,  fbFollowers: 9822,  ytViews: 5191, websiteClicks: 1512 },
+  rps: { instaFollowers: 10742, fbFollowers: 12928, ytViews: 4076, websiteClicks: 431  },
 };
 
 export const DEFAULT_FIXED = {
