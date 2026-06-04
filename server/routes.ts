@@ -3033,71 +3033,25 @@ paths:
   app.get("/api/marketing/monthly", async (_req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
-      // Discover exact RPS MAY tab name via spreadsheet metadata to avoid apostrophe escaping issues
-      let rows: string[][] = [];
-      try {
-        const auth = getAuthenticatedClient();
-        if (auth) {
-          const { google: goog } = await import("googleapis");
-          const sheets = goog.sheets({ version: "v4", auth });
-          const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_IDS.master, fields: "sheets.properties.title" });
-          const titles = (meta.data.sheets ?? []).map((s: any) => s.properties?.title ?? "");
-          const rpsTab = titles.find((t: string) => t.toUpperCase().includes("DM RPS MAY"));
-          if (rpsTab) {
-            const quotedRange = `'${rpsTab.replace(/'/g, "''")}'!A140:R210`;
-            rows = await fetchSheetRange(SHEET_IDS.master, quotedRange);
-          }
-        }
-      } catch { /* fall through — rows stays [] */ }
-      const parseINR = (s: string | undefined) => parseInt(String(s ?? "0").replace(/[₹,\s]/g, "")) || 0;
-      // Maps month name → { YYYY-MM key, short label }
-      const SPEND_MONTH_MAP: Record<string, { key: string; label: string }> = {
-        "June":      { key: "2025-06", label: "Jun 25" },
-        "July":      { key: "2025-07", label: "Jul 25" },
-        "August":    { key: "2025-08", label: "Aug 25" },
-        "September": { key: "2025-09", label: "Sep 25" },
-        "October":   { key: "2025-10", label: "Oct 25" },
-        "November":  { key: "2025-11", label: "Nov 25" },
-        "December":  { key: "2025-12", label: "Dec 25" },
-        "January":   { key: "2026-01", label: "Jan 26" },
-        "February":  { key: "2026-02", label: "Feb 26" },
-        "March":     { key: "2026-03", label: "Mar 26" },
-        "April":     { key: "2026-04", label: "Apr 26" },
-        "May":       { key: "2026-05", label: "May 26" },
+      // Re-use the already-parsed rpsSpend from /api/marketing/live by fetching it internally.
+      // rpsSpend month labels ("Dec 25", "Jan 26", …) → YYYY-MM monthKeys for the RpsSales page.
+      const LABEL_TO_KEY: Record<string, string> = {
+        "Jun 25": "2025-06", "Jul 25": "2025-07", "Aug 25": "2025-08",
+        "Sep 25": "2025-09", "Oct 25": "2025-10", "Nov 25": "2025-11",
+        "Dec 25": "2025-12", "Jan 26": "2026-01", "Feb 26": "2026-02",
+        "Mar 26": "2026-03", "Apr 26": "2026-04", "May 26": "2026-05",
+        "Jun 26": "2026-06",
       };
-      // Find header row (must have both "meta" and "google")
-      const hIdx = rows.findIndex(r => {
-        const cells = r.map(c => String(c).trim().toLowerCase());
-        return cells.some(c => c.includes("meta")) && cells.some(c => c.includes("google"));
-      });
-      if (hIdx === -1) return res.json([]);
-      const header = rows[hIdx];
-      const metaCol   = header.findIndex(h => String(h).trim().toLowerCase().includes("meta"));
-      const googleCol = header.findIndex(h => String(h).trim().toLowerCase().includes("google"));
-      const salaryCol = header.findIndex(h => String(h).trim().toLowerCase().includes("salar"));
-      if (metaCol === -1 || googleCol === -1) return res.json([]);
-      const afterHeader = rows.slice(hIdx + 1);
-      // Detect which column holds month names
-      let monthCol = 0;
-      for (const row of afterHeader.slice(0, 10)) {
-        for (let ci = 0; ci < row.length; ci++) {
-          if (SPEND_MONTH_MAP[String(row[ci] ?? "").trim()]) { monthCol = ci; break; }
-        }
-        if (monthCol > 0) break;
-      }
-      const result: Array<{ monthKey: string; label: string; salaries: number; meta: number; google: number; adSpend: number; total: number }> = [];
-      for (const row of afterHeader) {
-        const rawMonth = String(row[monthCol] ?? "").trim();
-        if (!rawMonth) continue;
-        if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
-        const mapped = SPEND_MONTH_MAP[rawMonth];
-        if (!mapped) continue;
-        const meta     = parseINR(row[metaCol]);
-        const google   = parseINR(row[googleCol]);
-        const salaries = salaryCol >= 0 ? parseINR(row[salaryCol]) : 0;
-        const adSpend  = meta + google;
-        result.push({ monthKey: mapped.key, label: mapped.label, salaries, meta, google, adSpend, total: salaries + adSpend });
-      }
+      const liveResp = await fetch(`http://localhost:${process.env.PORT ?? 5000}/api/marketing/live`);
+      if (!liveResp.ok) return res.json([]);
+      const live = await liveResp.json() as { rpsSpend: Array<{ month: string; salaries: number; meta: number; google: number; adSpend: number }> };
+      const result = (live.rpsSpend ?? [])
+        .filter(s => s.adSpend > 0 || s.salaries > 0)
+        .map(s => {
+          const monthKey = LABEL_TO_KEY[s.month] ?? "";
+          return { monthKey, label: s.month, salaries: s.salaries, meta: s.meta, google: s.google, adSpend: s.adSpend, total: s.salaries + s.adSpend };
+        })
+        .filter(s => s.monthKey);
       res.json(result);
     } catch (err: any) {
       console.error("[marketing/monthly] error:", err?.message);
