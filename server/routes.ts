@@ -3049,7 +3049,7 @@ paths:
         .filter(s => s.adSpend > 0 || s.salaries > 0)
         .map(s => {
           const monthKey = LABEL_TO_KEY[s.month] ?? "";
-          return { monthKey, label: s.month, salaries: s.salaries, meta: s.meta, google: s.google, adSpend: s.adSpend, total: s.salaries + s.adSpend };
+          return { monthKey, label: s.month, salaries: s.salaries, meta: s.meta, google: s.google, adSpend: s.adSpend, total: s.adSpend };
         })
         .filter(s => s.monthKey);
       res.json(result);
