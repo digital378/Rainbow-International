@@ -32,6 +32,9 @@ export const BRAND_CATEGORIES: BrandCategory[] = [
 ];
 
 export const BRAND_PARTNERS: BrandPartner[] = [
+  // Salon, Beauty & Spa — pinned first
+  { name: "Dream Of", file: "Dream-Of.webp", category: "Salon, Beauty & Spa" },
+
   // Restaurants & Cafés
   { name: "1441 Pizzeria", file: "rainbow-international-school-1441-pizzeria.webp", category: "Restaurants & Cafés" },
   { name: "73 Degrees", file: "rainbow-international-school-brand-partner-73d-dgrees.webp", category: "Restaurants & Cafés" },
