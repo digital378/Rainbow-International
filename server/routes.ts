@@ -2694,7 +2694,7 @@ export async function registerRoutes(
 
       const dmRecentSorted = dmRecentLeads
         .sort((a, b) => b.sortIdx - a.sortIdx || b.child.localeCompare(a.child))
-        .slice(0, 30)
+        .slice(0, 600)
         .map(({ sortIdx: _, ...rest }) => rest);
 
       const dmTotalOpen = dmOpen + dmWalkinBooked + dmWalkinDone;

@@ -248,6 +248,25 @@ function SalesDashboard() {
   const activeClosedSegs   = activeMonth ? activeMonth.closedSegs   : walkins.closedReasonSegments;
   const activeAdmBySource  = activeMonth ? activeMonth.admBySource  : admissions.bySource;
 
+  // DM Pipeline — convert "2026-01" period key → "Jan-26" label used in dmPipeline.byMonth
+  const dmMonthLabel = (selectedMonth !== "YTD" && dmPipeline)
+    ? new Date(selectedMonth + "-01").toLocaleString("en-US", { month: "short", year: "2-digit" })
+    : null;
+  const activeDmRow = dmMonthLabel ? dmPipeline?.byMonth.find(m => m.month === dmMonthLabel) : null;
+  const activeDm = activeDmRow
+    ? { total: activeDmRow.total, admitted: activeDmRow.admitted, open: activeDmRow.open,
+        walkinBooked: activeDmRow.walkinBooked, walkinDone: activeDmRow.walkinDone,
+        closed: activeDmRow.closed, transferred: 0,
+        convRate: activeDmRow.total > 0 ? Math.round(activeDmRow.admitted / activeDmRow.total * 1000) / 10 : 0 }
+    : dmPipeline
+      ? { total: dmPipeline.total, admitted: dmPipeline.admitted, open: dmPipeline.open,
+          walkinBooked: dmPipeline.walkinBooked, walkinDone: dmPipeline.walkinDone,
+          closed: dmPipeline.closed, transferred: dmPipeline.transferred, convRate: dmPipeline.convRate }
+      : null;
+  const activeDmRecent = dmMonthLabel && dmPipeline
+    ? dmPipeline.recent.filter(r => r.month === dmMonthLabel)
+    : (dmPipeline?.recent ?? []);
+
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
       {/* Top bar */}
@@ -987,29 +1006,29 @@ function SalesDashboard() {
         </>}
 
         {/* ══ DM PIPELINE ══════════════════════════════════════════════════════ */}
-        {activeTab === "pipeline" && dmPipeline && <>
+        {activeTab === "pipeline" && dmPipeline && activeDm && <>
           <div>
-            <SectionTitle sub="RIS DM Tracker · Nur to Class 12 · all months">DM Pipeline Overview</SectionTitle>
+            <SectionTitle sub={`RIS DM Tracker · Nur to Class 12 · ${dmMonthLabel ? dmMonthLabel : "all months"}`}>DM Pipeline Overview</SectionTitle>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-              <KpiCard label="Total DM Leads"  value={dmPipeline.total.toLocaleString("en-IN")}    accent={NAVY} />
-              <KpiCard label="Open / Active"   value={dmPipeline.open.toLocaleString("en-IN")}    accent={BLUE} sub={`${dmPipeline.walkinBooked} booked · ${dmPipeline.walkinDone} w/in done`} />
-              <KpiCard label="Walk-In Booked"  value={dmPipeline.walkinBooked.toLocaleString("en-IN")} accent={CYAN} />
-              <KpiCard label="Walk-In Done"    value={dmPipeline.walkinDone.toLocaleString("en-IN")}  accent={PURPLE} sub="Completed + Integrated" />
-              <KpiCard label="Admitted"        value={dmPipeline.admitted.toLocaleString("en-IN")}   accent={GREEN} highlight />
-              <KpiCard label="Closed / Exit"   value={(dmPipeline.closed + dmPipeline.transferred).toLocaleString("en-IN")} accent={RED} sub={`${dmPipeline.closed} closed · ${dmPipeline.transferred} transferred`} />
+              <KpiCard label="Total DM Leads"  value={activeDm.total.toLocaleString("en-IN")}    accent={NAVY} />
+              <KpiCard label="Open / Active"   value={activeDm.open.toLocaleString("en-IN")}    accent={BLUE} sub={`${activeDm.walkinBooked} booked · ${activeDm.walkinDone} w/in done`} />
+              <KpiCard label="Walk-In Booked"  value={activeDm.walkinBooked.toLocaleString("en-IN")} accent={CYAN} />
+              <KpiCard label="Walk-In Done"    value={activeDm.walkinDone.toLocaleString("en-IN")}  accent={PURPLE} sub="Completed + Integrated" />
+              <KpiCard label="Admitted"        value={activeDm.admitted.toLocaleString("en-IN")}   accent={GREEN} highlight />
+              <KpiCard label="Closed / Exit"   value={(activeDm.closed + activeDm.transferred).toLocaleString("en-IN")} accent={RED} sub={activeDm.transferred ? `${activeDm.closed} closed · ${activeDm.transferred} transferred` : undefined} />
             </div>
 
             {/* Funnel summary bar */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6">
-              <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>DM Lead Funnel</div>
+              <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>DM Lead Funnel{dmMonthLabel ? ` — ${dmMonthLabel}` : ""}</div>
               <div className="space-y-3">
                 {[
-                  { label: "Total Leads",         value: dmPipeline.total,         color: NAVY   },
-                  { label: "Walk-In Booked",       value: dmPipeline.walkinBooked + dmPipeline.walkinDone + dmPipeline.admitted, color: CYAN },
-                  { label: "Walk-In Completed",    value: dmPipeline.walkinDone + dmPipeline.admitted,    color: PURPLE },
-                  { label: "Admitted",             value: dmPipeline.admitted,      color: GREEN  },
+                  { label: "Total Leads",      value: activeDm.total,                                              color: NAVY   },
+                  { label: "Walk-In Booked",   value: activeDm.walkinBooked + activeDm.walkinDone + activeDm.admitted, color: CYAN   },
+                  { label: "Walk-In Completed",value: activeDm.walkinDone + activeDm.admitted,                     color: PURPLE },
+                  { label: "Admitted",         value: activeDm.admitted,                                           color: GREEN  },
                 ].map(({ label, value, color }) => {
-                  const pct = dmPipeline.total > 0 ? Math.round((value / dmPipeline.total) * 100) : 0;
+                  const pct = activeDm.total > 0 ? Math.round((value / activeDm.total) * 100) : 0;
                   return (
                     <div key={label}>
                       <div className="flex justify-between text-xs mb-1">
@@ -1024,8 +1043,8 @@ function SalesDashboard() {
                 })}
               </div>
               <div className="mt-4 pt-3 border-t border-slate-100 flex gap-6 text-xs text-slate-500">
-                <span>Conversion rate (leads → admitted): <strong className="text-green-700">{dmPipeline.convRate}%</strong></span>
-                <span>Closed / Exited: <strong className="text-red-600">{(dmPipeline.closed + dmPipeline.transferred).toLocaleString("en-IN")}</strong></span>
+                <span>Conversion rate (leads → admitted): <strong className="text-green-700">{activeDm.convRate}%</strong></span>
+                <span>Closed / Exited: <strong className="text-red-600">{(activeDm.closed + activeDm.transferred).toLocaleString("en-IN")}</strong></span>
               </div>
             </div>
 
@@ -1131,9 +1150,9 @@ function SalesDashboard() {
             )}
 
             {/* Recent leads */}
-            {dmPipeline.recent.length > 0 && (
+            {activeDmRecent.length > 0 && (
               <div>
-                <SectionTitle sub="Latest 30 DM leads from tracker">Recent DM Leads</SectionTitle>
+                <SectionTitle sub={dmMonthLabel ? `DM leads for ${dmMonthLabel}` : "Latest 30 DM leads from tracker"}>Recent DM Leads</SectionTitle>
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="bg-slate-50 uppercase text-slate-600">
@@ -1147,7 +1166,7 @@ function SalesDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dmPipeline.recent.map((r, i) => {
+                      {activeDmRecent.map((r, i) => {
                         const sColor = r.status === "ADM DONE" ? GREEN : r.status === "CLOSED" ? RED : r.status === "TRANSFERRED" ? "#ea580c" : r.status === "WALKIN BOOKED" ? CYAN : r.status === "WALK-IN COMPLETED" ? PURPLE : SLATE;
                         return (
                           <tr key={i} className="border-t border-slate-100">
