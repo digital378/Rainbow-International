@@ -63,6 +63,22 @@ type SalesData = {
     recent: Array<{ id: string; raName: string; raBranch: string; parentName: string; studentName: string; grade: string; submittedAt: string }>;
     last7Days: Array<{ date: string; count: number }>;
   };
+  dmPipeline: {
+    total: number;
+    admitted: number;
+    open: number;
+    walkinBooked: number;
+    walkinDone: number;
+    closed: number;
+    transferred: number;
+    integrated: number;
+    convRate: number;
+    byMonth: Array<{ month: string; total: number; admitted: number; open: number; walkinBooked: number; walkinDone: number; closed: number }>;
+    byProgram: Array<{ program: string; count: number }>;
+    byStatus: Array<{ status: string; count: number }>;
+    bySource: Array<{ source: string; count: number }>;
+    recent: Array<{ month: string; child: string; program: string; status: string; source: string; walkinDate: string }>;
+  };
   leadTemperature: { hot: number; warm: number; cold: number; provisional: number; open: number };
   heatGrid: Array<{
     counselor: string;
@@ -175,7 +191,7 @@ function SalesDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>("YTD");
-  const [activeTab, setActiveTab] = useState<"overview"|"trends"|"analytics"|"counselors"|"recent">("overview");
+  const [activeTab, setActiveTab] = useState<"overview"|"trends"|"analytics"|"counselors"|"recent"|"pipeline">("overview");
   const cancelled = useRef(false);
 
   const fetchData = useCallback(() => {
@@ -219,7 +235,7 @@ function SalesDashboard() {
   }
   if (!data) return null;
 
-  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio, monthBreakdown, leadTemperature, heatGrid } = data;
+  const { kpis, monthlyTargets, walkins, admissions, counselorLeaderboard, conversionRatio, monthBreakdown, leadTemperature, heatGrid, dmPipeline } = data;
 
   // Active month data (filtered or YTD)
   const activeMonth = selectedMonth !== "YTD" ? monthBreakdown.find(m => m.monthKey === selectedMonth) : null;
@@ -290,6 +306,7 @@ function SalesDashboard() {
             ["trends",     "Targets & Trends"],
             ["analytics",  "Analytics"],
             ["counselors", "Counselors"],
+            ["pipeline",   "DM Pipeline"],
             ["recent",     "Recent"],
           ] as const).map(([id, label]) => (
             <button key={id} onClick={() => setActiveTab(id)}
@@ -967,6 +984,190 @@ function SalesDashboard() {
           );
         })()}
 
+        </>}
+
+        {/* ══ DM PIPELINE ══════════════════════════════════════════════════════ */}
+        {activeTab === "pipeline" && dmPipeline && <>
+          <div>
+            <SectionTitle sub="RIS DM Tracker · Nur to Class 12 · all months">DM Pipeline Overview</SectionTitle>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+              <KpiCard label="Total DM Leads"  value={dmPipeline.total.toLocaleString("en-IN")}    accent={NAVY} />
+              <KpiCard label="Open / Active"   value={dmPipeline.open.toLocaleString("en-IN")}    accent={BLUE} sub={`${dmPipeline.walkinBooked} booked · ${dmPipeline.walkinDone} w/in done`} />
+              <KpiCard label="Walk-In Booked"  value={dmPipeline.walkinBooked.toLocaleString("en-IN")} accent={CYAN} />
+              <KpiCard label="Walk-In Done"    value={dmPipeline.walkinDone.toLocaleString("en-IN")}  accent={PURPLE} sub="Completed + Integrated" />
+              <KpiCard label="Admitted"        value={dmPipeline.admitted.toLocaleString("en-IN")}   accent={GREEN} highlight />
+              <KpiCard label="Closed / Exit"   value={(dmPipeline.closed + dmPipeline.transferred).toLocaleString("en-IN")} accent={RED} sub={`${dmPipeline.closed} closed · ${dmPipeline.transferred} transferred`} />
+            </div>
+
+            {/* Funnel summary bar */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-6">
+              <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>DM Lead Funnel</div>
+              <div className="space-y-3">
+                {[
+                  { label: "Total Leads",         value: dmPipeline.total,         color: NAVY   },
+                  { label: "Walk-In Booked",       value: dmPipeline.walkinBooked + dmPipeline.walkinDone + dmPipeline.admitted, color: CYAN },
+                  { label: "Walk-In Completed",    value: dmPipeline.walkinDone + dmPipeline.admitted,    color: PURPLE },
+                  { label: "Admitted",             value: dmPipeline.admitted,      color: GREEN  },
+                ].map(({ label, value, color }) => {
+                  const pct = dmPipeline.total > 0 ? Math.round((value / dmPipeline.total) * 100) : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium text-slate-700">{label}</span>
+                        <span className="font-bold tabular-nums" style={{ color }}>{value.toLocaleString("en-IN")} <span className="text-slate-400 font-normal">({pct}%)</span></span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-100">
+                        <div className="h-2 rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-100 flex gap-6 text-xs text-slate-500">
+                <span>Conversion rate (leads → admitted): <strong className="text-green-700">{dmPipeline.convRate}%</strong></span>
+                <span>Closed / Exited: <strong className="text-red-600">{(dmPipeline.closed + dmPipeline.transferred).toLocaleString("en-IN")}</strong></span>
+              </div>
+            </div>
+
+            {/* Monthly trend */}
+            {dmPipeline.byMonth.length > 0 && (
+              <div className="mb-6">
+                <SectionTitle sub="DM leads generated and admitted per month">Monthly DM Trend</SectionTitle>
+                <ChartCard title="DM Leads vs Admissions by Month">
+                  <BarChart data={dmPipeline.byMonth} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total"        fill={NAVY}   name="Total Leads"     stackId="a" />
+                    <Bar dataKey="admitted"     fill={GREEN}  name="Admitted"        />
+                    <Bar dataKey="walkinDone"   fill={PURPLE} name="Walk-In Done"    />
+                    <Bar dataKey="walkinBooked" fill={CYAN}   name="Walk-In Booked"  />
+                    <Bar dataKey="closed"       fill={RED}    name="Closed / Exit"   />
+                  </BarChart>
+                </ChartCard>
+              </div>
+            )}
+
+            {/* Stage breakdown by month (stacked) */}
+            {dmPipeline.byMonth.length > 0 && (
+              <div className="mb-6">
+                <SectionTitle sub="Pipeline stage mix per month">Stage Mix by Month</SectionTitle>
+                <ChartCard title="Open · Walk-In Booked · Walk-In Done · Admitted · Closed">
+                  <BarChart data={dmPipeline.byMonth} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="open"         fill={SLATE}  name="Open"            stackId="s" />
+                    <Bar dataKey="walkinBooked" fill={CYAN}   name="Walk-In Booked"  stackId="s" />
+                    <Bar dataKey="walkinDone"   fill={PURPLE} name="Walk-In Done"    stackId="s" />
+                    <Bar dataKey="admitted"     fill={GREEN}  name="Admitted"        stackId="s" />
+                    <Bar dataKey="closed"       fill={RED}    name="Closed / Exit"   stackId="s" radius={[3,3,0,0]} />
+                  </BarChart>
+                </ChartCard>
+              </div>
+            )}
+
+            {/* Program + Status breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+              {dmPipeline.byProgram.length > 0 && (
+                <ChartCard title="Top Programs (by DM Lead Volume)">
+                  <BarChart data={dmPipeline.byProgram.slice(0, 12)} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis type="number" tick={{ fontSize: 11 }} />
+                    <YAxis type="category" dataKey="program" tick={{ fontSize: 10 }} width={110} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill={BLUE} name="Leads" radius={[0,3,3,0]} />
+                  </BarChart>
+                </ChartCard>
+              )}
+
+              {dmPipeline.byStatus.length > 0 && (
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                  <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>Status Distribution</div>
+                  <div className="space-y-2">
+                    {dmPipeline.byStatus.map(({ status, count }) => {
+                      const pct = dmPipeline.total > 0 ? Math.round((count / dmPipeline.total) * 100) : 0;
+                      const color = status === "ADM DONE" ? GREEN : status === "CLOSED" ? RED : status === "TRANSFERRED" ? "#ea580c" : status === "WALKIN BOOKED" ? CYAN : status === "WALK-IN COMPLETED" ? PURPLE : status === "INTEGRATED" ? "#0ea5e9" : SLATE;
+                      return (
+                        <div key={status} className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                          <div className="flex-1 text-xs text-slate-700 truncate">{status}</div>
+                          <div className="text-xs font-bold tabular-nums w-8 text-right" style={{ color }}>{count}</div>
+                          <div className="w-24 h-1.5 rounded-full bg-slate-100">
+                            <div className="h-1.5 rounded-full" style={{ width: `${pct}%`, background: color }} />
+                          </div>
+                          <div className="text-xs text-slate-400 w-8 text-right">{pct}%</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Source breakdown */}
+            {dmPipeline.bySource.length > 0 && (
+              <div className="mb-6">
+                <SectionTitle sub="Lead source for all DM leads">Lead Source Breakdown</SectionTitle>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {dmPipeline.bySource.map(({ source, count }) => {
+                      const pct = dmPipeline.total > 0 ? Math.round((count / dmPipeline.total) * 100) : 0;
+                      return (
+                        <div key={source} className="rounded-lg bg-slate-50 p-3">
+                          <div className="text-xs text-slate-500 mb-1">{source}</div>
+                          <div className="text-2xl font-black" style={{ color: NAVY }}>{count.toLocaleString("en-IN")}</div>
+                          <div className="text-xs text-slate-400">{pct}% of total</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Recent leads */}
+            {dmPipeline.recent.length > 0 && (
+              <div>
+                <SectionTitle sub="Latest 30 DM leads from tracker">Recent DM Leads</SectionTitle>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-slate-50 uppercase text-slate-600">
+                      <tr>
+                        <th className="text-left py-2 px-3">Month</th>
+                        <th className="text-left py-2 px-3">Student</th>
+                        <th className="text-left py-2 px-3">Program</th>
+                        <th className="text-left py-2 px-3">Status</th>
+                        <th className="text-left py-2 px-3">Source</th>
+                        <th className="text-left py-2 px-3">Walk-In Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dmPipeline.recent.map((r, i) => {
+                        const sColor = r.status === "ADM DONE" ? GREEN : r.status === "CLOSED" ? RED : r.status === "TRANSFERRED" ? "#ea580c" : r.status === "WALKIN BOOKED" ? CYAN : r.status === "WALK-IN COMPLETED" ? PURPLE : SLATE;
+                        return (
+                          <tr key={i} className="border-t border-slate-100">
+                            <td className="py-2 px-3 tabular-nums whitespace-nowrap">{r.month}</td>
+                            <td className="py-2 px-3 font-medium">{r.child}</td>
+                            <td className="py-2 px-3 text-slate-600">{r.program}</td>
+                            <td className="py-2 px-3">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold" style={{ background: sColor + "22", color: sColor }}>{r.status}</span>
+                            </td>
+                            <td className="py-2 px-3 text-slate-500">{r.source}</td>
+                            <td className="py-2 px-3 text-slate-400">{r.walkinDate || "—"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
         </>}
 
         {/* ══ RECENT ════════════════════════════════════════════════════════════ */}

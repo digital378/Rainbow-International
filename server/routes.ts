@@ -2248,7 +2248,7 @@ export async function registerRoutes(
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
       const SID = SHEET_IDS.sales;
-      const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows] = await Promise.all([
+      const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows, risDmRows] = await Promise.all([
         fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
         fetchSheetRange(SID, "'New Admission List'!A2:T500"),
         fetchSheetRange(SID, "'Provisional Admission LIST'!A2:T200"),
@@ -2256,6 +2256,7 @@ export async function registerRoutes(
         fetchSheetRange(SID, "'RIS Target Sheet '!B13:N14"),   // achieved + target rows
         fetchSheetRange(SID, "'RIS Target Sheet '!B2:N2"),     // month header row
         fetchSheetRange(SID, "'MIS DASHBOARD'!A4:E300"),       // daily MIS rows
+        fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"), // DM pipeline
       ]);
 
       // ── helpers ────────────────────────────────────────────────
@@ -2621,6 +2622,101 @@ export async function registerRoutes(
           };
         });
 
+      // ── RIS DM Pipeline (from risCrm "Nur to Class 12") ───────────────────
+      // Cols: 0=Date 1=Month 2=ParentName 3=ChildName 4=Phone 5=Program
+      //       6=Status 7=Remark 8=LeadOwner 9=Source 10=WalkInDate 11=RevisitDate
+      const [risDmHeader, ...risDmData] = risDmRows;
+      const risDmNorm = (s: any) => String(s ?? "").trim();
+      let dmTotal = 0, dmAdmitted = 0, dmOpen = 0, dmWalkinBooked = 0;
+      let dmWalkinDone = 0, dmClosed = 0, dmTransferred = 0, dmIntegrated = 0;
+      const dmByMonthMap  = new Map<string, { total: number; admitted: number; open: number; walkinBooked: number; walkinDone: number; closed: number }>();
+      const dmByProgramMap = new Map<string, number>();
+      const dmByStatusMap  = new Map<string, number>();
+      const dmBySourceMap  = new Map<string, number>();
+      const dmRecentLeads: Array<{ month: string; child: string; program: string; status: string; source: string; walkinDate: string; sortIdx: number }> = [];
+      // Month order for sorting (risCrm uses "Mon-YY" labels)
+      const DM_MONTH_ORDER = ["Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26","Aug-26"];
+
+      for (let idx = 0; idx < risDmData.length; idx++) {
+        const r = risDmData[idx];
+        if (!r || !r[2]) continue; // must have parent name
+        const month   = risDmNorm(r[1]);
+        const child   = risDmNorm(r[3]) || risDmNorm(r[2]);
+        const program = risDmNorm(r[5]) || "Unknown";
+        const statusRaw = risDmNorm(r[6]).toUpperCase();
+        const source  = risDmNorm(r[9]) || "Unknown";
+        const walkinDate = risDmNorm(r[10]);
+        if (!month) continue;
+        // Filter noise rows
+        const knownStatuses = ["OPEN","WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED","TRANSFERRED","INTEGRATED","FUTURE PROSPECT","IN PROCESS ADM"];
+        const matchedStatus = knownStatuses.find(s => statusRaw === s || statusRaw.startsWith(s)) || "";
+        if (!matchedStatus && !statusRaw) continue;
+
+        dmTotal++;
+        if (matchedStatus === "ADM DONE")                                  dmAdmitted++;
+        else if (matchedStatus === "WALKIN BOOKED")                         dmWalkinBooked++;
+        else if (matchedStatus === "WALK-IN COMPLETED" || matchedStatus === "INTEGRATED") dmWalkinDone++;
+        else if (matchedStatus === "CLOSED")                                dmClosed++;
+        else if (matchedStatus === "TRANSFERRED")                           dmTransferred++;
+        else                                                                dmOpen++;
+
+        const isOpen = !["ADM DONE","CLOSED","TRANSFERRED"].includes(matchedStatus);
+        const mo = dmByMonthMap.get(month) || { total:0, admitted:0, open:0, walkinBooked:0, walkinDone:0, closed:0 };
+        mo.total++;
+        if (matchedStatus === "ADM DONE") mo.admitted++;
+        else if (matchedStatus === "WALKIN BOOKED") mo.walkinBooked++;
+        else if (matchedStatus === "WALK-IN COMPLETED" || matchedStatus === "INTEGRATED") mo.walkinDone++;
+        else if (matchedStatus === "CLOSED" || matchedStatus === "TRANSFERRED") mo.closed++;
+        else mo.open++;
+        dmByMonthMap.set(month, mo);
+
+        dmByProgramMap.set(program, (dmByProgramMap.get(program) || 0) + 1);
+        const displayStatus = statusRaw || "Unknown";
+        dmByStatusMap.set(displayStatus, (dmByStatusMap.get(displayStatus) || 0) + 1);
+        dmBySourceMap.set(source, (dmBySourceMap.get(source) || 0) + 1);
+
+        dmRecentLeads.push({ month, child, program, status: displayStatus, source, walkinDate, sortIdx: DM_MONTH_ORDER.indexOf(month) });
+      }
+
+      // Sort monthly pipeline by month order
+      const dmByMonth = DM_MONTH_ORDER
+        .filter(m => dmByMonthMap.has(m))
+        .map(m => ({ month: m, ...dmByMonthMap.get(m)! }));
+
+      const dmByProgram = Array.from(dmByProgramMap, ([program, count]) => ({ program, count }))
+        .sort((a, b) => b.count - a.count).slice(0, 15);
+
+      const dmByStatus = Array.from(dmByStatusMap, ([status, count]) => ({ status, count }))
+        .sort((a, b) => b.count - a.count);
+
+      const dmBySource = Array.from(dmBySourceMap, ([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count);
+
+      const dmRecentSorted = dmRecentLeads
+        .sort((a, b) => b.sortIdx - a.sortIdx || b.child.localeCompare(a.child))
+        .slice(0, 30)
+        .map(({ sortIdx: _, ...rest }) => rest);
+
+      const dmTotalOpen = dmOpen + dmWalkinBooked + dmWalkinDone;
+      const dmConvRate  = dmTotal > 0 ? Math.round((dmAdmitted / dmTotal) * 1000) / 10 : 0;
+
+      const dmPipeline = {
+        total: dmTotal,
+        admitted: dmAdmitted,
+        open: dmTotalOpen,
+        walkinBooked: dmWalkinBooked,
+        walkinDone: dmWalkinDone,
+        closed: dmClosed,
+        transferred: dmTransferred,
+        integrated: dmIntegrated,
+        convRate: dmConvRate,
+        byMonth: dmByMonth,
+        byProgram: dmByProgram,
+        byStatus: dmByStatus,
+        bySource: dmBySource,
+        recent: dmRecentSorted,
+      };
+
       res.json({
         generatedAt: new Date().toISOString(),
         kpis: {
@@ -2669,6 +2765,7 @@ export async function registerRoutes(
         monthBreakdown,
         leadTemperature,
         heatGrid: heatGridArr,
+        dmPipeline,
         liveCheckins: await (async () => {
           try {
             // IST midnight in UTC: IST = UTC+5:30, so IST midnight = UTC 18:30 previous day
