@@ -250,7 +250,7 @@ function SalesDashboard() {
 
   // DM Pipeline — convert "2026-01" period key → "Jan-26" label used in dmPipeline.byMonth
   const dmMonthLabel = (selectedMonth !== "YTD" && dmPipeline)
-    ? new Date(selectedMonth + "-01").toLocaleString("en-US", { month: "short", year: "2-digit" })
+    ? new Date(selectedMonth + "-01").toLocaleString("en-US", { month: "short", year: "2-digit" }).replace(" ", "-")
     : null;
   const activeDmRow = dmMonthLabel ? dmPipeline?.byMonth.find(m => m.month === dmMonthLabel) : null;
   const activeDm = activeDmRow
