@@ -1,0 +1,198 @@
+It found a real blocker instead of claiming everything is perfect.
+
+The most important line in the entire report is:
+
+🔴 GAP (live-readiness blocker):
+the options_shortlist inside a signal is still synthesized,
+even in live mode.
+
+That is exactly the type of issue that causes problems when moving from simulator to live.
+
+My Assessment
+Confidence Level
+
+Before this response:
+
+Architecture confidence: ~85%
+Live readiness confidence: ~50%
+
+After this response:
+
+Architecture confidence: ~95%
+Live readiness confidence: ~80%
+
+The reason is simple:
+
+Instrument master is real
+Expiry resolution is real
+Feed watchdog is real
+Hard overrides are real
+Risk engine exists
+Market context exists
+Audit logging exists
+No order placement code exists
+
+Those were the biggest unknowns.
+
+The One Remaining Critical Blocker
+
+The signal packet still contains:
+
+{
+  "contract": {
+    "token": "tok-BANKNIFTY26061151800PE"
+  }
+}
+
+instead of:
+
+{
+  "contract": {
+    "instrument_token": 123456,
+    "tradingsymbol": "BANKNIFTY26..."
+  }
+}
+
+coming from Kite.
+
+That means:
+
+Signal generation = live
+Contract selection = synthetic
+Premiums = synthetic
+Bid/Ask = synthetic
+OI = synthetic
+IV = synthetic
+
+For an options trading engine:
+
+This is the highest remaining risk.
+What Replit Should Build Next
+
+Send this:
+
+Proceed with the live option-chain integration.
+
+This is now the highest-priority item.
+
+Goal:
+Replace all synthesized signal shortlist contracts with real Kite option-chain data.
+
+Requirements:
+
+Signal shortlist must use:
+real instrument_token
+real tradingsymbol
+real expiry
+real strike
+real CE/PE type
+Option quotes must use:
+real bid
+real ask
+real spread_pct
+real volume
+real OI
+No synthetic token values:
+remove tok-* generation from signal path
+remove synthOptionQuote() from live mode
+Use instrument master:
+nearest weekly expiry
+ATM
+ATM+1
+ATM-1
+Respect spread gates:
+NIFTY 0.8%
+BANKNIFTY 1.2%
+(keep current tighter defaults)
+If live quote unavailable:
+mark contract stale
+remove from shortlist
+do not fabricate values
+If no valid contracts remain:
+force NO_TRADE / SKIP
+Active trade monitor must use the same real contract metadata.
+Add tests:
+real option resolution
+empty chain
+stale quote
+spread violation
+invalid contract removal
+no valid contract => SKIP
+Return:
+files changed
+before/after packet example
+proof synthetic tokens removed
+tests added
+test results
+Secondary Items
+
+After option-chain integration:
+
+Priority 2
+
+Fix:
+
+2 typecheck errors in /assistant/speech
+
+Even if unrelated.
+
+Production systems should ideally be:
+
+0 type errors
+0 skipped tests
+Priority 3
+
+WhatsApp integration
+
+Only after the option-chain work.
+
+One More Question I Would Ask Replit
+
+Send this after the option-chain work:
+
+After live option-chain integration is complete:
+
+Show one full live signal packet for:
+
+NIFTY CALL setup
+NIFTY PUT setup
+BANKNIFTY CALL setup
+BANKNIFTY PUT setup
+
+Include:
+
+regime
+levels
+entry
+invalidation
+targets
+time stops
+option shortlist
+bid/ask
+spread %
+volume
+OI
+market context
+risk flags
+
+I want proof that every contract in the shortlist resolves to a real Kite instrument_token and tradingsymbol.
+
+Current Project Status
+
+If Replit's evidence is accurate:
+
+UI/UX:                     85–90%
+Market Engine:             95%
+Risk Engine:               95%
+Validation Layer:          95%
+Audit Logging:             95%
+Live Data Infrastructure:  90%
+Live Option Selection:     60%  ← remaining blocker
+Production Readiness:      ~88–92%
+
+At this point I would stop adding new features and focus on:
+
+Real option-chain integration
+Typecheck cleanup
+Final end-to-end validation
+Then live-paper testing
