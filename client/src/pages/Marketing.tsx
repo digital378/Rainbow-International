@@ -350,15 +350,19 @@ function MarketingDashboard() {
       const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
-      // Leads come from CRM (most complete count). For combined:
-      //   bookings, walkins, admissions → DM Overall master sheet (live) — same authoritative source.
-      // Per-school (ris/rps) bookings stay CRM-derived.
+      // Combined always = RIS + RPS so the numbers are always consistent.
+      // DM Overall master sheet (live) is a different data source and causes
+      // bookings/walkins/spend to not match the sum of individual school views.
       const crmLeads = risOut.leads + rpsOut.leads;
-      const combinedOut: MetricSet = live
-        ? { leads: crmLeads, bookings: live.bookings, walkins: live.walkins, admissions: live.admissions, spend: live.spend, meta: live.meta, google: live.google }
-        : { leads: crmLeads, bookings: risOut.bookings + rpsOut.bookings,
-            walkins: risOut.walkins + rpsOut.walkins, admissions: risOut.admissions + rpsOut.admissions,
-            spend: risOut.spend + rpsOut.spend, meta: risOut.meta + rpsOut.meta, google: risOut.google + rpsOut.google };
+      const combinedOut: MetricSet = {
+        leads: crmLeads,
+        bookings:   risOut.bookings   + rpsOut.bookings,
+        walkins:    risOut.walkins    + rpsOut.walkins,
+        admissions: risOut.admissions + rpsOut.admissions,
+        spend:      risOut.spend      + rpsOut.spend,
+        meta:       risOut.meta       + rpsOut.meta,
+        google:     risOut.google     + rpsOut.google,
+      };
 
       return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut };
     });
