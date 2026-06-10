@@ -2296,6 +2296,9 @@ export async function registerRoutes(
       const counselorMap = new Map<string, CounselorAgg>();
       const recentWalkins: Array<{date:string; name:string; grade:string; counselor:string; source:string; status:string; sortKey:number}> = [];
       const closedSegmentMap = new Map<string,number>();
+      // Admitted walk-ins by marketing source (replaces New Admission List source col which only has "Unknown"/"Revisit adm")
+      const walkinAdmBySource = new Map<string,number>();
+      const walkinAdmSrcByMonth = new Map<string, Map<string,number>>();
       // Lead temperature classification
       type HeatCell = { hot: number; warm: number; cold: number; provisional: number; open: number };
       const heatGridMap = new Map<string, Map<string, HeatCell>>();
@@ -2343,6 +2346,16 @@ export async function registerRoutes(
         const source = norm(r[8]) || "Unknown";
         const status = upper(r[9]) || "OPEN";
         const grade = norm(r[4]) || "Unspecified";
+        // Track admitted walk-ins by marketing source
+        if (status.includes("ADMIS") && !status.includes("PROV")) {
+          walkinAdmBySource.set(source, (walkinAdmBySource.get(source) || 0) + 1);
+          if (d) {
+            const mk2 = monthKey(d);
+            const msm2 = walkinAdmSrcByMonth.get(mk2) || new Map<string,number>();
+            msm2.set(source, (msm2.get(source) || 0) + 1);
+            walkinAdmSrcByMonth.set(mk2, msm2);
+          }
+        }
         const temp = leadTemp(status);
         if (temp === "hot") tempHot++;
         else if (temp === "warm") tempWarm++;
@@ -2605,7 +2618,7 @@ export async function registerRoutes(
       const monthBreakdown = Array.from(monthWalkinMap.entries())
         .sort((a,b) => a[0].localeCompare(b[0]))
         .map(([mk, mw]) => {
-          const admSrc = admSourceByMonth.get(mk);
+          const admSrc = walkinAdmSrcByMonth.get(mk);
           return {
             monthKey: mk, label: mw.label,
             walkins: mw.walkins,
@@ -2751,7 +2764,7 @@ export async function registerRoutes(
           byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, total: v.total })),
           byBranch: sortByCount(admByBranch).map(x => ({ branch: x.key, count: x.count })),
           byGrade: sortByCount(admByGrade).map(x => ({ grade: x.key, count: x.count })),
-          bySource: sortByCount(admBySource).map(x => ({ source: x.key, count: x.count })),
+          bySource: sortByCount(walkinAdmBySource).map(x => ({ source: x.key, count: x.count })),
           byCounselor: sortByCount(admByCounselor).map(x => ({ counselor: x.key, count: x.count })),
           recent: recentAdmissions.slice(0, 25).map(({sortKey, ...rest}) => rest),
           recentProvisional: recentProvisional.slice(0, 10).map(({sortKey, ...rest}) => rest),
