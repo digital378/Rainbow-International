@@ -2299,6 +2299,8 @@ export async function registerRoutes(
       // Admitted walk-ins by marketing source (replaces New Admission List source col which only has "Unknown"/"Revisit adm")
       const walkinAdmBySource = new Map<string,number>();
       const walkinAdmSrcByMonth = new Map<string, Map<string,number>>();
+      const walkinAdmByGrade = new Map<string,number>();
+      const walkinAdmByCounselor = new Map<string,number>();
       // Lead temperature classification
       type HeatCell = { hot: number; warm: number; cold: number; provisional: number; open: number };
       const heatGridMap = new Map<string, Map<string, HeatCell>>();
@@ -2346,9 +2348,11 @@ export async function registerRoutes(
         const source = norm(r[8]) || "Unknown";
         const status = upper(r[9]) || "OPEN";
         const grade = norm(r[4]) || "Unspecified";
-        // Track admitted walk-ins by marketing source
+        // Track admitted walk-ins by source, grade and counselor (walk-in sheet cols are correct; New Admission List cols are not)
         if (status.includes("ADMIS") && !status.includes("PROV")) {
           walkinAdmBySource.set(source, (walkinAdmBySource.get(source) || 0) + 1);
+          walkinAdmByGrade.set(grade, (walkinAdmByGrade.get(grade) || 0) + 1);
+          walkinAdmByCounselor.set(counselor, (walkinAdmByCounselor.get(counselor) || 0) + 1);
           if (d) {
             const mk2 = monthKey(d);
             const msm2 = walkinAdmSrcByMonth.get(mk2) || new Map<string,number>();
@@ -2763,9 +2767,9 @@ export async function registerRoutes(
         admissions: {
           byMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, total: v.total })),
           byBranch: sortByCount(admByBranch).map(x => ({ branch: x.key, count: x.count })),
-          byGrade: sortByCount(admByGrade).map(x => ({ grade: x.key, count: x.count })),
+          byGrade: sortByCount(walkinAdmByGrade).map(x => ({ grade: x.key, count: x.count })),
           bySource: sortByCount(walkinAdmBySource).map(x => ({ source: x.key, count: x.count })),
-          byCounselor: sortByCount(admByCounselor).map(x => ({ counselor: x.key, count: x.count })),
+          byCounselor: sortByCount(walkinAdmByCounselor).map(x => ({ counselor: x.key, count: x.count })),
           recent: recentAdmissions.slice(0, 25).map(({sortKey, ...rest}) => rest),
           recentProvisional: recentProvisional.slice(0, 10).map(({sortKey, ...rest}) => rest),
         },
