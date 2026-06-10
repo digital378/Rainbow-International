@@ -2622,99 +2622,95 @@ export async function registerRoutes(
           };
         });
 
-      // ── RIS DM Pipeline (from risCrm "Nur to Class 12") ───────────────────
-      // Cols: 0=Date 1=Month 2=ParentName 3=ChildName 4=Phone 5=Program
-      //       6=Status 7=Remark 8=LeadOwner 9=Source 10=WalkInDate 11=RevisitDate
-      const [risDmHeader, ...risDmData] = risDmRows;
-      const risDmNorm = (s: any) => String(s ?? "").trim();
-      let dmTotal = 0, dmAdmitted = 0, dmOpen = 0, dmWalkinBooked = 0;
-      let dmWalkinDone = 0, dmClosed = 0, dmTransferred = 0, dmIntegrated = 0;
-      const dmByMonthMap  = new Map<string, { total: number; admitted: number; open: number; walkinBooked: number; walkinDone: number; closed: number }>();
-      const dmByProgramMap = new Map<string, number>();
-      const dmByStatusMap  = new Map<string, number>();
-      const dmBySourceMap  = new Map<string, number>();
-      const dmRecentLeads: Array<{ month: string; child: string; program: string; status: string; source: string; walkinDate: string; sortIdx: number }> = [];
-      // Month order for sorting (risCrm uses "Mon-YY" labels)
-      const DM_MONTH_ORDER = ["Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26","Aug-26"];
+      // ── RIS DM Pipeline (from Walk-in Sheet — "Digital Marketing" source) ───
+      // Reuses walkinRows (already fetched). Filters for source = "Digital Marketing".
+      // Shows RA (counselor) breakdown, open leads, ageing, monthly trend.
+      // Cols: 7=Counselor(RA)  8=Source  9=Status  1=Date  3=Name  4=Grade
+      const dmIsAdm2   = (st: string) => st.includes("ADMIS") && !st.includes("PROV");
+      const dmIsProv2  = (st: string) => st.includes("PROV");
+      const dmIsClosd2 = (st: string) => st.includes("CLOSED") || st.includes("SEAT NOT") || st.includes("NOT COUNT");
 
-      for (let idx = 0; idx < risDmData.length; idx++) {
-        const r = risDmData[idx];
-        if (!r || !r[2]) continue; // must have parent name
-        const month   = risDmNorm(r[1]);
-        const child   = risDmNorm(r[3]) || risDmNorm(r[2]);
-        const program = risDmNorm(r[5]) || "Unknown";
-        const statusRaw = risDmNorm(r[6]).toUpperCase();
-        const source  = risDmNorm(r[9]) || "Unknown";
-        const walkinDate = risDmNorm(r[10]);
-        if (!month) continue;
-        // Filter noise rows
-        const knownStatuses = ["OPEN","WALKIN BOOKED","WALK-IN COMPLETED","ADM DONE","CLOSED","TRANSFERRED","INTEGRATED","FUTURE PROSPECT","IN PROCESS ADM"];
-        const matchedStatus = knownStatuses.find(s => statusRaw === s || statusRaw.startsWith(s)) || "";
-        if (!matchedStatus && !statusRaw) continue;
+      let dm2Total = 0, dm2Open = 0, dm2Admitted = 0, dm2Closed = 0, dm2Provisional = 0;
+      const dm2RaMap = new Map<string, { total: number; open: number; admitted: number; closed: number; provisional: number }>();
+      const dm2MonthMap = new Map<string, { label: string; total: number; open: number; admitted: number; closed: number }>();
+      const dm2AgeingBuckets: Record<string, number> = { "0-7d": 0, "8-14d": 0, "15-30d": 0, "31-60d": 0, "60d+": 0 };
+      const dm2OpenLeads: Array<{ date: string; name: string; grade: string; ra: string; status: string; daysOpen: number }> = [];
 
-        dmTotal++;
-        if (matchedStatus === "ADM DONE")                                  dmAdmitted++;
-        else if (matchedStatus === "WALKIN BOOKED")                         dmWalkinBooked++;
-        else if (matchedStatus === "WALK-IN COMPLETED" || matchedStatus === "INTEGRATED") dmWalkinDone++;
-        else if (matchedStatus === "CLOSED")                                dmClosed++;
-        else if (matchedStatus === "TRANSFERRED")                           dmTransferred++;
-        else                                                                dmOpen++;
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const name = norm(r[3]); if (!name) continue;
+        const srcFull = norm(r[8]);
+        if (!srcFull.toLowerCase().includes("digital marketing")) continue;
 
-        const isOpen = !["ADM DONE","CLOSED","TRANSFERRED"].includes(matchedStatus);
-        const mo = dmByMonthMap.get(month) || { total:0, admitted:0, open:0, walkinBooked:0, walkinDone:0, closed:0 };
-        mo.total++;
-        if (matchedStatus === "ADM DONE") mo.admitted++;
-        else if (matchedStatus === "WALKIN BOOKED") mo.walkinBooked++;
-        else if (matchedStatus === "WALK-IN COMPLETED" || matchedStatus === "INTEGRATED") mo.walkinDone++;
-        else if (matchedStatus === "CLOSED" || matchedStatus === "TRANSFERRED") mo.closed++;
-        else mo.open++;
-        dmByMonthMap.set(month, mo);
+        const d = parseDate(r[1]);
+        const counselorRaw = norm(r[7]);
+        const isStatusVal = /ADMIS|CLOSED|FOLLOW[ -]?UP|NOT COUNT|SEAT NOT|PROV|WALKIN/i.test(counselorRaw);
+        const ra = (!isStatusVal && counselorRaw) ? counselorRaw : "Unassigned";
+        const status = upper(r[9]) || "OPEN";
+        const grade = norm(r[4]) || "Unspecified";
 
-        dmByProgramMap.set(program, (dmByProgramMap.get(program) || 0) + 1);
-        const displayStatus = statusRaw || "Unknown";
-        dmByStatusMap.set(displayStatus, (dmByStatusMap.get(displayStatus) || 0) + 1);
-        dmBySourceMap.set(source, (dmBySourceMap.get(source) || 0) + 1);
+        const isAdm   = dmIsAdm2(status);
+        const isProv  = dmIsProv2(status);
+        const isClosed= dmIsClosd2(status);
+        const isOpen  = !isAdm && !isProv && !isClosed;
 
-        dmRecentLeads.push({ month, child, program, status: displayStatus, source, walkinDate, sortIdx: DM_MONTH_ORDER.indexOf(month) });
+        dm2Total++;
+        if (isAdm) dm2Admitted++;
+        else if (isProv) dm2Provisional++;
+        else if (isClosed) dm2Closed++;
+        else dm2Open++;
+
+        const raEntry = dm2RaMap.get(ra) || { total:0, open:0, admitted:0, closed:0, provisional:0 };
+        raEntry.total++;
+        if (isAdm) raEntry.admitted++;
+        else if (isProv) raEntry.provisional++;
+        else if (isClosed) raEntry.closed++;
+        else raEntry.open++;
+        dm2RaMap.set(ra, raEntry);
+
+        if (d) {
+          const mk = monthKey(d);
+          const ml = monthLabel(d);
+          const mo = dm2MonthMap.get(mk) || { label: ml, total:0, open:0, admitted:0, closed:0 };
+          mo.total++;
+          if (isAdm) mo.admitted++;
+          else if (isClosed) mo.closed++;
+          else if (!isProv) mo.open++;
+          dm2MonthMap.set(mk, mo);
+
+          if (isOpen) {
+            const daysOpen = Math.max(0, Math.floor((now.getTime() - d.getTime()) / 86400000));
+            if (daysOpen <= 7)  dm2AgeingBuckets["0-7d"]++;
+            else if (daysOpen <= 14) dm2AgeingBuckets["8-14d"]++;
+            else if (daysOpen <= 30) dm2AgeingBuckets["15-30d"]++;
+            else if (daysOpen <= 60) dm2AgeingBuckets["31-60d"]++;
+            else                     dm2AgeingBuckets["60d+"]++;
+            dm2OpenLeads.push({ date: d.toISOString().slice(0,10), name, grade, ra, status, daysOpen });
+          }
+        }
       }
 
-      // Sort monthly pipeline by month order
-      const dmByMonth = DM_MONTH_ORDER
-        .filter(m => dmByMonthMap.has(m))
-        .map(m => ({ month: m, ...dmByMonthMap.get(m)! }));
-
-      const dmByProgram = Array.from(dmByProgramMap, ([program, count]) => ({ program, count }))
-        .sort((a, b) => b.count - a.count).slice(0, 15);
-
-      const dmByStatus = Array.from(dmByStatusMap, ([status, count]) => ({ status, count }))
-        .sort((a, b) => b.count - a.count);
-
-      const dmBySource = Array.from(dmBySourceMap, ([source, count]) => ({ source, count }))
-        .sort((a, b) => b.count - a.count);
-
-      const dmRecentSorted = dmRecentLeads
-        .sort((a, b) => b.sortIdx - a.sortIdx || b.child.localeCompare(a.child))
-        .slice(0, 600)
-        .map(({ sortIdx: _, ...rest }) => rest);
-
-      const dmTotalOpen = dmOpen + dmWalkinBooked + dmWalkinDone;
-      const dmConvRate  = dmTotal > 0 ? Math.round((dmAdmitted / dmTotal) * 1000) / 10 : 0;
+      dm2OpenLeads.sort((a, b) => b.daysOpen - a.daysOpen);
 
       const dmPipeline = {
-        total: dmTotal,
-        admitted: dmAdmitted,
-        open: dmTotalOpen,
-        walkinBooked: dmWalkinBooked,
-        walkinDone: dmWalkinDone,
-        closed: dmClosed,
-        transferred: dmTransferred,
-        integrated: dmIntegrated,
-        convRate: dmConvRate,
-        byMonth: dmByMonth,
-        byProgram: dmByProgram,
-        byStatus: dmByStatus,
-        bySource: dmBySource,
-        recent: dmRecentSorted,
+        total:       dm2Total,
+        open:        dm2Open,
+        admitted:    dm2Admitted,
+        closed:      dm2Closed,
+        provisional: dm2Provisional,
+        convRate:    dm2Total > 0 ? Math.round((dm2Admitted / dm2Total) * 1000) / 10 : 0,
+        byRA: Array.from(dm2RaMap.entries())
+          .map(([ra, v]) => ({
+            ra, total: v.total, open: v.open, admitted: v.admitted, closed: v.closed, provisional: v.provisional,
+            convRate: v.total > 0 ? Math.round((v.admitted / v.total) * 1000) / 10 : 0,
+          }))
+          .sort((a, b) => b.total - a.total),
+        byMonth: Array.from(dm2MonthMap.entries())
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([mk, v]) => ({ monthKey: mk, label: v.label, total: v.total, open: v.open, admitted: v.admitted, closed: v.closed })),
+        ageing: Object.entries(dm2AgeingBuckets)
+          .map(([bucket, count]) => ({ bucket, count, pct: dm2Open > 0 ? Math.round((count / dm2Open) * 100) : 0 })),
+        recentOpen: dm2OpenLeads.slice(0, 100),
       };
 
       res.json({
