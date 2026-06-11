@@ -28,6 +28,7 @@ export type MonthRow = {
   combined: MetricSet;
   ris: MetricSet;
   rps: MetricSet;
+  freshWalkins?: number;
 };
 
 export const MONTHLY: MonthRow[] = [

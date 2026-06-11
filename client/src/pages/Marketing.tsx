@@ -364,12 +364,12 @@ function MarketingDashboard() {
         google:     risOut.google     + rpsOut.google,
       };
 
-      return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut };
+      return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut, freshWalkins: live?.freshWalkins };
     });
   }, [liveData]);
 
   /* ── Memoized derived datasets ── */
-  const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({ month: m.month, ...getSegment(m, segment) })), [segment, MONTHLY_LIVE]);
+  const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({ month: m.month, ...getSegment(m, segment), freshWalkins: m.freshWalkins })), [segment, MONTHLY_LIVE]);
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
 
