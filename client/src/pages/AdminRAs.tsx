@@ -287,12 +287,12 @@ function RaManagement({ token, onLogout }: { token: string; onLogout: () => void
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <button onClick={() => openEdit(ra)} className="px-2.5 py-1 rounded text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100" data-testid={`button-edit-${ra.slug}`}>Edit</button>
+                      <div className="flex items-center justify-center gap-2 flex-nowrap">
+                        <button onClick={() => openEdit(ra)} className="px-2.5 py-1 rounded text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 whitespace-nowrap" data-testid={`button-edit-${ra.slug}`}>Edit</button>
                         <Link href={`/admin/ras/${ra.slug}/qr`}>
-                          <a className="px-2.5 py-1 rounded text-xs font-semibold text-white" style={{ background: NAVY }} target="_blank" data-testid={`button-qr-${ra.slug}`}>QR Card</a>
+                          <a className="px-2.5 py-1 rounded text-xs font-semibold text-white whitespace-nowrap" style={{ background: NAVY }} target="_blank" data-testid={`button-qr-${ra.slug}`}>QR Card</a>
                         </Link>
-                        <a href={`/walkin/${ra.slug}`} target="_blank" className="px-2.5 py-1 rounded text-xs font-semibold border border-amber-300 text-amber-700 hover:bg-amber-50" data-testid={`button-preview-${ra.slug}`} rel="noreferrer">Preview</a>
+                        <a href={`/walkin/${ra.slug}`} target="_blank" className="px-2.5 py-1 rounded text-xs font-semibold border border-amber-300 text-amber-700 hover:bg-amber-50 whitespace-nowrap" data-testid={`button-preview-${ra.slug}`} rel="noreferrer">Preview</a>
                       </div>
                     </td>
                   </tr>
