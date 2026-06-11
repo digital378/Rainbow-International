@@ -32,7 +32,7 @@ type LiveSpendEntry = { month: string; salaries: number; meta: number; google: n
 type LiveData = {
   generatedAt: string;
   currentDayOfMonth: number;
-  monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; freshWalkins?: number; admissions: number; meta: number; google: number; spend: number }>;
+  monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; freshWalkins?: number; risFreshWalkins?: number; rpsFreshWalkins?: number; admissions: number; meta: number; google: number; spend: number }>;
   mayWeeklyCombined: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number; spend: number }>;
   risWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   rpsWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
@@ -364,12 +364,17 @@ function MarketingDashboard() {
         google:     risOut.google     + rpsOut.google,
       };
 
-      return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut, freshWalkins: live?.freshWalkins };
+      return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut,
+               freshWalkins: live?.freshWalkins, risFreshWalkins: live?.risFreshWalkins, rpsFreshWalkins: live?.rpsFreshWalkins };
     });
   }, [liveData]);
 
   /* ── Memoized derived datasets ── */
-  const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({ month: m.month, ...getSegment(m, segment), freshWalkins: m.freshWalkins })), [segment, MONTHLY_LIVE]);
+  const segmentRows = useMemo(() => MONTHLY_LIVE.map(m => ({
+    month: m.month,
+    ...getSegment(m, segment),
+    freshWalkins: segment === "ris" ? m.risFreshWalkins : segment === "rps" ? m.rpsFreshWalkins : m.freshWalkins,
+  })), [segment, MONTHLY_LIVE]);
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
 

@@ -1917,7 +1917,9 @@ export async function registerRoutes(
       // Both maps key by "Jun-26" (dash); monthlyTotals uses "Jun 26" (space) → normalise.
       for (const mt of monthlyTotals) {
         const mKey = mt.month.replace(" ", "-");
-        mt.freshWalkins = (risFreshWalkinsMap[mKey] || 0) + (rpsFreshWalkinsMap[mKey] || 0);
+        mt.risFreshWalkins = risFreshWalkinsMap[mKey] || 0;
+        mt.rpsFreshWalkins = rpsFreshWalkinsMap[mKey] || 0;
+        mt.freshWalkins    = mt.risFreshWalkins + mt.rpsFreshWalkins;
       }
 
       res.json({
