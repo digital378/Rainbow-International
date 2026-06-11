@@ -32,7 +32,7 @@ type LiveSpendEntry = { month: string; salaries: number; meta: number; google: n
 type LiveData = {
   generatedAt: string;
   currentDayOfMonth: number;
-  monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number; meta: number; google: number; spend: number }>;
+  monthlyTotals: Array<{ month: string; leads: number; bookings: number; walkins: number; freshWalkins?: number; admissions: number; meta: number; google: number; spend: number }>;
   mayWeeklyCombined: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number; spend: number }>;
   risWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   rpsWeekly: Array<{ week: string; leads: number; bookings: number; walkins: number; admissions: number }>;
@@ -746,7 +746,7 @@ function MarketingDashboard() {
               { label: "Cost per Booking (CPB)", curr: cpb(current.spend, current.bookings), prev: cpb(previous.spend, previous.bookings), format: inr, color: CYAN, invert: true },
               { label: "Cost per Walk-in (CPW)", curr: cpw(current.spend, current.walkins), prev: cpw(previous.spend, previous.walkins), format: inr, color: SLATE, invert: true },
               { label: "Lead → Booking %", curr: (current.bookings / Math.max(current.leads, 1)) * 100, prev: (previous.bookings / Math.max(previous.leads, 1)) * 100, format: pct, color: PURPLE },
-              { label: "Booking → Walk-in %", curr: (current.walkins / Math.max(current.bookings, 1)) * 100, prev: (previous.walkins / Math.max(previous.bookings, 1)) * 100, format: pct, color: CYAN },
+              { label: "Booking → Walk-in % *", curr: ((current.freshWalkins ?? current.walkins) / Math.max(current.bookings, 1)) * 100, prev: ((previous.freshWalkins ?? previous.walkins) / Math.max(previous.bookings, 1)) * 100, format: pct, color: CYAN },
               { label: "Walk-in → Admission %", curr: (current.admissions / Math.max(current.walkins, 1)) * 100, prev: (previous.admissions / Math.max(previous.walkins, 1)) * 100, format: pct, color: GREEN },
               { label: "Revenue (Min.)", curr: current.admissions * MIN_REVENUE_PER_ADM, prev: previous.admissions * MIN_REVENUE_PER_ADM, format: inr, color: GREEN },
               { label: "Min. ROI %", curr: roi(current.admissions * MIN_REVENUE_PER_ADM, current.spend), prev: roi(previous.admissions * MIN_REVENUE_PER_ADM, previous.spend), format: (n: number) => `${Math.round(n)}%`, color: GREEN },
@@ -767,6 +767,7 @@ function MarketingDashboard() {
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
             June 2026 is in progress ({TODAY_DATE} days captured: June 1–{TODAY_DATE}). Compares partial-June to final May — see Forecast section for projected month-end values.
+            {" "}* Booking → Walk-in % counts only fresh walk-ins attributed to that month's bookings (same-month CRM pipeline, revisits excluded), not all calendar-month walk-ins.
           </div>
         </section>
 

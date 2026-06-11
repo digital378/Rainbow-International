@@ -1740,6 +1740,19 @@ export async function registerRoutes(
         }
       }
 
+      // ── Fresh booking-to-walk-in: CRM-based same-month conversion ──
+      // The DM Overall master sheet counts walk-ins by CALENDAR month (when visited),
+      // so it includes carry-over from previous months' bookings.
+      // The CRM groups each lead by their ENTRY/BOOKING month, so CRM walk-ins for
+      // month X = leads booked in X who have visited (same-month attribution).
+      // Additionally, RIS col 11 = Revisit Date — leads with a revisit date are
+      // returning visitors and must be excluded.
+      //
+      // freshWalkins[month] = RIS CRM walk-ins (no revisit) + RPS CRM walk-ins (all)
+      //                       both keyed to the booking/entry month, not the visit month.
+      const risFreshWalkinsMap: Record<string, number> = {};
+      const rpsFreshWalkinsMap: Record<string, number> = {};
+
       // ── RPS CRM → branch-wise by month ──
       const MONTH_ORDER = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"];
       const rpsMonthBranch: Record<string, Record<string, {leads:number;bookings:number;walkins:number;admissions:number;closed:number}>> = {};
@@ -1776,6 +1789,11 @@ export async function registerRoutes(
         }
         rpsStatusCount[status] = (rpsStatusCount[status] || 0) + 1;
         rpsSourceCount[source] = (rpsSourceCount[source] || 0) + 1;
+        // RPS has no Revisit Date column — count all walk-in status leads as fresh
+        // (attributing to their booking/entry month, not the physical visit month).
+        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(status)) {
+          rpsFreshWalkinsMap[month] = (rpsFreshWalkinsMap[month] || 0) + 1;
+        }
       }
 
       const rpsByMonth = Object.keys(rpsMonthBranch)
@@ -1867,6 +1885,16 @@ export async function registerRoutes(
         // Use effectiveStatus so CLOSED+walkin-date shows as "CLOSED AFTER WALKIN" in status summary
         risStatusCount[effectiveStatus] = (risStatusCount[effectiveStatus] || 0) + 1;
         risSourceCount[source] = (risSourceCount[source] || 0) + 1;
+        // Fresh walk-in: lead is attributed to their BOOKING/ENTRY month (same-month),
+        // and col 11 (Revisit Date) must be empty — revisiting parents are not fresh.
+        // Walk-in date (col 10) is intentionally NOT required because it is sparsely
+        // filled in the CRM; entry-month attribution is the reliable same-month proxy.
+        if (["WALK-IN COMPLETED","ADM DONE","CLOSED AFTER WALKIN"].includes(effectiveStatus)) {
+          const revisitDateRaw = String(r[11] ?? "").trim();
+          if (!revisitDateRaw) {
+            risFreshWalkinsMap[month] = (risFreshWalkinsMap[month] || 0) + 1;
+          }
+        }
       }
 
       const GROUP_ORDER_SRV = ["Pre-Primary","Primary","Middle","Secondary","Senior Secondary"];
@@ -1884,6 +1912,13 @@ export async function registerRoutes(
 
       const sortReasons = (map: Record<string, number>) =>
         Object.entries(map).filter(([r]) => r.trim()).sort((a, b) => b[1] - a[1]).map(([reason, count]) => ({ reason, count }));
+
+      // Post-process: inject freshWalkins (RIS no-revisit + RPS all) into each monthlyTotals entry.
+      // Both maps key by "Jun-26" (dash); monthlyTotals uses "Jun 26" (space) → normalise.
+      for (const mt of monthlyTotals) {
+        const mKey = mt.month.replace(" ", "-");
+        mt.freshWalkins = (risFreshWalkinsMap[mKey] || 0) + (rpsFreshWalkinsMap[mKey] || 0);
+      }
 
       res.json({
         generatedAt: new Date().toISOString(),
