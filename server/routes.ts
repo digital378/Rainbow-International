@@ -2350,6 +2350,7 @@ export async function registerRoutes(
         return "open";
       };
       let walkinsTotal = 0, walkinsThisMonth = 0;
+      const openWalkinsList: Array<{ date: string; name: string; grade: string; counselor: string; source: string; status: string; daysOpen: number }> = [];
 
       // Maps raw "REASON OF CLOSING" (col 13) → curated segment name
       const closedSegment = (raw: string): string => {
@@ -2398,6 +2399,10 @@ export async function registerRoutes(
           }
         }
         const temp = leadTemp(status);
+        if (temp === "open" || temp === "warm") {
+          const daysOpen = d ? Math.floor((now.getTime() - d.getTime()) / 86400000) : 0;
+          openWalkinsList.push({ date: d ? d.toISOString().slice(0,10) : norm(r[1]), name, grade, counselor, source, status, daysOpen });
+        }
         if (temp === "hot") tempHot++;
         else if (temp === "warm") tempWarm++;
         else if (temp === "cold") tempCold++;
@@ -2816,6 +2821,7 @@ export async function registerRoutes(
         leadTemperature,
         heatGrid: heatGridArr,
         dmPipeline,
+        openWalkins: openWalkinsList.sort((a, b) => b.daysOpen - a.daysOpen),
         liveCheckins: await (async () => {
           try {
             // IST midnight in UTC: IST = UTC+5:30, so IST midnight = UTC 18:30 previous day
@@ -3268,6 +3274,7 @@ paths:
       const leadDays: number[] = [];
       // Ageing for open/in-process leads
       let age0_7 = 0, age7_14 = 0, age15_30 = 0, age31_60 = 0, age60p = 0;
+      const rpsOpenWalkins: Array<{ date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; daysOpen: number }> = [];
       // Closed reason by month for heat-map
       const closedByMonthReason = new Map<string, Map<string, number>>();
       // Counselor funnel (from Walkin Data cols 11=CounsellingRecorded 12=SchoolTour)
@@ -3347,6 +3354,11 @@ paths:
             rMap.set(reason, (rMap.get(reason)||0)+1);
             closedByMonthReason.set(mk, rMap);
           }
+        }
+        // Collect open walk-in leads (visited but not yet admitted/closed)
+        if (isOpen || isInProc || isFuture) {
+          const daysOpen = d ? Math.floor((now.getTime() - d.getTime()) / 86400000) : 0;
+          rpsOpenWalkins.push({ date: d ? d.toISOString().slice(0,10) : norm(r[1]), name, grade, branch, counselor, source, status: statusRaw, daysOpen });
         }
 
         const br = byBranchMap.get(branch) || { enquiries: 0, admissions: 0, open: 0, closed: 0 };
@@ -3669,6 +3681,7 @@ paths:
         branchClosedList,
         branchSrcAdm: branchSrcAdmList,
         branchOpenPipeline: branchOpenList,
+        openWalkins: rpsOpenWalkins.sort((a, b) => b.daysOpen - a.daysOpen),
         liveCheckins: await (async () => {
           try {
             const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;

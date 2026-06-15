@@ -49,6 +49,7 @@ type RpsData = {
   counselorLeaderboard: Array<{ counselor: string; admDone: number; admRIS: number; closed: number; open: number; inProcess: number; futureProspect: number; total: number; conversion: number }>;
   closedReasons:   Array<{ reason: string; count: number }>;
   recentEnquiries: Array<{ date: string; monthKey: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string }>;
+  openWalkins?: Array<{ date: string; name: string; grade: string; branch: string; counselor: string; source: string; status: string; daysOpen: number }>;
   dmPipeline: {
     admitted: number; open: number; closed: number; convMedianDays: number;
     byBranch:     Array<{ branch: string; admitted: number; open: number; closed: number }>;
@@ -239,7 +240,7 @@ function RpsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview"|"analytics"|"revenue"|"pipeline"|"counselors"|"leads">("overview");
+  const [activeTab, setActiveTab] = useState<"overview"|"analytics"|"revenue"|"pipeline"|"counselors"|"leads"|"open">("overview");
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null); // null = All Time; value = monthKey "YYYY-MM"
   const cancelled = useRef(false);
 
@@ -350,6 +351,7 @@ function RpsDashboard() {
     { id: "pipeline"   as const, label: "DM Pipeline"  },
     { id: "counselors" as const, label: "Counselors"   },
     { id: "leads"      as const, label: "Recent Leads" },
+    { id: "open"       as const, label: "Open Walk-ins" },
   ];
 
   return (
@@ -1373,6 +1375,93 @@ function RpsDashboard() {
             </div>
           </div>
         )}
+
+        {/* ══ OPEN WALK-INS ════════════════════════════════════════════════════ */}
+        {activeTab === "open" && (() => {
+          const rows = d.openWalkins ?? [];
+          const ageBucket = (days: number) =>
+            days <= 7 ? "0–7 d" : days <= 14 ? "8–14 d" : days <= 30 ? "15–30 d" : days <= 60 ? "31–60 d" : "60 d+";
+          const bucketColor = (b: string) =>
+            b === "0–7 d" ? "#22c55e" : b === "8–14 d" ? "#f59e0b" : b === "15–30 d" ? "#f97316" : "#ef4444";
+          return (
+            <div className="space-y-6">
+              {/* Summary strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {(["0–7 d","8–14 d","15–30 d","60 d+"] as const).map(b => {
+                  const cnt = rows.filter(r => ageBucket(r.daysOpen) === b).length;
+                  return (
+                    <div key={b} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col gap-1">
+                      <span className="text-xs text-slate-500 font-medium">{b}</span>
+                      <span className="text-2xl font-black" style={{ color: bucketColor(b) }}>{cnt}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Table */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="text-base font-black text-slate-800">Open Walk-in Enquiries</div>
+                    <div className="text-xs text-slate-500">{rows.length} leads who visited but haven't yet taken admission or been closed · sorted by age</div>
+                  </div>
+                  <button
+                    className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
+                    onClick={() => csvDownload("rps-open-walkins.csv",
+                      ["Date","Student","Grade","Branch","Counsellor","Source","Status","Days Open"],
+                      rows.map(r => [r.date,r.name,r.grade,r.branch,r.counselor,r.source,r.status,r.daysOpen]))}>
+                    ↓ Download CSV
+                  </button>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+                  <table className="w-full text-sm" data-testid="table-rps-open-walkins">
+                    <thead className="bg-slate-50 text-xs uppercase text-slate-600">
+                      <tr>
+                        <th className="text-left py-3 px-4">Date</th>
+                        <th className="text-left py-3 px-4">Student</th>
+                        <th className="text-left py-3 px-3">Grade</th>
+                        <th className="text-left py-3 px-3">Branch</th>
+                        <th className="text-left py-3 px-3">Counsellor</th>
+                        <th className="text-left py-3 px-3">Source</th>
+                        <th className="text-left py-3 px-3">Status</th>
+                        <th className="text-right py-3 px-3">Age</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.length === 0 && (
+                        <tr><td colSpan={8} className="py-8 text-center text-slate-400">No open walk-in leads found</td></tr>
+                      )}
+                      {rows.map((r, i) => {
+                        const bucket = ageBucket(r.daysOpen);
+                        const color  = bucketColor(bucket);
+                        const sColor = STATUS_COLOR[r.status] || SLATE;
+                        return (
+                          <tr key={i} className="border-t border-slate-100 hover:bg-slate-50">
+                            <td className="py-2 px-4 text-slate-500 text-xs whitespace-nowrap">{r.date}</td>
+                            <td className="py-2 px-4 font-medium">{r.name}</td>
+                            <td className="py-2 px-3 text-slate-600">{r.grade}</td>
+                            <td className="py-2 px-3 text-slate-600">{r.branch}</td>
+                            <td className="py-2 px-3 text-slate-600">{r.counselor}</td>
+                            <td className="py-2 px-3 text-slate-500">{r.source}</td>
+                            <td className="py-2 px-3">
+                              <span className="px-2 py-0.5 rounded-full text-xs font-bold"
+                                style={{ background: sColor + "22", color: sColor }}>
+                                {STATUS_LABEL[r.status] || r.status}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-right">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: color + "22", color }}>{r.daysOpen}d</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="text-center text-xs text-slate-400 pb-6">
           Auto-refreshes every 5 min · v2.5 · Month filter · Real marketing spend · Generated {d.generatedAt ? new Date(d.generatedAt).toLocaleString("en-IN") : "—"}
