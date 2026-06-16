@@ -114,8 +114,6 @@ function BlogManagement({ token, onLogout }: { token: string; onLogout: () => vo
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
   const [search, setSearch] = useState("");
 
-  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-
   useEffect(() => {
     document.title = "Blog Management | Rainbow International School";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
@@ -157,7 +155,6 @@ function BlogManagement({ token, onLogout }: { token: string; onLogout: () => vo
 
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
-      {/* Header */}
       <div className="text-white py-4 px-6 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-md flex items-center justify-center font-black text-sm" style={{ background: AMBER, color: NAVY }}>RIS</div>
@@ -175,7 +172,6 @@ function BlogManagement({ token, onLogout }: { token: string; onLogout: () => vo
         </div>
       </div>
 
-      {/* Toolbar */}
       <div className="max-w-6xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xl font-black" style={{ color: NAVY }}>All Posts</div>
@@ -201,7 +197,6 @@ function BlogManagement({ token, onLogout }: { token: string; onLogout: () => vo
         </div>
       </div>
 
-      {/* Table */}
       <div className="max-w-6xl mx-auto px-4 pb-10">
         {loading ? (
           <div className="text-center py-16 text-slate-400 text-sm">Loading…</div>
@@ -391,6 +386,231 @@ function ImageUploadField({
   );
 }
 
+/* ─── Structured editor sub-components ─── */
+
+function SectionsEditor({ sections, onChange }: { sections: Section[]; onChange: (s: Section[]) => void }) {
+  const add = () => onChange([...sections, { heading: "", body: "", list: [] }]);
+
+  const update = (i: number, patch: Partial<Section>) =>
+    onChange(sections.map((s, idx) => idx === i ? { ...s, ...patch } : s));
+
+  const remove = (i: number) => onChange(sections.filter((_, idx) => idx !== i));
+
+  const move = (i: number, dir: -1 | 1) => {
+    const next = [...sections];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+
+  const addListItem = (i: number) => update(i, { list: [...(sections[i].list ?? []), ""] });
+
+  const updateListItem = (si: number, li: number, val: string) => {
+    const list = [...(sections[si].list ?? [])];
+    list[li] = val;
+    update(si, { list });
+  };
+
+  const removeListItem = (si: number, li: number) =>
+    update(si, { list: (sections[si].list ?? []).filter((_, idx) => idx !== li) });
+
+  return (
+    <div className="space-y-3">
+      {sections.map((s, i) => (
+        <div key={i} className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3" data-testid={`section-card-${i}`}>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Section {i + 1}</span>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}
+                className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
+                data-testid={`section-move-up-${i}`} title="Move up">↑</button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === sections.length - 1}
+                className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
+                data-testid={`section-move-down-${i}`} title="Move down">↓</button>
+              <button type="button" onClick={() => remove(i)}
+                className="px-2 py-1 text-xs rounded border border-red-200 text-red-600 bg-white hover:bg-red-50"
+                data-testid={`section-remove-${i}`}>Remove</button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Heading <span className="font-normal text-slate-400">(optional)</span></label>
+            <input
+              type="text"
+              value={s.heading ?? ""}
+              onChange={e => update(i, { heading: e.target.value })}
+              placeholder="Section heading"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              data-testid={`section-heading-${i}`}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Body text *</label>
+            <textarea
+              value={s.body}
+              onChange={e => update(i, { body: e.target.value })}
+              rows={4}
+              placeholder="Paragraph content for this section"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white"
+              data-testid={`section-body-${i}`}
+            />
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold text-slate-600">Bullet list items <span className="font-normal text-slate-400">(optional)</span></label>
+              <button type="button" onClick={() => addListItem(i)}
+                className="text-xs px-2 py-0.5 rounded border border-slate-300 bg-white hover:bg-slate-100 text-slate-600"
+                data-testid={`section-add-list-${i}`}>+ Add item</button>
+            </div>
+            {(s.list ?? []).map((item, li) => (
+              <div key={li} className="flex items-center gap-2 mb-1">
+                <span className="text-slate-400 text-sm">•</span>
+                <input
+                  type="text"
+                  value={item}
+                  onChange={e => updateListItem(i, li, e.target.value)}
+                  placeholder="Bullet item text"
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+                  data-testid={`section-list-item-${i}-${li}`}
+                />
+                <button type="button" onClick={() => removeListItem(i, li)}
+                  className="text-red-500 hover:text-red-700 text-sm px-1"
+                  data-testid={`section-list-remove-${i}-${li}`}>×</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={add}
+        className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-semibold hover:border-amber-400 hover:text-amber-600 transition-colors"
+        data-testid="button-add-section"
+      >
+        + Add Section
+      </button>
+    </div>
+  );
+}
+
+function FaqsEditor({ faqs, onChange }: { faqs: Faq[]; onChange: (f: Faq[]) => void }) {
+  const add = () => onChange([...faqs, { q: "", a: "" }]);
+  const update = (i: number, patch: Partial<Faq>) =>
+    onChange(faqs.map((f, idx) => idx === i ? { ...f, ...patch } : f));
+  const remove = (i: number) => onChange(faqs.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-3">
+      {faqs.map((f, i) => (
+        <div key={i} className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3" data-testid={`faq-card-${i}`}>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">FAQ {i + 1}</span>
+            <button type="button" onClick={() => remove(i)}
+              className="px-2 py-1 text-xs rounded border border-red-200 text-red-600 bg-white hover:bg-red-50"
+              data-testid={`faq-remove-${i}`}>Remove</button>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Question *</label>
+            <input
+              type="text"
+              value={f.q}
+              onChange={e => update(i, { q: e.target.value })}
+              placeholder="What is …?"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              data-testid={`faq-question-${i}`}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 mb-1">Answer *</label>
+            <textarea
+              value={f.a}
+              onChange={e => update(i, { a: e.target.value })}
+              rows={3}
+              placeholder="Detailed answer…"
+              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white"
+              data-testid={`faq-answer-${i}`}
+            />
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={add}
+        className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-semibold hover:border-amber-400 hover:text-amber-600 transition-colors"
+        data-testid="button-add-faq"
+      >
+        + Add FAQ
+      </button>
+    </div>
+  );
+}
+
+function InternalLinksEditor({ links, onChange }: { links: InternalLink[]; onChange: (l: InternalLink[]) => void }) {
+  const add = () => onChange([...links, { label: "", href: "" }]);
+  const update = (i: number, patch: Partial<InternalLink>) =>
+    onChange(links.map((l, idx) => idx === i ? { ...l, ...patch } : l));
+  const remove = (i: number) => onChange(links.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-2">
+      {links.map((l, i) => (
+        <div key={i} className="flex items-center gap-2" data-testid={`link-row-${i}`}>
+          <input
+            type="text"
+            value={l.label}
+            onChange={e => update(i, { label: e.target.value })}
+            placeholder="Link label"
+            className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            data-testid={`link-label-${i}`}
+          />
+          <input
+            type="text"
+            value={l.href}
+            onChange={e => update(i, { href: e.target.value })}
+            placeholder="/page-path or https://…"
+            className="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            data-testid={`link-href-${i}`}
+          />
+          <button type="button" onClick={() => remove(i)}
+            className="px-2 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm"
+            data-testid={`link-remove-${i}`}>×</button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={add}
+        className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-semibold hover:border-amber-400 hover:text-amber-600 transition-colors"
+        data-testid="button-add-link"
+      >
+        + Add Internal Link
+      </button>
+    </div>
+  );
+}
+
+/* ─── JSON Preview toggle ─── */
+function JsonPreview({ label, value }: { label: string; value: unknown }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="text-xs text-slate-400 hover:text-slate-600 underline underline-offset-2"
+        data-testid={`toggle-json-${label.toLowerCase().replace(/\s+/g, "-")}`}
+      >
+        {open ? "Hide" : "Show"} JSON preview
+      </button>
+      {open && (
+        <pre className="mt-2 p-3 bg-slate-900 text-green-400 text-xs rounded-lg overflow-auto max-h-48 font-mono leading-relaxed">
+          {JSON.stringify(value, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+}
+
+/* ─── PostForm ─── */
 function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; token: string; onDone: () => void; onCancel: () => void }) {
   const isEdit = !!post;
   const [saving, setSaving] = useState(false);
@@ -408,14 +628,10 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
   const [intro, setIntro] = useState(post?.intro ?? "");
   const [conclusion, setConclusion] = useState(post?.conclusion ?? "");
 
-  const [sectionsJson, setSectionsJson] = useState(() => JSON.stringify(post?.sections ?? [], null, 2));
+  const [sections, setSections] = useState<Section[]>(post?.sections ?? []);
   const [relatedSlugsRaw, setRelatedSlugsRaw] = useState(() => (post?.relatedSlugs ?? []).join(", "));
-  const [internalLinksJson, setInternalLinksJson] = useState(() => JSON.stringify(post?.internalLinks ?? [], null, 2));
-  const [faqsJson, setFaqsJson] = useState(() => JSON.stringify(post?.faqs ?? [], null, 2));
-
-  const [sectionsErr, setSectionsErr] = useState("");
-  const [internalLinksErr, setInternalLinksErr] = useState("");
-  const [faqsErr, setFaqsErr] = useState("");
+  const [internalLinks, setInternalLinks] = useState<InternalLink[]>(post?.internalLinks ?? []);
+  const [faqs, setFaqs] = useState<Faq[]>(post?.faqs ?? []);
 
   const autoSlug = (t: string) => t.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -424,24 +640,9 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
     if (!isEdit && !slug) setSlug(autoSlug(v));
   };
 
-  const parseJSON = (raw: string, label: string, setErr: (e: string) => void) => {
-    try {
-      setErr("");
-      return { ok: true, value: JSON.parse(raw) };
-    } catch {
-      setErr(`Invalid JSON in ${label}`);
-      return { ok: false, value: null };
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    const sectionsResult = parseJSON(sectionsJson, "Sections", setSectionsErr);
-    const linksResult = parseJSON(internalLinksJson, "Internal Links", setInternalLinksErr);
-    const faqsResult = parseJSON(faqsJson, "FAQs", setFaqsErr);
-    if (!sectionsResult.ok || !linksResult.ok || !faqsResult.ok) return;
 
     const relatedSlugs = relatedSlugsRaw.split(",").map(s => s.trim()).filter(Boolean);
 
@@ -451,16 +652,16 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
       metaTitle: metaTitle.trim() || title.trim(),
       metaDescription: metaDescription.trim(),
       keywords: keywords.trim(),
-      date: date,
+      date,
       cat: cat.trim(),
       thumbUrl: thumbUrl.trim() || null,
       heroUrl: heroUrl.trim(),
       intro: intro.trim(),
-      sections: sectionsResult.value,
+      sections,
       conclusion: conclusion.trim(),
       relatedSlugs,
-      internalLinks: linksResult.value,
-      faqs: faqsResult.value,
+      internalLinks,
+      faqs,
     };
 
     setSaving(true);
@@ -503,18 +704,6 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
     />
   );
 
-  const textarea = (value: string, onChange: (v: string) => void, rows = 3, err?: string) => (
-    <>
-      <textarea
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        rows={rows}
-        className={`w-full px-3 py-2 rounded-lg border text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y ${err ? "border-red-400 bg-red-50" : "border-slate-300"}`}
-      />
-      {err && <div className="text-xs text-red-600 mt-1">{err}</div>}
-    </>
-  );
-
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
       <div className="text-white py-4 px-6 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
@@ -535,6 +724,7 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
           <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm" data-testid="text-form-error">{error}</div>
         )}
 
+        {/* Core Fields */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <div className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b pb-2">Core Fields</div>
           {field("Title *", input(title, handleTitleChange, { placeholder: "Post title", required: true, "data-testid": "input-title" } as any))}
@@ -551,6 +741,7 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
           </div>
         </div>
 
+        {/* SEO */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <div className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b pb-2">SEO</div>
           {field("Meta Title", input(metaTitle, setMetaTitle, { placeholder: "Defaults to title if empty", "data-testid": "input-meta-title" } as any))}
@@ -558,6 +749,7 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
           {field("Keywords", input(keywords, setKeywords, { placeholder: "comma separated keywords", "data-testid": "input-keywords" } as any))}
         </div>
 
+        {/* Images */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <div className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b pb-2">Images</div>
           <div className="text-xs text-slate-400">Paste a URL or click Upload to choose a file (JPEG, PNG, WebP · max 5 MB)</div>
@@ -580,21 +772,39 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
           />
         </div>
 
+        {/* Content */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <div className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b pb-2">Content</div>
           {field("Intro", <textarea value={intro} onChange={e => setIntro(e.target.value)} rows={4} placeholder="Opening paragraph(s)" className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y" data-testid="input-intro" />)}
-          {field("Sections (JSON array)", textarea(sectionsJson, setSectionsJson, 10, sectionsErr),
-            '[{"heading":"Optional heading","body":"Paragraph text","list":["optional","bullet","items"]}]')}
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Sections</label>
+            <div className="text-xs text-slate-400 mb-3">Add body sections with optional headings and bullet lists. Drag to reorder using ↑↓ buttons.</div>
+            <SectionsEditor sections={sections} onChange={setSections} />
+            <JsonPreview label="Sections" value={sections} />
+          </div>
+
           {field("Conclusion", <textarea value={conclusion} onChange={e => setConclusion(e.target.value)} rows={3} placeholder="Closing paragraph(s)" className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y" data-testid="input-conclusion" />)}
         </div>
 
+        {/* Related & Links */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
           <div className="font-bold text-slate-700 text-sm uppercase tracking-wide border-b pb-2">Related & Links</div>
           {field("Related Slugs", input(relatedSlugsRaw, setRelatedSlugsRaw, { placeholder: "slug-one, slug-two (comma separated)", "data-testid": "input-related-slugs" } as any))}
-          {field("Internal Links (JSON array)", textarea(internalLinksJson, setInternalLinksJson, 4, internalLinksErr),
-            '[{"label":"Link text","href":"/page-path"}]')}
-          {field("FAQs (JSON array)", textarea(faqsJson, setFaqsJson, 6, faqsErr),
-            '[{"q":"Question?","a":"Answer."}]')}
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Internal Links</label>
+            <div className="text-xs text-slate-400 mb-3">Label and destination URL for each in-site link shown at the bottom of the post.</div>
+            <InternalLinksEditor links={internalLinks} onChange={setInternalLinks} />
+            <JsonPreview label="Internal Links" value={internalLinks} />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">FAQs</label>
+            <div className="text-xs text-slate-400 mb-3">Question and answer pairs for the FAQ section and FAQ structured data.</div>
+            <FaqsEditor faqs={faqs} onChange={setFaqs} />
+            <JsonPreview label="FAQs" value={faqs} />
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-3 pb-8">
