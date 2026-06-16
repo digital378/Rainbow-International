@@ -211,10 +211,9 @@ paths:
       operationId: getRisSalesLive
       summary: RIS Sales team dashboard — walk-ins, admissions, counselor leaderboard, DM pipeline
       description: >
-        Live sales dashboard for Rainbow International School (RIS). Returns walk-in and admission
-        KPIs for the 26-27 academic year, per-counselor leaderboard, lead temperature, DM (digital
-        marketing) pipeline, month-by-month breakdown, open walk-in enquiries (visited but not yet
-        admitted or closed), and today's RA check-ins. No authentication required.
+        Live RIS sales dashboard for 26-27. Returns KPIs, walk-ins by month/source/grade,
+        admissions by counselor, lead temperature, DM pipeline, month breakdown,
+        open enquiries with daysOpen, and today's RA check-ins. No auth required.
       responses:
         "200":
           description: RIS sales dashboard data
@@ -483,11 +482,10 @@ paths:
       operationId: getRpsSalesLive
       summary: RPS Sales team dashboard — walk-ins, admissions by branch, counselor leaderboard, DM pipeline
       description: >
-        Live sales dashboard for Rainbow Public School (RPS). Returns walk-in and admission
-        KPIs across all branches for the 26-27 academic year, per-branch and per-source
-        breakdown, counselor leaderboard, closed-lead reasons, DM pipeline, open walk-in
-        enquiries (visited but not yet admitted or closed), ageing buckets, and today's
-        RA check-ins. No authentication required.
+        Live RPS sales dashboard for 26-27. Returns KPIs, enquiries and admissions by
+        branch/source/grade, counselor leaderboard, closed-lead reasons, DM pipeline,
+        open walk-in enquiries with daysOpen and branch, ageing buckets, and RA check-ins.
+        No auth required.
       responses:
         "200":
           description: RPS sales dashboard data
