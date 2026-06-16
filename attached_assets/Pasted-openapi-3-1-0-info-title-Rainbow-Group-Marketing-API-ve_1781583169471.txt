@@ -1,0 +1,1267 @@
+openapi: 3.1.0
+info:
+  title: Rainbow Group Marketing API
+  version: 1.0.0
+  description: >
+    Live marketing, CRM and operations data for Rainbow International School (RIS) and Rainbow Preschools (RPS). All
+    endpoints are public — no authentication required.
+servers:
+  - url: https://rainbowinternationalschool.in
+components:
+  schemas:
+    FunnelMetrics:
+      type: object
+      properties:
+        leads:
+          type: integer
+        bookings:
+          type: integer
+        walkins:
+          type: integer
+        admissions:
+          type: integer
+    LastYearMetrics:
+      type: object
+      properties:
+        spend:
+          type: integer
+        leads:
+          type: integer
+        walkins:
+          type: integer
+        admissions:
+          type: integer
+    FixedCosts:
+      type: object
+      properties:
+        salary:
+          type: integer
+        crm:
+          type: integer
+        overhead:
+          type: integer
+paths:
+  /api/debug/headers:
+    get:
+      operationId: debugHeaders
+      summary: Echo request headers back (no auth required)
+      description: >
+        Returns all request headers as received by the server. Used to verify which headers ChatGPT is actually sending.
+        No authentication required.
+      responses:
+        "200":
+          description: Headers as seen by the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  method:
+                    type: string
+                    description: HTTP method of the request
+                  path:
+                    type: string
+                    description: Request path
+                  query:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Query string parameters
+                  headers:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: All request headers as key-value strings
+  /api/marketing/export:
+    get:
+      operationId: getMarketingData
+      summary: Full marketing dashboard data for RIS and RPS
+      description: >
+        Returns monthly lead, booking, walk-in, admission and ad spend data for both Rainbow International School (RIS)
+        and Rainbow Preschools (RPS). No authentication required.
+      responses:
+        "200":
+          description: Marketing data export
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  lastUpdated:
+                    type: string
+                  todayDate:
+                    type: integer
+                  daysInMay:
+                    type: integer
+                  minRevenuePerAdmission:
+                    type: integer
+                  monthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        combined:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                        ris:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                        rps:
+                          type: object
+                          properties:
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+                            spend:
+                              type: integer
+                            meta:
+                              type: integer
+                            google:
+                              type: integer
+                  organicPreSpend:
+                    type: object
+                    properties:
+                      combined:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                      ris:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                      rps:
+                        $ref: "#/components/schemas/FunnelMetrics"
+                  lastYear:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        ris:
+                          $ref: "#/components/schemas/LastYearMetrics"
+                        rps:
+                          $ref: "#/components/schemas/LastYearMetrics"
+                  mayWeekly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week:
+                          type: string
+                        risLeads:
+                          type: integer
+                        risAdm:
+                          type: integer
+                        risWalk:
+                          type: integer
+                        risBook:
+                          type: integer
+                        rpsLeads:
+                          type: integer
+                        rpsAdm:
+                          type: integer
+                        rpsWalk:
+                          type: integer
+                        rpsBook:
+                          type: integer
+                  social:
+                    type: object
+                    properties:
+                      ris:
+                        type: object
+                        properties:
+                          instaFollowers:
+                            type: integer
+                          fbFollowers:
+                            type: integer
+                          ytViews:
+                            type: integer
+                          websiteClicks:
+                            type: integer
+                      rps:
+                        type: object
+                        properties:
+                          instaFollowers:
+                            type: integer
+                          fbFollowers:
+                            type: integer
+                          ytViews:
+                            type: integer
+                          websiteClicks:
+                            type: integer
+                  defaultFixedCosts:
+                    type: object
+                    properties:
+                      combined:
+                        $ref: "#/components/schemas/FixedCosts"
+                      ris:
+                        $ref: "#/components/schemas/FixedCosts"
+                      rps:
+                        $ref: "#/components/schemas/FixedCosts"
+                  crmRps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        rows:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              centre:
+                                type: string
+                              leads:
+                                type: integer
+                              bookings:
+                                type: integer
+                              walkins:
+                                type: integer
+                              admissions:
+                                type: integer
+                        total:
+                          type: object
+                          properties:
+                            centre:
+                              type: string
+                            leads:
+                              type: integer
+                            bookings:
+                              type: integer
+                            walkins:
+                              type: integer
+                            admissions:
+                              type: integer
+        "401":
+          description: Missing or invalid API key.
+  /api/marketing/live:
+    get:
+      operationId: getMarketingLive
+      summary: Live combined marketing metrics from Google Sheets
+      description: >
+        Returns live monthly totals (leads, bookings, walk-ins, admissions, ad spend) for both RIS and RPS combined.
+        Also includes RPS branch-wise CRM, RIS education-level CRM, closed-lead reasons, and May weekly breakdown. No
+        authentication required.
+      security: []
+      responses:
+        "200":
+          description: Live aggregated data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  currentDayOfMonth:
+                    type: integer
+                  monthlyTotals:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        leads:
+                          type: integer
+                        bookings:
+                          type: integer
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                        spend:
+                          type: integer
+                        meta:
+                          type: integer
+                        google:
+                          type: integer
+                  mayWeeklyCombined:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week:
+                          type: string
+                        leads:
+                          type: integer
+                        bookings:
+                          type: integer
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                        spend:
+                          type: integer
+                  rpsCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month:
+                              type: string
+                            total:
+                              type: object
+                              properties:
+                                leads:
+                                  type: integer
+                                bookings:
+                                  type: integer
+                                walkins:
+                                  type: integer
+                                admissions:
+                                  type: integer
+                                closed:
+                                  type: integer
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason:
+                              type: string
+                            count:
+                              type: integer
+                      statusSummary:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                      bySource:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                  risCrm:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month:
+                              type: string
+                            total:
+                              type: object
+                              properties:
+                                leads:
+                                  type: integer
+                                bookings:
+                                  type: integer
+                                walkins:
+                                  type: integer
+                                admissions:
+                                  type: integer
+                                closed:
+                                  type: integer
+                      closedReasons:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            reason:
+                              type: string
+                            count:
+                              type: integer
+                  rpsSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+                  risSchoolMonthly:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        walkins:
+                          type: integer
+                        admissions:
+                          type: integer
+  /api/sheets/crm/rows:
+    get:
+      operationId: getSheetsCrmRows
+      summary: Raw CRM lead rows for precise date+source calculations
+      description: >
+        Raw CRM lead rows with original column headers (Enquiry Date, Source, Status, Centre, Month, Lead Owner). Use
+        for date+source counts e.g. "Google leads on 20-May-26". Includes quickCount totals (bySource, byStatus,
+        byDate). For monthly summaries use /api/sheets/crm.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: rps
+          description: Which school CRM. rps = Rainbow Preschools, ris = Rainbow International School.
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Filter by enquiry date (partial match, case-insensitive). Examples: "20-may-26", "may-26", "20". Leave blank
+            for all dates.
+        - name: source
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Filter by lead source (partial match). Examples: "google", "meta", "walkin", "instagram", "reference". Leave
+            blank for all sources.
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Filter by lead status. Examples: "adm done", "closed", "walkin booked", "walk-in completed", "open". Leave
+            blank for all statuses.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by month column (partial match). Example "may", "apr". Leave blank for all months.
+        - name: centre
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by centre or branch name (partial match). Example "aggarwal", "anand nagar". Leave blank for all
+            centres.
+      responses:
+        "200":
+          description: |
+            Filtered lead rows with named columns, quickCount aggregates, and full row list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                    example: RPS
+                  filters:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                      source:
+                        type: string
+                      status:
+                        type: string
+                      month:
+                        type: string
+                      centre:
+                        type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  totalRows:
+                    type: integer
+                    description: Number of rows returned after filtering.
+                  columns:
+                    type: array
+                    items:
+                      type: string
+                    description: |
+                      Exact column names from the sheet header row — use these as keys when reading the rows array.
+                  quickCount:
+                    type: object
+                    description: >
+                      Pre-computed aggregates over the filtered rows. Use these instead of iterating rows when you only
+                      need totals.
+                    properties:
+                      bySource:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                        description: Lead count keyed by source value (Google, Meta, etc.).
+                      byStatus:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                        description: Lead count keyed by status value.
+                      byDate:
+                        type: object
+                        additionalProperties:
+                          type: integer
+                        description: Lead count keyed by enquiry date string.
+                  rows:
+                    type: array
+                    description: >
+                      Every matching lead row as a key-value object where keys are the sheet column headers and values
+                      are cell text (always strings).
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: string
+  /api/sheets/crm:
+    get:
+      operationId: getSheetsCrm
+      summary: CRM lead summary aggregated by status, source, month and owner
+      description: >
+        Returns pre-aggregated lead counts from the RPS or RIS CRM Google Sheet, grouped by status (ADM DONE, CLOSED,
+        Open, WALKIN BOOKED, WALK-IN COMPLETED), lead source, month, and lead owner. Use /api/sheets/crm/rows instead
+        when you need date-level or source-level row counts.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school CRM — ris for Rainbow International School, rps for Rainbow Preschools.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional month filter e.g. "may", "apr". Omit for all months.
+      responses:
+        "200":
+          description: CRM summary with totals and breakdowns by status, source, month, and owner.
+  /api/sheets/master:
+    get:
+      operationId: getSheetsMaster
+      summary: Weekly funnel breakdown from the DM master tracker
+      description: Returns week-by-week lead, walk-in and admission data from the DM master Google Sheet.
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school tab to fetch.
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - may
+              - april
+              - feb
+          description: Month to retrieve. Defaults to may.
+      responses:
+        "200":
+          description: Week-by-week leads, walk-ins, admissions, conversion rates.
+  /api/sheets/targets:
+    get:
+      operationId: getSheetsTargets
+      summary: Branch or grade actuals vs monthly targets
+      description: >
+        RPS — per-branch actuals (leads, bookings, walk-ins, admissions) alongside monthly targets. RIS — per-grade
+        actuals (Nursery through Class 12).
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school target sheet to fetch.
+      responses:
+        "200":
+          description: Per-branch actuals vs targets (RPS) or per-grade actuals (RIS).
+  /api/sheets/tasks:
+    get:
+      operationId: getSheetsTasks
+      summary: DM team key task tracker
+      description: Returns tasks from the Key Task sheet with assignee, due date, status and remarks.
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by status e.g. "pending", "completed". Omit for all tasks.
+      responses:
+        "200":
+          description: Task list with summary counts (total, completed, pending).
+  /api/search-console/queries:
+    get:
+      operationId: getSearchConsoleQueries
+      summary: Top search queries from Google Search Console
+      description: Returns the top 25 queries by clicks for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+          description: Which school's Search Console property.
+      responses:
+        "200":
+          description: Top queries with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/search-console/pages:
+    get:
+      operationId: getSearchConsolePages
+      summary: Top pages from Google Search Console
+      description: Returns the top performing pages for the given site over the last 28 days.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: account
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+      responses:
+        "200":
+          description: Top pages with clicks, impressions, CTR, and average position.
+        "401":
+          description: Missing or invalid X-Api-Key.
+  /api/pagespeed:
+    get:
+      operationId: getPageSpeedData
+      summary: PageSpeed Insights for a given URL
+      description: Returns Core Web Vitals and performance scores for a URL.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Full URL to test e.g. https://rainbowinternationalschool.in
+        - name: strategy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - mobile
+              - desktop
+          description: Device strategy. Defaults to mobile.
+      responses:
+        "200":
+          description: Performance score, LCP, FID, CLS, and other Core Web Vitals.
+  /api/google-ads/campaigns:
+    get:
+      operationId: getGoogleAdsCampaigns
+      summary: Google Ads campaign performance (Basic Access — live data)
+      description: >
+        Live Google Ads data: spend, impressions, clicks, CTR, CPC, conversions, and cost-per-conversion for all enabled
+        campaigns (last 30 days). Use account=ris for Rainbow International School or account=rps for Rainbow
+        Preschools. Basic Access tier — up to 15,000 operations/day.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+          description: >
+            Which school account to query. ris = Rainbow International School, rps = Rainbow Preschools. Defaults to ris.
+      responses:
+        "200":
+          description: Active campaigns with performance metrics for the last 30 days.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                    example: RIS
+                  customerId:
+                    type: string
+                    description: Google Ads customer ID used for the query.
+                  period:
+                    type: string
+                    example: last 30 days
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Google Ads campaign ID.
+                        name:
+                          type: string
+                        type:
+                          type: string
+                          description: |
+                            Advertising channel type (SEARCH, DISPLAY, VIDEO, PERFORMANCE_MAX, etc.)
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Total spend in INR (cost_micros / 1,000,000).
+                        conversions:
+                          type: number
+                          description: Total conversions attributed to this campaign.
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage (e.g. 3.45 = 3.45%).
+                        avgCpc:
+                          type: number
+                          description: Average cost per click in INR.
+                        costPerConversion:
+                          type: number
+                          nullable: true
+                          description: Cost per conversion in INR. Null if no conversions.
+        "503":
+          description: Google Ads credentials not configured on the server.
+  /api/google-ads/keywords:
+    get:
+      operationId: getGoogleAdsKeywords
+      summary: Google Ads top keywords by spend (last 30 days)
+      description: >
+        Returns the top 25 active keywords by spend with clicks, impressions, CTR, avg CPC, conversions, quality score,
+        and match type. Use account=ris or account=rps to select the school's Google Ads account.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+          description: Which school account to query. Defaults to ris.
+      responses:
+        "200":
+          description: Top keywords with spend and performance data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  period:
+                    type: string
+                    example: last 30 days
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  keywords:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        keyword:
+                          type: string
+                        matchType:
+                          type: string
+                          description: EXACT, PHRASE, or BROAD.
+                        qualityScore:
+                          type: integer
+                          nullable: true
+                          description: Google Quality Score 1–10. Null if not yet assigned.
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Total spend in INR.
+                        conversions:
+                          type: number
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage.
+                        avgCpc:
+                          type: number
+                          description: Average cost per click in INR.
+        "503":
+          description: Google Ads credentials not configured on the server.
+  /api/google-ads/campaign-settings:
+    get:
+      operationId: getGoogleAdsCampaignSettings
+      summary: Google Ads campaign configuration — bidding, budget, status
+      description: >
+        Campaign config for all campaigns (enabled and paused): type, bidding strategy, daily budget, delivery method,
+        start/end date. No date filter — returns all campaigns regardless of spend. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+      responses:
+        "200":
+          description: Campaign config including budget and bidding strategy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        type:
+                          type: string
+                        biddingStrategy:
+                          type: string
+                        startDate:
+                          type: string
+                          nullable: true
+                        endDate:
+                          type: string
+                          nullable: true
+                        dailyBudget:
+                          type: number
+                          nullable: true
+                        deliveryMethod:
+                          type: string
+                          nullable: true
+  /api/google-ads/ad-groups:
+    get:
+      operationId: getGoogleAdsAdGroups
+      summary: Google Ads ad group performance for current month
+      description: >
+        Ad group spend, clicks, impressions, CTR, CPC, and conversions for the current calendar month. Shows all ad
+        groups with spend > 0. Useful for seeing whether setup is branch-wise, theme-wise, or generic. Use account=ris
+        or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+      responses:
+        "200":
+          description: Ad groups with performance metrics for current month.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  period:
+                    type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  adGroups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId:
+                          type: string
+                        campaignName:
+                          type: string
+                        campaignStatus:
+                          type: string
+                        adGroupId:
+                          type: string
+                        adGroupName:
+                          type: string
+                        adGroupStatus:
+                          type: string
+                        type:
+                          type: string
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                        conversions:
+                          type: number
+                        ctr:
+                          type: number
+                        avgCpc:
+                          type: number
+  /api/google-ads/ads:
+    get:
+      operationId: getGoogleAdsAds
+      summary: Google Ads ad copy, landing pages, and performance
+      description: >
+        Ad-level data for current month: ad type, final landing page URLs, RSA headlines and descriptions, plus
+        impressions, clicks, spend, conversions, and CTR. Shows all ads with spend > 0. Use account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+      responses:
+        "200":
+          description: Ads with copy, landing pages, and performance for current month.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  period:
+                    type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  ads:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId:
+                          type: string
+                        campaignName:
+                          type: string
+                        adGroupId:
+                          type: string
+                        adGroupName:
+                          type: string
+                        adId:
+                          type: string
+                        adStatus:
+                          type: string
+                        adType:
+                          type: string
+                        finalUrls:
+                          type: array
+                          items:
+                            type: string
+                        headlines:
+                          type: array
+                          items:
+                            type: string
+                        descriptions:
+                          type: array
+                          items:
+                            type: string
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                        conversions:
+                          type: number
+                        ctr:
+                          type: number
+  /api/google-ads/locations:
+    get:
+      operationId: getGoogleAdsLocations
+      summary: Google Ads geographic targeting (location and proximity criteria)
+      description: >
+        Returns all LOCATION and PROXIMITY campaign criteria — the geographic areas each campaign is targeting or
+        excluding. Includes geo_target_constant for city lookups and proximity radius/coordinates. Use account=ris or
+        account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+      responses:
+        "200":
+          description: Location and proximity targeting criteria per campaign.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        campaignId:
+                          type: string
+                        campaignName:
+                          type: string
+                        criterionId:
+                          type: string
+                        type:
+                          type: string
+                          description: LOCATION or PROXIMITY
+                        isNegative:
+                          type: boolean
+                        geoTargetConstant:
+                          type: string
+                          nullable: true
+                        proximity:
+                          type: object
+                          nullable: true
+                          properties:
+                            radius:
+                              type: number
+                            radiusUnits:
+                              type: string
+                            cityName:
+                              type: string
+                              nullable: true
+                            latMicro:
+                              type: integer
+                              nullable: true
+                            lngMicro:
+                              type: integer
+                              nullable: true
+  /api/google-ads/conversion-actions:
+    get:
+      operationId: getGoogleAdsConversionActions
+      summary: Google Ads conversion actions setup and tracking configuration
+      description: >
+        Lists all conversion actions configured in the account: name, status, type, category (form submit, call,
+        WhatsApp click, etc.), origin, counting type, and whether included in the campaign's conversions metric. Use
+        account=ris or account=rps.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+            default: ris
+      responses:
+        "200":
+          description: All conversion actions with tracking setup details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  customerId:
+                    type: string
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  conversionActions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                        type:
+                          type: string
+                        category:
+                          type: string
+                        origin:
+                          type: string
+                        countingType:
+                          type: string
+                        includeInConversionsMetric:
+                          type: boolean
+  /api/meta-ads/campaigns:
+    get:
+      operationId: getMetaAdsCampaigns
+      summary: Meta (Facebook/Instagram) Ads campaign performance (last 30 days)
+      description: >
+        Returns spend, reach, impressions, clicks, CTR, CPC, leads, landing page views, and cost-per-lead for all active
+        Meta campaigns. Use account=ris to filter to Rainbow International School campaigns, account=rps for Rainbow
+        Preschools, or omit (all) to get every campaign across both brands.
+      parameters:
+        - name: account
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ris
+              - rps
+              - all
+            default: all
+          description: >
+            Filter campaigns by brand name. ris = school campaigns, rps = preschool campaigns, all = every campaign on
+            the account.
+      responses:
+        "200":
+          description: Meta campaign performance data for the last 30 days.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  period:
+                    type: string
+                    example: last_30d
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  total:
+                    type: object
+                    properties:
+                      campaigns:
+                        type: integer
+                      spend:
+                        type: number
+                      impressions:
+                        type: integer
+                      clicks:
+                        type: integer
+                      leads:
+                        type: integer
+                  campaigns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                          description: ACTIVE, PAUSED, etc.
+                        objective:
+                          type: string
+                          description: LEAD_GENERATION, LINK_CLICKS, etc.
+                        impressions:
+                          type: integer
+                        clicks:
+                          type: integer
+                        spend:
+                          type: number
+                          description: Spend in INR.
+                        reach:
+                          type: integer
+                        frequency:
+                          type: number
+                          description: Average number of times each person saw the ad.
+                        ctr:
+                          type: number
+                          description: Click-through rate as a percentage.
+                        cpc:
+                          type: number
+                          description: Cost per click in INR.
+                        leads:
+                          type: integer
+                          description: Form submissions / lead actions.
+                        landingPageViews:
+                          type: integer
+                        costPerLead:
+                          type: number
+                          nullable: true
+                          description: Cost per lead in INR. Null if no leads.
+        "503":
+          description: Meta Ads token or account ID not configured on the server.

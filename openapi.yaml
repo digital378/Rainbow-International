@@ -206,6 +206,478 @@ paths:
         "401":
           description: Missing or invalid API key.
 
+  /api/sales/live:
+    get:
+      operationId: getRisSalesLive
+      summary: RIS Sales team dashboard — walk-ins, admissions, counselor leaderboard, DM pipeline
+      description: >
+        Live sales dashboard for Rainbow International School (RIS). Returns walk-in and admission
+        KPIs for the 26-27 academic year, per-counselor leaderboard, lead temperature, DM (digital
+        marketing) pipeline, month-by-month breakdown, open walk-in enquiries (visited but not yet
+        admitted or closed), and today's RA check-ins. No authentication required.
+      responses:
+        "200":
+          description: RIS sales dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  kpis:
+                    type: object
+                    description: Top-level KPIs for the full academic year
+                    properties:
+                      walkinsTotal:
+                        type: integer
+                        description: Total walk-ins all time (26-27)
+                      walkinsThisMonth:
+                        type: integer
+                      admissionsTotal:
+                        type: integer
+                        description: Total confirmed admissions (from New Admission List)
+                      admissionsThisMonth:
+                        type: integer
+                      provisionalCount:
+                        type: integer
+                        description: Leads marked Provisional — not yet confirmed
+                      overallConversion:
+                        type: number
+                        description: Admission-to-walk-in conversion % (all time)
+                      openEnquiries:
+                        type: integer
+                        description: Walk-ins still active — not admitted or closed
+                      closedEnquiries:
+                        type: integer
+                      yearTarget:
+                        type: integer
+                      yearAchieved:
+                        type: integer
+                      yearTargetGap:
+                        type: integer
+                        description: yearTarget minus yearAchieved
+                  walkins:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            monthKey: { type: string, description: "YYYY-MM" }
+                            month: { type: string }
+                            count: { type: integer }
+                      bySource:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            source: { type: string }
+                            count: { type: integer }
+                      byGrade:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            grade: { type: string }
+                            count: { type: integer }
+                      recent:
+                        type: array
+                        description: 25 most recent walk-ins
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string }
+                            name: { type: string }
+                            grade: { type: string }
+                            counselor: { type: string }
+                            source: { type: string }
+                            status: { type: string }
+                  admissions:
+                    type: object
+                    properties:
+                      byMonth:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            monthKey: { type: string }
+                            month: { type: string }
+                            total: { type: integer }
+                      byBranch:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            branch: { type: string }
+                            count: { type: integer }
+                      byGrade:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            grade: { type: string }
+                            count: { type: integer }
+                      bySource:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            source: { type: string }
+                            count: { type: integer }
+                      byCounselor:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            counselor: { type: string }
+                            count: { type: integer }
+                      recent:
+                        type: array
+                        description: 25 most recent confirmed admissions
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string }
+                            name: { type: string }
+                            grade: { type: string }
+                            counselor: { type: string }
+                            source: { type: string }
+                            branch: { type: string }
+                  counselorLeaderboard:
+                    type: array
+                    description: Per-counselor performance ranked by admissions
+                    items:
+                      type: object
+                      properties:
+                        counselor: { type: string }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
+                        provisional: { type: integer }
+                        closed: { type: integer }
+                        followup: { type: integer }
+                        conversion:
+                          type: number
+                          description: Admission conversion % for this counselor
+                  conversionRatio:
+                    type: array
+                    description: Counselor-level enquiry-to-admission ratio
+                    items:
+                      type: object
+                      properties:
+                        counselor: { type: string }
+                        enquiries: { type: integer }
+                        open: { type: integer }
+                        closed: { type: integer }
+                        admissions: { type: integer }
+                        ratio: { type: number }
+                        provisional: { type: integer }
+                        ratioWithProv: { type: number }
+                  leadTemperature:
+                    type: object
+                    description: Count of leads by temperature bucket
+                    properties:
+                      hot: { type: integer }
+                      warm: { type: integer, description: "FOLLOW UP status" }
+                      cold: { type: integer, description: "CLOSED status" }
+                      provisional: { type: integer }
+                      open: { type: integer }
+                  monthBreakdown:
+                    type: array
+                    description: Month-by-month walkin, admission, closed and counselor detail
+                    items:
+                      type: object
+                      properties:
+                        monthKey: { type: string }
+                        label: { type: string }
+                        walkins: { type: integer }
+                        admissions: { type: integer }
+                        closed: { type: integer }
+                        provisional: { type: integer }
+                        followup: { type: integer }
+                        counselors:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              counselor: { type: string }
+                              walkins: { type: integer }
+                              admissions: { type: integer }
+                              conversion: { type: number }
+                  dmPipeline:
+                    type: object
+                    description: Digital Marketing (DM source) pipeline from Walk-in Sheet
+                    properties:
+                      total: { type: integer }
+                      open: { type: integer }
+                      admitted: { type: integer }
+                      closed: { type: integer }
+                      provisional: { type: integer }
+                      convRate: { type: number }
+                      byRA:
+                        type: array
+                        description: Per-RA (counselor) DM pipeline breakdown
+                        items:
+                          type: object
+                          properties:
+                            ra: { type: string }
+                            total: { type: integer }
+                            open: { type: integer }
+                            admitted: { type: integer }
+                            closed: { type: integer }
+                      recentOpen:
+                        type: array
+                        description: Open DM leads sorted by age (oldest first)
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string }
+                            name: { type: string }
+                            grade: { type: string }
+                            ra: { type: string }
+                            status: { type: string }
+                            daysOpen: { type: integer }
+                  openWalkins:
+                    type: array
+                    description: >
+                      All walk-in enquiries that are still open (status = OPEN or FOLLOW UP).
+                      Sorted by daysOpen descending (oldest unresolved leads first).
+                      Use this to identify stale enquiries needing follow-up.
+                    items:
+                      type: object
+                      properties:
+                        date: { type: string }
+                        name: { type: string }
+                        grade: { type: string }
+                        counselor: { type: string }
+                        source: { type: string }
+                        status: { type: string }
+                        daysOpen:
+                          type: integer
+                          description: Calendar days since the walk-in date
+                  liveCheckins:
+                    type: object
+                    description: Today's RA walk-in QR check-in data for RIS
+                    properties:
+                      todayTotal: { type: integer }
+                      byRa:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            raName: { type: string }
+                            raBranch: { type: string }
+                            count: { type: integer }
+                      last7Days:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string }
+                            count: { type: integer }
+
+  /api/rps-sales/live:
+    get:
+      operationId: getRpsSalesLive
+      summary: RPS Sales team dashboard — walk-ins, admissions by branch, counselor leaderboard, DM pipeline
+      description: >
+        Live sales dashboard for Rainbow Public School (RPS). Returns walk-in and admission
+        KPIs across all branches for the 26-27 academic year, per-branch and per-source
+        breakdown, counselor leaderboard, closed-lead reasons, DM pipeline, open walk-in
+        enquiries (visited but not yet admitted or closed), ageing buckets, and today's
+        RA check-ins. No authentication required.
+      responses:
+        "200":
+          description: RPS sales dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  generatedAt:
+                    type: string
+                    format: date-time
+                  kpis:
+                    type: object
+                    description: Top-level KPIs for the full academic year
+                    properties:
+                      totalEnquiries: { type: integer }
+                      totalAdmissions: { type: integer, description: "ADM DONE in RPS" }
+                      totalAdmRIS: { type: integer, description: "Leads transferred and admitted in RIS" }
+                      openEnquiries: { type: integer }
+                      closedTotal: { type: integer }
+                      inProcess: { type: integer }
+                      futureProspect: { type: integer }
+                      overallConversion: { type: number, description: "Admission % of total enquiries" }
+                      thisMonthEnquiries: { type: integer }
+                      thisMonthAdm: { type: integer }
+                  byMonth:
+                    type: array
+                    description: Month-by-month enquiries and admissions
+                    items:
+                      type: object
+                      properties:
+                        monthKey: { type: string, description: "YYYY-MM" }
+                        label: { type: string }
+                        enquiries: { type: integer }
+                        admissions: { type: integer }
+                  byBranch:
+                    type: array
+                    description: Per-branch enquiry and admission totals with conversion rate
+                    items:
+                      type: object
+                      properties:
+                        branch: { type: string }
+                        enquiries: { type: integer }
+                        admissions: { type: integer }
+                        open: { type: integer }
+                        closed: { type: integer }
+                        conversion: { type: number, description: "Admission % for this branch" }
+                  bySource:
+                    type: array
+                    description: Enquiries and admissions by lead source
+                    items:
+                      type: object
+                      properties:
+                        source: { type: string }
+                        enquiries: { type: integer }
+                        admissions: { type: integer }
+                  byGrade:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        grade: { type: string }
+                        count: { type: integer }
+                  counselorLeaderboard:
+                    type: array
+                    description: Per-counselor breakdown of all lead statuses
+                    items:
+                      type: object
+                      properties:
+                        counselor: { type: string }
+                        admDone: { type: integer }
+                        admRIS: { type: integer }
+                        closed: { type: integer }
+                        open: { type: integer }
+                        inProcess: { type: integer }
+                        futureProspect: { type: integer }
+                        total: { type: integer }
+                        conversion: { type: number }
+                  closedReasons:
+                    type: array
+                    description: Top reasons why leads were closed
+                    items:
+                      type: object
+                      properties:
+                        reason: { type: string }
+                        count: { type: integer }
+                  recentEnquiries:
+                    type: array
+                    description: Most recent enquiries across all branches
+                    items:
+                      type: object
+                      properties:
+                        date: { type: string }
+                        name: { type: string }
+                        grade: { type: string }
+                        branch: { type: string }
+                        counselor: { type: string }
+                        source: { type: string }
+                        status: { type: string }
+                  openWalkins:
+                    type: array
+                    description: >
+                      Walk-in enquiries that are still open (status = OPEN, IN PROCESS, or
+                      FUTURE PROSPECT). Sorted by daysOpen descending (oldest first).
+                      Use to identify leads needing follow-up by branch or counselor.
+                    items:
+                      type: object
+                      properties:
+                        date: { type: string }
+                        name: { type: string }
+                        grade: { type: string }
+                        branch: { type: string }
+                        counselor: { type: string }
+                        source: { type: string }
+                        status: { type: string }
+                        daysOpen:
+                          type: integer
+                          description: Calendar days since the walk-in date
+                  ageingBuckets:
+                    type: object
+                    description: Open enquiry counts grouped by age bracket
+                    properties:
+                      "0-7d": { type: integer }
+                      "8-14d": { type: integer }
+                      "15-30d": { type: integer }
+                      "31-60d": { type: integer }
+                      "60d+": { type: integer }
+                  dmPipeline:
+                    type: object
+                    description: Digital Marketing pipeline across RPS branches
+                    properties:
+                      admitted: { type: integer }
+                      open: { type: integer }
+                      closed: { type: integer }
+                      convMedianDays: { type: integer, description: "Median days from enquiry to admission for DM leads" }
+                      byBranch:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            branch: { type: string }
+                            admitted: { type: integer }
+                            open: { type: integer }
+                            closed: { type: integer }
+                      byConfidence:
+                        type: array
+                        description: Open DM leads by confidence level (High, Medium, Low)
+                        items:
+                          type: object
+                          properties:
+                            confidence: { type: string }
+                            count: { type: integer }
+                      counselors:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            counselor: { type: string }
+                            open: { type: integer }
+                            admitted: { type: integer }
+                            closed: { type: integer }
+                            total: { type: integer }
+                            conv: { type: number }
+                  branchOpenPipeline:
+                    type: array
+                    description: Open pipeline counts per branch (all sources)
+                    items:
+                      type: object
+                      additionalProperties: true
+                  liveCheckins:
+                    type: object
+                    description: Today's RA walk-in QR check-in data for RPS
+                    properties:
+                      todayTotal: { type: integer }
+                      byRa:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            raName: { type: string }
+                            raBranch: { type: string }
+                            count: { type: integer }
+                      last7Days:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date: { type: string }
+                            count: { type: integer }
+
   /api/marketing/live:
     get:
       operationId: getMarketingLive
