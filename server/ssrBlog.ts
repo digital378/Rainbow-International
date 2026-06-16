@@ -34,6 +34,8 @@ const CAT_IMAGE: Record<string, string> = {
   "Admissions": "/blog/cat-school.png",
   "Safety & Security": "/blog/cat-school.png",
   "Student Achievements": "/blog/cat-awards.png",
+  "Technology in Education": "/blog/cat-education.png",
+  "Future Skills": "/blog/cat-education.png",
   "General": "/blog/cat-education.png",
 };
 
