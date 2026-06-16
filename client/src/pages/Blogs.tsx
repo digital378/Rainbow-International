@@ -14,36 +14,11 @@ interface BlogPost {
   title: string;
   date: string;
   cat: string;
-  thumbUrl: string | null;
   intro: string;
 }
 
 const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General"];
 
-function BlogThumb({ url, title, cat }: { url: string | null; title: string; cat: string }) {
-  const [errored, setErrored] = useState(false);
-  if (!url || errored) {
-    return (
-      <div className="h-44 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}>
-        <span className="text-white/60 text-sm font-medium">{cat}</span>
-      </div>
-    );
-  }
-  return (
-    <div className="relative h-44 overflow-hidden">
-      <img
-        src={url}
-        alt={title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        loading="lazy"
-        decoding="async"
-        width={400}
-        height={176}
-        onError={() => setErrored(true)}
-      />
-    </div>
-  );
-}
 
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -58,7 +33,6 @@ export default function Blogs() {
         title: p.title,
         date: p.date,
         cat: p.cat,
-        thumbUrl: p.thumbUrl,
         intro: p.intro,
       })),
   });
@@ -126,7 +100,6 @@ export default function Blogs() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
               {Array.from({ length: 9 }).map((_, i) => (
                 <div key={i} className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5 animate-pulse">
-                  <div className="h-40 bg-gray-100 rounded-xl mb-4" />
                   <div className="h-4 bg-gray-100 rounded w-1/3 mb-3" />
                   <div className="h-5 bg-gray-100 rounded w-full mb-2" />
                   <div className="h-5 bg-gray-100 rounded w-3/4" />
@@ -142,7 +115,6 @@ export default function Blogs() {
                   data-testid={`card-blog-${blog.slug}`}
                   className="group block rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                 >
-                  <BlogThumb url={blog.thumbUrl} title={blog.title} cat={blog.cat} />
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{blog.cat}</span>
