@@ -6721,7 +6721,7 @@ export const blogPosts: BlogPostData[] = [
     ],
     internalLinks: [
       { label: "Book a Campus Visit", href: "/contact-us" },
-      { label: "CBSE Curriculum at Rainbow", href: "/cbse-curriculum" },
+      { label: "CBSE Curriculum at Rainbow", href: "/curriculum" },
       { label: "Academics & Future-Ready Learning", href: "/academics" },
       { label: "Technology-Enabled Classrooms", href: "/amenities" },
       { label: "Admissions Open", href: "/admissions" },

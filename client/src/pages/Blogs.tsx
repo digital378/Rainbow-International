@@ -22,6 +22,7 @@ interface BlogPost {
 }
 
 const allBlogs: BlogPost[] = [
+  { title: "AI in Schools: Preparing Students for an AI-Driven Future", slug: "ai-in-schools", date: "16 Jun 2026", cat: "Technology in Education", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2026/06/ai-in-schools-preparing-students-for-an-ai-driven-future.jpg" },
   { title: "How CBSE Schools Can Foster Entrepreneurship and Innovation Among Students", slug: "how-cbse-schools-can-foster-entrepreneurship-and-innovation", date: "16 Dec 2025", cat: "CBSE School", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/12/how-cbse-schools-can-foster-entrepreneurship-and-innovation-among-students.jpg" },
   { title: "Why Rainbow International School Is Among the Top Schools in Thane", slug: "why-rainbow-international-school-is-among-the-top-schools-in-thane", date: "24 Nov 2025", cat: "CBSE School", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/11/why-rainbow-international-school-is-among-the-top-schools-in-thane.jpg" },
   { title: "The Growing Popularity of CBSE Schools in Thane Among Parents", slug: "the-growing-popularity-of-cbse-schools-in-thane-west-among-parents", date: "19 Nov 2025", cat: "CBSE School", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2025/11/the-growing-popularity-of-cbse-schools-in-thane-west-among-parents.jpg" },
@@ -110,7 +111,7 @@ const allBlogs: BlogPost[] = [
   { title: "Digital Classrooms: How Technology Improves Education In School", slug: "digital-classrooms-how-technology-improves-education-in-school", date: "22 Sep 2022", cat: "Education", thumbUrl: "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Digital-Classrooms-How-Technology-Improves-Education-In-School.jpg" },
 ];
 
-const categories = ["All", "CBSE School", "School", "Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General"];
+const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General"];
 
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
