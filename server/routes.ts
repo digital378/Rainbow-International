@@ -3126,6 +3126,52 @@ paths:
     }
   });
 
+  // ── Admin: Blog Posts ────────────────────────────────────────────────────────
+  app.get("/api/admin/blog-posts", requireAdmin, async (_req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json(posts);
+    } catch {
+      res.status(500).json({ message: "Failed to fetch blog posts" });
+    }
+  });
+
+  app.post("/api/admin/blog-posts", requireAdmin, async (req, res) => {
+    try {
+      const { insertBlogPostSchema } = await import("@shared/schema");
+      const validated = insertBlogPostSchema.parse(req.body);
+      const post = await storage.upsertBlogPost(validated);
+      res.status(201).json(post);
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to save blog post" });
+    }
+  });
+
+  app.put("/api/admin/blog-posts/:slug", requireAdmin, async (req, res) => {
+    try {
+      const { insertBlogPostSchema } = await import("@shared/schema");
+      const validated = insertBlogPostSchema.parse(req.body);
+      const post = await storage.updateBlogPost(req.params.slug, validated);
+      if (!post) return res.status(404).json({ message: "Blog post not found" });
+      res.json(post);
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to update blog post" });
+    }
+  });
+
+  app.delete("/api/admin/blog-posts/:slug", requireAdmin, async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) return res.status(404).json({ message: "Blog post not found" });
+      await storage.deleteBlogPost(req.params.slug);
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ message: "Failed to delete blog post" });
+    }
+  });
+
   // Sales: today's live check-in counts (no extra auth — same trust level as /api/sales/live)
   app.get("/api/walkin/today", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");

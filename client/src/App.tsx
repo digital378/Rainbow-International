@@ -62,6 +62,7 @@ const RpsSales = lazy(() => import("@/pages/RpsSales"));
 const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
+const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
 const QRCard = lazy(() => import("@/pages/QRCard"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
@@ -133,6 +134,7 @@ function Router() {
       <Route path="/admin/ras/submissions" component={AdminSubmissions} />
       <Route path="/admin/ras/:slug/qr" component={QRCard} />
       <Route path="/admin/ras" component={AdminRAs} />
+      <Route path="/admin/blog" component={AdminBlog} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>

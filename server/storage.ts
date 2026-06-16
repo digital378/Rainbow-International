@@ -51,6 +51,8 @@ export interface IStorage {
   getAllBlogPosts(): Promise<BlogPost[]>;
   getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
   upsertBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(originalSlug: string, data: InsertBlogPost): Promise<BlogPost | undefined>;
+  deleteBlogPost(slug: string): Promise<void>;
   getAllBlogSlugs(): Promise<string[]>;
 }
 
@@ -247,6 +249,36 @@ export class DbStorage implements IStorage {
       })
       .returning();
     return result;
+  }
+
+  async updateBlogPost(originalSlug: string, data: InsertBlogPost): Promise<BlogPost | undefined> {
+    const [result] = await db
+      .update(blogPostsTable)
+      .set({
+        slug: data.slug,
+        title: data.title,
+        metaTitle: data.metaTitle,
+        metaDescription: data.metaDescription,
+        keywords: data.keywords,
+        date: data.date,
+        cat: data.cat,
+        thumbUrl: data.thumbUrl,
+        heroUrl: data.heroUrl,
+        intro: data.intro,
+        sections: data.sections,
+        conclusion: data.conclusion,
+        relatedSlugs: data.relatedSlugs,
+        internalLinks: data.internalLinks,
+        faqs: data.faqs,
+        publishedAt: data.publishedAt,
+      })
+      .where(eq(blogPostsTable.slug, originalSlug))
+      .returning();
+    return result;
+  }
+
+  async deleteBlogPost(slug: string): Promise<void> {
+    await db.delete(blogPostsTable).where(eq(blogPostsTable.slug, slug));
   }
 
   async getAllBlogSlugs(): Promise<string[]> {
