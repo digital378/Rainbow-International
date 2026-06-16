@@ -1,7 +1,47 @@
+/**
+ * Blog seed script — loads blog posts from the committed JSON snapshot and
+ * upserts them into the database.  Safe to re-run on any environment.
+ *
+ * Usage:
+ *   npm run db:seed-blog
+ *
+ * The source of truth is server/data/blogPostsSeed.json which was exported
+ * from the original static blogPosts.ts data.  To refresh this snapshot from
+ * a live database, query the blog_posts table and write the rows to that file.
+ */
+
 import { db } from "./db";
 import { blogPostsTable } from "@shared/schema";
-import { blogPosts } from "../client/src/data/blogPosts";
-import { sql } from "drizzle-orm";
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
+import path from "path";
+import fs from "fs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const seedFile = path.resolve(__dirname, "data", "blogPostsSeed.json");
+
+if (!fs.existsSync(seedFile)) {
+  console.error(`Seed file not found: ${seedFile}`);
+  process.exit(1);
+}
+
+interface PostData {
+  slug: string;
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  date: string;
+  cat: string;
+  thumbUrl?: string | null;
+  heroUrl?: string;
+  intro?: string;
+  sections?: unknown;
+  conclusion?: string;
+  relatedSlugs?: unknown;
+  internalLinks?: unknown;
+  faqs?: unknown;
+}
 
 function parseDate(dateStr: string): Date {
   const d = new Date(dateStr);
@@ -10,39 +50,13 @@ function parseDate(dateStr: string): Date {
 }
 
 async function seed() {
-  console.log(`Seeding ${blogPosts.length} blog posts into the database...`);
-
-  await db.execute(sql`
-    CREATE TABLE IF NOT EXISTS blog_posts (
-      id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-      slug TEXT NOT NULL UNIQUE,
-      title TEXT NOT NULL,
-      meta_title TEXT NOT NULL,
-      meta_description TEXT NOT NULL,
-      keywords TEXT NOT NULL DEFAULT '',
-      date TEXT NOT NULL,
-      cat TEXT NOT NULL,
-      thumb_url TEXT,
-      hero_url TEXT NOT NULL DEFAULT '',
-      intro TEXT NOT NULL DEFAULT '',
-      sections JSONB NOT NULL DEFAULT '[]',
-      conclusion TEXT NOT NULL DEFAULT '',
-      related_slugs JSONB NOT NULL DEFAULT '[]',
-      internal_links JSONB NOT NULL DEFAULT '[]',
-      faqs JSONB NOT NULL DEFAULT '[]',
-      published_at TIMESTAMP NOT NULL DEFAULT NOW(),
-      created_at TIMESTAMP NOT NULL DEFAULT NOW()
-    )
-  `);
+  const posts: PostData[] = JSON.parse(fs.readFileSync(seedFile, "utf-8"));
+  console.log(`Seeding ${posts.length} blog posts into the database...`);
 
   let inserted = 0;
   let updated = 0;
 
-  for (const post of blogPosts) {
-    const existing = await db.execute(
-      sql`SELECT id FROM blog_posts WHERE slug = ${post.slug}`
-    );
-
+  for (const post of posts) {
     const values = {
       slug: post.slug,
       title: post.title,
@@ -51,49 +65,45 @@ async function seed() {
       keywords: post.keywords || "",
       date: post.date,
       cat: post.cat,
-      thumbUrl: post.thumbUrl || null,
-      heroUrl: post.heroUrl || "",
-      intro: post.intro || "",
-      sections: post.sections as any,
-      conclusion: post.conclusion || "",
-      relatedSlugs: post.relatedSlugs as any,
-      internalLinks: post.internalLinks as any,
-      faqs: (post.faqs || []) as any,
+      thumbUrl: post.thumbUrl ?? null,
+      heroUrl: post.heroUrl ?? "",
+      intro: post.intro ?? "",
+      sections: (post.sections ?? []) as any,
+      conclusion: post.conclusion ?? "",
+      relatedSlugs: (post.relatedSlugs ?? []) as any,
+      internalLinks: (post.internalLinks ?? []) as any,
+      faqs: (post.faqs ?? []) as any,
       publishedAt: parseDate(post.date),
     };
 
-    if (existing.rows.length > 0) {
-      await db
-        .insert(blogPostsTable)
-        .values(values)
-        .onConflictDoUpdate({
-          target: blogPostsTable.slug,
-          set: {
-            title: values.title,
-            metaTitle: values.metaTitle,
-            metaDescription: values.metaDescription,
-            keywords: values.keywords,
-            date: values.date,
-            cat: values.cat,
-            thumbUrl: values.thumbUrl,
-            heroUrl: values.heroUrl,
-            intro: values.intro,
-            sections: values.sections,
-            conclusion: values.conclusion,
-            relatedSlugs: values.relatedSlugs,
-            internalLinks: values.internalLinks,
-            faqs: values.faqs,
-            publishedAt: values.publishedAt,
-          },
-        });
-      updated++;
-    } else {
-      await db.insert(blogPostsTable).values(values);
-      inserted++;
-    }
+    await db
+      .insert(blogPostsTable)
+      .values(values)
+      .onConflictDoUpdate({
+        target: blogPostsTable.slug,
+        set: {
+          title: values.title,
+          metaTitle: values.metaTitle,
+          metaDescription: values.metaDescription,
+          keywords: values.keywords,
+          date: values.date,
+          cat: values.cat,
+          thumbUrl: values.thumbUrl,
+          heroUrl: values.heroUrl,
+          intro: values.intro,
+          sections: values.sections,
+          conclusion: values.conclusion,
+          relatedSlugs: values.relatedSlugs,
+          internalLinks: values.internalLinks,
+          faqs: values.faqs,
+          publishedAt: values.publishedAt,
+        },
+      });
+
+    inserted++;
   }
 
-  console.log(`Done. Inserted: ${inserted}, Updated: ${updated}`);
+  console.log(`Done. Upserted ${inserted} posts (inserted + updated).`);
   process.exit(0);
 }
 

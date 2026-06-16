@@ -46,7 +46,6 @@ export default defineConfig({
           if (id.includes("node_modules/react/")) return "vendor";
           if (id.includes("node_modules/@radix-ui")) return "ui";
           if (id.includes("node_modules/react-hook-form") || id.includes("node_modules/@hookform") || id.includes("node_modules/zod")) return "forms";
-          if (id.includes("data/blogPosts")) return "blog-data";
           if (id.includes("node_modules/@tanstack")) return "query";
         },
       },

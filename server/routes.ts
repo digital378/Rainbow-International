@@ -283,7 +283,7 @@ export async function registerRoutes(
     "/fee-structure-2": "/fee-structure",
     "/cbse-curriculum": "/curriculum",
 
-    // Blog-slug redirects — auto-generated from blogPosts array above
+    // Blog-slug redirects — auto-generated from the blog_posts table
     ...blogSlugRedirects,
   };
 
