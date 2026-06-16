@@ -27,6 +27,15 @@ app.get("/__repl_health", (_req, res) => {
   res.status(200).send("OK");
 });
 
+// Tell search-engine crawlers not to index or follow links on any /admin/* page.
+// Using a response header (X-Robots-Tag) is more reliable than a <meta> noindex
+// tag because it works even when JavaScript hasn't loaded yet, including SSR and
+// before the React bundle has executed.
+app.use("/admin", (_req, res, next) => {
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  next();
+});
+
 app.get("/global-brand-associations", (req, res) => {
   const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
   res.redirect(301, "/brand-partners" + query);
