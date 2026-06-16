@@ -1,5 +1,24 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
 import { Link } from "wouter";
+import { GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -388,6 +407,144 @@ function ImageUploadField({
 
 /* ─── Structured editor sub-components ─── */
 
+type SortableSectionCardProps = {
+  id: string;
+  index: number;
+  total: number;
+  section: Section;
+  sectionError?: string;
+  onUpdate: (patch: Partial<Section>) => void;
+  onRemove: () => void;
+  onMove: (dir: -1 | 1) => void;
+  onClearError?: () => void;
+  onAddListItem: () => void;
+  onUpdateListItem: (li: number, val: string) => void;
+  onRemoveListItem: (li: number) => void;
+};
+
+function SortableSectionCard({
+  id,
+  index,
+  total,
+  section: s,
+  sectionError,
+  onUpdate,
+  onRemove,
+  onMove,
+  onClearError,
+  onAddListItem,
+  onUpdateListItem,
+  onRemoveListItem,
+}: SortableSectionCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 10 : undefined,
+    position: "relative",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`border rounded-xl p-4 bg-slate-50 space-y-3 ${isDragging ? "border-amber-400 shadow-lg" : "border-slate-200"}`}
+      data-testid={`section-card-${index}`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 touch-none"
+            data-testid={`section-drag-handle-${index}`}
+            title="Drag to reorder"
+            aria-label="Drag to reorder section"
+          >
+            <GripVertical size={16} />
+          </button>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Section {index + 1}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => onMove(-1)} disabled={index === 0}
+            className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
+            data-testid={`section-move-up-${index}`} title="Move up">↑</button>
+          <button type="button" onClick={() => onMove(1)} disabled={index === total - 1}
+            className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
+            data-testid={`section-move-down-${index}`} title="Move down">↓</button>
+          <button type="button" onClick={onRemove}
+            className="px-2 py-1 text-xs rounded border border-red-200 text-red-600 bg-white hover:bg-red-50"
+            data-testid={`section-remove-${index}`}>Remove</button>
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs font-semibold text-slate-600 mb-1">Heading <span className="font-normal text-slate-400">(optional)</span></label>
+        <input
+          type="text"
+          value={s.heading ?? ""}
+          onChange={e => onUpdate({ heading: e.target.value })}
+          placeholder="Section heading"
+          className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+          data-testid={`section-heading-${index}`}
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-semibold text-slate-600 mb-1">Body text *</label>
+        <textarea
+          value={s.body}
+          onChange={e => {
+            onUpdate({ body: e.target.value });
+            if (e.target.value.trim()) onClearError?.();
+          }}
+          rows={4}
+          placeholder="Paragraph content for this section"
+          className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white ${sectionError ? "border-red-400 focus:ring-red-300" : "border-slate-300"}`}
+          data-testid={`section-body-${index}`}
+        />
+        {sectionError && (
+          <div className="mt-1 text-xs text-red-600 font-medium" data-testid={`section-body-error-${index}`}>
+            {sectionError}
+          </div>
+        )}
+      </div>
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-xs font-semibold text-slate-600">Bullet list items <span className="font-normal text-slate-400">(optional)</span></label>
+          <button type="button" onClick={onAddListItem}
+            className="text-xs px-2 py-0.5 rounded border border-slate-300 bg-white hover:bg-slate-100 text-slate-600"
+            data-testid={`section-add-list-${index}`}>+ Add item</button>
+        </div>
+        {(s.list ?? []).map((item, li) => (
+          <div key={li} className="flex items-center gap-2 mb-1">
+            <span className="text-slate-400 text-sm">•</span>
+            <input
+              type="text"
+              value={item}
+              onChange={e => onUpdateListItem(li, e.target.value)}
+              placeholder="Bullet item text"
+              className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
+              data-testid={`section-list-item-${index}-${li}`}
+            />
+            <button type="button" onClick={() => onRemoveListItem(li)}
+              className="text-red-500 hover:text-red-700 text-sm px-1"
+              data-testid={`section-list-remove-${index}-${li}`}>×</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SectionsEditor({
   sections,
   onChange,
@@ -399,13 +556,26 @@ function SectionsEditor({
   sectionErrors?: Record<number, string>;
   onClearError?: (i: number) => void;
 }) {
-  const add = () => onChange([...sections, { heading: "", body: "", list: [] }]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
+  const ids = sections.map((_, i) => String(i));
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = Number(active.id);
+    const newIndex = Number(over.id);
+    onChange(arrayMove(sections, oldIndex, newIndex));
+  };
+
+  const add = () => onChange([...sections, { heading: "", body: "", list: [] }]);
   const update = (i: number, patch: Partial<Section>) =>
     onChange(sections.map((s, idx) => idx === i ? { ...s, ...patch } : s));
-
   const remove = (i: number) => onChange(sections.filter((_, idx) => idx !== i));
-
   const move = (i: number, dir: -1 | 1) => {
     const next = [...sections];
     const j = i + dir;
@@ -413,101 +583,47 @@ function SectionsEditor({
     [next[i], next[j]] = [next[j], next[i]];
     onChange(next);
   };
-
   const addListItem = (i: number) => update(i, { list: [...(sections[i].list ?? []), ""] });
-
   const updateListItem = (si: number, li: number, val: string) => {
     const list = [...(sections[si].list ?? [])];
     list[li] = val;
     update(si, { list });
   };
-
   const removeListItem = (si: number, li: number) =>
     update(si, { list: (sections[si].list ?? []).filter((_, idx) => idx !== li) });
 
   return (
-    <div className="space-y-3">
-      {sections.map((s, i) => (
-        <div key={i} className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3" data-testid={`section-card-${i}`}>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Section {i + 1}</span>
-            <div className="flex items-center gap-1">
-              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}
-                className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
-                data-testid={`section-move-up-${i}`} title="Move up">↑</button>
-              <button type="button" onClick={() => move(i, 1)} disabled={i === sections.length - 1}
-                className="px-2 py-1 text-xs rounded border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-30"
-                data-testid={`section-move-down-${i}`} title="Move down">↓</button>
-              <button type="button" onClick={() => remove(i)}
-                className="px-2 py-1 text-xs rounded border border-red-200 text-red-600 bg-white hover:bg-red-50"
-                data-testid={`section-remove-${i}`}>Remove</button>
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Heading <span className="font-normal text-slate-400">(optional)</span></label>
-            <input
-              type="text"
-              value={s.heading ?? ""}
-              onChange={e => update(i, { heading: e.target.value })}
-              placeholder="Section heading"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
-              data-testid={`section-heading-${i}`}
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+        <div className="space-y-3">
+          {sections.map((s, i) => (
+            <SortableSectionCard
+              key={i}
+              id={String(i)}
+              index={i}
+              total={sections.length}
+              section={s}
+              sectionError={sectionErrors[i]}
+              onUpdate={patch => update(i, patch)}
+              onRemove={() => remove(i)}
+              onMove={dir => move(i, dir)}
+              onClearError={() => onClearError?.(i)}
+              onAddListItem={() => addListItem(i)}
+              onUpdateListItem={(li, val) => updateListItem(i, li, val)}
+              onRemoveListItem={li => removeListItem(i, li)}
             />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Body text *</label>
-            <textarea
-              value={s.body}
-              onChange={e => {
-                update(i, { body: e.target.value });
-                if (e.target.value.trim()) onClearError?.(i);
-              }}
-              rows={4}
-              placeholder="Paragraph content for this section"
-              className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white ${sectionErrors[i] ? "border-red-400 focus:ring-red-300" : "border-slate-300"}`}
-              data-testid={`section-body-${i}`}
-            />
-            {sectionErrors[i] && (
-              <div className="mt-1 text-xs text-red-600 font-medium" data-testid={`section-body-error-${i}`}>
-                {sectionErrors[i]}
-              </div>
-            )}
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-slate-600">Bullet list items <span className="font-normal text-slate-400">(optional)</span></label>
-              <button type="button" onClick={() => addListItem(i)}
-                className="text-xs px-2 py-0.5 rounded border border-slate-300 bg-white hover:bg-slate-100 text-slate-600"
-                data-testid={`section-add-list-${i}`}>+ Add item</button>
-            </div>
-            {(s.list ?? []).map((item, li) => (
-              <div key={li} className="flex items-center gap-2 mb-1">
-                <span className="text-slate-400 text-sm">•</span>
-                <input
-                  type="text"
-                  value={item}
-                  onChange={e => updateListItem(i, li, e.target.value)}
-                  placeholder="Bullet item text"
-                  className="flex-1 px-3 py-1.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
-                  data-testid={`section-list-item-${i}-${li}`}
-                />
-                <button type="button" onClick={() => removeListItem(i, li)}
-                  className="text-red-500 hover:text-red-700 text-sm px-1"
-                  data-testid={`section-list-remove-${i}-${li}`}>×</button>
-              </div>
-            ))}
-          </div>
+          ))}
+          <button
+            type="button"
+            onClick={add}
+            className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-semibold hover:border-amber-400 hover:text-amber-600 transition-colors"
+            data-testid="button-add-section"
+          >
+            + Add Section
+          </button>
         </div>
-      ))}
-      <button
-        type="button"
-        onClick={add}
-        className="w-full py-2 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-sm font-semibold hover:border-amber-400 hover:text-amber-600 transition-colors"
-        data-testid="button-add-section"
-      >
-        + Add Section
-      </button>
-    </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
@@ -808,7 +924,7 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
 
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Sections</label>
-            <div className="text-xs text-slate-400 mb-3">Add body sections with optional headings and bullet lists. Drag to reorder using ↑↓ buttons.</div>
+            <div className="text-xs text-slate-400 mb-3">Add body sections with optional headings and bullet lists. Drag the ⠿ handle to reorder, or use the ↑↓ buttons.</div>
             <SectionsEditor
               sections={sections}
               onChange={setSections}
