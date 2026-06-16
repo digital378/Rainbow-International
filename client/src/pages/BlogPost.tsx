@@ -5,9 +5,40 @@ import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { ContactForm } from "@/components/home/ContactForm";
-import { getBlogPost, blogPosts } from "@/data/blogPosts";
 import { Calendar, Tag, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
-import { BlogThumb } from "@/components/home/BlogThumb";
+import { useQuery } from "@tanstack/react-query";
+
+interface BlogSection {
+  heading?: string;
+  body: string;
+  list?: string[];
+}
+
+interface BlogPostData {
+  id: string;
+  slug: string;
+  title: string;
+  metaTitle: string;
+  metaDescription: string;
+  keywords: string;
+  date: string;
+  cat: string;
+  thumbUrl: string | null;
+  heroUrl: string;
+  intro: string;
+  sections: BlogSection[];
+  conclusion: string;
+  relatedSlugs: string[];
+  internalLinks: { label: string; href: string }[];
+  faqs: { q: string; a: string }[];
+}
+
+interface RelatedPost {
+  slug: string;
+  title: string;
+  cat: string;
+  date: string;
+}
 
 function renderInlineMarkdown(text: string) {
   const parts: (string | React.ReactElement)[] = [];
@@ -32,12 +63,59 @@ function renderInlineMarkdown(text: string) {
   return parts;
 }
 
+function useRelatedPosts(slugs: string[], enabled: boolean) {
+  return useQuery<RelatedPost[]>({
+    queryKey: ["/api/blog-posts", "related", slugs],
+    queryFn: async () => {
+      const results = await Promise.all(
+        slugs.slice(0, 3).map(async (s) => {
+          try {
+            const res = await fetch(`/api/blog-posts/${s}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            return { slug: data.slug, title: data.title, cat: data.cat, date: data.date } as RelatedPost;
+          } catch {
+            return null;
+          }
+        })
+      );
+      return results.filter(Boolean) as RelatedPost[];
+    },
+    enabled,
+  });
+}
+
 export default function BlogPost() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
-  const post = getBlogPost(slug);
 
-  if (!post) {
+  const { data: post, isLoading, isError } = useQuery<BlogPostData>({
+    queryKey: [`/api/blog-posts/${slug}`],
+    queryFn: async () => {
+      const res = await fetch(`/api/blog-posts/${slug}`);
+      if (!res.ok) throw new Error("Not found");
+      return res.json();
+    },
+  });
+
+  const { data: related = [] } = useRelatedPosts(
+    post?.relatedSlugs ?? [],
+    !!post && (post.relatedSlugs?.length ?? 0) > 0
+  );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center py-24">
+          <div className="text-center text-gray-400">Loading…</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (isError || !post) {
     return (
       <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
@@ -54,11 +132,6 @@ export default function BlogPost() {
       </div>
     );
   }
-
-  const related = post.relatedSlugs
-    .map((s) => blogPosts.find((p) => p.slug === s))
-    .filter(Boolean)
-    .slice(0, 3) as typeof blogPosts;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -85,7 +158,6 @@ export default function BlogPost() {
           minHeight: "320px",
         }}
       >
-        {/* Background image overlay */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${post.heroUrl})` }}

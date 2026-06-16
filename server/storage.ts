@@ -6,7 +6,8 @@ import {
   type BrochureRequest, type InsertBrochureRequest,
   type Ra, type InsertRa,
   type WalkinCheckin,
-  inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins,
+  type BlogPost, type InsertBlogPost,
+  inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins, blogPostsTable,
 } from "@shared/schema";
 import { db } from "./db";
 import { desc, eq, gte, and, sql } from "drizzle-orm";
@@ -45,6 +46,12 @@ export interface IStorage {
   markCheckinSyncFailed(id: string, error: string): Promise<void>;
   getTodayCheckinCounts(since: Date, school?: string): Promise<Array<{ raName: string; raBranch: string; count: number }>>;
   getDailyCheckinCounts(days: number, school?: string): Promise<Array<{ date: string; count: number }>>;
+
+  // Blog posts
+  getAllBlogPosts(): Promise<BlogPost[]>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  upsertBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getAllBlogSlugs(): Promise<string[]>;
 }
 
 export class DbStorage implements IStorage {
@@ -202,6 +209,49 @@ export class DbStorage implements IStorage {
       .groupBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`)
       .orderBy(sql`to_char(submitted_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')`);
     return rows;
+  }
+
+  // ── Blog post methods ────────────────────────────────────────
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    return await db.select().from(blogPostsTable).orderBy(desc(blogPostsTable.publishedAt));
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [result] = await db.select().from(blogPostsTable).where(eq(blogPostsTable.slug, slug));
+    return result;
+  }
+
+  async upsertBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [result] = await db
+      .insert(blogPostsTable)
+      .values(post)
+      .onConflictDoUpdate({
+        target: blogPostsTable.slug,
+        set: {
+          title: post.title,
+          metaTitle: post.metaTitle,
+          metaDescription: post.metaDescription,
+          keywords: post.keywords,
+          date: post.date,
+          cat: post.cat,
+          thumbUrl: post.thumbUrl,
+          heroUrl: post.heroUrl,
+          intro: post.intro,
+          sections: post.sections,
+          conclusion: post.conclusion,
+          relatedSlugs: post.relatedSlugs,
+          internalLinks: post.internalLinks,
+          faqs: post.faqs,
+          publishedAt: post.publishedAt,
+        },
+      })
+      .returning();
+    return result;
+  }
+
+  async getAllBlogSlugs(): Promise<string[]> {
+    const rows = await db.select({ slug: blogPostsTable.slug }).from(blogPostsTable);
+    return rows.map((r) => r.slug);
   }
 }
 

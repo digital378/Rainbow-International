@@ -10,7 +10,6 @@ import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
-import { blogPosts } from "../client/src/data/blogPosts";
 import { google } from "googleapis";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
@@ -270,11 +269,12 @@ export async function registerRoutes(
   registerPageSSR(app);
   registerSSRRoutes(app);
 
-  // Blog-slug redirects are derived automatically from the blogPosts data — every
+  // Blog-slug redirects are derived automatically from the blog_posts table — every
   // post gets a /slug → /blog/slug redirect so old WordPress backlinks resolve
   // correctly. No manual entry is needed when a new post is added.
+  const blogSlugs = await storage.getAllBlogSlugs();
   const blogSlugRedirects = Object.fromEntries(
-    blogPosts.map((post) => [`/${post.slug}`, `/blog/${post.slug}`])
+    blogSlugs.map((slug) => [`/${slug}`, `/blog/${slug}`])
   );
 
   const wpRedirects: Record<string, string> = {
@@ -296,6 +296,26 @@ export async function registerRoutes(
       return res.redirect(301, "/fee-structure");
     }
     return res.redirect(301, "/");
+  });
+
+  // ── Blog Posts ──────────────────────────────────────────────
+  app.get("/api/blog-posts", async (req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch blog posts" });
+    }
+  });
+
+  app.get("/api/blog-posts/:slug", async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) return res.status(404).json({ message: "Blog post not found" });
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch blog post" });
+    }
   });
 
   // ── Inquiries ───────────────────────────────────────────────

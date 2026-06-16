@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -138,6 +138,36 @@ export const insertBrochureRequestSchema = createInsertSchema(brochureRequests).
 
 export type InsertBrochureRequest = z.infer<typeof insertBrochureRequestSchema>;
 export type BrochureRequest = typeof brochureRequests.$inferSelect;
+
+// ── Blog Posts ──────────────────────────────────────────────────
+export const blogPostsTable = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  metaTitle: text("meta_title").notNull(),
+  metaDescription: text("meta_description").notNull(),
+  keywords: text("keywords").notNull().default(""),
+  date: text("date").notNull(),
+  cat: text("cat").notNull(),
+  thumbUrl: text("thumb_url"),
+  heroUrl: text("hero_url").notNull().default(""),
+  intro: text("intro").notNull().default(""),
+  sections: jsonb("sections").$type<Array<{ heading?: string; body: string; list?: string[] }>>().notNull().default([]),
+  conclusion: text("conclusion").notNull().default(""),
+  relatedSlugs: jsonb("related_slugs").$type<string[]>().notNull().default([]),
+  internalLinks: jsonb("internal_links").$type<Array<{ label: string; href: string }>>().notNull().default([]),
+  faqs: jsonb("faqs").$type<Array<{ q: string; a: string }>>().notNull().default([]),
+  publishedAt: timestamp("published_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPostsTable).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPostsTable.$inferSelect;
 
 // ── RA Walk-in QR Check-in System ─────────────────────────────
 export const ras = pgTable("ras", {

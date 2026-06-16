@@ -1,5 +1,6 @@
 import type { Express } from "express";
-import { blogPosts } from "../client/src/data/blogPosts";
+import { storage } from "./storage";
+import type { BlogPost } from "@shared/schema";
 
 function e(str: string | undefined | null): string {
   if (!str) return "";
@@ -55,14 +56,16 @@ function toISODate(dateStr: string): string {
   return d.toISOString().split("T")[0];
 }
 
-function renderBlogSSR(slug: string): string | null {
-  const post = blogPosts.find((p) => p.slug === slug);
+async function renderBlogSSR(slug: string): Promise<string | null> {
+  const post = await storage.getBlogPostBySlug(slug);
   if (!post) return null;
 
-  const related = post.relatedSlugs
-    .map((s) => blogPosts.find((p) => p.slug === s))
-    .filter(Boolean)
-    .slice(0, 3);
+  const relatedPosts: BlogPost[] = [];
+  for (const s of (post.relatedSlugs || []).slice(0, 3)) {
+    const rel = await storage.getBlogPostBySlug(s);
+    if (rel) relatedPosts.push(rel);
+  }
+  const related = relatedPosts;
 
   const sectionsHtml = post.sections
     .map((sec) => {
@@ -597,14 +600,19 @@ function renderBlogSSR(slug: string): string | null {
 
 export function registerSSRRoutes(app: Express) {
   // Production SSR — replaces React blog pages, no demo badge
-  app.get("/blog/:slug", (req, res, next) => {
+  app.get("/blog/:slug", async (req, res, next) => {
     const { slug } = req.params;
     if (/\.\w+$/.test(slug)) return next();
-    const html = renderBlogSSR(slug);
-    if (!html) return next();
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("X-Rendered-By", "Express SSR");
-    res.send(html);
+    try {
+      const html = await renderBlogSSR(slug);
+      if (!html) return next();
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("X-Rendered-By", "Express SSR");
+      res.send(html);
+    } catch (err) {
+      console.error("[ssrBlog] Error rendering blog post:", err);
+      next();
+    }
   });
 
 }
