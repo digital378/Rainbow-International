@@ -20,6 +20,31 @@ interface BlogPost {
 
 const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General"];
 
+function BlogThumb({ url, title, cat }: { url: string | null; title: string; cat: string }) {
+  const [errored, setErrored] = useState(false);
+  if (!url || errored) {
+    return (
+      <div className="h-44 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}>
+        <span className="text-white/60 text-sm font-medium">{cat}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="relative h-44 overflow-hidden">
+      <img
+        src={url}
+        alt={title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
+        decoding="async"
+        width={400}
+        height={176}
+        onError={() => setErrored(true)}
+      />
+    </div>
+  );
+}
+
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,23 +142,7 @@ export default function Blogs() {
                   data-testid={`card-blog-${blog.slug}`}
                   className="group block rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                 >
-                  {blog.thumbUrl ? (
-                    <div className="relative h-44 overflow-hidden">
-                      <img
-                        src={blog.thumbUrl}
-                        alt={blog.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                        decoding="async"
-                        width={400}
-                        height={176}
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-44 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}>
-                      <span className="text-white/60 text-sm font-medium">{blog.cat}</span>
-                    </div>
-                  )}
+                  <BlogThumb url={blog.thumbUrl} title={blog.title} cat={blog.cat} />
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{blog.cat}</span>
