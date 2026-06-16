@@ -388,7 +388,17 @@ function ImageUploadField({
 
 /* ─── Structured editor sub-components ─── */
 
-function SectionsEditor({ sections, onChange }: { sections: Section[]; onChange: (s: Section[]) => void }) {
+function SectionsEditor({
+  sections,
+  onChange,
+  sectionErrors = {},
+  onClearError,
+}: {
+  sections: Section[];
+  onChange: (s: Section[]) => void;
+  sectionErrors?: Record<number, string>;
+  onClearError?: (i: number) => void;
+}) {
   const add = () => onChange([...sections, { heading: "", body: "", list: [] }]);
 
   const update = (i: number, patch: Partial<Section>) =>
@@ -448,12 +458,20 @@ function SectionsEditor({ sections, onChange }: { sections: Section[]; onChange:
             <label className="block text-xs font-semibold text-slate-600 mb-1">Body text *</label>
             <textarea
               value={s.body}
-              onChange={e => update(i, { body: e.target.value })}
+              onChange={e => {
+                update(i, { body: e.target.value });
+                if (e.target.value.trim()) onClearError?.(i);
+              }}
               rows={4}
               placeholder="Paragraph content for this section"
-              className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white"
+              className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-y bg-white ${sectionErrors[i] ? "border-red-400 focus:ring-red-300" : "border-slate-300"}`}
               data-testid={`section-body-${i}`}
             />
+            {sectionErrors[i] && (
+              <div className="mt-1 text-xs text-red-600 font-medium" data-testid={`section-body-error-${i}`}>
+                {sectionErrors[i]}
+              </div>
+            )}
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -615,6 +633,7 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
   const isEdit = !!post;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [sectionErrors, setSectionErrors] = useState<Record<number, string>>({});
 
   const [slug, setSlug] = useState(post?.slug ?? "");
   const [title, setTitle] = useState(post?.title ?? "");
@@ -643,6 +662,16 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const emptyBodyIndexes: Record<number, string> = {};
+    sections.forEach((s, i) => {
+      if (!s.body.trim()) emptyBodyIndexes[i] = "Body text is required.";
+    });
+    if (Object.keys(emptyBodyIndexes).length > 0) {
+      setSectionErrors(emptyBodyIndexes);
+      return;
+    }
+    setSectionErrors({});
 
     const relatedSlugs = relatedSlugsRaw.split(",").map(s => s.trim()).filter(Boolean);
 
@@ -780,7 +809,12 @@ function PostForm({ post, token, onDone, onCancel }: { post: BlogPost | null; to
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Sections</label>
             <div className="text-xs text-slate-400 mb-3">Add body sections with optional headings and bullet lists. Drag to reorder using ↑↓ buttons.</div>
-            <SectionsEditor sections={sections} onChange={setSections} />
+            <SectionsEditor
+              sections={sections}
+              onChange={setSections}
+              sectionErrors={sectionErrors}
+              onClearError={i => setSectionErrors(prev => { const next = { ...prev }; delete next[i]; return next; })}
+            />
             <JsonPreview label="Sections" value={sections} />
           </div>
 
