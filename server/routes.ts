@@ -370,6 +370,7 @@ export async function registerRoutes(
     "/how-to-prepare-your-child-for-first-day-of-school": "/blog/how-to-prepare-your-child-for-first-day-of-school",
     "/benefits-of-multiple-intelligence-based-learning-in-schools": "/blog/benefits-of-multiple-intelligence-based-learning-in-schools",
     "/best-cbse-schools-in-thane-what-to-look-for": "/blog/best-cbse-schools-in-thane-what-to-look-for",
+    "/cbse-curriculum": "/curriculum",
   };
 
   for (const [from, to] of Object.entries(wpRedirects)) {
