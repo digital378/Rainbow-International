@@ -1,6 +1,8 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { timingSafeEqual } from "node:crypto";
+import fs from "fs";
+import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema } from "@shared/schema";
@@ -38,6 +40,32 @@ const careerUpload = multer({
       return cb(new Error("Resume must be a PDF, DOC, or DOCX file"));
     }
     cb(null, true);
+  },
+});
+
+// ── Blog image upload (admin only) ──────────────────────────────────────────
+const BLOG_IMAGE_MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const BLOG_IMAGE_ALLOWED_MIMES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const BLOG_UPLOAD_DIR = path.resolve("./uploads/blog");
+
+const blogImageUpload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      fs.mkdirSync(BLOG_UPLOAD_DIR, { recursive: true });
+      cb(null, BLOG_UPLOAD_DIR);
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+      cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+    },
+  }),
+  limits: { fileSize: BLOG_IMAGE_MAX_BYTES, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (BLOG_IMAGE_ALLOWED_MIMES.has(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPEG, PNG, and WebP images are allowed"));
+    }
   },
 });
 
@@ -258,6 +286,13 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // Serve admin-uploaded blog images from the persistent uploads directory.
+  // This must be registered early so it resolves before the SPA catch-all.
+  app.use("/uploads", express.static(path.resolve("./uploads"), {
+    maxAge: "365d",
+    immutable: false,
+  }));
 
   // SSR must be registered BEFORE wpRedirects so that search engine bots receive
   // fully-rendered HTML for all registered paths. For bots, the SSR handler returns
@@ -3170,6 +3205,23 @@ paths:
     } catch {
       res.status(500).json({ message: "Failed to delete blog post" });
     }
+  });
+
+  // POST /api/admin/upload-image — upload a blog hero or thumbnail image (admin only)
+  // Accepts: multipart/form-data with a single "image" field (JPEG, PNG, WebP; max 5 MB)
+  // Returns: { url: "/uploads/blog/<filename>" }
+  app.post("/api/admin/upload-image", requireAdmin, (req: any, res: any) => {
+    blogImageUpload.single("image")(req, res, (err: any) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ message: "File too large. Maximum size is 5 MB." });
+        }
+        return res.status(400).json({ message: `Upload error: ${err.message}` });
+      }
+      if (err) return res.status(400).json({ message: err.message });
+      if (!req.file) return res.status(400).json({ message: "No file provided." });
+      res.json({ url: `/uploads/blog/${req.file.filename}` });
+    });
   });
 
   // Sales: today's live check-in counts (no extra auth — same trust level as /api/sales/live)
