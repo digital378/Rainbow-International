@@ -328,7 +328,7 @@ function ImageUploadField({
       </label>
       <div className="flex gap-2">
         <input
-          type="url"
+          type="text"
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
