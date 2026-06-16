@@ -247,7 +247,7 @@ function RpsDashboard() {
   const fetchData = useCallback(() => {
     setLoading(true);
     Promise.all([
-      fetch("/api/rps-sales/live").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/rps-sales/live?full=1").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
       fetch("/api/marketing/monthly").then(r => r.ok ? r.json() : Promise.resolve([])),
     ])
       .then(([rps, mkt]: [RpsData, MarketingMonth[]]) => {

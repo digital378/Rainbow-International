@@ -2772,31 +2772,61 @@ export async function registerRoutes(
         recentOpen: dm2OpenLeads.slice(0, 100),
       };
 
+      const risKpis = {
+        walkinsTotal,
+        walkinsThisMonth,
+        admissionsTotal: admTotal,
+        admissionsThisMonth: admThisMonth,
+        provisionalCount: provTotal,
+        provisionalRegular: provRegular,
+        provisionalIntegrated: provIntegrated,
+        provisionalThisMonth: provThisMonth,
+        rpsRollover,
+        overallConversion,
+        openEnquiries: (statusMap.get("OPEN") || 0) + (statusMap.get("FOLLOW UP") || 0) + (statusMap.get("FOLLOWUP") || 0),
+        closedEnquiries: statusMap.get("CLOSED") || 0,
+        yearTarget,
+        yearAchieved,
+        yearTargetGap,
+        docsPending,
+        docsClear,
+        misDate: misData.date,
+        misWalkins: misData.walkins,
+        misAdmissions: misData.admissions,
+        misTargetGap: misData.targetGap,
+      };
+
+      // Slim response for AI agents (default). Pass ?full=1 for the complete dashboard payload.
+      if (!req.query.full) {
+        let slimCheckins = { todayTotal: 0, byRa: [] as any[] };
+        try {
+          const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+          const istNow = new Date(Date.now() + IST_OFFSET_MS);
+          istNow.setUTCHours(0, 0, 0, 0);
+          const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
+          const counts = await storage.getTodayCheckinCounts(todayStart, "RIS");
+          slimCheckins = {
+            todayTotal: counts.reduce((s: number, r: any) => s + r.count, 0),
+            byRa: counts.sort((a: any, b: any) => b.count - a.count).slice(0, 5),
+          };
+        } catch {}
+        return res.json({
+          generatedAt: new Date().toISOString(),
+          kpis: risKpis,
+          leadTemperature,
+          walkinsByMonth: sortedMonths(walkinByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, count: v.count })),
+          admissionsByMonth: sortedMonths(admByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, total: v.total })),
+          topSources: sortByCount(sourceMap).slice(0, 6).map(x => ({ source: x.key, count: x.count })),
+          counselorLeaderboard: counselorLeaderboard.slice(0, 8),
+          dmPipeline: { total: dmPipeline.total, open: dmPipeline.open, admitted: dmPipeline.admitted, closed: dmPipeline.closed, convRate: dmPipeline.convRate },
+          openWalkins: { count: openWalkinsList.length, oldest5: openWalkinsList.sort((a, b) => b.daysOpen - a.daysOpen).slice(0, 5) },
+          todayCheckins: slimCheckins,
+        });
+      }
+
       res.json({
         generatedAt: new Date().toISOString(),
-        kpis: {
-          walkinsTotal,
-          walkinsThisMonth,
-          admissionsTotal: admTotal,
-          admissionsThisMonth: admThisMonth,
-          provisionalCount: provTotal,
-          provisionalRegular: provRegular,
-          provisionalIntegrated: provIntegrated,
-          provisionalThisMonth: provThisMonth,
-          rpsRollover,
-          overallConversion,
-          openEnquiries: (statusMap.get("OPEN") || 0) + (statusMap.get("FOLLOW UP") || 0) + (statusMap.get("FOLLOWUP") || 0),
-          closedEnquiries: statusMap.get("CLOSED") || 0,
-          yearTarget,
-          yearAchieved,
-          yearTargetGap,
-          docsPending,
-          docsClear,
-          misDate: misData.date,
-          misWalkins: misData.walkins,
-          misAdmissions: misData.admissions,
-          misTargetGap: misData.targetGap,
-        },
+        kpis: risKpis,
         monthlyTargets,
         walkins: {
           byMonth: sortedMonths(walkinByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, count: v.count })),
@@ -3213,7 +3243,7 @@ paths:
   });
 
   // ── RPS Sales Dashboard ─────────────────────────────────────────────────────
-  app.get("/api/rps-sales/live", async (_req, res) => {
+  app.get("/api/rps-sales/live", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
       const RPS_SID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
@@ -3655,6 +3685,35 @@ paths:
         branches: Object.fromEntries(Array.from(det.branches.entries()).map(([br, v]) => [br, v])),
         sources:  Object.fromEntries(Array.from(det.sources.entries()).map(([src, v]) => [src, v])),
       })).sort((a, b) => a.monthKey.localeCompare(b.monthKey));
+
+      // Slim response for AI agents (default). Pass ?full=1 for the complete dashboard payload.
+      if (!req.query.full) {
+        let slimCheckins = { todayTotal: 0, byRa: [] as any[] };
+        try {
+          const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+          const istNow = new Date(Date.now() + IST_OFFSET_MS);
+          istNow.setUTCHours(0, 0, 0, 0);
+          const todayStart = new Date(istNow.getTime() - IST_OFFSET_MS);
+          const counts = await storage.getTodayCheckinCounts(todayStart, "RPS");
+          slimCheckins = {
+            todayTotal: counts.reduce((s: number, r: any) => s + r.count, 0),
+            byRa: counts.sort((a: any, b: any) => b.count - a.count).slice(0, 5),
+          };
+        } catch {}
+        return res.json({
+          generatedAt: new Date().toISOString(),
+          kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
+          byMonth,
+          byBranch,
+          topSources: bySource.slice(0, 6),
+          counselorLeaderboard: counselorLeaderboard.slice(0, 8),
+          closedReasons: closedReasons.slice(0, 6),
+          dmPipeline: { admitted: dmAdmitted, open: dmOpen, closed: dmClosed, convMedianDays: dmConvMedian },
+          ageingBuckets,
+          openWalkins: { count: rpsOpenWalkins.length, oldest5: rpsOpenWalkins.sort((a, b) => b.daysOpen - a.daysOpen).slice(0, 5) },
+          todayCheckins: slimCheckins,
+        });
+      }
 
       res.json({
         generatedAt: new Date().toISOString(),

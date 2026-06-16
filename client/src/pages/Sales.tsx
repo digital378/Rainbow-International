@@ -193,7 +193,7 @@ function SalesDashboard() {
 
   const fetchData = useCallback(() => {
     setLoading(true);
-    fetch("/api/sales/live")
+    fetch("/api/sales/live?full=1")
       .then((r) => (r.ok ? r.json() : Promise.reject(r.statusText)))
       .then((d: SalesData) => {
         if (!cancelled.current) { setData(d); setError(null); setLastFetch(new Date()); }
