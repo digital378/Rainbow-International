@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import { timingSafeEqual } from "node:crypto";
+import { timingSafeEqual, randomBytes } from "node:crypto";
 import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
@@ -47,6 +47,23 @@ const careerUpload = multer({
 const BLOG_IMAGE_MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 const BLOG_IMAGE_ALLOWED_MIMES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const BLOG_UPLOAD_DIR = path.resolve("./uploads/blog");
+
+function checkImageMagicBytes(filePath: string): boolean {
+  const fd = fs.openSync(filePath, "r");
+  const buf = Buffer.alloc(12);
+  const bytesRead = fs.readSync(fd, buf, 0, 12, 0);
+  fs.closeSync(fd);
+  if (bytesRead < 3) return false;
+  // JPEG: FF D8 FF
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return true;
+  // PNG: 89 50 4E 47
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return true;
+  // WebP: RIFF????WEBP (bytes 0-3 == "RIFF", bytes 8-11 == "WEBP")
+  if (bytesRead >= 12 &&
+      buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
+      buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) return true;
+  return false;
+}
 
 const blogImageUpload = multer({
   storage: multer.diskStorage({
@@ -461,8 +478,18 @@ export async function registerRoutes(
     },
   );
 
-  // ── Debug endpoint — logs all request headers (no auth required) ─────────
+  // ── Debug endpoint — logs all request headers (ADMIN_TOKEN required) ──────
   app.get("/api/debug/headers", (req, res) => {
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (!adminToken || !provided || !timingSafeEqual(
+      Buffer.from(adminToken),
+      Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)),
+    )) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const safe = { ...req.headers };
     // Mask any token values partially so they're not fully exposed in logs
     for (const k of Object.keys(safe)) {
@@ -676,11 +703,14 @@ export async function registerRoutes(
     if (!clientId || !clientSecret) {
       return res.status(503).json({ message: "Google credentials not configured" });
     }
+    const state = randomBytes(16).toString("hex");
+    res.setHeader("Set-Cookie", `oauth_state=${state}; HttpOnly; SameSite=Lax; Path=/; Max-Age=300`);
     const oauth2Client = getOAuthClient();
     const url = oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: GOOGLE_SCOPES,
       prompt: "consent",
+      state,
     });
     res.redirect(url);
   });
@@ -688,6 +718,18 @@ export async function registerRoutes(
   app.get("/auth/google/callback", async (req, res) => {
     const code = typeof req.query.code === "string" ? req.query.code : "";
     if (!code) return res.status(400).json({ message: "Missing code" });
+    const returnedState = typeof req.query.state === "string" ? req.query.state : "";
+    const cookies = Object.fromEntries(
+      (req.headers.cookie || "").split(";").map((c) => {
+        const [k, ...v] = c.trim().split("=");
+        return [k, v.join("=")];
+      }),
+    );
+    const expectedState = cookies["oauth_state"] || "";
+    res.setHeader("Set-Cookie", "oauth_state=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0");
+    if (!returnedState || !expectedState || returnedState !== expectedState) {
+      return res.status(403).json({ message: "Invalid OAuth state — possible CSRF. Please start the auth flow again at /auth/google." });
+    }
     try {
       const oauth2Client = getOAuthClient();
       const { tokens } = await oauth2Client.getToken(code);
@@ -3220,6 +3262,10 @@ paths:
       }
       if (err) return res.status(400).json({ message: err.message });
       if (!req.file) return res.status(400).json({ message: "No file provided." });
+      if (!checkImageMagicBytes(req.file.path)) {
+        try { fs.unlinkSync(req.file.path); } catch {}
+        return res.status(400).json({ message: "File content does not match a valid image format (JPEG, PNG, or WebP required)." });
+      }
       res.json({ url: `/uploads/blog/${req.file.filename}` });
     });
   });
