@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
+import { injectPageTitle } from "./pageTitles";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -32,8 +33,15 @@ export function serveStatic(app: Express) {
     },
   }));
 
-  app.use("*", (_req, res) => {
+  let cachedIndexHtml: string | null = null;
+
+  app.use("*", (req, res) => {
+    if (!cachedIndexHtml) {
+      cachedIndexHtml = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+    }
+    const html = injectPageTitle(cachedIndexHtml, req.originalUrl);
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
-    res.sendFile(path.resolve(distPath, "index.html"));
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(html);
   });
 }
