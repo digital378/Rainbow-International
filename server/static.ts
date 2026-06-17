@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { injectPageTitle, isKnownRoute } from "./pageTitles";
+import { injectPageTitle, isKnownRoute, resolveBlogTitle } from "./pageTitles";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -35,11 +35,17 @@ export function serveStatic(app: Express) {
 
   let cachedIndexHtml: string | null = null;
 
-  app.use("*", (req, res) => {
+  app.use("*", async (req, res) => {
     if (!cachedIndexHtml) {
       cachedIndexHtml = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
     }
-    const html = injectPageTitle(cachedIndexHtml, req.originalUrl);
+    const basePath = req.originalUrl.split("?")[0].replace(/\/$/, "");
+    const blogMatch = basePath.match(/^\/blog\/([^/]+)$/);
+    let overrideTitle: string | undefined;
+    if (blogMatch) {
+      overrideTitle = (await resolveBlogTitle(blogMatch[1])) ?? undefined;
+    }
+    const html = injectPageTitle(cachedIndexHtml, req.originalUrl, overrideTitle);
     const status = isKnownRoute(req.originalUrl) ? 200 : 404;
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
     res.setHeader("Content-Type", "text/html; charset=utf-8");

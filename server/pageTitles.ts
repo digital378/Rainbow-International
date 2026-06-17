@@ -1,3 +1,20 @@
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { blogPostsTable } from "@shared/schema";
+
+export async function resolveBlogTitle(slug: string): Promise<string | null> {
+  try {
+    const rows = await db
+      .select({ metaTitle: blogPostsTable.metaTitle })
+      .from(blogPostsTable)
+      .where(eq(blogPostsTable.slug, slug))
+      .limit(1);
+    return rows[0]?.metaTitle ?? null;
+  } catch {
+    return null;
+  }
+}
+
 const PAGE_TITLES: Record<string, string> = {
   "/": "Best CBSE School in Thane | Nursery to Class 12",
   "/about-rainbow-international-school": "About Us | Rainbow International School Thane",
@@ -79,9 +96,9 @@ function escHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function injectPageTitle(html: string, reqPath: string): string {
+export function injectPageTitle(html: string, reqPath: string, overrideTitle?: string): string {
   const basePath = (reqPath.split("?")[0].replace(/\/$/, "") || "/");
-  const title = PAGE_TITLES[basePath];
+  const title = overrideTitle ?? PAGE_TITLES[basePath];
   if (!title) return html;
   const safe = escHtml(title);
   return html
