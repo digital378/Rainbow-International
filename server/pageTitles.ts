@@ -51,6 +51,27 @@ const PAGE_TITLES: Record<string, string> = {
   "/sales": "Admissions | Rainbow International School",
 };
 
+const STATIC_KNOWN_PATHS = new Set([
+  ...Object.keys(PAGE_TITLES),
+  "/marketing",
+  "/admin/ras/submissions",
+  "/admin/ras",
+  "/admin/blog",
+]);
+
+const DYNAMIC_KNOWN_PATTERNS: RegExp[] = [
+  /^\/blog\/[^/]+$/,
+  /^\/walkin\/[^/]+$/,
+  /^\/admin\/ras\/[^/]+\/qr$/,
+  /^\/admin\/ras\/[^/]+$/,
+];
+
+export function isKnownRoute(reqPath: string): boolean {
+  const basePath = (reqPath.split("?")[0].replace(/\/$/, "") || "/");
+  if (STATIC_KNOWN_PATHS.has(basePath)) return true;
+  return DYNAMIC_KNOWN_PATTERNS.some((re) => re.test(basePath));
+}
+
 function escHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

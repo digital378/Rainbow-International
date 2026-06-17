@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ScrollToTop from "@/components/ScrollToTop";
 import { initGA, trackPageView } from "@/lib/analytics";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Home from "@/pages/Home";
 
 const About = lazy(() => import("@/pages/About"));
@@ -190,7 +191,9 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <PageViewTracker />
-        <Router />
+        <ErrorBoundary>
+          <Router />
+        </ErrorBoundary>
         <DeferredExtras />
       </TooltipProvider>
     </QueryClientProvider>

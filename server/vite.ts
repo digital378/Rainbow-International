@@ -5,7 +5,7 @@ import viteConfig from "../vite.config";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
-import { injectPageTitle } from "./pageTitles";
+import { injectPageTitle, isKnownRoute } from "./pageTitles";
 
 const viteLogger = createLogger();
 
@@ -51,7 +51,8 @@ export async function setupVite(server: Server, app: Express) {
       );
       const page = await vite.transformIndexHtml(url, template);
       const pageWithTitle = injectPageTitle(page, req.originalUrl);
-      res.status(200).set({ "Content-Type": "text/html" }).end(pageWithTitle);
+      const status = isKnownRoute(req.originalUrl) ? 200 : 404;
+      res.status(status).set({ "Content-Type": "text/html" }).end(pageWithTitle);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);

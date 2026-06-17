@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { injectPageTitle } from "./pageTitles";
+import { injectPageTitle, isKnownRoute } from "./pageTitles";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -40,8 +40,9 @@ export function serveStatic(app: Express) {
       cachedIndexHtml = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
     }
     const html = injectPageTitle(cachedIndexHtml, req.originalUrl);
+    const status = isKnownRoute(req.originalUrl) ? 200 : 404;
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.send(html);
+    res.status(status).send(html);
   });
 }

@@ -2,10 +2,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Link } from "wouter";
 import ScrollProgress from "@/components/home/ScrollProgress";
+import { SEO } from "@/components/SEO";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      <SEO title="Page Not Found | Rainbow International School" robots="noindex, follow" />
       <ScrollProgress />
       <Navbar />
       <main className="flex-grow flex items-center justify-center py-20">
