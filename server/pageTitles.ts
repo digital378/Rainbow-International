@@ -63,7 +63,6 @@ const DYNAMIC_KNOWN_PATTERNS: RegExp[] = [
   /^\/blog\/[^/]+$/,
   /^\/walkin\/[^/]+$/,
   /^\/admin\/ras\/[^/]+\/qr$/,
-  /^\/admin\/ras\/[^/]+$/,
 ];
 
 export function isKnownRoute(reqPath: string): boolean {
