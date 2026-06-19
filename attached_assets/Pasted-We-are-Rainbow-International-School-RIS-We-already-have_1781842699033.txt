@@ -1,0 +1,66 @@
+We are Rainbow International School (RIS). We already have an existing RIS project in Replit.
+
+We want to build a fully automated Timetable and Teaching Resource Planning System.
+
+This is not only a timetable tool. It should also help the school plan, allocate, and monitor teaching staff resources properly.
+
+The system should include:
+
+1. Timetable Generation
+- Grade-wise and section-wise timetable generation
+- Subject-period allocation
+- Classroom-wise timetable
+- Teacher-wise timetable
+- Day-wise and weekly timetable
+- Clash detection for teachers, classes, rooms, and shared resources
+- Admin approval before final publishing
+- Export to PDF / Excel
+
+2. Teaching Staff Resource Planning
+- Teacher availability management
+- Teacher workload calculation
+- Maximum and minimum teaching periods per teacher
+- Free-period tracking
+- Substitute teacher planning
+- Leave/absence-based timetable adjustment
+- Balanced workload across teachers
+- Subject-specialist mapping
+- Class teacher and co-teacher mapping
+- Identification of underutilized and overutilized teachers
+- Requirement planning for additional teachers if workload is high
+
+3. Academic Resource Planning
+- Allocation of shared resources such as labs, library, ICT room, sports ground, activity room, and special rooms
+- Room capacity and availability management
+- Resource clash detection
+- Weekly resource utilization report
+
+4. Management Dashboard
+- Teacher workload dashboard
+- Class-wise timetable dashboard
+- Subject allocation dashboard
+- Resource utilization dashboard
+- Substitution dashboard
+- Pending approval dashboard
+- Reports for Principal / Academic Head / Timetable Coordinator
+
+5. Future Integration
+- Possible future integration with existing RIS project
+- Possible future integration with ERP / MCB
+- Import/export through Excel or Google Sheets
+- API-based connection in future if required
+
+Our main concern is safety. We do not want the current RIS project to face downtime, database conflict, code conflict, deployment issue, or accidental data loss.
+
+Please advise clearly:
+
+1. Should this be built as a new Replit project or inside the existing RIS project?
+2. Can it later connect with the existing RIS project?
+3. What database setup should we use?
+4. How should we separate development, testing, and production?
+5. What is the safest technical architecture?
+6. What technology stack do you recommend for this type of school operations system?
+7. Should the timetable and resource-planning logic be kept separate from the existing RIS codebase?
+8. What precautions should we take before integrating it with the live RIS system?
+
+Please give a clear recommendation with reasons.
