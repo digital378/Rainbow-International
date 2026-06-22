@@ -106,11 +106,11 @@ export const LAST_YEAR: LastYearRow[] = [
 ];
 
 export const MAY_WEEKLY = [
-  { week: "01–03 May", risLeads: 27, risAdm: 0, risWalk: 3, risBook: 7, rpsLeads: 20, rpsAdm: 1, rpsWalk: 3, rpsBook: 3 },
-  { week: "04–09 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "10–16 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "17–23 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
-  { week: "24–31 May", risLeads: 0,  risAdm: 0, risWalk: 0, risBook: 0, rpsLeads: 0,  rpsAdm: 0, rpsWalk: 0, rpsBook: 0 },
+  { week: "01/05 - 02/05", risLeads: 15, risAdm: 0, risWalk: 4, risBook: 6,  rpsLeads: 14, rpsAdm: 1, rpsWalk: 2, rpsBook: 6  },
+  { week: "03/05 - 09/05", risLeads: 41, risAdm: 2, risWalk: 11, risBook: 18, rpsLeads: 39, rpsAdm: 3, rpsWalk: 7, rpsBook: 16 },
+  { week: "10/05 - 16/05", risLeads: 40, risAdm: 3, risWalk: 11, risBook: 14, rpsLeads: 38, rpsAdm: 3, rpsWalk: 6, rpsBook: 12 },
+  { week: "17/05 - 23/05", risLeads: 38, risAdm: 1, risWalk: 13, risBook: 24, rpsLeads: 36, rpsAdm: 2, rpsWalk: 8, rpsBook: 21 },
+  { week: "24/05 - 31/05", risLeads: 25, risAdm: 5, risWalk: 14, risBook: 11, rpsLeads: 27, rpsAdm: 2, rpsWalk: 9, rpsBook: 11 },
 ];
 
 export const SOCIAL = {

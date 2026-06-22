@@ -383,11 +383,15 @@ function MarketingDashboard() {
     const isMay = weeklyMonth === "May 26";
     const monthMark = isMay ? "/05" : "/06";
     if (weeklyTab === "ris") {
-      if (!isMay && liveData?.risWeekly?.length) return liveData.risWeekly;
+      const schoolWeeks = (liveData?.risWeekly ?? []).filter(w => w.week.includes(monthMark));
+      if (schoolWeeks.length) return schoolWeeks;
+      if (!isMay) return [];
       return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.risLeads, bookings: w.risBook, walkins: w.risWalk, admissions: w.risAdm }));
     }
     if (weeklyTab === "rps") {
-      if (!isMay && liveData?.rpsWeekly?.length) return liveData.rpsWeekly;
+      const schoolWeeks = (liveData?.rpsWeekly ?? []).filter(w => w.week.includes(monthMark));
+      if (schoolWeeks.length) return schoolWeeks;
+      if (!isMay) return [];
       return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.rpsLeads, bookings: w.rpsBook, walkins: w.rpsWalk, admissions: w.rpsAdm }));
     }
     // combined — use live mayWeeklyCombined filtered by month

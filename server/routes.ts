@@ -1622,10 +1622,15 @@ export async function registerRoutes(
         const aCol    = header.findIndex(h => String(h).includes("Total Admissions"));
         const result: Array<{week:string;leads:number;bookings:number;walkins:number;admissions:number}> = [];
         for (const row of rows.slice(hIdx + 1)) {
-          const label = String(row[1] ?? "").trim();
-          if (String(row[0] ?? "").toUpperCase().includes("DIGITAL") || label.toUpperCase().includes("DIGITAL")) break;
+          const labelB = String(row[1] ?? "").trim();
+          const labelA = String(row[0] ?? "").trim();
+          if (labelA.toUpperCase().includes("DIGITAL") || labelB.toUpperCase().includes("DIGITAL")) break;
           // Weekly aggregate rows have a date-range format: "01/06 - 07/06" (contains both "/" and "-")
-          if (label.includes("/") && label.includes("-")) {
+          // Some school tab layouts put the date in col A (row[0]) rather than col B (row[1])
+          const label = (labelB.includes("/") && labelB.includes("-")) ? labelB
+                      : (labelA.includes("/") && labelA.includes("-")) ? labelA
+                      : "";
+          if (label) {
             result.push({
               week: label,
               leads:      parseInt(String(row[leadCol] ?? 0).replace(/[₹,\s]/g,"")) || 0,
