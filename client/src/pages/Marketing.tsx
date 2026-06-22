@@ -444,6 +444,7 @@ function MarketingDashboard() {
 
   /* TY Oct–May totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
   const TY_OCT_NOV_ADM = { combined: 21, ris: 12, rps: 9 }; // oct+nov 25 organic adm per segment
+  const TY_OCT_NOV_WALK = { combined: 139, ris: 86, rps: 53 }; // oct+nov 25 walk-ins per segment
   const tyOctMayTotals = useMemo(() => {
     const dec_may = totalsFor(MONTHLY_LIVE, segment); // Dec 25 – May 26 (all 6 rows)
     return {
@@ -1666,7 +1667,7 @@ function MarketingDashboard() {
               { label: "Leads YoY", curr: totals.leads, prev: totalsLastYearSegment.leads },
               { label: "Admissions YoY", curr: totals.admissions + TY_OCT_NOV_ADM[segment], prev: totalsLastYearSegment.admissions },
               { label: "Spend YoY", curr: totals.spend, prev: totalsLastYearSegment.spend, money: true },
-              { label: "Walk-ins YoY", curr: totals.walkins, prev: totalsLastYearSegment.walkins },
+              { label: "Walk-ins YoY", curr: totals.walkins + TY_OCT_NOV_WALK[segment], prev: totalsLastYearSegment.walkins },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               return (
