@@ -1660,18 +1660,14 @@ function MarketingDashboard() {
 
         {/* ───────── 9. YoY Comparison ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <SectionTitle title={`Year-over-Year — ${segmentLabel}`} sub="AY 2024-25 vs AY 2025-26 (same Dec–Apr period)" />
+          <SectionTitle title={`Year-over-Year — ${segmentLabel}`} sub="AY 2024-25 vs AY 2025-26 (Oct–Jun actual)" />
           <div className="grid sm:grid-cols-4 gap-3 mb-5">
-            {(() => {
-              const lyAvgPerMonth = totalsLastYearSegment.admissions / 9;
-              const lyEquivalent = lyAvgPerMonth * 5;
-              return [
-                { label: "Leads YoY", curr: totals.leads, prev: Math.round(totalsLastYearSegment.leads / 9 * 5) },
-                { label: "Admissions YoY", curr: totals.admissions + TY_OCT_NOV_ADM[segment], prev: Math.round(lyEquivalent) },
-                { label: "Spend YoY", curr: totals.spend, prev: Math.round(totalsLastYearSegment.spend / 9 * 5), money: true },
-                { label: "Walk-ins YoY", curr: totals.walkins, prev: Math.round(totalsLastYearSegment.walkins / 9 * 5) },
-              ];
-            })().map((k, i) => {
+            {[
+              { label: "Leads YoY", curr: totals.leads, prev: totalsLastYearSegment.leads },
+              { label: "Admissions YoY", curr: totals.admissions + TY_OCT_NOV_ADM[segment], prev: totalsLastYearSegment.admissions },
+              { label: "Spend YoY", curr: totals.spend, prev: totalsLastYearSegment.spend, money: true },
+              { label: "Walk-ins YoY", curr: totals.walkins, prev: totalsLastYearSegment.walkins },
+            ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               return (
                 <div key={i} className="rounded-xl border border-gray-100 p-4">
@@ -1679,7 +1675,7 @@ function MarketingDashboard() {
                   <div className="text-2xl font-black mt-1" style={{ color: NAVY }}>{(k as any).money ? inr(k.curr) : num(k.curr)}</div>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`text-xs font-bold ${d.positive ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
-                    <span className="text-[11px] text-gray-500">vs {(k as any).money ? inr(k.prev) : num(k.prev)} LY (5-mo equiv)</span>
+                    <span className="text-[11px] text-gray-500">vs {(k as any).money ? inr(k.prev) : num(k.prev)} LY (Oct 24–Jun 25)</span>
                   </div>
                 </div>
               );
