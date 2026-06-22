@@ -378,10 +378,14 @@ function MarketingDashboard() {
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
 
+  const WEEKLY_MONTH_MARK: Record<string, string> = {
+    "Jan 26": "/01", "Feb 26": "/02", "Mar 26": "/03",
+    "Apr 26": "/04", "May 26": "/05", "Jun 26": "/06",
+  };
   type WeekRow = { week: string; leads: number; bookings: number; walkins: number; admissions: number };
   const weeklyTableRows = useMemo((): WeekRow[] => {
+    const monthMark = WEEKLY_MONTH_MARK[weeklyMonth] ?? "/06";
     const isMay = weeklyMonth === "May 26";
-    const monthMark = isMay ? "/05" : "/06";
     if (weeklyTab === "ris") {
       const schoolWeeks = (liveData?.risWeekly ?? []).filter(w => w.week.includes(monthMark));
       if (schoolWeeks.length) return schoolWeeks;
@@ -394,9 +398,21 @@ function MarketingDashboard() {
       if (!isMay) return [];
       return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.rpsLeads, bookings: w.rpsBook, walkins: w.rpsWalk, admissions: w.rpsAdm }));
     }
-    // combined — use live mayWeeklyCombined filtered by month
-    const live = liveData?.mayWeeklyCombined.filter(w => w.week.includes(monthMark)) ?? [];
+    // combined — use live mayWeeklyCombined filtered by month first
+    const live = (liveData?.mayWeeklyCombined ?? []).filter(w => w.week.includes(monthMark));
     if (live.length) return live;
+    // fallback: compute combined from school tab weekly data (covers months DM Overall doesn't have)
+    const risW = (liveData?.risWeekly ?? []).filter(w => w.week.includes(monthMark));
+    const rpsW = (liveData?.rpsWeekly ?? []).filter(w => w.week.includes(monthMark));
+    if (risW.length || rpsW.length) {
+      const allWeeks = [...new Set([...risW.map(w => w.week), ...rpsW.map(w => w.week)])].sort();
+      return allWeeks.map(wk => {
+        const r = risW.find(w => w.week === wk) ?? { leads: 0, bookings: 0, walkins: 0, admissions: 0 };
+        const p = rpsW.find(w => w.week === wk) ?? { leads: 0, bookings: 0, walkins: 0, admissions: 0 };
+        return { week: wk, leads: r.leads + p.leads, bookings: r.bookings + p.bookings, walkins: r.walkins + p.walkins, admissions: r.admissions + p.admissions };
+      });
+    }
+    if (!isMay) return [];
     return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.risLeads + w.rpsLeads, bookings: w.risBook + w.rpsBook, walkins: w.risWalk + w.rpsWalk, admissions: w.risAdm + w.rpsAdm }));
   }, [liveData, weeklyMonth, weeklyTab]);
 
@@ -1697,14 +1713,17 @@ function MarketingDashboard() {
             </div>
           </div>
           {/* Month filter */}
-          <div className="flex gap-2 mb-4">
-            {(["May 26", "Jun 26"] as const).map(m => (
-              <button key={m} onClick={() => setWeeklyMonth(m)}
-                className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${weeklyMonth === m ? "text-white border-transparent" : "text-gray-500 border-gray-200 hover:border-gray-400"}`}
-                style={weeklyMonth === m ? { background: NAVY } : {}}>
-                {m === "May 26" ? "May 2026" : "June 2026"}
-              </button>
-            ))}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {(["Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26"] as const).map(m => {
+              const labels: Record<string, string> = { "Jan 26": "Jan 2026", "Feb 26": "Feb 2026", "Mar 26": "Mar 2026", "Apr 26": "Apr 2026", "May 26": "May 2026", "Jun 26": "Jun 2026" };
+              return (
+                <button key={m} onClick={() => setWeeklyMonth(m)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${weeklyMonth === m ? "text-white border-transparent" : "text-gray-500 border-gray-200 hover:border-gray-400"}`}
+                  style={weeklyMonth === m ? { background: NAVY } : {}}>
+                  {labels[m]}
+                </button>
+              );
+            })}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

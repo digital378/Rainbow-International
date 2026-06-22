@@ -1555,7 +1555,7 @@ export async function registerRoutes(
 
       // CRM + master + current-month school tabs — all fetched in parallel
       const [masterRows, rpsCrmRows, risCrmRows, rpsAllRows, risAllRows] = await Promise.all([
-        fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z65"),
+        fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z200"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
         fetchSchoolTab("RPS"),
@@ -1727,8 +1727,8 @@ export async function registerRoutes(
           }
           continue;
         }
-        // May weekly: date patterns containing "/05" (May rows appear BEFORE the MAY monthly row)
-        if (label.includes("/") && (label.includes("/05") || inMay)) {
+        // Weekly rows: any date-range label like "01/01 - 07/01", "01/05 - 02/05", "01/06 - 07/06"
+        if (label.includes("/") && label.includes("-") && /\d{2}\/\d{2}/.test(label)) {
           const leads = parseN(row[2]); const spend = parseINR(row[20]);
           if (leads > 0 || spend > 0) {
             mayWeeklyCombined.push({ week: label, leads, bookings: parseN(row[5]), walkins: parseN(row[6]), admissions: parseN(row[10]), spend });
