@@ -656,7 +656,7 @@ function MarketingDashboard() {
         </div>
         <div className="flex items-center gap-5 text-xs">
           <div className="text-right"><div className="text-blue-200 uppercase tracking-wider">Academic Year</div><div className="font-black text-sm">2026 – 27</div></div>
-          <div className="text-right"><div className="text-blue-200 uppercase tracking-wider">Last Updated</div><div className="font-black text-sm">{LAST_UPDATED}</div></div>
+          <div className="text-right"><div className="text-blue-200 uppercase tracking-wider">Last Updated</div><div className="font-black text-sm">{liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED}</div></div>
           <span className="bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wider">Confidential</span>
         </div>
       </div>
@@ -1651,7 +1651,7 @@ function MarketingDashboard() {
               const lyEquivalent = lyAvgPerMonth * 5;
               return [
                 { label: "Leads YoY", curr: totals.leads, prev: Math.round(totalsLastYearSegment.leads / 9 * 5) },
-                { label: "Admissions YoY", curr: totals.admissions, prev: Math.round(lyEquivalent) },
+                { label: "Admissions YoY", curr: totals.admissions + TY_OCT_NOV_ADM[segment], prev: Math.round(lyEquivalent) },
                 { label: "Spend YoY", curr: totals.spend, prev: Math.round(totalsLastYearSegment.spend / 9 * 5), money: true },
                 { label: "Walk-ins YoY", curr: totals.walkins, prev: Math.round(totalsLastYearSegment.walkins / 9 * 5) },
               ];
@@ -1675,8 +1675,8 @@ function MarketingDashboard() {
               <div className="text-gray-700">Spend: <strong>{inr(totalsLastYearSegment.spend)}</strong> · Leads: <strong>{num(totalsLastYearSegment.leads)}</strong> · Admissions: <strong>{totalsLastYearSegment.admissions}</strong></div>
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
-              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Dec 25 – Jun 26)</div>
-              <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
+              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – Jun 26)</div>
+              <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions + TY_OCT_NOV_ADM[segment]}</strong></div>
             </div>
           </div>
         </section>
