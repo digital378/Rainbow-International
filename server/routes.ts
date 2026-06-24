@@ -412,6 +412,12 @@ export async function registerRoutes(
       sendCallbackEmail(validatedData).catch((err) =>
         console.error("[callback] Email error:", err)
       );
+      appendEnquiryToSheet({
+        parentName: validatedData.name,
+        studentName: "",
+        grade: "",
+        phone: validatedData.phone,
+      }).catch((err) => console.error("[callback] Sheet append error:", err));
       res.status(201).json(saved);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -2028,6 +2034,7 @@ export async function registerRoutes(
         values: [[dateStr, monthStr, data.parentName, data.studentName, data.grade, data.phone]],
       },
     });
+    console.log(`[sheet] Appended enquiry row — ${data.parentName} / ${data.phone}`);
   }
 
   // RPS walk-in check-ins sync to the RPS master sheet ("RA Checkin" tab)
