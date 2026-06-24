@@ -378,6 +378,12 @@ export async function registerRoutes(
       sendInquiryEmail(validatedData).catch((err) =>
         console.error("[inquiry] Email error:", err)
       );
+      appendEnquiryToSheet({
+        parentName: validatedData.parentName,
+        studentName: validatedData.studentName,
+        grade: validatedData.grade,
+        phone: validatedData.phone,
+      }).catch((err) => console.error("[inquiry] Sheet append error:", err));
       res.status(201).json(inquiry);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -1997,6 +2003,29 @@ export async function registerRoutes(
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[dateStr, timeStr, checkin.raName, checkin.raBranch, checkin.parentName, checkin.studentName, checkin.grade]],
+      },
+    });
+  }
+
+  // Website enquiry form → Google Sheet ("Nur to Class 12" tab)
+  const ENQUIRY_SHEET_ID = "1zLIWutvJxwLyVBAK-vDlpEzNPV7c2RwutYC9Gn3yd2s";
+  const ENQUIRY_SHEET_TAB = "Nur to Class 12";
+  async function appendEnquiryToSheet(data: {
+    parentName: string; studentName: string; grade: string; phone: string;
+  }): Promise<void> {
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric" });
+    const monthStr = now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", month: "long", year: "numeric" });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: ENQUIRY_SHEET_ID,
+      range: `${ENQUIRY_SHEET_TAB}!A:F`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[dateStr, monthStr, data.parentName, data.studentName, data.grade, data.phone]],
       },
     });
   }
