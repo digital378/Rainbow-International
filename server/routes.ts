@@ -2031,7 +2031,7 @@ export async function registerRoutes(
       range: `${ENQUIRY_SHEET_TAB}!A:F`,
       valueInputOption: "USER_ENTERED",
       requestBody: {
-        values: [[dateStr, monthStr, data.parentName, data.studentName, data.grade, data.phone]],
+        values: [[dateStr, monthStr, data.parentName, data.studentName, data.phone, data.grade]],
       },
     });
     console.log(`[sheet] Appended enquiry row — ${data.parentName} / ${data.phone}`);
