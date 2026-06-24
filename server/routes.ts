@@ -2023,9 +2023,13 @@ export async function registerRoutes(
     if (!auth) throw new Error("Google not connected");
     const { google: goog } = await import("googleapis");
     const sheets = goog.sheets({ version: "v4", auth });
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "2-digit", year: "numeric" });
-    const monthStr = now.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", month: "long", year: "numeric" });
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const dd = now.getDate().toString().padStart(2, "0");
+    const mon = MON[now.getMonth()];
+    const yy = now.getFullYear().toString().slice(-2);
+    const dateStr = `${dd}-${mon}-${yy}`;   // e.g. 24-Jun-26
+    const monthStr = `${mon}-${yy}`;         // e.g. Jun-26
     await sheets.spreadsheets.values.append({
       spreadsheetId: ENQUIRY_SHEET_ID,
       range: `${ENQUIRY_SHEET_TAB}!A:F`,
