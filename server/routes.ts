@@ -2584,7 +2584,9 @@ export async function registerRoutes(
       const admByCounselor = new Map<string,number>();
       const admSourceByMonth = new Map<string, Map<string,number>>();  // mk → source → count
       const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
-      let admTotal = 0, admThisMonth = 0, rpsRollover = 0, docsClear = 0, docsPending = 0;
+      // RPS rollover = walkins from RPS students who got admitted (walkin sheet is source of truth)
+      const rpsRollover = walkinAdmBySource.get("RPS Student") || 0;
+      let admTotal = 0, admThisMonth = 0, docsClear = 0, docsPending = 0;
 
       for (const r of admRows) {
         const name = norm(r[5]); if (!name) continue;       // col 5 = student name
@@ -2600,7 +2602,7 @@ export async function registerRoutes(
         const pend = upper(r[16]);
         admTotal++;
         if (mk === curMonthKey) admThisMonth++;
-        if (source === "RPS Student") rpsRollover++;
+
         if (pend === "CLEAR CASE" || pend === "CLEAR") docsClear++; else docsPending++;
         if (mk) {
           const cur = admByMonth.get(mk) || { label, total: 0 };
