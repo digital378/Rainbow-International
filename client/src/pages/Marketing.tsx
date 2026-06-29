@@ -562,7 +562,7 @@ function MarketingDashboard() {
   })), [segmentRows, monthlyFixed]);
 
   /* What-If Calculator */
-  const calcMonthData = monthlyForCharts.find(m => m.month === calcMonth) || monthlyForCharts[4];
+  const calcMonthData = monthlyForCharts.find(m => m.month === calcMonth) || monthlyForCharts[MAY_IDX];
   const calcResults = useMemo(() => {
     if (!calcSpend || calcSpend <= 0) return { leads: 0, walkins: 0, admissions: 0, bookings: 0, revenue: 0, marketingRoi: 0, trueRoi: 0, marketingCpa: 0, trueCpa: 0 };
     const leads = calcSpend / calcMonthData.cpl;
@@ -1902,11 +1902,11 @@ function MarketingDashboard() {
             const monthsYoY = [
               { label: "Oct", ly: lyPick(0), ty: TY_OCT, tyFixedOverride: PRE_FIXED },
               { label: "Nov", ly: lyPick(1), ty: TY_NOV, tyFixedOverride: PRE_FIXED },
-              { label: "Dec", ly: lyPick(2), ty: segmentRows[0] },
-              { label: "Jan", ly: lyPick(3), ty: segmentRows[1] },
-              { label: "Feb", ly: lyPick(4), ty: segmentRows[2] },
-              { label: "Mar", ly: lyPick(5), ty: segmentRows[3] },
-              { label: "Apr", ly: lyPick(6), ty: segmentRows[4] },
+              { label: "Dec", ly: lyPick(2), ty: segmentRows[2] },
+              { label: "Jan", ly: lyPick(3), ty: segmentRows[3] },
+              { label: "Feb", ly: lyPick(4), ty: segmentRows[4] },
+              { label: "Mar", ly: lyPick(5), ty: segmentRows[5] },
+              { label: "Apr", ly: lyPick(6), ty: segmentRows[6] },
               { label: "May", ly: lyPick(7), ty: segmentRows[MAY_IDX] },
               { label: "Jun", ly: lyPick(8), ty: segmentRows[CURRENT_IDX] },
             ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;

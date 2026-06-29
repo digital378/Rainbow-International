@@ -10,8 +10,8 @@ export const TODAY_DATE = 2;
 export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
 export const DAYS_IN_CURRENT_MONTH = 30;  // June 2026 — current month (30 days)
 export const MIN_REVENUE_PER_ADM = 90000;
-export const MAY_IDX = 5;      // May 26 — completed, index in MONTHLY
-export const CURRENT_IDX = 6;  // Jun 26 — current in-progress month, index in MONTHLY
+export const MAY_IDX = 7;      // May 26 — completed, index in MONTHLY
+export const CURRENT_IDX = 8;  // Jun 26 — current in-progress month, index in MONTHLY
 
 export type SegmentKey = "combined" | "ris" | "rps";
 export type MetricSet = {
@@ -34,6 +34,20 @@ export type MonthRow = {
 };
 
 export const MONTHLY: MonthRow[] = [
+  {
+    // Oct 25 — organic, no ad spend. School tab data (source of truth).
+    month: "Oct 25",
+    combined: { leads: 57,  bookings: 27, walkins: 42, admissions: 6,  spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 36,  bookings: 14, walkins: 25, admissions: 4,  spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 21,  bookings: 13, walkins: 17, admissions: 2,  spend: 0, meta: 0, google: 0 },
+  },
+  {
+    // Nov 25 — organic, no ad spend. School tab data (source of truth).
+    month: "Nov 25",
+    combined: { leads: 103, bookings: 33, walkins: 68, admissions: 15, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 69,  bookings: 19, walkins: 40, admissions: 8,  spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 34,  bookings: 14, walkins: 28, admissions: 7,  spend: 0, meta: 0, google: 0 },
+  },
   {
     month: "Dec 25",
     combined: { leads: 455, bookings: 93,  walkins: 71,  admissions: 23, spend: 178604, meta: 100231, google: 78373 },
