@@ -95,10 +95,12 @@ export const MONTHLY: MonthRow[] = [
   },
 ];
 
+// Oct 25 and Nov 25 are now in MONTHLY[] as individual rows.
+// This constant covers only the pre-DM-team organic months: Jun–Sep 2025.
 export const ORGANIC_PRE_SPEND = {
-  combined: { leads: 197, bookings: 83, walkins: 139, admissions: 21 },
-  ris:      { leads: 134, bookings: 48, walkins: 86,  admissions: 12 },
-  rps:      { leads:  63, bookings: 35, walkins: 53,  admissions:  9 },
+  combined: { leads: 37, bookings: 23, walkins: 29, admissions: 0 },
+  ris:      { leads: 29, bookings: 15, walkins: 21, admissions: 0 },
+  rps:      { leads:  8, bookings:  8, walkins:  8, admissions: 0 },
 };
 
 export type LastYearRow = {

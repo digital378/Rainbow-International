@@ -442,16 +442,14 @@ function MarketingDashboard() {
     return { ...ly[segment as "ris" | "rps"], bookings: 0 };
   }, [segment]);
 
-  /* TY Oct–May totals: Oct/Nov 25 had ₹0 spend & 0 tracked digital leads; admissions from ORGANIC_PRE_SPEND oct+nov */
-  const TY_OCT_NOV_ADM = { combined: 21, ris: 12, rps: 9 }; // oct+nov 25 organic adm per segment
-  const TY_OCT_NOV_WALK = { combined: 139, ris: 86, rps: 53 }; // oct+nov 25 walk-ins per segment
+  /* Oct 25 and Nov 25 are now full rows in MONTHLY_LIVE — no manual add-on needed */
   const tyOctMayTotals = useMemo(() => {
-    const dec_may = totalsFor(MONTHLY_LIVE, segment); // Dec 25 – May 26 (all 6 rows)
+    const all = totalsFor(MONTHLY_LIVE, segment); // Oct 25 – Jun 26 (all 9 rows)
     return {
-      leads:       dec_may.leads,       // Oct/Nov digital leads untracked; Dec-May only
-      walkins:     dec_may.walkins,     // same
-      admissions:  dec_may.admissions + TY_OCT_NOV_ADM[segment], // add organic Oct+Nov adm
-      spend:       dec_may.spend,       // Oct/Nov had ₹0 ad spend
+      leads:      all.leads,
+      walkins:    all.walkins,
+      admissions: all.admissions,
+      spend:      all.spend,
     };
   }, [segment]);
 
@@ -475,7 +473,8 @@ function MarketingDashboard() {
 
   // Organic period (Jun–Nov 25): school tab Aug–Nov is authoritative for per-school metrics.
   // Jun-25 and Jul-25 had negligible tracked activity; static ORGANIC_PRE_SPEND covers the full Jun–Nov total.
-  const PRE_SPEND_SCHOOL_MONTHS = ["Aug-25","Sep-25","Oct-25","Nov-25"];
+  // Oct-25 and Nov-25 are now in MONTHLY_LIVE rows; only sum pre-spend months here
+  const PRE_SPEND_SCHOOL_MONTHS = ["Aug-25","Sep-25"];
   const organicFromSchoolTab = useMemo(() => {
     const fallback = {
       ris: { leads: ORGANIC_PRE_SPEND.ris.leads, bookings: ORGANIC_PRE_SPEND.ris.bookings, walkins: ORGANIC_PRE_SPEND.ris.walkins, admissions: ORGANIC_PRE_SPEND.ris.admissions },
@@ -1665,9 +1664,9 @@ function MarketingDashboard() {
           <div className="grid sm:grid-cols-4 gap-3 mb-5">
             {[
               { label: "Leads YoY", curr: totals.leads, prev: totalsLastYearSegment.leads },
-              { label: "Admissions YoY", curr: totals.admissions + TY_OCT_NOV_ADM[segment], prev: totalsLastYearSegment.admissions },
+              { label: "Admissions YoY", curr: totals.admissions, prev: totalsLastYearSegment.admissions },
               { label: "Spend YoY", curr: totals.spend, prev: totalsLastYearSegment.spend, money: true },
-              { label: "Walk-ins YoY", curr: totals.walkins + TY_OCT_NOV_WALK[segment], prev: totalsLastYearSegment.walkins },
+              { label: "Walk-ins YoY", curr: totals.walkins, prev: totalsLastYearSegment.walkins },
             ].map((k, i) => {
               const d = mom(k.curr, k.prev);
               return (
@@ -1689,7 +1688,7 @@ function MarketingDashboard() {
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
               <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – Jun 26)</div>
-              <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions + TY_OCT_NOV_ADM[segment]}</strong></div>
+              <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
             </div>
           </div>
         </section>
