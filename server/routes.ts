@@ -2342,7 +2342,7 @@ export async function registerRoutes(
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
       const SID = SHEET_IDS.sales;
-      const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows, risDmRows] = await Promise.all([
+      const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows, risDmRows, rpsAdmRows] = await Promise.all([
         fetchSheetRange(SID, "'Walkin Sheet 26-27'!A2:S5000"),
         fetchSheetRange(SID, "'New Admission List'!A2:T500"),
         fetchSheetRange(SID, "'Provisional Admission LIST'!A2:T200"),
@@ -2351,6 +2351,7 @@ export async function registerRoutes(
         fetchSheetRange(SID, "'RIS Target Sheet '!B2:N2"),     // month header row
         fetchSheetRange(SID, "'MIS DASHBOARD'!A4:E300"),       // daily MIS rows
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"), // DM pipeline
+        fetchSheetRange(SID, "'RPS ADMISSIONS'!A2:A500"),      // RPS rollover admissions
       ]);
 
       // ── helpers ────────────────────────────────────────────────
@@ -2584,8 +2585,8 @@ export async function registerRoutes(
       const admByCounselor = new Map<string,number>();
       const admSourceByMonth = new Map<string, Map<string,number>>();  // mk → source → count
       const recentAdmissions: Array<{date:string; name:string; grade:string; counselor:string; source:string; branch:string; sortKey:number}> = [];
-      // RPS rollover = walkins from RPS students who got admitted (walkin sheet is source of truth)
-      const rpsRollover = walkinAdmBySource.get("RPS Student") || 0;
+      // RPS rollover = count of rows in the dedicated "RPS ADMISSIONS" tab (source of truth)
+      const rpsRollover = rpsAdmRows.filter(r => r && r[0] && String(r[0]).trim() !== "").length;
       let admTotal = 0, admThisMonth = 0, docsClear = 0, docsPending = 0;
 
       for (const r of admRows) {
