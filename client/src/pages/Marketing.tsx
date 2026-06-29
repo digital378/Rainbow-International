@@ -309,9 +309,14 @@ function MarketingDashboard() {
     "Feb 26":"Feb-26","Mar 26":"Mar-26","Apr 26":"Apr-26","May 26":"May-26",
     "Jun 26":"Jun-26",
   };
+  // Jun–Sep 25 are pre-DM-team organic months. CRM data for those months is
+  // unreliable (contains carry-over school data). Always use the static values.
+  const STATIC_ONLY_MONTHS = new Set(["Jun 25", "Jul 25", "Aug 25", "Sep 25"]);
+
   const MONTHLY_LIVE = useMemo<MonthRow[]>(() => {
     if (!liveData?.monthlyTotals?.length) return MONTHLY_STATIC;
     return MONTHLY_STATIC.map(row => {
+      if (STATIC_ONLY_MONTHS.has(row.month)) return row;   // never override organic months
       const live = liveData.monthlyTotals.find(m => m.month === row.month);
       const crmKey = DASH_TO_CRM[row.month] ?? "";
       const risMon = liveData.risCrm.byMonth.find(m => m.month === crmKey);
