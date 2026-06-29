@@ -471,10 +471,9 @@ function MarketingDashboard() {
   /* Full-AY totals — Jun 2025 through Jun 2026 YTD (reconciled with sheet's TOTAL TILL DATE) */
   const organic = ORGANIC_PRE_SPEND[segment];
 
-  // Organic period (Jun–Nov 25): school tab Aug–Nov is authoritative for per-school metrics.
-  // Jun-25 and Jul-25 had negligible tracked activity; static ORGANIC_PRE_SPEND covers the full Jun–Nov total.
-  // Oct-25 and Nov-25 are now in MONTHLY_LIVE rows; only sum pre-spend months here
-  const PRE_SPEND_SCHOOL_MONTHS = ["Aug-25","Sep-25"];
+  // All months Jun 25–Jun 26 are now individual rows in MONTHLY_LIVE.
+  // No separate organic period needed; ORGANIC_PRE_SPEND is zero.
+  const PRE_SPEND_SCHOOL_MONTHS: string[] = [];
   const organicFromSchoolTab = useMemo(() => {
     const fallback = {
       ris: { leads: ORGANIC_PRE_SPEND.ris.leads, bookings: ORGANIC_PRE_SPEND.ris.bookings, walkins: ORGANIC_PRE_SPEND.ris.walkins, admissions: ORGANIC_PRE_SPEND.ris.admissions },
@@ -1901,11 +1900,11 @@ function MarketingDashboard() {
             const monthsYoY = [
               { label: "Oct", ly: lyPick(0), ty: TY_OCT, tyFixedOverride: PRE_FIXED },
               { label: "Nov", ly: lyPick(1), ty: TY_NOV, tyFixedOverride: PRE_FIXED },
-              { label: "Dec", ly: lyPick(2), ty: segmentRows[2] },
-              { label: "Jan", ly: lyPick(3), ty: segmentRows[3] },
-              { label: "Feb", ly: lyPick(4), ty: segmentRows[4] },
-              { label: "Mar", ly: lyPick(5), ty: segmentRows[5] },
-              { label: "Apr", ly: lyPick(6), ty: segmentRows[6] },
+              { label: "Dec", ly: lyPick(2), ty: segmentRows[6] },
+              { label: "Jan", ly: lyPick(3), ty: segmentRows[7] },
+              { label: "Feb", ly: lyPick(4), ty: segmentRows[8] },
+              { label: "Mar", ly: lyPick(5), ty: segmentRows[9] },
+              { label: "Apr", ly: lyPick(6), ty: segmentRows[10] },
               { label: "May", ly: lyPick(7), ty: segmentRows[MAY_IDX] },
               { label: "Jun", ly: lyPick(8), ty: segmentRows[CURRENT_IDX] },
             ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;

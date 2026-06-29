@@ -10,8 +10,8 @@ export const TODAY_DATE = 2;
 export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
 export const DAYS_IN_CURRENT_MONTH = 30;  // June 2026 — current month (30 days)
 export const MIN_REVENUE_PER_ADM = 90000;
-export const MAY_IDX = 7;      // May 26 — completed, index in MONTHLY
-export const CURRENT_IDX = 8;  // Jun 26 — current in-progress month, index in MONTHLY
+export const MAY_IDX = 11;     // May 26 — completed, index in MONTHLY
+export const CURRENT_IDX = 12; // Jun 26 — current in-progress month, index in MONTHLY
 
 export type SegmentKey = "combined" | "ris" | "rps";
 export type MetricSet = {
@@ -34,6 +34,31 @@ export type MonthRow = {
 };
 
 export const MONTHLY: MonthRow[] = [
+  {
+    // Jun 25 — pre-DM-team organic. Combined from DM Overall master sheet.
+    month: "Jun 25",
+    combined: { leads: 8,  bookings: 5,  walkins: 1,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 7,  bookings: 4,  walkins: 1,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 1,  bookings: 1,  walkins: 0,  admissions: 0, spend: 0, meta: 0, google: 0 },
+  },
+  {
+    month: "Jul 25",
+    combined: { leads: 4,  bookings: 3,  walkins: 4,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 3,  bookings: 2,  walkins: 3,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 1,  bookings: 1,  walkins: 1,  admissions: 0, spend: 0, meta: 0, google: 0 },
+  },
+  {
+    month: "Aug 25",
+    combined: { leads: 5,  bookings: 4,  walkins: 9,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 4,  bookings: 3,  walkins: 7,  admissions: 0, spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 1,  bookings: 1,  walkins: 2,  admissions: 0, spend: 0, meta: 0, google: 0 },
+  },
+  {
+    month: "Sep 25",
+    combined: { leads: 20, bookings: 11, walkins: 15, admissions: 0, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 15, bookings: 6,  walkins: 10, admissions: 0, spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 5,  bookings: 5,  walkins: 5,  admissions: 0, spend: 0, meta: 0, google: 0 },
+  },
   {
     // Oct 25 — organic, no ad spend. School tab data (source of truth).
     month: "Oct 25",
@@ -95,12 +120,12 @@ export const MONTHLY: MonthRow[] = [
   },
 ];
 
-// Oct 25 and Nov 25 are now in MONTHLY[] as individual rows.
-// This constant covers only the pre-DM-team organic months: Jun–Sep 2025.
+// All months Jun 25–Jun 26 are now individual rows in MONTHLY[].
+// ORGANIC_PRE_SPEND is kept as zero so ytdFull totals = sum of all monthly rows.
 export const ORGANIC_PRE_SPEND = {
-  combined: { leads: 37, bookings: 23, walkins: 29, admissions: 0 },
-  ris:      { leads: 29, bookings: 15, walkins: 21, admissions: 0 },
-  rps:      { leads:  8, bookings:  8, walkins:  8, admissions: 0 },
+  combined: { leads: 0, bookings: 0, walkins: 0, admissions: 0 },
+  ris:      { leads: 0, bookings: 0, walkins: 0, admissions: 0 },
+  rps:      { leads: 0, bookings: 0, walkins: 0, admissions: 0 },
 };
 
 export type LastYearRow = {
