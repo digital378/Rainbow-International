@@ -357,15 +357,14 @@ function MarketingDashboard() {
       const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
-      // Combined always = RIS + RPS so the numbers are always consistent.
-      // DM Overall master sheet (live) is a different data source and causes
-      // bookings/walkins/spend to not match the sum of individual school views.
-      const crmLeads = risOut.leads + rpsOut.leads;
+      // Combined: use DM Overall (live) for leads/bookings/walkins/admissions when available —
+      // it captures all sources (DM + organic) and is the authoritative combined total.
+      // Spend/meta/google come from per-school spend sheets (more granular).
       const combinedOut: MetricSet = {
-        leads: crmLeads,
-        bookings:   risOut.bookings   + rpsOut.bookings,
-        walkins:    risOut.walkins    + rpsOut.walkins,
-        admissions: risOut.admissions + rpsOut.admissions,
+        leads:      live?.leads      ?? (risOut.leads      + rpsOut.leads),
+        bookings:   live?.bookings   ?? (risOut.bookings   + rpsOut.bookings),
+        walkins:    live?.walkins    ?? (risOut.walkins    + rpsOut.walkins),
+        admissions: live?.admissions ?? (risOut.admissions + rpsOut.admissions),
         spend:      risOut.spend      + rpsOut.spend,
         meta:       risOut.meta       + rpsOut.meta,
         google:     risOut.google     + rpsOut.google,
