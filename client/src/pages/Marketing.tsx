@@ -383,6 +383,12 @@ function MarketingDashboard() {
   })), [segment, MONTHLY_LIVE]);
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
+  // Count only completed months where actual ad spend occurred (salary should not be
+  // charged to pre-DM organic months where no marketing team was active).
+  // Uses slice(0, CURRENT_IDX) to exclude the current in-progress month from YTD salary.
+  const spendMonths = useMemo(() =>
+    MONTHLY_LIVE.slice(0, CURRENT_IDX).filter(r => getSegment(r, segment).spend > 0).length,
+  [MONTHLY_LIVE, segment]);
 
   // Auto-generated from MONTHLY_STATIC — converts "Mon YY" → "/MM" for weekly row filtering
   const _WEEK_MON_IDX = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -557,12 +563,13 @@ function MarketingDashboard() {
   const walkToAdm  = ytdWalkinsFull  ? (ytdAdmissionsFull / ytdWalkinsFull)  * 100 : 0;
   const bookToAdm  = ytdBookingsFull ? (ytdAdmissionsFull / ytdBookingsFull) * 100 : 0;
 
-  /* YTD totals using full-AY admissions (matches sheet's CPA ₹6,960 / True CPA ₹14,772) */
+  /* YTD totals — True CPA uses spendMonths (completed months with spend > 0) not totalMonths,
+     so pre-DM organic months (Jun–Nov 25) don't inflate the salary cost. */
   const ytdRevenue = admForCosts * MIN_REVENUE_PER_ADM;
   const ytdMarketingCpa = cpa(totals.spend, admForCosts);
-  const ytdTrueCpa = trueCpa(totals.spend, admForCosts, monthlyFixed, totalMonths);
+  const ytdTrueCpa = trueCpa(totals.spend, admForCosts, monthlyFixed, spendMonths);
   const ytdMarketingRoi = roi(ytdRevenue, totals.spend);
-  const ytdTrueRoi = roi(ytdRevenue, totals.spend + monthlyFixed * totalMonths);
+  const ytdTrueRoi = roi(ytdRevenue, totals.spend + monthlyFixed * spendMonths);
 
   /* June Forecast (linear pace projection) */
   const fcMul = DAYS_IN_CURRENT_MONTH / TODAY_DATE;
