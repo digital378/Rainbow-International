@@ -10,8 +10,8 @@ export const TODAY_DATE = 2;
 export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
 export const DAYS_IN_CURRENT_MONTH = 30;  // June 2026 — current month (30 days)
 export const MIN_REVENUE_PER_ADM = 90000;
-export const MAY_IDX = 11;     // May 26 — completed, index in MONTHLY
-export const CURRENT_IDX = 12; // Jun 26 — current in-progress month, index in MONTHLY
+export const MAY_IDX = 12;     // Jun 26 — last completed month, index in MONTHLY
+export const CURRENT_IDX = 13; // Jul 26 — current in-progress month, index in MONTHLY
 
 export type SegmentKey = "combined" | "ris" | "rps";
 export type MetricSet = {
@@ -110,13 +110,20 @@ export const MONTHLY: MonthRow[] = [
     rps:      { leads: 146, bookings: 61,  walkins: 32, admissions: 11, spend: 92434,  meta: 45680, google: 46754 },
   },
   {
-    /* June 2026 — in progress (2 days captured as of June 2).
-       Combined from DM Overall June weekly row (01/06–07/06).
-       Will be overridden by live API each load. */
+    /* June 2026 — completed month final static baseline.
+       Will be overridden by live CRM API each load. */
     month: "Jun 26",
     combined: { leads: 18, bookings: 10, walkins: 5, admissions: 2, spend: 2154, meta: 694,  google: 1460 },
     ris:      { leads: 6,  bookings: 2,  walkins: 2, admissions: 2, spend: 504,  meta: 0,    google: 504  },
     rps:      { leads: 12, bookings: 7,  walkins: 3, admissions: 0, spend: 1650, meta: 694,  google: 956  },
+  },
+  {
+    /* July 2026 — in progress (3 days captured as of Jul 3).
+       Will be overridden by live API each load. */
+    month: "Jul 26",
+    combined: { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
+    ris:      { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
+    rps:      { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
   },
 ];
 

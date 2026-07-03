@@ -229,9 +229,9 @@ function MarketingDashboard() {
   const [segment, setSegment] = useState<SegmentKey>("combined");
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
-  const [weeklyMonth, setWeeklyMonth] = useState<string>("Jun 26");
+  const [weeklyMonth, setWeeklyMonth] = useState<string>("Jul 26");
   const [calcSpend, setCalcSpend] = useState<number>(100000);
-  const [calcMonth, setCalcMonth] = useState<string>("Jun 26");
+  const [calcMonth, setCalcMonth] = useState<string>("Jul 26");
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
 
   /* Editable cost inputs — initialized from segment defaults */
@@ -307,7 +307,7 @@ function MarketingDashboard() {
     "Jun 25":"Jun-25","Jul 25":"Jul-25","Aug 25":"Aug-25","Sep 25":"Sep-25",
     "Oct 25":"Oct-25","Nov 25":"Nov-25","Dec 25":"Dec-25","Jan 26":"Jan-26",
     "Feb 26":"Feb-26","Mar 26":"Mar-26","Apr 26":"Apr-26","May 26":"May-26",
-    "Jun 26":"Jun-26",
+    "Jun 26":"Jun-26","Jul 26":"Jul-26",
   };
   // Jun–Sep 25 are pre-DM-team organic months. CRM data for those months is
   // unreliable (contains carry-over school data). Always use the static values.
@@ -1043,7 +1043,7 @@ function MarketingDashboard() {
               {(() => {
                 const rpsMonths = liveData?.rpsCrm.byMonth.map(m => m.month) ?? [];
                 const risMonths = liveData?.risCrm.byMonth.map(m => m.month) ?? [];
-                const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26"];
+                const MONTH_ORDER_UI = ["Apr-25","May-25","Jun-25","Jul-25","Aug-25","Sep-25","Oct-25","Nov-25","Dec-25","Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26"];
                 const allMonths = Array.from(new Set([...rpsMonths, ...risMonths])).sort((a,b) => {
                   const ai = MONTH_ORDER_UI.indexOf(a), bi = MONTH_ORDER_UI.indexOf(b);
                   return (ai<0?99:ai)-(bi<0?99:bi);
@@ -1691,7 +1691,7 @@ function MarketingDashboard() {
               <div className="text-gray-700">Spend: <strong>{inr(totalsLastYearSegment.spend)}</strong> · Leads: <strong>{num(totalsLastYearSegment.leads)}</strong> · Admissions: <strong>{totalsLastYearSegment.admissions}</strong></div>
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
-              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – Jun 26)</div>
+              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – Jul 26)</div>
               <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
             </div>
           </div>
@@ -1714,8 +1714,8 @@ function MarketingDashboard() {
           </div>
           {/* Month filter */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {(["Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26"] as const).map(m => {
-              const labels: Record<string, string> = { "Jan 26": "Jan 2026", "Feb 26": "Feb 2026", "Mar 26": "Mar 2026", "Apr 26": "Apr 2026", "May 26": "May 2026", "Jun 26": "Jun 2026" };
+            {(["Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26"] as const).map(m => {
+              const labels: Record<string, string> = { "Jan 26": "Jan 2026", "Feb 26": "Feb 2026", "Mar 26": "Mar 2026", "Apr 26": "Apr 2026", "May 26": "May 2026", "Jun 26": "Jun 2026", "Jul 26": "Jul 2026" };
               return (
                 <button key={m} onClick={() => setWeeklyMonth(m)}
                   className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${weeklyMonth === m ? "text-white border-transparent" : "text-gray-500 border-gray-200 hover:border-gray-400"}`}
@@ -1868,7 +1868,7 @@ function MarketingDashboard() {
         {/* ───────── 13b. YEAR-ON-YEAR MONTH COMPARISON (Dec-Apr) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title={`YoY Month-by-Month Comparison — Oct to May (${segmentLabel})`}
+            title={`YoY Month-by-Month Comparison — Oct to Jun (${segmentLabel})`}
             sub={
               segment === "combined"
                 ? `LY True Cost = Ad Spend + ₹2,50,000 salaries + ₹85,000 agency fee/mo · TY True Cost = Ad Spend + ${inr(monthlyFixed)} salaries/mo (no agency)`
@@ -1910,8 +1910,8 @@ function MarketingDashboard() {
               { label: "Feb", ly: lyPick(4), ty: segmentRows[8] },
               { label: "Mar", ly: lyPick(5), ty: segmentRows[9] },
               { label: "Apr", ly: lyPick(6), ty: segmentRows[10] },
-              { label: "May", ly: lyPick(7), ty: segmentRows[MAY_IDX] },
-              { label: "Jun", ly: lyPick(8), ty: segmentRows[CURRENT_IDX] },
+              { label: "May", ly: lyPick(7), ty: segmentRows[11] },
+              { label: "Jun", ly: lyPick(8), ty: segmentRows[MAY_IDX] },
             ] as Array<{ label: string; ly: { spend: number; leads: number; walkins: number; admissions: number }; ty: { spend: number; leads: number; walkins: number; admissions: number; bookings: number; month?: string }; tyFixedOverride?: number }>;
             type Row = {
               label: string;
