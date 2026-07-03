@@ -404,20 +404,28 @@ function MarketingDashboard() {
       if (!isMay) return [];
       return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.rpsLeads, bookings: w.rpsBook, walkins: w.rpsWalk, admissions: w.rpsAdm }));
     }
-    // combined — use live mayWeeklyCombined filtered by month first
-    const live = (liveData?.mayWeeklyCombined ?? []).filter(w => w.week.includes(monthMark));
-    if (live.length) return live;
-    // fallback: compute combined from school tab weekly data (covers months DM Overall doesn't have)
+    // combined — build from CRM (ris+rps) for complete, correct week skeleton (all 5 weeks),
+    // then overlay DM Overall (mayWeeklyCombined) values where the week labels match exactly.
+    // This avoids showing spurious future-week rows that the DM Overall sheet sometimes
+    // pre-fills (e.g. a "27/07 - 31/07" row appearing on July 3).
+    const dmLive = (liveData?.mayWeeklyCombined ?? []).filter(w => w.week.includes(monthMark));
     const risW = (liveData?.risWeekly ?? []).filter(w => w.week.includes(monthMark));
     const rpsW = (liveData?.rpsWeekly ?? []).filter(w => w.week.includes(monthMark));
     if (risW.length || rpsW.length) {
       const allWeeks = [...new Set([...risW.map(w => w.week), ...rpsW.map(w => w.week)])].sort();
       return allWeeks.map(wk => {
+        // Prefer DM Overall row when the week label matches exactly (captures organic + DM leads)
+        const dmRow = dmLive.find(w => w.week === wk);
+        if (dmRow) return dmRow;
+        // Fallback: CRM combined for this week
         const r = risW.find(w => w.week === wk) ?? { leads: 0, bookings: 0, walkins: 0, admissions: 0 };
         const p = rpsW.find(w => w.week === wk) ?? { leads: 0, bookings: 0, walkins: 0, admissions: 0 };
         return { week: wk, leads: r.leads + p.leads, bookings: r.bookings + p.bookings, walkins: r.walkins + p.walkins, admissions: r.admissions + p.admissions };
       });
     }
+    // fallback: use DM Overall directly if no CRM weekly data
+    const live = dmLive;
+    if (live.length) return live;
     if (!isMay) return [];
     return MAY_WEEKLY.map(w => ({ week: w.week, leads: w.risLeads + w.rpsLeads, bookings: w.risBook + w.rpsBook, walkins: w.risWalk + w.rpsWalk, admissions: w.risAdm + w.rpsAdm }));
   }, [liveData, weeklyMonth, weeklyTab]);
