@@ -5,10 +5,10 @@
    When monthly numbers change, edit them HERE only.
    ═══════════════════════════════════════════════════════════════════ */
 
-export const LAST_UPDATED = "June 2, 2026";
-export const TODAY_DATE = 2;
+export const LAST_UPDATED = "Jul 3, 2026";
+export const TODAY_DATE = 3;
 export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
-export const DAYS_IN_CURRENT_MONTH = 30;  // June 2026 — current month (30 days)
+export const DAYS_IN_CURRENT_MONTH = 31;  // July 2026 — current month (31 days)
 export const MIN_REVENUE_PER_ADM = 90000;
 export const MAY_IDX = 12;     // Jun 26 — last completed month, index in MONTHLY
 export const CURRENT_IDX = 13; // Jul 26 — current in-progress month, index in MONTHLY

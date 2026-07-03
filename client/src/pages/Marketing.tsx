@@ -437,8 +437,24 @@ function MarketingDashboard() {
     return { instaFollowers: SOCIAL.ris.instaFollowers + SOCIAL.rps.instaFollowers, fbFollowers: SOCIAL.ris.fbFollowers + SOCIAL.rps.fbFollowers, ytViews: SOCIAL.ris.ytViews + SOCIAL.rps.ytViews, websiteClicks: SOCIAL.ris.websiteClicks + SOCIAL.rps.websiteClicks };
   }, [segment]);
 
-  const current = segmentRows[CURRENT_IDX]; // Jun 26 (in progress)
-  const previous = segmentRows[MAY_IDX];    // May 26 (final)
+  const current = segmentRows[CURRENT_IDX]; // current in-progress month
+  const previous = segmentRows[MAY_IDX];    // last completed month
+
+  // Expand "Jul 26" → "July 2026" for use in labels
+  const MONTH_FULL: Record<string, string> = {
+    "Jan":"January","Feb":"February","Mar":"March","Apr":"April",
+    "May":"May","Jun":"June","Jul":"July","Aug":"August",
+    "Sep":"September","Oct":"October","Nov":"November","Dec":"December",
+  };
+  const expandMonth = (m: string) => {
+    const [mon, yr] = m.split(" ");
+    return `${MONTH_FULL[mon] ?? mon} 20${yr ?? ""}`;
+  };
+  const currentMonthName  = expandMonth(current.month);   // e.g. "July 2026"
+  const previousMonthName = expandMonth(previous.month);  // e.g. "June 2026"
+  const [curMon, curYr] = current.month.split(" ");
+  const lastYearSameMonthName = expandMonth(`${curMon} ${String(parseInt(curYr ?? "26") - 1).padStart(2,"0")}`); // e.g. "July 2025"
+  const prevMonAbbr = previous.month.split(" ")[0];  // e.g. "Jun"
 
   /* June last year (index 8 = "Jun 25" in LAST_YEAR) */
   const mayLastYear = useMemo(() => {
@@ -632,8 +648,8 @@ function MarketingDashboard() {
 
     /* June pace — only show when month is still running */
     if (TODAY_DATE < DAYS_IN_CURRENT_MONTH && forecast.leads < previous.leads * 0.95) {
-      arr.push({ severity: "warning", title: "June tracking below May",
-        body: `Forecasted June leads (${num(forecast.leads)}) projected below May (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_CURRENT_MONTH - TODAY_DATE} days.` });
+      arr.push({ severity: "warning", title: `${currentMonthName} tracking below ${previousMonthName}`,
+        body: `Forecasted ${currentMonthName} leads (${num(forecast.leads)}) projected below ${previousMonthName} (${num(previous.leads)}). Boost spend or refresh creatives in remaining ${DAYS_IN_CURRENT_MONTH - TODAY_DATE} days.` });
     }
 
     /* YoY growth */
@@ -763,7 +779,7 @@ function MarketingDashboard() {
 
         {/* ───────── 3. MoM Comparison ───────── */}
         <section>
-          <SectionTitle title="Month-over-Month Comparison" sub={`June 2026 (in progress, ${TODAY_DATE} days) vs May 2026 (final)`} />
+          <SectionTitle title="Month-over-Month Comparison" sub={`${currentMonthName} (in progress, ${TODAY_DATE} days) vs ${previousMonthName} (final)`} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: "Leads", curr: current.leads, prev: previous.leads, format: num, color: NAVY },
@@ -789,20 +805,20 @@ function MarketingDashboard() {
                     <div className="text-xl font-black text-gray-900">{k.format(k.curr)}</div>
                     <span className={`text-[11px] font-bold ${goodDirection ? "text-green-600" : "text-red-500"}`}>{d.sign} {d.val}</span>
                   </div>
-                  <div className="text-[11px] text-gray-500 mt-1">vs May: {k.format(k.prev)}</div>
+                  <div className="text-[11px] text-gray-500 mt-1">vs {prevMonAbbr}: {k.format(k.prev)}</div>
                 </div>
               );
             })}
           </div>
           <div className="mt-3 text-[12px] text-gray-500 italic">
-            June 2026 is in progress ({TODAY_DATE} days captured: June 1–{TODAY_DATE}). Compares partial-June to final May — see Forecast section for projected month-end values.
+            {currentMonthName} is in progress ({TODAY_DATE} days captured: {curMon} 1–{TODAY_DATE}). Compares partial {curMon} to final {prevMonAbbr} — see Forecast section for projected month-end values.
             {" "}* Booking → Walk-in % counts only fresh walk-ins attributed to that month's bookings (same-month CRM pipeline, revisits excluded), not all calendar-month walk-ins.
           </div>
         </section>
 
         {/* ───────── 3b. Year-over-Year Comparison ───────── */}
         <section>
-          <SectionTitle title="Year-over-Year Comparison" sub={`June 2026 (partial, ${TODAY_DATE} days) vs June 2025 (full month)`} />
+          <SectionTitle title="Year-over-Year Comparison" sub={`${currentMonthName} (partial, ${TODAY_DATE} days) vs ${lastYearSameMonthName} (full month)`} />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
@@ -836,7 +852,7 @@ function MarketingDashboard() {
         {/* ───────── 4. June Forecast (with True CPA) ───────── */}
         <section className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <SectionTitle
-            title={TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? "June 2026 — Final Actuals" : "June 2026 Forecast (Projected Month-End)"}
+            title={TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? `${currentMonthName} — Final Actuals` : `${currentMonthName} Forecast (Projected Month-End)`}
             sub={TODAY_DATE >= DAYS_IN_CURRENT_MONTH ? `Month complete · All ${DAYS_IN_CURRENT_MONTH} days captured · ${LAST_UPDATED}` : `Linear pace projection: ${TODAY_DATE} days elapsed × ${fcMul.toFixed(2)}× multiplier`}
             badge={`Confidence: ${fcConfidence}`}
           />
@@ -1125,7 +1141,7 @@ function MarketingDashboard() {
             </div>
 
             <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <SectionTitle title="June 2026 — Channel Spend" sub="Meta vs Google ad investment (partial month)" />
+              <SectionTitle title={`${currentMonthName} — Channel Spend`} sub="Meta vs Google ad investment (partial month)" />
               <div className="space-y-3">
                 <div className="rounded-xl p-4 text-white" style={{ background: "#1877f2" }}>
                   <div className="flex justify-between items-baseline">
@@ -2146,7 +2162,7 @@ function MarketingDashboard() {
             Monthly performance data sourced live from the DM Overall master Google Sheet · CRM data sourced live from RPS CRM &amp; RIS CRM Google Sheets · auto-refreshes every 5 minutes.
           </div>
           <div className="mt-1">
-            Last updated: {liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED} · June 2026 reflects partial month ({TODAY_DATE} of {DAYS_IN_CURRENT_MONTH} days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.
+            Last updated: {liveData ? new Date(liveData.generatedAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : LAST_UPDATED} · {currentMonthName} reflects partial month ({TODAY_DATE} of {DAYS_IN_CURRENT_MONTH} days). Prior-month RIS/RPS splits use source-sheet derived ratios. True CPA uses editable salary defaults.
           </div>
         </div>
       </div>
