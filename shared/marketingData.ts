@@ -2,16 +2,20 @@
    Marketing dashboard data — single source of truth shared by:
      - client/src/pages/Marketing.tsx (UI)
      - server/routes.ts (token-protected JSON export at /api/marketing/export)
-   When monthly numbers change, edit them HERE only.
+   Historical monthly data is defined in the MONTHLY array below.
+   Date-based constants (TODAY_DATE, CURRENT_IDX, etc.) are computed
+   automatically from new Date() — no manual update needed each month.
    ═══════════════════════════════════════════════════════════════════ */
 
-export const LAST_UPDATED = "Jul 3, 2026";
-export const TODAY_DATE = 3;
-export const DAYS_IN_MAY = 31;            // May 2026 — completed month (kept for LY comparisons)
-export const DAYS_IN_CURRENT_MONTH = 31;  // July 2026 — current month (31 days)
-export const MIN_REVENUE_PER_ADM = 90000;
-export const MAY_IDX = 12;     // Jun 26 — last completed month, index in MONTHLY
-export const CURRENT_IDX = 13; // Jul 26 — current in-progress month, index in MONTHLY
+// ── Dynamic date constants (auto-computed each load) ──────────────────
+const _now  = new Date();
+const _MONS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+export const LAST_UPDATED          = `${_MONS[_now.getMonth()]} ${_now.getDate()}, ${_now.getFullYear()}`;
+export const TODAY_DATE            = _now.getDate();
+export const DAYS_IN_MAY           = 31;  // May 2026 — historical reference kept for LY comparisons
+export const DAYS_IN_CURRENT_MONTH = new Date(_now.getFullYear(), _now.getMonth() + 1, 0).getDate();
+export const MIN_REVENUE_PER_ADM   = 90000;
 
 export type SegmentKey = "combined" | "ris" | "rps";
 export type MetricSet = {
@@ -33,7 +37,7 @@ export type MonthRow = {
   rpsFreshWalkins?: number;
 };
 
-export const MONTHLY: MonthRow[] = [
+const _HISTORICAL_ROWS: MonthRow[] = [
   {
     // Jun 25 — pre-DM-team organic. Combined from DM Overall master sheet.
     month: "Jun 25",
@@ -117,17 +121,33 @@ export const MONTHLY: MonthRow[] = [
     ris:      { leads: 68,  bookings: 47,  walkins: 15, admissions: 7,  spend: 32272, meta: 0,     google: 32272 },
     rps:      { leads: 150, bookings: 79,  walkins: 32, admissions: 10, spend: 31954, meta: 15189, google: 16765 },
   },
-  {
-    /* July 2026 — in progress (3 days captured as of Jul 3).
-       Will be overridden by live API each load. */
-    month: "Jul 26",
-    combined: { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
-    ris:      { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
-    rps:      { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 },
-  },
 ];
 
-// All months Jun 25–Jun 26 are now individual rows in MONTHLY[].
+// ── Auto-extend MONTHLY to always include the current calendar month ─────────────────
+// Historical rows above cover Jun 25 – Jun 26. Any month beyond that (Jul 26, Aug 26 …)
+// is generated automatically as a blank row and filled at runtime by the live API.
+// No manual update is needed when a new month begins.
+const _zero: MetricSet = { leads: 0, bookings: 0, walkins: 0, admissions: 0, spend: 0, meta: 0, google: 0 };
+const _existing = new Set(_HISTORICAL_ROWS.map(r => r.month));
+// Advance month-by-month from Jul 26 (first month after last historical row) to today
+{
+  let y = 2026, mi = 6; // Jul 2026 = index 6
+  const ey = _now.getFullYear(), emi = _now.getMonth();
+  while (y < ey || (y === ey && mi <= emi)) {
+    const key = `${_MONS[mi]} ${String(y).slice(2)}`;
+    if (!_existing.has(key)) {
+      _HISTORICAL_ROWS.push({ month: key, combined: { ..._zero }, ris: { ..._zero }, rps: { ..._zero } });
+    }
+    if (++mi > 11) { mi = 0; y++; }
+  }
+}
+export const MONTHLY = _HISTORICAL_ROWS;
+
+// ── Derived indices (computed from MONTHLY so they never need manual updates) ────────
+const _currentKey = `${_MONS[_now.getMonth()]} ${String(_now.getFullYear()).slice(2)}`;
+export const CURRENT_IDX = MONTHLY.findIndex(r => r.month === _currentKey);
+export const MAY_IDX     = Math.max(0, CURRENT_IDX - 1);
+
 // ORGANIC_PRE_SPEND is kept as zero so ytdFull totals = sum of all monthly rows.
 export const ORGANIC_PRE_SPEND = {
   combined: { leads: 0, bookings: 0, walkins: 0, admissions: 0 },

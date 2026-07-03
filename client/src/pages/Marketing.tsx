@@ -229,9 +229,13 @@ function MarketingDashboard() {
   const [segment, setSegment] = useState<SegmentKey>("combined");
   const [chartTab, setChartTab] = useState<"leads" | "spend" | "roi" | "truecpa" | "funnel">("leads");
   const [weeklyTab, setWeeklyTab] = useState<SegmentKey>("combined");
-  const [weeklyMonth, setWeeklyMonth] = useState<string>("Jul 26");
+  // Default to current month key, e.g. "Jul 26"
+  const _nowM = new Date();
+  const _MONS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const _currentMonthKey = `${_MONS_SHORT[_nowM.getMonth()]} ${String(_nowM.getFullYear()).slice(2)}`;
+  const [weeklyMonth, setWeeklyMonth] = useState<string>(_currentMonthKey);
   const [calcSpend, setCalcSpend] = useState<number>(100000);
-  const [calcMonth, setCalcMonth] = useState<string>("Jul 26");
+  const [calcMonth, setCalcMonth] = useState<string>(_currentMonthKey);
   const [includeSalary, setIncludeSalary] = useState<boolean>(true);
 
   /* Editable cost inputs — initialized from segment defaults */
@@ -303,17 +307,13 @@ function MarketingDashboard() {
 
   /* ── Live MONTHLY override (only current month affected; spend kept from static for RIS/RPS) ── */
   const TODAY_DATE = liveData?.currentDayOfMonth ?? TODAY_DATE_STATIC;
-  const DASH_TO_CRM: Record<string, string> = {
-    "Jun 25":"Jun-25","Jul 25":"Jul-25","Aug 25":"Aug-25","Sep 25":"Sep-25",
-    "Oct 25":"Oct-25","Nov 25":"Nov-25","Dec 25":"Dec-25","Jan 26":"Jan-26",
-    "Feb 26":"Feb-26","Mar 26":"Mar-26","Apr 26":"Apr-26","May 26":"May-26",
-    "Jun 26":"Jun-26","Jul 26":"Jul-26",
-  };
-  // Jun–Sep 25 are pre-DM-team organic months. CRM data for those months is
-  // unreliable (contains carry-over school data). Always use the static values.
-  // Jun 25–Sep 25: pre-DM-team organic months (CRM unreliable)
-  // Jun 26: completed month — locked to DM Overall final values in marketingData.ts
-  const STATIC_ONLY_MONTHS = new Set(["Jun 25", "Jul 25", "Aug 25", "Sep 25", "Jun 26"]);
+  // Auto-generated from MONTHLY_STATIC (static baseline always has current month key via auto-extend)
+  // Must use MONTHLY_STATIC here (not MONTHLY_LIVE) since MONTHLY_LIVE is defined below and uses DASH_TO_CRM
+  const DASH_TO_CRM: Record<string, string> = Object.fromEntries(
+    MONTHLY_STATIC.map(r => [r.month, r.month.replace(" ", "-")])
+  );
+  // Jun–Sep 25: pre-DM-team organic months — CRM data is unreliable, always use static values
+  const STATIC_ONLY_MONTHS = new Set(["Jun 25", "Jul 25", "Aug 25", "Sep 25"]);
 
   const MONTHLY_LIVE = useMemo<MonthRow[]>(() => {
     if (!liveData?.monthlyTotals?.length) return MONTHLY_STATIC;
@@ -384,10 +384,14 @@ function MarketingDashboard() {
   const totals = useMemo(() => totalsFor(MONTHLY_LIVE, segment), [segment, MONTHLY_LIVE]);
   const totalMonths = MONTHLY_LIVE.length;
 
-  const WEEKLY_MONTH_MARK: Record<string, string> = {
-    "Jan 26": "/01", "Feb 26": "/02", "Mar 26": "/03",
-    "Apr 26": "/04", "May 26": "/05", "Jun 26": "/06", "Jul 26": "/07",
-  };
+  // Auto-generated from MONTHLY_STATIC — converts "Mon YY" → "/MM" for weekly row filtering
+  const _WEEK_MON_IDX = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const WEEKLY_MONTH_MARK: Record<string, string> = Object.fromEntries(
+    MONTHLY_STATIC.map(r => {
+      const num = _WEEK_MON_IDX.indexOf(r.month.split(" ")[0]) + 1;
+      return [r.month, `/${String(num).padStart(2, "0")}`];
+    })
+  );
   type WeekRow = { week: string; leads: number; bookings: number; walkins: number; admissions: number };
   const weeklyTableRows = useMemo((): WeekRow[] => {
     const monthMark = WEEKLY_MONTH_MARK[weeklyMonth] ?? "/06";
@@ -1716,7 +1720,7 @@ function MarketingDashboard() {
               <div className="text-gray-700">Spend: <strong>{inr(totalsLastYearSegment.spend)}</strong> · Leads: <strong>{num(totalsLastYearSegment.leads)}</strong> · Admissions: <strong>{totalsLastYearSegment.admissions}</strong></div>
             </div>
             <div className="rounded-lg p-3 bg-green-50 border-l-4 border-green-400">
-              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – Jul 26)</div>
+              <div className="font-bold text-green-700 mb-1">This Year Pace ({segment === "combined" ? "RIS + RPS" : segment.toUpperCase()}, Oct 25 – {currentMonthName})</div>
               <div className="text-gray-700">Spend: <strong>{inr(totals.spend)}</strong> · Leads: <strong>{num(totals.leads)}</strong> · Admissions: <strong>{totals.admissions}</strong></div>
             </div>
           </div>
@@ -1739,13 +1743,22 @@ function MarketingDashboard() {
           </div>
           {/* Month filter */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {(["Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26"] as const).map(m => {
-              const labels: Record<string, string> = { "Jan 26": "Jan 2026", "Feb 26": "Feb 2026", "Mar 26": "Mar 2026", "Apr 26": "Apr 2026", "May 26": "May 2026", "Jun 26": "Jun 2026", "Jul 26": "Jul 2026" };
+            {MONTHLY_STATIC.filter(r => {
+              // Show weekly tabs for months from Jan 26 through the current month
+              const [mon, yr] = r.month.split(" ");
+              const absMonth = (2000 + parseInt(yr)) * 12 + _WEEK_MON_IDX.indexOf(mon);
+              const startAbs = 2026 * 12 + 0; // Jan 2026
+              const nowAbs   = _nowM.getFullYear() * 12 + _nowM.getMonth();
+              return absMonth >= startAbs && absMonth <= nowAbs;
+            }).map(r => {
+              const m = r.month;
+              const [mon, yr] = m.split(" ");
+              const label = `${mon} 20${yr}`; // "Jul 26" → "Jul 2026"
               return (
                 <button key={m} onClick={() => setWeeklyMonth(m)}
                   className={`px-3 py-1 rounded-full text-xs font-bold border transition-colors ${weeklyMonth === m ? "text-white border-transparent" : "text-gray-500 border-gray-200 hover:border-gray-400"}`}
                   style={weeklyMonth === m ? { background: NAVY } : {}}>
-                  {labels[m]}
+                  {label}
                 </button>
               );
             })}
