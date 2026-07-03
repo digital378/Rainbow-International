@@ -311,7 +311,9 @@ function MarketingDashboard() {
   };
   // Jun–Sep 25 are pre-DM-team organic months. CRM data for those months is
   // unreliable (contains carry-over school data). Always use the static values.
-  const STATIC_ONLY_MONTHS = new Set(["Jun 25", "Jul 25", "Aug 25", "Sep 25"]);
+  // Jun 25–Sep 25: pre-DM-team organic months (CRM unreliable)
+  // Jun 26: completed month — locked to DM Overall final values in marketingData.ts
+  const STATIC_ONLY_MONTHS = new Set(["Jun 25", "Jul 25", "Aug 25", "Sep 25", "Jun 26"]);
 
   const MONTHLY_LIVE = useMemo<MonthRow[]>(() => {
     if (!liveData?.monthlyTotals?.length) return MONTHLY_STATIC;
@@ -385,7 +387,7 @@ function MarketingDashboard() {
 
   const WEEKLY_MONTH_MARK: Record<string, string> = {
     "Jan 26": "/01", "Feb 26": "/02", "Mar 26": "/03",
-    "Apr 26": "/04", "May 26": "/05", "Jun 26": "/06",
+    "Apr 26": "/04", "May 26": "/05", "Jun 26": "/06", "Jul 26": "/07",
   };
   type WeekRow = { week: string; leads: number; bookings: number; walkins: number; admissions: number };
   const weeklyTableRows = useMemo((): WeekRow[] => {

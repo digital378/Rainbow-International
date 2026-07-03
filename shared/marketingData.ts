@@ -110,12 +110,12 @@ export const MONTHLY: MonthRow[] = [
     rps:      { leads: 146, bookings: 61,  walkins: 32, admissions: 11, spend: 92434,  meta: 45680, google: 46754 },
   },
   {
-    /* June 2026 — completed month final static baseline.
-       Will be overridden by live CRM API each load. */
+    /* June 2026 — FINAL. Source: DM Overall master sheet (authoritative combined)
+       + RIS/RPS CRM for per-school split. Locked via STATIC_ONLY_MONTHS. */
     month: "Jun 26",
-    combined: { leads: 18, bookings: 10, walkins: 5, admissions: 2, spend: 2154, meta: 694,  google: 1460 },
-    ris:      { leads: 6,  bookings: 2,  walkins: 2, admissions: 2, spend: 504,  meta: 0,    google: 504  },
-    rps:      { leads: 12, bookings: 7,  walkins: 3, admissions: 0, spend: 1650, meta: 694,  google: 956  },
+    combined: { leads: 231, bookings: 126, walkins: 86, admissions: 32, spend: 64222, meta: 15185, google: 49037 },
+    ris:      { leads: 68,  bookings: 47,  walkins: 15, admissions: 7,  spend: 32272, meta: 0,     google: 32272 },
+    rps:      { leads: 150, bookings: 79,  walkins: 32, admissions: 10, spend: 31954, meta: 15189, google: 16765 },
   },
   {
     /* July 2026 — in progress (3 days captured as of Jul 3).

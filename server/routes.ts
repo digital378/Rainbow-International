@@ -1769,6 +1769,21 @@ export async function registerRoutes(
         }
       }
 
+      // Dedup fix: DM Overall sheet sometimes labels the new-AY month row as the previous
+      // year's month (e.g. "Jul 25" instead of "Jul 26"). If a month appears twice and the
+      // second occurrence sits after "Jun 26" in the list, relabel it to the next-year key.
+      const seenMonths = new Set<string>();
+      for (let i = 0; i < monthlyTotals.length; i++) {
+        const m = monthlyTotals[i].month as string;
+        if (seenMonths.has(m)) {
+          // Duplicate — advance year by 1: "Jul 25" → "Jul 26"
+          const [mon, yr] = m.split(" ");
+          monthlyTotals[i].month = `${mon} ${String(parseInt(yr) + 1).padStart(2, "0")}`;
+        } else {
+          seenMonths.add(m);
+        }
+      }
+
       // ── Fresh booking-to-walk-in: CRM-based same-month conversion ──
       // The DM Overall master sheet counts walk-ins by CALENDAR month (when visited),
       // so it includes carry-over from previous months' bookings.
