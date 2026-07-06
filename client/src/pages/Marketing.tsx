@@ -40,6 +40,8 @@ type LiveData = {
   risCrm: { byMonth: LiveRisMonth[]; closedReasons: Array<{ reason: string; count: number }>; statusSummary: Record<string,number>; bySource: Record<string,number> };
   rpsSchoolMonthly: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number }>;
   risSchoolMonthly: Array<{ month: string; leads: number; bookings: number; walkins: number; admissions: number }>;
+  risSchoolYtd: { leads: number; walkins: number; admissions: number } | null;
+  rpsSchoolYtd: { leads: number; walkins: number; admissions: number } | null;
   risSpend: LiveSpendEntry[];
   rpsSpend: LiveSpendEntry[];
 };
@@ -545,21 +547,24 @@ function MarketingDashboard() {
   const organicWalkins    = segment === "combined" ? organic.walkins    : organicPerSchool.walkins;
   const organicBookings   = segment === "combined" ? organic.bookings   : organicPerSchool.bookings;
 
-  // Verified YTD totals per school — reconciled against DM Overall master sheet
-  const VERIFIED_YTD = {
-    ris: { leads: 1482, walkins: 352, admissions: 79 },
-    rps: { leads: 1920, walkins: 472, admissions: 147 },
-  } as const;
+  // Per-school YTD totals read directly from the "TOTAL (TILL DATE)" row in each
+  // school's DM tracker tab — the single authoritative figure the school maintains.
+  // Falls back to summed monthly values if the row isn't found yet.
+  const schoolYtd = segment === "ris"
+    ? liveData?.risSchoolYtd ?? null
+    : segment === "rps"
+      ? liveData?.rpsSchoolYtd ?? null
+      : null;
 
   const ytdAdmissionsFull = segment === "combined"
     ? totals.admissions + organicAdmissions
-    : VERIFIED_YTD[segment as "ris" | "rps"]?.admissions ?? (totals.admissions + organicAdmissions);
+    : schoolYtd?.admissions ?? (totals.admissions + organicAdmissions);
   const ytdLeadsFull = segment === "combined"
     ? totals.leads + organicLeads
-    : VERIFIED_YTD[segment as "ris" | "rps"]?.leads ?? (totals.leads + organicLeads);
+    : schoolYtd?.leads ?? (totals.leads + organicLeads);
   const ytdWalkinsFull = segment === "combined"
     ? totals.walkins + organicWalkins
-    : VERIFIED_YTD[segment as "ris" | "rps"]?.walkins ?? (totals.walkins + organicWalkins);
+    : schoolYtd?.walkins ?? (totals.walkins + organicWalkins);
   const ytdBookingsFull   = totals.bookings   + organicBookings;
   /* All efficiency metrics use the full-AY admissions denominator */
   const admForCosts = ytdAdmissionsFull;

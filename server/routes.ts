@@ -1580,15 +1580,26 @@ export async function registerRoutes(
       const risSpendRaw   = risAllRows;
 
       // ── Per-school master monthly totals (source of truth for walkins/admissions) ──
-      // The per-school May tabs contain monthly-level summary rows for all months
-      // (all-caps: DECEMBER, JANUARY … APRIL; in-progress month: MAY TOTAL)
-      const SCHOOL_MONTH_KEY: Record<string, string> = {
-        "AUGUST":"Aug-25","SEPTEMBER":"Sep-25","OCTOBER":"Oct-25","NOVEMBER":"Nov-25",
-        "DECEMBER":"Dec-25","JANUARY":"Jan-26","FEBRUARY":"Feb-26","MARCH":"Mar-26",
-        "APRIL":"Apr-26",
-        "MAY":"May-26","MAY TOTAL":"May-26",           // completed May (in June tab) or in-progress
-        "JUNE TOTAL":"Jun-26",                          // current-month June total; bare "JUNE" = June 2025 historical row, skip it
+      // Auto-built from all AY 2025-26 months so it never needs manual updating.
+      // Each entry maps both bare "MONTHNAME" and "MONTHNAME TOTAL" → "Mon-YY".
+      // The `seen` set in parseSchoolRows handles ambiguity (section-1 TOTAL rows
+      // always precede section-2 prior-year historical bare rows, so TOTAL wins).
+      const _AY_SCHOOL_MONTHS = [
+        "Aug-25","Sep-25","Oct-25","Nov-25","Dec-25",
+        "Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26",
+      ];
+      const _MONTH_ABBR_TO_UPPER: Record<string,string> = {
+        Jan:"JANUARY",Feb:"FEBRUARY",Mar:"MARCH",Apr:"APRIL",May:"MAY",Jun:"JUNE",
+        Jul:"JULY",Aug:"AUGUST",Sep:"SEPTEMBER",Oct:"OCTOBER",Nov:"NOVEMBER",Dec:"DECEMBER",
       };
+      const SCHOOL_MONTH_KEY: Record<string, string> = {};
+      for (const key of _AY_SCHOOL_MONTHS) {
+        const upper = _MONTH_ABBR_TO_UPPER[key.slice(0, 3)];
+        if (upper) {
+          SCHOOL_MONTH_KEY[upper] = key;
+          SCHOOL_MONTH_KEY[upper + " TOTAL"] = key;
+        }
+      }
       const parseSchoolRows = (rows: string[][]): Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> => {
         const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
         if (hIdx === -1) return [];
@@ -1597,18 +1608,19 @@ export async function registerRoutes(
         const bookCol = header.findIndex(h => String(h).toLowerCase().includes("booking"));
         const wCol    = header.findIndex(h => String(h).includes("Total Walkins"));
         const aCol    = header.findIndex(h => String(h).includes("Total Admissions"));
-        const seen = new Set<string>();
-        const result: Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> = [];
+        // Use a Map (last-occurrence wins) so later month-end subtotal rows override
+        // any early new-cycle rows that share the same month label (e.g. JUNE/JULY
+        // at the top of the tab are AY 26-27 new-cycle; correct AY 25-26 subtotals
+        // appear further down after all daily entries for that month).
+        // IMPORTANT: only match on col0 — col1 fallback was also matching spend-summary
+        // rows where the month name sits in col1 with ₹ spend values in the data cols.
+        const seen = new Map<string, {month:string;leads:number;bookings:number;walkins:number;admissions:number}>();
         for (const row of rows.slice(hIdx + 1)) {
-          // In DM RIS/RPS school tabs the date label (e.g. "JUNE TOTAL") is in column B (row[1]).
-          // Column A (row[0]) is a blank marker column. Check B first, fall back to A.
-          const r1 = String(row[1] ?? "").trim().toUpperCase();
           const r0 = String(row[0] ?? "").trim().toUpperCase();
-          const crmKey = SCHOOL_MONTH_KEY[r1] ?? SCHOOL_MONTH_KEY[r0];
-          if (crmKey && !seen.has(crmKey)) {
-            seen.add(crmKey);
+          const crmKey = SCHOOL_MONTH_KEY[r0];
+          if (crmKey) {
             const p = (v: unknown) => parseInt(String(v ?? 0).replace(/[₹,\s]/g,"")) || 0;
-            result.push({
+            seen.set(crmKey, {
               month:      crmKey,
               leads:      leadCol >= 0 ? p(row[leadCol]) : 0,
               bookings:   bookCol >= 0 ? p(row[bookCol]) : 0,
@@ -1617,10 +1629,35 @@ export async function registerRoutes(
             });
           }
         }
-        return result;
+        return [...seen.values()];
+      };
+
+      // Reads the "TOTAL (TILL DATE)" summary row from the school tab — the single
+      // authoritative YTD figure the school maintains for each metric.
+      const parseSchoolYtd = (rows: string[][]): {leads:number;walkins:number;admissions:number} | null => {
+        const hIdx = rows.findIndex(r => r.some(c => String(c).includes("Total Walkins")));
+        if (hIdx === -1) return null;
+        const header = rows[hIdx];
+        const leadCol = header.findIndex(h => String(h).includes("Total Leads"));
+        const wCol    = header.findIndex(h => String(h).includes("Total Walkins"));
+        const aCol    = header.findIndex(h => String(h).includes("Total Admissions"));
+        for (const row of rows.slice(hIdx + 1)) {
+          const r0 = String(row[0] ?? "").trim().toUpperCase();
+          if (r0.includes("TOTAL") && (r0.includes("DATE") || r0.includes("TILL"))) {
+            const p = (v: unknown) => parseInt(String(v ?? 0).replace(/[₹,\s]/g,"")) || 0;
+            return {
+              leads:      leadCol >= 0 ? p(row[leadCol]) : 0,
+              walkins:    wCol >= 0 ? p(row[wCol]) : 0,
+              admissions: aCol >= 0 ? p(row[aCol]) : 0,
+            };
+          }
+        }
+        return null;
       };
       const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
       const risSchoolMonthly = parseSchoolRows(risSchoolRows);
+      const risSchoolYtd = parseSchoolYtd(risSchoolRows);
+      const rpsSchoolYtd = parseSchoolYtd(rpsSchoolRows);
 
       // ── Per-school weekly rows (for the weekly breakdown table) ──
       // Reads weekly aggregate rows (date ranges like "01/06 - 07/06") from the current school tab.
@@ -1975,6 +2012,8 @@ export async function registerRoutes(
         risCrm: { byMonth: risByMonth, closedReasons: sortReasons(risCloseReasons), statusSummary: risStatusCount, bySource: risSourceCount },
         rpsSchoolMonthly,
         risSchoolMonthly,
+        risSchoolYtd,
+        rpsSchoolYtd,
         rpsWeekly,
         risWeekly,
         risSpend,

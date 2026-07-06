@@ -1,0 +1,22 @@
+---
+name: School tab monthly parser pitfalls
+description: Three traps when parsing DM RIS/RPS school tracker tabs for monthly leads/walkins/admissions
+---
+
+## The rule
+Use **last-occurrence Map** (not first-occurrence Set) for month deduplication, match on **col0 only** (never col1 fallback), and add a separate `parseSchoolYtd()` that reads the `TOTAL (TILL DATE)` row.
+
+**Why:**
+Three independent bugs in the original parser:
+
+1. **New-cycle rows at top of tab** — each school tab opens with a summary section listing JUNE and JULY near the top (rows 2–3). These are AY 26-27 new-cycle figures (tiny: 8 leads). The correct AY 25-26 month-end subtotals appear much later in the tab (row 199 for JUNE, row 247 for JULY TOTAL) after all daily entries for those months. First-occurrence wrongly locked in the new-cycle values.
+
+2. **Spend-summary rows** — the tab ends with a spend breakdown table where the month name sits in col1 (col0 is blank) and col5 contains rupee spend (e.g. `["", "March", "125000", "₹3,011", "₹72,040", "₹75,051", ...]`). The original code checked col1 as a fallback; this caused spend values to be read as walkins (col5 = wCol).
+
+3. **TOTAL (TILL DATE) row ignored** — row 249 contains the single authoritative YTD total the school maintains. It must be read separately with `parseSchoolYtd()`.
+
+**How to apply:**
+- `parseSchoolRows`: iterate all rows, `crmKey = SCHOOL_MONTH_KEY[row[0].trim().toUpperCase()]` only; use `seen.set(crmKey, data)` (Map, overwrites every match → last wins).
+- `parseSchoolYtd`: scan col0 for a value that includes both "TOTAL" and ("DATE" or "TILL"); parse leads/walkins/admissions from standard column indices.
+- In Marketing.tsx: `schoolYtd` (from `risSchoolYtd`/`rpsSchoolYtd`) drives the YTD header cards; `risSchoolMonthly`/`rpsSchoolMonthly` drive per-month charts.
+- The "Total RIS July'26" / "Total RPS July'26" master-sheet tabs track ALL physical walk-ins including revisits — they are NOT the source for dashboard walkin metrics.
