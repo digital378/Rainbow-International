@@ -1702,9 +1702,8 @@ export async function registerRoutes(
         "October":"Oct 25","November":"Nov 25","December":"Dec 25",
         "January":"Jan 26","February":"Feb 26","March":"Mar 26","April":"Apr 26","May":"May 26",
         "June26":"Jun 26", // sentinel key used internally when a 2nd June row is detected
+        "July26":"Jul 26", // sentinel key used internally when a 2nd July row is detected
       };
-      // Track whether we've already mapped a "June" (Jun 25); the next one is Jun 26
-      const spendSeenMonths = new Set<string>();
       const parseSpendRows = (rows: string[][]): Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> => {
         // Find header row: must contain both "meta" and "google" (partial, case-insensitive)
         const hIdx = rows.findIndex(r => {
@@ -1735,8 +1734,11 @@ export async function registerRoutes(
           const rawMonth = String(row[monthCol] ?? "").trim();
           if (!rawMonth) continue;
           if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
-          // If "June" appears a second time in the sheet, it's June 2026 not June 2025
-          const lookupKey = (rawMonth === "June" && seenInThisSheet.has("Jun 25")) ? "June26" : rawMonth;
+          // If "June" or "July" appears a second time in the sheet, it's the 2026 occurrence
+          const lookupKey =
+            (rawMonth === "June" && seenInThisSheet.has("Jun 25")) ? "June26" :
+            (rawMonth === "July" && seenInThisSheet.has("Jul 25")) ? "July26" :
+            rawMonth;
           const mapped = SPEND_MONTH_MAP[lookupKey];
           if (!mapped) continue;
           seenInThisSheet.add(mapped);
