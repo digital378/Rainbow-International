@@ -1701,8 +1701,10 @@ export async function registerRoutes(
         "June":"Jun 25","July":"Jul 25","August":"Aug 25","September":"Sep 25",
         "October":"Oct 25","November":"Nov 25","December":"Dec 25",
         "January":"Jan 26","February":"Feb 26","March":"Mar 26","April":"Apr 26","May":"May 26",
-        "June26":"Jun 26", // sentinel key used internally when a 2nd June row is detected
-        "July26":"Jul 26", // sentinel key used internally when a 2nd July row is detected
+        "June26":"Jun 26",   // sentinel: 2nd bare "June" → Jun 26
+        "July26":"Jul 26",   // sentinel: 2nd bare "July" → Jul 26
+        "June 2026":"Jun 26",  // school renamed row to "June 2026"
+        "July 2026":"Jul 26",  // school renamed row to "July 2026"
       };
       const parseSpendRows = (rows: string[][]): Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> => {
         // Find header row: must contain both "meta" and "google" (partial, case-insensitive)
@@ -1751,11 +1753,14 @@ export async function registerRoutes(
       const risSpend = parseSpendRows(risSpendRaw);
       const rpsSpend = parseSpendRows(rpsSpendRaw);
 
+
       // ── DM Overall → monthly combined totals + May weekly ──
       const MONTH_MAP: Record<string, string> = {
         JUNE: "Jun 25", JULY: "Jul 25", AUGUST: "Aug 25", SEPTEMBER: "Sep 25",
         OCTOBER: "Oct 25", NOVEMBER: "Nov 25", DECEMBER: "Dec 25", JANUARY: "Jan 26",
         FEBRUARY: "Feb 26", MARCH: "Mar 26", APRIL: "Apr 26", MAY: "May 26",
+        // School renamed current-cycle month rows to include the year (e.g. "July 2026")
+        "JUNE 2026": "Jun 26", "JULY 2026": "Jul 26",
       };
       const monthlyTotals: any[] = [];
       const mayWeeklyCombined: any[] = [];
@@ -1767,8 +1772,9 @@ export async function registerRoutes(
         if (!label) continue;
         if (label.toUpperCase().startsWith("TOTAL")) break;
         let monthVal = MONTH_MAP[label.toUpperCase()];
-        // After seeing MAY (May 26), a subsequent JUNE row is June 2026, not June 2025
+        // After seeing MAY (May 26), subsequent JUNE/JULY rows are 2026, not 2025
         if (passedMay && label.toUpperCase() === "JUNE") monthVal = "Jun 26";
+        if (passedMay && label.toUpperCase() === "JULY") monthVal = "Jul 26";
         if (monthVal) {
           if (monthVal === "May 26") passedMay = true;
           inMay = monthVal === "May 26";

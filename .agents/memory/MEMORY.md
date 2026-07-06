@@ -2,3 +2,4 @@
 - [RIS CRM GRADE_MAP variants](ris-crm-grade-map.md) — GRADE_MAP must cover "Grade N", "Jr. KG", "Sr. KG", "LKG", "UKG" etc.; unknown grades fall to "Other" (never skip); totals use Object.values() sum.
 - [Express wildcard req.path bug](express-wildcard-req-path.md) — inside `app.use("*", handler)`, req.path is always "/"; use req.originalUrl for the real path.
 - [School tab monthly parser pitfalls](school-tab-parser.md) — three traps: new-cycle rows at top override via first-occurrence, spend-summary rows match via col1 fallback, use last-occurrence Map + col0-only matching + parseSchoolYtd for TOTAL row.
+- [Google Sheets month row renaming pattern](sheets-month-rename.md) — school renames current-AY month rows from bare "JUNE"/"JULY" to "June 2026"/"July 2026" each new cycle; both SPEND_MONTH_MAP and DM Overall MONTH_MAP must carry both forms as explicit keys.
