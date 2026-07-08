@@ -1622,7 +1622,8 @@ export async function registerRoutes(
         if (upper) {
           SCHOOL_MONTH_KEY[upper] = key;
           SCHOOL_MONTH_KEY[upper + " TOTAL"] = key;
-          SCHOOL_MONTH_KEY[upper + " " + year4 + " TOTAL"] = key; // e.g. "JULY 2026 TOTAL"
+          SCHOOL_MONTH_KEY[upper + " " + year4] = key;              // e.g. "JUNE 2026"  (year-qualified, no TOTAL)
+          SCHOOL_MONTH_KEY[upper + " " + year4 + " TOTAL"] = key;  // e.g. "JULY 2026 TOTAL"
         }
       }
       const parseSchoolRows = (rows: string[][]): Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> => {
@@ -1721,7 +1722,8 @@ export async function registerRoutes(
       ): SchoolMonthRow[] => {
         if (!ytd) return monthly;
         const prev = monthly.find(m => m.month === prevMonthKey);
-        if (!prev || prev.leads > 0 || prev.walkins > 0 || prev.admissions > 0) return monthly;
+        // Skip if the prev month already has real data
+        if (prev && (prev.leads > 0 || prev.walkins > 0 || prev.admissions > 0)) return monthly;
         const cur = monthly.find(m => m.month === curMonthKey);
         const sumOther = monthly
           .filter(m => m.month !== prevMonthKey && m.month !== curMonthKey)
@@ -1732,7 +1734,11 @@ export async function registerRoutes(
           walkins:    Math.max(0, ytd.walkins    - sumOther.walkins    - (cur?.walkins ?? 0)),
           admissions: Math.max(0, ytd.admissions - sumOther.admissions - (cur?.admissions ?? 0)),
         };
-        return monthly.map(m => m.month === prevMonthKey ? { ...m, ...derived } : m);
+        // If prev month row is absent entirely, append it; otherwise overwrite the all-zeros row
+        const derivedRow = { month: prevMonthKey, leads: derived.leads, bookings: 0, walkins: derived.walkins, admissions: derived.admissions };
+        return prev
+          ? monthly.map(m => m.month === prevMonthKey ? { ...m, ...derived } : m)
+          : [...monthly, derivedRow];
       };
 
       const rpsSchoolMonthly = fillMissingLastMonth(rpsSchoolMonthlyRaw, rpsSchoolYtd);
