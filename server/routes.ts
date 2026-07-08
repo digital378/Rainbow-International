@@ -1936,7 +1936,7 @@ export async function registerRoutes(
       const rpsSourceCount: Record<string, number> = {};
 
       for (const r of rpsCrmRows.slice(1)) {
-        if (!r[0] || !r[2]) continue;
+        if (!r[0]) continue;                         // skip rows with no date (blank/header rows)
         const month = String(r[1] ?? "").trim();
         const centre = String(r[6] ?? "").trim() || "Unassigned";
         const status = String(r[7] ?? "OPEN").trim().toUpperCase();
@@ -2027,7 +2027,7 @@ export async function registerRoutes(
       const risSourceCount: Record<string, number> = {};
 
       for (const r of risCrmRows.slice(1)) {
-        if (!r[0] || !r[2]) continue;
+        if (!r[0]) continue;                         // skip rows with no date (blank/header rows)
         const month = String(r[1] ?? "").trim();
         const grade = String(r[5] ?? "").trim().toLowerCase().replace(/\s+/g, " ");
         const group = GRADE_MAP[grade] || "Other";
