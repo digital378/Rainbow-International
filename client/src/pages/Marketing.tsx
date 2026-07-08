@@ -337,39 +337,46 @@ function MarketingDashboard() {
 
       // School tab is source of truth for all per-school metrics (leads, bookings, walkins, admissions).
       // CRM used only as fallback when school tab has no entry for the month.
+      // Guard: only trust school tab walkins/admissions when the row has actual data (not all-zeros),
+      // since the school sometimes adds a placeholder all-zeros row before the real data arrives.
+      const risSchoolHasData = !!(risSchool && (risSchool.leads > 0 || risSchool.walkins > 0 || risSchool.admissions > 0));
+      const rpsSchoolHasData = !!(rpsSchool && (rpsSchool.leads > 0 || rpsSchool.walkins > 0 || rpsSchool.admissions > 0));
       const risBase: MetricSet = risMon
         ? { ...row.ris,
             leads:      risSchool && risSchool.leads      > 0 ? risSchool.leads      : risMon.total.leads,
             bookings:   risSchool && risSchool.bookings   > 0 ? risSchool.bookings   : risMon.total.bookings,
-            walkins:    risSchool ? risSchool.walkins    : risMon.total.walkins,
-            admissions: risSchool ? risSchool.admissions : risMon.total.admissions }
+            walkins:    risSchoolHasData ? risSchool!.walkins    : risMon.total.walkins,
+            admissions: risSchoolHasData ? risSchool!.admissions : risMon.total.admissions }
         : row.ris;
       const rpsBase: MetricSet = rpsMon
         ? { ...row.rps,
             leads:      rpsSchool && rpsSchool.leads      > 0 ? rpsSchool.leads      : rpsMon.total.leads,
             bookings:   rpsSchool && rpsSchool.bookings   > 0 ? rpsSchool.bookings   : rpsMon.total.bookings,
-            walkins:    rpsSchool ? rpsSchool.walkins    : rpsMon.total.walkins,
-            admissions: rpsSchool ? rpsSchool.admissions : rpsMon.total.admissions }
+            walkins:    rpsSchoolHasData ? rpsSchool!.walkins    : rpsMon.total.walkins,
+            admissions: rpsSchoolHasData ? rpsSchool!.admissions : rpsMon.total.admissions }
         : row.rps;
 
-      // For combined: use DM Overall if available; otherwise derive from per-school data
       const risOut: MetricSet = risSpendLive && risSpendLive.adSpend > 0
         ? { ...risBase, meta: risSpendLive.meta, google: risSpendLive.google, spend: risSpendLive.adSpend }
         : risBase;
       const rpsOut: MetricSet = rpsSpendLive && rpsSpendLive.adSpend > 0
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
-      // Combined: use DM Overall (live) for leads/bookings/walkins/admissions when available —
-      // it captures all sources (DM + organic) and is the authoritative combined total.
-      // Spend/meta/google come from per-school spend sheets (more granular).
+
+      // Combined leads/walkins/admissions:
+      // - Completed months: DM Overall is authoritative (fully reconciled, includes all sources).
+      // - Current in-progress month: DM Overall formula row may include future-week projections
+      //   or carry-over, making it unreliable mid-month. Always sum per-school so that
+      //   Combined = RIS + RPS and all three views are internally consistent.
+      const isCurrentMonth = row.month === MONTHLY_STATIC[CURRENT_IDX]?.month;
       const combinedOut: MetricSet = {
-        leads:      live?.leads      ?? (risOut.leads      + rpsOut.leads),
-        bookings:   live?.bookings   ?? (risOut.bookings   + rpsOut.bookings),
-        walkins:    live?.walkins    ?? (risOut.walkins    + rpsOut.walkins),
-        admissions: live?.admissions ?? (risOut.admissions + rpsOut.admissions),
-        spend:      risOut.spend      + rpsOut.spend,
-        meta:       risOut.meta       + rpsOut.meta,
-        google:     risOut.google     + rpsOut.google,
+        leads:      (!isCurrentMonth && live?.leads      != null) ? live.leads      : (risOut.leads      + rpsOut.leads),
+        bookings:   (!isCurrentMonth && live?.bookings   != null) ? live.bookings   : (risOut.bookings   + rpsOut.bookings),
+        walkins:    (!isCurrentMonth && live?.walkins    != null) ? live.walkins    : (risOut.walkins    + rpsOut.walkins),
+        admissions: (!isCurrentMonth && live?.admissions != null) ? live.admissions : (risOut.admissions + rpsOut.admissions),
+        spend:      risOut.spend + rpsOut.spend,
+        meta:       risOut.meta  + rpsOut.meta,
+        google:     risOut.google + rpsOut.google,
       };
 
       return { month: row.month, combined: combinedOut, ris: risOut, rps: rpsOut,

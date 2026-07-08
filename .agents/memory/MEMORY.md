@@ -3,3 +3,4 @@
 - [Express wildcard req.path bug](express-wildcard-req-path.md) — inside `app.use("*", handler)`, req.path is always "/"; use req.originalUrl for the real path.
 - [School tab monthly parser pitfalls](school-tab-parser.md) — three traps: new-cycle rows at top override via first-occurrence, spend-summary rows match via col1 fallback, use last-occurrence Map + col0-only matching + parseSchoolYtd for TOTAL row.
 - [Google Sheets month row renaming pattern](sheets-month-rename.md) — school renames current-AY month rows from bare "JUNE"/"JULY" to "June 2026"/"July 2026" each new cycle; both SPEND_MONTH_MAP and DM Overall MONTH_MAP must carry both forms as explicit keys.
+- [Current-month combined vs per-school consistency](current-month-combined.md) — for in-progress months, DM Overall formula row includes future-week projections; always sum risOut+rpsOut for combined. Use schoolHasData guard (any field > 0) before trusting an all-zeros school tab row.
