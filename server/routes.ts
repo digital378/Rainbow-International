@@ -1618,9 +1618,11 @@ export async function registerRoutes(
       const SCHOOL_MONTH_KEY: Record<string, string> = {};
       for (const key of _AY_SCHOOL_MONTHS) {
         const upper = _MONTH_ABBR_TO_UPPER[key.slice(0, 3)];
+        const year4 = "20" + key.slice(4);          // "2025" or "2026"
         if (upper) {
           SCHOOL_MONTH_KEY[upper] = key;
           SCHOOL_MONTH_KEY[upper + " TOTAL"] = key;
+          SCHOOL_MONTH_KEY[upper + " " + year4 + " TOTAL"] = key; // e.g. "JULY 2026 TOTAL"
         }
       }
       const parseSchoolRows = (rows: string[][]): Array<{month:string;leads:number;bookings:number;walkins:number;admissions:number}> => {

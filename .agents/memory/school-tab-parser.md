@@ -17,8 +17,11 @@ Four independent bugs in the original parser:
 
 4. **Spend table: July appears twice** — the spend section has two separate "July" rows: first occurrence = July 2025 (₹0, top summary section), second occurrence = July 2026 (real spend, bottom table). The SPEND_MONTH_MAP duplicate sentinel must cover BOTH "June26":"Jun 26" AND "July26":"Jul 26". Same pattern: `if (rawMonth === "July" && seenInThisSheet.has("Jul 25")) lookupKey = "July26"`.
 
+5. **"{MONTH} {YEAR} TOTAL" label not recognized** — the monthly accumulated row at the bottom of each school tab is labeled "JULY 2026 TOTAL" (with the 4-digit year), not "JULY TOTAL". Without the year-qualified form in `SCHOOL_MONTH_KEY`, this definitive TOTAL row is silently ignored and the all-zeros placeholder at the top of the tab wins. Add `SCHOOL_MONTH_KEY[upper + " " + year4 + " TOTAL"] = key` for every AY month (year4 = "20" + key.slice(4)).
+
 **How to apply:**
 - `parseSchoolRows`: iterate all rows, `crmKey = SCHOOL_MONTH_KEY[row[0].trim().toUpperCase()]` only; use `seen.set(crmKey, data)` (Map, overwrites every match → last wins).
+- `SCHOOL_MONTH_KEY` must include THREE forms per month: bare ("JULY"), bare+TOTAL ("JULY TOTAL"), and year+TOTAL ("JULY 2026 TOTAL").
 - `parseSchoolYtd`: scan col0 for a value that includes both "TOTAL" and ("DATE" or "TILL"); parse leads/walkins/admissions from standard column indices.
 - `parseSpendRows`: detect second occurrence of "June" → "June26" and second occurrence of "July" → "July26" sentinel keys.
 - In Marketing.tsx: `schoolYtd` (from `risSchoolYtd`/`rpsSchoolYtd`) drives the YTD header cards; `risSchoolMonthly`/`rpsSchoolMonthly` drive per-month charts.
