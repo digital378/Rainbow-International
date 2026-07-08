@@ -323,39 +323,33 @@ function MarketingDashboard() {
       if (STATIC_ONLY_MONTHS.has(row.month)) return row;   // never override organic months
       const live = liveData.monthlyTotals.find(m => m.month === row.month);
       const crmKey = DASH_TO_CRM[row.month] ?? "";
-      const risMon = liveData.risCrm.byMonth.find(m => m.month === crmKey);
-      const rpsMon = liveData.rpsCrm.byMonth.find(m => m.month === crmKey);
-      // Per-school master sheet is source of truth for walkins/admissions (CRM lags current month)
+      // Overview uses ONLY master sheet data for per-school metrics:
+      //   Combined  → DM Overall tab  (live)
+      //   RIS       → DM RIS tab      (risSchool)
+      //   RPS       → DM RPS tab      (rpsSchool)
+      // CRM data is intentionally NOT used here; it is only used in the CRM and Trends tabs.
       const rpsSchool = liveData.rpsSchoolMonthly?.find(s => s.month === crmKey);
       const risSchool = liveData.risSchoolMonthly?.find(s => s.month === crmKey);
       // Live Meta/Google spend from the "Digital Marketing Spend Analysis" table in each school tab
       const risSpendLive = liveData.risSpend?.find(s => s.month === row.month);
       const rpsSpendLive = liveData.rpsSpend?.find(s => s.month === row.month);
 
-      // If DM Overall has no entry AND no CRM/school/spend data, keep static row as-is
-      if (!live && !risMon && !rpsMon && !rpsSchool && !risSchool && !risSpendLive && !rpsSpendLive) return row;
+      // If no master-sheet data at all for this month, keep the static row as-is
+      if (!live && !rpsSchool && !risSchool && !risSpendLive && !rpsSpendLive) return row;
 
-      // School tab is source of truth for all per-school metrics (leads, bookings, walkins, admissions).
-      // CRM used only as fallback when school tab has no entry for the month.
-      // Guard: only trust school tab walkins/admissions when the row has actual data (not all-zeros),
-      // since the school sometimes adds a placeholder all-zeros row before the real data arrives.
-      const risSchoolHasData = !!(risSchool && (risSchool.leads > 0 || risSchool.walkins > 0 || risSchool.admissions > 0));
-      const rpsSchoolHasData = !!(rpsSchool && (rpsSchool.leads > 0 || rpsSchool.walkins > 0 || rpsSchool.admissions > 0));
-      const risBase: MetricSet = risMon
-        ? { ...row.ris,
-            leads:      risSchool && risSchool.leads      > 0 ? risSchool.leads      : risMon.total.leads,
-            bookings:   risSchool && risSchool.bookings   > 0 ? risSchool.bookings   : risMon.total.bookings,
-            walkins:    risSchoolHasData ? risSchool!.walkins    : risMon.total.walkins,
-            admissions: risSchoolHasData ? risSchool!.admissions : risMon.total.admissions }
+      // Per-school: use master sheet school tab as-is (leads/bookings/walkins/admissions).
+      // If the tab has a row (even all-zeros) that reflects what the school has entered.
+      // If no row exists yet, fall back to the static estimate.
+      const risBase: MetricSet = risSchool
+        ? { ...row.ris, leads: risSchool.leads, bookings: risSchool.bookings,
+            walkins: risSchool.walkins, admissions: risSchool.admissions }
         : row.ris;
-      const rpsBase: MetricSet = rpsMon
-        ? { ...row.rps,
-            leads:      rpsSchool && rpsSchool.leads      > 0 ? rpsSchool.leads      : rpsMon.total.leads,
-            bookings:   rpsSchool && rpsSchool.bookings   > 0 ? rpsSchool.bookings   : rpsMon.total.bookings,
-            walkins:    rpsSchoolHasData ? rpsSchool!.walkins    : rpsMon.total.walkins,
-            admissions: rpsSchoolHasData ? rpsSchool!.admissions : rpsMon.total.admissions }
+      const rpsBase: MetricSet = rpsSchool
+        ? { ...row.rps, leads: rpsSchool.leads, bookings: rpsSchool.bookings,
+            walkins: rpsSchool.walkins, admissions: rpsSchool.admissions }
         : row.rps;
 
+      // Overlay live spend (Meta + Google) from the per-school spend analysis table
       const risOut: MetricSet = risSpendLive && risSpendLive.adSpend > 0
         ? { ...risBase, meta: risSpendLive.meta, google: risSpendLive.google, spend: risSpendLive.adSpend }
         : risBase;
@@ -363,17 +357,13 @@ function MarketingDashboard() {
         ? { ...rpsBase, meta: rpsSpendLive.meta, google: rpsSpendLive.google, spend: rpsSpendLive.adSpend }
         : rpsBase;
 
-      // Combined leads/walkins/admissions:
-      // - Completed months: DM Overall is authoritative (fully reconciled, includes all sources).
-      // - Current in-progress month: DM Overall formula row may include future-week projections
-      //   or carry-over, making it unreliable mid-month. Always sum per-school so that
-      //   Combined = RIS + RPS and all three views are internally consistent.
-      const isCurrentMonth = row.month === MONTHLY_STATIC[CURRENT_IDX]?.month;
+      // Combined: DM Overall (master sheet) is the authoritative combined total for ALL months.
+      // Spend sums from per-school tabs (more granular than DM Overall's spend column).
       const combinedOut: MetricSet = {
-        leads:      (!isCurrentMonth && live?.leads      != null) ? live.leads      : (risOut.leads      + rpsOut.leads),
-        bookings:   (!isCurrentMonth && live?.bookings   != null) ? live.bookings   : (risOut.bookings   + rpsOut.bookings),
-        walkins:    (!isCurrentMonth && live?.walkins    != null) ? live.walkins    : (risOut.walkins    + rpsOut.walkins),
-        admissions: (!isCurrentMonth && live?.admissions != null) ? live.admissions : (risOut.admissions + rpsOut.admissions),
+        leads:      live?.leads      ?? (risOut.leads      + rpsOut.leads),
+        bookings:   live?.bookings   ?? (risOut.bookings   + rpsOut.bookings),
+        walkins:    live?.walkins    ?? (risOut.walkins    + rpsOut.walkins),
+        admissions: live?.admissions ?? (risOut.admissions + rpsOut.admissions),
         spend:      risOut.spend + rpsOut.spend,
         meta:       risOut.meta  + rpsOut.meta,
         google:     risOut.google + rpsOut.google,

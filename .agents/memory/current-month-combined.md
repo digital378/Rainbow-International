@@ -1,28 +1,35 @@
 ---
-name: Current-month combined vs per-school consistency
-description: For in-progress months, DM Overall formula row includes future-week projections making it unreliable; always derive combined from risOut+rpsOut. Guard against all-zeros school tab rows.
+name: Overview data source — master sheet only
+description: Overview tab uses ONLY master sheet data. CRM is for CRM/Trends tabs only.
 ---
 
-## Rule
-In Marketing.tsx `MONTHLY_LIVE`, the `combinedOut` object must NOT use DM Overall `live` data for the current in-progress month. The DM Overall master sheet's monthly formula row for the current month sums weekly sub-rows, which may include future week projections or carry-over walkins, producing inflated numbers (e.g. 13 walkins when per-school only shows 4).
+## Rule — Overview uses master sheet exclusively
+In Marketing.tsx `MONTHLY_LIVE`, per-school metrics must come ONLY from the master sheet school tabs. CRM data (`risCrm`/`rpsCrm`) must NOT be used in the MONTHLY_LIVE computation.
 
-**Current month**: always `combinedOut.leads = risOut.leads + rpsOut.leads` (and same for walkins, admissions, bookings).
-**Completed months**: DM Overall is authoritative and should continue to be used.
+| View | Source |
+|---|---|
+| Combined | DM Overall tab (master sheet) via `live` |
+| RIS individual | DM RIS tab (master sheet) via `risSchool` |
+| RPS individual | DM RPS tab (master sheet) via `rpsSchool` |
+| CRM tab | risCrm / rpsCrm (separate CRM sheets) |
+| Trends tab | risCrm / rpsCrm (separate CRM sheets) |
 
-## School tab all-zeros guard
-The school sometimes creates a placeholder row with all-zeros before actual data arrives. Use `schoolHasData = !!(school && (school.leads > 0 || school.walkins > 0 || school.admissions > 0))` before trusting the school tab's walkins/admissions. Without this guard, an all-zeros row overrides the CRM fallback.
+Combined ≠ RIS + RPS is acceptable — each tab is an independent authoritative source in the master sheet.
 
 ## How to apply
 In the `MONTHLY_LIVE` useMemo map callback:
 ```js
-const isCurrentMonth = row.month === MONTHLY_STATIC[CURRENT_IDX]?.month;
+// No risMon / rpsMon lookup here
+const risBase = risSchool
+  ? { ...row.ris, leads: risSchool.leads, bookings: risSchool.bookings, walkins: risSchool.walkins, admissions: risSchool.admissions }
+  : row.ris;  // fallback to static estimate, never to CRM
 const combinedOut = {
-  leads:      (!isCurrentMonth && live?.leads != null) ? live.leads : (risOut.leads + rpsOut.leads),
-  walkins:    (!isCurrentMonth && live?.walkins != null) ? live.walkins : (risOut.walkins + rpsOut.walkins),
-  admissions: (!isCurrentMonth && live?.admissions != null) ? live.admissions : (risOut.admissions + rpsOut.admissions),
-  spend: risOut.spend + rpsOut.spend,
+  leads: live?.leads ?? (risOut.leads + rpsOut.leads),  // DM Overall for all months
   ...
 };
 ```
 
-**Why:** DM Overall formula rows for in-progress months include future weekly projections. Combined ≠ RIS+RPS confused the user. The fix ensures all three views are internally consistent for the current month.
+**Why:** CRM data introduces a different data pipeline than the master sheet — they capture leads at different times and with different logic. Mixing them into Overview created numbers that didn't match what the school's own trackers show. Using master-sheet-only data makes the Overview a clean mirror of what the marketing team sees in their own Google Sheet.
+
+## All-zeros school tab rows
+If the school creates a placeholder row (all zeros) before actual data arrives, the zero values are shown directly — this is accurate per the master sheet. The school will update the row when data is available.
