@@ -1565,13 +1565,36 @@ export async function registerRoutes(
         try { return await fetchSheetRange(SHEET_IDS.master, quoteTab(tab, "!A:T")); } catch { return []; }
       };
 
+      // Fetch the PREVIOUS month's school tab (one tab older than the current).
+      // Needed because when a new monthly tab is created, the prior month's subtotals
+      // may not have been migrated into the new tab yet — they live in the previous tab.
+      const fetchPrevSchoolTab = async (school: "RPS" | "RIS"): Promise<string[][]> => {
+        const titles = await getMasterTabs();
+        const now = new Date();
+        let found = 0;
+        for (let offset = 0; offset <= 5; offset++) {
+          const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+          const mon = MONTH_NAMES_UPPER[d.getMonth()];
+          const match = titles.find(t => t.toUpperCase().includes(`DM ${school}`) && t.toUpperCase().includes(mon));
+          if (match) {
+            found++;
+            if (found === 2) {
+              try { return await fetchSheetRange(SHEET_IDS.master, quoteTab(match, "!A:T")); } catch { return []; }
+            }
+          }
+        }
+        return [];
+      };
+
       // CRM + master + current-month school tabs — all fetched in parallel
-      const [masterRows, rpsCrmRows, risCrmRows, rpsAllRows, risAllRows] = await Promise.all([
+      const [masterRows, rpsCrmRows, risCrmRows, rpsAllRows, risAllRows, rpsPrevRows, risPrevRows] = await Promise.all([
         fetchSheetRange(SHEET_IDS.master, "DM Overall!A1:Z200"),
         fetchSheetRange(SHEET_IDS.rpsCrm, "DM 2026-27!A:K"),
         fetchSheetRange(SHEET_IDS.risCrm, "Nur to Class 12!A:L"),
         fetchSchoolTab("RPS"),
         fetchSchoolTab("RIS"),
+        fetchPrevSchoolTab("RPS"),
+        fetchPrevSchoolTab("RIS"),
       ]);
       // Both school summary rows and spend analysis come from the same full-tab fetch
       const rpsSchoolRows = rpsAllRows;
@@ -1654,10 +1677,64 @@ export async function registerRoutes(
         }
         return null;
       };
-      const rpsSchoolMonthly = parseSchoolRows(rpsSchoolRows);
-      const risSchoolMonthly = parseSchoolRows(risSchoolRows);
+      // Merge current + previous tab monthly data.
+      // Rule: for each month, prefer non-zero data from either tab.
+      // The current tab wins when it has real data; otherwise the previous tab's
+      // data is used (covers the transition window when a new tab is created but
+      // the prior month's subtotals haven't been migrated into it yet).
+      type SchoolMonthRow = { month: string; leads: number; bookings: number; walkins: number; admissions: number };
+      const mergeSchoolMonthly = (current: SchoolMonthRow[], prev: SchoolMonthRow[]): SchoolMonthRow[] => {
+        const result = new Map<string, SchoolMonthRow>();
+        for (const m of prev) result.set(m.month, m);
+        for (const m of current) {
+          const hasData = m.leads > 0 || m.walkins > 0 || m.admissions > 0 || m.bookings > 0;
+          if (hasData || !result.has(m.month)) {
+            result.set(m.month, m);   // current has real data → always prefer; or new month not in prev
+          }
+          // else: current is all-zeros AND prev has real data → keep prev
+        }
+        return [...result.values()];
+      };
+      const rpsSchoolMonthlyRaw = mergeSchoolMonthly(parseSchoolRows(rpsSchoolRows), parseSchoolRows(rpsPrevRows));
+      const risSchoolMonthlyRaw = mergeSchoolMonthly(parseSchoolRows(risSchoolRows), parseSchoolRows(risPrevRows));
       const risSchoolYtd = parseSchoolYtd(risSchoolRows);
       const rpsSchoolYtd = parseSchoolYtd(rpsSchoolRows);
+
+      // If the last completed month has all-zeros (school hasn't entered subtotals yet
+      // into the new tab), derive its data from: YTD - sum(all other months).
+      // This is purely master-sheet data — YTD comes from the TOTAL (TILL DATE) row
+      // in the same school tab, so it's always self-consistent.
+      const MONTH_SHORT_3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const _now = new Date();
+      const _cm = _now.getMonth();
+      const _cy = _now.getFullYear() % 100;
+      const _pm = _cm === 0 ? 11 : _cm - 1;
+      const _py = _cm === 0 ? _cy - 1 : _cy;
+      const curMonthKey  = `${MONTH_SHORT_3[_cm]}-${String(_cy).padStart(2,"0")}`;
+      const prevMonthKey = `${MONTH_SHORT_3[_pm]}-${String(_py).padStart(2,"0")}`;
+
+      const fillMissingLastMonth = (
+        monthly: SchoolMonthRow[],
+        ytd: { leads: number; walkins: number; admissions: number } | null,
+      ): SchoolMonthRow[] => {
+        if (!ytd) return monthly;
+        const prev = monthly.find(m => m.month === prevMonthKey);
+        if (!prev || prev.leads > 0 || prev.walkins > 0 || prev.admissions > 0) return monthly;
+        const cur = monthly.find(m => m.month === curMonthKey);
+        const sumOther = monthly
+          .filter(m => m.month !== prevMonthKey && m.month !== curMonthKey)
+          .reduce((s, m) => ({ leads: s.leads + m.leads, walkins: s.walkins + m.walkins, admissions: s.admissions + m.admissions }),
+            { leads: 0, walkins: 0, admissions: 0 });
+        const derived = {
+          leads:      Math.max(0, ytd.leads      - sumOther.leads      - (cur?.leads ?? 0)),
+          walkins:    Math.max(0, ytd.walkins    - sumOther.walkins    - (cur?.walkins ?? 0)),
+          admissions: Math.max(0, ytd.admissions - sumOther.admissions - (cur?.admissions ?? 0)),
+        };
+        return monthly.map(m => m.month === prevMonthKey ? { ...m, ...derived } : m);
+      };
+
+      const rpsSchoolMonthly = fillMissingLastMonth(rpsSchoolMonthlyRaw, rpsSchoolYtd);
+      const risSchoolMonthly = fillMissingLastMonth(risSchoolMonthlyRaw, risSchoolYtd);
 
       // ── Per-school weekly rows (for the weekly breakdown table) ──
       // Reads weekly aggregate rows (date ranges like "01/06 - 07/06") from the current school tab.
