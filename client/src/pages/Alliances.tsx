@@ -912,6 +912,15 @@ function AlliancesDashboard() {
 
 // ── Page entry point ───────────────────────────────────────────
 export default function Alliances() {
+  // Prevent search engines from indexing this internal tool
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    return () => { document.head.removeChild(meta); };
+  }, []);
+
   const [authed, setAuthed] = useState<boolean>(() => {
     try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
   });

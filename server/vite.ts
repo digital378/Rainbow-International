@@ -58,6 +58,10 @@ export async function setupVite(server: Server, app: Express) {
       }
       const pageWithTitle = injectPageTitle(page, req.originalUrl, overrideTitle);
       const status = isKnownRoute(req.originalUrl) ? 200 : 404;
+      const basePath2 = req.originalUrl.split("?")[0].replace(/\/$/, "");
+      if (basePath2 === "/alliances" || basePath2.startsWith("/alliances/")) {
+        res.set("X-Robots-Tag", "noindex, nofollow");
+      }
       res.status(status).set({ "Content-Type": "text/html" }).end(pageWithTitle);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);

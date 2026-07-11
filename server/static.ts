@@ -49,6 +49,9 @@ export function serveStatic(app: Express) {
     const status = isKnownRoute(req.originalUrl) ? 200 : 404;
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
+    if (basePath === "/alliances" || basePath.startsWith("/alliances/")) {
+      res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    }
     res.status(status).send(html);
   });
 }
