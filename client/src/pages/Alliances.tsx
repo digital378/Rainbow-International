@@ -1,5 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, RadialBarChart, RadialBar,
+  CartesianGrid, LabelList,
+} from "recharts";
 
 const PIN = "ALL8";
 const AUTH_KEY = "alliances_auth_v1";
@@ -170,25 +175,115 @@ function Select({ value, onChange, options, placeholder }: { value: string; onCh
   );
 }
 
+// ── Chart colour palette ──────────────────────────────────────
+const C = {
+  navy:   "#091a4f",
+  amber:  "#f59e0b",
+  green:  "#22c55e",
+  blue:   "#3b82f6",
+  indigo: "#6366f1",
+  purple: "#a855f7",
+  red:    "#ef4444",
+  slate:  "#94a3b8",
+  teal:   "#14b8a6",
+  orange: "#f97316",
+};
+
+const STAGE_CHART_COLOR: Record<string, string> = {
+  "Not Contacted":          C.slate,
+  "Initial Discussion":     C.blue,
+  "Touchbase Done":         C.indigo,
+  "Waiting for Revert":     C.amber,
+  "MOU Sent":               C.orange,
+  "MOU Signing Pending":    C.purple,
+  "MOU Done":               C.green,
+  "Not Interested / Dropped": C.red,
+};
+
+const SHORT_STAGE: Record<string, string> = {
+  "Not Contacted":           "Not Contacted",
+  "Initial Discussion":      "Initial Disc.",
+  "Touchbase Done":          "Touchbase",
+  "Waiting for Revert":      "Waiting",
+  "MOU Sent":                "MOU Sent",
+  "MOU Signing Pending":     "MOU Pending",
+  "MOU Done":                "MOU Done ✓",
+  "Not Interested / Dropped":"Dropped",
+};
+
+// Custom tooltip wrapper
+function ChartTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-slate-200 shadow-lg rounded-lg px-3 py-2 text-xs">
+      <div className="font-bold text-slate-700 mb-1">{label}</div>
+      {payload.map((p: any) => (
+        <div key={p.name} className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: p.fill ?? p.color }} />
+          <span className="text-slate-600">{p.name}:</span>
+          <span className="font-bold text-slate-800">{p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Overview Tab ──────────────────────────────────────────────
 function OverviewTab({ data }: { data: AlliancesData }) {
   const { kpi, funnel, ownerLeaderboard, categoryBreakdown, pipelineStages } = data;
 
-  const topAdmBrands = [...data.brandPartners]
-    .filter(b => b.admissionsReferred > 0)
-    .sort((a, b) => b.admissionsReferred - a.admissionsReferred)
-    .slice(0, 10);
-  const topAdmCorps = [...data.corporates]
-    .filter(c => c.admissionsReferred > 0)
-    .sort((a, b) => b.admissionsReferred - a.admissionsReferred)
-    .slice(0, 5);
-  const topAdmSchools = [...data.friendshipSchools]
-    .filter(s => s.totalAdm > 0)
-    .sort((a, b) => b.totalAdm - a.totalAdm)
-    .slice(0, 5);
+  // ── Chart data derivations ──────────────────────────────────
+
+  // 1. Grouped bar: stages × verticals
+  const stageChartData = pipelineStages.map(st => ({
+    stage: SHORT_STAGE[st] ?? st,
+    "Brand Partners":    funnel.brandPartners[st] ?? 0,
+    "Corporates":        funnel.corporates[st] ?? 0,
+    "Friend. Schools":   funnel.friendshipSchools[st] ?? 0,
+  }));
+
+  // 2. Donut: overall status split
+  const mouDoneTotal = (funnel.brandPartners["MOU Done"] ?? 0)
+    + (funnel.corporates["MOU Done"] ?? 0)
+    + (funnel.friendshipSchools["MOU Done"] ?? 0);
+  const droppedTotal = (funnel.brandPartners["Not Interested / Dropped"] ?? 0)
+    + (funnel.corporates["Not Interested / Dropped"] ?? 0)
+    + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
+  const inPipeline = kpi.totalProspects - mouDoneTotal - droppedTotal;
+  const donutData = [
+    { name: "MOU Done",    value: mouDoneTotal, color: C.green  },
+    { name: "In Pipeline", value: inPipeline,   color: C.blue   },
+    { name: "Dropped",     value: droppedTotal, color: C.red    },
+  ];
+
+  // 3. Horizontal bar: top categories (total vs MOU done)
+  const catChartData = categoryBreakdown
+    .slice(0, 12)
+    .map(c => ({ name: c.name.length > 22 ? c.name.slice(0, 20) + "…" : c.name, Total: c.total, "MOU Done": c.mouDone }))
+    .reverse();
+
+  // 4. Horizontal bar: team leaderboard
+  const leaderData = ownerLeaderboard
+    .filter(o => o.name.trim())
+    .slice(0, 10)
+    .map(o => ({ name: o.name.split(" ")[0], Total: o.total, "MOU Done": o.mouDone }))
+    .reverse();
+
+  // 5. PA funnel
+  const paData = data.paStatuses.map(st => ({
+    name: st, value: data.funnel.parentAdvocacy[st] ?? 0,
+  }));
+  const PA_COLORS = [C.blue, C.indigo, C.amber, C.green, C.red];
+
+  // Vertical conversion rates for radial chart
+  const verticals = [
+    { name: "Brand Partners", total: data.brandPartners.length, mou: funnel.brandPartners["MOU Done"] ?? 0, fill: C.navy },
+    { name: "Corporates",     total: data.corporates.length,    mou: funnel.corporates["MOU Done"] ?? 0,    fill: C.blue },
+    { name: "Fr. Schools",    total: data.friendshipSchools.length, mou: funnel.friendshipSchools["MOU Done"] ?? 0, fill: C.teal },
+  ].map(v => ({ ...v, rate: v.total > 0 ? Math.round((v.mou / v.total) * 100) : 0 }));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <KpiCard label="Total Prospects" value={kpi.totalProspects} sub="All verticals" />
@@ -199,8 +294,123 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         <KpiCard label="PA Conversions" value={kpi.paAdmissions} sub="Admissions confirmed" accent="text-green-600" />
       </div>
 
-      {/* Pipeline funnels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Row 1: Pipeline bar chart + MOU donut */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Stacked pipeline bar — spans 2 cols */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 lg:col-span-2">
+          <div className="font-bold text-sm text-[#091a4f] mb-4">Pipeline Stage Distribution — All Verticals</div>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={stageChartData} margin={{ top: 4, right: 12, left: -10, bottom: 50 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="stage" tick={{ fontSize: 10, fill: "#64748b" }} angle={-35} textAnchor="end" interval={0} />
+              <YAxis tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+              <Bar dataKey="Brand Partners"   fill={C.navy}  radius={[3,3,0,0]} />
+              <Bar dataKey="Corporates"       fill={C.blue}  radius={[3,3,0,0]} />
+              <Bar dataKey="Friend. Schools"  fill={C.teal}  radius={[3,3,0,0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* MOU conversion donut */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col">
+          <div className="font-bold text-sm text-[#091a4f] mb-2">Overall Prospect Status</div>
+          <div className="flex-1 flex flex-col items-center justify-center">
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie data={donutData} cx="50%" cy="50%" innerRadius={52} outerRadius={80}
+                  dataKey="value" paddingAngle={3}>
+                  {donutData.map((d, i) => <Cell key={i} fill={d.color} />)}
+                </Pie>
+                <Tooltip formatter={(v: any, n: any) => [v, n]} contentStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-col gap-1.5 w-full mt-1">
+              {donutData.map(d => (
+                <div key={d.name} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: d.color }} />
+                    <span className="text-slate-600">{d.name}</span>
+                  </div>
+                  <span className="font-bold text-slate-800">{d.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Conversion rates per vertical */}
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+            <div className="text-xs font-semibold text-slate-400 uppercase">MOU Conversion Rate</div>
+            {verticals.map(v => (
+              <div key={v.name} className="flex items-center gap-2 text-xs">
+                <div className="w-24 text-slate-600 truncate">{v.name}</div>
+                <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full" style={{ width: `${v.rate}%`, background: v.fill }} />
+                </div>
+                <div className="w-8 text-right font-bold text-slate-700">{v.rate}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Row 2: Category chart + Team leaderboard chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top categories horizontal bar */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+          <div className="font-bold text-sm text-[#091a4f] mb-4">Top Brand Partner Categories</div>
+          <ResponsiveContainer width="100%" height={340}>
+            <BarChart data={catChartData} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
+              <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 10, fill: "#64748b" }} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="Total"    fill={C.navy}  radius={[0,3,3,0]}>
+                <LabelList dataKey="Total" position="right" style={{ fontSize: 10, fill: "#64748b" }} />
+              </Bar>
+              <Bar dataKey="MOU Done" fill={C.green} radius={[0,3,3,0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Team leaderboard horizontal bar */}
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+          <div className="font-bold text-sm text-[#091a4f] mb-4">Team Leaderboard — Prospects Owned</div>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={leaderData} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
+              <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 11, fill: "#334155" }} />
+              <Tooltip content={<ChartTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="Total"    fill={C.navy}  radius={[0,3,3,0]}>
+                <LabelList dataKey="Total" position="right" style={{ fontSize: 10, fill: "#64748b" }} />
+              </Bar>
+              <Bar dataKey="MOU Done" fill={C.green} radius={[0,3,3,0]} />
+            </BarChart>
+          </ResponsiveContainer>
+
+          {/* PA funnel compact below leaderboard */}
+          <div className="mt-5 pt-5 border-t border-slate-100">
+            <div className="font-bold text-sm text-[#091a4f] mb-3">Parent Advocacy Funnel</div>
+            <ResponsiveContainer width="100%" height={120}>
+              <BarChart data={paData} margin={{ top: 0, right: 12, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#64748b" }} />
+                <YAxis tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} width={20} />
+                <Tooltip contentStyle={{ fontSize: 11 }} />
+                <Bar dataKey="value" radius={[3,3,0,0]}>
+                  {paData.map((_, i) => <Cell key={i} fill={PA_COLORS[i % PA_COLORS.length]} />)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Stage breakdown text cards (quick reference) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           { title: "Brand Partners", counts: funnel.brandPartners, total: data.brandPartners.length },
           { title: "Corporate Tie-ups", counts: funnel.corporates, total: data.corporates.length },
@@ -214,100 +424,6 @@ function OverviewTab({ data }: { data: AlliancesData }) {
             <FunnelBar stages={pipelineStages} counts={counts} palette={STAGE_COLOR} />
           </div>
         ))}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="font-bold text-sm text-[#091a4f]">Parent Advocacy</div>
-            <div className="text-xs text-slate-400">{data.parentAdvocacy.length} total</div>
-          </div>
-          <FunnelBar stages={data.paStatuses} counts={funnel.parentAdvocacy} palette={PA_COLOR} />
-        </div>
-      </div>
-
-      {/* Admissions by partner */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {topAdmBrands.length > 0 && (
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 lg:col-span-1">
-            <div className="font-bold text-sm text-[#091a4f] mb-4">Top Brand Partners — Admissions</div>
-            <div className="space-y-2">
-              {topAdmBrands.map((b, i) => (
-                <div key={b.name} className="flex items-center gap-2 text-sm">
-                  <div className="w-5 text-center text-xs font-bold text-slate-400">#{i + 1}</div>
-                  <div className="flex-1 truncate text-slate-700">{b.name}</div>
-                  <div className="font-black text-amber-600">{b.admissionsReferred}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {(topAdmCorps.length > 0 || topAdmSchools.length > 0) && (
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-            <div className="font-bold text-sm text-[#091a4f] mb-4">Corporates & Schools — Admissions</div>
-            {topAdmCorps.length > 0 && (
-              <div className="mb-3">
-                <div className="text-xs text-slate-400 font-semibold uppercase mb-1">Corporates</div>
-                {topAdmCorps.map(c => (
-                  <div key={c.name} className="flex items-center gap-2 text-sm py-0.5">
-                    <div className="flex-1 truncate text-slate-700">{c.name}</div>
-                    <div className="font-black text-amber-600">{c.admissionsReferred}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {topAdmSchools.length > 0 && (
-              <div>
-                <div className="text-xs text-slate-400 font-semibold uppercase mb-1">Friendship Schools</div>
-                {topAdmSchools.map(s => (
-                  <div key={s.name} className="flex items-center gap-2 text-sm py-0.5">
-                    <div className="flex-1 truncate text-slate-700">{s.name}</div>
-                    <div className="font-black text-amber-600">{s.totalAdm}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Owner leaderboard */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-          <div className="font-bold text-sm text-[#091a4f] mb-4">Team Leaderboard</div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead><tr className="border-b border-slate-100">
-                <th className="text-left py-1.5 text-slate-400 font-semibold">Owner</th>
-                <th className="text-right py-1.5 text-slate-400 font-semibold">Total</th>
-                <th className="text-right py-1.5 text-slate-400 font-semibold">MOUs</th>
-                <th className="text-right py-1.5 text-slate-400 font-semibold">Adm</th>
-              </tr></thead>
-              <tbody>
-                {ownerLeaderboard.filter(o => o.name.trim()).slice(0, 10).map((o, i) => (
-                  <tr key={o.name} className={`border-b border-slate-50 ${i === 0 ? "font-bold" : ""}`}>
-                    <td className="py-1.5 text-slate-700 truncate max-w-[120px]">{o.name}</td>
-                    <td className="text-right text-[#091a4f] font-bold">{o.total}</td>
-                    <td className="text-right text-green-600 font-bold">{o.mouDone}</td>
-                    <td className="text-right text-amber-600 font-bold">{o.admissions}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Category breakdown */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <div className="font-bold text-sm text-[#091a4f] mb-4">Brand Partner Categories</div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {categoryBreakdown.slice(0, 20).map(c => (
-            <div key={c.name} className="border border-slate-100 rounded-lg p-3">
-              <div className="text-xs text-slate-500 truncate mb-1">{c.name}</div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-[#091a4f]">{c.total}</span>
-                <span className="text-xs text-green-600 font-semibold">{c.mouDone} MOUs</span>
-              </div>
-              {c.admissions > 0 && <div className="text-xs text-amber-600 font-semibold mt-0.5">{c.admissions} adm</div>}
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
