@@ -58,6 +58,7 @@ const SchoolNearBrahmand = lazy(() => import("@/pages/SchoolNearBrahmand"));
 const SchoolNearGhodbunderRoad = lazy(() => import("@/pages/SchoolNearGhodbunderRoad"));
 const SchoolNearManpada = lazy(() => import("@/pages/SchoolNearManpada"));
 const Marketing = lazy(() => import("@/pages/Marketing"));
+const Alliances = lazy(() => import("@/pages/Alliances"));
 const Sales = lazy(() => import("@/pages/Sales"));
 const RpsSales = lazy(() => import("@/pages/RpsSales"));
 const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
@@ -129,6 +130,7 @@ function Router() {
       <Route path="/school-near-ghodbunder-road-thane" component={SchoolNearGhodbunderRoad} />
       <Route path="/school-near-manpada-thane" component={SchoolNearManpada} />
       <Route path="/marketing" component={Marketing} />
+      <Route path="/alliances" component={Alliances} />
       <Route path="/sales" component={Sales} />
       <Route path="/rps-sales" component={RpsSales} />
       <Route path="/walkin/:slug" component={WalkinForm} />

@@ -2124,6 +2124,7 @@ export async function registerRoutes(
     risCrm:    "1zLIWutvJxwLyVBAK-vDlpEzNPV7c2RwutYC9Gn3yd2s",
     master:    "1FjLbJbThU2wZCu7m0Y-GAzv6vTs8WdkVxBRBZh8QZqc",
     sales:     "1R5evjW6gVYIB6nyR1dmIdiWp1qMTui4J9wQovmUkakw",
+    alliances: "1eTo457sA4SXnlQoEthHclcnr2WO_YG6cosUfhcrRmxA",
   };
 
   async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
@@ -4040,6 +4041,196 @@ paths:
     } catch (err: any) {
       console.error("[rps-sales] error:", err?.message);
       res.status(500).json({ message: err?.message || "Failed to load RPS sales data" });
+    }
+  });
+
+  // ── Alliances Dashboard ───────────────────────────────────────
+  app.get("/api/alliances/live", async (_req, res) => {
+    try {
+      const SID = SHEET_IDS.alliances;
+      const [bpRows, ctRows, fsRows, paRows] = await Promise.all([
+        fetchSheetRange(SID, "Brand Partners!A:R"),
+        fetchSheetRange(SID, "Corporate Tie-ups!A:R"),
+        fetchSheetRange(SID, "Friendship Schools!A:R"),
+        fetchSheetRange(SID, "Parent Advocacy!A:M"),
+      ]);
+
+      const n = (v: string | undefined) => { const x = parseFloat((v ?? "").replace(/,/g, "")); return isNaN(x) ? 0 : x; };
+      const bool = (v: string | undefined) => (v ?? "").toLowerCase().includes("yes") || (v ?? "").toLowerCase().includes("true");
+
+      // Brand Partners (skip header row 0)
+      const brandPartners = bpRows.slice(1)
+        .filter(r => r[1] && r[1].trim())
+        .map(r => ({
+          sno: r[0] ?? "",
+          name: r[1] ?? "",
+          category: r[2] ?? "",
+          discount: r[4] ?? "",
+          owner: r[5] ?? "",
+          stage: r[6] ?? "",
+          dateApproached: r[7] ?? "",
+          lastUpdate: r[8] ?? "",
+          mouSentDate: r[9] ?? "",
+          mouDoneDate: r[10] ?? "",
+          hasBanner: bool(r[11]),
+          hasWebsite: bool(r[12]),
+          hasBrochure: bool(r[13]),
+          admissionsReferred: n(r[15]),
+          daysSinceUpdate: n(r[16]),
+          followUpNeeded: bool(r[17]),
+        }));
+
+      // Corporate Tie-ups
+      const corporates = ctRows.slice(1)
+        .filter(r => r[1] && r[1].trim())
+        .map(r => ({
+          sno: r[0] ?? "",
+          name: r[1] ?? "",
+          size: r[2] ?? "",
+          industry: r[3] ?? "",
+          location: r[4] ?? "",
+          employees: r[5] ?? "",
+          contactPerson: r[6] ?? "",
+          contactNumber: r[7] ?? "",
+          owner: r[8] ?? "",
+          stage: r[9] ?? "",
+          dateApproached: r[10] ?? "",
+          lastUpdate: r[11] ?? "",
+          mouSentDate: r[12] ?? "",
+          mouDoneDate: r[13] ?? "",
+          admissionsReferred: n(r[14]),
+          daysSinceUpdate: n(r[15]),
+          followUpNeeded: bool(r[16]),
+          remarks: r[17] ?? "",
+        }));
+
+      // Friendship Schools
+      const friendshipSchools = fsRows.slice(1)
+        .filter(r => r[1] && r[1].trim())
+        .map(r => ({
+          sno: r[0] ?? "",
+          name: r[1] ?? "",
+          location: r[2] ?? "",
+          address: r[3] ?? "",
+          contactPerson: r[4] ?? "",
+          contactNumber: r[5] ?? "",
+          catersFrom: r[6] ?? "",
+          avgFee: r[7] ?? "",
+          strength: r[8] ?? "",
+          contractType: r[9] ?? "",
+          owner: r[10] ?? "",
+          stage: r[11] ?? "",
+          dateApproached: r[12] ?? "",
+          lastUpdate: r[13] ?? "",
+          mouSentDate: r[14] ?? "",
+          mouDoneDate: r[15] ?? "",
+          admJrKg: n(r[16]),
+          admSrKg: n(r[17]),
+          totalAdm: n(r[16]) + n(r[17]),
+        }));
+
+      // Parent Advocacy
+      const parentAdvocacy = paRows.slice(1)
+        .filter(r => r[1] && r[1].trim())
+        .map(r => ({
+          sno: r[0] ?? "",
+          referringParent: r[1] ?? "",
+          wardClass: r[2] ?? "",
+          referredFamily: r[4] ?? "",
+          gradeApplying: r[5] ?? "",
+          status: r[6] ?? "",
+          dateReferred: r[7] ?? "",
+          lastUpdate: r[8] ?? "",
+          incentiveGiven: r[9] ?? "",
+          incentiveDetails: r[10] ?? "",
+          owner: r[11] ?? "",
+          remarks: r[12] ?? "",
+        }));
+
+      // ── Computed aggregates ────────────────────────────────────
+      const PIPELINE_STAGES = ["Not Contacted","Initial Discussion","Touchbase Done","Waiting for Revert","MOU Sent","MOU Signing Pending","MOU Done","Not Interested / Dropped"];
+      const PA_STATUSES = ["Enquired","Campus Visit Scheduled","Application Submitted","Admission Confirmed","Not Interested"];
+
+      const stageCounts = (arr: {stage:string}[]) => {
+        const m: Record<string,number> = {};
+        for (const s of PIPELINE_STAGES) m[s] = 0;
+        for (const r of arr) { if (m[r.stage] !== undefined) m[r.stage]++; else m["Not Contacted"]++; }
+        return m;
+      };
+      const statusCounts = (arr: {status:string}[]) => {
+        const m: Record<string,number> = {};
+        for (const s of PA_STATUSES) m[s] = 0;
+        for (const r of arr) { if (m[r.status] !== undefined) m[r.status]++; }
+        return m;
+      };
+
+      // Owner leaderboard — across all verticals
+      const ownerMap: Record<string, {total:number;mouDone:number;admissions:number;followUp:number}> = {};
+      const addOwner = (owner:string, isMou:boolean, adm:number, fu:boolean) => {
+        if (!owner.trim()) return;
+        if (!ownerMap[owner]) ownerMap[owner] = {total:0,mouDone:0,admissions:0,followUp:0};
+        ownerMap[owner].total++;
+        if (isMou) ownerMap[owner].mouDone++;
+        ownerMap[owner].admissions += adm;
+        if (fu) ownerMap[owner].followUp++;
+      };
+      for (const r of brandPartners) addOwner(r.owner, r.stage==="MOU Done", r.admissionsReferred, r.followUpNeeded);
+      for (const r of corporates) addOwner(r.owner, r.stage==="MOU Done", r.admissionsReferred, r.followUpNeeded);
+      for (const r of friendshipSchools) addOwner(r.owner, r.stage==="MOU Done", r.totalAdm, false);
+      for (const r of parentAdvocacy) addOwner(r.owner, r.status==="Admission Confirmed", r.status==="Admission Confirmed"?1:0, false);
+
+      const ownerLeaderboard = Object.entries(ownerMap)
+        .map(([name, d]) => ({ name, ...d }))
+        .sort((a, b) => b.total - a.total);
+
+      // Category breakdown for brand partners
+      const categoryMap: Record<string, {total:number;mouDone:number;admissions:number}> = {};
+      for (const r of brandPartners) {
+        const cat = r.category || "Uncategorised";
+        if (!categoryMap[cat]) categoryMap[cat] = {total:0,mouDone:0,admissions:0};
+        categoryMap[cat].total++;
+        if (r.stage==="MOU Done") categoryMap[cat].mouDone++;
+        categoryMap[cat].admissions += r.admissionsReferred;
+      }
+      const categoryBreakdown = Object.entries(categoryMap)
+        .map(([name, d]) => ({ name, ...d }))
+        .sort((a, b) => b.total - a.total);
+
+      // KPIs
+      const totalProspects = brandPartners.length + corporates.length + friendshipSchools.length;
+      const totalMouDone = brandPartners.filter(r=>r.stage==="MOU Done").length
+        + corporates.filter(r=>r.stage==="MOU Done").length
+        + friendshipSchools.filter(r=>r.stage==="MOU Done").length;
+      const totalAdmissions = brandPartners.reduce((s,r)=>s+r.admissionsReferred,0)
+        + corporates.reduce((s,r)=>s+r.admissionsReferred,0)
+        + friendshipSchools.reduce((s,r)=>s+r.totalAdm,0)
+        + parentAdvocacy.filter(r=>r.status==="Admission Confirmed").length;
+      const totalFollowUp = brandPartners.filter(r=>r.followUpNeeded).length
+        + corporates.filter(r=>r.followUpNeeded).length;
+      const paAdmissions = parentAdvocacy.filter(r=>r.status==="Admission Confirmed").length;
+      const paReferrals = parentAdvocacy.length;
+
+      res.json({
+        generatedAt: new Date().toISOString(),
+        kpi: { totalProspects, totalMouDone, totalAdmissions, totalFollowUp, paReferrals, paAdmissions },
+        funnel: {
+          brandPartners: stageCounts(brandPartners),
+          corporates: stageCounts(corporates),
+          friendshipSchools: stageCounts(friendshipSchools),
+          parentAdvocacy: statusCounts(parentAdvocacy),
+        },
+        brandPartners,
+        corporates,
+        friendshipSchools,
+        parentAdvocacy,
+        ownerLeaderboard,
+        categoryBreakdown,
+        pipelineStages: PIPELINE_STAGES,
+        paStatuses: PA_STATUSES,
+      });
+    } catch (err: any) {
+      console.error("[alliances] error:", err?.message);
+      res.status(500).json({ message: "Failed to fetch alliances data", error: err.message });
     }
   });
 
