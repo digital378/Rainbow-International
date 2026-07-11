@@ -1,10 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, RadialBarChart, RadialBar,
-  CartesianGrid, LabelList,
-} from "recharts";
 
 const PIN = "ALL8";
 const AUTH_KEY = "alliances_auth_v1";
@@ -175,55 +170,139 @@ function Select({ value, onChange, options, placeholder }: { value: string; onCh
   );
 }
 
-// ── Chart colour palette ──────────────────────────────────────
+// ── Colour tokens ────────────────────────────────────────────
 const C = {
-  navy:   "#091a4f",
-  amber:  "#f59e0b",
-  green:  "#22c55e",
-  blue:   "#3b82f6",
-  indigo: "#6366f1",
-  purple: "#a855f7",
-  red:    "#ef4444",
-  slate:  "#94a3b8",
-  teal:   "#14b8a6",
+  navy:   "#091a4f", amber:  "#f59e0b", green:  "#22c55e",
+  blue:   "#3b82f6", indigo: "#6366f1", purple: "#a855f7",
+  red:    "#ef4444", slate:  "#94a3b8", teal:   "#14b8a6",
   orange: "#f97316",
 };
-
-const STAGE_CHART_COLOR: Record<string, string> = {
-  "Not Contacted":          C.slate,
-  "Initial Discussion":     C.blue,
-  "Touchbase Done":         C.indigo,
-  "Waiting for Revert":     C.amber,
-  "MOU Sent":               C.orange,
-  "MOU Signing Pending":    C.purple,
-  "MOU Done":               C.green,
-  "Not Interested / Dropped": C.red,
+const STAGE_COLOR_HEX: Record<string, string> = {
+  "Not Contacted": C.slate, "Initial Discussion": C.blue,
+  "Touchbase Done": C.indigo, "Waiting for Revert": C.amber,
+  "MOU Sent": C.orange, "MOU Signing Pending": C.purple,
+  "MOU Done": C.green, "Not Interested / Dropped": C.red,
 };
 
-const SHORT_STAGE: Record<string, string> = {
-  "Not Contacted":           "Not Contacted",
-  "Initial Discussion":      "Initial Disc.",
-  "Touchbase Done":          "Touchbase",
-  "Waiting for Revert":      "Waiting",
-  "MOU Sent":                "MOU Sent",
-  "MOU Signing Pending":     "MOU Pending",
-  "MOU Done":                "MOU Done ✓",
-  "Not Interested / Dropped":"Dropped",
-};
+// ── useCountUp: animates 0 → target over ~1.1 s ──────────────
+function useCountUp(target: number, duration = 1100) {
+  const [val, setVal] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(eased * target));
+      if (p < 1) rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [target, duration]);
+  return val;
+}
 
-// Custom tooltip wrapper
-function ChartTooltip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null;
+// ── AnimatedNumber ────────────────────────────────────────────
+function AN({ value, className = "" }: { value: number; className?: string }) {
+  const n = useCountUp(value);
+  return <span className={className}>{n.toLocaleString()}</span>;
+}
+
+// ── AnimatedRing: SVG circular progress with big number ───────
+function AnimatedRing({
+  value, max, size = 120, stroke = 10, color, label, sub,
+  suffix = "",
+}: {
+  value: number; max: number; size?: number; stroke?: number;
+  color: string; label: string; sub?: string; suffix?: string;
+}) {
+  const n = useCountUp(value);
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const pct = max > 0 ? value / max : 0;
+  const [dash, setDash] = useState(0);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setDash(pct * circ));
+    return () => cancelAnimationFrame(id);
+  }, [pct, circ]);
   return (
-    <div className="bg-white border border-slate-200 shadow-lg rounded-lg px-3 py-2 text-xs">
-      <div className="font-bold text-slate-700 mb-1">{label}</div>
-      {payload.map((p: any) => (
-        <div key={p.name} className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: p.fill ?? p.color }} />
-          <span className="text-slate-600">{p.name}:</span>
-          <span className="font-bold text-slate-800">{p.value}</span>
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+          <circle cx={size/2} cy={size/2} r={r} fill="none"
+            stroke="#f1f5f9" strokeWidth={stroke} />
+          <circle cx={size/2} cy={size/2} r={r} fill="none"
+            stroke={color} strokeWidth={stroke} strokeLinecap="round"
+            strokeDasharray={circ}
+            strokeDashoffset={circ - dash}
+            style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)" }} />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-black text-xl leading-none" style={{ color }}>
+            {n.toLocaleString()}{suffix}
+          </span>
+          {max !== value && (
+            <span className="text-[10px] text-slate-400 mt-0.5">/ {max.toLocaleString()}</span>
+          )}
         </div>
-      ))}
+      </div>
+      <div className="text-center">
+        <div className="text-xs font-bold text-[#091a4f]">{label}</div>
+        {sub && <div className="text-[10px] text-slate-400">{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+// ── AnimatedBar row ────────────────────────────────────────────
+function AnimatedBarRow({
+  label, value, max, color, rank,
+}: { label: string; value: number; max: number; color: string; rank?: number }) {
+  const n = useCountUp(value);
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const id = requestAnimationFrame(() =>
+      setWidth(max > 0 ? (value / max) * 100 : 0));
+    return () => cancelAnimationFrame(id);
+  }, [value, max]);
+  return (
+    <div className="flex items-center gap-3">
+      {rank !== undefined && (
+        <div className="w-5 text-center text-[10px] font-bold text-slate-300 shrink-0">
+          #{rank + 1}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-slate-600 truncate pr-2">{label}</span>
+          <span className="text-xs font-black shrink-0" style={{ color }}>
+            {n.toLocaleString()}
+          </span>
+        </div>
+        <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-full rounded-full"
+            style={{
+              width: `${width}%`, background: color,
+              transition: "width 1.1s cubic-bezier(0.34,1.0,0.64,1)",
+            }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Stage tile ─────────────────────────────────────────────────
+function StageTile({ stage, count, delay = 0 }: { stage: string; count: number; delay?: number }) {
+  const n = useCountUp(count);
+  const color = STAGE_COLOR_HEX[stage] ?? C.slate;
+  return (
+    <div className="bg-white border border-slate-100 rounded-xl p-4 flex flex-col items-center gap-1.5 shadow-sm"
+      style={{ animationDelay: `${delay}ms` }}>
+      <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+      <div className="text-3xl font-black" style={{ color }}>{n}</div>
+      <div className="text-[10px] text-slate-500 text-center leading-tight">{stage}</div>
     </div>
   );
 }
@@ -232,17 +311,6 @@ function ChartTooltip({ active, payload, label }: any) {
 function OverviewTab({ data }: { data: AlliancesData }) {
   const { kpi, funnel, ownerLeaderboard, categoryBreakdown, pipelineStages } = data;
 
-  // ── Chart data derivations ──────────────────────────────────
-
-  // 1. Grouped bar: stages × verticals
-  const stageChartData = pipelineStages.map(st => ({
-    stage: SHORT_STAGE[st] ?? st,
-    "Brand Partners":    funnel.brandPartners[st] ?? 0,
-    "Corporates":        funnel.corporates[st] ?? 0,
-    "Friend. Schools":   funnel.friendshipSchools[st] ?? 0,
-  }));
-
-  // 2. Donut: overall status split
   const mouDoneTotal = (funnel.brandPartners["MOU Done"] ?? 0)
     + (funnel.corporates["MOU Done"] ?? 0)
     + (funnel.friendshipSchools["MOU Done"] ?? 0);
@@ -250,181 +318,198 @@ function OverviewTab({ data }: { data: AlliancesData }) {
     + (funnel.corporates["Not Interested / Dropped"] ?? 0)
     + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
   const inPipeline = kpi.totalProspects - mouDoneTotal - droppedTotal;
-  const donutData = [
-    { name: "MOU Done",    value: mouDoneTotal, color: C.green  },
-    { name: "In Pipeline", value: inPipeline,   color: C.blue   },
-    { name: "Dropped",     value: droppedTotal, color: C.red    },
-  ];
 
-  // 3. Horizontal bar: top categories (total vs MOU done)
-  const catChartData = categoryBreakdown
-    .slice(0, 12)
-    .map(c => ({ name: c.name.length > 22 ? c.name.slice(0, 20) + "…" : c.name, Total: c.total, "MOU Done": c.mouDone }))
-    .reverse();
-
-  // 4. Horizontal bar: team leaderboard
-  const leaderData = ownerLeaderboard
-    .filter(o => o.name.trim())
-    .slice(0, 10)
-    .map(o => ({ name: o.name.split(" ")[0], Total: o.total, "MOU Done": o.mouDone }))
-    .reverse();
-
-  // 5. PA funnel
-  const paData = data.paStatuses.map(st => ({
-    name: st, value: data.funnel.parentAdvocacy[st] ?? 0,
-  }));
-  const PA_COLORS = [C.blue, C.indigo, C.amber, C.green, C.red];
-
-  // Vertical conversion rates for radial chart
   const verticals = [
-    { name: "Brand Partners", total: data.brandPartners.length, mou: funnel.brandPartners["MOU Done"] ?? 0, fill: C.navy },
-    { name: "Corporates",     total: data.corporates.length,    mou: funnel.corporates["MOU Done"] ?? 0,    fill: C.blue },
-    { name: "Fr. Schools",    total: data.friendshipSchools.length, mou: funnel.friendshipSchools["MOU Done"] ?? 0, fill: C.teal },
+    { name: "Brand Partners", label: "BP",  total: data.brandPartners.length,
+      mou: funnel.brandPartners["MOU Done"] ?? 0, color: C.navy },
+    { name: "Corporates",     label: "Corp", total: data.corporates.length,
+      mou: funnel.corporates["MOU Done"] ?? 0,    color: C.blue },
+    { name: "Friendship Schools", label: "FS", total: data.friendshipSchools.length,
+      mou: funnel.friendshipSchools["MOU Done"] ?? 0, color: C.teal },
   ].map(v => ({ ...v, rate: v.total > 0 ? Math.round((v.mou / v.total) * 100) : 0 }));
 
+  const topCats = categoryBreakdown.slice(0, 12);
+  const catMax = topCats[0]?.total ?? 1;
+  const topOwners = ownerLeaderboard.filter(o => o.name.trim()).slice(0, 10);
+  const ownerMax = topOwners[0]?.total ?? 1;
+
   return (
-    <div className="space-y-6">
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <KpiCard label="Total Prospects" value={kpi.totalProspects} sub="All verticals" />
-        <KpiCard label="Active MOUs" value={kpi.totalMouDone} sub="Tie-ups live" accent="text-green-600" />
-        <KpiCard label="Total Admissions" value={kpi.totalAdmissions} sub="Referred till date" accent="text-amber-600" />
-        <KpiCard label="Follow-up Needed" value={kpi.totalFollowUp} sub="> 7 days stale" accent={kpi.totalFollowUp > 0 ? "text-red-600" : "text-slate-400"} />
-        <KpiCard label="PA Referrals" value={kpi.paReferrals} sub="Parent advocacy" />
-        <KpiCard label="PA Conversions" value={kpi.paAdmissions} sub="Admissions confirmed" accent="text-green-600" />
+    <div className="space-y-8">
+
+      {/* ── Row 1: Hero KPI rings ────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+          Overall Snapshot
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
+          <AnimatedRing value={kpi.totalProspects} max={kpi.totalProspects}
+            color={C.navy} label="Total Prospects" sub="All verticals" size={110} />
+          <AnimatedRing value={kpi.totalMouDone} max={kpi.totalProspects}
+            color={C.green} label="Active MOUs" sub="Tie-ups live" size={110} />
+          <AnimatedRing value={mouDoneTotal} max={kpi.totalProspects}
+            color={C.teal} label="MOU Done" sub="Across verticals" size={110} />
+          <AnimatedRing value={inPipeline} max={kpi.totalProspects}
+            color={C.blue} label="In Pipeline" sub="Active pursuit" size={110} />
+          <AnimatedRing value={droppedTotal} max={kpi.totalProspects}
+            color={C.red} label="Dropped" sub="Not interested" size={110} />
+          <AnimatedRing value={kpi.totalAdmissions} max={kpi.totalAdmissions || 1}
+            color={C.amber} label="Admissions" sub="Referred till date" size={110} />
+        </div>
       </div>
 
-      {/* Row 1: Pipeline bar chart + MOU donut */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Stacked pipeline bar — spans 2 cols */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 lg:col-span-2">
-          <div className="font-bold text-sm text-[#091a4f] mb-4">Pipeline Stage Distribution — All Verticals</div>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={stageChartData} margin={{ top: 4, right: 12, left: -10, bottom: 50 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="stage" tick={{ fontSize: 10, fill: "#64748b" }} angle={-35} textAnchor="end" interval={0} />
-              <YAxis tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
-              <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
-              <Bar dataKey="Brand Partners"   fill={C.navy}  radius={[3,3,0,0]} />
-              <Bar dataKey="Corporates"       fill={C.blue}  radius={[3,3,0,0]} />
-              <Bar dataKey="Friend. Schools"  fill={C.teal}  radius={[3,3,0,0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* ── Row 2: Vertical rings + stage tiles ─────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+        {/* Vertical MOU conversion rings */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-2">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+            MOU Conversion by Vertical
+          </div>
+          <div className="flex justify-around items-start flex-wrap gap-6">
+            {verticals.map(v => (
+              <AnimatedRing key={v.name}
+                value={v.rate} max={100} suffix="%" size={120} stroke={11}
+                color={v.color} label={v.name}
+                sub={`${v.mou} of ${v.total} MOUs`} />
+            ))}
+          </div>
+          {/* Prospect-count row */}
+          <div className="mt-6 pt-5 border-t border-slate-100 space-y-3">
+            {verticals.map(v => (
+              <AnimatedBarRow key={v.name}
+                label={v.name} value={v.total} max={data.brandPartners.length || 1}
+                color={v.color} />
+            ))}
+          </div>
         </div>
 
-        {/* MOU conversion donut */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 flex flex-col">
-          <div className="font-bold text-sm text-[#091a4f] mb-2">Overall Prospect Status</div>
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height={180}>
-              <PieChart>
-                <Pie data={donutData} cx="50%" cy="50%" innerRadius={52} outerRadius={80}
-                  dataKey="value" paddingAngle={3}>
-                  {donutData.map((d, i) => <Cell key={i} fill={d.color} />)}
-                </Pie>
-                <Tooltip formatter={(v: any, n: any) => [v, n]} contentStyle={{ fontSize: 11 }} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex flex-col gap-1.5 w-full mt-1">
-              {donutData.map(d => (
-                <div key={d.name} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: d.color }} />
-                    <span className="text-slate-600">{d.name}</span>
-                  </div>
-                  <span className="font-bold text-slate-800">{d.value}</span>
-                </div>
-              ))}
-            </div>
+        {/* Stage tiles grid */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-3">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+            Pipeline Stage Distribution
           </div>
-          {/* Conversion rates per vertical */}
-          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
-            <div className="text-xs font-semibold text-slate-400 uppercase">MOU Conversion Rate</div>
+          {/* Combined counts across all 3 verticals */}
+          <div className="grid grid-cols-4 gap-3">
+            {pipelineStages.map((st, i) => {
+              const combined =
+                (funnel.brandPartners[st] ?? 0)
+                + (funnel.corporates[st] ?? 0)
+                + (funnel.friendshipSchools[st] ?? 0);
+              return <StageTile key={st} stage={st} count={combined} delay={i * 60} />;
+            })}
+          </div>
+          {/* Per-vertical mini breakdown */}
+          <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs">
             {verticals.map(v => (
-              <div key={v.name} className="flex items-center gap-2 text-xs">
-                <div className="w-24 text-slate-600 truncate">{v.name}</div>
-                <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${v.rate}%`, background: v.fill }} />
-                </div>
-                <div className="w-8 text-right font-bold text-slate-700">{v.rate}%</div>
+              <div key={v.name}>
+                <div className="font-bold text-[#091a4f] mb-2">{v.name}</div>
+                {["MOU Done","MOU Sent","Touchbase Done","Initial Discussion"].map(st => (
+                  <div key={st} className="flex justify-between py-0.5">
+                    <span className="text-slate-500 truncate pr-1">{st}</span>
+                    <span className="font-black shrink-0"
+                      style={{ color: STAGE_COLOR_HEX[st] ?? C.slate }}>
+                      <AN value={(v.name === "Brand Partners" ? funnel.brandPartners :
+                        v.name === "Corporates" ? funnel.corporates : funnel.friendshipSchools)[st] ?? 0} />
+                    </span>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Row 2: Category chart + Team leaderboard chart */}
+      {/* ── Row 3: Categories + Team leaderboard ─────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top categories horizontal bar */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-          <div className="font-bold text-sm text-[#091a4f] mb-4">Top Brand Partner Categories</div>
-          <ResponsiveContainer width="100%" height={340}>
-            <BarChart data={catChartData} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
-              <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 10, fill: "#64748b" }} />
-              <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="Total"    fill={C.navy}  radius={[0,3,3,0]}>
-                <LabelList dataKey="Total" position="right" style={{ fontSize: 10, fill: "#64748b" }} />
-              </Bar>
-              <Bar dataKey="MOU Done" fill={C.green} radius={[0,3,3,0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
 
-        {/* Team leaderboard horizontal bar */}
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-          <div className="font-bold text-sm text-[#091a4f] mb-4">Team Leaderboard — Prospects Owned</div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={leaderData} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} />
-              <YAxis type="category" dataKey="name" width={90} tick={{ fontSize: 11, fill: "#334155" }} />
-              <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="Total"    fill={C.navy}  radius={[0,3,3,0]}>
-                <LabelList dataKey="Total" position="right" style={{ fontSize: 10, fill: "#64748b" }} />
-              </Bar>
-              <Bar dataKey="MOU Done" fill={C.green} radius={[0,3,3,0]} />
-            </BarChart>
-          </ResponsiveContainer>
-
-          {/* PA funnel compact below leaderboard */}
-          <div className="mt-5 pt-5 border-t border-slate-100">
-            <div className="font-bold text-sm text-[#091a4f] mb-3">Parent Advocacy Funnel</div>
-            <ResponsiveContainer width="100%" height={120}>
-              <BarChart data={paData} margin={{ top: 0, right: 12, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 9, fill: "#64748b" }} />
-                <YAxis tick={{ fontSize: 10, fill: "#64748b" }} allowDecimals={false} width={20} />
-                <Tooltip contentStyle={{ fontSize: 11 }} />
-                <Bar dataKey="value" radius={[3,3,0,0]}>
-                  {paData.map((_, i) => <Cell key={i} fill={PA_COLORS[i % PA_COLORS.length]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Top categories */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+            Top Brand Partner Categories
+          </div>
+          <div className="space-y-3">
+            {topCats.map((c, i) => (
+              <div key={c.name}>
+                <AnimatedBarRow label={c.name} value={c.total}
+                  max={catMax} color={C.navy} rank={i} />
+                {c.mouDone > 0 && (
+                  <div className="flex items-center gap-3 mt-1 pl-8">
+                    <div className="flex-1 min-w-0">
+                      <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-green-400 transition-all duration-1000"
+                          style={{ width: `${catMax > 0 ? (c.mouDone / catMax) * 100 : 0}%` }} />
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-green-600 shrink-0">
+                      <AN value={c.mouDone} /> MOU
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Row 3: Stage breakdown text cards (quick reference) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { title: "Brand Partners", counts: funnel.brandPartners, total: data.brandPartners.length },
-          { title: "Corporate Tie-ups", counts: funnel.corporates, total: data.corporates.length },
-          { title: "Friendship Schools", counts: funnel.friendshipSchools, total: data.friendshipSchools.length },
-        ].map(({ title, counts, total }) => (
-          <div key={title} className="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="font-bold text-sm text-[#091a4f]">{title}</div>
-              <div className="text-xs text-slate-400">{total} total</div>
+        {/* Team leaderboard */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+            Team Leaderboard
+          </div>
+          <div className="space-y-4">
+            {topOwners.map((o, i) => (
+              <div key={o.name}>
+                <AnimatedBarRow label={o.name} value={o.total}
+                  max={ownerMax} color={C.navy} rank={i} />
+                <div className="flex gap-4 pl-8 mt-0.5">
+                  <span className="text-[10px] text-green-600 font-bold">
+                    <AN value={o.mouDone} /> MOUs
+                  </span>
+                  {o.admissions > 0 && (
+                    <span className="text-[10px] text-amber-600 font-bold">
+                      <AN value={o.admissions} /> adm
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* PA numbers */}
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Parent Advocacy
             </div>
-            <FunnelBar stages={pipelineStages} counts={counts} palette={STAGE_COLOR} />
+            <div className="flex items-end gap-6 justify-center flex-wrap">
+              {[
+                { label: "Referrals", value: kpi.paReferrals, color: C.indigo },
+                { label: "Admissions", value: kpi.paAdmissions, color: C.green },
+              ].map(s => (
+                <div key={s.label} className="text-center">
+                  <div className="text-4xl font-black" style={{ color: s.color }}>
+                    <AN value={s.value} />
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">{s.label}</div>
+                </div>
+              ))}
+              {data.paStatuses.map(st => {
+                const v = data.funnel.parentAdvocacy[st] ?? 0;
+                if (!v) return null;
+                const colors = [C.blue, C.amber, C.teal, C.purple];
+                const ci = data.paStatuses.indexOf(st) % colors.length;
+                return (
+                  <div key={st} className="text-center">
+                    <div className="text-2xl font-black" style={{ color: colors[ci] }}>
+                      <AN value={v} />
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{st}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
+
     </div>
   );
 }
