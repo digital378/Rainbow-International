@@ -314,6 +314,9 @@ function OverviewTab({ data }: { data: AlliancesData }) {
   const mouDoneTotal = (funnel.brandPartners["MOU Done"] ?? 0)
     + (funnel.corporates["MOU Done"] ?? 0)
     + (funnel.friendshipSchools["MOU Done"] ?? 0);
+  const mouSentTotal = (funnel.brandPartners["MOU Sent"] ?? 0)
+    + (funnel.corporates["MOU Sent"] ?? 0)
+    + (funnel.friendshipSchools["MOU Sent"] ?? 0);
   const droppedTotal = (funnel.brandPartners["Not Interested / Dropped"] ?? 0)
     + (funnel.corporates["Not Interested / Dropped"] ?? 0)
     + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
@@ -346,8 +349,8 @@ function OverviewTab({ data }: { data: AlliancesData }) {
             color={C.navy} label="Total Prospects" sub="All verticals" size={110} />
           <AnimatedRing value={kpi.totalMouDone} max={kpi.totalProspects}
             color={C.green} label="Active MOUs" sub="Tie-ups live" size={110} />
-          <AnimatedRing value={mouDoneTotal} max={kpi.totalProspects}
-            color={C.teal} label="MOU Done" sub="Across verticals" size={110} />
+          <AnimatedRing value={mouSentTotal} max={kpi.totalProspects}
+            color={C.purple} label="MOU Sent" sub="Awaiting signature" size={110} />
           <AnimatedRing value={inPipeline} max={kpi.totalProspects}
             color={C.blue} label="In Pipeline" sub="Active pursuit" size={110} />
           <AnimatedRing value={droppedTotal} max={kpi.totalProspects}
@@ -514,6 +517,80 @@ function OverviewTab({ data }: { data: AlliancesData }) {
   );
 }
 
+// ── Tab Summary Infographic ───────────────────────────────────
+function TabSummary({
+  stats, pipelineStages, stageCounts, topOwners,
+}: {
+  stats: Array<{ label: string; value: number | string; color: string; bold?: boolean }>;
+  pipelineStages: string[];
+  stageCounts: Record<string, number>;
+  topOwners: Array<{ name: string; count: number }>;
+}) {
+  const total = pipelineStages.reduce((s, st) => s + (stageCounts[st] ?? 0), 0) || 1;
+  const [ready, setReady] = useState(false);
+  useEffect(() => { const id = requestAnimationFrame(() => setReady(true)); return () => cancelAnimationFrame(id); }, []);
+  return (
+    <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-4">
+      {/* Stat tiles */}
+      <div className="flex flex-wrap gap-3">
+        {stats.map(s => (
+          <div key={s.label}
+            className="flex flex-col items-center bg-slate-50 rounded-xl px-5 py-3 min-w-[88px] border border-slate-100">
+            <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
+              {typeof s.value === "number" ? <AN value={s.value} /> : s.value}
+            </div>
+            <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Segmented stage bar */}
+      <div>
+        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Stage Breakdown</div>
+        <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
+          {pipelineStages.map(st => {
+            const cnt = stageCounts[st] ?? 0;
+            if (!cnt) return null;
+            return (
+              <div key={st} title={`${st}: ${cnt}`}
+                style={{
+                  width: ready ? `${(cnt / total) * 100}%` : "0%",
+                  background: STAGE_COLOR_HEX[st] ?? C.slate,
+                  transition: "width 1.1s cubic-bezier(0.34,1.0,0.64,1)",
+                }} />
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+          {pipelineStages.filter(st => (stageCounts[st] ?? 0) > 0).map(st => (
+            <div key={st} className="flex items-center gap-1.5 text-xs">
+              <span className="w-2 h-2 rounded-full shrink-0"
+                style={{ background: STAGE_COLOR_HEX[st] ?? C.slate }} />
+              <span className="text-slate-500">{st}</span>
+              <span className="font-black text-slate-800">{stageCounts[st]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Top owners */}
+      {topOwners.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top Owners</span>
+          {topOwners.map((o, i) => (
+            <span key={o.name}
+              className="flex items-center gap-1 text-xs bg-slate-50 border border-slate-100 rounded-full px-2.5 py-1">
+              {i === 0 && <span className="text-amber-500">★</span>}
+              <span className="text-slate-700 font-semibold">{o.name.split(" ")[0]}</span>
+              <span className="font-black text-[#091a4f]">{o.count}</span>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Brand Partners Tab ────────────────────────────────────────
 function BrandPartnersTab({ data }: { data: AlliancesData }) {
   const [search, setSearch] = useState("");
@@ -532,12 +609,33 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
-  const mouDone = rows.filter(b => b.stage === "MOU Done").length;
-  const totalAdm = rows.reduce((s, b) => s + b.admissionsReferred, 0);
-  const needsFU = rows.filter(b => b.followUpNeeded).length;
+  const mouDone = data.brandPartners.filter(b => b.stage === "MOU Done").length;
+  const mouSent = data.brandPartners.filter(b => b.stage === "MOU Sent").length;
+  const mouPending = data.brandPartners.filter(b => b.stage === "MOU Signing Pending").length;
+  const totalAdm = data.brandPartners.reduce((s, b) => s + b.admissionsReferred, 0);
+  const needsFU = data.brandPartners.filter(b => b.followUpNeeded).length;
+  const bpStageCounts: Record<string, number> = {};
+  data.brandPartners.forEach(b => { if (b.stage) bpStageCounts[b.stage] = (bpStageCounts[b.stage] ?? 0) + 1; });
+  const bpOwnerCounts: Record<string, number> = {};
+  data.brandPartners.forEach(b => { if (b.owner) bpOwnerCounts[b.owner] = (bpOwnerCounts[b.owner] ?? 0) + 1; });
+  const bpTopOwners = Object.entries(bpOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
 
   return (
     <div className="space-y-4">
+      <TabSummary
+        stats={[
+          { label: "Total Brands", value: data.brandPartners.length, color: C.navy },
+          { label: "MOU Done ✓", value: mouDone, color: C.green },
+          { label: "MOU Sent", value: mouSent, color: C.purple },
+          { label: "MOU Pending", value: mouPending, color: C.orange },
+          { label: "Follow-up Needed", value: needsFU, color: C.red },
+          { label: "Admissions", value: totalAdm, color: C.amber },
+          { label: "Categories", value: cats.length, color: C.slate },
+        ]}
+        pipelineStages={data.pipelineStages}
+        stageCounts={bpStageCounts}
+        topOwners={bpTopOwners}
+      />
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search brands…" />
         <Select value={filterCat} onChange={setFilterCat} options={cats} placeholder="All categories" />
@@ -545,9 +643,6 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
         <Select value={filterOwner} onChange={setFilterOwner} options={owners} placeholder="All owners" />
         <div className="ml-auto flex gap-4 text-sm">
           <span className="text-slate-500">{rows.length} shown</span>
-          <span className="text-green-600 font-semibold">{mouDone} MOU Done</span>
-          {totalAdm > 0 && <span className="text-amber-600 font-semibold">{totalAdm} admissions</span>}
-          {needsFU > 0 && <span className="text-red-500 font-semibold">{needsFU} follow-up needed</span>}
         </div>
       </div>
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
@@ -617,8 +712,32 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
+  const corpMouDone = data.corporates.filter(c => c.stage === "MOU Done").length;
+  const corpMouSent = data.corporates.filter(c => c.stage === "MOU Sent").length;
+  const corpMouPending = data.corporates.filter(c => c.stage === "MOU Signing Pending").length;
+  const corpAdm = data.corporates.reduce((s, c) => s + c.admissionsReferred, 0);
+  const corpFU = data.corporates.filter(c => c.followUpNeeded).length;
+  const corpStageCounts: Record<string, number> = {};
+  data.corporates.forEach(c => { if (c.stage) corpStageCounts[c.stage] = (corpStageCounts[c.stage] ?? 0) + 1; });
+  const corpOwnerCounts: Record<string, number> = {};
+  data.corporates.forEach(c => { if (c.owner) corpOwnerCounts[c.owner] = (corpOwnerCounts[c.owner] ?? 0) + 1; });
+  const corpTopOwners = Object.entries(corpOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
+
   return (
     <div className="space-y-4">
+      <TabSummary
+        stats={[
+          { label: "Total Corporates", value: data.corporates.length, color: C.navy },
+          { label: "MOU Done ✓", value: corpMouDone, color: C.green },
+          { label: "MOU Sent", value: corpMouSent, color: C.purple },
+          { label: "MOU Pending", value: corpMouPending, color: C.orange },
+          { label: "Follow-up Needed", value: corpFU, color: C.red },
+          { label: "Admissions", value: corpAdm, color: C.amber },
+        ]}
+        pipelineStages={data.pipelineStages}
+        stageCounts={corpStageCounts}
+        topOwners={corpTopOwners}
+      />
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search corporates…" />
         <Select value={filterStage} onChange={setFilterStage} options={data.pipelineStages} placeholder="All stages" />
@@ -685,9 +804,34 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
   });
 
   const totalAdm = rows.reduce((s, r) => s + r.totalAdm, 0);
+  const fsMouDone = data.friendshipSchools.filter(s => s.stage === "MOU Done").length;
+  const fsMouSent = data.friendshipSchools.filter(s => s.stage === "MOU Sent").length;
+  const fsMouPending = data.friendshipSchools.filter(s => s.stage === "MOU Signing Pending").length;
+  const fsTotalJr = data.friendshipSchools.reduce((s, r) => s + r.admJrKg, 0);
+  const fsTotalSr = data.friendshipSchools.reduce((s, r) => s + r.admSrKg, 0);
+  const fsTotalAdm = data.friendshipSchools.reduce((s, r) => s + r.totalAdm, 0);
+  const fsStageCounts: Record<string, number> = {};
+  data.friendshipSchools.forEach(s => { if (s.stage) fsStageCounts[s.stage] = (fsStageCounts[s.stage] ?? 0) + 1; });
+  const fsOwnerCounts: Record<string, number> = {};
+  data.friendshipSchools.forEach(s => { if (s.owner) fsOwnerCounts[s.owner] = (fsOwnerCounts[s.owner] ?? 0) + 1; });
+  const fsTopOwners = Object.entries(fsOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
 
   return (
     <div className="space-y-4">
+      <TabSummary
+        stats={[
+          { label: "Total Schools", value: data.friendshipSchools.length, color: C.navy },
+          { label: "MOU Done ✓", value: fsMouDone, color: C.green },
+          { label: "MOU Sent", value: fsMouSent, color: C.purple },
+          { label: "MOU Pending", value: fsMouPending, color: C.orange },
+          { label: "Jr KG Adm", value: fsTotalJr, color: C.teal },
+          { label: "Sr KG Adm", value: fsTotalSr, color: C.indigo },
+          { label: "Total Adm", value: fsTotalAdm, color: C.amber },
+        ]}
+        pipelineStages={data.pipelineStages}
+        stageCounts={fsStageCounts}
+        topOwners={fsTopOwners}
+      />
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search schools…" />
         <Select value={filterStage} onChange={setFilterStage} options={data.pipelineStages} placeholder="All stages" />
@@ -753,21 +897,58 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const confirmed = data.parentAdvocacy.filter(p => p.status === "Admission Confirmed").length;
   const conversion = data.parentAdvocacy.length > 0
     ? Math.round((confirmed / data.parentAdvocacy.length) * 100) : 0;
+  const paStageCounts: Record<string, number> = {};
+  data.parentAdvocacy.forEach(p => { if (p.status) paStageCounts[p.status] = (paStageCounts[p.status] ?? 0) + 1; });
+  const PA_HEX: Record<string, string> = {
+    "Referred": C.blue, "Meeting Scheduled": C.indigo,
+    "Visited School": C.teal, "Admission Confirmed": C.green, "Not Interested": C.red,
+  };
+  const paStatusStages = data.paStatuses;
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-2">
-        {data.paStatuses.map(st => (
-          <div key={st} className="bg-white rounded-xl border border-slate-100 shadow-sm p-3 text-center">
-            <div className="text-xl font-black text-[#091a4f]">{data.funnel.parentAdvocacy[st] ?? 0}</div>
-            <div className="text-xs text-slate-500 mt-0.5">{st}</div>
+      {/* PA Summary Infographic */}
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-4">
+        <div className="flex flex-wrap gap-3">
+          {[
+            { label: "Total Referrals", value: data.parentAdvocacy.length, color: C.navy },
+            { label: "Confirmed Adm", value: confirmed, color: C.green },
+            { label: "Conversion Rate", value: `${conversion}%`, color: C.amber },
+          ].map(s => (
+            <div key={s.label}
+              className="flex flex-col items-center bg-slate-50 rounded-xl px-5 py-3 min-w-[100px] border border-slate-100">
+              <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
+                {typeof s.value === "number" ? <AN value={s.value} /> : s.value}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{s.label}</div>
+            </div>
+          ))}
+          {paStatusStages.map(st => (
+            <div key={st}
+              className="flex flex-col items-center bg-slate-50 rounded-xl px-4 py-3 min-w-[88px] border border-slate-100">
+              <div className="text-2xl font-black leading-none" style={{ color: PA_HEX[st] ?? C.slate }}>
+                <AN value={data.funnel.parentAdvocacy[st] ?? 0} />
+              </div>
+              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{st}</div>
+            </div>
+          ))}
+        </div>
+        {/* Conversion progress bar */}
+        <div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Referral Pipeline</div>
+          <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
+            {paStatusStages.map(st => {
+              const cnt = data.funnel.parentAdvocacy[st] ?? 0;
+              const total = data.parentAdvocacy.length || 1;
+              if (!cnt) return null;
+              return (
+                <div key={st} title={`${st}: ${cnt}`}
+                  style={{ width: `${(cnt / total) * 100}%`, background: PA_HEX[st] ?? C.slate }}
+                  className="transition-all duration-1000" />
+              );
+            })}
           </div>
-        ))}
-      </div>
-      <div className="flex items-center gap-3 text-sm text-slate-500">
-        <span>Total: <strong>{data.parentAdvocacy.length}</strong></span>
-        <span>Confirmed: <strong className="text-green-600">{confirmed}</strong></span>
-        <span>Conversion: <strong className="text-amber-600">{conversion}%</strong></span>
+        </div>
       </div>
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
