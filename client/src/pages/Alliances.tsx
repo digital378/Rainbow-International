@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 const PIN = "ALL8";
@@ -308,54 +308,173 @@ function StageTile({ stage, count, delay = 0 }: { stage: string; count: number; 
 }
 
 // ── Overview Tab ──────────────────────────────────────────────
+type VerticalKey = "all" | "brandPartners" | "corporates" | "friendshipSchools";
+const VERTICAL_OPTS: { key: VerticalKey; label: string; color: string }[] = [
+  { key: "all",              label: "All Verticals",    color: C.navy  },
+  { key: "brandPartners",    label: "Brand Partners",   color: C.navy  },
+  { key: "corporates",       label: "Corporates",       color: C.blue  },
+  { key: "friendshipSchools",label: "Friendship Schools",color: C.teal },
+];
+
 function OverviewTab({ data }: { data: AlliancesData }) {
   const { kpi, funnel, ownerLeaderboard, categoryBreakdown, pipelineStages } = data;
 
-  const mouDoneTotal = (funnel.brandPartners["MOU Done"] ?? 0)
-    + (funnel.corporates["MOU Done"] ?? 0)
-    + (funnel.friendshipSchools["MOU Done"] ?? 0);
-  const mouSentTotal = (funnel.brandPartners["MOU Sent"] ?? 0)
-    + (funnel.corporates["MOU Sent"] ?? 0)
-    + (funnel.friendshipSchools["MOU Sent"] ?? 0);
-  const droppedTotal = (funnel.brandPartners["Not Interested / Dropped"] ?? 0)
-    + (funnel.corporates["Not Interested / Dropped"] ?? 0)
-    + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
-  const inPipeline = kpi.totalProspects - mouDoneTotal - droppedTotal;
+  // ── Filter state ──────────────────────────────────────────
+  const [filterVertical, setFilterVertical] = useState<VerticalKey>("all");
+  const [filterBPCat, setFilterBPCat]       = useState("");
 
-  const verticals = [
-    { name: "Brand Partners", label: "BP",  total: data.brandPartners.length,
-      mou: funnel.brandPartners["MOU Done"] ?? 0, color: C.navy },
-    { name: "Corporates",     label: "Corp", total: data.corporates.length,
-      mou: funnel.corporates["MOU Done"] ?? 0,    color: C.blue },
-    { name: "Friendship Schools", label: "FS", total: data.friendshipSchools.length,
-      mou: funnel.friendshipSchools["MOU Done"] ?? 0, color: C.teal },
+  // Reset sub-filter when vertical changes
+  useEffect(() => { setFilterBPCat(""); }, [filterVertical]);
+
+  const bpCategories = useMemo(
+    () => [...new Set(data.brandPartners.map(b => b.category).filter(Boolean))].sort(),
+    [data.brandPartners],
+  );
+
+  // ── Derive filtered rows (or null = "all") ────────────────
+  const filteredRows = useMemo(() => {
+    if (filterVertical === "brandPartners") {
+      const rows = filterBPCat
+        ? data.brandPartners.filter(b => b.category === filterBPCat)
+        : data.brandPartners;
+      return { rows, source: "bp" as const };
+    }
+    if (filterVertical === "corporates")
+      return { rows: data.corporates, source: "corp" as const };
+    if (filterVertical === "friendshipSchools")
+      return { rows: data.friendshipSchools, source: "fs" as const };
+    return null;
+  }, [filterVertical, filterBPCat, data]);
+
+  // ── Derived KPI numbers ───────────────────────────────────
+  const stats = useMemo(() => {
+    if (!filteredRows) {
+      const mouDone   = (funnel.brandPartners["MOU Done"] ?? 0) + (funnel.corporates["MOU Done"] ?? 0) + (funnel.friendshipSchools["MOU Done"] ?? 0);
+      const mouSent   = (funnel.brandPartners["MOU Sent"] ?? 0) + (funnel.corporates["MOU Sent"] ?? 0) + (funnel.friendshipSchools["MOU Sent"] ?? 0);
+      const dropped   = (funnel.brandPartners["Not Interested / Dropped"] ?? 0) + (funnel.corporates["Not Interested / Dropped"] ?? 0) + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
+      const total     = kpi.totalProspects;
+      return { total, mouDone, mouSent, dropped, inPipeline: total - mouDone - dropped, admissions: kpi.totalAdmissions };
+    }
+    const { rows } = filteredRows;
+    const mouDone   = rows.filter((r: any) => r.stage === "MOU Done").length;
+    const mouSent   = rows.filter((r: any) => r.stage === "MOU Sent").length;
+    const dropped   = rows.filter((r: any) => r.stage === "Not Interested / Dropped").length;
+    const admissions = rows.reduce((s: number, r: any) => s + (r.admissionsReferred ?? r.totalAdm ?? 0), 0);
+    return { total: rows.length, mouDone, mouSent, dropped, inPipeline: rows.length - mouDone - dropped, admissions };
+  }, [filteredRows, funnel, kpi]);
+
+  // ── Derived stage counts ──────────────────────────────────
+  const stageCounts = useMemo(() => {
+    if (!filteredRows) {
+      return Object.fromEntries(pipelineStages.map(st => [
+        st,
+        (funnel.brandPartners[st] ?? 0) + (funnel.corporates[st] ?? 0) + (funnel.friendshipSchools[st] ?? 0),
+      ]));
+    }
+    const counts: Record<string, number> = {};
+    filteredRows.rows.forEach((r: any) => {
+      const s = r.stage;
+      if (s) counts[s] = (counts[s] ?? 0) + 1;
+    });
+    return counts;
+  }, [filteredRows, funnel, pipelineStages]);
+
+  // ── Verticals for conversion rings ────────────────────────
+  const allVerticals = [
+    { name: "Brand Partners",    label: "BP",   total: data.brandPartners.length,    mou: funnel.brandPartners["MOU Done"] ?? 0,    color: C.navy },
+    { name: "Corporates",        label: "Corp", total: data.corporates.length,        mou: funnel.corporates["MOU Done"] ?? 0,        color: C.blue },
+    { name: "Friendship Schools",label: "FS",   total: data.friendshipSchools.length, mou: funnel.friendshipSchools["MOU Done"] ?? 0, color: C.teal },
   ].map(v => ({ ...v, rate: v.total > 0 ? Math.round((v.mou / v.total) * 100) : 0 }));
 
-  const topCats = categoryBreakdown.slice(0, 12);
+  const verticals = filterVertical === "all" ? allVerticals
+    : allVerticals.filter(v =>
+        (filterVertical === "brandPartners"    && v.name === "Brand Partners") ||
+        (filterVertical === "corporates"       && v.name === "Corporates") ||
+        (filterVertical === "friendshipSchools"&& v.name === "Friendship Schools"),
+      );
+  const vertMax = Math.max(...allVerticals.map(v => v.total), 1);
+
+  // ── Category + owner lists ────────────────────────────────
+  const topCats = useMemo(() => {
+    if (filterVertical === "brandPartners" && filterBPCat) return [];
+    return categoryBreakdown.slice(0, 12);
+  }, [categoryBreakdown, filterVertical, filterBPCat]);
   const catMax = topCats[0]?.total ?? 1;
   const topOwners = ownerLeaderboard.filter(o => o.name.trim()).slice(0, 10);
   const ownerMax = topOwners[0]?.total ?? 1;
 
+  const isFiltered = filterVertical !== "all" || filterBPCat !== "";
+  const activeColor = VERTICAL_OPTS.find(o => o.key === filterVertical)?.color ?? C.navy;
+
   return (
     <div className="space-y-8">
 
+      {/* ── Filter bar ───────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest shrink-0">View by</span>
+          <div className="flex flex-wrap gap-2">
+            {VERTICAL_OPTS.map(opt => (
+              <button key={opt.key}
+                onClick={() => setFilterVertical(opt.key)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                  filterVertical === opt.key
+                    ? "text-white border-transparent shadow-sm"
+                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                }`}
+                style={filterVertical === opt.key ? { background: opt.color } : {}}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* BP category chips — only when Brand Partners selected */}
+          {filterVertical === "brandPartners" && (
+            <div className="flex flex-wrap gap-1.5 mt-1 w-full pl-0">
+              <button onClick={() => setFilterBPCat("")}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                  filterBPCat === "" ? "bg-[#091a4f] text-white border-transparent" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                }`}>
+                All Categories
+              </button>
+              {bpCategories.map(cat => (
+                <button key={cat} onClick={() => setFilterBPCat(cat)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                    filterBPCat === cat ? "bg-[#091a4f] text-white border-transparent" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                  }`}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ── Row 1: Hero KPI rings ────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
-          Overall Snapshot
+        <div className="flex items-center gap-3 mb-6">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            {filterBPCat ? `${filterBPCat} · Brand Partners` : VERTICAL_OPTS.find(o => o.key === filterVertical)?.label} Snapshot
+          </div>
+          {isFiltered && (
+            <button onClick={() => { setFilterVertical("all"); setFilterBPCat(""); }}
+              className="text-[10px] font-bold text-slate-400 hover:text-slate-600 border border-slate-200 rounded-full px-2 py-0.5 transition-colors">
+              ✕ Reset
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
-          <AnimatedRing value={kpi.totalProspects} max={kpi.totalProspects}
-            color={C.navy} label="Total Prospects" sub="All verticals" size={110} />
-          <AnimatedRing value={kpi.totalMouDone} max={kpi.totalProspects}
-            color={C.green} label="Active MOUs" sub="Tie-ups live" size={110} />
-          <AnimatedRing value={mouSentTotal} max={kpi.totalProspects}
+          <AnimatedRing value={stats.total} max={stats.total || 1}
+            color={activeColor} label="Total" sub={filterBPCat || VERTICAL_OPTS.find(o => o.key === filterVertical)?.label || "All verticals"} size={110} />
+          <AnimatedRing value={stats.mouDone} max={stats.total || 1}
+            color={C.green} label="MOU Done" sub="Tie-ups signed" size={110} />
+          <AnimatedRing value={stats.mouSent} max={stats.total || 1}
             color={C.purple} label="MOU Sent" sub="Awaiting signature" size={110} />
-          <AnimatedRing value={inPipeline} max={kpi.totalProspects}
+          <AnimatedRing value={stats.inPipeline} max={stats.total || 1}
             color={C.blue} label="In Pipeline" sub="Active pursuit" size={110} />
-          <AnimatedRing value={droppedTotal} max={kpi.totalProspects}
+          <AnimatedRing value={stats.dropped} max={stats.total || 1}
             color={C.red} label="Dropped" sub="Not interested" size={110} />
-          <AnimatedRing value={kpi.totalAdmissions} max={kpi.totalAdmissions || 1}
+          <AnimatedRing value={stats.admissions} max={stats.admissions || 1}
             color={C.amber} label="Admissions" sub="Referred till date" size={110} />
         </div>
       </div>
@@ -376,12 +495,10 @@ function OverviewTab({ data }: { data: AlliancesData }) {
                 sub={`${v.mou} of ${v.total} MOUs`} />
             ))}
           </div>
-          {/* Prospect-count row */}
           <div className="mt-6 pt-5 border-t border-slate-100 space-y-3">
             {verticals.map(v => (
               <AnimatedBarRow key={v.name}
-                label={v.name} value={v.total} max={data.brandPartners.length || 1}
-                color={v.color} />
+                label={v.name} value={v.total} max={vertMax} color={v.color} />
             ))}
           </div>
         </div>
@@ -391,67 +508,64 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
             Pipeline Stage Distribution
           </div>
-          {/* Combined counts across all 3 verticals */}
           <div className="grid grid-cols-4 gap-3">
-            {pipelineStages.map((st, i) => {
-              const combined =
-                (funnel.brandPartners[st] ?? 0)
-                + (funnel.corporates[st] ?? 0)
-                + (funnel.friendshipSchools[st] ?? 0);
-              return <StageTile key={st} stage={st} count={combined} delay={i * 60} />;
-            })}
-          </div>
-          {/* Per-vertical mini breakdown */}
-          <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs">
-            {verticals.map(v => (
-              <div key={v.name}>
-                <div className="font-bold text-[#091a4f] mb-2">{v.name}</div>
-                {["MOU Done","MOU Sent","Touchbase Done","Initial Discussion"].map(st => (
-                  <div key={st} className="flex justify-between py-0.5">
-                    <span className="text-slate-500 truncate pr-1">{st}</span>
-                    <span className="font-black shrink-0"
-                      style={{ color: STAGE_COLOR_HEX[st] ?? C.slate }}>
-                      <AN value={(v.name === "Brand Partners" ? funnel.brandPartners :
-                        v.name === "Corporates" ? funnel.corporates : funnel.friendshipSchools)[st] ?? 0} />
-                    </span>
-                  </div>
-                ))}
-              </div>
+            {pipelineStages.map((st, i) => (
+              <StageTile key={st} stage={st} count={stageCounts[st] ?? 0} delay={i * 60} />
             ))}
           </div>
+          {/* Per-vertical mini breakdown — only in "all" mode */}
+          {filterVertical === "all" && (
+            <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs">
+              {allVerticals.map(v => (
+                <div key={v.name}>
+                  <div className="font-bold text-[#091a4f] mb-2">{v.name}</div>
+                  {["MOU Done","MOU Sent","Touchbase Done","Initial Discussion"].map(st => (
+                    <div key={st} className="flex justify-between py-0.5">
+                      <span className="text-slate-500 truncate pr-1">{st}</span>
+                      <span className="font-black shrink-0" style={{ color: STAGE_COLOR_HEX[st] ?? C.slate }}>
+                        <AN value={(v.name === "Brand Partners" ? funnel.brandPartners :
+                          v.name === "Corporates" ? funnel.corporates : funnel.friendshipSchools)[st] ?? 0} />
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* ── Row 3: Categories + Team leaderboard ─────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Top categories */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
-            Top Brand Partner Categories
-          </div>
-          <div className="space-y-3">
-            {topCats.map((c, i) => (
-              <div key={c.name}>
-                <AnimatedBarRow label={c.name} value={c.total}
-                  max={catMax} color={C.navy} rank={i} />
-                {c.mouDone > 0 && (
-                  <div className="flex items-center gap-3 mt-1 pl-8">
-                    <div className="flex-1 min-w-0">
-                      <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-green-400 transition-all duration-1000"
-                          style={{ width: `${catMax > 0 ? (c.mouDone / catMax) * 100 : 0}%` }} />
+        {/* Top categories — hide when a BP category is already selected */}
+        {topCats.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+              Top Brand Partner Categories
+            </div>
+            <div className="space-y-3">
+              {topCats.map((c, i) => (
+                <div key={c.name}>
+                  <AnimatedBarRow label={c.name} value={c.total} max={catMax} color={C.navy} rank={i} />
+                  {c.mouDone > 0 && (
+                    <div className="flex items-center gap-3 mt-1 pl-8">
+                      <div className="flex-1 min-w-0">
+                        <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full bg-green-400 transition-all duration-1000"
+                            style={{ width: `${catMax > 0 ? (c.mouDone / catMax) * 100 : 0}%` }} />
+                        </div>
                       </div>
+                      <span className="text-[10px] font-bold text-green-600 shrink-0">
+                        <AN value={c.mouDone} /> MOU
+                      </span>
                     </div>
-                    <span className="text-[10px] font-bold text-green-600 shrink-0">
-                      <AN value={c.mouDone} /> MOU
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Team leaderboard */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
@@ -461,16 +575,11 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           <div className="space-y-4">
             {topOwners.map((o, i) => (
               <div key={o.name}>
-                <AnimatedBarRow label={o.name} value={o.total}
-                  max={ownerMax} color={C.navy} rank={i} />
+                <AnimatedBarRow label={o.name} value={o.total} max={ownerMax} color={C.navy} rank={i} />
                 <div className="flex gap-4 pl-8 mt-0.5">
-                  <span className="text-[10px] text-green-600 font-bold">
-                    <AN value={o.mouDone} /> MOUs
-                  </span>
+                  <span className="text-[10px] text-green-600 font-bold"><AN value={o.mouDone} /> MOUs</span>
                   {o.admissions > 0 && (
-                    <span className="text-[10px] text-amber-600 font-bold">
-                      <AN value={o.admissions} /> adm
-                    </span>
+                    <span className="text-[10px] text-amber-600 font-bold"><AN value={o.admissions} /> adm</span>
                   )}
                 </div>
               </div>
@@ -479,18 +588,14 @@ function OverviewTab({ data }: { data: AlliancesData }) {
 
           {/* PA numbers */}
           <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
-              Parent Advocacy
-            </div>
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Parent Advocacy</div>
             <div className="flex items-end gap-6 justify-center flex-wrap">
               {[
-                { label: "Referrals", value: kpi.paReferrals, color: C.indigo },
-                { label: "Admissions", value: kpi.paAdmissions, color: C.green },
+                { label: "Referrals",  value: kpi.paReferrals,  color: C.indigo },
+                { label: "Admissions", value: kpi.paAdmissions, color: C.green  },
               ].map(s => (
                 <div key={s.label} className="text-center">
-                  <div className="text-4xl font-black" style={{ color: s.color }}>
-                    <AN value={s.value} />
-                  </div>
+                  <div className="text-4xl font-black" style={{ color: s.color }}><AN value={s.value} /></div>
                   <div className="text-xs text-slate-500 mt-1">{s.label}</div>
                 </div>
               ))}
@@ -498,10 +603,9 @@ function OverviewTab({ data }: { data: AlliancesData }) {
                 const v = data.funnel.parentAdvocacy[st] ?? 0;
                 if (!v) return null;
                 const colors = [C.blue, C.amber, C.teal, C.purple];
-                const ci = data.paStatuses.indexOf(st) % colors.length;
                 return (
                   <div key={st} className="text-center">
-                    <div className="text-2xl font-black" style={{ color: colors[ci] }}>
+                    <div className="text-2xl font-black" style={{ color: colors[data.paStatuses.indexOf(st) % colors.length] }}>
                       <AN value={v} />
                     </div>
                     <div className="text-[10px] text-slate-400 mt-0.5">{st}</div>
