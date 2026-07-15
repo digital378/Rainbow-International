@@ -631,8 +631,6 @@ function TabSummary({
   topOwners: Array<{ name: string; count: number }>;
 }) {
   const total = pipelineStages.reduce((s, st) => s + (stageCounts[st] ?? 0), 0) || 1;
-  const [ready, setReady] = useState(false);
-  useEffect(() => { const id = requestAnimationFrame(() => setReady(true)); return () => cancelAnimationFrame(id); }, []);
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-4">
       {/* Stat tiles */}
@@ -651,17 +649,13 @@ function TabSummary({
       {/* Segmented stage bar */}
       <div>
         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Stage Breakdown</div>
-        <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
+        <div className="flex h-3 rounded-full overflow-hidden">
           {pipelineStages.map(st => {
             const cnt = stageCounts[st] ?? 0;
             if (!cnt) return null;
             return (
               <div key={st} title={`${st}: ${cnt}`}
-                style={{
-                  width: ready ? `${(cnt / total) * 100}%` : "0%",
-                  background: STAGE_COLOR_HEX[st] ?? C.slate,
-                  transition: "width 1.1s cubic-bezier(0.34,1.0,0.64,1)",
-                }} />
+                style={{ width: `${(cnt / total) * 100}%`, background: STAGE_COLOR_HEX[st] ?? C.slate }} />
             );
           })}
         </div>
@@ -713,22 +707,22 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
-  const mouDone = data.brandPartners.filter(b => b.stage === "MOU Done").length;
-  const mouSent = data.brandPartners.filter(b => b.stage === "MOU Sent").length;
-  const mouPending = data.brandPartners.filter(b => b.stage === "MOU Signing Pending").length;
-  const totalAdm = data.brandPartners.reduce((s, b) => s + b.admissionsReferred, 0);
-  const needsFU = data.brandPartners.filter(b => b.followUpNeeded).length;
+  const mouDone   = rows.filter(b => b.stage === "MOU Done").length;
+  const mouSent   = rows.filter(b => b.stage === "MOU Sent").length;
+  const mouPending = rows.filter(b => b.stage === "MOU Signing Pending").length;
+  const totalAdm  = rows.reduce((s, b) => s + b.admissionsReferred, 0);
+  const needsFU   = rows.filter(b => b.followUpNeeded).length;
   const bpStageCounts: Record<string, number> = {};
-  data.brandPartners.forEach(b => { if (b.stage) bpStageCounts[b.stage] = (bpStageCounts[b.stage] ?? 0) + 1; });
+  rows.forEach(b => { if (b.stage) bpStageCounts[b.stage] = (bpStageCounts[b.stage] ?? 0) + 1; });
   const bpOwnerCounts: Record<string, number> = {};
-  data.brandPartners.forEach(b => { if (b.owner) bpOwnerCounts[b.owner] = (bpOwnerCounts[b.owner] ?? 0) + 1; });
+  rows.forEach(b => { if (b.owner) bpOwnerCounts[b.owner] = (bpOwnerCounts[b.owner] ?? 0) + 1; });
   const bpTopOwners = Object.entries(bpOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
 
   return (
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Total Brands", value: data.brandPartners.length, color: C.navy },
+          { label: "Brands Shown", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: mouDone, color: C.green },
           { label: "MOU Sent", value: mouSent, color: C.purple },
           { label: "MOU Pending", value: mouPending, color: C.orange },
@@ -750,9 +744,9 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
         </div>
       </div>
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[62vh]">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Brand Name</th>
@@ -816,22 +810,22 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
-  const corpMouDone = data.corporates.filter(c => c.stage === "MOU Done").length;
-  const corpMouSent = data.corporates.filter(c => c.stage === "MOU Sent").length;
-  const corpMouPending = data.corporates.filter(c => c.stage === "MOU Signing Pending").length;
-  const corpAdm = data.corporates.reduce((s, c) => s + c.admissionsReferred, 0);
-  const corpFU = data.corporates.filter(c => c.followUpNeeded).length;
+  const corpMouDone = rows.filter(c => c.stage === "MOU Done").length;
+  const corpMouSent = rows.filter(c => c.stage === "MOU Sent").length;
+  const corpMouPending = rows.filter(c => c.stage === "MOU Signing Pending").length;
+  const corpAdm = rows.reduce((s, c) => s + c.admissionsReferred, 0);
+  const corpFU = rows.filter(c => c.followUpNeeded).length;
   const corpStageCounts: Record<string, number> = {};
-  data.corporates.forEach(c => { if (c.stage) corpStageCounts[c.stage] = (corpStageCounts[c.stage] ?? 0) + 1; });
+  rows.forEach(c => { if (c.stage) corpStageCounts[c.stage] = (corpStageCounts[c.stage] ?? 0) + 1; });
   const corpOwnerCounts: Record<string, number> = {};
-  data.corporates.forEach(c => { if (c.owner) corpOwnerCounts[c.owner] = (corpOwnerCounts[c.owner] ?? 0) + 1; });
+  rows.forEach(c => { if (c.owner) corpOwnerCounts[c.owner] = (corpOwnerCounts[c.owner] ?? 0) + 1; });
   const corpTopOwners = Object.entries(corpOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
 
   return (
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Total Corporates", value: data.corporates.length, color: C.navy },
+          { label: "Corporates Shown", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: corpMouDone, color: C.green },
           { label: "MOU Sent", value: corpMouSent, color: C.purple },
           { label: "MOU Pending", value: corpMouPending, color: C.orange },
@@ -849,9 +843,9 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
         <div className="ml-auto text-sm text-slate-500">{rows.length} shown</div>
       </div>
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[62vh]">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Corporate</th>
@@ -908,23 +902,23 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
   });
 
   const totalAdm = rows.reduce((s, r) => s + r.totalAdm, 0);
-  const fsMouDone = data.friendshipSchools.filter(s => s.stage === "MOU Done").length;
-  const fsMouSent = data.friendshipSchools.filter(s => s.stage === "MOU Sent").length;
-  const fsMouPending = data.friendshipSchools.filter(s => s.stage === "MOU Signing Pending").length;
-  const fsTotalJr = data.friendshipSchools.reduce((s, r) => s + r.admJrKg, 0);
-  const fsTotalSr = data.friendshipSchools.reduce((s, r) => s + r.admSrKg, 0);
-  const fsTotalAdm = data.friendshipSchools.reduce((s, r) => s + r.totalAdm, 0);
+  const fsMouDone = rows.filter(s => s.stage === "MOU Done").length;
+  const fsMouSent = rows.filter(s => s.stage === "MOU Sent").length;
+  const fsMouPending = rows.filter(s => s.stage === "MOU Signing Pending").length;
+  const fsTotalJr = rows.reduce((s, r) => s + r.admJrKg, 0);
+  const fsTotalSr = rows.reduce((s, r) => s + r.admSrKg, 0);
+  const fsTotalAdm = rows.reduce((s, r) => s + r.totalAdm, 0);
   const fsStageCounts: Record<string, number> = {};
-  data.friendshipSchools.forEach(s => { if (s.stage) fsStageCounts[s.stage] = (fsStageCounts[s.stage] ?? 0) + 1; });
+  rows.forEach(s => { if (s.stage) fsStageCounts[s.stage] = (fsStageCounts[s.stage] ?? 0) + 1; });
   const fsOwnerCounts: Record<string, number> = {};
-  data.friendshipSchools.forEach(s => { if (s.owner) fsOwnerCounts[s.owner] = (fsOwnerCounts[s.owner] ?? 0) + 1; });
+  rows.forEach(s => { if (s.owner) fsOwnerCounts[s.owner] = (fsOwnerCounts[s.owner] ?? 0) + 1; });
   const fsTopOwners = Object.entries(fsOwnerCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }));
 
   return (
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Total Schools", value: data.friendshipSchools.length, color: C.navy },
+          { label: "Schools Shown", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: fsMouDone, color: C.green },
           { label: "MOU Sent", value: fsMouSent, color: C.purple },
           { label: "MOU Pending", value: fsMouPending, color: C.orange },
@@ -945,9 +939,9 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
         </div>
       </div>
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[62vh]">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">School Name</th>
@@ -1060,9 +1054,9 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
         <div className="ml-auto text-sm text-slate-500">{rows.length} shown</div>
       </div>
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[62vh]">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referring Parent</th>
