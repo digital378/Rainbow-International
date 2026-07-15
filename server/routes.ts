@@ -4049,7 +4049,7 @@ paths:
     try {
       const SID = SHEET_IDS.alliances;
       const [bpRows, ctRows, fsRows, paRows] = await Promise.all([
-        fetchSheetRange(SID, "Brand Partners!A:R"),
+        fetchSheetRange(SID, "Brand Partners!A:T"),
         fetchSheetRange(SID, "Corporate Tie-ups!A:R"),
         fetchSheetRange(SID, "Friendship Schools!A:R"),
         fetchSheetRange(SID, "Parent Advocacy!A:M"),
@@ -4059,25 +4059,30 @@ paths:
       const bool = (v: string | undefined) => (v ?? "").toLowerCase().includes("yes") || (v ?? "").toLowerCase().includes("true");
 
       // Brand Partners (skip header row 0)
+      // Actual sheet columns (A:T, 0-indexed):
+      // 0=S.No  1=Brand Name  2=Category  3=Address/Location  4=Contact details
+      // 5=Discount/Offer  6=Owner  7=Stage  8=Date First Approached  9=Last Update Date
+      // 10=MOU Sent Date  11=MOU Done Date  12=Banner  13=Website  14=Brochure
+      // 15=Instagram  16=Admissions Referred  17=Days Since Update  18=Follow Up Needed
       const brandPartners = bpRows.slice(1)
         .filter(r => r[1] && r[1].trim())
         .map(r => ({
           sno: r[0] ?? "",
           name: r[1] ?? "",
           category: r[2] ?? "",
-          discount: r[4] ?? "",
-          owner: r[5] ?? "",
-          stage: r[6] ?? "",
-          dateApproached: r[7] ?? "",
-          lastUpdate: r[8] ?? "",
-          mouSentDate: r[9] ?? "",
-          mouDoneDate: r[10] ?? "",
-          hasBanner: bool(r[11]),
-          hasWebsite: bool(r[12]),
-          hasBrochure: bool(r[13]),
-          admissionsReferred: n(r[15]),
-          daysSinceUpdate: n(r[16]),
-          followUpNeeded: bool(r[17]),
+          discount: r[5] ?? "",
+          owner: r[6] ?? "",
+          stage: r[7] ?? "",
+          dateApproached: r[8] ?? "",
+          lastUpdate: r[9] ?? "",
+          mouSentDate: r[10] ?? "",
+          mouDoneDate: r[11] ?? "",
+          hasBanner: bool(r[12]),
+          hasWebsite: bool(r[13]),
+          hasBrochure: bool(r[14]),
+          admissionsReferred: n(r[16]),
+          daysSinceUpdate: n(r[17]),
+          followUpNeeded: bool(r[18]),
         }));
 
       // Corporate Tie-ups
