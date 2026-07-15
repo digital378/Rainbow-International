@@ -1107,6 +1107,7 @@ const TABS: { key: TabKey; label: string }[] = [
 function AlliancesDashboard() {
   const [tab, setTab] = useState<TabKey>("overview");
   const [fetchKey, setFetchKey] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const { data, isLoading, isError, dataUpdatedAt } = useQuery<AlliancesData>({
     queryKey: ["alliances-live", fetchKey],
@@ -1117,46 +1118,105 @@ function AlliancesDashboard() {
 
   const syncTime = dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : null;
 
+  const tabCount = (key: TabKey) => {
+    if (!data) return null;
+    if (key === "brandPartners") return data.brandPartners.length;
+    if (key === "corporates") return data.corporates.length;
+    if (key === "friendshipSchools") return data.friendshipSchools.length;
+    if (key === "parentAdvocacy") return data.parentAdvocacy.length;
+    return null;
+  };
+  const activeLabel = TABS.find(t => t.key === tab)?.label ?? "";
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-[#091a4f] sticky top-0 z-30 shadow-lg">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-4">
+        {/* Top bar */}
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3">
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-xs shrink-0">RIS</div>
-            <div>
-              <div className="text-white font-black text-base leading-tight">Strategic Alliances Dashboard</div>
-              <div className="text-slate-400 text-xs">
-                {syncTime ? <>Live from Google Sheets · synced {syncTime}</> : "Loading…"}
+            <div className="min-w-0">
+              <div className="text-white font-black text-sm sm:text-base leading-tight truncate">Strategic Alliances Dashboard</div>
+              <div className="text-slate-400 text-xs truncate">
+                {syncTime ? <>Live · synced {syncTime}</> : "Loading…"}
               </div>
             </div>
           </div>
+          {/* Refresh */}
           <button
             onClick={() => setFetchKey(k => k + 1)}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400 text-[#091a4f] text-sm font-bold hover:bg-amber-300 transition disabled:opacity-60"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400 text-[#091a4f] text-xs sm:text-sm font-bold hover:bg-amber-300 transition disabled:opacity-60 shrink-0"
             data-testid="button-refresh"
           >
             <svg className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            REFRESH
+            <span className="hidden sm:inline">REFRESH</span>
+          </button>
+          {/* Hamburger — mobile only */}
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            className="md:hidden flex flex-col items-center justify-center gap-1 w-8 h-8 rounded-lg hover:bg-white/10 transition shrink-0"
+            aria-label="Open menu"
+            data-testid="button-hamburger"
+          >
+            {menuOpen ? (
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : (
+              <>
+                <span className="block w-5 h-0.5 bg-white rounded" />
+                <span className="block w-5 h-0.5 bg-white rounded" />
+                <span className="block w-5 h-0.5 bg-white rounded" />
+              </>
+            )}
           </button>
         </div>
-        {/* Tabs */}
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6">
-          <div className="flex gap-1 overflow-x-auto pb-px">
-            {TABS.map(t => (
-              <button key={t.key} onClick={() => setTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${tab === t.key ? "text-amber-400 border-amber-400" : "text-slate-400 border-transparent hover:text-white"}`}>
-                {t.label}
-                {t.key === "brandPartners" && data && <span className="ml-1.5 text-xs opacity-60">{data.brandPartners.length}</span>}
-                {t.key === "corporates" && data && <span className="ml-1.5 text-xs opacity-60">{data.corporates.length}</span>}
-                {t.key === "friendshipSchools" && data && <span className="ml-1.5 text-xs opacity-60">{data.friendshipSchools.length}</span>}
-                {t.key === "parentAdvocacy" && data && <span className="ml-1.5 text-xs opacity-60">{data.parentAdvocacy.length}</span>}
-              </button>
-            ))}
+
+        {/* Mobile dropdown menu */}
+        {menuOpen && (
+          <div className="md:hidden bg-[#0b2060] border-t border-white/10 px-4 pb-3">
+            {TABS.map(t => {
+              const cnt = tabCount(t.key);
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => { setTab(t.key); setMenuOpen(false); }}
+                  className={`w-full flex items-center justify-between px-3 py-3 rounded-lg my-0.5 text-sm font-semibold transition ${tab === t.key ? "bg-amber-400/15 text-amber-400" : "text-slate-300 hover:bg-white/10 hover:text-white"}`}
+                  data-testid={`tab-mobile-${t.key}`}
+                >
+                  <span>{t.label}</span>
+                  {cnt !== null && <span className="text-xs opacity-60 bg-white/10 px-2 py-0.5 rounded-full">{cnt}</span>}
+                </button>
+              );
+            })}
           </div>
+        )}
+
+        {/* Desktop tab bar — hidden on mobile */}
+        <div className="hidden md:block max-w-screen-2xl mx-auto px-4 sm:px-6">
+          <div className="flex gap-1">
+            {TABS.map(t => {
+              const cnt = tabCount(t.key);
+              return (
+                <button key={t.key} onClick={() => setTab(t.key)}
+                  className={`px-4 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 transition ${tab === t.key ? "text-amber-400 border-amber-400" : "text-slate-400 border-transparent hover:text-white"}`}
+                  data-testid={`tab-${t.key}`}>
+                  {t.label}
+                  {cnt !== null && <span className="ml-1.5 text-xs opacity-60">{cnt}</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile active tab indicator */}
+        <div className="md:hidden flex items-center justify-between px-4 py-2 border-t border-white/10">
+          <span className="text-amber-400 text-sm font-semibold">{activeLabel}</span>
+          <span className="text-slate-400 text-xs">tap ☰ to switch</span>
         </div>
       </div>
 

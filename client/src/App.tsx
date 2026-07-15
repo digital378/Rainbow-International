@@ -177,12 +177,13 @@ function DeferredExtras() {
   }, []);
 
   const isSalesDashboard = location === "/rps-sales" || location === "/sales";
+  const isInternalDashboard = location === "/alliances";
 
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
       {!isCoarsePointer && <RainbowCursor />}
-      {!isSalesDashboard && <ChatBot />}
+      {!isSalesDashboard && !isInternalDashboard && <ChatBot />}
     </Suspense>
   );
 }
