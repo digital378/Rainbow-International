@@ -496,7 +496,7 @@ export default function BlogSpainArgentina() {
               {[
                 "Pick one match a week to watch together as a family, and talk about the host city afterwards.",
                 "Start a wall chart with flags of qualified teams, updated as the tournament progresses.",
-                "Let your child be the "commentator" for five minutes of a match — a fun way to build vocabulary and confidence.",
+                "Let your child be the \u201ccommentator\u201d for five minutes of a match — a fun way to build vocabulary and confidence.",
                 "Track the group tables together as a quick, low-pressure maths exercise.",
               ].map((item, i) => (
                 <li key={i} className="flex gap-3 items-start text-gray-700 text-sm md:text-base">
