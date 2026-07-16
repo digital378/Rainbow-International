@@ -12,6 +12,7 @@ import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
+import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
 import { google } from "googleapis";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
@@ -319,6 +320,7 @@ export async function registerRoutes(
   //   - Browsers → 301 redirect to /pre-primary-school-thane (legacy URL consolidation)
   registerHomeSSR(app);
   registerPageSSR(app);
+  registerSpainArgentinaSSR(app);
   registerSSRRoutes(app);
 
   // Blog-slug redirects are derived automatically from the blog_posts table — every

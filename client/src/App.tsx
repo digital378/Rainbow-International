@@ -43,6 +43,7 @@ const BrandPartners = lazy(() => import("@/pages/BrandPartners"));
 const StudentsLeavingCertificate = lazy(() => import("@/pages/StudentsLeavingCertificate"));
 const Curriculum = lazy(() => import("@/pages/Curriculum"));
 const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const BlogSpainArgentina = lazy(() => import("@/pages/BlogSpainArgentina"));
 const ApplicationForm = lazy(() => import("@/pages/ApplicationForm"));
 const GoogleSchool = lazy(() => import("@/pages/GoogleSchool"));
 const MetaSchool = lazy(() => import("@/pages/MetaSchool"));
@@ -114,6 +115,7 @@ function Router() {
       <Route path="/brand-partners" component={BrandPartners} />
       <Route path="/students-leaving-certificate" component={StudentsLeavingCertificate} />
       <Route path="/curriculum" component={Curriculum} />
+      <Route path="/blog/spain-vs-argentina-world-cup-2026-final-lessons" component={BlogSpainArgentina} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/application-form" component={ApplicationForm} />
       <Route path="/google-school-2025-26" component={GoogleSchool} />

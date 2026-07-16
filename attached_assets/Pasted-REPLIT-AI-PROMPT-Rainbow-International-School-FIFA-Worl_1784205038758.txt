@@ -1,0 +1,45 @@
+REPLIT AI PROMPT — Rainbow International School FIFA World Cup 2026 Blog Page
+================================================================================
+Copy everything below this line into Replit AI, along with the attached blog document (RIS_Fifa_26_Blog.docx).
+
+---
+
+Build a single responsive blog page for Rainbow International School, Thane (https://rainbowinternationalschool.in/). Use the attached document as the full source of content — do not invent, alter, or embellish any facts, statistics, or quotes beyond what is written there.
+
+CONTENT SOURCE
+- Use every section of the attached document in the order given: intro, "Quick FIFA World Cup 2026 Primer," "Geography Lessons Hiding in Every Match," "The Maths Hiding in the Beautiful Game," "Teamwork, Resilience and a Few Real Underdog Stories," "Simple Ways to Turn World Cup Time Into Family Learning Time," FAQ, "Meet the 48 Nations," "The Big Final — Spain vs Argentina," Conclusion, and Tags.
+- Do NOT include the "SEO Meta Block" or "Appendix — Notes for Replit AI" as visible page content — use them as build instructions only (see below).
+- IMPORTANT — quotes: the document flags every quote attributed to Messi, de la Fuente, Yamal, and the ESPN analyst as unverified. Do not publish these as direct quotes. Rewrite each as paraphrase with no quotation marks (e.g., "Messi has spoken about wanting to win this one for his teammates and for Argentina's fans"). Keep the Yamal/Messi 2007 photo detail and the aggregated "next Messi vs the original Messi" social-sentiment line as-is, since those are not attributed to a single named source.
+
+PAGE METADATA (use exactly as given in the document's SEO Meta Block)
+- Title tag: "Spain vs Argentina Final 2026: What It Teaches Your Child"
+- H1: "What the Spain vs Argentina World Cup Final Can Teach Your Child"
+- Meta description: "Spain meets Argentina in the World Cup 2026 Final on July 19. Rainbow International School Thane shows how the big finish is packed with geography and maths lessons for kids."
+- URL slug: /blog/spain-vs-argentina-world-cup-2026-final-lessons
+- Focus keyword: "Spain vs Argentina World Cup 2026 Final"
+- Secondary keywords: World Cup learning activities for kids, World Cup 2026 geography lesson, teamwork lessons from sports, CBSE school Thane blog, Rainbow International School Thane
+- Featured image alt text: "Students at Rainbow International School Thane doing a FIFA World Cup 2026 geography and maths activity in class"
+- Byline: "Written by [Author Name], Rainbow International School Marketing Team · Last updated 16 July 2026" — display this near the top as a visible "Last updated" line.
+
+STRUCTURE & MARKUP
+- Use real semantic HTML heading tags (h1/h2/h3) matching the document's heading levels — not bold paragraph text.
+- Build every table (World Cup winners, all 48 teams, continents, stat leaders, head-to-head) as real HTML <table> elements with proper <thead>/<tbody>, not images. Make them horizontally scrollable on mobile.
+- Add FAQPage schema (JSON-LD) for the "Frequently Asked Questions" section.
+- Add Article schema (JSON-LD) for the page overall, including author, datePublished, and dateModified.
+- Preserve the two internal links exactly as given (https://rainbowinternationalschool.in/holistic-development-rainbow-international-school/ and https://rainbowinternationalschool.in/application-form/) plus the cross-promotion link to https://rainbowinternationalschool.in/rainbow-preschool-international/. Add outbound links on first mention of Squawka, ESPN, Nate Silver, and DraftKings in the predictions section (link to each source's general site if a specific article URL isn't available).
+- Include a table of contents / jump-links at the top for the major sections, since the page is long.
+
+DESIGN
+- Warm, welcoming school-website aesthetic — not a stock sports/news template. Reflect Rainbow International School's brand: friendly, trustworthy, education-first, suitable for parents of CBSE-age children.
+- Fully responsive: mobile-first, clean typography, generous line-height and spacing for readability on phones (most parents will read this on mobile at night, per the "India stays up late" section).
+- Use callout/highlight boxes for the "Classroom activity," "Teaching tip," and "Fun history fact" asides so they're visually distinct from body text.
+- Style the FAQ section as an accordion (expand/collapse) for compactness on mobile — this also pairs naturally with the FAQPage schema.
+- Include a placeholder hero image area sized for the featured image, using the alt text given above.
+- End the page with a clear "Explore Admissions" call-to-action button linking to the admissions URL above.
+
+FRESHNESS NOTE (build in, don't need to solve now)
+- Add a small, easily-editable "Last updated" field near the top and a code comment flagging that the prediction/odds/quotes sections and the "Score Predictions" and "What the World Is Saying" sections will need updating once the July 19 final is played, so the page can be turned into a recap rather than left with stale pre-match content.
+
+OUTPUT
+- Single page (HTML/CSS/JS or React, whichever the Replit template defaults to) ready to preview and deploy.
+- Keep all copy from the source document intact aside from the quote paraphrasing instruction above.
