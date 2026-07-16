@@ -4135,21 +4135,27 @@ paths:
         }));
 
       // Parent Advocacy
+      // Actual sheet columns (A:M, 0-indexed):
+      // 0=S.No  1=Referring Parent Name  2=Branch  3=Ward-Class
+      // 4=Name of the Parent(Father)  5=Name of the Mother  6=Contact Number
+      // 7=Referred Family Name  8=Grade Applying For  9=Status
+      // 10=Date Referred  11=Last Update Date  12=Incentive/Discount Given?
       const parentAdvocacy = paRows.slice(1)
         .filter(r => r[1] && r[1].trim())
         .map(r => ({
           sno: r[0] ?? "",
           referringParent: r[1] ?? "",
-          wardClass: r[2] ?? "",
-          referredFamily: r[4] ?? "",
-          gradeApplying: r[5] ?? "",
-          status: r[6] ?? "",
-          dateReferred: r[7] ?? "",
-          lastUpdate: r[8] ?? "",
-          incentiveGiven: r[9] ?? "",
-          incentiveDetails: r[10] ?? "",
-          owner: r[11] ?? "",
-          remarks: r[12] ?? "",
+          branch: r[2] ?? "",
+          wardClass: r[3] ?? "",
+          fatherName: r[4] ?? "",
+          motherName: r[5] ?? "",
+          contactNumber: r[6] ?? "",
+          referredFamily: r[7] ?? "",
+          gradeApplying: r[8] ?? "",
+          status: r[9] ?? "",
+          dateReferred: r[10] ?? "",
+          lastUpdate: r[11] ?? "",
+          incentiveGiven: r[12] ?? "",
         }));
 
       // ── Computed aggregates ────────────────────────────────────
@@ -4182,7 +4188,7 @@ paths:
       for (const r of brandPartners) addOwner(r.owner, r.stage==="MOU Done", r.admissionsReferred, r.followUpNeeded);
       for (const r of corporates) addOwner(r.owner, r.stage==="MOU Done", r.admissionsReferred, r.followUpNeeded);
       for (const r of friendshipSchools) addOwner(r.owner, r.stage==="MOU Done", r.totalAdm, false);
-      for (const r of parentAdvocacy) addOwner(r.owner, r.status==="Admission Confirmed", r.status==="Admission Confirmed"?1:0, false);
+      // PA has no owner column — skip owner leaderboard for PA entries
 
       const ownerLeaderboard = Object.entries(ownerMap)
         .map(([name, d]) => ({ name, ...d }))
