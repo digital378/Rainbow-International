@@ -79,28 +79,68 @@
 }
 
 /* =========================================================
-   4. FOOTBALL CURSOR + TRAIL (desktop only)
+   4. FOOTBALL CURSOR — spring ball + 3D orbital ring + canvas trail
    ========================================================= */
 .ris-cursor-on, .ris-cursor-on a, .ris-cursor-on button { cursor: none !important; }
-.ris-cursor-ball, .ris-cursor-ring {
-  position: fixed; top: 0; left: 0; pointer-events: none;
-  transform: translate(-50%,-50%); z-index: 100001;
+
+/* ── The spinning football ── */
+.ris-cursor-ball {
+  position: fixed; top: 0; left: 0;
+  width: 28px; height: 28px;
+  pointer-events: none; z-index: 100002;
+  will-change: transform, left, top;
+  transition: opacity .3s;
 }
-.ris-cursor-ball { width: 26px; height: 26px; }
 .ris-cursor-ball svg { display:block; width:100%; height:100%;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
-.ris-cursor-ring {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 2px solid rgba(245,166,35,.6); z-index: 100000;
-  transition: width .18s ease, height .18s ease, background .18s ease, border-color .18s ease;
+  filter: drop-shadow(0 3px 7px rgba(0,0,0,.45)); }
+
+/* Pop-kick on click */
+.ris-cursor-ball.ris-cursor-kick {
+  animation: risCursorKick .38s cubic-bezier(.22,1.4,.4,1) forwards;
 }
-.ris-cursor-ring.ris-cursor-hover {
-  width: 66px; height: 66px; background: rgba(245,166,35,.10); border-color: var(--ris-accent);
+@keyframes risCursorKick {
+  0%  { transform: translate(-50%,-50%) scale(1)   rotate(0deg); }
+  30% { transform: translate(-50%,-50%) scale(1.9) rotate(200deg); }
+  100%{ transform: translate(-50%,-50%) scale(1)   rotate(360deg); }
 }
-.ris-cursor-trail {
-  position: fixed; width: 8px; height: 8px; border-radius: 50%;
-  background: radial-gradient(circle, var(--ris-accent), transparent 70%);
-  pointer-events: none; transform: translate(-50%,-50%); z-index: 99998; opacity: .6;
+
+/* ── Orbital ring — Argentina / Spain dual-color, tilts in 3D ── */
+.ris-cursor-orbital {
+  position: fixed; top: 0; left: 0;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  pointer-events: none; z-index: 100001;
+  /* Conic-gradient ring via mask: half ARG sky-blue, half ESP red */
+  background: conic-gradient(
+    var(--ris-arg-1) 0deg,
+    var(--ris-esp-1) 180deg,
+    var(--ris-arg-1) 360deg
+  );
+  /* Hollow it out to just a ring */
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+  mask:         radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+  will-change: transform, left, top;
+  transform-style: preserve-3d;
+  transition: opacity .3s;
+}
+/* On hover over links/buttons: full accent ring + slight grow */
+.ris-cursor-orbital.ris-cursor-hover {
+  background: conic-gradient(
+    var(--ris-accent) 0deg,
+    var(--ris-esp-2)  120deg,
+    var(--ris-accent-2) 240deg,
+    var(--ris-accent) 360deg
+  );
+  width: 70px; height: 70px;
+}
+
+/* ── Canvas layer for the comet-particle trail ── */
+.ris-cursor-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity .3s;
 }
 
 /* =========================================================

@@ -241,34 +241,172 @@
   }
 
   /* ================================================================
-     5. FOOTBALL CURSOR + TRAIL
+     5. FOOTBALL CURSOR — spring physics + 3D orbital ring + canvas trail
+     ================================================================
+     How it works:
+       • The football follows your cursor with a spring — it lags behind
+         then overshoots slightly, like a real ball being dribbled.
+       • Rotation is driven by horizontal velocity so it rolls naturally.
+       • An orbital ring (half Argentina sky-blue / half Spain red) spins
+         around the ball like a planet ring, tilting in 3D based on the
+         direction you're moving.
+       • A canvas comet trail emits team-colored particles from the ball's
+         current position, fading out with slight gravity.
+       • Clicking fires a pop-kick burst of team-colored confetti.
+       • When your cursor is still for 1.5s the ball gently idles/bounces.
      ================================================================ */
   function initCursor(){
     if(reduceMotion || isTouch) return;
-    var ball=el("div","ris-cursor-ball"); ball.innerHTML=ballSVG();
-    var ring=el("div","ris-cursor-ring");
-    document.body.appendChild(ball); document.body.appendChild(ring);
+
+    /* ── DOM elements ── */
+    var ball = el("div","ris-cursor-ball"); ball.innerHTML = ballSVG();
+    document.body.appendChild(ball);
     document.body.classList.add("ris-cursor-on");
 
-    var mx=innerWidth/2,my=innerHeight/2, rx=mx,ry=my, rot=0, lastX=mx;
-    var trail=[], TRAIL=6;
-    for(var i=0;i<TRAIL;i++){ var d=el("div","ris-cursor-trail"); d.style.opacity=String(0.35*(1-i/TRAIL)); document.body.appendChild(d); trail.push({elm:d,x:mx,y:my}); }
+    var orbital = el("div","ris-cursor-orbital");
+    document.body.appendChild(orbital);
 
-    window.addEventListener("mousemove",function(e){ mx=e.clientX; my=e.clientY; },{passive:true});
-    function loop(){
-      rx+=(mx-rx)*0.2; ry+=(my-ry)*0.2;
-      rot+=(mx-lastX)*2; lastX=mx;
-      ball.style.left=mx+"px"; ball.style.top=my+"px";
-      ball.style.transform="translate(-50%,-50%) rotate("+rot+"deg)";
-      ring.style.left=rx+"px"; ring.style.top=ry+"px";
-      // trail follows with easing chain
-      var px=mx,py=my;
-      for(var i=0;i<trail.length;i++){ var tr=trail[i]; tr.x+=(px-tr.x)*0.35; tr.y+=(py-tr.y)*0.35; tr.elm.style.left=tr.x+"px"; tr.elm.style.top=tr.y+"px"; px=tr.x; py=tr.y; }
+    /* Canvas for the comet-particle trail */
+    var pCanvas = el("canvas","ris-cursor-canvas");
+    document.body.appendChild(pCanvas);
+    var pCtx = pCanvas.getContext("2d");
+    /* Argentina + Spain + gold team colors for particles */
+    var COLORS = ["#75aadb","#c60b1e","#ffc400","#ffffff","#f5a623"];
+    function resizeCanvas(){ pCanvas.width=innerWidth; pCanvas.height=innerHeight; }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    /* ── Physics state ── */
+    var mx=innerWidth/2, my=innerHeight/2;   /* mouse target */
+    var bx=mx, by=my;                        /* ball position */
+    var bvx=0, bvy=0;                        /* ball velocity (spring) */
+    var rotation=0;                          /* cumulative Z-rotation */
+    var orbAngle=0;                          /* orbital ring spin angle */
+    var isIdle=false, idlePhase=0;
+    var idleTimer=null;
+    var particles=[];
+
+    /* ── Track mouse — spawn trail particles at ball position ── */
+    window.addEventListener("mousemove", function(e){
+      mx=e.clientX; my=e.clientY;
+      /* Reset idle */
+      isIdle=false; idlePhase=0;
+      clearTimeout(idleTimer);
+      idleTimer=setTimeout(function(){ isIdle=true; }, 1500);
+
+      /* Emit 1-2 trail particles from where the BALL currently is
+         (not the mouse) so the trail follows the spring lag naturally */
+      var spd=Math.sqrt(bvx*bvx+bvy*bvy);
+      if(Math.random()>0.38){
+        particles.push({
+          x:bx, y:by,
+          /* slight backwards drift + random spread */
+          vx:-bvx*0.12 + (Math.random()-0.5)*1.4,
+          vy:-bvy*0.12 + (Math.random()-0.5)*1.4,
+          life:1.0,
+          decay:0.042 + Math.random()*0.038,
+          r: Math.max(1.5, Math.min(spd*0.22, 5)),
+          color: COLORS[Math.floor(Math.random()*COLORS.length)]
+        });
+      }
+    },{passive:true});
+
+    /* ── Click: pop-kick burst ── */
+    document.addEventListener("click", function(){
+      ball.classList.add("ris-cursor-kick");
+      setTimeout(function(){ ball.classList.remove("ris-cursor-kick"); }, 400);
+      /* Radial burst of 16 team-colored particles */
+      for(var i=0; i<16; i++){
+        var ang=(i/16)*Math.PI*2;
+        var sp=3+Math.random()*5;
+        particles.push({
+          x:bx, y:by,
+          vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 1.8,
+          life:1.0, decay:0.020,
+          r:3+Math.random()*4,
+          color:COLORS[Math.floor(Math.random()*COLORS.length)]
+        });
+      }
+    });
+
+    /* ── Main animation loop ── */
+    var lastTs=0;
+    function loop(ts){
+      var dt=Math.min((ts-lastTs)/16, 3); lastTs=ts;
+
+      /* ── Spring physics (stiffness + damping) ── */
+      var SPRING=0.16, DAMP=0.68;
+      bvx = (bvx + (mx-bx)*SPRING) * DAMP;
+      bvy = (bvy + (my-by)*SPRING) * DAMP;
+      bx += bvx; by += bvy;
+      var spd=Math.sqrt(bvx*bvx + bvy*bvy);
+
+      /* ── Idle bounce when cursor has been still ── */
+      var drawBY=by;
+      if(isIdle){ idlePhase+=0.06; drawBY=by+Math.sin(idlePhase)*7; }
+
+      /* ── Rotation: horizontal velocity drives the roll ── */
+      rotation += bvx*1.7;
+
+      /* ── Subtle squash/stretch in the direction of travel ── */
+      var stretchFactor=Math.min(spd*0.018, 0.22);
+      var angle=Math.atan2(bvy, bvx);
+      var sx=1 + stretchFactor*Math.abs(Math.cos(angle));
+      var sy=1 - stretchFactor*0.5;
+
+      ball.style.left = bx+"px";
+      ball.style.top  = drawBY+"px";
+      ball.style.transform =
+        "translate(-50%,-50%) rotate("+rotation+"deg) scaleX("+sx+") scaleY("+sy+")";
+
+      /* ── Orbital ring: spins freely, tilts toward movement direction ── */
+      /* Spin rate increases when the ball is moving fast */
+      orbAngle += 1.6 + spd*0.18;
+      /* tiltX (pitch) driven by vertical velocity — ring "dips" when going down */
+      var tiltX=Math.max(-55, Math.min(55, -bvy*3.5));
+      /* tiltY (yaw) driven by horizontal velocity — ring "banks" on turns */
+      var tiltY=Math.max(-35, Math.min(35,  bvx*1.8));
+      orbital.style.left=bx+"px";
+      orbital.style.top =drawBY+"px";
+      orbital.style.transform=
+        "translate(-50%,-50%) rotateX("+tiltX+"deg) rotateY("+tiltY+"deg) rotateZ("+orbAngle+"deg)";
+
+      /* ── Particle trail rendering ── */
+      pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+      for(var i=particles.length-1; i>=0; i--){
+        var p=particles[i];
+        p.x+=p.vx; p.y+=p.vy;
+        p.vy+=0.09;        /* slight downward gravity */
+        p.life-=p.decay;
+        if(p.life<=0){ particles.splice(i,1); continue; }
+        pCtx.save();
+        pCtx.globalAlpha=p.life*0.72;
+        pCtx.fillStyle=p.color;
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.r*p.life, 0, Math.PI*2);
+        pCtx.fill();
+        pCtx.restore();
+      }
+
       requestAnimationFrame(loop);
     }
-    loop();
-    document.addEventListener("mouseover",function(e){ if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']")) ring.classList.add("ris-cursor-hover"); });
-    document.addEventListener("mouseout",function(e){ if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']")) ring.classList.remove("ris-cursor-hover"); });
+    requestAnimationFrame(loop);
+
+    /* ── Hover: ring swaps to accent gradient on interactive elements ── */
+    document.addEventListener("mouseover", function(e){
+      if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']"))
+        orbital.classList.add("ris-cursor-hover");
+    });
+    document.addEventListener("mouseout", function(e){
+      if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']"))
+        orbital.classList.remove("ris-cursor-hover");
+    });
+
+    /* ── Fade elements when cursor leaves the window ── */
+    function hideCursor(){ ball.style.opacity="0"; orbital.style.opacity="0"; pCanvas.style.opacity="0"; }
+    function showCursor(){ ball.style.opacity="1"; orbital.style.opacity="1"; pCanvas.style.opacity="1"; }
+    document.addEventListener("mouseleave", hideCursor);
+    document.addEventListener("mouseenter", showCursor);
   }
 
   /* ================================================================
