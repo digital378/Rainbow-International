@@ -1,504 +1,538 @@
 /*!
- * Rainbow International School — Blog Drop-In Animations  v1.0.0
- * Pure vanilla JS + CSS. No libraries. No build step.
+ * Rainbow International School — World Cup blog INTERACTIVE LAYER v2
+ * DROP-IN vanilla JavaScript. No libraries, no build step, no image files
+ * (every graphic is inline SVG). Paste into a WPCode "JS Snippet (Footer)"
+ * scoped to the target post.
  *
- * ── WORDPRESS USAGE ──────────────────────────────────────────────────────────
- * 1. Paste animations.css into WPCode → "CSS Snippet".
- * 2. Paste this file into WPCode → "JS Snippet (Footer)".
- * 3. In both snippets, set Location → "Specific pages" → select only this post.
+ * FEATURES
+ * • Spinning-football cursor with a fading comet trail (desktop)
+ * • Player-name hotspots: names like "Messi", "Yamal", "Rodri" become
+ *   clickable. Hover / click / scroll-into-view pops up an animated 2D
+ *   footballer mascot card in the player's team colors + stat bars.
+ *   Clicking a name also fires a GOAL! confetti celebration.
+ * • GOAL! confetti + flash when a count-up number finishes counting
+ * • A football rides the top scroll-progress bar and spins as you scroll
+ * • A ball rolls in ahead of every section heading on reveal
+ * • Table rows cascade in; Table-of-Contents scrollspy
+ * • Spain-vs-Argentina jersey "duel" banner (opt-in)
+ * • Animated stat bars, magnetic buttons, tilt cards
  *
- * ── OPTIONAL CLASSES & DATA-ATTRIBUTES ──────────────────────────────────────
+ * OPT-IN CLASSES (add via WP editor → block → Advanced → CSS class):
+ *   count-up   number counts from 0. <span class="count-up" data-target="8">0</span>
+ *   stat-bar   filling bar. <div class="stat-bar" data-value="80"></div>
+ *   magnetic   button pulls toward cursor
+ *   tilt       card tilts toward cursor
+ *   ris-vs     duel banner. <div class="ris-vs" data-home="Argentina" data-away="Spain"></div>
  *
- *   class="count-up"  data-target="48"
- *     → counts from 0 → 48 when the element scrolls into view.
- *
- *   class="count-up"  data-target="104"  data-suffix="+"
- *     → counts from 0 → 104, appending "+" (shows "104+").
- *
- *   class="magnetic"
- *     → the element gently pulls toward the cursor (desktop).
- *     → NOTE: also auto-applied to any <a> or <button> whose text
- *             includes "Apply" or "Admissions" (case-insensitive).
- *
- *   class="tilt"
- *     → the element gets a subtle 3-D tilt as the cursor moves over it.
- *
- * ── EVERYTHING ELSE IS AUTOMATIC (no classes needed) ────────────────────────
- *   • Scroll-progress bar fills at page top.
- *   • Every <h2> inside the article root fades + slides up on scroll.
- *   • Every <tbody tr> fades + slides up (staggered, per-table cascade).
- *   • TOC links (a[href^="#"]) get .ris-toc-active as their section enters view.
- *   • First hero image gets a subtle upward parallax.
- *   • Custom glowing cursor + trailing ring on desktop (non-touch) devices.
- *
- * ── CONFIGURATION ────────────────────────────────────────────────────────────
- *   ROOT_SELECTOR: the article content wrapper. Tried in order; first match wins.
- *   TOC_SELECTOR:  container holding your anchor-links table of contents.
- * ─────────────────────────────────────────────────────────────────────────────
+ * CUSTOMISE PLAYERS: edit the PLAYERS object below, or define window.RIS_PLAYERS
+ * before this script to override. Stats shown are illustrative — edit freely.
  */
 
 (function () {
-  'use strict';
+  "use strict";
 
-  /* ── CONFIG — change these if your theme uses different wrappers ─────────── */
-  var ROOT_SELECTOR = '.entry-content, article .post-content, article, .elementor-widget-container, main';
-  var TOC_SELECTOR  = '.ris-toc, .wp-block-table-of-contents, nav.toc, [id*="table-of-contents"], [class*="table-of-contents"], [class*="toc-"]';
-  /* ── END CONFIG ─────────────────────────────────────────────────────────── */
+  /* -------------------- CONFIG -------------------- */
+  var CONFIG = {
+    root: null, // null = auto-detect the article body; or set e.g. ".entry-content"
+    rootCandidates: [
+      ".entry-content",
+      ".elementor-widget-theme-post-content .elementor-widget-container",
+      "article .elementor-widget-container",
+      "article .post-content",
+      "article",
+      "main"
+    ],
+    maxNameWraps: 60 // safety cap on how many names we make interactive
+  };
 
-  /* Boot after DOM is ready. */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
+  /* -------------------- PLAYER DATA --------------------
+     team: "ARG" | "ESP" | "FRA" | "GEN"  (drives mascot colors)
+     Add/rename freely. Stats are illustrative for a pre-final preview. */
+  var PLAYERS = window.RIS_PLAYERS || {
+    "messi":   { name: "Lionel Messi",   team: "ARG", num: 10, pos: "Forward",   goals: 8, assists: 6, tag: "🐐 All-time top scorer" },
+    "lionel messi": { alias: "messi" },
+    "yamal":   { name: "Lamine Yamal",   team: "ESP", num: 19, pos: "Winger",    goals: 4, assists: 5, tag: "✨ Teen sensation" },
+    "lamine yamal": { alias: "yamal" },
+    "rodri":   { name: "Rodri",          team: "ESP", num: 16, pos: "Midfielder", goals: 2, assists: 3, tag: "🧠 Engine room" },
+    "alvarez": { name: "Julián Álvarez", team: "ARG", num: 9,  pos: "Forward",   goals: 5, assists: 2, tag: "⚡ Relentless" },
+    "julian alvarez": { alias: "alvarez" },
+    "julián álvarez": { alias: "alvarez" },
+    "lautaro": { name: "Lautaro Martínez", team: "ARG", num: 22, pos: "Forward", goals: 4, assists: 1, tag: "🔫 El Toro" },
+    "nico williams": { name: "Nico Williams", team: "ESP", num: 17, pos: "Winger", goals: 3, assists: 4, tag: "🚀 Pace to burn" },
+    "mbappe":  { name: "Kylian Mbappé",  team: "FRA", num: 10, pos: "Forward",   goals: 8, assists: 3, tag: "🏃 Golden Boot race" },
+    "mbappé":  { alias: "mbappe" }
+  };
+
+  /* Team color sets for the mascot + card header */
+  var TEAMS = {
+    ARG: { jersey: "#75aadb", stripe: "#ffffff", shorts: "#0d2c54", striped: true,  headerFrom: "#75aadb", headerTo: "#4f86c6", text: "#0d2c54" },
+    ESP: { jersey: "#c60b1e", stripe: "#c60b1e", shorts: "#1a2a6c", striped: false, headerFrom: "#c60b1e", headerTo: "#8a0713", text: "#ffffff" },
+    FRA: { jersey: "#1e3a8a", stripe: "#1e3a8a", shorts: "#e11d2a", striped: false, headerFrom: "#1e3a8a", headerTo: "#12235a", text: "#ffffff" },
+    GEN: { jersey: "#f5a623", stripe: "#f5a623", shorts: "#333333", striped: false, headerFrom: "#f5a623", headerTo: "#ff7a18", text: "#5a3b00" }
+  };
+
+  /* -------------------- ENV -------------------- */
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var isTouch = !window.matchMedia || window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+  function ready(fn){ if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",fn);}else{fn();} }
+  function $(s,c){ try{return (c||document).querySelector(s);}catch(e){return null;} }
+  function $all(s,c){ try{return Array.prototype.slice.call((c||document).querySelectorAll(s));}catch(e){return [];} }
+  function el(tag,cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+
+  function getRoot(){
+    if(CONFIG.root){ var f=$(CONFIG.root); if(f) return f; }
+    for(var i=0;i<CONFIG.rootCandidates.length;i++){
+      var e=$(CONFIG.rootCandidates[i]);
+      if(e && e.textContent && e.textContent.trim().length>200) return e;
+    }
+    return document.body;
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * BOOT — detect environment once, then wire up each feature.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function boot() {
-    var root           = document.querySelector(ROOT_SELECTOR) || document.body;
-    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var isTouch        = window.matchMedia('(pointer: coarse)').matches;
-
-    initProgressBar();                          /* 1 — always on             */
-    initReveal(root, prefersReduced);           /* 2 — respects motion pref  */
-    initCountUp(root);                          /* 3 — always on             */
-    initScrollSpy();                            /* 4 — always on             */
-    initParallax(prefersReduced);               /* 5 — respects motion pref  */
-    if (!isTouch && !prefersReduced) {
-      initCursor();                             /* 6 — desktop only          */
-    }
-    if (!isTouch) {
-      initMagnetic(root);                       /* 7 — desktop only          */
-      initTilt(root);                           /* 8 — desktop only          */
-    }
+  /* -------------------- SVG builders -------------------- */
+  function ballSVG(){
+    return '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' +
+      '<circle cx="16" cy="16" r="15" fill="#fff" stroke="#111" stroke-width="1.5"/>' +
+      '<path d="M16 7l4.7 3.4-1.8 5.5h-5.8l-1.8-5.5z" fill="#111"/>' +
+      '<path d="M16 7l0-4M20.7 10.4l3.4-2M19 16l4.5 1.5M13 16l-4.5 1.5M11.3 10.4l-3.4-2" stroke="#111" stroke-width="1.3"/>' +
+      '</svg>';
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 1. SCROLL PROGRESS BAR
-   * Creates a thin colored bar fixed at the very top of the viewport that
-   * fills from 0 → 100% as the user scrolls the full page height.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initProgressBar() {
-    var bar = document.createElement('div');
-    bar.className = 'ris-progress';
-    bar.setAttribute('role', 'presentation');
-    bar.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(bar);
-
-    var ticking = false;
-
-    function update() {
-      var scrollTop = window.scrollY || document.documentElement.scrollTop;
-      var docH      = document.documentElement.scrollHeight - window.innerHeight;
-      var pct       = docH > 0 ? (scrollTop / docH) * 100 : 0;
-      bar.style.width = Math.min(pct, 100) + '%';
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', function () {
-      if (!ticking) {
-        requestAnimationFrame(update);
-        ticking = true;
+  // A cute 2D footballer mascot in team colors, with animated groups.
+  function mascotSVG(team){
+    var t = TEAMS[team] || TEAMS.GEN;
+    var stripes = "";
+    if(t.striped){
+      // vertical stripes across the jersey area (x 34..86)
+      for(var x=34; x<86; x+=10){
+        stripes += '<rect x="'+x+'" y="52" width="5" height="46" fill="'+t.stripe+'"/>';
       }
-    }, { passive: true });
-
-    update(); /* Set initial state in case page is pre-scrolled. */
+    }
+    return '<svg viewBox="0 0 120 170" xmlns="http://www.w3.org/2000/svg">' +
+      '<g class="ris-mascot-body">' +
+        // legs
+        '<rect x="46" y="112" width="10" height="42" rx="5" fill="#e8b98f"/>' +
+        '<rect x="64" y="112" width="10" height="42" rx="5" fill="#e8b98f"/>' +
+        // boots
+        '<rect x="42" y="150" width="18" height="9" rx="4" fill="#111"/>' +
+        '<rect x="60" y="150" width="18" height="9" rx="4" fill="#111"/>' +
+        // shorts
+        '<rect x="42" y="96" width="36" height="24" rx="6" fill="'+t.shorts+'"/>' +
+        // jersey base
+        '<rect x="34" y="52" width="52" height="48" rx="10" fill="'+(t.striped? t.stripe : t.jersey)+'"/>' +
+        (t.striped ? '<rect x="34" y="52" width="52" height="48" rx="10" fill="'+t.jersey+'"/>' + stripes : '') +
+        // number on chest
+        '<text x="60" y="84" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="20" fill="#fff" opacity=".85">'+ '</text>' +
+        // arms
+        '<g class="ris-mascot-arm"><rect x="24" y="54" width="10" height="34" rx="5" fill="'+(t.striped? t.jersey : t.jersey)+'"/><circle cx="29" cy="90" r="5" fill="#e8b98f"/></g>' +
+        '<rect x="86" y="54" width="10" height="34" rx="5" fill="'+t.jersey+'"/><circle cx="91" cy="90" r="5" fill="#e8b98f"/>' +
+        // head
+        '<circle cx="60" cy="34" r="18" fill="#f0c19a"/>' +
+        '<path d="M42 30a18 18 0 0 1 36 0c-6-6-12-8-18-8s-12 2-18 8z" fill="#3a2418"/>' +
+        // eyes + smile
+        '<circle cx="53" cy="34" r="2.2" fill="#222"/><circle cx="67" cy="34" r="2.2" fill="#222"/>' +
+        '<path d="M53 42q7 5 14 0" stroke="#a15b3b" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '</g>' +
+      // juggled ball at the feet
+      '<g class="ris-mascot-ball"><circle cx="86" cy="140" r="11" fill="#fff" stroke="#111" stroke-width="1.4"/>' +
+        '<path d="M86 133l3.4 2.4-1.3 4h-4.2l-1.3-4z" fill="#111"/></g>' +
+      '</svg>';
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 2. REVEAL ON SCROLL
-   * Auto-targets every <h2> and every <tbody tr> inside the article root.
-   * Adds .ris-reveal (hidden) via JS only — so without JS the page stays
-   * fully visible. IntersectionObserver triggers .ris-in (visible).
-   * Table rows are staggered per-tbody so they cascade in one by one.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initReveal(root, prefersReduced) {
-    if (prefersReduced) return;             /* Honour motion preference. */
-    if (!window.IntersectionObserver) return; /* Safari <12 / old browsers. */
+  /* ================================================================
+     1. PROGRESS BAR + ROLLING BALL
+     ================================================================ */
+  function initProgress(){
+    if(reduceMotion) return;
+    var track = el("div","ris-progress-track");
+    var fill = el("div","ris-progress-fill");
+    track.appendChild(fill);
+    var ball = el("div","ris-progress-ball"); ball.innerHTML = ballSVG();
+    document.body.appendChild(track); document.body.appendChild(ball);
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('ris-in');
-          observer.unobserve(entry.target); /* Fire once, then stop watching. */
-        }
+    var ticking=false;
+    function update(){
+      var h=document.documentElement;
+      var scrolled=h.scrollTop||document.body.scrollTop;
+      var height=h.scrollHeight-h.clientHeight;
+      var pct=height>0?(scrolled/height):0;
+      fill.style.width=(pct*100)+"%";
+      var x=pct*window.innerWidth;
+      ball.style.transform="translateX("+x+"px) rotate("+(pct*1440)+"deg)";
+      ticking=false;
+    }
+    window.addEventListener("scroll",function(){ if(!ticking){requestAnimationFrame(update);ticking=true;} },{passive:true});
+    window.addEventListener("resize",update); update();
+  }
+
+  /* ================================================================
+     2. REVEAL ON SCROLL + rolling ball before headings
+     ================================================================ */
+  function initReveal(root){
+    if(reduceMotion || !("IntersectionObserver" in window)) return;
+    var targets=[];
+    $all("h2, h3", root).forEach(function(h){
+      var ball=el("span","ris-heading-ball"); ball.innerHTML=ballSVG();
+      h.insertBefore(ball, h.firstChild);
+      h.classList.add("ris-reveal"); targets.push(h);
+    });
+    $all("blockquote, figure, .wp-block-image", root).forEach(function(e){ e.classList.add("ris-reveal"); targets.push(e); });
+    $all("table", root).forEach(function(table){
+      $all("tr", table).forEach(function(row,i){
+        row.classList.add("ris-reveal");
+        row.style.transitionDelay=Math.min(i*45,420)+"ms";
+        targets.push(row);
       });
-    }, {
-      threshold:  0.10,   /* Trigger when 10% of the element is visible. */
-      rootMargin: '0px'
     });
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("ris-in"); io.unobserve(en.target);} });
+    },{threshold:0.12, rootMargin:"0px 0px -8% 0px"});
+    targets.forEach(function(t){ io.observe(t); });
+  }
 
-    /* Headings — no stagger (each is its own landmark). */
-    var headings = root.querySelectorAll('h2');
-    headings.forEach(function (el) {
-      el.classList.add('ris-reveal');
-      observer.observe(el);
+  /* ================================================================
+     3. COUNT-UP + GOAL celebration on completion
+     ================================================================ */
+  function initCountUp(){
+    var els=$all(".count-up"); if(!els.length) return;
+    function animate(elm){
+      var target=parseFloat(elm.getAttribute("data-target")); if(isNaN(target)) return;
+      var suffix=elm.getAttribute("data-suffix")||"", prefix=elm.getAttribute("data-prefix")||"";
+      var duration=parseInt(elm.getAttribute("data-duration"),10)||1500;
+      var decimals=(String(target).split(".")[1]||"").length;
+      if(reduceMotion){ elm.textContent=prefix+target.toFixed(decimals)+suffix; return; }
+      var start=null;
+      function step(ts){
+        if(start===null) start=ts;
+        var p=Math.min((ts-start)/duration,1);
+        var eased=1-Math.pow(1-p,3);
+        elm.textContent=prefix+(target*eased).toFixed(decimals)+suffix;
+        if(p<1){ requestAnimationFrame(step); }
+        else { celebrate(); } // GOAL when the number lands
+      }
+      requestAnimationFrame(step);
+    }
+    if(!("IntersectionObserver" in window)){ els.forEach(animate); return; }
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ animate(en.target); io.unobserve(en.target);} });
+    },{threshold:0.6});
+    els.forEach(function(e){ io.observe(e); });
+  }
+
+  /* ================================================================
+     4. SCROLLSPY
+     ================================================================ */
+  function initScrollspy(){
+    var links=$all('a[href^="#"]').filter(function(a){
+      var id=a.getAttribute("href").slice(1); return id && document.getElementById(id);
     });
+    if(links.length<2 || !("IntersectionObserver" in window)) return;
+    var map={}, sections=[];
+    links.forEach(function(a){ var id=a.getAttribute("href").slice(1); var s=document.getElementById(id);
+      if(s && !map[id]){ map[id]=a; sections.push(s); } });
+    if(!sections.length) return;
+    var visible={};
+    function clear(){ links.forEach(function(a){ a.classList.remove("ris-toc-active"); }); }
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ visible[en.target.id]=en.isIntersecting; });
+      for(var i=0;i<sections.length;i++){ if(visible[sections[i].id]){ clear(); var l=map[sections[i].id]; if(l) l.classList.add("ris-toc-active"); break; } }
+    },{rootMargin:"-15% 0px -70% 0px", threshold:0});
+    sections.forEach(function(s){ io.observe(s); });
+  }
 
-    /* Table rows — staggered per-tbody so each table cascades independently. */
-    var tbodies = root.querySelectorAll('tbody');
-    tbodies.forEach(function (tbody) {
-      var rows = tbody.querySelectorAll('tr');
-      rows.forEach(function (row, idx) {
-        row.classList.add('ris-reveal');
-        /* 55 ms between rows feels snappy without being overwhelming. */
-        row.style.transitionDelay = (idx * 55) + 'ms';
-        observer.observe(row);
+  /* ================================================================
+     5. FOOTBALL CURSOR + TRAIL
+     ================================================================ */
+  function initCursor(){
+    if(reduceMotion || isTouch) return;
+    var ball=el("div","ris-cursor-ball"); ball.innerHTML=ballSVG();
+    var ring=el("div","ris-cursor-ring");
+    document.body.appendChild(ball); document.body.appendChild(ring);
+    document.body.classList.add("ris-cursor-on");
+
+    var mx=innerWidth/2,my=innerHeight/2, rx=mx,ry=my, rot=0, lastX=mx;
+    var trail=[], TRAIL=6;
+    for(var i=0;i<TRAIL;i++){ var d=el("div","ris-cursor-trail"); d.style.opacity=String(0.35*(1-i/TRAIL)); document.body.appendChild(d); trail.push({elm:d,x:mx,y:my}); }
+
+    window.addEventListener("mousemove",function(e){ mx=e.clientX; my=e.clientY; },{passive:true});
+    function loop(){
+      rx+=(mx-rx)*0.2; ry+=(my-ry)*0.2;
+      rot+=(mx-lastX)*2; lastX=mx;
+      ball.style.left=mx+"px"; ball.style.top=my+"px";
+      ball.style.transform="translate(-50%,-50%) rotate("+rot+"deg)";
+      ring.style.left=rx+"px"; ring.style.top=ry+"px";
+      // trail follows with easing chain
+      var px=mx,py=my;
+      for(var i=0;i<trail.length;i++){ var tr=trail[i]; tr.x+=(px-tr.x)*0.35; tr.y+=(py-tr.y)*0.35; tr.elm.style.left=tr.x+"px"; tr.elm.style.top=tr.y+"px"; px=tr.x; py=tr.y; }
+      requestAnimationFrame(loop);
+    }
+    loop();
+    document.addEventListener("mouseover",function(e){ if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']")) ring.classList.add("ris-cursor-hover"); });
+    document.addEventListener("mouseout",function(e){ if(e.target.closest && e.target.closest("a,button,.ris-player,.ris-magnetic,[role='button']")) ring.classList.remove("ris-cursor-hover"); });
+  }
+
+  /* ================================================================
+     6. PLAYER NAME HOTSPOTS + MASCOT CARD
+     ================================================================ */
+  function resolve(key){
+    var p=PLAYERS[key]; if(!p) return null;
+    if(p.alias) return PLAYERS[p.alias]; return p;
+  }
+
+  function buildNameRegex(){
+    // longest names first so "Lionel Messi" wins over "Messi"
+    var keys=Object.keys(PLAYERS).sort(function(a,b){ return b.length-a.length; });
+    var escaped=keys.map(function(k){ return k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); });
+    return { rx:new RegExp("\\b("+escaped.join("|")+")\\b","gi"), keys:keys };
+  }
+
+  function wrapNames(root){
+    var info=buildNameRegex();
+    var walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode:function(node){
+        if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        var p=node.parentNode;
+        if(!p) return NodeFilter.FILTER_REJECT;
+        var tag=p.nodeName.toLowerCase();
+        if(tag==="script"||tag==="style"||tag==="a"||tag==="button") return NodeFilter.FILTER_REJECT;
+        if(p.classList && p.classList.contains("ris-player")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes=[], n;
+    while((n=walker.nextNode())){ if(info.rx.test(n.nodeValue)){ info.rx.lastIndex=0; nodes.push(n);} }
+    var count=0;
+    nodes.forEach(function(node){
+      if(count>=CONFIG.maxNameWraps) return;
+      var text=node.nodeValue; info.rx.lastIndex=0;
+      var frag=document.createDocumentFragment(); var last=0, m;
+      while((m=info.rx.exec(text))){
+        if(count>=CONFIG.maxNameWraps) break;
+        var key=m[1].toLowerCase();
+        var player=resolve(key); if(!player){ continue; }
+        if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+        var span=el("span","ris-player"); span.textContent=m[0];
+        span.setAttribute("data-player",key);
+        frag.appendChild(span); last=m.index+m[0].length; count++;
+      }
+      if(last>0){ if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last))); node.parentNode.replaceChild(frag,node); }
+    });
+    return count;
+  }
+
+  var cardEl, cardPinned=false, hideTimer=null;
+  function ensureCard(){
+    if(cardEl) return cardEl;
+    cardEl=el("div","ris-card");
+    document.body.appendChild(cardEl);
+    cardEl.addEventListener("mouseenter",function(){ if(hideTimer) clearTimeout(hideTimer); });
+    cardEl.addEventListener("mouseleave",function(){ if(!cardPinned) scheduleHide(); });
+    return cardEl;
+  }
+  function statRow(label,val,max){
+    var pct=Math.max(0,Math.min(100,(val/max)*100));
+    return '<div class="ris-stat"><div class="ris-stat-label"><span>'+label+'</span><span>'+val+'</span></div>'+
+      '<div class="ris-stat-track"><div class="ris-stat-fill" data-pct="'+pct+'"></div></div></div>';
+  }
+  function renderCard(key){
+    var p=resolve(key); if(!p) return;
+    var t=TEAMS[p.team]||TEAMS.GEN;
+    var c=ensureCard();
+    c.innerHTML=
+      '<div class="ris-card-head" style="background:linear-gradient(135deg,'+t.headerFrom+','+t.headerTo+');color:'+t.text+'">'+
+        '<div class="ris-card-fig">'+mascotSVG(p.team)+'</div>'+
+        '<div class="ris-card-id"><div class="ris-card-name">'+p.name+'</div>'+
+        '<div class="ris-card-meta">'+p.pos+' • #'+p.num+'</div></div>'+
+        '<div class="ris-card-num">'+p.num+'</div>'+
+      '</div>'+
+      '<div class="ris-card-body">'+
+        statRow("Goals", p.goals, 10)+
+        statRow("Assists", p.assists, 10)+
+        '<span class="ris-card-tag">'+(p.tag||"World Cup 2026")+'</span>'+
+      '</div>';
+    // animate stat bars after paint
+    requestAnimationFrame(function(){ $all(".ris-stat-fill",c).forEach(function(f){ f.style.width=f.getAttribute("data-pct")+"%"; }); });
+  }
+  function positionCard(anchor){
+    var c=ensureCard(); var r=anchor.getBoundingClientRect();
+    var w=260, h=c.offsetHeight||220;
+    var left=r.left+r.width/2-w/2;
+    left=Math.max(12, Math.min(left, innerWidth-w-12));
+    var top=r.top-h-14;
+    if(top<12) top=r.bottom+14; // flip below if no room above
+    c.style.left=left+"px"; c.style.top=top+"px";
+  }
+  function showCard(key,anchor){
+    renderCard(key); positionCard(anchor);
+    var c=ensureCard(); requestAnimationFrame(function(){ c.classList.add("ris-card-show"); });
+  }
+  function scheduleHide(){ if(hideTimer) clearTimeout(hideTimer); hideTimer=setTimeout(function(){ if(cardEl && !cardPinned) cardEl.classList.remove("ris-card-show"); },220); }
+
+  function initPlayers(root){
+    var wrapped=wrapNames(root);
+    if(!wrapped) return;
+    var spans=$all(".ris-player", root);
+
+    spans.forEach(function(span){
+      var key=span.getAttribute("data-player");
+      // hover (desktop)
+      if(!isTouch){
+        span.addEventListener("mouseenter",function(){ if(hideTimer) clearTimeout(hideTimer); cardPinned=false; showCard(key,span); });
+        span.addEventListener("mouseleave",function(){ scheduleHide(); });
+      }
+      // click / tap: pin the card + celebrate
+      span.addEventListener("click",function(e){
+        e.preventDefault();
+        cardPinned=true; showCard(key,span);
+        var r=span.getBoundingClientRect();
+        celebrate(r.left+r.width/2, r.top);
       });
     });
-  }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 3. COUNT-UP NUMBERS
-   * Any element with class="count-up" and data-target="48" will count from
-   * 0 → 48 with an ease-out curve when it scrolls into view. Optionally
-   * add data-suffix="+" to append a string after the number.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initCountUp(root) {
-    if (!window.IntersectionObserver) return;
-
-    var counters = root.querySelectorAll('.count-up[data-target]');
-    if (!counters.length) return;
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          runCounter(entry.target);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 }); /* Wait until the number is half-visible. */
-
-    counters.forEach(function (el) {
-      observer.observe(el);
-    });
-  }
-
-  function runCounter(el) {
-    var target   = parseFloat(el.getAttribute('data-target')) || 0;
-    var suffix   = el.getAttribute('data-suffix') || '';
-    var duration = 1500; /* ms — tweak if you want faster/slower counts. */
-    var startTs  = null;
-
-    el.classList.add('ris-counting');
-
-    function step(timestamp) {
-      if (!startTs) startTs = timestamp;
-
-      var elapsed  = timestamp - startTs;
-      var progress = Math.min(elapsed / duration, 1);
-
-      /* Cubic ease-out: starts fast, decelerates smoothly at the end. */
-      var eased   = 1 - Math.pow(1 - progress, 3);
-      var current = Math.round(target * eased);
-
-      el.textContent = current + suffix;
-
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      } else {
-        el.textContent = target + suffix; /* Ensure exact final value. */
-        el.classList.remove('ris-counting');
+    // dismiss pinned card on outside click / scroll / esc
+    document.addEventListener("click",function(e){
+      if(cardPinned && cardEl && !cardEl.contains(e.target) && !(e.target.classList && e.target.classList.contains("ris-player"))){
+        cardPinned=false; cardEl.classList.remove("ris-card-show");
       }
+    });
+    window.addEventListener("scroll",function(){ if(cardPinned){ cardPinned=false; if(cardEl) cardEl.classList.remove("ris-card-show"); } },{passive:true});
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape" && cardEl){ cardPinned=false; cardEl.classList.remove("ris-card-show"); } });
+
+    // First time a player's name scrolls into view, give the name a gentle
+    // pulse so readers notice it's interactive (once each).
+    if("IntersectionObserver" in window && !reduceMotion){
+      var io=new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){ en.target.animate(
+            [{backgroundColor:"rgba(245,166,35,.35)"},{backgroundColor:"transparent"}],
+            {duration:1400, easing:"ease-out"}); io.unobserve(en.target); }
+        });
+      },{threshold:1});
+      spans.forEach(function(s){ io.observe(s); });
     }
-
-    requestAnimationFrame(step);
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 4. SCROLLSPY — Table of Contents highlighting
-   * Finds all TOC anchor links (href="#someId"). On scroll, determines which
-   * section is in the top third of the viewport and marks that link active
-   * with .ris-toc-active, removing it from all others.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initScrollSpy() {
-    /* Try the explicit TOC container first, then fall back to any page anchors. */
-    var tocLinks = document.querySelectorAll(TOC_SELECTOR + ' a[href^="#"]');
-    if (!tocLinks.length) {
-      /* Broader fallback: any nav link or standalone TOC-style anchor. */
-      tocLinks = document.querySelectorAll('nav a[href^="#"], .toc a[href^="#"]');
+  /* ================================================================
+     7. GOAL CONFETTI
+     ================================================================ */
+  var confettiCanvas, cctx, particles=[], rafRunning=false;
+  var TEAM_CONFETTI=["#75aadb","#ffffff","#c60b1e","#ffc400","#f5a623"];
+  function ensureCanvas(){
+    if(confettiCanvas) return;
+    confettiCanvas=el("canvas","ris-confetti");
+    document.body.appendChild(confettiCanvas);
+    cctx=confettiCanvas.getContext("2d");
+    function size(){ confettiCanvas.width=innerWidth; confettiCanvas.height=innerHeight; }
+    size(); window.addEventListener("resize",size);
+  }
+  function celebrate(x,y){
+    if(reduceMotion) return;
+    ensureCanvas();
+    x=(x==null)?innerWidth/2:x; y=(y==null)?innerHeight*0.3:y;
+    for(var i=0;i<80;i++){
+      var ang=Math.random()*Math.PI*2, sp=4+Math.random()*7;
+      particles.push({ x:x,y:y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-4,
+        g:0.15+Math.random()*0.1, life:60+Math.random()*40,
+        c:TEAM_CONFETTI[(Math.random()*TEAM_CONFETTI.length)|0],
+        s:4+Math.random()*5, rot:Math.random()*6, vr:(Math.random()-0.5)*0.4 });
     }
-    if (!tocLinks.length) return;
-
-    /* Build id → <a> element map. */
-    var linkMap = {};
-    tocLinks.forEach(function (link) {
-      var hash = link.getAttribute('href');
-      if (hash && hash.length > 1) {
-        var id = hash.slice(1);
-        if (!linkMap[id]) linkMap[id] = link; /* First link per id wins. */
-      }
-    });
-
-    var ids = Object.keys(linkMap);
-    if (!ids.length) return;
-
-    var ticking = false;
-
-    function spy() {
-      var scrollY     = window.scrollY || document.documentElement.scrollTop;
-      var viewGuide   = scrollY + window.innerHeight * 0.33; /* 1/3 down viewport */
-      var activeId    = null;
-
-      /* Walk sections top-to-bottom; last one whose top is above the guide wins. */
-      ids.forEach(function (id) {
-        var section = document.getElementById(id);
-        if (!section) return;
-        var sectionTop = section.getBoundingClientRect().top + scrollY;
-        if (sectionTop <= viewGuide) activeId = id;
-      });
-
-      /* Update active class on all tracked links. */
-      ids.forEach(function (id) {
-        var link = linkMap[id];
-        if (id === activeId) {
-          link.classList.add('ris-toc-active');
-          link.setAttribute('aria-current', 'location');
-        } else {
-          link.classList.remove('ris-toc-active');
-          link.removeAttribute('aria-current');
-        }
-      });
-
-      ticking = false;
+    flashGoal();
+    if(!rafRunning){ rafRunning=true; requestAnimationFrame(drawConfetti); }
+  }
+  function drawConfetti(){
+    cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    for(var i=particles.length-1;i>=0;i--){
+      var p=particles[i];
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life--;
+      if(p.life<=0 || p.y>confettiCanvas.height+20){ particles.splice(i,1); continue; }
+      cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+      cctx.globalAlpha=Math.max(0,Math.min(1,p.life/40));
+      cctx.fillStyle=p.c; cctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);
+      cctx.restore();
     }
-
-    window.addEventListener('scroll', function () {
-      if (!ticking) {
-        requestAnimationFrame(spy);
-        ticking = true;
-      }
-    }, { passive: true });
-
-    spy(); /* Run immediately in case the page loads mid-scroll. */
+    if(particles.length){ requestAnimationFrame(drawConfetti); } else { rafRunning=false; cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); }
+  }
+  var flashEl;
+  function flashGoal(){
+    if(reduceMotion) return;
+    if(!flashEl){ flashEl=el("div","ris-goal-flash"); flashEl.textContent="GOAL!"; document.body.appendChild(flashEl); }
+    flashEl.classList.remove("ris-goal-go"); void flashEl.offsetWidth; flashEl.classList.add("ris-goal-go");
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 5. HERO IMAGE PARALLAX
-   * Finds the first large/featured image and shifts it upward at ~30% of
-   * the scroll speed so it appears to move more slowly than the page — a
-   * classic depth illusion. Does nothing if no suitable image is found.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initParallax(prefersReduced) {
-    if (prefersReduced) return;
-
-    var hero = document.querySelector(
-      '.wp-post-image, .post-thumbnail img, header img, .hero img, ' +
-      '.entry-content img:first-of-type, article img:first-of-type, figure:first-of-type img'
-    );
-    if (!hero) return;
-
-    hero.classList.add('ris-parallax');
-
-    /* Cache the image's page offset once, then update only on scroll. */
-    var heroOffsetTop = getOffsetTop(hero);
-    var ticking = false;
-
-    function update() {
-      /* Only move while the hero is at least partially in view. */
-      var rect = hero.getBoundingClientRect();
-      if (rect.bottom > 0 && rect.top < window.innerHeight) {
-        var scrolled = window.scrollY || document.documentElement.scrollTop;
-        var offset   = (scrolled - heroOffsetTop) * 0.28;
-        hero.style.transform = 'translateY(' + offset + 'px)';
-      }
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', function () {
-      if (!ticking) {
-        requestAnimationFrame(update);
-        ticking = true;
-      }
-    }, { passive: true });
-  }
-
-  /* Utility: cumulative offsetTop relative to the document. */
-  function getOffsetTop(el) {
-    var top = 0;
-    while (el) {
-      top += el.offsetTop || 0;
-      el   = el.offsetParent;
-    }
-    return top;
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 6. CUSTOM CURSOR — glowing dot + trailing ring  (desktop only)
-   * Creates two fixed-position DIVs: a dot that snaps to the mouse and a
-   * ring that eases toward it with lag for a fluid trailing feel.
-   * The ring enlarges and tints when the cursor hovers interactive elements.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initCursor() {
-    var dot  = document.createElement('div');
-    var ring = document.createElement('div');
-    dot.className  = 'ris-cursor-dot';
-    ring.className = 'ris-cursor-ring';
-    dot.setAttribute('aria-hidden',  'true');
-    ring.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(dot);
-    document.body.appendChild(ring);
-    document.body.classList.add('ris-cursor-on');
-
-    /* Current mouse position (pixels from viewport top-left). */
-    var mx = window.innerWidth  / 2;
-    var my = window.innerHeight / 2;
-
-    /* Ring's current (eased) position. */
-    var rx = mx;
-    var ry = my;
-
-    var isHovering = false;
-    var rafRunning = false;
-
-    /* Move dot instantly; ring is eased in the rAF loop. */
-    document.addEventListener('mousemove', function (e) {
-      mx = e.clientX;
-      my = e.clientY;
-
-      /* Dot: snap directly to cursor (offset by half its own size). */
-      var half = parseInt(getComputedStyle(document.documentElement)
-                   .getPropertyValue('--ris-cursor-size'), 10) / 2 || 5;
-      dot.style.transform = 'translate(' + (mx - half) + 'px,' + (my - half) + 'px)';
-
-      if (!rafRunning) {
-        rafRunning = true;
-        requestAnimationFrame(easeRing);
-      }
-    });
-
-    /* Easing loop — runs until ring is close enough to mouse to stop. */
-    function easeRing() {
-      var ringHalf = parseInt(getComputedStyle(document.documentElement)
-                      .getPropertyValue('--ris-ring-size'), 10) / 2 || 20;
-
-      /* Lerp ring toward cursor at 15% per frame (~9px/frame at 60fps). */
-      rx += (mx - rx) * 0.15;
-      ry += (my - ry) * 0.15;
-      ring.style.transform = 'translate(' + (rx - ringHalf) + 'px,' + (ry - ringHalf) + 'px)';
-
-      /* Keep looping while there's still visible distance to cover. */
-      if (Math.abs(mx - rx) > 0.5 || Math.abs(my - ry) > 0.5) {
-        requestAnimationFrame(easeRing);
-      } else {
-        rafRunning = false;
-      }
-    }
-
-    /* Enlarge ring on interactive element hover. */
-    document.addEventListener('mouseover', function (e) {
-      if (e.target.closest('a, button, .ris-magnetic')) {
-        if (!isHovering) {
-          isHovering = true;
-          ring.classList.add('ris-cursor-hover');
-        }
-      }
-    });
-    document.addEventListener('mouseout', function (e) {
-      if (e.target.closest('a, button, .ris-magnetic')) {
-        isHovering = false;
-        ring.classList.remove('ris-cursor-hover');
-      }
-    });
-
-    /* Fade out cursor elements when mouse leaves the browser window. */
-    document.addEventListener('mouseleave', function () {
-      dot.style.opacity  = '0';
-      ring.style.opacity = '0';
-    });
-    document.addEventListener('mouseenter', function () {
-      dot.style.opacity  = '1';
-      ring.style.opacity = '1';
+  /* ================================================================
+     8. VS DUEL BANNER (opt-in .ris-vs)
+     ================================================================ */
+  function initVS(root){
+    $all(".ris-vs", root).forEach(function(node){
+      var home=node.getAttribute("data-home")||"Argentina";
+      var away=node.getAttribute("data-away")||"Spain";
+      var b=el("div","ris-vs-banner");
+      b.innerHTML='<div class="ris-vs-side ris-vs-home"><span class="ris-vs-team">'+home+'</span></div>'+
+        '<div class="ris-vs-side ris-vs-away"><span class="ris-vs-team">'+away+'</span></div>'+
+        '<div class="ris-vs-badge">VS</div>';
+      node.innerHTML=""; node.appendChild(b);
+      if(reduceMotion || !("IntersectionObserver" in window)){ b.classList.add("ris-in"); return; }
+      var io=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting){ b.classList.add("ris-in"); io.unobserve(en.target); } }); },{threshold:0.4});
+      io.observe(b);
     });
   }
 
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 7. MAGNETIC BUTTONS
-   * Elements with class="magnetic" (or auto-detected Apply/Admissions text)
-   * gently pull toward the cursor while it hovers nearby, snapping back on
-   * mouse-leave. strength controls the pull intensity (0 = none, 1 = full).
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initMagnetic(root) {
-    /* 1. Collect explicit .magnetic elements. */
-    var targets = Array.prototype.slice.call(root.querySelectorAll('.magnetic'));
-
-    /* 2. Auto-detect Apply / Admissions text in buttons and links. */
-    var candidates = root.querySelectorAll('a, button');
-    candidates.forEach(function (el) {
-      var text = (el.textContent || '').toLowerCase().trim();
-      if (/apply|admissions/.test(text)) {
-        targets.push(el);
-      }
+  /* ================================================================
+     9. STAT BARS (opt-in .stat-bar)
+     ================================================================ */
+  function initStatBars(root){
+    var bars=$all(".stat-bar", root); if(!bars.length) return;
+    bars.forEach(function(node){
+      var val=Math.max(0,Math.min(100,parseFloat(node.getAttribute("data-value"))||0));
+      var track=el("div","ris-statbar-track"); var fill=el("div","ris-statbar-fill");
+      track.appendChild(fill); node.appendChild(track);
+      node._fill=fill; node._val=val;
     });
+    if(!("IntersectionObserver" in window) || reduceMotion){ bars.forEach(function(n){ n._fill.style.width=n._val+"%"; }); return; }
+    var io=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting){ en.target._fill.style.width=en.target._val+"%"; io.unobserve(en.target); } }); },{threshold:0.4});
+    bars.forEach(function(n){ io.observe(n); });
+  }
 
-    /* 3. Deduplicate (an element might match both rules). */
-    targets = targets.filter(function (el, i, arr) {
-      return arr.indexOf(el) === i;
+  /* ================================================================
+     10. MAGNETIC + TILT
+     ================================================================ */
+  function initMagnetic(){
+    if(reduceMotion || isTouch) return;
+    var els=$all(".magnetic");
+    $all("a,button").forEach(function(e){ var t=(e.textContent||"").toLowerCase();
+      if((t.indexOf("apply")!==-1||t.indexOf("admission")!==-1) && els.indexOf(e)===-1) els.push(e); });
+    els.forEach(function(e){ e.classList.add("ris-magnetic");
+      e.addEventListener("mousemove",function(ev){ var r=e.getBoundingClientRect();
+        e.style.transform="translate("+((ev.clientX-(r.left+r.width/2))*0.35)+"px,"+((ev.clientY-(r.top+r.height/2))*0.35)+"px)"; });
+      e.addEventListener("mouseleave",function(){ e.style.transform="translate(0,0)"; });
     });
-
-    targets.forEach(function (el) {
-      el.classList.add('ris-magnetic');
-      bindMagnetic(el);
+  }
+  function initTilt(){
+    if(reduceMotion || isTouch) return;
+    $all(".tilt").forEach(function(e){ e.classList.add("ris-tilt"); var max=8;
+      e.addEventListener("mousemove",function(ev){ var r=e.getBoundingClientRect();
+        var px=(ev.clientX-r.left)/r.width, py=(ev.clientY-r.top)/r.height;
+        e.style.transform="perspective(700px) rotateX("+((py-0.5)*-2*max).toFixed(2)+"deg) rotateY("+((px-0.5)*2*max).toFixed(2)+"deg)"; });
+      e.addEventListener("mouseleave",function(){ e.style.transform="perspective(700px) rotateX(0) rotateY(0)"; });
     });
   }
 
-  function bindMagnetic(el) {
-    var STRENGTH = 0.32; /* Pull factor — increase for stronger pull. */
-
-    el.addEventListener('mousemove', function (e) {
-      var rect = el.getBoundingClientRect();
-      var cx   = rect.left + rect.width  / 2;
-      var cy   = rect.top  + rect.height / 2;
-      var dx   = (e.clientX - cx) * STRENGTH;
-      var dy   = (e.clientY - cy) * STRENGTH;
-      el.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
-    });
-
-    el.addEventListener('mouseleave', function () {
-      /* Snap back smoothly via the CSS transition on .ris-magnetic. */
-      el.style.transform = 'translate(0px, 0px)';
-    });
-  }
-
-  /* ─────────────────────────────────────────────────────────────────────────
-   * 8. TILT ON HOVER — 3-D card tilt effect
-   * Elements with class="tilt" rotate on both axes as the cursor moves over
-   * them, creating a depth illusion. MAX_TILT controls the maximum angle.
-   * ───────────────────────────────────────────────────────────────────────── */
-  function initTilt(root) {
-    var els = root.querySelectorAll('.tilt');
-    if (!els.length) return;
-
-    els.forEach(function (el) {
-      el.classList.add('ris-tilt');
-      bindTilt(el);
-    });
-  }
-
-  function bindTilt(el) {
-    var MAX_TILT = 12; /* Maximum rotation in degrees. */
-
-    el.addEventListener('mousemove', function (e) {
-      var rect = el.getBoundingClientRect();
-
-      /* Normalise cursor position to −0.5 … +0.5 range. */
-      var xFrac = (e.clientX - rect.left)  / rect.width  - 0.5;
-      var yFrac = (e.clientY - rect.top)   / rect.height - 0.5;
-
-      /* Invert Y axis so moving up tilts the top toward the viewer. */
-      var rotX = -yFrac * MAX_TILT;
-      var rotY =  xFrac * MAX_TILT;
-
-      el.style.transform =
-        'perspective(640px) rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg) scale(1.025)';
-    });
-
-    el.addEventListener('mouseleave', function () {
-      /* Reset smoothly via the CSS transition on .ris-tilt. */
-      el.style.transform =
-        'perspective(640px) rotateX(0deg) rotateY(0deg) scale(1)';
-    });
-  }
-
+  /* -------------------- BOOTSTRAP -------------------- */
+  ready(function(){
+    try{
+      var root=getRoot();
+      initProgress();
+      initReveal(root);
+      initPlayers(root);
+      initCountUp();
+      initScrollspy();
+      initCursor();
+      initVS(root);
+      initStatBars(root);
+      initMagnetic();
+      initTilt();
+      // expose a manual trigger for fun: window.RIS.goal()
+      window.RIS={ goal:celebrate };
+    }catch(err){ if(window.console) console.warn("[RIS v2] init error:",err); }
+  });
 })();

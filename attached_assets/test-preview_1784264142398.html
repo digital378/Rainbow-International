@@ -5,8 +5,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RIS interactive layer v2 — preview</title>
-  <link rel="stylesheet" href="/animations.css" />
+  <title>RIS interactive layer — preview</title>
+  <link rel="stylesheet" href="animations.css" />
   <style>
     body{font-family:system-ui,Segoe UI,sans-serif;color:#1c2340;margin:0;line-height:1.65;background:#fbfbfd}
     .hero{background:linear-gradient(135deg,#0b2a5b,#123a7a);color:#fff;text-align:center;padding:70px 20px}
@@ -25,8 +25,7 @@
     .btn{display:inline-block;background:#f5a623;color:#fff;padding:14px 30px;border-radius:30px;text-decoration:none;font-weight:800}
     section{min-height:70vh}
     .barwrap{margin:16px 0}
-    .barwrap b{font-size:.85rem;display:block;margin-bottom:4px;color:#444}
-    .hint{font-size:12px;color:#888;margin-top:24px;background:#f9fafb;border:1px solid #eee;border-radius:8px;padding:12px 16px}
+    .barwrap b{font-size:.85rem}
   </style>
 </head>
 <body>
@@ -45,14 +44,6 @@
       <a href="#s4">The Big Final</a>
     </nav>
 
-    <div class="hint">
-      <strong>Preview hints:</strong>
-      Move your mouse for the football cursor + trail.
-      Scroll to see headings reveal with a rolling ball.
-      Hover or click player names (<strong>Messi</strong>, <strong>Yamal</strong>, <strong>Rodri</strong>) to see the mascot card + GOAL! confetti.
-      The VS banner slides in. Stat bars fill on scroll. "Apply Now" is magnetic on desktop.
-    </div>
-
     <div class="entry-content">
       <div class="stat-row">
         <div><div class="n"><span class="count-up" data-target="48">0</span></div>Teams</div>
@@ -60,12 +51,11 @@
         <div><div class="n"><span class="count-up" data-target="8">0</span></div>Messi goals</div>
       </div>
 
-      <!-- VS Duel Banner — slides in when scrolled into view -->
       <div class="ris-vs" data-home="Argentina" data-away="Spain"></div>
 
       <section id="s1">
         <h2>World Cup 2026 Primer</h2>
-        <p>Forty-eight teams across three host nations — the biggest tournament in history, and a rich classroom resource for geography, maths and teamwork. Lionel Messi leads Argentina while Lamine Yamal and Rodri drive Spain's engine.</p>
+        <p>Forty-eight teams across three host nations — the biggest tournament in history, and a rich classroom resource for geography, maths and teamwork.</p>
       </section>
 
       <section id="s2">
@@ -85,12 +75,10 @@
 
       <section id="s3">
         <h2>Meet the 48 Nations</h2>
-        <p>Hover or click a player's name to meet them: <strong>Messi</strong> leads Argentina, while <strong>Yamal</strong> and <strong>Rodri</strong> drive Spain. Watch for <strong>Julián Álvarez</strong> and <strong>Nico Williams</strong> too.</p>
-        <div class="card tilt"><strong>Hover me</strong> — this callout card tilts toward your mouse (add <code>class="tilt"</code>).</div>
-
-        <!-- Stat bars -->
-        <div class="barwrap"><b>Possession — Spain 61%</b><div class="stat-bar" data-value="61"></div></div>
-        <div class="barwrap"><b>Possession — Argentina 39%</b><div class="stat-bar" data-value="39"></div></div>
+        <p>Hover or tap a player's name to meet them: <strong>Messi</strong> leads Argentina, while <strong>Yamal</strong> and <strong>Rodri</strong> drive Spain. Watch for <strong>Julián Álvarez</strong> and <strong>Nico Williams</strong> too.</p>
+        <div class="card tilt"><strong>Hover me</strong> — this callout tilts toward your mouse.</div>
+        <div class="barwrap"><b>Possession — Spain</b><div class="stat-bar" data-value="61"></div></div>
+        <div class="barwrap"><b>Possession — Argentina</b><div class="stat-bar" data-value="39"></div></div>
       </section>
 
       <section id="s4">
@@ -101,6 +89,6 @@
     </div>
   </div>
 
-  <script src="/animations.js"></script>
+  <script src="animations.js"></script>
 </body>
 </html>

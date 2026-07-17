@@ -504,6 +504,9 @@ function renderPage(): string {
         <h2 class="section-h2" id="the-final">The Big Final — Spain vs Argentina: What Every Student Should Know</h2>
         <p class="body-para">After six weeks of extraordinary football across 16 cities in three countries, it comes down to this: Spain vs Argentina in the 2026 FIFA World Cup Final at MetLife Stadium, New Jersey, on Sunday 19 July. It is the first time in the history of the World Cup that the reigning European Champions (Spain) and the reigning South American Champions (Argentina) have met in the final.</p>
 
+        <!-- VS duel banner — slides in when scrolled into view -->
+        <div class="ris-vs" data-home="Argentina" data-away="Spain"></div>
+
         <h3 class="section-h3">Head-to-Head — How Spain and Argentina Have Clashed</h3>
         <p class="body-para">These two footballing nations have met 22 times in total, in friendlies and official competitions, but have never before met in a World Cup final — making Sunday 19 July a historic occasion.</p>
         <div class="table-wrap">
@@ -520,6 +523,13 @@ function renderPage(): string {
             </tbody>
           </table>
         </div>
+        <!-- Possession stat bars -->
+        <div style="margin:20px 0 4px;font-size:13px;font-weight:700;color:#444;">Average possession this tournament</div>
+        <div style="margin-bottom:6px;font-size:13px;color:#555;">Spain <strong>61%</strong></div>
+        <div class="stat-bar" data-value="61"></div>
+        <div style="margin-top:10px;margin-bottom:6px;font-size:13px;color:#555;">Argentina <strong>39%</strong></div>
+        <div class="stat-bar" data-value="39"></div>
+
         <div class="callout callout-fact tilt"><div class="callout-label">🌟 Fun History Fact</div><div class="callout-body">The last time Spain and Argentina played each other was a friendly in March 2018 — and Spain won 6–1! But Argentina have won the World Cup twice since that defeat (2022, and now aiming for 2026). Both teams are completely different now.</div></div>
         <div class="callout callout-activity tilt"><div class="callout-label">📚 Classroom Geography Link</div><div class="callout-body">Spain's capital is Madrid. Argentina's capital is Buenos Aires. Find both on a world map — they are on opposite sides of the Atlantic Ocean, yet both countries share deep cultural roots because Spain colonised much of South America in the 16th century. Football, language, and passion connect them!</div></div>
 
