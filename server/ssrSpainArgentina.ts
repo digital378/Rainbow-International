@@ -73,7 +73,7 @@ function renderPage(): string {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Poppins', system-ui, sans-serif; background: #fff; color: #1a1a2e; line-height: 1.7; }
-    #progress-bar { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg,#7c3aed,#f97316,#fbbf24,#10b981); z-index: 9999; transition: width 0.1s; }
+    /* progress bar handled by animations.js (.ris-progress) */
     .topbar { background: #091a4f; color: rgba(255,255,255,0.8); font-size: 12px; padding: 6px 16px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
     .topbar a { color: rgba(255,255,255,0.8); text-decoration: none; display: flex; align-items: center; gap: 5px; }
     .topbar a:hover { color: #fbbf24; }
@@ -237,11 +237,13 @@ function renderPage(): string {
     .footer-bottom-inner { max-width: 1280px; margin: 0 auto; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.35); }
     .footer-bottom-inner a { color: rgba(255,255,255,0.35); text-decoration: none; }
   </style>
+  <!-- Drop-in animations for this post only -->
+  <link rel="stylesheet" href="/animations.css" />
   <!-- Meta Pixel -->
   <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1280590747364170');fbq('track','PageView');</script>
 </head>
 <body>
-<div id="progress-bar"></div>
+<!-- progress bar is injected by animations.js -->
 
 <div class="topbar">
   <a href="tel:02269105000"><svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>(022) 69105000</a>
@@ -317,7 +319,7 @@ function renderPage(): string {
 
         <!-- Primer -->
         <h2 class="section-h2" id="primer">A Quick FIFA World Cup 2026 Primer (For Parents Catching Up)</h2>
-        <p class="body-para">In case you're piecing it together between meetings and homework checks: this edition is the biggest World Cup in history. 48 teams competed across 12 groups, playing a total of 104 matches. For the first time ever, three countries — the USA, Mexico, and Canada — co-hosted, spreading matches across 16 cities. The tournament wraps up with the final in New Jersey on July 19.</p>
+        <p class="body-para">In case you're piecing it together between meetings and homework checks: this edition is the biggest World Cup in history. <span class="count-up" data-target="48">48</span> teams competed across <span class="count-up" data-target="12">12</span> groups, playing a total of <span class="count-up" data-target="104">104</span> matches. For the first time ever, three countries — the USA, Mexico, and Canada — co-hosted, spreading matches across <span class="count-up" data-target="16">16</span> cities. The tournament wraps up with the final in New Jersey on July 19.</p>
         <p class="body-para">That's plenty of material for a curious child to sink their teeth into — and plenty of natural openings for you to turn "Can I watch the match?" into "Let's watch it together and figure some things out."</p>
 
         <!-- Geography -->
@@ -396,7 +398,7 @@ function renderPage(): string {
             </tbody>
           </table>
         </div>
-        <div class="callout callout-fact"><div class="callout-label">🌟 Fun History Fact</div><div class="callout-body">Italy has won the World Cup four times — but did you know they failed to qualify for 2026? It's one of the biggest upsets in football history.</div></div>
+        <div class="callout callout-fact tilt"><div class="callout-label">🌟 Fun History Fact</div><div class="callout-body">Italy has won the World Cup four times — but did you know they failed to qualify for 2026? It's one of the biggest upsets in football history.</div></div>
 
         <h3 class="section-h3">All 48 Teams — Country, Capital, and Continent</h3>
         <p class="body-para">Use the table below to find any team on a world map, identify their capital city, and explore which continent they come from. Teams marked ★ are making their World Cup debut in 2026.</p>
@@ -456,7 +458,7 @@ function renderPage(): string {
             </tbody>
           </table>
         </div>
-        <div class="callout callout-activity"><div class="callout-label">📚 Classroom Activity</div><div class="callout-body">Curaçao, Jordan, Cabo Verde, and Uzbekistan (marked ★) are making their World Cup debut — ask students to find these four countries on a map and share one interesting fact about each.</div></div>
+        <div class="callout callout-activity tilt"><div class="callout-label">📚 Classroom Activity</div><div class="callout-body">Curaçao, Jordan, Cabo Verde, and Uzbekistan (marked ★) are making their World Cup debut — ask students to find these four countries on a map and share one interesting fact about each.</div></div>
 
         <h3 class="section-h3">Continents at a Glance — Who Has the Most Teams?</h3>
         <div class="table-wrap">
@@ -518,8 +520,8 @@ function renderPage(): string {
             </tbody>
           </table>
         </div>
-        <div class="callout callout-fact"><div class="callout-label">🌟 Fun History Fact</div><div class="callout-body">The last time Spain and Argentina played each other was a friendly in March 2018 — and Spain won 6–1! But Argentina have won the World Cup twice since that defeat (2022, and now aiming for 2026). Both teams are completely different now.</div></div>
-        <div class="callout callout-activity"><div class="callout-label">📚 Classroom Geography Link</div><div class="callout-body">Spain's capital is Madrid. Argentina's capital is Buenos Aires. Find both on a world map — they are on opposite sides of the Atlantic Ocean, yet both countries share deep cultural roots because Spain colonised much of South America in the 16th century. Football, language, and passion connect them!</div></div>
+        <div class="callout callout-fact tilt"><div class="callout-label">🌟 Fun History Fact</div><div class="callout-body">The last time Spain and Argentina played each other was a friendly in March 2018 — and Spain won 6–1! But Argentina have won the World Cup twice since that defeat (2022, and now aiming for 2026). Both teams are completely different now.</div></div>
+        <div class="callout callout-activity tilt"><div class="callout-label">📚 Classroom Geography Link</div><div class="callout-body">Spain's capital is Madrid. Argentina's capital is Buenos Aires. Find both on a world map — they are on opposite sides of the Atlantic Ocean, yet both countries share deep cultural roots because Spain colonised much of South America in the 16th century. Football, language, and passion connect them!</div></div>
 
         <h3 class="section-h3">Score Predictions — Who Will Win?</h3>
         <!-- NOTE TO EDITOR: These predictions will be stale after July 19. Update or remove once the result is known. -->
@@ -530,7 +532,7 @@ function renderPage(): string {
           <li class="pred-item"><span class="pred-source"><a href="https://draftkings.com" target="_blank" rel="noopener noreferrer">DraftKings ↗</a></span><span>Sportsbook (odds): Spain favourites (−164), Argentina underdogs (+134).</span></li>
           <li class="pred-item"><span class="pred-source">Social media</span><span>fans split 50–50 — could go to extra time or penalties.</span></li>
         </ul>
-        <div class="callout callout-tip"><div class="callout-label">💡 Teaching Tip — Probability in Maths</div><div class="callout-body">If Spain are favourites at −164 odds and Argentina are underdogs at +134, ask your child which team has the better statistical chance, and to convert those numbers into percentages (roughly 62% vs 43% — the two won't add to 100% because the bookmaker takes a cut).</div></div>
+        <div class="callout callout-tip tilt"><div class="callout-label">💡 Teaching Tip — Probability in Maths</div><div class="callout-body">If Spain are favourites at −164 odds and Argentina are underdogs at +134, ask your child which team has the better statistical chance, and to convert those numbers into percentages (roughly 62% vs 43% — the two won't add to 100% because the bookmaker takes a cut).</div></div>
 
         <h3 class="section-h3">What the World Is Saying — Voices Around the Final</h3>
         <!-- NOTE TO EDITOR: The following are paraphrases — NOT direct quotes — because the original
@@ -541,7 +543,7 @@ function renderPage(): string {
         <p class="body-para">ESPN analysts have noted that Spain look like the best team in the tournament, while also cautioning that Messi's presence makes Argentina dangerous in any match, at any time.</p>
         <p class="body-para">Lamine Yamal has spoken about Messi being his idol — while also making clear that on Sunday he will be competing against him on the pitch, not admiring him from afar.</p>
         <p class="body-para">Football fans on social media have been drawn to the Yamal-vs-Messi angle — a 20-year age gap between opposing lead players, described by many as "the next Messi vs the original Messi."</p>
-        <div class="callout callout-fact"><div class="callout-label">🌟 Something Genuinely Remarkable</div><div class="callout-body">Lamine Yamal was photographed as a baby with Lionel Messi in 2007. Nineteen years later, that baby — now 19 years old — plays against Messi in the World Cup Final. A widely reported detail that brings the story full circle.</div></div>
+        <div class="callout callout-fact tilt"><div class="callout-label">🌟 Something Genuinely Remarkable</div><div class="callout-body">Lamine Yamal was photographed as a baby with Lionel Messi in 2007. Nineteen years later, that baby — now 19 years old — plays against Messi in the World Cup Final. A widely reported detail that brings the story full circle.</div></div>
 
         <!-- Stat Leaders -->
         <h2 class="section-h2" id="stat-leaders">Stat Leaders at the 2026 World Cup</h2>
@@ -590,7 +592,7 @@ function renderPage(): string {
             </tbody>
           </table>
         </div>
-        <div class="callout callout-activity"><div class="callout-label">📚 Classroom Maths Activity</div><div class="callout-body">Challenge students to add up all goals scored in the tournament so far, work out the average goals per match, and predict whether the final will finish 1–0 or 2–1 — real-world statistics in action.</div></div>
+        <div class="callout callout-activity tilt"><div class="callout-label">📚 Classroom Maths Activity</div><div class="callout-body">Challenge students to add up all goals scored in the tournament so far, work out the average goals per match, and predict whether the final will finish 1–0 or 2–1 — real-world statistics in action.</div></div>
 
         <h3 class="section-h3">Messi's Record-Breaking 2026 World Cup</h3>
         <p class="body-para">Lionel Messi enters Sunday's final having already broken or equalled several World Cup records:</p>
@@ -607,7 +609,7 @@ function renderPage(): string {
           <li class="record-item"><span class="arrow">→</span>Back-to-back World Cup winner — if Argentina win, Messi becomes the first player to win back-to-back World Cup titles since Brazil's players in 1958 and 1962, and the oldest World Cup winning captain ever.</li>
           <li class="record-item"><span class="arrow">→</span>Triple World Cup finalist — only Cafu of Brazil has ever played in three World Cup finals. Messi can join him on Sunday.</li>
         </ul>
-        <div class="callout callout-activity"><div class="callout-label">📚 For Students</div><div class="callout-body">Messi's 8 goals in this tournament means he needs 6 more in one match to beat Just Fontaine's single-tournament record of 13 goals (set in 1958). That won't happen — but can your students calculate how many goals per game Messi averages across his 6 World Cups?</div></div>
+        <div class="callout callout-activity tilt"><div class="callout-label">📚 For Students</div><div class="callout-body">Messi's 8 goals in this tournament means he needs 6 more in one match to beat Just Fontaine's single-tournament record of 13 goals (set in 1958). That won't happen — but can your students calculate how many goals per game Messi averages across his 6 World Cups?</div></div>
 
         <h3 class="section-h3">7 Mind-Blowing Facts About This World Cup Final</h3>
         <ul class="facts-list">
@@ -772,15 +774,10 @@ function renderPage(): string {
   </div>
 </footer>
 
+<!-- Drop-in animations (scroll progress, reveal, count-up, scrollspy, parallax, cursor, magnetic, tilt) -->
+<script src="/animations.js"></script>
 <script>
-  // Scroll progress bar
-  window.addEventListener('scroll', function() {
-    var el = document.getElementById('progress-bar');
-    var scrollTop = window.scrollY || document.documentElement.scrollTop;
-    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    el.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
-  });
-  // FAQ accordion
+  // FAQ accordion (specific to this page)
   document.querySelectorAll('.faq-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var item = this.closest('.faq-item');
