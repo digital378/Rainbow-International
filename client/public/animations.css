@@ -1,0 +1,171 @@
+/* =====================================================================
+   Rainbow International School — Blog Drop-In Animations
+   Scoped, drop-in stylesheet. All custom classes are prefixed .ris- so
+   they will NOT collide with your WordPress theme. Fonts, existing text
+   colors and layout rules are never overridden.
+
+   ── WORDPRESS USAGE ──────────────────────────────────────────────────
+   Paste into a WPCode "CSS Snippet", set it to load only on the target
+   blog post. Or enqueue via functions.php with a post ID conditional.
+
+   ── BRAND COLOR ──────────────────────────────────────────────────────
+   Change --ris-accent below to match your school's primary color.
+   ===================================================================== */
+
+:root {
+  --ris-accent:          #f5a623;   /* warm orange/gold — swap for brand  */
+  --ris-accent-2:        #ff7a18;   /* secondary gradient stop             */
+  --ris-cursor-size:     10px;      /* inner cursor dot diameter           */
+  --ris-ring-size:       40px;      /* outer cursor ring diameter          */
+  --ris-reveal-distance: 28px;      /* how far elements slide up           */
+  --ris-reveal-time:     0.68s;     /* reveal animation duration           */
+}
+
+/* ── 1. SCROLL PROGRESS BAR ──────────────────────────────────────────── */
+.ris-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 99999;
+  background: linear-gradient(90deg, var(--ris-accent), var(--ris-accent-2));
+  box-shadow: 0 0 10px rgba(245, 166, 35, 0.55);
+  transition: width 0.07s linear;
+  pointer-events: none;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── 2. REVEAL ON SCROLL ─────────────────────────────────────────────── */
+/* .ris-reveal is applied by JS only, so pages with JS disabled are       */
+/* never permanently hidden. The .ris-in class makes the element visible. */
+.ris-reveal {
+  opacity: 0;
+  transform: translateY(var(--ris-reveal-distance));
+  transition:
+    opacity   var(--ris-reveal-time) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--ris-reveal-time) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.ris-reveal.ris-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── 4. SCROLLSPY — active Table of Contents link ────────────────────── */
+.ris-toc-active {
+  color: var(--ris-accent) !important;
+  font-weight: 700 !important;
+  position: relative;
+}
+.ris-toc-active::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ris-accent);
+  transform: translateY(-50%);
+  box-shadow: 0 0 6px rgba(245, 166, 35, 0.6);
+}
+
+/* ── 5. PARALLAX HERO ───────────────────────────────────────────────── */
+.ris-parallax {
+  will-change: transform;
+}
+
+/* ── 6. CUSTOM CURSOR (desktop only, injected by JS) ────────────────── */
+/* Hides the default cursor on body + interactive children.              */
+.ris-cursor-on,
+.ris-cursor-on a,
+.ris-cursor-on button {
+  cursor: none !important;
+}
+.ris-cursor-dot,
+.ris-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100000;
+}
+.ris-cursor-dot {
+  width:  var(--ris-cursor-size);
+  height: var(--ris-cursor-size);
+  background: var(--ris-accent);
+  box-shadow: 0 0 14px rgba(245, 166, 35, 0.9);
+  transition: transform 0.05s linear;
+  will-change: transform;
+}
+.ris-cursor-ring {
+  width:  var(--ris-ring-size);
+  height: var(--ris-ring-size);
+  border: 2px solid rgba(245, 166, 35, 0.65);
+  transition:
+    width  0.22s ease,
+    height 0.22s ease,
+    background  0.22s ease,
+    border-color 0.22s ease;
+  will-change: transform;
+}
+/* Ring grows + tints when hovering links / buttons */
+.ris-cursor-ring.ris-cursor-hover {
+  width:  calc(var(--ris-ring-size) + 22px);
+  height: calc(var(--ris-ring-size) + 22px);
+  background: rgba(245, 166, 35, 0.10);
+  border-color: var(--ris-accent);
+}
+
+/* ── 7. MAGNETIC BUTTONS ────────────────────────────────────────────── */
+/* JS adds this class; the transition makes the snap-back smooth.        */
+.ris-magnetic {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  display: inline-block;
+}
+
+/* ── 8. TILT ON HOVER ───────────────────────────────────────────────── */
+.ris-tilt {
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── COUNT-UP PULSE ─────────────────────────────────────────────────── */
+/* Optional visual emphasis while the number is ticking. JS adds/removes */
+/* .ris-counting on the element.                                          */
+.ris-counting {
+  animation: ris-pulse-count 0.4s infinite alternate;
+}
+@keyframes ris-pulse-count {
+  from { color: var(--ris-accent); }
+  to   { color: inherit;           }
+}
+
+/* ── ACCESSIBILITY & SAFETY ─────────────────────────────────────────── */
+/* Instantly show everything and disable all movement for users who       */
+/* prefer reduced motion. Covers scrollspy / progress bar too.           */
+@media (prefers-reduced-motion: reduce) {
+  .ris-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .ris-progress,
+  .ris-cursor-dot,
+  .ris-cursor-ring {
+    display: none !important;
+  }
+  .ris-magnetic,
+  .ris-tilt,
+  .ris-parallax {
+    transform: none !important;
+    transition: none !important;
+  }
+  .ris-counting {
+    animation: none !important;
+  }
+}

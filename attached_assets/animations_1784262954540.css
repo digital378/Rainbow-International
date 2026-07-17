@@ -1,0 +1,133 @@
+/* =====================================================================
+   Rainbow International School — Blog page interactive animations
+   Scoped, drop-in stylesheet. All classes are prefixed .ris- so they
+   will NOT collide with your theme. Paste this into a WPCode
+   "CSS Snippet" and set it to load only on the target post.
+
+   Brand color: change --ris-accent below to match your school palette.
+   ===================================================================== */
+
+:root {
+  --ris-accent: #f5a623;          /* warm orange/gold — change to brand */
+  --ris-accent-2: #ff7a18;        /* secondary for gradients            */
+  --ris-cursor-size: 10px;        /* inner dot size                     */
+  --ris-ring-size: 40px;          /* outer ring size                    */
+  --ris-reveal-distance: 28px;    /* how far elements slide up          */
+  --ris-reveal-time: 0.7s;        /* reveal duration                    */
+}
+
+/* ---------- 1. Scroll progress bar ---------- */
+.ris-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 99999;
+  background: linear-gradient(90deg, var(--ris-accent), var(--ris-accent-2));
+  box-shadow: 0 0 8px rgba(245, 166, 35, 0.6);
+  transition: width 0.08s linear;
+  pointer-events: none;
+}
+
+/* ---------- 2. Reveal on scroll ---------- */
+/* Elements the JS decides to animate get .ris-reveal (hidden) then
+   .ris-in (visible). We keep the initial state subtle so that if JS
+   fails to run, nothing is permanently hidden — see the safety rule
+   at the bottom of this file. */
+.ris-reveal {
+  opacity: 0;
+  transform: translateY(var(--ris-reveal-distance));
+  transition: opacity var(--ris-reveal-time) cubic-bezier(0.22, 1, 0.36, 1),
+              transform var(--ris-reveal-time) cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.ris-reveal.ris-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- 4. Scrollspy — active Table of Contents link ---------- */
+.ris-toc-active {
+  color: var(--ris-accent) !important;
+  font-weight: 700 !important;
+  position: relative;
+}
+.ris-toc-active::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ris-accent);
+  transform: translateY(-50%);
+}
+
+/* ---------- 5. Parallax hero ---------- */
+.ris-parallax {
+  will-change: transform;
+}
+
+/* ---------- 6. Custom cursor (desktop only) ---------- */
+.ris-cursor-on,
+.ris-cursor-on a,
+.ris-cursor-on button {
+  cursor: none !important;
+}
+.ris-cursor-dot,
+.ris-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 100000;
+  transform: translate(-50%, -50%);
+}
+.ris-cursor-dot {
+  width: var(--ris-cursor-size);
+  height: var(--ris-cursor-size);
+  background: var(--ris-accent);
+  box-shadow: 0 0 12px rgba(245, 166, 35, 0.9);
+}
+.ris-cursor-ring {
+  width: var(--ris-ring-size);
+  height: var(--ris-ring-size);
+  border: 2px solid rgba(245, 166, 35, 0.7);
+  transition: width 0.2s ease, height 0.2s ease,
+              background 0.2s ease, border-color 0.2s ease;
+}
+/* Grows over links/buttons */
+.ris-cursor-ring.ris-cursor-hover {
+  width: calc(var(--ris-ring-size) + 20px);
+  height: calc(var(--ris-ring-size) + 20px);
+  background: rgba(245, 166, 35, 0.12);
+  border-color: var(--ris-accent);
+}
+
+/* ---------- 7 & 8. Magnetic + tilt helpers ---------- */
+.ris-magnetic {
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  display: inline-block;
+}
+.ris-tilt {
+  transition: transform 0.15s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ---------- Accessibility & safety ---------- */
+/* If the user prefers reduced motion, remove ALL movement and make
+   everything instantly visible. */
+@media (prefers-reduced-motion: reduce) {
+  .ris-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .ris-progress, .ris-cursor-dot, .ris-cursor-ring { display: none !important; }
+  .ris-magnetic, .ris-tilt, .ris-parallax { transform: none !important; transition: none !important; }
+}
+
+/* Safety net: if JS is disabled/blocked, this class is only added BY JS,
+   so un-run pages never hide content. Nothing needed here — the .ris-reveal
+   class is applied by JS itself, so the default page stays fully visible. */

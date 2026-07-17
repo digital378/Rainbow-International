@@ -1,0 +1,54 @@
+Write me a DROP-IN animation snippet — one CSS file and one vanilla JavaScript
+file — that I will paste into an EXISTING WordPress blog post via the WPCode
+plugin. Do NOT build a new page, do NOT use React or any build step, and do NOT
+recreate my content. The snippet must attach itself to whatever article DOM is
+already on the page.
+
+TARGET PAGE
+A long WordPress article (educational football World Cup post). It already has:
+a main content container (assume the standard WordPress `.entry-content`, but
+also try `article`, `.elementor-widget-container`, `main` as fallbacks — make
+the root selector a CONFIG variable at the top of the JS). Inside it there are
+<h2> section headings, a Table of Contents made of anchor links (a[href^="#"]),
+several <table> elements with many rows, callout/tip boxes, and CTA buttons
+containing text like "Apply" or "Admissions".
+
+REQUIREMENTS
+- Everything self-initializes on DOMContentLoaded. Guard every selector so it
+  NEVER throws if an element is absent (this runs on a live page).
+- No external libraries. Pure vanilla JS + CSS. Use requestAnimationFrame for
+  smoothing. Keep JS well under 15KB, unminified, heavily commented.
+- Theme all colors via CSS variables (default --accent to a warm orange/gold)
+  so I can match my school's brand.
+- Respect prefers-reduced-motion (disable motion) and disable cursor/tilt/
+  magnetic effects on touch / pointer:coarse devices (keep scroll reveals).
+- Scope all CSS so it won't collide with my theme (prefix custom classes, e.g.
+  .ris-*), and don't override existing fonts/colors of the article text.
+
+ANIMATIONS
+1. A scroll-progress bar fixed at the top, filling as the article scrolls.
+2. Reveal-on-scroll via IntersectionObserver: automatically fade+slide-up each
+   <h2> section and each table row (staggered cascade per row). No manual
+   classes needed for this — auto-target headings and rows inside the root.
+3. Count-up numbers: any element I tag with class "count-up" and data-target
+   (e.g. <span class="count-up" data-target="48">) counts from 0 when visible.
+4. Scrollspy: add an .active class to the Table-of-Contents link matching the
+   section currently in view.
+5. Subtle parallax on the top hero/featured image if one exists.
+6. Custom cursor: a glowing dot + trailing ring that eases toward the pointer,
+   enlarging over links/buttons. (Desktop only.)
+7. Magnetic buttons: elements I tag with class "magnetic" pull gently toward
+   the cursor. Auto-apply it to buttons/links whose text includes "Apply" or
+   "Admissions" too.
+8. Tilt-on-hover: elements I tag with class "tilt" get a subtle 3D tilt.
+
+DELIVERABLES
+- animations.css and animations.js, shown IN FULL so I can copy them.
+- At the top of animations.js, a comment block listing EXACTLY which optional
+  classes/data-attributes to add to my WordPress blocks (count-up, magnetic,
+  tilt) and confirming everything else is automatic.
+- Brief instructions: paste the CSS into a WPCode "CSS Snippet" and the JS into
+  a WPCode "JS Snippet (Footer)", set location to run only on this single post.
+- Provide a tiny local test.html with fake headings/tables/TOC ONLY so I can
+  preview the effects in Replit — but make clear this test file is throwaway and
+  is NOT my real page.

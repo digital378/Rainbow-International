@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+     THROWAWAY PREVIEW ONLY — not your real page.
+     This file exists solely to let you see all animations working in
+     Replit before you paste the CSS/JS into WordPress via WPCode.
+     Preview at: /test-preview.html
+     Delete or ignore once you've verified the effects.
+     ===================================================================== -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RIS Animations — preview (throwaway)</title>
+
+  <!-- 1. Load the drop-in CSS FIRST -->
+  <link rel="stylesheet" href="/animations.css" />
+
+  <style>
+    /* ── Base page styles (these mimic your WordPress theme, NOT the deliverable) ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html  { scroll-behavior: smooth; }
+    body  { font-family: system-ui, -apple-system, sans-serif; color: #222; line-height: 1.65; background: #fff; }
+
+    .wrap       { max-width: 860px; margin: 0 auto; padding: 40px 20px 160px; }
+    h1          { font-size: clamp(1.6rem, 4vw, 2.4rem); margin: 24px 0 8px; line-height: 1.2; }
+    h2          { font-size: clamp(1.1rem, 3vw, 1.5rem); margin: 48px 0 12px; color: #0d3b86; }
+    p           { margin-bottom: 14px; color: #374151; font-size: 15px; }
+    section     { min-height: 55vh; padding-top: 24px; }
+
+    /* Featured / hero image */
+    .hero-img   { width: 100%; max-height: 340px; object-fit: cover; border-radius: 14px; display: block; margin-bottom: 8px; overflow: hidden; }
+
+    /* TOC */
+    nav.toc {
+      background: #faf7f0; border: 1px solid #ecddb5; border-radius: 12px;
+      padding: 18px 24px; margin: 28px 0;
+    }
+    nav.toc strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: #888; margin-bottom: 10px; }
+    nav.toc a {
+      display: block; color: #444; text-decoration: none;
+      padding: 5px 0 5px 18px; font-size: 14px; font-weight: 500;
+      border-bottom: 1px solid #f0e8d0; position: relative;
+    }
+    nav.toc a:last-child { border-bottom: none; }
+    nav.toc a:hover { color: #f5a623; }
+
+    /* Stat counters */
+    .stat-row  { display: flex; gap: 36px; flex-wrap: wrap; margin: 32px 0; }
+    .stat-item { text-align: center; }
+    .stat      { font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; color: #f5a623; display: block; }
+    .stat-lbl  { font-size: 13px; color: #6b7280; margin-top: 2px; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb; margin: 24px 0; }
+    table   { width: 100%; border-collapse: collapse; font-size: 14px; }
+    caption { font-size: 11px; color: #6b7280; text-align: left; padding: 8px 14px; background: #f9fafb; }
+    thead th { background: #0d3b86; color: #fff; padding: 10px 14px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+    tbody tr:nth-child(even) { background: #f9fafb; }
+    tbody tr:hover           { background: #fffbeb; }
+
+    /* Tilt card */
+    .card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 16px;
+      padding: 28px 24px; box-shadow: 0 8px 32px rgba(0,0,0,.07);
+      margin: 28px 0; font-size: 15px; color: #374151;
+    }
+    .card strong { color: #0d3b86; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+    /* CTA button */
+    .btn {
+      display: inline-block; background: #f5a623; color: #fff !important;
+      padding: 14px 30px; border-radius: 30px; text-decoration: none;
+      font-weight: 700; font-size: 15px; box-shadow: 0 4px 14px rgba(245,166,35,.35);
+    }
+    .btn:hover { background: #e09518; }
+
+    /* Callout */
+    .callout {
+      border-left: 4px solid #f5a623; background: #fffbeb;
+      border-radius: 0 10px 10px 0; padding: 14px 18px;
+      margin: 20px 0; font-size: 14px; color: #374151;
+    }
+    .callout strong { color: #92400e; }
+
+    /* Footer padding */
+    .spacer { height: 120px; }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- ── Featured / hero image (parallax target) ── -->
+    <figure>
+      <img
+        src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=70"
+        alt="Football stadium aerial view"
+        class="hero-img"
+        loading="eager"
+      />
+    </figure>
+
+    <h1>Spain vs Argentina — World Cup 2026 Final: Lessons for Every Student</h1>
+
+    <!-- ── Table of Contents (scrollspy target) ── -->
+    <nav class="toc" aria-label="Table of contents">
+      <strong>In this article</strong>
+      <a href="#s1">World Cup 2026 Primer</a>
+      <a href="#s2">Mathematics in Sports</a>
+      <a href="#s3">The 48 Nations</a>
+      <a href="#s4">Final Analysis &amp; Apply</a>
+    </nav>
+
+    <!-- The .entry-content wrapper mimics a WordPress article body. -->
+    <div class="entry-content">
+
+      <!-- ── Count-up stats ── -->
+      <div class="stat-row">
+        <div class="stat-item">
+          <span class="stat count-up" data-target="48">0</span>
+          <div class="stat-lbl">Teams</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat count-up" data-target="104" data-suffix="+">0</span>
+          <div class="stat-lbl">Matches</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat count-up" data-target="8">0</span>
+          <div class="stat-lbl">Messi Goals</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat count-up" data-target="3">0</span>
+          <div class="stat-lbl">Host Nations</div>
+        </div>
+      </div>
+
+      <!-- ── Section 1 ── -->
+      <section id="s1">
+        <h2>World Cup 2026 Primer</h2>
+        <p>Forty-eight teams, three host nations, one hundred and four matches. This is the largest World Cup in history and a rich, ready-made classroom resource for students of every age.</p>
+        <div class="callout">
+          <strong>Tip:</strong> Use group-stage standings as a live maths worksheet — wins (3 pts), draws (1 pt), losses (0 pts).
+        </div>
+        <p>This is also the first time three countries have co-hosted the World Cup. The USA, Mexico, and Canada spread matches across 16 cities and multiple time zones, making it a natural geography exercise too.</p>
+      </section>
+
+      <!-- ── Section 2 — table (row reveal target) ── -->
+      <section id="s2">
+        <h2>Mathematics in Sports</h2>
+        <p>Points, goal differentials, and probability come alive during the group stage. Track these standings with your child every evening after matches.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Semifinal teams — group-stage record (fictional illustration)</caption>
+            <thead>
+              <tr><th>Team</th><th>Won</th><th>Drawn</th><th>Lost</th><th>Points</th><th>GD</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Spain</td><td>6</td><td>1</td><td>0</td><td>19</td><td>+11</td></tr>
+              <tr><td>Argentina</td><td>6</td><td>0</td><td>1</td><td>18</td><td>+9</td></tr>
+              <tr><td>France</td><td>5</td><td>1</td><td>1</td><td>16</td><td>+8</td></tr>
+              <tr><td>Brazil</td><td>5</td><td>0</td><td>2</td><td>15</td><td>+7</td></tr>
+              <tr><td>England</td><td>4</td><td>2</td><td>1</td><td>14</td><td>+5</td></tr>
+              <tr><td>Germany</td><td>4</td><td>1</td><td>2</td><td>13</td><td>+3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── Section 3 — tilt card ── -->
+      <section id="s3">
+        <h2>The 48 Nations</h2>
+        <p>Four nations are appearing at the FIFA World Cup for the very first time. Hover the card below to see the tilt effect — add <code>class="tilt"</code> to any WordPress callout block.</p>
+
+        <!-- This card has class="tilt" — it will get 3D tilt on hover. -->
+        <div class="card tilt">
+          <strong>🌍 First-time qualifiers in 2026</strong><br><br>
+          Curaçao (Caribbean), Jordan (Middle East), Cabo Verde (Atlantic Africa), and Uzbekistan (Central Asia) are making their World Cup debut. Ask students to find all four on a map.
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <caption>Continents represented at FIFA World Cup 2026</caption>
+            <thead>
+              <tr><th>Continent</th><th>Teams</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Europe</td><td>16</td></tr>
+              <tr><td>Africa</td><td>10</td></tr>
+              <tr><td>Asia</td><td>9</td></tr>
+              <tr><td>South America</td><td>6</td></tr>
+              <tr><td>CONCACAF</td><td>6</td></tr>
+              <tr><td>Oceania</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── Section 4 — magnetic CTA ── -->
+      <section id="s4">
+        <h2>Final Analysis &amp; What's Next</h2>
+        <p>The generational storyline: Lamine Yamal (19) vs Lionel Messi (39). In 2007 Yamal was photographed as a newborn alongside Messi at a charity event. On July 19 they play each other in the World Cup Final — a detail that writes itself.</p>
+        <p>The button below has its text "Apply Now" so the JS <strong>auto-applies</strong> the magnetic effect. Hover slowly to feel the pull. On mobile it degrades gracefully to a normal button.</p>
+        <p style="margin-top:28px;">
+          <!-- No extra class needed — "Apply" in the text triggers magnetic automatically. -->
+          <a href="#s1" class="btn">Apply Now</a>
+        </p>
+        <p style="margin-top:16px;font-size:13px;color:#9ca3af;">
+          (This button was detected automatically — no <code>class="magnetic"</code> needed.)
+        </p>
+      </section>
+
+    </div><!-- /.entry-content -->
+
+    <div class="spacer"></div>
+
+  </div><!-- /.wrap -->
+
+  <!-- 2. Load the drop-in JS LAST, in the footer -->
+  <script src="/animations.js"></script>
+</body>
+</html>

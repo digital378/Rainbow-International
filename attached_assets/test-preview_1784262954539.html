@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+     THROWAWAY PREVIEW ONLY. This is NOT your real page. It exists only so
+     you can SEE the animations working in Replit before pasting the CSS/JS
+     into WordPress. Do not publish this file. It fakes a WordPress article
+     (.entry-content) with headings, a Table of Contents, tables, count-up
+     numbers, an Apply button, and a tilt card.
+     ===================================================================== -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RIS animations — preview (throwaway)</title>
+  <link rel="stylesheet" href="animations.css" />
+  <style>
+    body { font-family: system-ui, sans-serif; color:#222; margin:0; line-height:1.6; }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 120px; }
+    header img { width:100%; border-radius:12px; display:block; }
+    h1 { font-size: 2rem; }
+    nav.toc { background:#faf7f0; border:1px solid #eee; border-radius:10px; padding:16px 22px; margin:24px 0; }
+    nav.toc a { display:block; color:#555; text-decoration:none; padding:4px 0; }
+    table { width:100%; border-collapse:collapse; margin:24px 0; }
+    th,td { border:1px solid #eee; padding:10px 12px; text-align:left; }
+    th { background:#faf7f0; }
+    .stat { font-size:2.4rem; font-weight:800; color:#f5a623; }
+    .stat-row { display:flex; gap:40px; margin:30px 0; }
+    .card { background:#fff; border:1px solid #eee; border-radius:14px; padding:24px; box-shadow:0 8px 30px rgba(0,0,0,.06); margin:30px 0; }
+    .btn { display:inline-block; background:#f5a623; color:#fff; padding:14px 28px; border-radius:30px; text-decoration:none; font-weight:700; }
+    section { min-height: 60vh; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=60" alt="football" />
+      <h1>Spain vs Argentina — World Cup 2026 Final Lessons</h1>
+    </header>
+
+    <nav class="toc">
+      <strong>Table of Contents</strong>
+      <a href="#s1">World Cup 2026 Primer</a>
+      <a href="#s2">Mathematics in Sports</a>
+      <a href="#s3">The 48 Nations</a>
+      <a href="#s4">Final Analysis</a>
+    </nav>
+
+    <!-- This wrapper mimics WordPress's article body -->
+    <div class="entry-content">
+      <div class="stat-row">
+        <div><span class="stat count-up" data-target="48">0</span><div>Teams</div></div>
+        <div><span class="stat count-up" data-target="104" data-suffix="+">0</span><div>Matches</div></div>
+        <div><span class="stat count-up" data-target="8">0</span><div>Messi goals</div></div>
+      </div>
+
+      <section id="s1">
+        <h2>World Cup 2026 Primer</h2>
+        <p>Forty-eight teams, three host nations, one hundred and four matches. This is the largest tournament in history and a rich classroom resource.</p>
+      </section>
+
+      <section id="s2">
+        <h2>Mathematics in Sports</h2>
+        <p>Points, goal differentials and probability come alive through the group stage.</p>
+        <table>
+          <thead><tr><th>Team</th><th>Won</th><th>Points</th><th>GD</th></tr></thead>
+          <tbody>
+            <tr><td>Spain</td><td>6</td><td>18</td><td>+11</td></tr>
+            <tr><td>Argentina</td><td>6</td><td>18</td><td>+9</td></tr>
+            <tr><td>France</td><td>5</td><td>15</td><td>+8</td></tr>
+            <tr><td>Brazil</td><td>5</td><td>15</td><td>+7</td></tr>
+            <tr><td>England</td><td>4</td><td>12</td><td>+5</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="s3">
+        <h2>The 48 Nations</h2>
+        <div class="card tilt">
+          <strong>Hover me</strong> — this callout card tilts toward your mouse (add class <code>tilt</code>).
+        </div>
+      </section>
+
+      <section id="s4">
+        <h2>Final Analysis</h2>
+        <p>The generational angle: Lamine Yamal vs Messi. Ready to join a school that learns beyond the classroom?</p>
+        <p><a href="#s1" class="btn">Apply Now</a></p>
+      </section>
+    </div>
+  </div>
+
+  <script src="animations.js"></script>
+</body>
+</html>
