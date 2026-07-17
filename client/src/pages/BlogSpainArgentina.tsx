@@ -184,7 +184,7 @@ function Callout({ type, children }: { type: "activity" | "tip" | "fact"; childr
   };
   const s = styles[type];
   return (
-    <div className={`rounded-xl border-l-4 ${s.bg} p-4 my-6`}>
+    <div className={`rounded-xl border-l-4 ${s.bg} p-4 my-6 tilt`}>
       <p className={`font-semibold text-sm mb-1 ${s.labelColor}`}>
         {s.icon} {s.label}
       </p>
@@ -331,6 +331,36 @@ export default function BlogSpainArgentina() {
     return () => {
       document.getElementById("ld-article")?.remove();
       document.getElementById("ld-faq")?.remove();
+    };
+  }, []);
+
+  /* Inject football animations (CSS + JS) on mount; clean up on unmount.
+     This ensures the animations layer works whether the user arrives via
+     a direct URL load (SSR already injects them) OR via client-side
+     navigation from another page in the app. */
+  useEffect(() => {
+    if (!document.getElementById("ris-anim-css")) {
+      const link = document.createElement("link");
+      link.id = "ris-anim-css";
+      link.rel = "stylesheet";
+      link.href = "/animations.css";
+      document.head.appendChild(link);
+    }
+    if (!document.getElementById("ris-anim-js")) {
+      const script = document.createElement("script");
+      script.id = "ris-anim-js";
+      script.src = "/animations.js";
+      document.body.appendChild(script);
+    }
+    return () => {
+      document.getElementById("ris-anim-css")?.remove();
+      document.getElementById("ris-anim-js")?.remove();
+      /* Also clean up DOM nodes the animation script may have added */
+      document.querySelector(".ris-cursor-ball")?.remove();
+      document.querySelector(".ris-cursor-orbital")?.remove();
+      document.querySelector(".ris-cursor-canvas")?.remove();
+      document.querySelector("#ris-progress-wrap")?.remove();
+      document.body.classList.remove("ris-cursor-on");
     };
   }, []);
 
@@ -651,6 +681,9 @@ export default function BlogSpainArgentina() {
               After six weeks of extraordinary football across 16 cities in three countries, it comes down to this: Spain vs Argentina in the 2026 FIFA World Cup Final at MetLife Stadium, New Jersey, on Sunday 19 July. It is the first time in the history of the World Cup that the reigning European Champions (Spain) and the reigning South American Champions (Argentina) have met in the final.
             </BodyP>
 
+            {/* VS duel banner — animated by animations.js on scroll */}
+            <div className="ris-vs" data-home="Argentina" data-away="Spain" />
+
             <SubHeading>Head-to-Head — How Spain and Argentina Have Clashed</SubHeading>
             <BodyP>
               These two footballing nations have met 22 times in total, in friendlies and official competitions, but have never before met in a World Cup final — making Sunday 19 July a historic occasion.
@@ -674,6 +707,15 @@ export default function BlogSpainArgentina() {
                 ))}
               </tbody>
             </ScrollTable>
+
+            {/* Possession stat bars — animated by animations.js on scroll */}
+            <div style={{ margin: "20px 0 4px", fontSize: 13, fontWeight: 700, color: "#444" }}>
+              Average possession this tournament
+            </div>
+            <div style={{ marginBottom: 6, fontSize: 13, color: "#555" }}>Spain <strong>61%</strong></div>
+            <div className="stat-bar" data-value="61" />
+            <div style={{ marginTop: 10, marginBottom: 6, fontSize: 13, color: "#555" }}>Argentina <strong>39%</strong></div>
+            <div className="stat-bar" data-value="39" />
 
             <Callout type="fact">
               The last time Spain and Argentina played each other was a friendly in March 2018 — and Spain won 6–1! But Argentina have won the World Cup twice since that defeat. Both teams are completely different now.
