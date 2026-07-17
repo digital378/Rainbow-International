@@ -906,8 +906,7 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
   const fsMouDone = rows.filter(s => s.stage === "MOU Done").length;
   const fsMouSent = rows.filter(s => s.stage === "MOU Sent").length;
   const fsMouPending = rows.filter(s => s.stage === "MOU Signing Pending").length;
-  const fsTotalJr = rows.reduce((s, r) => s + r.admJrKg, 0);
-  const fsTotalSr = rows.reduce((s, r) => s + r.admSrKg, 0);
+  const fsClosedDropped = rows.filter(s => s.stage === "Not Interested / Dropped").length;
   const fsTotalAdm = rows.reduce((s, r) => s + r.totalAdm, 0);
   const fsStageCounts: Record<string, number> = {};
   rows.forEach(s => { if (s.stage) fsStageCounts[s.stage] = (fsStageCounts[s.stage] ?? 0) + 1; });
@@ -923,8 +922,7 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
           { label: "MOU Done ✓", value: fsMouDone, color: C.green },
           { label: "MOU Sent", value: fsMouSent, color: C.purple },
           { label: "MOU Pending", value: fsMouPending, color: C.orange },
-          { label: "Jr KG Adm", value: fsTotalJr, color: C.teal },
-          { label: "Sr KG Adm", value: fsTotalSr, color: C.indigo },
+          { label: "Closed / Dropped", value: fsClosedDropped, color: C.red },
           { label: "Total Adm", value: fsTotalAdm, color: C.amber },
         ]}
         pipelineStages={data.pipelineStages}
