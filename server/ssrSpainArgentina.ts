@@ -355,6 +355,21 @@ function renderPage(): string {
           <li><span class="num-badge">4</span>Track the group tables together as a quick, low-pressure maths exercise.</li>
         </ul>
 
+        <!-- Preschool cross-link — natural fit after family-learning tips -->
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 18px;margin:20px 0;display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:1.25rem;flex-shrink:0;">🎒</span>
+          <div>
+            <p style="font-weight:700;color:#065f46;font-size:13px;margin:0 0 4px;">Have a little one at home?</p>
+            <p style="color:#374151;font-size:13px;line-height:1.6;margin:0;">
+              These activities work brilliantly for toddlers too. Explore our
+              <a href="https://www.rainbowpreschools.com/playgroup" target="_blank" rel="noopener" style="color:#065f46;font-weight:600;">Playgroup</a>,
+              <a href="https://www.rainbowpreschools.com/nursery" target="_blank" rel="noopener" style="color:#065f46;font-weight:600;">Nursery</a>, and
+              <a href="https://www.rainbowpreschools.com/kindergarten" target="_blank" rel="noopener" style="color:#065f46;font-weight:600;">Kindergarten</a> programmes at
+              <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener" style="color:#065f46;font-weight:700;">Rainbow Preschools International ↗</a>.
+            </p>
+          </div>
+        </div>
+
         <!-- FAQ -->
         <h2 class="section-h2" id="faq">Frequently Asked Questions</h2>
         <div class="faq-list">
@@ -647,10 +662,24 @@ function renderPage(): string {
           <a href="https://rainbowinternationalschool.in/application-form/" class="cta-btn" target="_blank" rel="noopener">Explore Admissions →</a>
         </div>
 
-        <!-- Cross-promotion -->
-        <div class="cross-promo">
-          <span style="font-size:24px;flex-shrink:0;">🌈</span>
-          <p><strong>Looking for early-learning ideas for a younger child?</strong> Visit <a href="https://rainbowinternationalschool.in/rainbow-preschool-international/" target="_blank" rel="noopener">Rainbow Preschool International</a> for a fun World Cup-themed activity guide for toddlers and pre-schoolers too.</p>
+        <!-- Cross-promotion — preschool programmes -->
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px 22px;margin:20px 0;">
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+            <span style="font-size:1.5rem;flex-shrink:0;">🌈</span>
+            <div>
+              <p style="font-weight:700;color:#0d3b86;font-size:14px;margin:0 0 4px;">Looking for early-learning programmes for a younger child?</p>
+              <p style="color:#374151;font-size:13px;line-height:1.6;margin:0;">
+                <a href="/rainbow-preschool-international" style="font-weight:700;color:#0d3b86;">Rainbow Preschool International</a> —
+                our award-winning sister school — offers Playgroup, Nursery and Kindergarten in Thane. The perfect foundation before joining RIS.
+              </p>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding-left:36px;">
+            <a href="https://www.rainbowpreschools.com/playgroup" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;background:#fff;border:1px solid #bfdbfe;color:#0d3b86;padding:6px 14px;border-radius:999px;text-decoration:none;">Playgroup ↗</a>
+            <a href="https://www.rainbowpreschools.com/nursery" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;background:#fff;border:1px solid #bfdbfe;color:#0d3b86;padding:6px 14px;border-radius:999px;text-decoration:none;">Nursery ↗</a>
+            <a href="https://www.rainbowpreschools.com/kindergarten" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;background:#fff;border:1px solid #bfdbfe;color:#0d3b86;padding:6px 14px;border-radius:999px;text-decoration:none;">Kindergarten ↗</a>
+            <a href="https://www.rainbowpreschools.com/preschool-admissions" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;background:#0d3b86;color:#fff;padding:6px 14px;border-radius:999px;text-decoration:none;">Apply for Admission ↗</a>
+          </div>
         </div>
 
         <!-- Tags -->

@@ -538,6 +538,21 @@ export default function BlogSpainArgentina() {
               ))}
             </ul>
 
+            {/* Preschool cross-link — natural fit after family-learning tips */}
+            <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-4 my-4 flex gap-3 items-start">
+              <span className="text-xl shrink-0">🎒</span>
+              <div>
+                <p className="font-semibold text-emerald-800 text-sm mb-1">Have a little one at home?</p>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  These activities work brilliantly for toddlers too. Explore our{" "}
+                  <a href="https://www.rainbowpreschools.com/playgroup" target="_blank" rel="noopener" className="text-emerald-700 underline hover:text-emerald-900 font-medium">Playgroup</a>,{" "}
+                  <a href="https://www.rainbowpreschools.com/nursery" target="_blank" rel="noopener" className="text-emerald-700 underline hover:text-emerald-900 font-medium">Nursery</a>, and{" "}
+                  <a href="https://www.rainbowpreschools.com/kindergarten" target="_blank" rel="noopener" className="text-emerald-700 underline hover:text-emerald-900 font-medium">Kindergarten</a> programmes at{" "}
+                  <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener" className="text-emerald-700 underline hover:text-emerald-900 font-semibold">Rainbow Preschools International ↗</a>.
+                </p>
+              </div>
+            </div>
+
             {/* ── SECTION 6: FAQ ── */}
             <SectionHeading id="faq">Frequently Asked Questions</SectionHeading>
             <div role="list">
@@ -991,23 +1006,23 @@ export default function BlogSpainArgentina() {
               </a>
             </div>
 
-            {/* Cross-promotion */}
-            <div className="border border-blue-100 bg-blue-50 rounded-xl p-5 my-6 flex gap-4 items-start">
-              <span className="text-2xl shrink-0">🌈</span>
-              <div>
-                <p className="font-semibold text-[#0d3b86] text-sm mb-1">Looking for early-learning ideas for a younger child?</p>
-                <p className="text-gray-700 text-sm">
-                  Visit{" "}
-                  <a
-                    href="https://rainbowinternationalschool.in/rainbow-preschool-international/"
-                    className="underline text-[#0d3b86] hover:text-amber-600"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    Rainbow Preschool International
-                  </a>{" "}
-                  for a fun World Cup-themed activity guide for toddlers and pre-schoolers too.
-                </p>
+            {/* Cross-promotion — preschool */}
+            <div className="border border-blue-200 bg-blue-50 rounded-xl p-5 my-6">
+              <div className="flex gap-3 items-start mb-3">
+                <span className="text-2xl shrink-0">🌈</span>
+                <div>
+                  <p className="font-semibold text-[#0d3b86] text-sm mb-1">Looking for early-learning programmes for a younger child?</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    <a href="/rainbow-preschool-international" className="font-semibold text-[#0d3b86] underline hover:text-amber-600">Rainbow Preschool International</a> —
+                    our award-winning sister school — offers Playgroup, Nursery and Kindergarten programmes in Thane. The perfect foundation before joining RIS.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 pl-9">
+                <a href="https://www.rainbowpreschools.com/playgroup" target="_blank" rel="noopener" className="text-xs font-semibold bg-white border border-blue-200 text-[#0d3b86] px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">Playgroup ↗</a>
+                <a href="https://www.rainbowpreschools.com/nursery" target="_blank" rel="noopener" className="text-xs font-semibold bg-white border border-blue-200 text-[#0d3b86] px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">Nursery ↗</a>
+                <a href="https://www.rainbowpreschools.com/kindergarten" target="_blank" rel="noopener" className="text-xs font-semibold bg-white border border-blue-200 text-[#0d3b86] px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">Kindergarten ↗</a>
+                <a href="https://www.rainbowpreschools.com/preschool-admissions" target="_blank" rel="noopener" className="text-xs font-semibold bg-[#0d3b86] text-white px-3 py-1.5 rounded-full hover:bg-blue-800 transition-colors">Apply for Admission ↗</a>
               </div>
             </div>
 
