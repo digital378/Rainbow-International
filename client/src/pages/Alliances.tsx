@@ -712,7 +712,7 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
   const mouSent   = rows.filter(b => b.stage === "MOU Sent").length;
   const mouPending = rows.filter(b => b.stage === "MOU Signing Pending").length;
   const totalAdm  = rows.reduce((s, b) => s + b.admissionsReferred, 0);
-  const needsFU   = rows.filter(b => b.followUpNeeded).length;
+  const closedDropped = rows.filter(b => b.stage === "Not Interested / Dropped").length;
   const bpStageCounts: Record<string, number> = {};
   rows.forEach(b => { if (b.stage) bpStageCounts[b.stage] = (bpStageCounts[b.stage] ?? 0) + 1; });
   const bpOwnerCounts: Record<string, number> = {};
@@ -727,7 +727,7 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
           { label: "MOU Done ✓", value: mouDone, color: C.green },
           { label: "MOU Sent", value: mouSent, color: C.purple },
           { label: "MOU Pending", value: mouPending, color: C.orange },
-          { label: "Follow-up Needed", value: needsFU, color: C.red },
+          { label: "Closed / Dropped", value: closedDropped, color: C.red },
           { label: "Admissions", value: totalAdm, color: C.amber },
           { label: "Categories", value: cats.length, color: C.slate },
         ]}
@@ -815,7 +815,7 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
   const corpMouSent = rows.filter(c => c.stage === "MOU Sent").length;
   const corpMouPending = rows.filter(c => c.stage === "MOU Signing Pending").length;
   const corpAdm = rows.reduce((s, c) => s + c.admissionsReferred, 0);
-  const corpFU = rows.filter(c => c.followUpNeeded).length;
+  const corpClosedDropped = rows.filter(c => c.stage === "Not Interested / Dropped").length;
   const corpStageCounts: Record<string, number> = {};
   rows.forEach(c => { if (c.stage) corpStageCounts[c.stage] = (corpStageCounts[c.stage] ?? 0) + 1; });
   const corpOwnerCounts: Record<string, number> = {};
@@ -830,7 +830,7 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
           { label: "MOU Done ✓", value: corpMouDone, color: C.green },
           { label: "MOU Sent", value: corpMouSent, color: C.purple },
           { label: "MOU Pending", value: corpMouPending, color: C.orange },
-          { label: "Follow-up Needed", value: corpFU, color: C.red },
+          { label: "Closed / Dropped", value: corpClosedDropped, color: C.red },
           { label: "Admissions", value: corpAdm, color: C.amber },
         ]}
         pipelineStages={data.pipelineStages}
