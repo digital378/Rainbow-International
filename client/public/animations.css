@@ -149,7 +149,7 @@
 .ris-player {
   cursor: pointer; font-weight: 700; color: inherit;
   border-bottom: 2px dashed var(--ris-accent);
-  position: relative; white-space: nowrap; transition: color .2s;
+  position: relative; display: inline; transition: color .2s;
 }
 .ris-player:hover { color: var(--ris-accent); }
 .ris-player::after {
