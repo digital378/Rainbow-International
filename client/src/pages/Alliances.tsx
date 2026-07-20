@@ -354,7 +354,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
       const mouDone   = (funnel.brandPartners["MOU Done"] ?? 0) + (funnel.corporates["MOU Done"] ?? 0) + (funnel.friendshipSchools["MOU Done"] ?? 0);
       const mouSent   = (funnel.brandPartners["MOU Sent"] ?? 0) + (funnel.corporates["MOU Sent"] ?? 0) + (funnel.friendshipSchools["MOU Sent"] ?? 0);
       const dropped   = (funnel.brandPartners["Not Interested / Dropped"] ?? 0) + (funnel.corporates["Not Interested / Dropped"] ?? 0) + (funnel.friendshipSchools["Not Interested / Dropped"] ?? 0);
-      const total     = kpi.totalProspects;
+      const total     = kpi.totalProspects + data.parentAdvocacy.length;
       return { total, mouDone, mouSent, dropped, inPipeline: total - mouDone - dropped, admissions: kpi.totalAdmissions };
     }
     const { rows } = filteredRows;
@@ -386,6 +386,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
     { name: "Brand Partners",    label: "BP",   total: data.brandPartners.length,    mou: funnel.brandPartners["MOU Done"] ?? 0,    color: C.navy },
     { name: "Corporates",        label: "Corp", total: data.corporates.length,        mou: funnel.corporates["MOU Done"] ?? 0,        color: C.blue },
     { name: "Friendship Schools",label: "FS",   total: data.friendshipSchools.length, mou: funnel.friendshipSchools["MOU Done"] ?? 0, color: C.teal },
+    { name: "Parent Advocacy",   label: "PA",   total: data.parentAdvocacy.length,   mou: data.parentAdvocacy.filter(p => p.status === "Admission Confirmed").length, color: C.amber },
   ].map(v => ({ ...v, rate: v.total > 0 ? Math.round((v.mou / v.total) * 100) : 0 }));
 
   const verticals = filterVertical === "all" ? allVerticals
@@ -998,6 +999,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const confirmed = data.parentAdvocacy.filter(p => p.status === "Admission Confirmed").length;
   const conversion = data.parentAdvocacy.length > 0
     ? Math.round((confirmed / data.parentAdvocacy.length) * 100) : 0;
+  const partnersOnboarded = data.parentAdvocacy.filter(p => p.partnerStatus?.toLowerCase().includes("accept")).length;
   const paStageCounts: Record<string, number> = {};
   data.parentAdvocacy.forEach(p => { if (p.status) paStageCounts[p.status] = (paStageCounts[p.status] ?? 0) + 1; });
   const PA_HEX: Record<string, string> = {
@@ -1016,7 +1018,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
         <div className="flex flex-wrap gap-3">
           {[
             { label: "Total Referrals", value: data.parentAdvocacy.length, color: C.navy },
-            { label: "Confirmed Adm", value: confirmed, color: C.green },
+            { label: "Partners Onboarded", value: partnersOnboarded, color: C.blue },
             { label: "Conversion Rate", value: `${conversion}%`, color: C.amber },
           ].map(s => (
             <div key={s.label}
