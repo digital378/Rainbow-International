@@ -432,21 +432,17 @@ function OverviewTab({ data }: { data: AlliancesData }) {
 
           {/* BP category chips — only when Brand Partners selected */}
           {filterVertical === "brandPartners" && (
-            <div className="flex flex-wrap gap-1.5 mt-1 w-full pl-0">
-              <button onClick={() => setFilterBPCat("")}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
-                  filterBPCat === "" ? "bg-[#091a4f] text-white border-transparent" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
-                }`}>
-                All Categories
-              </button>
-              {bpCategories.map(cat => (
-                <button key={cat} onClick={() => setFilterBPCat(cat)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
-                    filterBPCat === cat ? "bg-[#091a4f] text-white border-transparent" : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
-                  }`}>
-                  {cat}
-                </button>
-              ))}
+            <div className="mt-2 w-full max-w-xs">
+              <select
+                value={filterBPCat}
+                onChange={e => setFilterBPCat(e.target.value)}
+                className="w-full text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#091a4f]/20 focus:border-[#091a4f]"
+              >
+                <option value="">All Categories</option>
+                {bpCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
             </div>
           )}
         </div>

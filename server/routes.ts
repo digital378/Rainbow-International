@@ -4152,13 +4152,13 @@ paths:
           fatherName: r[4] ?? "",
           motherName: r[5] ?? "",
           contactNumber: r[6] ?? "",
-          referredFamily: r[7] ?? "",
-          gradeApplying: r[8] ?? "",
-          status: r[9] ?? "",
-          dateReferred: r[10] ?? "",
-          lastUpdate: r[11] ?? "",
-          incentiveGiven: r[12] ?? "",
-          partnerStatus: r[13] ?? "",
+          partnerStatus: r[7] ?? "",
+          referredFamily: r[8] ?? "",
+          gradeApplying: r[9] ?? "",
+          status: r[10] ?? "",
+          dateReferred: r[11] ?? "",
+          lastUpdate: r[12] ?? "",
+          incentiveGiven: r[13] ?? "",
         }));
 
       // ── Computed aggregates ────────────────────────────────────
