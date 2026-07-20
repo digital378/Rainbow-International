@@ -310,12 +310,13 @@ function StageTile({ stage, count, delay = 0 }: { stage: string; count: number; 
 }
 
 // ── Overview Tab ──────────────────────────────────────────────
-type VerticalKey = "all" | "brandPartners" | "corporates" | "friendshipSchools";
+type VerticalKey = "all" | "brandPartners" | "corporates" | "friendshipSchools" | "parentAdvocacy";
 const VERTICAL_OPTS: { key: VerticalKey; label: string; color: string }[] = [
   { key: "all",              label: "All Verticals",    color: C.navy  },
   { key: "brandPartners",    label: "Brand Partners",   color: C.navy  },
   { key: "corporates",       label: "Corporates",       color: C.blue  },
   { key: "friendshipSchools",label: "Friendship Schools",color: C.teal },
+  { key: "parentAdvocacy",   label: "Parent Advocacy",  color: C.amber },
 ];
 
 function OverviewTab({ data }: { data: AlliancesData }) {
@@ -345,6 +346,8 @@ function OverviewTab({ data }: { data: AlliancesData }) {
       return { rows: data.corporates, source: "corp" as const };
     if (filterVertical === "friendshipSchools")
       return { rows: data.friendshipSchools, source: "fs" as const };
+    if (filterVertical === "parentAdvocacy")
+      return { rows: data.parentAdvocacy, source: "pa" as const };
     return null;
   }, [filterVertical, filterBPCat, data]);
 
@@ -357,7 +360,13 @@ function OverviewTab({ data }: { data: AlliancesData }) {
       const total     = kpi.totalProspects + data.parentAdvocacy.length;
       return { total, mouDone, mouSent, dropped, inPipeline: total - mouDone - dropped, admissions: kpi.totalAdmissions };
     }
-    const { rows } = filteredRows;
+    const { rows, source } = filteredRows;
+    if (source === "pa") {
+      const onboarded = rows.filter((r: any) => r.partnerStatus?.toLowerCase().includes("accept")).length;
+      const dropped   = rows.filter((r: any) => r.status === "Not Interested").length;
+      const confirmed = rows.filter((r: any) => r.status === "Admission Confirmed").length;
+      return { total: rows.length, mouDone: onboarded, mouSent: 0, dropped, inPipeline: rows.length - onboarded - dropped, admissions: confirmed };
+    }
     const mouDone   = rows.filter((r: any) => r.stage === "MOU Done").length;
     const mouSent   = rows.filter((r: any) => r.stage === "MOU Sent").length;
     const dropped   = rows.filter((r: any) => r.stage === "Not Interested / Dropped").length;
@@ -374,8 +383,9 @@ function OverviewTab({ data }: { data: AlliancesData }) {
       ]));
     }
     const counts: Record<string, number> = {};
+    const useStatus = filteredRows.source === "pa";
     filteredRows.rows.forEach((r: any) => {
-      const s = r.stage;
+      const s = useStatus ? r.status : r.stage;
       if (s) counts[s] = (counts[s] ?? 0) + 1;
     });
     return counts;
@@ -386,7 +396,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
     { name: "Brand Partners",    label: "BP",   total: data.brandPartners.length,    mou: funnel.brandPartners["MOU Done"] ?? 0,    color: C.navy },
     { name: "Corporates",        label: "Corp", total: data.corporates.length,        mou: funnel.corporates["MOU Done"] ?? 0,        color: C.blue },
     { name: "Friendship Schools",label: "FS",   total: data.friendshipSchools.length, mou: funnel.friendshipSchools["MOU Done"] ?? 0, color: C.teal },
-    { name: "Parent Advocacy",   label: "PA",   total: data.parentAdvocacy.length,   mou: data.parentAdvocacy.filter(p => p.status === "Admission Confirmed").length, color: C.amber },
+    { name: "Parent Advocacy",   label: "PA",   total: data.parentAdvocacy.length,   mou: data.parentAdvocacy.filter(p => p.partnerStatus?.toLowerCase().includes("accept")).length, color: C.amber },
   ].map(v => ({ ...v, rate: v.total > 0 ? Math.round((v.mou / v.total) * 100) : 0 }));
 
   const verticals = filterVertical === "all" ? allVerticals
@@ -484,14 +494,14 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         {/* Vertical MOU conversion rings */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-2">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
-            MOU Conversion by Vertical
+            Conversion by Vertical
           </div>
           <div className="flex justify-around items-start flex-wrap gap-6">
             {verticals.map(v => (
               <AnimatedRing key={v.name}
                 value={v.rate} max={100} suffix="%" size={120} stroke={11}
                 color={v.color} label={v.name}
-                sub={`${v.mou} of ${v.total} MOUs`} />
+                sub={v.name === "Parent Advocacy" ? `${v.mou} of ${v.total} Onboarded` : `${v.mou} of ${v.total} MOUs`} />
             ))}
           </div>
           <div className="mt-6 pt-5 border-t border-slate-100 space-y-3">
