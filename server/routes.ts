@@ -4054,7 +4054,7 @@ paths:
         fetchSheetRange(SID, "Brand Partners!A:T"),
         fetchSheetRange(SID, "Corporate Tie-ups!A:R"),
         fetchSheetRange(SID, "Friendship Schools!A:R"),
-        fetchSheetRange(SID, "Parent Advocacy!A:M"),
+        fetchSheetRange(SID, "Parent Advocacy!A:N"),
       ]);
 
       const n = (v: string | undefined) => { const x = parseFloat((v ?? "").replace(/,/g, "")); return isNaN(x) ? 0 : x; };
@@ -4158,6 +4158,7 @@ paths:
           dateReferred: r[10] ?? "",
           lastUpdate: r[11] ?? "",
           incentiveGiven: r[12] ?? "",
+          partnerStatus: r[13] ?? "",
         }));
 
       // ── Computed aggregates ────────────────────────────────────

@@ -28,6 +28,7 @@ interface ParentAdvocacy {
   fatherName: string; motherName: string; contactNumber: string;
   referredFamily: string; gradeApplying: string; status: string;
   dateReferred: string; lastUpdate: string; incentiveGiven: string;
+  partnerStatus: string;
 }
 interface OwnerEntry { name: string; total: number; mouDone: number; admissions: number; followUp: number; }
 interface CategoryEntry { name: string; total: number; mouDone: number; admissions: number; }
@@ -1068,7 +1069,9 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
             <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referring Parent</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Student Name</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Parent Name</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Partner Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
@@ -1086,11 +1089,19 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                     <div className="text-xs text-slate-400">{[p.branch, p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
                   </td>
                   <td className="px-4 py-2.5">
-                    <div className="text-slate-700">{p.referredFamily || p.fatherName || "—"}</div>
-                    {p.motherName && (
-                      <div className="text-xs text-slate-400">{p.motherName}</div>
-                    )}
+                    <div className="text-slate-700">{p.fatherName || "—"}</div>
+                    {p.motherName && <div className="text-xs text-slate-400">{p.motherName}</div>}
                   </td>
+                  <td className="px-4 py-2.5">
+                    {p.partnerStatus ? (
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        p.partnerStatus.toLowerCase().includes("accept") ? "bg-green-100 text-green-700" :
+                        p.partnerStatus.toLowerCase().includes("reject") || p.partnerStatus.toLowerCase().includes("declin") ? "bg-red-100 text-red-700" :
+                        "bg-amber-100 text-amber-700"
+                      }`}>{p.partnerStatus}</span>
+                    ) : <span className="text-slate-300">—</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-slate-700">{p.referredFamily || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-600 text-xs font-mono">{p.contactNumber || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.gradeApplying || "—"}</td>
                   <td className="px-4 py-2.5"><StageBadge stage={p.status} palette={PA_COLOR} /></td>
@@ -1099,7 +1110,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
+                <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
               )}
             </tbody>
           </table>
