@@ -1085,7 +1085,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                     <div className="text-xs text-slate-400">{[p.branch, p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
                   </td>
                   <td className="px-4 py-2.5">
-                    <div className="text-slate-700">{p.fatherName || "—"}</div>
+                    <div className="text-slate-600 text-xs">{p.fatherName || "—"}</div>
                     {p.motherName && <div className="text-xs text-slate-400">{p.motherName}</div>}
                   </td>
                   <td className="px-4 py-2.5">
@@ -1095,11 +1095,11 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                         p.partnerStatus.toLowerCase().includes("reject") || p.partnerStatus.toLowerCase().includes("declin") ? "bg-red-100 text-red-700" :
                         "bg-amber-100 text-amber-700"
                       }`}>{p.partnerStatus}</span>
-                    ) : <span className="text-slate-300">—</span>}
+                    ) : <span className="text-slate-400 text-xs">—</span>}
                   </td>
-                  <td className="px-4 py-2.5 text-slate-700">{p.referredFamily || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-600 text-xs font-mono">{p.contactNumber || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-xs">{p.gradeApplying || "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.referredFamily || "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.contactNumber || "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.gradeApplying || "—"}</td>
                   <td className="px-4 py-2.5"><StageBadge stage={p.status} palette={PA_COLOR} /></td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.dateReferred || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.incentiveGiven || "—"}</td>
