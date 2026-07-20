@@ -258,7 +258,7 @@ function RpsDashboard() {
   }, []);
 
   useEffect(() => {
-    document.title = "RPS Sales Dashboard | Rainbow Public School";
+    document.title = "RPS Sales Dashboard | Rainbow Preschool";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
@@ -363,7 +363,7 @@ function RpsDashboard() {
             <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-red-700 font-black text-sm shadow-sm">RPS</div>
             <div>
               <div className="text-white font-black text-lg leading-tight">RPS Sales Dashboard</div>
-              <div className="text-red-100 text-xs">Rainbow Public School · 26-27 Academic Year · v2.4</div>
+              <div className="text-red-100 text-xs">Rainbow Preschool · 26-27 Academic Year · v2.4</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -412,7 +412,7 @@ function RpsDashboard() {
 
           {/* Funnel KPIs */}
           <div>
-            <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · filtered view` : "Rainbow Public School · all branches · 26-27"}>Key Performance Indicators</SectionTitle>
+            <SectionTitle sub={selectedMonth ? `${monthDet?.label ?? ""} · filtered view` : "Rainbow Preschool · all branches · 26-27"}>Key Performance Indicators</SectionTitle>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               <KpiCard label="Total Enquiries"  value={fmt(filtKpis.totalEnquiries)} sub={selectedMonth ? monthDet?.label : `${filtKpis.thisMonthEnquiries} this month`} />
               <KpiCard label="Admissions Done"  value={fmt(filtKpis.totalAdmissions + filtKpis.totalAdmRIS)} sub={selectedMonth ? monthDet?.label : `${filtKpis.totalAdmissions} RPS · ${filtKpis.totalAdmRIS} RIS`} accent={GREEN} highlight />
