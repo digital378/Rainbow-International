@@ -4,3 +4,4 @@ attached_assets/Gallery-20260403T041306Z-3-001_1775189636164.zip filter=lfs diff
 attached_assets/Gallery-20260403T041306Z-3-001_1775192526285.zip filter=lfs diff=lfs merge=lfs -text
 attached_assets/home-20260403T045453Z-3-001_1775192152508.zip filter=lfs diff=lfs merge=lfs -text
 attached_assets/extra_photo's-20260404T045243Z-3-001_1775278489400.zip filter=lfs diff=lfs merge=lfs -text
+source.zip filter=lfs diff=lfs merge=lfs -text
