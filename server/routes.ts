@@ -4599,6 +4599,42 @@ paths:
     }
   });
 
+  // Admin: sync lead statuses from Google Sheets back into DB
+  app.post("/api/admin/alliances/friendship/sync-status-from-sheets", requireAdmin, async (req, res) => {
+    try {
+      const schoolId = Number(req.body?.schoolId);
+      if (!schoolId) return res.status(400).json({ message: "schoolId required" });
+      const sheetId = process.env.ALLIANCES_SHEET_ID;
+      if (!sheetId) return res.status(500).json({ message: "ALLIANCES_SHEET_ID env var not set" });
+      const auth = getAuthenticatedClient();
+      if (!auth) return res.status(500).json({ message: "Google not connected" });
+
+      const school = await storage.getFriendshipSchoolById(schoolId);
+      if (!school) return res.status(404).json({ message: "School not found" });
+
+      const { google: goog } = await import("googleapis");
+      const sheets = goog.sheets({ version: "v4", auth });
+
+      // Read columns E (Phone) and H (Status) from the school's tab
+      const range = `'${school.sheetsTabName}'!E:H`;
+      const response = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
+      const rows = response.data.values || [];
+
+      // Skip header row; col E=index0, H=index3 within the E:H range
+      const updates: { phone: string; status: string }[] = [];
+      for (let i = 1; i < rows.length; i++) {
+        const phone = (rows[i][0] || "").toString().trim();
+        const status = (rows[i][3] || "").toString().trim();
+        if (phone && status) updates.push({ phone, status });
+      }
+
+      const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, updates);
+      res.json({ updated, total: updates.length });
+    } catch {
+      res.status(500).json({ message: "Failed to sync status from sheets" });
+    }
+  });
+
   // Admin: backfill status dropdown validation on all existing sheet tabs
   app.post("/api/admin/alliances/friendship/apply-validation", requireAdmin, async (_req, res) => {
     try {
