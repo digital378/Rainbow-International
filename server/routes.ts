@@ -5,8 +5,19 @@ import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
+import { z } from "zod";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+
+// ── Restricted public input schema for friendship lead submission ─
+// Only accepts student/parent fields; server forces status, source, etc.
+const publicFriendshipLeadSchema = z.object({
+  studentName: z.string().min(1, "Student name is required"),
+  grade: z.string().min(1, "Grade is required"),
+  parentName: z.string().min(1, "Parent name is required"),
+  phone: z.string().min(7, "Valid phone number required"),
+  email: z.string().email().optional().or(z.literal("")).transform(v => v || undefined),
+});
 import nodemailer from "nodemailer";
 import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
@@ -4330,9 +4341,13 @@ paths:
       const school = await storage.getFriendshipSchoolByToken(req.params.token);
       if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
 
-      const validated = insertFriendshipLeadSchema.parse({ ...req.body, schoolId: school.id, source: "manual" });
-      const lead = await storage.createFriendshipLead(validated);
-      console.log(`[friendship] Lead submitted: ${validated.studentName} → ${school.name}`);
+      const input = publicFriendshipLeadSchema.parse(req.body);
+      const lead = await storage.createFriendshipLead({
+        schoolId: school.id, source: "manual", status: "Open",
+        studentName: input.studentName, grade: input.grade,
+        parentName: input.parentName, phone: input.phone, email: input.email,
+      });
+      console.log(`[friendship] Lead submitted: ${input.studentName} → ${school.name}`);
       res.status(201).json({ success: true, id: lead.id });
 
       appendFriendshipLeadToSheets(lead, school.sheetsTabName)
@@ -4387,16 +4402,21 @@ paths:
           skipped.push(`Row ${i + 2}: missing required fields`);
           return [];
         }
-        return [{ studentName: sn, grade: gr, parentName: pn, phone: ph, email: em || undefined, schoolId: school.id, source: "bulk" as const }];
+        return [{ studentName: sn, grade: gr, parentName: pn, phone: ph, email: em || undefined }];
       });
 
-      if (rawLeads.length === 0) return res.status(400).json({ message: "No valid rows found", skipped });
+      if (rawLeads.length === 0) return res.status(400).json({ message: "No valid rows found", skippedDetails: skipped });
       if (rawLeads.length > 500) return res.status(400).json({ message: "Maximum 500 rows per upload" });
 
-      const leadsToInsert = rawLeads.map((row: any) => insertFriendshipLeadSchema.parse(row));
+      // Force all server-controlled fields; never trust client for status/commission/remarks
+      const leadsToInsert = rawLeads.map(row => ({
+        schoolId: school.id, source: "bulk" as const, status: "Open",
+        studentName: row.studentName, grade: row.grade,
+        parentName: row.parentName, phone: row.phone, email: row.email,
+      }));
       const inserted = await storage.createFriendshipLeads(leadsToInsert);
       console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name} (${skipped.length} skipped)`);
-      res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length });
+      res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length, skippedDetails: skipped });
 
       for (const lead of inserted) {
         appendFriendshipLeadToSheets(lead, school.sheetsTabName)
@@ -4480,7 +4500,9 @@ paths:
     try {
       const schoolId = req.query.schoolId ? Number(req.query.schoolId) : undefined;
       const status = typeof req.query.status === "string" ? req.query.status : undefined;
-      res.json(await storage.listFriendshipLeads(schoolId, status));
+      const limit = req.query.limit ? Math.min(Number(req.query.limit), 500) : 200;
+      const offset = req.query.offset ? Number(req.query.offset) : 0;
+      res.json(await storage.listFriendshipLeads(schoolId, status, limit, offset));
     } catch {
       res.status(500).json({ message: "Failed to fetch leads" });
     }

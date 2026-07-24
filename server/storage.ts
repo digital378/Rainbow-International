@@ -69,7 +69,7 @@ export interface IStorage {
   // Friendship School Leads
   createFriendshipLead(lead: InsertFriendshipLead): Promise<FriendshipSchoolLead>;
   createFriendshipLeads(leads: InsertFriendshipLead[]): Promise<FriendshipSchoolLead[]>;
-  listFriendshipLeads(schoolId?: number, status?: string): Promise<FriendshipSchoolLead[]>;
+  listFriendshipLeads(schoolId?: number, status?: string, limit?: number, offset?: number): Promise<FriendshipSchoolLead[]>;
   listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]>;
   markFriendshipLeadSynced(id: number): Promise<void>;
   markFriendshipLeadSyncFailed(id: number): Promise<void>;
@@ -351,12 +351,14 @@ export class DbStorage implements IStorage {
     return await db.insert(friendshipSchoolLeads).values(leads).returning();
   }
 
-  async listFriendshipLeads(schoolId?: number, status?: string): Promise<FriendshipSchoolLead[]> {
+  async listFriendshipLeads(schoolId?: number, status?: string, limit = 200, offset = 0): Promise<FriendshipSchoolLead[]> {
     const conds = [];
     if (schoolId) conds.push(eq(friendshipSchoolLeads.schoolId, schoolId));
     if (status) conds.push(eq(friendshipSchoolLeads.status, status));
     const where = conds.length ? and(...conds) : undefined;
-    return await db.select().from(friendshipSchoolLeads).where(where).orderBy(desc(friendshipSchoolLeads.submittedAt));
+    return await db.select().from(friendshipSchoolLeads).where(where)
+      .orderBy(desc(friendshipSchoolLeads.submittedAt))
+      .limit(limit).offset(offset);
   }
 
   async listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]> {
