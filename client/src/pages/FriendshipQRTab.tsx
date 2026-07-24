@@ -307,11 +307,6 @@ function FriendshipQRTabInner() {
               {syncMsg}
             </span>
           )}
-          <button onClick={handleSyncSheets}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-slate-300 text-slate-600 hover:bg-slate-100 transition"
-            data-testid="button-qr-sync">
-            🔄 Retry Sync
-          </button>
           <button onClick={openAddModal}
             className="px-4 py-1.5 rounded-lg text-xs font-black text-white transition"
             style={{ background: NAVY }}
@@ -419,7 +414,7 @@ function FriendshipQRTabInner() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        {["Date", "Student", "Grade", "Parent", "Phone", "Source", "Status", "Comm.", "Synced"].map(h => (
+                        {["Date", "Student", "Grade", "Parent", "Phone", "Source", "Status", "Ref. Amt", "Synced"].map(h => (
                           <th key={h} className="px-3 py-3 text-left whitespace-nowrap">{h}</th>
                         ))}
                       </tr>

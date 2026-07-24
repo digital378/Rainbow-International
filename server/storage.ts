@@ -407,7 +407,7 @@ export class DbStorage implements IStorage {
     for (const r of rows) {
       const n = Number(r.cnt);
       totalLeads += n;
-      if (r.status === "Walk-in Booked" || r.status === "Walk-in Completed") walkIns += n;
+      if (r.status === "Walk-in Completed" || r.status === "Admission Done") walkIns += n;
       if (r.status === "Admission Done") admissions += n;
     }
     return { totalLeads, walkIns, admissions };

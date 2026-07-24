@@ -4306,33 +4306,51 @@ paths:
         spreadsheetId: sheetId,
         range: `${tabName}!A1:J1`,
         valueInputOption: "USER_ENTERED",
-        requestBody: { values: [["Date", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Commission", "Remarks"]] },
+        requestBody: { values: [["Date", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Referral Amount", "Remarks"]] },
       });
-      // Add status dropdown on column H (index 7), rows 2-1000
+      // Add status dropdown on column H (index 7) and Referral Amount dropdown on column I (index 8), rows 2-1000
       if (newSheetId !== undefined) {
         await sheets.spreadsheets.batchUpdate({
           spreadsheetId: sheetId,
           requestBody: {
-            requests: [{
-              setDataValidation: {
-                range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
-                rule: {
-                  condition: {
-                    type: "ONE_OF_LIST",
-                    values: [
-                      { userEnteredValue: "Open" },
-                      { userEnteredValue: "Walk-in Booked" },
-                      { userEnteredValue: "Walk-in Completed" },
-                      { userEnteredValue: "Closed" },
-                      { userEnteredValue: "Future Prospect" },
-                      { userEnteredValue: "Admission Done" },
-                    ],
+            requests: [
+              {
+                setDataValidation: {
+                  range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
+                  rule: {
+                    condition: {
+                      type: "ONE_OF_LIST",
+                      values: [
+                        { userEnteredValue: "Open" },
+                        { userEnteredValue: "Walk-in Booked" },
+                        { userEnteredValue: "Walk-in Completed" },
+                        { userEnteredValue: "Closed" },
+                        { userEnteredValue: "Future Prospect" },
+                        { userEnteredValue: "Admission Done" },
+                      ],
+                    },
+                    showCustomUi: true,
+                    strict: false,
                   },
-                  showCustomUi: true,
-                  strict: false,
                 },
               },
-            }],
+              {
+                setDataValidation: {
+                  range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 8, endColumnIndex: 9 },
+                  rule: {
+                    condition: {
+                      type: "ONE_OF_LIST",
+                      values: [
+                        { userEnteredValue: "Pending" },
+                        { userEnteredValue: "Paid" },
+                      ],
+                    },
+                    showCustomUi: true,
+                    strict: false,
+                  },
+                },
+              },
+            ],
           },
         });
       }
@@ -4731,26 +4749,44 @@ paths:
           await sheets.spreadsheets.batchUpdate({
             spreadsheetId: sheetId,
             requestBody: {
-              requests: [{
-                setDataValidation: {
-                  range: { sheetId: numericSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
-                  rule: {
-                    condition: {
-                      type: "ONE_OF_LIST",
-                      values: [
-                        { userEnteredValue: "Open" },
-                        { userEnteredValue: "Walk-in Booked" },
-                        { userEnteredValue: "Walk-in Completed" },
-                        { userEnteredValue: "Closed" },
-                        { userEnteredValue: "Future Prospect" },
-                        { userEnteredValue: "Admission Done" },
-                      ],
+              requests: [
+                {
+                  setDataValidation: {
+                    range: { sheetId: numericSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
+                    rule: {
+                      condition: {
+                        type: "ONE_OF_LIST",
+                        values: [
+                          { userEnteredValue: "Open" },
+                          { userEnteredValue: "Walk-in Booked" },
+                          { userEnteredValue: "Walk-in Completed" },
+                          { userEnteredValue: "Closed" },
+                          { userEnteredValue: "Future Prospect" },
+                          { userEnteredValue: "Admission Done" },
+                        ],
+                      },
+                      showCustomUi: true,
+                      strict: false,
                     },
-                    showCustomUi: true,
-                    strict: false,
                   },
                 },
-              }],
+                {
+                  setDataValidation: {
+                    range: { sheetId: numericSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 8, endColumnIndex: 9 },
+                    rule: {
+                      condition: {
+                        type: "ONE_OF_LIST",
+                        values: [
+                          { userEnteredValue: "Pending" },
+                          { userEnteredValue: "Paid" },
+                        ],
+                      },
+                      showCustomUi: true,
+                      strict: false,
+                    },
+                  },
+                },
+              ],
             },
           });
           console.log(`[friendship] Applied status dropdown to existing tab: ${tabName}`);

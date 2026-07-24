@@ -323,11 +323,6 @@ function AdminFriendshipSchoolsInner() {
               data-testid="button-apply-validation">
               ✅ Apply Dropdowns
             </button>
-            <button onClick={handleSyncSheets}
-              className="px-4 py-2 rounded-lg text-xs font-bold border-2 border-white/30 text-white hover:bg-white/10 transition"
-              data-testid="button-sync-sheets">
-              🔄 Retry Sync
-            </button>
             <button onClick={openAddModal}
               className="px-4 py-2 rounded-lg text-xs font-black transition"
               style={{ background: AMBER, color: NAVY }}
@@ -453,7 +448,7 @@ function AdminFriendshipSchoolsInner() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                          {["Date", "Student", "Grade", "Parent", "Phone", "Source", "Status", "Commission", "Synced"].map(h => (
+                          {["Date", "Student", "Grade", "Parent", "Phone", "Source", "Status", "Ref. Amt", "Synced"].map(h => (
                             <th key={h} className="px-4 py-3 text-left whitespace-nowrap">{h}</th>
                           ))}
                         </tr>
