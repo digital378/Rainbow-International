@@ -16,7 +16,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 type School = {
   id: number; name: string; slug: string; token: string;
-  contactPerson: string; contactEmail?: string; sheetsTabName: string;
+  contactPerson: string; contactEmail?: string; contactPhone?: string; sheetsTabName: string;
   isActive: boolean; createdAt: string; leadCount: number;
 };
 
@@ -134,9 +134,30 @@ export default function FriendshipQRTab() {
   return <FriendshipQRTabInner />;
 }
 
+function portalUrl(token: string) {
+  return `${window.location.origin}/alliances/friendship/${token}`;
+}
+
 function copyPortalUrl(token: string) {
-  const url = `${window.location.origin}/alliances/friendship/${token}`;
-  navigator.clipboard.writeText(url).catch(() => {});
+  navigator.clipboard.writeText(portalUrl(token)).catch(() => {});
+}
+
+function normalizePhone(phone: string) {
+  const d = phone.replace(/\D/g, "");
+  if (d.length === 10) return `91${d}`;
+  if (d.length === 12 && d.startsWith("91")) return d;
+  return d;
+}
+
+function buildWhatsAppUrl(phone: string, token: string, schoolName: string) {
+  const text = `Hello! Here is the Rainbow International School admission portal link for ${schoolName}:\n${portalUrl(token)}`;
+  return `https://wa.me/${normalizePhone(phone)}?text=${encodeURIComponent(text)}`;
+}
+
+function buildEmailUrl(email: string, token: string, schoolName: string) {
+  const subject = `Rainbow International School — Admission Portal Link`;
+  const body = `Hello,\n\nPlease find the admission portal link for ${schoolName} below:\n\n${portalUrl(token)}\n\nRegards,\nRainbow International School`;
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function FriendshipQRTabInner() {
@@ -163,6 +184,7 @@ function FriendshipQRTabInner() {
   const [formName, setFormName] = useState("");
   const [formContact, setFormContact] = useState("");
   const [formEmail, setFormEmail] = useState("");
+  const [formPhone, setFormPhone] = useState("");
   const [formTabName, setFormTabName] = useState("");
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -218,13 +240,13 @@ function FriendshipQRTabInner() {
 
   const openAddModal = () => {
     setEditSchool(null);
-    setFormName(""); setFormContact(""); setFormEmail(""); setFormTabName(""); setFormError("");
+    setFormName(""); setFormContact(""); setFormEmail(""); setFormPhone(""); setFormTabName(""); setFormError("");
     setShowModal(true);
   };
 
   const openEditModal = (s: School) => {
     setEditSchool(s);
-    setFormName(s.name); setFormContact(s.contactPerson); setFormEmail(s.contactEmail || ""); setFormTabName(s.sheetsTabName); setFormError("");
+    setFormName(s.name); setFormContact(s.contactPerson); setFormEmail(s.contactEmail || ""); setFormPhone(s.contactPhone || ""); setFormTabName(s.sheetsTabName); setFormError("");
     setShowModal(true);
   };
 
@@ -236,7 +258,9 @@ function FriendshipQRTabInner() {
     try {
       const body: Record<string, unknown> = {
         name: formName.trim(), contactPerson: formContact.trim(),
-        contactEmail: formEmail.trim() || undefined, sheetsTabName: formTabName.trim(),
+        contactEmail: formEmail.trim() || undefined,
+        contactPhone: formPhone.trim() || undefined,
+        sheetsTabName: formTabName.trim(),
       };
       if (!editSchool) body.isActive = true;
       const url = editSchool ? `/api/admin/alliances/friendship/schools/${editSchool.id}` : "/api/admin/alliances/friendship/schools";
@@ -370,6 +394,27 @@ function FriendshipQRTabInner() {
                           title="Copy portal link">
                           {copiedId === s.id ? "✓" : "Link"}
                         </button>
+                        {s.contactPhone && (
+                          <a href={buildWhatsAppUrl(s.contactPhone, s.token, s.name)}
+                            target="_blank" rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            className="text-xs px-2 py-1 rounded font-semibold text-center transition"
+                            style={{ background: "#dcfce7", color: "#16a34a" }}
+                            data-testid={`button-qr-whatsapp-${s.id}`}
+                            title="Send portal link via WhatsApp">
+                            WA
+                          </a>
+                        )}
+                        {s.contactEmail && (
+                          <a href={buildEmailUrl(s.contactEmail, s.token, s.name)}
+                            onClick={e => e.stopPropagation()}
+                            className="text-xs px-2 py-1 rounded font-semibold text-center transition"
+                            style={{ background: "#eff6ff", color: "#2563eb" }}
+                            data-testid={`button-qr-email-${s.id}`}
+                            title="Send portal link via Email">
+                            Mail
+                          </a>
+                        )}
                         <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
                           className="text-xs px-2 py-1 rounded font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
                           data-testid={`button-qr-edit-${s.id}`}>Edit</button>
@@ -498,6 +543,12 @@ function FriendshipQRTabInner() {
                 <input value={formContact} onChange={e => setFormContact(e.target.value)} placeholder="e.g. Ms. Anita Sharma"
                   className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium focus:outline-none focus:border-amber-400 transition"
                   data-testid="input-qr-contact-person" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Contact Phone <span className="font-normal text-slate-400">(optional — for WhatsApp)</span></label>
+                <input type="tel" value={formPhone} onChange={e => setFormPhone(e.target.value)} placeholder="e.g. 9876543210"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 text-sm font-medium focus:outline-none focus:border-amber-400 transition"
+                  data-testid="input-qr-contact-phone" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1.5">Contact Email <span className="font-normal text-slate-400">(optional)</span></label>

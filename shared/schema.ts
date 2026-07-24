@@ -177,6 +177,7 @@ export const friendshipSchools = pgTable("friendship_schools", {
   token: text("token").notNull().unique(),
   contactPerson: text("contact_person").notNull(),
   contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
   sheetsTabName: text("sheets_tab_name").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
