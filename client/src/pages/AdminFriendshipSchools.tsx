@@ -295,6 +295,7 @@ function AdminFriendshipSchoolsInner() {
       const res = await fetch("/api/admin/alliances/friendship/apply-validation", { method: "POST", headers: authHeader() });
       const d = await res.json().catch(() => ({}));
       setSyncMsg(`Dropdowns applied — ${d.applied ?? 0}/${d.total ?? 0} tabs updated`);
+      fetchValidationStatus();
     } catch { setSyncMsg("Apply validation failed"); }
     setTimeout(() => setSyncMsg(""), 7000);
   };
