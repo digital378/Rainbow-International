@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import FriendshipQRTab from "./FriendshipQRTab";
 
 const PIN = "ALL8";
 const AUTH_KEY = "alliances_auth_v1";
@@ -1129,13 +1130,14 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 }
 
 // ── Main Dashboard ─────────────────────────────────────────────
-type TabKey = "overview" | "brandPartners" | "corporates" | "friendshipSchools" | "parentAdvocacy";
+type TabKey = "overview" | "brandPartners" | "corporates" | "friendshipSchools" | "parentAdvocacy" | "qrLeads";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "brandPartners", label: "Brand Partners" },
   { key: "corporates", label: "Corporates" },
   { key: "friendshipSchools", label: "Friendship Schools" },
   { key: "parentAdvocacy", label: "Parent Advocacy" },
+  { key: "qrLeads", label: "QR Leads" },
 ];
 
 function AlliancesDashboard() {
@@ -1256,26 +1258,32 @@ function AlliancesDashboard() {
 
       {/* Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
-        {isLoading && (
-          <div className="flex items-center justify-center py-32 text-slate-400">
-            <svg className="w-6 h-6 animate-spin mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Fetching live data from Google Sheets…
-          </div>
-        )}
-        {isError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">
-            Failed to load data. Please click REFRESH to try again.
-          </div>
-        )}
-        {data && !isLoading && (
+        {tab === "qrLeads" ? (
+          <FriendshipQRTab />
+        ) : (
           <>
-            {tab === "overview" && <OverviewTab data={data} />}
-            {tab === "brandPartners" && <BrandPartnersTab data={data} />}
-            {tab === "corporates" && <CorporatesTab data={data} />}
-            {tab === "friendshipSchools" && <FriendshipSchoolsTab data={data} />}
-            {tab === "parentAdvocacy" && <ParentAdvocacyTab data={data} />}
+            {isLoading && (
+              <div className="flex items-center justify-center py-32 text-slate-400">
+                <svg className="w-6 h-6 animate-spin mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Fetching live data from Google Sheets…
+              </div>
+            )}
+            {isError && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">
+                Failed to load data. Please click REFRESH to try again.
+              </div>
+            )}
+            {data && !isLoading && (
+              <>
+                {tab === "overview" && <OverviewTab data={data} />}
+                {tab === "brandPartners" && <BrandPartnersTab data={data} />}
+                {tab === "corporates" && <CorporatesTab data={data} />}
+                {tab === "friendshipSchools" && <FriendshipSchoolsTab data={data} />}
+                {tab === "parentAdvocacy" && <ParentAdvocacyTab data={data} />}
+              </>
+            )}
           </>
         )}
       </div>

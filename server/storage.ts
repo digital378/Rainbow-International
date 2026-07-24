@@ -372,6 +372,21 @@ export class DbStorage implements IStorage {
   async markFriendshipLeadSyncFailed(id: number): Promise<void> {
     await db.update(friendshipSchoolLeads).set({ syncFailed: true }).where(eq(friendshipSchoolLeads.id, id));
   }
+
+  async getFriendshipLeadStats(): Promise<{ totalLeads: number; walkIns: number; admissions: number }> {
+    const rows = await db
+      .select({ status: friendshipSchoolLeads.status, cnt: count() })
+      .from(friendshipSchoolLeads)
+      .groupBy(friendshipSchoolLeads.status);
+    let totalLeads = 0, walkIns = 0, admissions = 0;
+    for (const r of rows) {
+      const n = Number(r.cnt);
+      totalLeads += n;
+      if (r.status === "Walk-in Booked" || r.status === "Walk-in Completed") walkIns += n;
+      if (r.status === "Admission Done") admissions += n;
+    }
+    return { totalLeads, walkIns, admissions };
+  }
 }
 
 export const storage = new DbStorage();

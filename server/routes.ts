@@ -4293,13 +4293,14 @@ paths:
   const FRIENDSHIP_TEMPLATE_PATH = path.resolve("./server/assets/friendship_school_template.xlsx");
 
   async function ensureFriendshipSheetTab(sheets: any, sheetId: string, tabName: string): Promise<void> {
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title" });
-    const exists = (meta.data.sheets || []).some((s: any) => s.properties?.title === tabName);
-    if (!exists) {
-      await sheets.spreadsheets.batchUpdate({
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title,sheets.properties.sheetId" });
+    const existing = (meta.data.sheets || []).find((s: any) => s.properties?.title === tabName);
+    if (!existing) {
+      const addResp = await sheets.spreadsheets.batchUpdate({
         spreadsheetId: sheetId,
         requestBody: { requests: [{ addSheet: { properties: { title: tabName } } }] },
       });
+      const newSheetId: number | undefined = addResp.data.replies?.[0]?.addSheet?.properties?.sheetId;
       // Write header row
       await sheets.spreadsheets.values.update({
         spreadsheetId: sheetId,
@@ -4307,7 +4308,35 @@ paths:
         valueInputOption: "USER_ENTERED",
         requestBody: { values: [["Date", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Commission", "Remarks"]] },
       });
-      console.log(`[friendship] Created sheet tab: ${tabName}`);
+      // Add status dropdown on column H (index 7), rows 2-1000
+      if (newSheetId !== undefined) {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: sheetId,
+          requestBody: {
+            requests: [{
+              setDataValidation: {
+                range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
+                rule: {
+                  condition: {
+                    type: "ONE_OF_LIST",
+                    values: [
+                      { userEnteredValue: "Open" },
+                      { userEnteredValue: "Walk-in Booked" },
+                      { userEnteredValue: "Walk-in Completed" },
+                      { userEnteredValue: "Closed" },
+                      { userEnteredValue: "Future Prospect" },
+                      { userEnteredValue: "Admission Done" },
+                    ],
+                  },
+                  showCustomUi: true,
+                  strict: false,
+                },
+              },
+            }],
+          },
+        });
+      }
+      console.log(`[friendship] Created sheet tab with status dropdown: ${tabName}`);
     }
   }
 
@@ -4558,6 +4587,18 @@ paths:
       res.json({ total: failed.length, synced, failed: failedCount });
     } catch {
       res.status(500).json({ message: "Sync failed" });
+    }
+  });
+
+  app.get("/api/admin/alliances/friendship/stats", requireAdmin, async (_req, res) => {
+    try {
+      const schools = await storage.listFriendshipSchools();
+      const totalSchools = schools.length;
+      const activeSchools = schools.filter(s => s.leadCount > 0).length;
+      const { totalLeads, walkIns, admissions } = await storage.getFriendshipLeadStats();
+      res.json({ totalSchools, activeSchools, totalLeads, walkIns, admissions });
+    } catch {
+      res.status(500).json({ message: "Failed to fetch stats" });
     }
   });
 
