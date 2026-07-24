@@ -76,9 +76,6 @@ const authHeader = () => {
   return t ? { Authorization: `Bearer ${t}` } : {};
 };
 
-function slugify(name: string) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
 
 export default function AdminFriendshipSchools() {
   const [authToken, setAuthToken] = useState<string | null>(() => {
@@ -163,8 +160,6 @@ function AdminFriendshipSchoolsInner() {
         sheetsTabName: formTabName.trim(),
       };
       if (!editSchool) {
-        body.slug = slugify(formName);
-        body.token = crypto.randomUUID();
         body.isActive = true;
       }
       const url = editSchool ? `/api/admin/alliances/friendship/schools/${editSchool.id}` : "/api/admin/alliances/friendship/schools";

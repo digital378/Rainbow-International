@@ -13,7 +13,6 @@ const GRADES = [
 ];
 
 type School = { id: number; name: string };
-type ParsedRow = { studentName: string; grade: string; parentName: string; phone: string; email: string; rowIndex: number; error?: string };
 
 export default function FriendshipPortal() {
   const { token } = useParams<{ token: string }>();
@@ -32,11 +31,11 @@ export default function FriendshipPortal() {
   const [manualError, setManualError] = useState("");
 
   // Bulk upload state
-  const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
-  const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
   const [uploading, setUploading] = useState(false);
   const [bulkSuccess, setBulkSuccess] = useState(0);
+  const [bulkSkipped, setBulkSkipped] = useState(0);
   const [bulkError, setBulkError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
@@ -82,8 +81,8 @@ export default function FriendshipPortal() {
     }
   };
 
-  const parseFile = useCallback(async (file: File) => {
-    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+  const pickFile = useCallback((file: File) => {
+    if (!file.name.toLowerCase().endsWith(".xlsx")) {
       setBulkError("Only .xlsx files are accepted.");
       return;
     }
@@ -91,70 +90,30 @@ export default function FriendshipPortal() {
       setBulkError("File must be under 2 MB.");
       return;
     }
-    setFileName(file.name); setBulkError(""); setParsedRows([]); setParseErrors([]);
-    const buffer = await file.arrayBuffer();
-    const { read, utils } = await import("xlsx");
-    const wb = read(buffer);
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows: string[][] = utils.sheet_to_json(ws, { header: 1, defval: "" });
-    if (rows.length < 2) { setBulkError("Sheet appears empty (no data rows)."); return; }
-
-    const header = rows[0].map((h: unknown) => String(h).trim().toLowerCase());
-    const idx = {
-      studentName: header.findIndex(h => h.includes("student")),
-      grade: header.findIndex(h => h.includes("grade")),
-      parentName: header.findIndex(h => h.includes("parent")),
-      phone: header.findIndex(h => h.includes("phone") || h.includes("mobile")),
-      email: header.findIndex(h => h.includes("email")),
-    };
-    if (idx.studentName < 0 || idx.grade < 0 || idx.parentName < 0 || idx.phone < 0) {
-      setBulkError("Missing required columns. Please use the provided template (Student Name, Grade, Parent Name, Phone).");
-      return;
-    }
-
-    const valid: ParsedRow[] = [];
-    const errors: string[] = [];
-    rows.slice(1).forEach((row, i) => {
-      const sn = String(row[idx.studentName] ?? "").trim();
-      const gr = String(row[idx.grade] ?? "").trim();
-      const pn = String(row[idx.parentName] ?? "").trim();
-      const ph = String(row[idx.phone] ?? "").trim();
-      const em = idx.email >= 0 ? String(row[idx.email] ?? "").trim() : "";
-      if (!sn && !pn && !ph) return;
-      if (!sn || !gr || !pn || !ph) {
-        errors.push(`Row ${i + 2}: missing ${[!sn && "Student Name", !gr && "Grade", !pn && "Parent Name", !ph && "Phone"].filter(Boolean).join(", ")}`);
-        return;
-      }
-      if (ph.replace(/\D/g, "").length < 7) {
-        errors.push(`Row ${i + 2}: invalid phone "${ph}"`);
-        return;
-      }
-      valid.push({ studentName: sn, grade: gr, parentName: pn, phone: ph, email: em, rowIndex: i + 2 });
-    });
-
-    if (valid.length === 0 && errors.length === 0) { setBulkError("No data rows found in file."); return; }
-    setParsedRows(valid); setParseErrors(errors);
+    setBulkError(""); setFileName(file.name); setSelectedFile(file);
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file) parseFile(file);
-  }, [parseFile]);
+    if (file) pickFile(file);
+  }, [pickFile]);
 
   const handleBulkSubmit = async () => {
-    if (parsedRows.length === 0) return;
+    if (!selectedFile) return;
     setUploading(true); setBulkError("");
     try {
+      const fd = new FormData();
+      fd.append("file", selectedFile);
       const res = await fetch(`/api/alliances/friendship/bulk-upload/${token}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leads: parsedRows.map(r => ({ studentName: r.studentName, grade: r.grade, parentName: r.parentName, phone: r.phone, email: r.email })) }),
+        body: fd,
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.message || "Upload failed");
-      setBulkSuccess(d.inserted ?? parsedRows.length);
-      setParsedRows([]); setParseErrors([]); setFileName("");
+      setBulkSuccess(d.inserted ?? 0);
+      setBulkSkipped(d.skipped ?? 0);
+      setSelectedFile(null); setFileName("");
     } catch (err: any) {
       setBulkError(err.message || "Upload failed. Please try again.");
     } finally {
@@ -293,7 +252,7 @@ export default function FriendshipPortal() {
               {bulkSuccess > 0 && (
                 <div className="p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold" style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
                   <span>✓</span>
-                  <span>{bulkSuccess} leads uploaded successfully!</span>
+                  <span>{bulkSuccess} lead{bulkSuccess !== 1 ? "s" : ""} uploaded{bulkSkipped > 0 ? ` · ${bulkSkipped} row${bulkSkipped !== 1 ? "s" : ""} skipped` : ""}!</span>
                 </div>
               )}
 
@@ -327,52 +286,16 @@ export default function FriendshipPortal() {
                     <div className="text-xs text-slate-400 mt-1">or click to browse · max 2 MB · max 500 rows</div>
                   </div>
                 )}
-                <input id="bulk-file-input" type="file" accept=".xlsx,.xls" className="hidden"
-                  onChange={e => { const f = e.target.files?.[0]; if (f) parseFile(f); e.target.value = ""; }}
+                <input id="bulk-file-input" type="file" accept=".xlsx" className="hidden"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) pickFile(f); e.target.value = ""; }}
                   data-testid="input-file-bulk" />
               </div>
 
-              {parseErrors.length > 0 && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-                  <div className="text-xs font-bold text-amber-700 mb-1">⚠ {parseErrors.length} row{parseErrors.length > 1 ? "s" : ""} skipped:</div>
-                  <ul className="text-xs text-amber-600 space-y-0.5">
-                    {parseErrors.map((e, i) => <li key={i}>• {e}</li>)}
-                  </ul>
-                </div>
-              )}
-
-              {parsedRows.length > 0 && (
-                <div>
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
-                    Preview — {parsedRows.length} valid row{parsedRows.length > 1 ? "s" : ""}
-                  </div>
-                  <div className="rounded-xl border border-slate-200 overflow-hidden">
-                    <div className="overflow-x-auto max-h-48">
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="bg-slate-50">
-                            {["Student", "Grade", "Parent", "Phone", "Email"].map(h => (
-                              <th key={h} className="px-3 py-2 text-left font-bold text-slate-500">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {parsedRows.slice(0, 10).map((r, i) => (
-                            <tr key={i} className="border-t border-slate-100">
-                              <td className="px-3 py-2 font-medium text-slate-700">{r.studentName}</td>
-                              <td className="px-3 py-2 text-slate-500">{r.grade}</td>
-                              <td className="px-3 py-2 text-slate-700">{r.parentName}</td>
-                              <td className="px-3 py-2 text-slate-500">{r.phone}</td>
-                              <td className="px-3 py-2 text-slate-400">{r.email || "—"}</td>
-                            </tr>
-                          ))}
-                          {parsedRows.length > 10 && (
-                            <tr><td colSpan={5} className="px-3 py-2 text-center text-slate-400">…and {parsedRows.length - 10} more rows</td></tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+              {selectedFile && (
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span className="text-xs text-slate-700 font-medium truncate">{fileName}</span>
+                  <button onClick={() => { setSelectedFile(null); setFileName(""); }} className="ml-auto text-slate-400 hover:text-red-500 text-xs">✕</button>
                 </div>
               )}
 
@@ -380,18 +303,18 @@ export default function FriendshipPortal() {
                 <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2" data-testid="text-bulk-error">{bulkError}</div>
               )}
 
-              {parsedRows.length > 0 && (
+              {selectedFile && (
                 <button onClick={handleBulkSubmit} disabled={uploading}
                   className="w-full py-3.5 rounded-xl font-black text-sm tracking-wide transition-all disabled:opacity-60"
                   style={{ background: uploading ? "#94a3b8" : GREEN, color: "#fff" }}
                   data-testid="button-upload-confirm">
-                  {uploading ? "Uploading…" : `Confirm & Upload ${parsedRows.length} Lead${parsedRows.length > 1 ? "s" : ""} →`}
+                  {uploading ? "Uploading…" : "Upload File →"}
                 </button>
               )}
 
-              {!parsedRows.length && !fileName && (
+              {!selectedFile && !fileName && (
                 <div className="text-xs text-slate-400 text-center leading-relaxed">
-                  Use the template above to fill student data, then upload the completed file here.
+                  Use the template above to fill student data, then upload the completed .xlsx file here.
                 </div>
               )}
             </div>

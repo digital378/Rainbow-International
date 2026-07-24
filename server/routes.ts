@@ -31,6 +31,35 @@ const RESUME_MAGIC_BYTES: Record<string, Buffer[]> = {
   docx: [Buffer.from([0x50, 0x4b, 0x03, 0x04])],
 };
 
+// ── Simple in-memory rate limiter (no external package needed) ─
+const _ipRateMap = new Map<string, { count: number; windowStart: number }>();
+function makeRateLimit(maxReqs: number, windowMs: number) {
+  return (_req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const ip = (_req.headers["x-forwarded-for"] as string || _req.socket.remoteAddress || "unknown").split(",")[0].trim();
+    const now = Date.now();
+    const entry = _ipRateMap.get(ip);
+    if (!entry || now - entry.windowStart > windowMs) {
+      _ipRateMap.set(ip, { count: 1, windowStart: now });
+      return next();
+    }
+    entry.count++;
+    if (entry.count > maxReqs) {
+      return res.status(429).json({ message: "Too many requests. Please try again in a minute." });
+    }
+    next();
+  };
+}
+const friendshipSubmitRateLimit = makeRateLimit(20, 60_000);
+
+const xlsxUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    const ok = file.originalname.toLowerCase().endsWith(".xlsx");
+    cb(ok ? null : new Error("Only .xlsx files are accepted") as any, ok);
+  },
+});
+
 const careerUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: RESUME_MAX_BYTES, files: 1 },
@@ -4296,7 +4325,7 @@ paths:
   });
 
   // Public: submit individual lead
-  app.post("/api/alliances/friendship/submit/:token", async (req, res) => {
+  app.post("/api/alliances/friendship/submit/:token", friendshipSubmitRateLimit, async (req, res) => {
     try {
       const school = await storage.getFriendshipSchoolByToken(req.params.token);
       if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
@@ -4319,22 +4348,55 @@ paths:
     }
   });
 
-  // Public: bulk upload leads (JSON array after client-side Excel parsing)
-  app.post("/api/alliances/friendship/bulk-upload/:token", async (req, res) => {
+  // Public: bulk upload leads (multipart .xlsx file, parsed server-side)
+  app.post("/api/alliances/friendship/bulk-upload/:token", friendshipSubmitRateLimit, xlsxUpload.single("file"), async (req, res) => {
     try {
       const school = await storage.getFriendshipSchoolByToken(req.params.token);
       if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
 
-      const rawLeads: unknown[] = Array.isArray(req.body?.leads) ? req.body.leads : [];
-      if (rawLeads.length === 0) return res.status(400).json({ message: "No leads provided" });
+      if (!req.file) return res.status(400).json({ message: "No .xlsx file uploaded (field name: 'file')" });
+
+      const { read, utils } = await import("xlsx");
+      const wb = read(req.file.buffer, { type: "buffer" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows: string[][] = utils.sheet_to_json(ws, { header: 1, defval: "" }) as string[][];
+
+      if (rows.length < 2) return res.status(400).json({ message: "Sheet is empty or missing data rows" });
+
+      const header = rows[0].map((h: unknown) => String(h).trim().toLowerCase());
+      const idx = {
+        studentName: header.findIndex(h => h.includes("student")),
+        grade: header.findIndex(h => h.includes("grade")),
+        parentName: header.findIndex(h => h.includes("parent")),
+        phone: header.findIndex(h => h.includes("phone") || h.includes("mobile")),
+        email: header.findIndex(h => h.includes("email")),
+      };
+      if (idx.studentName < 0 || idx.grade < 0 || idx.parentName < 0 || idx.phone < 0) {
+        return res.status(400).json({ message: "Missing required columns: Student Name, Grade, Parent Name, Phone" });
+      }
+
+      const skipped: string[] = [];
+      const rawLeads = rows.slice(1).flatMap((row, i) => {
+        const sn = String(row[idx.studentName] ?? "").trim();
+        const gr = String(row[idx.grade] ?? "").trim();
+        const pn = String(row[idx.parentName] ?? "").trim();
+        const ph = String(row[idx.phone] ?? "").trim();
+        const em = idx.email >= 0 ? String(row[idx.email] ?? "").trim() : "";
+        if (!sn && !pn && !ph) return [];
+        if (!sn || !gr || !pn || !ph) {
+          skipped.push(`Row ${i + 2}: missing required fields`);
+          return [];
+        }
+        return [{ studentName: sn, grade: gr, parentName: pn, phone: ph, email: em || undefined, schoolId: school.id, source: "bulk" as const }];
+      });
+
+      if (rawLeads.length === 0) return res.status(400).json({ message: "No valid rows found", skipped });
       if (rawLeads.length > 500) return res.status(400).json({ message: "Maximum 500 rows per upload" });
 
-      const leadsToInsert = rawLeads.map((row: any) =>
-        insertFriendshipLeadSchema.parse({ ...row, schoolId: school.id, source: "bulk" })
-      );
+      const leadsToInsert = rawLeads.map((row: any) => insertFriendshipLeadSchema.parse(row));
       const inserted = await storage.createFriendshipLeads(leadsToInsert);
-      console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name}`);
-      res.status(201).json({ success: true, inserted: inserted.length });
+      console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name} (${skipped.length} skipped)`);
+      res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length });
 
       for (const lead of inserted) {
         appendFriendshipLeadToSheets(lead, school.sheetsTabName)
@@ -4371,10 +4433,17 @@ paths:
     }
   });
 
-  // Admin: create friendship school
+  // Admin: create friendship school (slug + token auto-generated server-side)
   app.post("/api/admin/alliances/friendship/schools", requireAdmin, async (req, res) => {
     try {
-      const validated = insertFriendshipSchoolSchema.parse(req.body);
+      const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const body = {
+        ...req.body,
+        slug: slugify(String(req.body.name || "")),
+        token: randomBytes(16).toString("hex"),
+        isActive: req.body.isActive !== false,
+      };
+      const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
       res.status(201).json(school);
     } catch (err: any) {
