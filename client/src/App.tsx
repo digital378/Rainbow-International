@@ -67,6 +67,9 @@ const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
 const QRCard = lazy(() => import("@/pages/QRCard"));
+const FriendshipPortal = lazy(() => import("@/pages/FriendshipPortal"));
+const FriendshipQRCard = lazy(() => import("@/pages/FriendshipQRCard"));
+const AdminFriendshipSchools = lazy(() => import("@/pages/AdminFriendshipSchools"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const ChatBot = lazy(() => import("@/components/ChatBot").then(m => ({ default: m.ChatBot })));
 const RainbowCursor = lazy(() => import("@/components/RainbowCursor"));
@@ -136,6 +139,9 @@ function Router() {
       <Route path="/sales" component={Sales} />
       <Route path="/rps-sales" component={RpsSales} />
       <Route path="/walkin/:slug" component={WalkinForm} />
+      <Route path="/alliances/friendship/:token" component={FriendshipPortal} />
+      <Route path="/admin/alliances/friendship/:id/qr" component={FriendshipQRCard} />
+      <Route path="/admin/alliances/friendship" component={AdminFriendshipSchools} />
       <Route path="/admin/ras/submissions" component={AdminSubmissions} />
       <Route path="/admin/ras/:slug/qr" component={QRCard} />
       <Route path="/admin/ras" component={AdminRAs} />

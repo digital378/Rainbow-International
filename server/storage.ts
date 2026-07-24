@@ -7,10 +7,13 @@ import {
   type Ra, type InsertRa,
   type WalkinCheckin,
   type BlogPost, type InsertBlogPost,
+  type FriendshipSchool, type InsertFriendshipSchool,
+  type FriendshipSchoolLead, type InsertFriendshipLead,
   inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins, blogPostsTable,
+  friendshipSchools, friendshipSchoolLeads,
 } from "@shared/schema";
 import { db } from "./db";
-import { desc, eq, gte, and, sql } from "drizzle-orm";
+import { desc, eq, gte, and, sql, count } from "drizzle-orm";
 
 export interface IStorage {
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
@@ -54,6 +57,22 @@ export interface IStorage {
   updateBlogPost(originalSlug: string, data: InsertBlogPost): Promise<BlogPost | undefined>;
   deleteBlogPost(slug: string): Promise<void>;
   getAllBlogSlugs(): Promise<string[]>;
+
+  // Friendship Schools
+  createFriendshipSchool(school: InsertFriendshipSchool): Promise<FriendshipSchool>;
+  updateFriendshipSchool(id: number, data: Partial<InsertFriendshipSchool>): Promise<FriendshipSchool | undefined>;
+  listFriendshipSchools(): Promise<(FriendshipSchool & { leadCount: number })[]>;
+  getFriendshipSchoolById(id: number): Promise<FriendshipSchool | undefined>;
+  getFriendshipSchoolByToken(token: string): Promise<FriendshipSchool | undefined>;
+  regenerateFriendshipSchoolToken(id: number, newToken: string): Promise<FriendshipSchool | undefined>;
+
+  // Friendship School Leads
+  createFriendshipLead(lead: InsertFriendshipLead): Promise<FriendshipSchoolLead>;
+  createFriendshipLeads(leads: InsertFriendshipLead[]): Promise<FriendshipSchoolLead[]>;
+  listFriendshipLeads(schoolId?: number, status?: string): Promise<FriendshipSchoolLead[]>;
+  listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]>;
+  markFriendshipLeadSynced(id: number): Promise<void>;
+  markFriendshipLeadSyncFailed(id: number): Promise<void>;
 }
 
 export class DbStorage implements IStorage {
@@ -284,6 +303,72 @@ export class DbStorage implements IStorage {
   async getAllBlogSlugs(): Promise<string[]> {
     const rows = await db.select({ slug: blogPostsTable.slug }).from(blogPostsTable);
     return rows.map((r) => r.slug);
+  }
+
+  // ── Friendship School methods ─────────────────────────────────
+  async createFriendshipSchool(school: InsertFriendshipSchool): Promise<FriendshipSchool> {
+    const [result] = await db.insert(friendshipSchools).values(school).returning();
+    return result;
+  }
+
+  async updateFriendshipSchool(id: number, data: Partial<InsertFriendshipSchool>): Promise<FriendshipSchool | undefined> {
+    const [result] = await db.update(friendshipSchools).set(data).where(eq(friendshipSchools.id, id)).returning();
+    return result;
+  }
+
+  async listFriendshipSchools(): Promise<(FriendshipSchool & { leadCount: number })[]> {
+    const schools = await db.select().from(friendshipSchools).orderBy(friendshipSchools.name);
+    const counts = await db
+      .select({ schoolId: friendshipSchoolLeads.schoolId, leadCount: count() })
+      .from(friendshipSchoolLeads)
+      .groupBy(friendshipSchoolLeads.schoolId);
+    const countMap = new Map(counts.map(c => [c.schoolId, Number(c.leadCount)]));
+    return schools.map(s => ({ ...s, leadCount: countMap.get(s.id) ?? 0 }));
+  }
+
+  async getFriendshipSchoolById(id: number): Promise<FriendshipSchool | undefined> {
+    const [result] = await db.select().from(friendshipSchools).where(eq(friendshipSchools.id, id));
+    return result;
+  }
+
+  async getFriendshipSchoolByToken(token: string): Promise<FriendshipSchool | undefined> {
+    const [result] = await db.select().from(friendshipSchools).where(eq(friendshipSchools.token, token));
+    return result;
+  }
+
+  async regenerateFriendshipSchoolToken(id: number, newToken: string): Promise<FriendshipSchool | undefined> {
+    const [result] = await db.update(friendshipSchools).set({ token: newToken }).where(eq(friendshipSchools.id, id)).returning();
+    return result;
+  }
+
+  async createFriendshipLead(lead: InsertFriendshipLead): Promise<FriendshipSchoolLead> {
+    const [result] = await db.insert(friendshipSchoolLeads).values(lead).returning();
+    return result;
+  }
+
+  async createFriendshipLeads(leads: InsertFriendshipLead[]): Promise<FriendshipSchoolLead[]> {
+    if (leads.length === 0) return [];
+    return await db.insert(friendshipSchoolLeads).values(leads).returning();
+  }
+
+  async listFriendshipLeads(schoolId?: number, status?: string): Promise<FriendshipSchoolLead[]> {
+    const conds = [];
+    if (schoolId) conds.push(eq(friendshipSchoolLeads.schoolId, schoolId));
+    if (status) conds.push(eq(friendshipSchoolLeads.status, status));
+    const where = conds.length ? and(...conds) : undefined;
+    return await db.select().from(friendshipSchoolLeads).where(where).orderBy(desc(friendshipSchoolLeads.submittedAt));
+  }
+
+  async listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]> {
+    return await db.select().from(friendshipSchoolLeads).where(eq(friendshipSchoolLeads.syncFailed, true)).orderBy(friendshipSchoolLeads.submittedAt);
+  }
+
+  async markFriendshipLeadSynced(id: number): Promise<void> {
+    await db.update(friendshipSchoolLeads).set({ syncedToSheets: true, syncFailed: false }).where(eq(friendshipSchoolLeads.id, id));
+  }
+
+  async markFriendshipLeadSyncFailed(id: number): Promise<void> {
+    await db.update(friendshipSchoolLeads).set({ syncFailed: true }).where(eq(friendshipSchoolLeads.id, id));
   }
 }
 

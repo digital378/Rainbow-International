@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, jsonb, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -168,6 +168,63 @@ export const insertBlogPostSchema = createInsertSchema(blogPostsTable).omit({
 
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPostsTable.$inferSelect;
+
+// ── Friendship School QR Portal ───────────────────────────────
+export const friendshipSchools = pgTable("friendship_schools", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  token: text("token").notNull().unique(),
+  contactPerson: text("contact_person").notNull(),
+  contactEmail: text("contact_email"),
+  sheetsTabName: text("sheets_tab_name").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertFriendshipSchoolSchema = createInsertSchema(friendshipSchools).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  name: z.string().min(1, "School name is required"),
+  contactPerson: z.string().min(1, "Contact person is required"),
+  sheetsTabName: z.string().min(1, "Sheets tab name is required"),
+});
+export type InsertFriendshipSchool = z.infer<typeof insertFriendshipSchoolSchema>;
+export type FriendshipSchool = typeof friendshipSchools.$inferSelect;
+
+export const friendshipSchoolLeads = pgTable("friendship_school_leads", {
+  id: serial("id").primaryKey(),
+  schoolId: integer("school_id").notNull().references(() => friendshipSchools.id),
+  studentName: text("student_name").notNull(),
+  grade: text("grade").notNull(),
+  parentName: text("parent_name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  source: text("source").notNull().default("manual"),
+  status: text("status").notNull().default("Open"),
+  commissionPaid: boolean("commission_paid"),
+  remarks: text("remarks"),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  syncedToSheets: boolean("synced_to_sheets").notNull().default(false),
+  syncFailed: boolean("sync_failed").notNull().default(false),
+});
+
+export const insertFriendshipLeadSchema = createInsertSchema(friendshipSchoolLeads).omit({
+  id: true,
+  submittedAt: true,
+  syncedToSheets: true,
+  syncFailed: true,
+}).extend({
+  studentName: z.string().min(1, "Student name is required"),
+  grade: z.string().min(1, "Grade is required"),
+  parentName: z.string().min(1, "Parent name is required"),
+  phone: z.string().min(7, "Valid phone number required"),
+  source: z.enum(["manual", "bulk"]).default("manual"),
+  status: z.string().default("Open"),
+});
+export type InsertFriendshipLead = z.infer<typeof insertFriendshipLeadSchema>;
+export type FriendshipSchoolLead = typeof friendshipSchoolLeads.$inferSelect;
 
 // ── RA Walk-in QR Check-in System ─────────────────────────────
 export const ras = pgTable("ras", {

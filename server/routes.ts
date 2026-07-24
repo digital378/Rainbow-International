@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import multer from "multer";
@@ -4245,6 +4245,197 @@ paths:
     } catch (err: any) {
       console.error("[alliances] error:", err?.message);
       res.status(500).json({ message: "Failed to fetch alliances data", error: err.message });
+    }
+  });
+
+  // ── Friendship School QR Portal ─────────────────────────────────────────────
+
+  const FRIENDSHIP_TEMPLATE_PATH = path.resolve("./server/assets/friendship_school_template.xlsx");
+
+  async function appendFriendshipLeadToSheets(lead: {
+    id: number; submittedAt: Date | string; studentName: string; grade: string;
+    parentName: string; phone: string; email?: string | null; source: string;
+  }, tabName: string): Promise<void> {
+    const sheetId = process.env.ALLIANCES_SHEET_ID;
+    if (!sheetId) throw new Error("ALLIANCES_SHEET_ID env var not set");
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const dt = new Date(lead.submittedAt);
+    const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${tabName}!A:J`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[dateStr, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open", "Pending", ""]],
+      },
+    });
+  }
+
+  // Template download (public)
+  app.get("/api/alliances/friendship/template", (_req, res) => {
+    if (!fs.existsSync(FRIENDSHIP_TEMPLATE_PATH)) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    res.setHeader("Content-Disposition", 'attachment; filename="friendship_school_template.xlsx"');
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.sendFile(FRIENDSHIP_TEMPLATE_PATH);
+  });
+
+  // Public: get school info by token (name + active flag only — no PII)
+  app.get("/api/alliances/friendship/school/:token", async (req, res) => {
+    try {
+      const school = await storage.getFriendshipSchoolByToken(req.params.token);
+      if (!school) return res.status(404).json({ message: "School not found" });
+      res.json({ id: school.id, name: school.name, isActive: school.isActive });
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Public: submit individual lead
+  app.post("/api/alliances/friendship/submit/:token", async (req, res) => {
+    try {
+      const school = await storage.getFriendshipSchoolByToken(req.params.token);
+      if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
+
+      const validated = insertFriendshipLeadSchema.parse({ ...req.body, schoolId: school.id, source: "manual" });
+      const lead = await storage.createFriendshipLead(validated);
+      console.log(`[friendship] Lead submitted: ${validated.studentName} → ${school.name}`);
+      res.status(201).json({ success: true, id: lead.id });
+
+      appendFriendshipLeadToSheets(lead, school.sheetsTabName)
+        .then(() => storage.markFriendshipLeadSynced(lead.id))
+        .catch(async (err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error(`[friendship] Sheet sync failed for lead ${lead.id}: ${msg}`);
+          await storage.markFriendshipLeadSyncFailed(lead.id).catch(() => {});
+        });
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to submit lead" });
+    }
+  });
+
+  // Public: bulk upload leads (JSON array after client-side Excel parsing)
+  app.post("/api/alliances/friendship/bulk-upload/:token", async (req, res) => {
+    try {
+      const school = await storage.getFriendshipSchoolByToken(req.params.token);
+      if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
+
+      const rawLeads: unknown[] = Array.isArray(req.body?.leads) ? req.body.leads : [];
+      if (rawLeads.length === 0) return res.status(400).json({ message: "No leads provided" });
+      if (rawLeads.length > 500) return res.status(400).json({ message: "Maximum 500 rows per upload" });
+
+      const leadsToInsert = rawLeads.map((row: any) =>
+        insertFriendshipLeadSchema.parse({ ...row, schoolId: school.id, source: "bulk" })
+      );
+      const inserted = await storage.createFriendshipLeads(leadsToInsert);
+      console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name}`);
+      res.status(201).json({ success: true, inserted: inserted.length });
+
+      for (const lead of inserted) {
+        appendFriendshipLeadToSheets(lead, school.sheetsTabName)
+          .then(() => storage.markFriendshipLeadSynced(lead.id))
+          .catch(async (err: unknown) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            await storage.markFriendshipLeadSyncFailed(lead.id).catch(() => {});
+            console.error(`[friendship] Bulk sheet sync failed for lead ${lead.id}: ${msg}`);
+          });
+      }
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to process bulk upload" });
+    }
+  });
+
+  // Admin: list all friendship schools (with lead counts)
+  app.get("/api/admin/alliances/friendship/schools", requireAdmin, async (_req, res) => {
+    try {
+      res.json(await storage.listFriendshipSchools());
+    } catch {
+      res.status(500).json({ message: "Failed to fetch schools" });
+    }
+  });
+
+  // Admin: get single school by ID
+  app.get("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+    try {
+      const school = await storage.getFriendshipSchoolById(Number(req.params.id));
+      if (!school) return res.status(404).json({ message: "School not found" });
+      res.json(school);
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Admin: create friendship school
+  app.post("/api/admin/alliances/friendship/schools", requireAdmin, async (req, res) => {
+    try {
+      const validated = insertFriendshipSchoolSchema.parse(req.body);
+      const school = await storage.createFriendshipSchool(validated);
+      res.status(201).json(school);
+    } catch (err: any) {
+      if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
+      res.status(500).json({ message: "Failed to create school" });
+    }
+  });
+
+  // Admin: update friendship school
+  app.put("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+    try {
+      const school = await storage.updateFriendshipSchool(Number(req.params.id), req.body);
+      if (!school) return res.status(404).json({ message: "School not found" });
+      res.json(school);
+    } catch {
+      res.status(500).json({ message: "Failed to update school" });
+    }
+  });
+
+  // Admin: regenerate QR token
+  app.post("/api/admin/alliances/friendship/schools/:id/regenerate-token", requireAdmin, async (req, res) => {
+    try {
+      const newToken = randomBytes(16).toString("hex");
+      const school = await storage.regenerateFriendshipSchoolToken(Number(req.params.id), newToken);
+      if (!school) return res.status(404).json({ message: "School not found" });
+      res.json({ success: true, token: newToken });
+    } catch {
+      res.status(500).json({ message: "Failed to regenerate token" });
+    }
+  });
+
+  // Admin: list leads (optionally filtered by schoolId / status)
+  app.get("/api/admin/alliances/friendship/leads", requireAdmin, async (req, res) => {
+    try {
+      const schoolId = req.query.schoolId ? Number(req.query.schoolId) : undefined;
+      const status = typeof req.query.status === "string" ? req.query.status : undefined;
+      res.json(await storage.listFriendshipLeads(schoolId, status));
+    } catch {
+      res.status(500).json({ message: "Failed to fetch leads" });
+    }
+  });
+
+  // Admin: retry sync for all failed leads
+  app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
+    try {
+      const failed = await storage.listFailedFriendshipLeads();
+      let synced = 0; let failedCount = 0;
+      for (const lead of failed) {
+        const school = await storage.getFriendshipSchoolById(lead.schoolId);
+        if (!school) continue;
+        try {
+          await appendFriendshipLeadToSheets(lead, school.sheetsTabName);
+          await storage.markFriendshipLeadSynced(lead.id);
+          synced++;
+        } catch {
+          failedCount++;
+        }
+      }
+      res.json({ total: failed.length, synced, failed: failedCount });
+    } catch {
+      res.status(500).json({ message: "Sync failed" });
     }
   });
 
