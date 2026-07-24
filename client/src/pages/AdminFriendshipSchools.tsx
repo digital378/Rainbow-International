@@ -306,6 +306,16 @@ function AdminFriendshipSchoolsInner() {
     setTimeout(() => setSyncMsg(""), 5000);
   };
 
+  const handleApplyValidation = async () => {
+    setSyncMsg("Applying dropdowns…");
+    try {
+      const res = await fetch("/api/admin/alliances/friendship/apply-validation", { method: "POST", headers: authHeader() });
+      const d = await res.json().catch(() => ({}));
+      setSyncMsg(`Dropdowns applied — ${d.applied ?? 0}/${d.total ?? 0} tabs updated`);
+    } catch { setSyncMsg("Apply validation failed"); }
+    setTimeout(() => setSyncMsg(""), 7000);
+  };
+
   const formatDate = (ts: string) => {
     const d = new Date(ts);
     return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
@@ -324,6 +334,11 @@ function AdminFriendshipSchoolsInner() {
             </div>
           </div>
           <div className="flex gap-2">
+            <button onClick={handleApplyValidation}
+              className="px-4 py-2 rounded-lg text-xs font-bold border-2 border-white/30 text-white hover:bg-white/10 transition"
+              data-testid="button-apply-validation">
+              ✅ Apply Dropdowns
+            </button>
             <button onClick={handleSyncSheets}
               className="px-4 py-2 rounded-lg text-xs font-bold border-2 border-white/30 text-white hover:bg-white/10 transition"
               data-testid="button-sync-sheets">

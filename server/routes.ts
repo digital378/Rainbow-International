@@ -4599,6 +4599,80 @@ paths:
     }
   });
 
+  // Admin: backfill status dropdown validation on all existing sheet tabs
+  app.post("/api/admin/alliances/friendship/apply-validation", requireAdmin, async (_req, res) => {
+    try {
+      const sheetId = process.env.ALLIANCES_SHEET_ID;
+      if (!sheetId) return res.status(500).json({ message: "ALLIANCES_SHEET_ID env var not set" });
+      const auth = getAuthenticatedClient();
+      if (!auth) return res.status(500).json({ message: "Google not connected" });
+
+      const { google: goog } = await import("googleapis");
+      const sheets = goog.sheets({ version: "v4", auth });
+
+      // Get all sheet tab metadata (title → numeric sheetId)
+      const meta = await sheets.spreadsheets.get({
+        spreadsheetId: sheetId,
+        fields: "sheets.properties.title,sheets.properties.sheetId",
+      });
+      const tabMap: Record<string, number> = {};
+      for (const s of (meta.data.sheets || [])) {
+        if (s.properties?.title !== undefined && s.properties?.sheetId !== undefined) {
+          tabMap[s.properties.title] = s.properties.sheetId as number;
+        }
+      }
+
+      const schools = await storage.listFriendshipSchools();
+      const results: { school: string; tab: string; status: string }[] = [];
+
+      for (const school of schools) {
+        const tabName = school.sheetsTabName;
+        const numericSheetId = tabMap[tabName];
+        if (numericSheetId === undefined) {
+          results.push({ school: school.name, tab: tabName, status: "tab not found in sheet" });
+          continue;
+        }
+        try {
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: sheetId,
+            requestBody: {
+              requests: [{
+                setDataValidation: {
+                  range: { sheetId: numericSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
+                  rule: {
+                    condition: {
+                      type: "ONE_OF_LIST",
+                      values: [
+                        { userEnteredValue: "Open" },
+                        { userEnteredValue: "Walk-in Booked" },
+                        { userEnteredValue: "Walk-in Completed" },
+                        { userEnteredValue: "Closed" },
+                        { userEnteredValue: "Future Prospect" },
+                        { userEnteredValue: "Admission Done" },
+                      ],
+                    },
+                    showCustomUi: true,
+                    strict: false,
+                  },
+                },
+              }],
+            },
+          });
+          console.log(`[friendship] Applied status dropdown to existing tab: ${tabName}`);
+          results.push({ school: school.name, tab: tabName, status: "ok" });
+        } catch (err: any) {
+          console.error(`[friendship] Failed to apply validation to "${tabName}":`, err?.message);
+          results.push({ school: school.name, tab: tabName, status: `error: ${err?.message}` });
+        }
+      }
+
+      res.json({ applied: results.filter(r => r.status === "ok").length, total: schools.length, results });
+    } catch (err: any) {
+      console.error("[friendship] apply-validation error:", err?.message);
+      res.status(500).json({ message: "Failed to apply validation", error: err?.message });
+    }
+  });
+
   // Admin: retry sync for all failed leads
   app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
     try {
