@@ -17,6 +17,14 @@ export default function FriendshipQRCard() {
   const [portalUrl, setPortalUrl] = useState("");
   const [notFound, setNotFound] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(portalUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
     document.title = "QR Card | Rainbow International School";
@@ -107,8 +115,21 @@ export default function FriendshipQRCard() {
         <div className="h-2" style={{ background: AMBER }} />
       </div>
 
-      <div className="mt-4 text-xs text-slate-400 text-center print:hidden">
-        Portal URL: <code className="bg-white px-2 py-0.5 rounded border border-slate-200 text-xs">{portalUrl}</code>
+      {/* Copyable portal link — for sharing to desktop */}
+      <div className="mt-5 w-full print:hidden" style={{ maxWidth: 360 }}>
+        <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 text-center">Share Portal Link (for Desktop)</div>
+        <div className="bg-white rounded-xl border border-slate-200 px-3 py-2.5 flex items-center gap-2 shadow-sm">
+          <code className="text-xs text-slate-600 flex-1 truncate select-all" data-testid="text-portal-url">{portalUrl}</code>
+          <button onClick={copyLink}
+            className="flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition"
+            style={{ background: copied ? "#dcfce7" : AMBER + "20", color: copied ? "#059669" : "#92400e" }}
+            data-testid="button-copy-link">
+            {copied ? "✓ Copied!" : "Copy"}
+          </button>
+        </div>
+        <div className="text-[11px] text-slate-400 text-center mt-1.5">
+          Share this link so schools can submit leads from their desktop too
+        </div>
       </div>
 
       <style>{`

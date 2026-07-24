@@ -134,6 +134,11 @@ export default function FriendshipQRTab() {
   return <FriendshipQRTabInner />;
 }
 
+function copyPortalUrl(token: string) {
+  const url = `${window.location.origin}/alliances/friendship/${token}`;
+  navigator.clipboard.writeText(url).catch(() => {});
+}
+
 function FriendshipQRTabInner() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [schools, setSchools] = useState<School[]>([]);
@@ -146,6 +151,14 @@ function FriendshipQRTabInner() {
   const [syncMsg, setSyncMsg] = useState("");
   const [confirmRegen, setConfirmRegen] = useState<School | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<School | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  const handleCopyLink = (e: React.MouseEvent, s: School) => {
+    e.stopPropagation();
+    copyPortalUrl(s.token);
+    setCopiedId(s.id);
+    setTimeout(() => setCopiedId(prev => prev === s.id ? null : prev), 2000);
+  };
 
   const [formName, setFormName] = useState("");
   const [formContact, setFormContact] = useState("");
@@ -350,6 +363,13 @@ function FriendshipQRTabInner() {
                           className="text-xs px-2 py-1 rounded font-semibold transition hover:opacity-80"
                           style={{ background: "#f0f4ff", color: NAVY }}
                           data-testid={`button-qr-qr-${s.id}`}>QR</button>
+                        <button onClick={e => handleCopyLink(e, s)}
+                          className="text-xs px-2 py-1 rounded font-semibold transition"
+                          style={{ background: copiedId === s.id ? "#dcfce7" : "#f0fdf4", color: copiedId === s.id ? "#059669" : "#16a34a" }}
+                          data-testid={`button-qr-link-${s.id}`}
+                          title="Copy portal link">
+                          {copiedId === s.id ? "✓" : "Link"}
+                        </button>
                         <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
                           className="text-xs px-2 py-1 rounded font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
                           data-testid={`button-qr-edit-${s.id}`}>Edit</button>
