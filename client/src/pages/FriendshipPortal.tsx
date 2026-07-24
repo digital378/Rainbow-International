@@ -19,6 +19,7 @@ export default function FriendshipPortal() {
   const { token } = useParams<{ token: string }>();
   const [school, setSchool] = useState<School | null>(null);
   const [inactive, setInactive] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
   const [tab, setTab] = useState<"manual" | "bulk">("manual");
 
   // Manual form state
@@ -42,19 +43,36 @@ export default function FriendshipPortal() {
   const [bulkError, setBulkError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
+  const loadSchool = useCallback(() => {
+    setNetworkError(false);
+    setInactive(false);
+    setSchool(null);
+    fetch(`/api/alliances/friendship/school/${token}`)
+      .then(r => {
+        if (r.status === 404) return Promise.reject({ kind: "inactive" });
+        if (!r.ok) return Promise.reject({ kind: "network" });
+        return r.json();
+      })
+      .then((d: School & { isActive: boolean }) => {
+        if (!d.isActive) { setInactive(true); return; }
+        setSchool(d);
+      })
+      .catch((err: { kind?: string }) => {
+        if (err?.kind === "inactive") {
+          setInactive(true);
+        } else {
+          setNetworkError(true);
+        }
+      });
+  }, [token]);
+
   useEffect(() => {
     document.title = "Alliances Portal | Rainbow International School";
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
-    fetch(`/api/alliances/friendship/school/${token}`)
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then((d: School & { isActive: boolean }) => {
-        if (!d.isActive) { setInactive(true); return; }
-        setSchool(d);
-      })
-      .catch(() => setInactive(true));
-  }, [token]);
+    loadSchool();
+  }, [loadSchool]);
 
   const resetManual = () => { setStudentName(""); setGrade(""); setParentName(""); setPhone(""); setEmail(""); setManualError(""); };
 
@@ -172,6 +190,25 @@ export default function FriendshipPortal() {
           <div className="text-4xl mb-4">🔒</div>
           <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Link No Longer Active</div>
           <div className="text-sm text-slate-500">This QR code has been deactivated or is invalid. Please contact the RIS Alliances team for an updated QR code.</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (networkError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }}>
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border-t-4 border-red-400">
+          <div className="text-4xl mb-4">📡</div>
+          <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Couldn't Load Portal</div>
+          <div className="text-sm text-slate-500 mb-6">Check your connection and try again. If the problem persists, contact the RIS Alliances team.</div>
+          <button
+            onClick={loadSchool}
+            className="px-6 py-2.5 rounded-xl font-black text-sm text-white transition-opacity hover:opacity-80"
+            style={{ background: NAVY }}
+            data-testid="button-retry">
+            Retry
+          </button>
         </div>
       </div>
     );
