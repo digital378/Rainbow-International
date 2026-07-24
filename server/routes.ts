@@ -4738,11 +4738,37 @@ paths:
       const schools = await storage.listFriendshipSchools();
       const results: { school: string; tab: string; status: string }[] = [];
 
+      // Batch-check which tabs already have a ONE_OF_LIST rule on column H (H2)
+      const existingTabTitles = Object.keys(tabMap);
+      const schoolsWithTabs = schools.filter(s => existingTabTitles.includes(s.sheetsTabName));
+      const tabHasDropdown: Record<string, boolean> = {};
+
+      if (schoolsWithTabs.length > 0) {
+        const ranges = schoolsWithTabs.map(s => `${s.sheetsTabName}!H2:H2`);
+        const gridResp = await sheets.spreadsheets.get({
+          spreadsheetId: sheetId,
+          ranges,
+          includeGridData: true,
+          fields: "sheets(properties.title,data.rowData.values.dataValidation)",
+        });
+        for (const sheet of (gridResp.data.sheets || [])) {
+          const title = sheet.properties?.title;
+          if (!title) continue;
+          const cell = sheet.data?.[0]?.rowData?.[0]?.values?.[0];
+          const dvType = cell?.dataValidation?.condition?.type;
+          tabHasDropdown[title] = dvType === "ONE_OF_LIST";
+        }
+      }
+
       for (const school of schools) {
         const tabName = school.sheetsTabName;
         const numericSheetId = tabMap[tabName];
         if (numericSheetId === undefined) {
           results.push({ school: school.name, tab: tabName, status: "tab not found in sheet" });
+          continue;
+        }
+        if (tabHasDropdown[tabName]) {
+          results.push({ school: school.name, tab: tabName, status: "already has dropdown" });
           continue;
         }
         try {
@@ -4797,7 +4823,8 @@ paths:
         }
       }
 
-      res.json({ applied: results.filter(r => r.status === "ok").length, total: schools.length, results });
+      const skipped = results.filter(r => r.status === "already has dropdown").length;
+      res.json({ applied: results.filter(r => r.status === "ok").length, skipped, total: schools.length, results });
     } catch (err: any) {
       console.error("[friendship] apply-validation error:", err?.message);
       res.status(500).json({ message: "Failed to apply validation", error: err?.message });
