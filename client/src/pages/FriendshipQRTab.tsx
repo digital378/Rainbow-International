@@ -104,6 +104,7 @@ function FriendshipQRTabInner() {
   const [editSchool, setEditSchool] = useState<School | null>(null);
   const [syncMsg, setSyncMsg] = useState("");
   const [confirmRegen, setConfirmRegen] = useState<School | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<School | null>(null);
 
   const [formName, setFormName] = useState("");
   const [formContact, setFormContact] = useState("");
@@ -194,6 +195,19 @@ function FriendshipQRTabInner() {
     } catch { /* silent */ }
   };
 
+  const handleDelete = async (s: School) => {
+    try {
+      const res = await fetch(`/api/admin/alliances/friendship/schools/${s.id}`, {
+        method: "DELETE", headers: authHeader(),
+      });
+      if (res.ok) {
+        setConfirmDelete(null);
+        if (selectedSchool?.id === s.id) { setSelectedSchool(null); setLeads([]); }
+        fetchAll();
+      }
+    } catch { /* silent */ }
+  };
+
   const handleSyncSheets = async () => {
     setSyncMsg("Syncing…");
     try {
@@ -279,6 +293,9 @@ function FriendshipQRTabInner() {
                         <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
                           className="text-xs px-2 py-1 rounded font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
                           data-testid={`button-qr-edit-${s.id}`}>Edit</button>
+                        <button onClick={e => { e.stopPropagation(); setConfirmDelete(s); }}
+                          className="text-xs px-2 py-1 rounded font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition"
+                          data-testid={`button-qr-delete-${s.id}`}>Del</button>
                       </div>
                     </div>
                   </div>
@@ -425,6 +442,32 @@ function FriendshipQRTabInner() {
                 style={{ background: saving ? "#94a3b8" : NAVY }}
                 data-testid="button-qr-save">
                 {saving ? "Saving…" : editSchool ? "Save Changes" : "Create School"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(9,26,79,0.7)" }}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+            <div className="text-3xl mb-3">🗑️</div>
+            <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Delete School?</div>
+            <div className="text-sm text-slate-600 mb-6">
+              This will permanently delete <strong>{confirmDelete.name}</strong> and all{" "}
+              <strong>{confirmDelete.leadCount} lead{confirmDelete.leadCount !== 1 ? "s" : ""}</strong> associated with it. This cannot be undone.
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmDelete(null)}
+                className="flex-1 py-3 rounded-xl font-semibold border-2 border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+                Cancel
+              </button>
+              <button onClick={() => handleDelete(confirmDelete)}
+                className="flex-1 py-3 rounded-xl font-black text-white"
+                style={{ background: "#dc2626" }}
+                data-testid="button-qr-confirm-delete">
+                Delete Permanently
               </button>
             </div>
           </div>

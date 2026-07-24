@@ -4544,6 +4544,15 @@ paths:
   });
 
   // Admin: regenerate QR token
+  app.delete("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+    try {
+      await storage.deleteFriendshipSchool(Number(req.params.id));
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ message: "Failed to delete school" });
+    }
+  });
+
   app.post("/api/admin/alliances/friendship/schools/:id/regenerate-token", requireAdmin, async (req, res) => {
     try {
       const newToken = randomBytes(16).toString("hex");

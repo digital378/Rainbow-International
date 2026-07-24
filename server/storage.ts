@@ -316,6 +316,11 @@ export class DbStorage implements IStorage {
     return result;
   }
 
+  async deleteFriendshipSchool(id: number): Promise<void> {
+    await db.delete(friendshipSchoolLeads).where(eq(friendshipSchoolLeads.schoolId, id));
+    await db.delete(friendshipSchools).where(eq(friendshipSchools.id, id));
+  }
+
   async listFriendshipSchools(): Promise<(FriendshipSchool & { leadCount: number })[]> {
     const schools = await db.select().from(friendshipSchools).orderBy(friendshipSchools.name);
     const counts = await db
