@@ -114,6 +114,8 @@ export default function AdminFriendshipSchools() {
   return <AdminFriendshipSchoolsInner />;
 }
 
+type ValidationStatus = { hasDropdown: boolean; reason?: string };
+
 function AdminFriendshipSchoolsInner() {
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,6 +125,8 @@ function AdminFriendshipSchoolsInner() {
   const [showModal, setShowModal] = useState(false);
   const [editSchool, setEditSchool] = useState<School | null>(null);
   const [syncMsg, setSyncMsg] = useState("");
+  const [validationStatus, setValidationStatus] = useState<Record<number, ValidationStatus>>({});
+  const [validationLoading, setValidationLoading] = useState(false);
 
   const handleSyncStatusFromSheets = async () => {
     if (!selectedSchool) return;
@@ -168,9 +172,24 @@ function AdminFriendshipSchoolsInner() {
     try {
       const res = await fetch("/api/admin/alliances/friendship/schools", { headers: authHeader() });
       if (res.status === 401) { try { sessionStorage.removeItem(ADMIN_AUTH_KEY); } catch {} window.location.reload(); return; }
-      setSchools(await res.json());
+      const data: School[] = await res.json();
+      setSchools(data);
+      if (data.length > 0) fetchValidationStatus();
     } catch { /* silent */ }
     setLoading(false);
+  };
+
+  const fetchValidationStatus = async () => {
+    setValidationLoading(true);
+    try {
+      const res = await fetch("/api/admin/alliances/friendship/validation-status", { headers: authHeader() });
+      if (!res.ok) return;
+      const data: { schools: { id: number; hasDropdown: boolean; reason?: string }[] } = await res.json();
+      const map: Record<number, ValidationStatus> = {};
+      for (const s of data.schools) map[s.id] = { hasDropdown: s.hasDropdown, reason: s.reason };
+      setValidationStatus(map);
+    } catch { /* silent */ }
+    setValidationLoading(false);
   };
 
   const fetchLeads = async (school: School) => {
@@ -343,12 +362,27 @@ function AdminFriendshipSchoolsInner() {
                         <div className="min-w-0">
                           <div className="font-bold text-slate-800 text-sm truncate">{s.name}</div>
                           <div className="text-xs text-slate-500 mt-0.5">{s.contactPerson}</div>
-                          <div className="flex items-center gap-2 mt-1.5">
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                             <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
                               style={{ background: s.isActive ? "#dcfce7" : "#fee2e2", color: s.isActive ? GREEN : "#dc2626" }}>
                               {s.isActive ? "Active" : "Inactive"}
                             </span>
                             <span className="text-xs text-slate-400">{s.leadCount} lead{s.leadCount !== 1 ? "s" : ""}</span>
+                            {validationLoading && !(s.id in validationStatus) ? (
+                              <span className="text-xs text-slate-300 font-medium" data-testid={`badge-validation-${s.id}`}>…</span>
+                            ) : s.id in validationStatus ? (
+                              validationStatus[s.id].hasDropdown ? (
+                                <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
+                                  style={{ background: "#dcfce7", color: "#059669" }}
+                                  title="Column H has status dropdown"
+                                  data-testid={`badge-validation-${s.id}`}>✓ dropdown</span>
+                              ) : (
+                                <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
+                                  style={{ background: "#fff7ed", color: "#c2410c" }}
+                                  title={validationStatus[s.id].reason === "tab not found" ? "Sheet tab not found" : "Column H is missing the status dropdown"}
+                                  data-testid={`badge-validation-${s.id}`}>⚠ missing</span>
+                              )
+                            ) : null}
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 flex-shrink-0">

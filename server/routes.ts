@@ -4636,6 +4636,65 @@ paths:
   });
 
   // Admin: backfill status dropdown validation on all existing sheet tabs
+  app.get("/api/admin/alliances/friendship/validation-status", requireAdmin, async (_req, res) => {
+    try {
+      const sheetId = process.env.ALLIANCES_SHEET_ID;
+      if (!sheetId) return res.status(500).json({ message: "ALLIANCES_SHEET_ID env var not set" });
+      const auth = getAuthenticatedClient();
+      if (!auth) return res.status(500).json({ message: "Google not connected" });
+
+      const { google: goog } = await import("googleapis");
+      const sheets = goog.sheets({ version: "v4", auth });
+
+      const meta = await sheets.spreadsheets.get({
+        spreadsheetId: sheetId,
+        fields: "sheets.properties.title",
+      });
+      const existingTabs = new Set(
+        (meta.data.sheets || []).map(s => s.properties?.title).filter(Boolean)
+      );
+
+      const schools = await storage.listFriendshipSchools();
+      const result: { id: number; name: string; tab: string; hasDropdown: boolean; reason?: string }[] = [];
+
+      const schoolsWithTabs = schools.filter(s => existingTabs.has(s.sheetsTabName));
+      const schoolsWithoutTabs = schools.filter(s => !existingTabs.has(s.sheetsTabName));
+
+      for (const s of schoolsWithoutTabs) {
+        result.push({ id: s.id, name: s.name, tab: s.sheetsTabName, hasDropdown: false, reason: "tab not found" });
+      }
+
+      if (schoolsWithTabs.length > 0) {
+        const ranges = schoolsWithTabs.map(s => `${s.sheetsTabName}!H2:H2`);
+        const gridResp = await sheets.spreadsheets.get({
+          spreadsheetId: sheetId,
+          ranges,
+          includeGridData: true,
+          fields: "sheets(properties.title,data.rowData.values.dataValidation)",
+        });
+
+        const tabValidation: Record<string, boolean> = {};
+        for (const sheet of (gridResp.data.sheets || [])) {
+          const title = sheet.properties?.title;
+          if (!title) continue;
+          const cell = sheet.data?.[0]?.rowData?.[0]?.values?.[0];
+          const dvType = cell?.dataValidation?.condition?.type;
+          tabValidation[title] = dvType === "ONE_OF_LIST";
+        }
+
+        for (const s of schoolsWithTabs) {
+          const hasDropdown = tabValidation[s.sheetsTabName] ?? false;
+          result.push({ id: s.id, name: s.name, tab: s.sheetsTabName, hasDropdown });
+        }
+      }
+
+      res.json({ schools: result });
+    } catch (err: any) {
+      console.error("[friendship] validation-status error:", err?.message);
+      res.status(500).json({ message: "Failed to check validation status", error: err?.message });
+    }
+  });
+
   app.post("/api/admin/alliances/friendship/apply-validation", requireAdmin, async (_req, res) => {
     try {
       const sheetId = process.env.ALLIANCES_SHEET_ID;
