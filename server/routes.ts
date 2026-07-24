@@ -4550,6 +4550,60 @@ paths:
     }
   });
 
+  // Admin: bulk-import MOU Done schools from Google Sheets pipeline tab
+  app.post("/api/admin/alliances/friendship/import-mou-done", requireAdmin, async (req, res) => {
+    try {
+      const SID = process.env.ALLIANCES_SHEET_ID;
+      if (!SID) return res.status(500).json({ message: "ALLIANCES_SHEET_ID not configured" });
+      const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
+      const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const mouDone = rows.slice(1)
+        .filter(r => r[1] && r[1].trim() && String(r[11] ?? "").trim() === "MOU Done")
+        .map(r => ({
+          name: String(r[1]).trim(),
+          contactPerson: String(r[4] ?? "").trim() || "—",
+          contactPhone: String(r[5] ?? "").trim() || undefined,
+          sheetsTabName: String(r[1]).trim(),
+        }));
+
+      const existing = await storage.listFriendshipSchools();
+      const existingNames = new Set(existing.map((s: any) => s.name.toLowerCase().trim()));
+
+      let imported = 0;
+      const skipped: string[] = [];
+      for (const s of mouDone) {
+        if (existingNames.has(s.name.toLowerCase())) {
+          skipped.push(s.name);
+          continue;
+        }
+        const school = await storage.createFriendshipSchool({
+          name: s.name,
+          slug: slugify(s.name),
+          token: randomBytes(16).toString("hex"),
+          contactPerson: s.contactPerson,
+          contactPhone: s.contactPhone,
+          sheetsTabName: s.sheetsTabName,
+          isActive: true,
+        });
+        imported++;
+        existingNames.add(s.name.toLowerCase());
+        // Auto-create Sheets tab (non-blocking)
+        const auth = getAuthenticatedClient();
+        if (SID && auth) {
+          import("googleapis").then(({ google: goog }) => {
+            const sheets = goog.sheets({ version: "v4", auth });
+            ensureFriendshipSheetTab(sheets, SID, school.sheetsTabName).catch(() => {});
+          });
+        }
+      }
+
+      res.json({ imported, skipped: skipped.length, skippedNames: skipped, total: mouDone.length });
+    } catch (err: any) {
+      console.error("[friendship] import-mou-done error:", err);
+      res.status(500).json({ message: "Import failed" });
+    }
+  });
+
   // Admin: update friendship school
   app.put("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
     try {

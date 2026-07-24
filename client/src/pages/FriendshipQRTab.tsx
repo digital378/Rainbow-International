@@ -320,6 +320,23 @@ function FriendshipQRTabInner() {
     setTimeout(() => setSyncMsg(""), 5000);
   };
 
+  const handleImportMouDone = async () => {
+    setSyncMsg("Importing MOU Done schools from Sheets…");
+    try {
+      const res = await fetch("/api/admin/alliances/friendship/import-mou-done", {
+        method: "POST", headers: authHeader(),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setSyncMsg(`Imported ${d.imported} new school${d.imported !== 1 ? "s" : ""}${d.skipped > 0 ? ` · ${d.skipped} already existed` : ""} (${d.total} MOU Done total)`);
+        fetchAll();
+      } else {
+        setSyncMsg(d.message || "Import failed");
+      }
+    } catch { setSyncMsg("Import failed"); }
+    setTimeout(() => setSyncMsg(""), 8000);
+  };
+
   return (
     <div>
       {/* Stats row */}
@@ -344,6 +361,12 @@ function FriendshipQRTabInner() {
               {syncMsg}
             </span>
           )}
+          <button onClick={handleImportMouDone}
+            className="px-4 py-1.5 rounded-lg text-xs font-bold border-2 transition"
+            style={{ borderColor: "#0ea5e9", color: "#0ea5e9", background: "#fff" }}
+            data-testid="button-qr-import-mou">
+            ⬇ Import MOU Done
+          </button>
           <button onClick={openAddModal}
             className="px-4 py-1.5 rounded-lg text-xs font-black text-white transition"
             style={{ background: NAVY }}
