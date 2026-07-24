@@ -73,6 +73,7 @@ export interface IStorage {
   listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]>;
   markFriendshipLeadSynced(id: number): Promise<void>;
   markFriendshipLeadSyncFailed(id: number): Promise<void>;
+  updateFriendshipLead(id: number, data: { status?: string; commissionPaid?: boolean }): Promise<FriendshipSchoolLead | undefined>;
 }
 
 export class DbStorage implements IStorage {
@@ -376,6 +377,11 @@ export class DbStorage implements IStorage {
 
   async markFriendshipLeadSyncFailed(id: number): Promise<void> {
     await db.update(friendshipSchoolLeads).set({ syncFailed: true }).where(eq(friendshipSchoolLeads.id, id));
+  }
+
+  async updateFriendshipLead(id: number, data: { status?: string; commissionPaid?: boolean }): Promise<FriendshipSchoolLead | undefined> {
+    const [result] = await db.update(friendshipSchoolLeads).set(data).where(eq(friendshipSchoolLeads.id, id)).returning();
+    return result;
   }
 
   async getFriendshipLeadStats(): Promise<{ totalLeads: number; walkIns: number; admissions: number }> {

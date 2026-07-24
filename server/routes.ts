@@ -4577,6 +4577,28 @@ paths:
     }
   });
 
+  // Admin: update lead status / commission
+  app.patch("/api/admin/alliances/friendship/leads/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!id) return res.status(400).json({ message: "Invalid lead id" });
+      const { status, commissionPaid } = req.body as { status?: string; commissionPaid?: boolean };
+      const VALID_STATUSES = ["Open", "Walk-in Booked", "Walk-in Completed", "Closed", "Future Prospect", "Admission Done"];
+      if (status !== undefined && !VALID_STATUSES.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+      const update: { status?: string; commissionPaid?: boolean } = {};
+      if (status !== undefined) update.status = status;
+      if (commissionPaid !== undefined) update.commissionPaid = Boolean(commissionPaid);
+      if (Object.keys(update).length === 0) return res.status(400).json({ message: "Nothing to update" });
+      const lead = await storage.updateFriendshipLead(id, update);
+      if (!lead) return res.status(404).json({ message: "Lead not found" });
+      res.json(lead);
+    } catch {
+      res.status(500).json({ message: "Failed to update lead" });
+    }
+  });
+
   // Admin: retry sync for all failed leads
   app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
     try {

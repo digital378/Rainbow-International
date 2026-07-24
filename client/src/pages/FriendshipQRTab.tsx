@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
 const ADMIN_AUTH_KEY = "ris_admin_auth";
+
+const STATUS_OPTIONS = ["Open", "Walk-in Booked", "Walk-in Completed", "Closed", "Future Prospect", "Admission Done"] as const;
 
 const STATUS_COLORS: Record<string, string> = {
   "Open": "#3b82f6",
@@ -87,6 +89,113 @@ function formatDate(ts: string) {
   return new Date(ts).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
 }
 
+function StatusDropdown({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: Lead) => void }) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const select = async (status: string) => {
+    if (status === lead.status) { setOpen(false); return; }
+    setSaving(true); setOpen(false);
+    try {
+      const res = await fetch(`/api/admin/alliances/friendship/leads/${lead.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        onUpdate(updated);
+      }
+    } catch { /* silent */ }
+    setSaving(false);
+  };
+
+  const color = STATUS_COLORS[lead.status] ?? "#64748b";
+
+  return (
+    <div className="relative inline-block" ref={ref}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        disabled={saving}
+        className="text-xs px-2 py-0.5 rounded-full font-semibold cursor-pointer hover:opacity-80 transition disabled:opacity-50 flex items-center gap-1"
+        style={{ background: color + "20", color }}
+        data-testid={`badge-status-${lead.id}`}
+        title="Click to change status"
+      >
+        {saving ? "…" : lead.status}
+        {!saving && <span className="opacity-60 text-[10px]">▾</span>}
+      </button>
+      {open && (
+        <div className="absolute z-50 mt-1 left-0 bg-white rounded-xl shadow-xl border border-slate-100 py-1 min-w-[160px]"
+          data-testid={`dropdown-status-${lead.id}`}>
+          {STATUS_OPTIONS.map(s => (
+            <button
+              key={s}
+              onClick={() => select(s)}
+              className={`w-full text-left px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 transition flex items-center gap-2 ${s === lead.status ? "opacity-50 cursor-default" : ""}`}
+              data-testid={`option-status-${lead.id}-${s.replace(/\s+/g, "-").toLowerCase()}`}
+            >
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: STATUS_COLORS[s] }} />
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: Lead) => void }) {
+  const [saving, setSaving] = useState(false);
+
+  if (lead.status !== "Admission Done") {
+    return <span className="text-xs text-slate-300">—</span>;
+  }
+
+  const toggle = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/alliances/friendship/leads/${lead.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify({ commissionPaid: !lead.commissionPaid }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        onUpdate(updated);
+      }
+    } catch { /* silent */ }
+    setSaving(false);
+  };
+
+  const paid = lead.commissionPaid === true;
+  const color = paid ? GREEN : lead.commissionPaid === false ? "#dc2626" : AMBER;
+  const label = paid ? "Paid" : lead.commissionPaid === false ? "Unpaid" : "Pending";
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={saving}
+      className="text-xs font-semibold hover:underline disabled:opacity-50 transition"
+      style={{ color }}
+      data-testid={`toggle-commission-${lead.id}`}
+      title="Click to toggle commission paid"
+    >
+      {saving ? "…" : label}
+    </button>
+  );
+}
+
 export default function FriendshipQRTab() {
   const [authed, setAuthed] = useState<boolean>(() => Boolean(getToken()));
   if (!authed) return <TokenGate onSuccess={() => setAuthed(true)} />;
@@ -136,6 +245,10 @@ function FriendshipQRTabInner() {
       setLeads(await res.json());
     } catch { /* silent */ }
     setLeadsLoading(false);
+  };
+
+  const updateLeadInList = (updated: Lead) => {
+    setLeads(prev => prev.map(l => l.id === updated.id ? updated : l));
   };
 
   const openAddModal = () => {
@@ -369,18 +482,10 @@ function FriendshipQRTabInner() {
                             </span>
                           </td>
                           <td className="px-3 py-2.5">
-                            <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                              style={{ background: (STATUS_COLORS[l.status] ?? "#64748b") + "20", color: STATUS_COLORS[l.status] ?? "#64748b" }}>
-                              {l.status}
-                            </span>
+                            <StatusDropdown lead={l} onUpdate={updateLeadInList} />
                           </td>
                           <td className="px-3 py-2.5">
-                            {l.status === "Admission Done" ? (
-                              <span className="text-xs font-semibold"
-                                style={{ color: l.commissionPaid === true ? GREEN : l.commissionPaid === false ? "#dc2626" : AMBER }}>
-                                {l.commissionPaid === true ? "Paid" : l.commissionPaid === false ? "Unpaid" : "Pending"}
-                              </span>
-                            ) : <span className="text-xs text-slate-300">—</span>}
+                            <CommissionToggle lead={l} onUpdate={updateLeadInList} />
                           </td>
                           <td className="px-3 py-2.5">
                             {l.syncFailed ? <span className="text-xs text-red-500 font-semibold">Failed</span>
