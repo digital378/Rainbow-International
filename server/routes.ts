@@ -4292,6 +4292,25 @@ paths:
 
   const FRIENDSHIP_TEMPLATE_PATH = path.resolve("./server/assets/friendship_school_template.xlsx");
 
+  async function ensureFriendshipSheetTab(sheets: any, sheetId: string, tabName: string): Promise<void> {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title" });
+    const exists = (meta.data.sheets || []).some((s: any) => s.properties?.title === tabName);
+    if (!exists) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: { requests: [{ addSheet: { properties: { title: tabName } } }] },
+      });
+      // Write header row
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: sheetId,
+        range: `${tabName}!A1:J1`,
+        valueInputOption: "USER_ENTERED",
+        requestBody: { values: [["Date", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Commission", "Remarks"]] },
+      });
+      console.log(`[friendship] Created sheet tab: ${tabName}`);
+    }
+  }
+
   async function appendFriendshipLeadToSheets(lead: {
     id: number; submittedAt: Date | string; studentName: string; grade: string;
     parentName: string; phone: string; email?: string | null; source: string;
@@ -4302,6 +4321,7 @@ paths:
     if (!auth) throw new Error("Google not connected");
     const { google: goog } = await import("googleapis");
     const sheets = goog.sheets({ version: "v4", auth });
+    await ensureFriendshipSheetTab(sheets, sheetId, tabName);
     const dt = new Date(lead.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
     await sheets.spreadsheets.values.append({
@@ -4466,6 +4486,17 @@ paths:
       const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
       res.status(201).json(school);
+      // Auto-create the Sheets tab (non-blocking)
+      const sheetId = process.env.ALLIANCES_SHEET_ID;
+      const auth = getAuthenticatedClient();
+      if (sheetId && auth) {
+        import("googleapis").then(({ google: goog }) => {
+          const sheets = goog.sheets({ version: "v4", auth });
+          ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
+            console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
+          });
+        });
+      }
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to create school" });
