@@ -747,7 +747,7 @@ function BrandPartnersTab({ data }: { data: AlliancesData }) {
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Brands Shown", value: rows.length, color: C.navy },
+          { label: "Brands Targeted", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: mouDone, color: C.green },
           { label: "MOU Sent", value: mouSent, color: C.purple },
           { label: "MOU Pending", value: mouPending, color: C.orange },
@@ -850,7 +850,7 @@ function CorporatesTab({ data }: { data: AlliancesData }) {
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Corporates Shown", value: rows.length, color: C.navy },
+          { label: "Corporates Targeted", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: corpMouDone, color: C.green },
           { label: "MOU Sent", value: corpMouSent, color: C.purple },
           { label: "MOU Pending", value: corpMouPending, color: C.orange },
@@ -942,7 +942,7 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
     <div className="space-y-4">
       <TabSummary
         stats={[
-          { label: "Schools Shown", value: rows.length, color: C.navy },
+          { label: "Preschools Targeted", value: rows.length, color: C.navy },
           { label: "MOU Done ✓", value: fsMouDone, color: C.green },
           { label: "MOU Sent", value: fsMouSent, color: C.purple },
           { label: "MOU Pending", value: fsMouPending, color: C.orange },
