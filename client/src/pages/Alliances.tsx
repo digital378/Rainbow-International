@@ -538,7 +538,8 @@ function OverviewTab({ data }: { data: AlliancesData }) {
       {/* ── Row 2: Vertical rings + stage tiles ─────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-        {/* Vertical MOU conversion rings */}
+        {/* Vertical MOU conversion rings — hidden for PA view */}
+        {filterVertical !== "parentAdvocacy" && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-2">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
             Conversion by Vertical
@@ -558,9 +559,10 @@ function OverviewTab({ data }: { data: AlliancesData }) {
             ))}
           </div>
         </div>
+        )}
 
         {/* Stage tiles grid */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-3">
+        <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-6 ${filterVertical === "parentAdvocacy" ? "lg:col-span-5" : "lg:col-span-3"}`}>
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
             {filterVertical === "parentAdvocacy" ? "Ambassador Status Distribution" : "Pipeline Stage Distribution"}
           </div>
@@ -599,7 +601,8 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         </div>
       </div>
 
-      {/* ── Row 3: Categories + Team leaderboard ─────────────── */}
+      {/* ── Row 3: Categories + Team leaderboard — hidden for PA view ── */}
+      {filterVertical !== "parentAdvocacy" && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Top categories — hide when a BP category is already selected */}
@@ -680,6 +683,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           </div>
         </div>
       </div>
+      )} {/* end filterVertical !== "parentAdvocacy" */}
 
     </div>
   );
