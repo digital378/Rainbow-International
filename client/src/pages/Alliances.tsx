@@ -202,6 +202,9 @@ const STAGE_COLOR_HEX: Record<string, string> = {
   "Touchbase Done": C.indigo, "Waiting for Revert": C.amber,
   "MOU Sent": C.orange, "MOU Signing Pending": C.purple,
   "MOU Done": C.green, "Not Interested / Dropped": C.red,
+  // PA ambassador statuses
+  "Accepted": C.green, "To be Decided": C.amber,
+  "Not yet reached": C.slate, "Rejected": C.red,
 };
 
 // ── useCountUp: animates 0 → target over ~1.1 s ──────────────
@@ -400,10 +403,19 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         (funnel.brandPartners[st] ?? 0) + (funnel.corporates[st] ?? 0) + (funnel.friendshipSchools[st] ?? 0),
       ]));
     }
+    if (filteredRows.source === "pa") {
+      // Use partnerStatus (ambassador recruitment status), blank → "Not yet reached"
+      const psc = data.partnerStatusCounts;
+      return {
+        "Accepted":       psc.accepted,
+        "To be Decided":  psc.pending,
+        "Not yet reached": psc.notReached,
+        "Rejected":       psc.rejected,
+      };
+    }
     const counts: Record<string, number> = {};
-    const useStatus = filteredRows.source === "pa";
     filteredRows.rows.forEach((r: any) => {
-      const s = useStatus ? r.status : r.stage;
+      const s = r.stage;
       if (s) counts[s] = (counts[s] ?? 0) + 1;
     });
     return counts;
@@ -490,20 +502,37 @@ function OverviewTab({ data }: { data: AlliancesData }) {
             </button>
           )}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
-          <AnimatedRing value={stats.total} max={stats.total || 1}
-            color={activeColor} label="Total" sub={filterBPCat || VERTICAL_OPTS.find(o => o.key === filterVertical)?.label || "All verticals"} size={110} />
-          <AnimatedRing value={stats.mouDone} max={stats.total || 1}
-            color={C.green} label="MOU Done" sub="Tie-ups signed" size={110} />
-          <AnimatedRing value={stats.mouSent} max={stats.total || 1}
-            color={C.purple} label="MOU Sent" sub="Awaiting signature" size={110} />
-          <AnimatedRing value={stats.inPipeline} max={stats.total || 1}
-            color={C.blue} label="In Pipeline" sub="Active pursuit" size={110} />
-          <AnimatedRing value={stats.dropped} max={stats.total || 1}
-            color={C.red} label="Dropped" sub="Not interested" size={110} />
-          <AnimatedRing value={stats.admissions} max={stats.admissions || 1}
-            color={C.amber} label="Admissions" sub="Referred till date" size={110} />
-        </div>
+        {filterVertical === "parentAdvocacy" ? (
+          /* PA-specific recruitment rings */
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-6 justify-items-center">
+            <AnimatedRing value={stats.total} max={stats.total || 1}
+              color={C.amber} label="Total" sub="Ambassadors targeted" size={110} />
+            <AnimatedRing value={data.partnerStatusCounts.accepted} max={stats.total || 1}
+              color={C.green} label="Accepted" sub="Onboarded as ambassador" size={110} />
+            <AnimatedRing value={data.partnerStatusCounts.pending} max={stats.total || 1}
+              color={C.orange} label="To be Decided" sub="Considering" size={110} />
+            <AnimatedRing value={data.partnerStatusCounts.notReached} max={stats.total || 1}
+              color={C.slate} label="Not Yet Reached" sub="Pending outreach" size={110} />
+            <AnimatedRing value={data.partnerStatusCounts.rejected} max={stats.total || 1}
+              color={C.red} label="Rejected" sub="Declined" size={110} />
+          </div>
+        ) : (
+          /* Standard MOU pipeline rings */
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
+            <AnimatedRing value={stats.total} max={stats.total || 1}
+              color={activeColor} label="Total" sub={filterBPCat || VERTICAL_OPTS.find(o => o.key === filterVertical)?.label || "All verticals"} size={110} />
+            <AnimatedRing value={stats.mouDone} max={stats.total || 1}
+              color={C.green} label="MOU Done" sub="Tie-ups signed" size={110} />
+            <AnimatedRing value={stats.mouSent} max={stats.total || 1}
+              color={C.purple} label="MOU Sent" sub="Awaiting signature" size={110} />
+            <AnimatedRing value={stats.inPipeline} max={stats.total || 1}
+              color={C.blue} label="In Pipeline" sub="Active pursuit" size={110} />
+            <AnimatedRing value={stats.dropped} max={stats.total || 1}
+              color={C.red} label="Dropped" sub="Not interested" size={110} />
+            <AnimatedRing value={stats.admissions} max={stats.admissions || 1}
+              color={C.amber} label="Admissions" sub="Referred till date" size={110} />
+          </div>
+        )}
       </div>
 
       {/* ── Row 2: Vertical rings + stage tiles ─────────────── */}
@@ -533,13 +562,21 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         {/* Stage tiles grid */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-3">
           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
-            Pipeline Stage Distribution
+            {filterVertical === "parentAdvocacy" ? "Ambassador Status Distribution" : "Pipeline Stage Distribution"}
           </div>
-          <div className="grid grid-cols-4 gap-3">
-            {pipelineStages.map((st, i) => (
-              <StageTile key={st} stage={st} count={stageCounts[st] ?? 0} delay={i * 60} />
-            ))}
-          </div>
+          {filterVertical === "parentAdvocacy" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {(["Accepted", "To be Decided", "Not yet reached", "Rejected"] as const).map((st, i) => (
+                <StageTile key={st} stage={st} count={stageCounts[st] ?? 0} delay={i * 60} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-3">
+              {pipelineStages.map((st, i) => (
+                <StageTile key={st} stage={st} count={stageCounts[st] ?? 0} delay={i * 60} />
+              ))}
+            </div>
+          )}
           {/* Per-vertical mini breakdown — only in "all" mode */}
           {filterVertical === "all" && (
             <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs">
