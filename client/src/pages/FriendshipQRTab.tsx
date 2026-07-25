@@ -186,7 +186,10 @@ function FriendshipQRTabInner() {
       });
       const d = await res.json().catch(() => ({}));
       if (res.ok) {
-        setSyncMsg(`Done — ${d.updated ?? 0} lead${d.updated !== 1 ? "s" : ""} updated`);
+        const parts = [];
+        if ((d.imported ?? 0) > 0) parts.push(`${d.imported} imported`);
+        if ((d.updated ?? 0) > 0) parts.push(`${d.updated} status${d.updated !== 1 ? "es" : ""} updated`);
+        setSyncMsg(parts.length ? `Done — ${parts.join(", ")}` : "Done — nothing new");
         fetchLeads(selectedSchool);
       } else {
         setSyncMsg(d.message || "Sync failed");
@@ -213,10 +216,12 @@ function FriendshipQRTabInner() {
 
   const fetchLeads = async (school: School) => {
     setSelectedSchool(school); setLeadsLoading(true); setLeads([]);
-    // Scroll the leads panel into view on mobile / when card is below the fold
-    setTimeout(() => {
-      leadsPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 50);
+    // Only scroll on narrow screens (< 1024px) where the panel is stacked below the list
+    if (window.innerWidth < 1024) {
+      setTimeout(() => {
+        leadsPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
     try {
       const res = await fetch(`/api/admin/alliances/friendship/leads?schoolId=${school.id}`, { headers: authHeader() });
       setLeads(await res.json());

@@ -4800,26 +4800,70 @@ paths:
       const { google: goog } = await import("googleapis");
       const sheets = goog.sheets({ version: "v4", auth });
 
-      // Read columns E (Phone) and H (Status) from the school's tab
-      const range = `'${school.sheetsTabName}'!E:H`;
+      // Read all columns A:J — Date, Student, Grade, Parent, Phone, Email, Source, Status, Ref Amt, Remarks
+      const range = `'${school.sheetsTabName}'!A:J`;
       const response = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
       const rows = response.data.values || [];
 
-      // Skip header row; col E=index0, H=index3 within the E:H range
-      const updates: { phone: string; status: string }[] = [];
+      // Get existing leads for this school so we can detect new ones
+      const existing = await storage.getFriendshipLeads({ schoolId });
+      const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
+
+      const statusUpdates: { phone: string; status: string }[] = [];
+      const newLeads: any[] = [];
+
       for (let i = 1; i < rows.length; i++) {
-        const phone = (rows[i][0] || "").toString().trim();
-        const status = (rows[i][3] || "").toString().trim();
-        if (phone && status) updates.push({ phone, status });
+        const r = rows[i];
+        const dateRaw   = (r[0] || "").toString().trim();
+        const student   = (r[1] || "").toString().trim();
+        const grade     = (r[2] || "").toString().trim();
+        const parent    = (r[3] || "").toString().trim();
+        const phone     = (r[4] || "").toString().trim();
+        const email     = (r[5] || "").toString().trim();
+        const source    = (r[6] || "manual").toString().trim();
+        const status    = (r[7] || "Open").toString().trim();
+
+        if (!phone) continue;
+
+        // Always queue a status update for existing leads
+        if (status) statusUpdates.push({ phone, status });
+
+        // Import leads that exist in the sheet but not in the DB
+        if (!existingPhones.has(phone.replace(/\D/g, "")) && student && grade && parent) {
+          // Parse date — sheet stores "25 Jul 2026" style
+          let submittedAt: Date | undefined;
+          if (dateRaw) {
+            const parsed = new Date(dateRaw);
+            if (!isNaN(parsed.getTime())) submittedAt = parsed;
+          }
+          newLeads.push({
+            schoolId,
+            studentName: student,
+            grade,
+            parentName: parent,
+            phone,
+            email: email || undefined,
+            source: ["manual", "bulk"].includes(source) ? source : "manual",
+            status: status || "Open",
+            syncedToSheets: true,
+            ...(submittedAt ? { submittedAt } : {}),
+          });
+        }
       }
 
-      const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, updates);
-      res.json({ updated, total: updates.length });
+      const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, statusUpdates);
+      let imported = 0;
+      if (newLeads.length) {
+        await storage.createFriendshipLeads(newLeads);
+        imported = newLeads.length;
+      }
+
+      res.json({ updated, imported, total: statusUpdates.length });
     } catch (err: any) {
-      // Google Sheets throws when the tab doesn't exist yet (no leads submitted via QR)
+      // Google Sheets throws when the tab doesn't exist yet
       const msg = err?.message || "";
       if (msg.includes("Unable to parse range") || msg.includes("Requested entity was not found")) {
-        return res.json({ updated: 0, total: 0, note: "No sheet tab yet — submit a lead first" });
+        return res.json({ updated: 0, imported: 0, total: 0, note: "No sheet tab yet" });
       }
       res.status(500).json({ message: "Failed to sync status from sheets" });
     }
