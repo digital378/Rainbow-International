@@ -4815,7 +4815,12 @@ paths:
 
       const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, updates);
       res.json({ updated, total: updates.length });
-    } catch {
+    } catch (err: any) {
+      // Google Sheets throws when the tab doesn't exist yet (no leads submitted via QR)
+      const msg = err?.message || "";
+      if (msg.includes("Unable to parse range") || msg.includes("Requested entity was not found")) {
+        return res.json({ updated: 0, total: 0, note: "No sheet tab yet — submit a lead first" });
+      }
       res.status(500).json({ message: "Failed to sync status from sheets" });
     }
   });

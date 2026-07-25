@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { normalizePhone } from "@/lib/friendship-url-utils";
 
 const NAVY = "#091a4f";
@@ -158,6 +158,7 @@ function FriendshipQRTabInner() {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [schoolSearch, setSchoolSearch] = useState("");
   const [sortBy, setSortBy] = useState<"alpha-asc" | "alpha-desc" | "newest" | "oldest">("alpha-asc");
+  const leadsPanelRef = useRef<HTMLDivElement>(null);
 
   const handleCopyLink = (e: React.MouseEvent, s: School) => {
     e.stopPropagation();
@@ -212,6 +213,10 @@ function FriendshipQRTabInner() {
 
   const fetchLeads = async (school: School) => {
     setSelectedSchool(school); setLeadsLoading(true); setLeads([]);
+    // Scroll the leads panel into view on mobile / when card is below the fold
+    setTimeout(() => {
+      leadsPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
     try {
       const res = await fetch(`/api/admin/alliances/friendship/leads?schoolId=${school.id}`, { headers: authHeader() });
       setLeads(await res.json());
@@ -427,7 +432,7 @@ function FriendshipQRTabInner() {
         </div>
 
         {/* Leads panel */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2" ref={leadsPanelRef}>
           {!selectedSchool ? (
             <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
               <div className="text-3xl mb-3">🏫</div>
