@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { buildWhatsAppUrl, buildEmailUrl } from "@/lib/friendship-url-utils";
+import { normalizePhone, buildWhatsAppUrl, buildEmailUrl } from "@/lib/friendship-url-utils";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -456,6 +456,24 @@ function AdminFriendshipSchoolsInner() {
                     <div>
                       <div className="font-black text-slate-800">{selectedSchool.name}</div>
                       <div className="text-xs text-slate-500 mt-0.5">Sheets tab: <code className="bg-slate-100 px-1 py-0.5 rounded">{selectedSchool.sheetsTabName}</code></div>
+                      <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 items-center">
+                        <span>{selectedSchool.contactPerson}</span>
+                        {selectedSchool.contactPhone && (
+                          <a href={`https://wa.me/${normalizePhone(selectedSchool.contactPhone)}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className="font-semibold text-green-600 hover:underline"
+                            data-testid="link-header-whatsapp">
+                            📞 {selectedSchool.contactPhone}
+                          </a>
+                        )}
+                        {selectedSchool.contactEmail && (
+                          <a href={`mailto:${selectedSchool.contactEmail}`}
+                            className="font-semibold text-blue-600 hover:underline"
+                            data-testid="link-header-email">
+                            ✉ {selectedSchool.contactEmail}
+                          </a>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => handleToggleActive(selectedSchool)}
