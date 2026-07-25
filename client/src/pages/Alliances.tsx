@@ -137,9 +137,9 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
 }
 
 // ── Shared helpers ─────────────────────────────────────────────
-function StageBadge({ stage, palette }: { stage: string; palette: Record<string, string> }) {
+function StageBadge({ stage, palette, label }: { stage: string; palette: Record<string, string>; label?: string }) {
   const cls = palette[stage] ?? "bg-slate-100 text-slate-600";
-  return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{stage || "—"}</span>;
+  return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label ?? stage ?? "—"}</span>;
 }
 function KpiCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: string }) {
   return (
@@ -1009,6 +1009,10 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
+  // Display-only label remapping: sheet value "Enquired" → shows as "Referred"
+  const PA_DISPLAY_LABEL: Record<string, string> = { "Enquired": "Referred" };
+  const displayLabel = (st: string) => PA_DISPLAY_LABEL[st] ?? st;
+
   const rows = data.parentAdvocacy.filter(p => {
     if (filterStatus && p.status !== filterStatus) return false;
     if (search) {
@@ -1022,12 +1026,34 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
-  const confirmed = data.parentAdvocacy.filter(p => p.status === "Admission Confirmed").length;
-  const conversion = data.parentAdvocacy.length > 0
-    ? Math.round((confirmed / data.parentAdvocacy.length) * 100) : 0;
-  const partnersOnboarded = data.parentAdvocacy.filter(p => p.partnerStatus?.toLowerCase().includes("accept")).length;
-  const paStageCounts: Record<string, number> = {};
-  data.parentAdvocacy.forEach(p => { if (p.status) paStageCounts[p.status] = (paStageCounts[p.status] ?? 0) + 1; });
+  const ambassadorsOnBoard = data.parentAdvocacy.filter(p => p.partnerStatus?.toLowerCase().includes("accept")).length;
+
+  // Rows with partnerStatus containing "reject" or "declin" count toward Not Interested in pipeline
+  const isPartnerRejected = (p: ParentAdvocacy) => {
+    const ps = p.partnerStatus?.toLowerCase() ?? "";
+    return ps.includes("reject") || ps.includes("declin");
+  };
+
+  const decidedNotInterested = data.parentAdvocacy.filter(p =>
+    p.status === "Not Interested" || isPartnerRejected(p)
+  ).length;
+
+  // Conversion: onboarded ÷ (onboarded + not-interested/rejected) — excludes pending
+  const conversionDenominator = ambassadorsOnBoard + decidedNotInterested;
+  const conversion = conversionDenominator > 0
+    ? Math.round((ambassadorsOnBoard / conversionDenominator) * 100) : 0;
+
+  // Recompute pipeline funnel client-side: rejected partnerStatus → bucket into "Not Interested"
+  const paFunnel: Record<string, number> = {};
+  for (const st of data.paStatuses) paFunnel[st] = 0;
+  for (const p of data.parentAdvocacy) {
+    if (isPartnerRejected(p)) {
+      paFunnel["Not Interested"] = (paFunnel["Not Interested"] ?? 0) + 1;
+    } else if (p.status && paFunnel[p.status] !== undefined) {
+      paFunnel[p.status]++;
+    }
+  }
+
   const PA_HEX: Record<string, string> = {
     "Enquired": C.blue,
     "Campus Visit Scheduled": C.indigo,
@@ -1037,14 +1063,24 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   };
   const paStatusStages = data.paStatuses;
 
+  // Branch-wise breakdown: Ambassadors Targeted + on Board per branch
+  const branchMap: Record<string, { targeted: number; onBoard: number }> = {};
+  for (const p of data.parentAdvocacy) {
+    const br = p.branch?.trim() || "Unknown";
+    if (!branchMap[br]) branchMap[br] = { targeted: 0, onBoard: 0 };
+    branchMap[br].targeted++;
+    if (p.partnerStatus?.toLowerCase().includes("accept")) branchMap[br].onBoard++;
+  }
+  const branches = Object.entries(branchMap).sort((a, b) => b[1].targeted - a[1].targeted);
+
   return (
     <div className="space-y-4">
       {/* PA Summary Infographic */}
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-4">
         <div className="flex flex-wrap gap-3">
           {[
-            { label: "Total Referrals", value: data.parentAdvocacy.length, color: C.navy },
-            { label: "Partners Onboarded", value: partnersOnboarded, color: C.blue },
+            { label: "Total Ambassadors Targeted", value: data.parentAdvocacy.length, color: C.navy },
+            { label: "Ambassadors on Board", value: ambassadorsOnBoard, color: C.blue },
             { label: "Conversion Rate", value: `${conversion}%`, color: C.amber },
           ].map(s => (
             <div key={s.label}
@@ -1059,28 +1095,46 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
             <div key={st}
               className="flex flex-col items-center bg-slate-50 rounded-xl px-4 py-3 min-w-[88px] border border-slate-100">
               <div className="text-2xl font-black leading-none" style={{ color: PA_HEX[st] ?? C.slate }}>
-                <AN value={data.funnel.parentAdvocacy[st] ?? 0} />
+                <AN value={paFunnel[st] ?? 0} />
               </div>
-              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{st}</div>
+              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{displayLabel(st)}</div>
             </div>
           ))}
         </div>
-        {/* Conversion progress bar */}
+        {/* Referral pipeline bar */}
         <div>
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Referral Pipeline</div>
           <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
             {paStatusStages.map(st => {
-              const cnt = data.funnel.parentAdvocacy[st] ?? 0;
+              const cnt = paFunnel[st] ?? 0;
               const total = data.parentAdvocacy.length || 1;
               if (!cnt) return null;
               return (
-                <div key={st} title={`${st}: ${cnt}`}
+                <div key={st} title={`${displayLabel(st)}: ${cnt}`}
                   style={{ width: `${(cnt / total) * 100}%`, background: PA_HEX[st] ?? C.slate }}
                   className="transition-all duration-1000" />
               );
             })}
           </div>
         </div>
+        {/* Branch-wise breakdown */}
+        {branches.length > 0 && (
+          <div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">By Branch</div>
+            <div className="flex flex-wrap gap-2">
+              {branches.map(([br, { targeted, onBoard }]) => (
+                <div key={br}
+                  className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 border border-slate-100 text-xs">
+                  <span className="font-semibold text-slate-700">{br}</span>
+                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-500">{targeted} targeted</span>
+                  <span className="text-slate-300">·</span>
+                  <span className="font-semibold" style={{ color: C.blue }}>{onBoard} on board</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
@@ -1128,7 +1182,9 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                   <td className="px-4 py-2.5 text-slate-600 text-xs">{p.referredFamily || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-600 text-xs">{p.contactNumber || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-600 text-xs">{p.gradeApplying || "—"}</td>
-                  <td className="px-4 py-2.5"><StageBadge stage={p.status} palette={PA_COLOR} /></td>
+                  <td className="px-4 py-2.5">
+                    <StageBadge stage={p.status} palette={PA_COLOR} label={displayLabel(p.status)} />
+                  </td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.dateReferred || "—"}</td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.incentiveGiven || "—"}</td>
                 </tr>
