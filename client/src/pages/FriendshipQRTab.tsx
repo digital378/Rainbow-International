@@ -5,8 +5,6 @@ const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
 const ADMIN_AUTH_KEY = "ris_admin_auth";
-const ALLIANCES_AUTH_KEY = "alliances_auth_v1";
-const ALLIANCES_PIN = "ALL8";
 
 const STATUS_COLORS: Record<string, string> = {
   "Open": "#3b82f6",
@@ -39,16 +37,9 @@ function getToken() {
   try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
 }
 const authHeader = (): Record<string, string> => {
-  const headers: Record<string, string> = {};
   const t = getToken();
-  if (t) headers["Authorization"] = `Bearer ${t}`;
-  // Always send the alliances passcode when the alliances dashboard session is active
-  try {
-    if (sessionStorage.getItem(ALLIANCES_AUTH_KEY) === "1") {
-      headers["X-Alliances-Auth"] = ALLIANCES_PIN;
-    }
-  } catch { /* ignore */ }
-  return headers;
+  // Alliances session is handled by HttpOnly cookie set at login — no extra header needed.
+  return t ? { Authorization: `Bearer ${t}` } : {};
 };
 
 function TokenGate({ onSuccess }: { onSuccess: () => void }) {

@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import FriendshipQRTab from "./FriendshipQRTab";
 
-const PIN = "ALL8";
 const AUTH_KEY = "alliances_auth_v1";
 
 // ── Types ──────────────────────────────────────────────────────
@@ -76,16 +75,32 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === PIN) { onSuccess(); }
-    else {
+    if (!code.trim()) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/alliances/verify-passcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode: code }),
+        credentials: "same-origin",
+      });
+      if (res.ok) {
+        onSuccess();
+      } else {
+        setError(true); setShake(true); setCode("");
+        setTimeout(() => setShake(false), 500);
+      }
+    } catch {
       setError(true); setShake(true); setCode("");
       setTimeout(() => setShake(false), 500);
     }
+    setLoading(false);
   };
   return (
     <div className="min-h-screen bg-[#091a4f] flex items-center justify-center p-4">
@@ -111,9 +126,9 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
           data-testid="input-passcode"
         />
         {error && <div className="mt-2 text-sm text-red-600 text-center">Incorrect passcode</div>}
-        <button type="submit" data-testid="button-unlock"
-          className="mt-5 w-full py-3 rounded-lg bg-[#091a4f] text-white font-bold hover:bg-[#0b2168] transition">
-          Unlock
+        <button type="submit" disabled={loading} data-testid="button-unlock"
+          className="mt-5 w-full py-3 rounded-lg bg-[#091a4f] text-white font-bold hover:bg-[#0b2168] transition disabled:opacity-60">
+          {loading ? "Checking…" : "Unlock"}
         </button>
       </form>
       <style>{`@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}`}</style>

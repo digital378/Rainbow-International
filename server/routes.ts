@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import { timingSafeEqual, randomBytes } from "node:crypto";
+import { timingSafeEqual, randomBytes, createHmac } from "node:crypto";
 import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
@@ -3319,14 +3319,37 @@ paths:
     next();
   }
 
-  // Accepts either the admin Bearer token OR the alliances dashboard passcode
-  // (sent as X-Alliances-Auth header). Used for Friendship Schools endpoints
-  // that are accessible from the alliances dashboard without needing the full admin token.
-  const ALLIANCES_PIN = process.env.ALLIANCES_PASSCODE || "ALL8";
+  // Returns the expected HMAC session token for the alliances dashboard session cookie.
+  function alliancesSessionToken(): string | null {
+    const secret = process.env.SESSION_SECRET;
+    if (!secret) return null;
+    return createHmac("sha256", secret).update("alliances-session-v1").digest("hex");
+  }
+
+  // Parses cookies from a raw Cookie header string.
+  function parseCookies(cookieHeader: string): Record<string, string> {
+    return Object.fromEntries(
+      cookieHeader.split(";").map(c => {
+        const i = c.indexOf("=");
+        return i < 0 ? [c.trim(), ""] : [c.slice(0, i).trim(), decodeURIComponent(c.slice(i + 1).trim())];
+      })
+    );
+  }
+
+  // Accepts either the admin Bearer token OR a valid server-issued alliances session cookie.
+  // Used for read-only Friendship Schools endpoints accessible from the alliances dashboard.
   function requireAlliancesOrAdmin(req: any, res: any, next: any) {
-    // Check alliances passcode header first
-    const alliancesAuth = req.headers["x-alliances-auth"] || "";
-    if (alliancesAuth && alliancesAuth === ALLIANCES_PIN) return next();
+    // Check server-issued alliances session cookie
+    const expected = alliancesSessionToken();
+    if (expected) {
+      const cookies = parseCookies(req.headers.cookie || "");
+      const sessionVal = cookies["alliances_session"] || "";
+      if (sessionVal && sessionVal.length === expected.length) {
+        try {
+          if (timingSafeEqual(Buffer.from(expected), Buffer.from(sessionVal))) return next();
+        } catch { /* fall through */ }
+      }
+    }
     // Fall back to admin Bearer token
     const adminToken = process.env.ADMIN_TOKEN;
     if (!adminToken) return res.status(503).json({ message: "Admin token not configured" });
@@ -4111,6 +4134,29 @@ paths:
   });
 
   // ── Alliances Dashboard ───────────────────────────────────────
+  // Public: exchange alliances dashboard passcode for a signed session cookie
+  app.post("/api/alliances/verify-passcode", async (req, res) => {
+    try {
+      const passcode = process.env.ALLIANCES_PASSCODE;
+      if (!passcode) return res.status(503).json({ message: "Not configured" });
+      const submitted = String(req.body?.passcode || "");
+      if (!submitted || submitted.length !== passcode.length) {
+        return res.status(401).json({ ok: false });
+      }
+      try {
+        if (!timingSafeEqual(Buffer.from(passcode), Buffer.from(submitted))) {
+          return res.status(401).json({ ok: false });
+        }
+      } catch { return res.status(401).json({ ok: false }); }
+      const token = alliancesSessionToken();
+      if (!token) return res.status(503).json({ message: "SESSION_SECRET not configured" });
+      res.setHeader("Set-Cookie", `alliances_session=${token}; Path=/; HttpOnly; SameSite=Strict`);
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
   app.get("/api/alliances/live", async (_req, res) => {
     try {
       const SID = SHEET_IDS.alliances;
