@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { normalizePhone, buildWhatsAppUrl, buildEmailUrl } from "@/lib/friendship-url-utils";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -350,62 +349,37 @@ function FriendshipQRTabInner() {
               <div className="divide-y divide-slate-100">
                 {schools.map(s => (
                   <div key={s.id}
-                    className={`p-4 cursor-pointer transition-colors hover:bg-slate-50 border-l-4 ${selectedSchool?.id === s.id ? "bg-blue-50" : "border-l-transparent"}`}
+                    className={`px-4 pt-4 pb-3 cursor-pointer transition-colors hover:bg-slate-50 border-l-4 ${selectedSchool?.id === s.id ? "bg-blue-50" : "border-l-transparent"}`}
                     style={selectedSchool?.id === s.id ? { borderLeftColor: NAVY } : {}}
                     onClick={() => fetchLeads(s)}
                     data-testid={`card-qr-school-${s.id}`}>
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="font-bold text-slate-800 text-sm truncate">{s.name}</div>
-                        <div className="text-xs text-slate-500 mt-0.5">{s.contactPerson}</div>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                            style={{ background: s.isActive ? "#dcfce7" : "#fee2e2", color: s.isActive ? GREEN : "#dc2626" }}>
-                            {s.isActive ? "Active" : "Inactive"}
-                          </span>
-                          <span className="text-xs text-slate-400">{s.leadCount} lead{s.leadCount !== 1 ? "s" : ""}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-1 flex-shrink-0">
-                        <button onClick={e => { e.stopPropagation(); window.open(`/admin/alliances/friendship/${s.id}/qr`, "_blank"); }}
-                          className="text-xs px-2 py-1 rounded font-semibold transition hover:opacity-80"
-                          style={{ background: "#f0f4ff", color: NAVY }}
-                          data-testid={`button-qr-qr-${s.id}`}>QR</button>
-                        <button onClick={e => handleCopyLink(e, s)}
-                          className="text-xs px-2 py-1 rounded font-semibold transition"
-                          style={{ background: copiedId === s.id ? "#dcfce7" : "#f0fdf4", color: copiedId === s.id ? "#059669" : "#16a34a" }}
-                          data-testid={`button-qr-link-${s.id}`}
-                          title="Copy portal link">
-                          {copiedId === s.id ? "✓" : "Link"}
-                        </button>
-                        {s.contactPhone && (
-                          <a href={buildWhatsAppUrl(s.contactPhone, s.token, s.name, window.location.origin)}
-                            target="_blank" rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="text-xs px-2 py-1 rounded font-semibold text-center transition"
-                            style={{ background: "#dcfce7", color: "#16a34a" }}
-                            data-testid={`button-qr-whatsapp-${s.id}`}
-                            title="Send portal link via WhatsApp">
-                            WA
-                          </a>
-                        )}
-                        {s.contactEmail && (
-                          <a href={buildEmailUrl(s.contactEmail, s.token, s.name, window.location.origin)}
-                            onClick={e => e.stopPropagation()}
-                            className="text-xs px-2 py-1 rounded font-semibold text-center transition"
-                            style={{ background: "#eff6ff", color: "#2563eb" }}
-                            data-testid={`button-qr-email-${s.id}`}
-                            title="Send portal link via Email">
-                            Mail
-                          </a>
-                        )}
-                        <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
-                          className="text-xs px-2 py-1 rounded font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
-                          data-testid={`button-qr-edit-${s.id}`}>Edit</button>
-                        <button onClick={e => { e.stopPropagation(); setConfirmDelete(s); }}
-                          className="text-xs px-2 py-1 rounded font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition"
-                          data-testid={`button-qr-delete-${s.id}`}>Del</button>
-                      </div>
+                    <div className="font-bold text-slate-800 text-sm leading-snug">{s.name}</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{s.contactPerson || "—"}</div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                        style={{ background: s.isActive ? "#dcfce7" : "#fee2e2", color: s.isActive ? GREEN : "#dc2626" }}>
+                        {s.isActive ? "Active" : "Inactive"}
+                      </span>
+                      <span className="text-xs text-slate-400">{s.leadCount} lead{s.leadCount !== 1 ? "s" : ""}</span>
+                    </div>
+                    {/* Action buttons — bottom row */}
+                    <div className="flex items-center gap-2 mt-3 flex-wrap" onClick={e => e.stopPropagation()}>
+                      <button onClick={e => { e.stopPropagation(); window.open(`/admin/alliances/friendship/${s.id}/qr`, "_blank"); }}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:opacity-80"
+                        style={{ background: "#f0f4ff", color: NAVY }}
+                        data-testid={`button-qr-qr-${s.id}`}>QR Code</button>
+                      <button onClick={e => handleCopyLink(e, s)}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
+                        style={{ background: copiedId === s.id ? "#dcfce7" : "#f0fdf4", color: copiedId === s.id ? "#059669" : "#16a34a" }}
+                        data-testid={`button-qr-link-${s.id}`}>
+                        {copiedId === s.id ? "✓ Copied" : "Copy Link"}
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
+                        data-testid={`button-qr-edit-${s.id}`}>Edit</button>
+                      <button onClick={e => { e.stopPropagation(); setConfirmDelete(s); }}
+                        className="text-xs px-3 py-1.5 rounded-lg font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition"
+                        data-testid={`button-qr-delete-${s.id}`}>Delete</button>
                     </div>
                   </div>
                 ))}
