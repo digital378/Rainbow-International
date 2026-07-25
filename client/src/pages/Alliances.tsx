@@ -1035,9 +1035,9 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 
   // Ambassador acceptance rate: Accepted ÷ (Accepted + Rejected) — excludes still-pending
   const psc = data.partnerStatusCounts;
-  const acceptanceDenominator = psc.accepted + psc.rejected;
-  const acceptanceRate = acceptanceDenominator > 0
-    ? Math.round((psc.accepted / acceptanceDenominator) * 100) : 0;
+  const totalTargeted = psc.accepted + psc.pending + psc.rejected + psc.notReached;
+  const acceptanceRate = totalTargeted > 0
+    ? Math.round((psc.accepted / totalTargeted) * 100) : 0;
 
   // Referral pipeline funnel — driven purely by status col K (may all be zero currently)
   const PA_STATUSES = ["Enquired", "Campus Visit Scheduled", "Application Submitted", "Admission Confirmed", "Not Interested"];
@@ -1173,7 +1173,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
         <Select value={filterPartnerStatus} onChange={setFilterPartnerStatus}
-          options={PA_PARTNER_STATUS_OPTIONS} placeholder="All partner statuses" />
+          options={PA_PARTNER_STATUS_OPTIONS} placeholder="All ambassador statuses" />
         <div className="ml-auto text-sm text-slate-500">{rows.length} shown</div>
       </div>
 
@@ -1185,7 +1185,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Student Name</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Parent Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Partner Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Ambassador Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
