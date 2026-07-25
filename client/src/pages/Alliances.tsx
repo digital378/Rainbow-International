@@ -421,6 +421,24 @@ function OverviewTab({ data }: { data: AlliancesData }) {
     return counts;
   }, [filteredRows, funnel, pipelineStages]);
 
+  // ── PA branch-wise ambassador distribution ─────────────────
+  const paBranchStats = useMemo(() => {
+    const map: Record<string, { accepted: number; pending: number; notReached: number; rejected: number; total: number }> = {};
+    data.parentAdvocacy.forEach((p: any) => {
+      const br = (p.branch ?? "").trim() || "Unassigned";
+      if (!map[br]) map[br] = { accepted: 0, pending: 0, notReached: 0, rejected: 0, total: 0 };
+      const ps = (p.partnerStatus ?? "").trim().toLowerCase();
+      if (ps.includes("accept"))                          map[br].accepted++;
+      else if (ps.includes("reject") || ps.includes("declin")) map[br].rejected++;
+      else if (ps)                                        map[br].pending++;
+      else                                                map[br].notReached++;
+      map[br].total++;
+    });
+    return Object.entries(map)
+      .map(([branch, c]) => ({ branch, ...c }))
+      .sort((a, b) => b.total - a.total);
+  }, [data.parentAdvocacy]);
+
   // ── Verticals for conversion rings ────────────────────────
   const allVerticals = [
     { name: "Brand Partners",    label: "BP",   total: data.brandPartners.length,    mou: funnel.brandPartners["MOU Done"] ?? 0,    color: C.navy },
@@ -600,6 +618,42 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           )}
         </div>
       </div>
+
+      {/* ── PA Branch Distribution — only for PA view ─────── */}
+      {filterVertical === "parentAdvocacy" && paBranchStats.length > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
+            Branch-wise Ambassador Distribution
+          </div>
+          <div className="space-y-4">
+            {paBranchStats.map(b => {
+              const total = b.total || 1;
+              return (
+                <div key={b.branch}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-semibold text-slate-700 capitalize">{b.branch.charAt(0) + b.branch.slice(1).toLowerCase()}</span>
+                    <span className="text-xs text-slate-400 font-medium">{b.total} ambassadors</span>
+                  </div>
+                  {/* Segmented bar */}
+                  <div className="flex h-2.5 rounded-full overflow-hidden gap-px bg-slate-100">
+                    {b.accepted  > 0 && <div style={{ width: `${(b.accepted  / total) * 100}%`, background: C.green  }} title={`Accepted: ${b.accepted}`} />}
+                    {b.pending   > 0 && <div style={{ width: `${(b.pending   / total) * 100}%`, background: C.amber  }} title={`To be Decided: ${b.pending}`} />}
+                    {b.notReached> 0 && <div style={{ width: `${(b.notReached/ total) * 100}%`, background: C.slate  }} title={`Not Yet Reached: ${b.notReached}`} />}
+                    {b.rejected  > 0 && <div style={{ width: `${(b.rejected  / total) * 100}%`, background: C.red    }} title={`Rejected: ${b.rejected}`} />}
+                  </div>
+                  {/* Count pills */}
+                  <div className="flex gap-4 mt-1.5 text-[11px] font-semibold">
+                    {b.accepted   > 0 && <span style={{ color: C.green  }}>✓ {b.accepted} Accepted</span>}
+                    {b.pending    > 0 && <span style={{ color: C.amber  }}>◷ {b.pending} To be Decided</span>}
+                    {b.notReached > 0 && <span style={{ color: C.slate  }}>· {b.notReached} Not Yet Reached</span>}
+                    {b.rejected   > 0 && <span style={{ color: C.red    }}>✕ {b.rejected} Rejected</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Row 3: Categories + Team leaderboard — hidden for PA view ── */}
       {filterVertical !== "parentAdvocacy" && (
