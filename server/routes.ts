@@ -4574,7 +4574,7 @@ paths:
   app.get("/api/admin/alliances/friendship/schools", requireAlliancesOrAdmin, async (_req, res) => {
     try {
       // Auto-sync: pull MOU Done schools from Sheets and upsert any that aren't in the DB yet
-      const SID = process.env.ALLIANCES_SHEET_ID;
+      const SID = SHEET_IDS.alliances;
       if (SID) {
         try {
           const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
