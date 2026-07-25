@@ -4641,14 +4641,7 @@ paths:
               isActive: true,
             });
             existingByName.set(s.name.toLowerCase(), school);
-            // Auto-create Sheets tab (non-blocking)
-            const auth = getAuthenticatedClient();
-            if (auth) {
-              import("googleapis").then(({ google: goog }) => {
-                const sheets = goog.sheets({ version: "v4", auth });
-                ensureFriendshipSheetTab(sheets, SID, school.sheetsTabName).catch(() => {});
-              });
-            }
+            // Tab is created on-demand when the first lead is submitted — no need to pre-create it here.
           }
         } catch (syncErr) {
           console.error("[friendship] auto-sync error:", syncErr instanceof Error ? syncErr.message : syncErr);

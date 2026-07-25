@@ -395,8 +395,8 @@ function FriendshipQRTabInner() {
                     <div className="text-xs text-slate-500 mt-0.5">{s.contactPerson || "—"}</div>
                     <div className="flex items-center gap-2 mt-1.5">
                       <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                        style={{ background: s.isActive ? "#dcfce7" : "#fee2e2", color: s.isActive ? GREEN : "#dc2626" }}>
-                        {s.isActive ? "Active" : "Inactive"}
+                        style={{ background: s.leadCount > 0 ? "#dcfce7" : "#f1f5f9", color: s.leadCount > 0 ? GREEN : "#94a3b8" }}>
+                        {s.leadCount > 0 ? "Active" : "Inactive"}
                       </span>
                       <span className="text-xs text-slate-400">{s.leadCount} lead{s.leadCount !== 1 ? "s" : ""}</span>
                     </div>
