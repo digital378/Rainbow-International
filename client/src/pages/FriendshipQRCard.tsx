@@ -32,9 +32,22 @@ export default function FriendshipQRCard() {
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
 
-    const token = getToken();
+    // Prefer URL params (passed by the caller) — avoids needing auth in the new tab.
+    const params = new URLSearchParams(window.location.search);
+    const nameParam  = params.get("name");
+    const tokenParam = params.get("token");
+
+    if (nameParam && tokenParam) {
+      setSchool({ id: Number(id), name: nameParam, contactPerson: "", isActive: true });
+      setPortalUrl(`${window.location.origin}/alliances/friendship/${tokenParam}`);
+      return;
+    }
+
+    // Fallback: fetch from API (requires admin auth via cookie or Bearer token)
+    const adminToken = getToken();
     fetch(`/api/admin/alliances/friendship/schools/${id}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: adminToken ? { Authorization: `Bearer ${adminToken}` } : {},
+      credentials: "same-origin",
     })
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then((d: School & { token: string }) => {

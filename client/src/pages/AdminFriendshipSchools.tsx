@@ -395,7 +395,7 @@ function AdminFriendshipSchoolsInner() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-1 flex-shrink-0">
-                          <button onClick={e => { e.stopPropagation(); window.location.href = `/admin/alliances/friendship/${s.id}/qr`; }}
+                          <button onClick={e => { e.stopPropagation(); window.open(`/admin/alliances/friendship/${s.id}/qr?name=${encodeURIComponent(s.name)}&token=${s.token}`, "_blank"); }}
                             className="text-xs px-2 py-1 rounded font-semibold transition hover:opacity-80"
                             style={{ background: "#f0f4ff", color: NAVY }}
                             data-testid={`button-qr-${s.id}`}>QR</button>

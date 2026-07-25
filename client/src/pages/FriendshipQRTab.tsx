@@ -364,7 +364,7 @@ function FriendshipQRTabInner() {
                     </div>
                     {/* Action buttons — bottom row */}
                     <div className="flex items-center gap-2 mt-3 flex-wrap" onClick={e => e.stopPropagation()}>
-                      <button onClick={e => { e.stopPropagation(); window.open(`/admin/alliances/friendship/${s.id}/qr`, "_blank"); }}
+                      <button onClick={e => { e.stopPropagation(); window.open(`/admin/alliances/friendship/${s.id}/qr?name=${encodeURIComponent(s.name)}&token=${s.token}`, "_blank"); }}
                         className="text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:opacity-80"
                         style={{ background: "#f0f4ff", color: NAVY }}
                         data-testid={`button-qr-qr-${s.id}`}>QR Code</button>
