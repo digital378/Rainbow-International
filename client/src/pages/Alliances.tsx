@@ -49,6 +49,8 @@ interface AlliancesData {
   categoryBreakdown: CategoryEntry[];
   pipelineStages: string[];
   paStatuses: string[];
+  paPartnerStatuses: string[];
+  partnerStatusCounts: { accepted: number; pending: number; rejected: number; notReached: number; };
 }
 
 // ── Stage colours ──────────────────────────────────────────────
@@ -1007,14 +1009,19 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
 // ── Parent Advocacy Tab ───────────────────────────────────────
 function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterPartnerStatus, setFilterPartnerStatus] = useState("");
 
-  // Display-only label remapping: sheet value "Enquired" → shows as "Referred"
-  const PA_DISPLAY_LABEL: Record<string, string> = { "Enquired": "Referred" };
-  const displayLabel = (st: string) => PA_DISPLAY_LABEL[st] ?? st;
+  // partnerStatus filter options (including a synthetic "Not yet reached" for blank rows)
+  const PA_PARTNER_STATUS_OPTIONS = ["Accepted", "To be Decided", "Rejected", "Not yet reached"];
 
   const rows = data.parentAdvocacy.filter(p => {
-    if (filterStatus && p.status !== filterStatus) return false;
+    if (filterPartnerStatus) {
+      if (filterPartnerStatus === "Not yet reached") {
+        if (p.partnerStatus?.trim()) return false;
+      } else {
+        if (p.partnerStatus !== filterPartnerStatus) return false;
+      }
+    }
     if (search) {
       const q = search.toLowerCase();
       if (!p.referringParent.toLowerCase().includes(q) &&
@@ -1026,34 +1033,16 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
     return true;
   });
 
-  const ambassadorsOnBoard = data.parentAdvocacy.filter(p => p.partnerStatus?.toLowerCase().includes("accept")).length;
+  // Ambassador acceptance rate: Accepted ÷ (Accepted + Rejected) — excludes still-pending
+  const psc = data.partnerStatusCounts;
+  const acceptanceDenominator = psc.accepted + psc.rejected;
+  const acceptanceRate = acceptanceDenominator > 0
+    ? Math.round((psc.accepted / acceptanceDenominator) * 100) : 0;
 
-  // Rows with partnerStatus containing "reject" or "declin" count toward Not Interested in pipeline
-  const isPartnerRejected = (p: ParentAdvocacy) => {
-    const ps = p.partnerStatus?.toLowerCase() ?? "";
-    return ps.includes("reject") || ps.includes("declin");
-  };
-
-  const decidedNotInterested = data.parentAdvocacy.filter(p =>
-    p.status === "Not Interested" || isPartnerRejected(p)
-  ).length;
-
-  // Conversion: onboarded ÷ (onboarded + not-interested/rejected) — excludes pending
-  const conversionDenominator = ambassadorsOnBoard + decidedNotInterested;
-  const conversion = conversionDenominator > 0
-    ? Math.round((ambassadorsOnBoard / conversionDenominator) * 100) : 0;
-
-  // Recompute pipeline funnel client-side: rejected partnerStatus → bucket into "Not Interested"
-  const paFunnel: Record<string, number> = {};
-  for (const st of data.paStatuses) paFunnel[st] = 0;
-  for (const p of data.parentAdvocacy) {
-    if (isPartnerRejected(p)) {
-      paFunnel["Not Interested"] = (paFunnel["Not Interested"] ?? 0) + 1;
-    } else if (p.status && paFunnel[p.status] !== undefined) {
-      paFunnel[p.status]++;
-    }
-  }
-
+  // Referral pipeline funnel — driven purely by status col K (may all be zero currently)
+  const PA_STATUSES = ["Enquired", "Campus Visit Scheduled", "Application Submitted", "Admission Confirmed", "Not Interested"];
+  const PA_DISPLAY_LABEL: Record<string, string> = { "Enquired": "Referred" };
+  const displayLabel = (st: string) => PA_DISPLAY_LABEL[st] ?? st;
   const PA_HEX: Record<string, string> = {
     "Enquired": C.blue,
     "Campus Visit Scheduled": C.indigo,
@@ -1061,9 +1050,15 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
     "Admission Confirmed": C.green,
     "Not Interested": C.red,
   };
-  const paStatusStages = data.paStatuses;
 
-  // Branch-wise breakdown: Ambassadors Targeted + on Board per branch
+  const paFunnel: Record<string, number> = {};
+  for (const st of PA_STATUSES) paFunnel[st] = 0;
+  for (const p of data.parentAdvocacy) {
+    if (p.status && paFunnel[p.status] !== undefined) paFunnel[p.status]++;
+  }
+  const hasReferrals = Object.values(paFunnel).some(v => v > 0);
+
+  // Branch-wise breakdown
   const branchMap: Record<string, { targeted: number; onBoard: number }> = {};
   for (const p of data.parentAdvocacy) {
     const br = p.branch?.trim() || "Unknown";
@@ -1073,50 +1068,88 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   }
   const branches = Object.entries(branchMap).sort((a, b) => b[1].targeted - a[1].targeted);
 
+  const total = data.parentAdvocacy.length || 1;
+
   return (
     <div className="space-y-4">
-      {/* PA Summary Infographic */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-4">
-        <div className="flex flex-wrap gap-3">
-          {[
-            { label: "Total Ambassadors Targeted", value: data.parentAdvocacy.length, color: C.navy },
-            { label: "Ambassadors on Board", value: ambassadorsOnBoard, color: C.blue },
-            { label: "Conversion Rate", value: `${conversion}%`, color: C.amber },
-          ].map(s => (
-            <div key={s.label}
-              className="flex flex-col items-center bg-slate-50 rounded-xl px-5 py-3 min-w-[100px] border border-slate-100">
-              <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
-                {typeof s.value === "number" ? <AN value={s.value} /> : s.value}
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{s.label}</div>
-            </div>
-          ))}
-          {paStatusStages.map(st => (
-            <div key={st}
-              className="flex flex-col items-center bg-slate-50 rounded-xl px-4 py-3 min-w-[88px] border border-slate-100">
-              <div className="text-2xl font-black leading-none" style={{ color: PA_HEX[st] ?? C.slate }}>
-                <AN value={paFunnel[st] ?? 0} />
-              </div>
-              <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{displayLabel(st)}</div>
-            </div>
-          ))}
-        </div>
-        {/* Referral pipeline bar */}
+      {/* PA Summary */}
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-5 space-y-5">
+
+        {/* ── Section 1: Ambassador Recruitment ── */}
         <div>
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Referral Pipeline</div>
-          <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
-            {paStatusStages.map(st => {
-              const cnt = paFunnel[st] ?? 0;
-              const total = data.parentAdvocacy.length || 1;
-              if (!cnt) return null;
-              return (
-                <div key={st} title={`${displayLabel(st)}: ${cnt}`}
-                  style={{ width: `${(cnt / total) * 100}%`, background: PA_HEX[st] ?? C.slate }}
-                  className="transition-all duration-1000" />
-              );
-            })}
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Ambassador Recruitment</div>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { label: "Total Targeted",    value: data.parentAdvocacy.length, color: C.navy  },
+              { label: "Accepted",          value: psc.accepted,               color: C.green },
+              { label: "Pending Decision",  value: psc.pending,                color: C.amber },
+              { label: "Not Yet Reached",   value: psc.notReached,             color: C.slate },
+              { label: "Rejected",          value: psc.rejected,               color: C.red   },
+              { label: "Acceptance Rate",   value: `${acceptanceRate}%`,       color: C.amber },
+            ].map(s => (
+              <div key={s.label}
+                className="flex flex-col items-center bg-slate-50 rounded-xl px-5 py-3 min-w-[90px] border border-slate-100">
+                <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
+                  {typeof s.value === "number" ? <AN value={s.value} /> : s.value}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Recruitment progress bar */}
+        <div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Recruitment Progress</div>
+          <div className="flex h-3 rounded-full overflow-hidden gap-[1px]">
+            {[
+              { key: "accepted",   label: "Accepted",         count: psc.accepted,   color: C.green  },
+              { key: "pending",    label: "Pending Decision",  count: psc.pending,    color: C.amber  },
+              { key: "notReached", label: "Not Yet Reached",   count: psc.notReached, color: "#e2e8f0" },
+              { key: "rejected",   label: "Rejected",          count: psc.rejected,   color: C.red    },
+            ].filter(s => s.count > 0).map(s => (
+              <div key={s.key} title={`${s.label}: ${s.count}`}
+                style={{ width: `${(s.count / total) * 100}%`, background: s.color }}
+                className="transition-all duration-1000" />
+            ))}
+          </div>
+          <div className="flex gap-4 mt-1.5 flex-wrap">
+            {[
+              { label: "Accepted",         color: C.green   },
+              { label: "Pending",          color: C.amber   },
+              { label: "Not yet reached",  color: "#e2e8f0" },
+              { label: "Rejected",         color: C.red     },
+            ].map(l => (
+              <div key={l.label} className="flex items-center gap-1 text-[10px] text-slate-500">
+                <div className="w-2.5 h-2.5 rounded-sm border border-slate-200" style={{ background: l.color }} />
+                {l.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Section 2: Referral Pipeline (conditional) ── */}
+        <div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Referral Pipeline</div>
+          {hasReferrals ? (
+            <div className="flex flex-wrap gap-3">
+              {PA_STATUSES.map(st => (
+                <div key={st}
+                  className="flex flex-col items-center bg-slate-50 rounded-xl px-4 py-3 min-w-[88px] border border-slate-100">
+                  <div className="text-2xl font-black leading-none" style={{ color: PA_HEX[st] ?? C.slate }}>
+                    <AN value={paFunnel[st] ?? 0} />
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-1 text-center leading-tight">{displayLabel(st)}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 italic py-0.5">
+              No referrals yet — will populate as ambassadors send leads
+            </p>
+          )}
+        </div>
+
         {/* Branch-wise breakdown */}
         {branches.length > 0 && (
           <div>
@@ -1136,11 +1169,14 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
           </div>
         )}
       </div>
+
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
-        <Select value={filterStatus} onChange={setFilterStatus} options={data.paStatuses} placeholder="All statuses" />
+        <Select value={filterPartnerStatus} onChange={setFilterPartnerStatus}
+          options={PA_PARTNER_STATUS_OPTIONS} placeholder="All partner statuses" />
         <div className="ml-auto text-sm text-slate-500">{rows.length} shown</div>
       </div>
+
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-auto max-h-[62vh]">
           <table className="w-full text-sm">
@@ -1153,7 +1189,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referral Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Date Referred</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Incentive</th>
               </tr>
@@ -1164,7 +1200,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                   <td className="px-4 py-2.5 text-slate-400 text-xs">{p.sno}</td>
                   <td className="px-4 py-2.5">
                     <div className="font-medium text-slate-800">{p.referringParent}</div>
-                    <div className="text-xs text-slate-400">{[p.branch, p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
+                    <div className="text-xs text-slate-400">{[p.branch?.trim(), p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="text-slate-600 text-xs">{p.fatherName || "—"}</div>

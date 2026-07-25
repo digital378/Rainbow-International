@@ -4247,11 +4247,11 @@ paths:
         }));
 
       // Parent Advocacy
-      // Actual sheet columns (A:M, 0-indexed):
-      // 0=S.No  1=Referring Parent Name  2=Branch  3=Ward-Class
-      // 4=Name of the Parent(Father)  5=Name of the Mother  6=Contact Number
-      // 7=Referred Family Name  8=Grade Applying For  9=Status
-      // 10=Date Referred  11=Last Update Date  12=Incentive/Discount Given?
+      // Actual sheet columns (A:N, 0-indexed):
+      // 0=S.No  1=Student Name (RIS student)  2=Branch  3=Ward-Class
+      // 4=Father Name  5=Mother Name  6=Contact Number
+      // 7=Partner Status (H)  8=Referred Family Name  9=Grade Applying For
+      // 10=Status (referral lead stage)  11=Date Referred  12=Last Update  13=Incentive Given?
       const parentAdvocacy = paRows.slice(1)
         .filter(r => r[1] && r[1].trim())
         .map(r => ({
@@ -4274,6 +4274,15 @@ paths:
       // ── Computed aggregates ────────────────────────────────────
       const PIPELINE_STAGES = ["Not Contacted","Initial Discussion","Touchbase Done","Waiting for Revert","MOU Sent","MOU Signing Pending","MOU Done","Not Interested / Dropped"];
       const PA_STATUSES = ["Enquired","Campus Visit Scheduled","Application Submitted","Admission Confirmed","Not Interested"];
+      const PA_PARTNER_STATUSES = ["Accepted","To be Decided","Rejected","Not yet reached"];
+
+      // Ambassador recruitment counts (partnerStatus col H)
+      const partnerStatusCounts = {
+        accepted:   parentAdvocacy.filter(p => p.partnerStatus === "Accepted").length,
+        pending:    parentAdvocacy.filter(p => p.partnerStatus === "To be Decided").length,
+        rejected:   parentAdvocacy.filter(p => p.partnerStatus === "Rejected").length,
+        notReached: parentAdvocacy.filter(p => !p.partnerStatus?.trim()).length,
+      };
 
       const stageCounts = (arr: {stage:string}[]) => {
         const m: Record<string,number> = {};
@@ -4351,6 +4360,8 @@ paths:
         categoryBreakdown,
         pipelineStages: PIPELINE_STAGES,
         paStatuses: PA_STATUSES,
+        paPartnerStatuses: PA_PARTNER_STATUSES,
+        partnerStatusCounts,
       });
     } catch (err: any) {
       console.error("[alliances] error:", err?.message);
