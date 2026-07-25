@@ -601,7 +601,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           )}
           {/* Per-vertical mini breakdown — only in "all" mode */}
           {filterVertical === "all" && (
-            <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+            <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-2 gap-x-8 gap-y-5 text-xs">
               {/* MOU-based verticals */}
               {([ 
                 { name: "Brand Partners",     f: funnel.brandPartners     },
