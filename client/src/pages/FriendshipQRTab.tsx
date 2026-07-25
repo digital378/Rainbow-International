@@ -437,7 +437,7 @@ function FriendshipQRTabInner() {
         </div>
 
         {/* Leads panel */}
-        <div className="lg:col-span-2 lg:sticky lg:top-4 lg:self-start" ref={leadsPanelRef}>
+        <div className="lg:col-span-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:rounded-2xl" ref={leadsPanelRef}>
           {!selectedSchool ? (
             <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
               <div className="text-3xl mb-3">🏫</div>
