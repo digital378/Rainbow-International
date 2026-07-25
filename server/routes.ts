@@ -4591,9 +4591,28 @@ paths:
               sheetsTabName: String(r[1]).trim(),
             }));
           const existing = await storage.listFriendshipSchools();
-          const existingNames = new Set(existing.map((s: any) => s.name.toLowerCase().trim()));
+          const existingByName = new Map(existing.map((s: any) => [s.name.toLowerCase().trim(), s]));
           for (const s of mouDone) {
-            if (existingNames.has(s.name.toLowerCase())) continue;
+            const dbSchool = existingByName.get(s.name.toLowerCase());
+            if (dbSchool) {
+              // School already exists — update contact details from Sheets if they've changed,
+              // but only when the admin has not manually overridden them (contactOverride flag).
+              if (!dbSchool.contactOverride) {
+                const contactChanged =
+                  dbSchool.contactPerson !== s.contactPerson ||
+                  (dbSchool.contactPhone ?? "") !== (s.contactPhone ?? "");
+                if (contactChanged) {
+                  await storage.updateFriendshipSchool(dbSchool.id, {
+                    contactPerson: s.contactPerson,
+                    contactPhone: s.contactPhone,
+                  }).catch((e: unknown) => {
+                    console.error(`[friendship] contact update failed for "${s.name}":`, e instanceof Error ? e.message : e);
+                  });
+                }
+              }
+              continue;
+            }
+            // New school — create it
             const school = await storage.createFriendshipSchool({
               name: s.name,
               slug: slugify(s.name),
@@ -4603,7 +4622,7 @@ paths:
               sheetsTabName: s.sheetsTabName,
               isActive: true,
             });
-            existingNames.add(s.name.toLowerCase());
+            existingByName.set(s.name.toLowerCase(), school);
             // Auto-create Sheets tab (non-blocking)
             const auth = getAuthenticatedClient();
             if (auth) {
@@ -4668,7 +4687,18 @@ paths:
   // Admin: update friendship school
   app.put("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
     try {
-      const school = await storage.updateFriendshipSchool(Number(req.params.id), req.body);
+      const update = { ...req.body };
+      // If the admin is manually setting contact fields, mark the record so that
+      // the Sheets auto-sync won't overwrite them on the next poll.
+      const existing = await storage.getFriendshipSchoolById(Number(req.params.id));
+      if (existing && ("contactPerson" in update || "contactPhone" in update)) {
+        const personChanged = "contactPerson" in update && update.contactPerson !== existing.contactPerson;
+        const phoneChanged  = "contactPhone"  in update && update.contactPhone  !== existing.contactPhone;
+        if (personChanged || phoneChanged) {
+          update.contactOverride = true;
+        }
+      }
+      const school = await storage.updateFriendshipSchool(Number(req.params.id), update);
       if (!school) return res.status(404).json({ message: "School not found" });
       res.json(school);
     } catch {

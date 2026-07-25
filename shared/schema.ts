@@ -180,6 +180,8 @@ export const friendshipSchools = pgTable("friendship_schools", {
   contactPhone: text("contact_phone"),
   sheetsTabName: text("sheets_tab_name").notNull(),
   isActive: boolean("is_active").notNull().default(true),
+  // When true, Sheets auto-sync will not overwrite contactPerson/contactPhone
+  contactOverride: boolean("contact_override").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
