@@ -4806,7 +4806,7 @@ paths:
       const rows = response.data.values || [];
 
       // Get existing leads for this school so we can detect new ones
-      const existing = await storage.getFriendshipLeads({ schoolId });
+      const existing = await storage.listFriendshipLeads(schoolId);
       const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
 
       const statusUpdates: { phone: string; status: string }[] = [];
