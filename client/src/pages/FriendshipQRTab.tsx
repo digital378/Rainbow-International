@@ -5,6 +5,8 @@ const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
 const ADMIN_AUTH_KEY = "ris_admin_auth";
+const ALLIANCES_AUTH_KEY = "alliances_auth_v1";
+const ALLIANCES_PIN = "ALL8";
 
 const STATUS_COLORS: Record<string, string> = {
   "Open": "#3b82f6",
@@ -36,9 +38,17 @@ type Stats = {
 function getToken() {
   try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
 }
-const authHeader = () => {
+const authHeader = (): Record<string, string> => {
+  const headers: Record<string, string> = {};
   const t = getToken();
-  return t ? { Authorization: `Bearer ${t}` } : {};
+  if (t) headers["Authorization"] = `Bearer ${t}`;
+  // Always send the alliances passcode when the alliances dashboard session is active
+  try {
+    if (sessionStorage.getItem(ALLIANCES_AUTH_KEY) === "1") {
+      headers["X-Alliances-Auth"] = ALLIANCES_PIN;
+    }
+  } catch { /* ignore */ }
+  return headers;
 };
 
 function TokenGate({ onSuccess }: { onSuccess: () => void }) {
@@ -130,8 +140,6 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
 }
 
 export default function FriendshipQRTab() {
-  const [authed, setAuthed] = useState<boolean>(() => Boolean(getToken()));
-  if (!authed) return <TokenGate onSuccess={() => setAuthed(true)} />;
   return <FriendshipQRTabInner />;
 }
 
@@ -200,7 +208,7 @@ function FriendshipQRTabInner() {
         fetch("/api/admin/alliances/friendship/schools", { headers: authHeader() }),
         fetch("/api/admin/alliances/friendship/stats", { headers: authHeader() }),
       ]);
-      if (schoolsRes.status === 401) { try { sessionStorage.removeItem(ADMIN_AUTH_KEY); } catch {} window.location.reload(); return; }
+      if (schoolsRes.status === 401) { setLoading(false); return; } // auth handled at dashboard level
       setSchools(await schoolsRes.json());
       if (statsRes.ok) setStats(await statsRes.json());
     } catch { /* silent */ }
@@ -304,22 +312,6 @@ function FriendshipQRTabInner() {
     setTimeout(() => setSyncMsg(""), 5000);
   };
 
-  const handleImportMouDone = async () => {
-    setSyncMsg("Importing MOU Done schools from Sheets…");
-    try {
-      const res = await fetch("/api/admin/alliances/friendship/import-mou-done", {
-        method: "POST", headers: authHeader(),
-      });
-      const d = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setSyncMsg(`Imported ${d.imported} new school${d.imported !== 1 ? "s" : ""}${d.skipped > 0 ? ` · ${d.skipped} already existed` : ""} (${d.total} MOU Done total)`);
-        fetchAll();
-      } else {
-        setSyncMsg(d.message || "Import failed");
-      }
-    } catch { setSyncMsg("Import failed"); }
-    setTimeout(() => setSyncMsg(""), 8000);
-  };
 
   return (
     <div>
@@ -345,12 +337,6 @@ function FriendshipQRTabInner() {
               {syncMsg}
             </span>
           )}
-          <button onClick={handleImportMouDone}
-            className="px-4 py-1.5 rounded-lg text-xs font-bold border-2 transition"
-            style={{ borderColor: "#0ea5e9", color: "#0ea5e9", background: "#fff" }}
-            data-testid="button-qr-import-mou">
-            ⬇ Import MOU Done
-          </button>
           <button onClick={openAddModal}
             className="px-4 py-1.5 rounded-lg text-xs font-black text-white transition"
             style={{ background: NAVY }}

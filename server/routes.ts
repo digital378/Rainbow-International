@@ -3319,6 +3319,30 @@ paths:
     next();
   }
 
+  // Accepts either the admin Bearer token OR the alliances dashboard passcode
+  // (sent as X-Alliances-Auth header). Used for Friendship Schools endpoints
+  // that are accessible from the alliances dashboard without needing the full admin token.
+  const ALLIANCES_PIN = process.env.ALLIANCES_PASSCODE || "ALL8";
+  function requireAlliancesOrAdmin(req: any, res: any, next: any) {
+    // Check alliances passcode header first
+    const alliancesAuth = req.headers["x-alliances-auth"] || "";
+    if (alliancesAuth && alliancesAuth === ALLIANCES_PIN) return next();
+    // Fall back to admin Bearer token
+    const adminToken = process.env.ADMIN_TOKEN;
+    if (!adminToken) return res.status(503).json({ message: "Admin token not configured" });
+    const authHeader = req.headers.authorization || "";
+    const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (!bearer || bearer.length !== adminToken.length) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    try {
+      if (!timingSafeEqual(Buffer.from(adminToken), Buffer.from(bearer))) throw new Error();
+    } catch {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    next();
+  }
+
   // Public: get RA info by slug (used by walkin form to display RA name)
   app.get("/api/walkin/:slug/info", async (req, res) => {
     try {
@@ -4501,8 +4525,50 @@ paths:
   });
 
   // Admin: list all friendship schools (with lead counts)
-  app.get("/api/admin/alliances/friendship/schools", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/alliances/friendship/schools", requireAlliancesOrAdmin, async (_req, res) => {
     try {
+      // Auto-sync: pull MOU Done schools from Sheets and upsert any that aren't in the DB yet
+      const SID = process.env.ALLIANCES_SHEET_ID;
+      if (SID) {
+        try {
+          const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
+          const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          const mouDone = rows.slice(1)
+            .filter(r => r[1] && r[1].trim() && String(r[11] ?? "").trim() === "MOU Done")
+            .map(r => ({
+              name: String(r[1]).trim(),
+              contactPerson: String(r[4] ?? "").trim() || "—",
+              contactPhone: String(r[5] ?? "").trim() || undefined,
+              sheetsTabName: String(r[1]).trim(),
+            }));
+          const existing = await storage.listFriendshipSchools();
+          const existingNames = new Set(existing.map((s: any) => s.name.toLowerCase().trim()));
+          for (const s of mouDone) {
+            if (existingNames.has(s.name.toLowerCase())) continue;
+            const school = await storage.createFriendshipSchool({
+              name: s.name,
+              slug: slugify(s.name),
+              token: randomBytes(16).toString("hex"),
+              contactPerson: s.contactPerson,
+              contactPhone: s.contactPhone,
+              sheetsTabName: s.sheetsTabName,
+              isActive: true,
+            });
+            existingNames.add(s.name.toLowerCase());
+            // Auto-create Sheets tab (non-blocking)
+            const auth = getAuthenticatedClient();
+            if (auth) {
+              import("googleapis").then(({ google: goog }) => {
+                const sheets = goog.sheets({ version: "v4", auth });
+                ensureFriendshipSheetTab(sheets, SID, school.sheetsTabName).catch(() => {});
+              });
+            }
+          }
+        } catch (syncErr) {
+          console.error("[friendship] auto-sync error:", syncErr instanceof Error ? syncErr.message : syncErr);
+          // Non-fatal: still return whatever is in the DB
+        }
+      }
       res.json(await storage.listFriendshipSchools());
     } catch {
       res.status(500).json({ message: "Failed to fetch schools" });
@@ -4510,7 +4576,7 @@ paths:
   });
 
   // Admin: get single school by ID
-  app.get("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+  app.get("/api/admin/alliances/friendship/schools/:id", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const school = await storage.getFriendshipSchoolById(Number(req.params.id));
       if (!school) return res.status(404).json({ message: "School not found" });
@@ -4550,60 +4616,6 @@ paths:
     }
   });
 
-  // Admin: bulk-import MOU Done schools from Google Sheets pipeline tab
-  app.post("/api/admin/alliances/friendship/import-mou-done", requireAdmin, async (req, res) => {
-    try {
-      const SID = process.env.ALLIANCES_SHEET_ID;
-      if (!SID) return res.status(500).json({ message: "ALLIANCES_SHEET_ID not configured" });
-      const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
-      const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-      const mouDone = rows.slice(1)
-        .filter(r => r[1] && r[1].trim() && String(r[11] ?? "").trim() === "MOU Done")
-        .map(r => ({
-          name: String(r[1]).trim(),
-          contactPerson: String(r[4] ?? "").trim() || "—",
-          contactPhone: String(r[5] ?? "").trim() || undefined,
-          sheetsTabName: String(r[1]).trim(),
-        }));
-
-      const existing = await storage.listFriendshipSchools();
-      const existingNames = new Set(existing.map((s: any) => s.name.toLowerCase().trim()));
-
-      let imported = 0;
-      const skipped: string[] = [];
-      for (const s of mouDone) {
-        if (existingNames.has(s.name.toLowerCase())) {
-          skipped.push(s.name);
-          continue;
-        }
-        const school = await storage.createFriendshipSchool({
-          name: s.name,
-          slug: slugify(s.name),
-          token: randomBytes(16).toString("hex"),
-          contactPerson: s.contactPerson,
-          contactPhone: s.contactPhone,
-          sheetsTabName: s.sheetsTabName,
-          isActive: true,
-        });
-        imported++;
-        existingNames.add(s.name.toLowerCase());
-        // Auto-create Sheets tab (non-blocking)
-        const auth = getAuthenticatedClient();
-        if (SID && auth) {
-          import("googleapis").then(({ google: goog }) => {
-            const sheets = goog.sheets({ version: "v4", auth });
-            ensureFriendshipSheetTab(sheets, SID, school.sheetsTabName).catch(() => {});
-          });
-        }
-      }
-
-      res.json({ imported, skipped: skipped.length, skippedNames: skipped, total: mouDone.length });
-    } catch (err: any) {
-      console.error("[friendship] import-mou-done error:", err);
-      res.status(500).json({ message: "Import failed" });
-    }
-  });
-
   // Admin: update friendship school
   app.put("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
     try {
@@ -4637,7 +4649,7 @@ paths:
   });
 
   // Admin: list leads (optionally filtered by schoolId / status)
-  app.get("/api/admin/alliances/friendship/leads", requireAdmin, async (req, res) => {
+  app.get("/api/admin/alliances/friendship/leads", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const schoolId = req.query.schoolId ? Number(req.query.schoolId) : undefined;
       const status = typeof req.query.status === "string" ? req.query.status : undefined;
@@ -4907,7 +4919,7 @@ paths:
     }
   });
 
-  app.get("/api/admin/alliances/friendship/stats", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/alliances/friendship/stats", requireAlliancesOrAdmin, async (_req, res) => {
     try {
       const schools = await storage.listFriendshipSchools();
       const totalSchools = schools.length;
