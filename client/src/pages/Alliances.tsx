@@ -1184,7 +1184,6 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Student Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Parent Name</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Ambassador Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
@@ -1201,10 +1200,6 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                   <td className="px-4 py-2.5">
                     <div className="font-medium text-slate-800">{p.referringParent}</div>
                     <div className="text-xs text-slate-400">{[p.branch?.trim(), p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <div className="text-slate-600 text-xs">{p.fatherName || "—"}</div>
-                    {p.motherName && <div className="text-xs text-slate-400">{p.motherName}</div>}
                   </td>
                   <td className="px-4 py-2.5">
                     {p.partnerStatus ? (
