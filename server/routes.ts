@@ -4579,6 +4579,9 @@ paths:
         try {
           const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
           const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          // Debug: log unique stages found in the sheet
+          const uniqueStages = [...new Set(rows.slice(1).filter(r => r[1]?.trim()).map(r => JSON.stringify(String(r[11] ?? ""))))];
+          console.log(`[friendship-sync] ${rows.length - 1} data rows, unique stages:`, uniqueStages.join(", "));
           const mouDone = rows.slice(1)
             .filter(r => r[1] && r[1].trim() && String(r[11] ?? "").trim() === "MOU Done")
             .map(r => ({
