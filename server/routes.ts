@@ -4785,7 +4785,7 @@ paths:
   });
 
   // Admin: sync lead statuses from Google Sheets back into DB
-  app.post("/api/admin/alliances/friendship/sync-status-from-sheets", requireAdmin, async (req, res) => {
+  app.post("/api/admin/alliances/friendship/sync-status-from-sheets", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const schoolId = Number(req.body?.schoolId);
       if (!schoolId) return res.status(400).json({ message: "schoolId required" });

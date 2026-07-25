@@ -493,7 +493,7 @@ function FriendshipQRTabInner() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        {["Date", "Student", "Grade", "Parent", "Phone", "Source", "Status", "Ref. Amt", "Synced"].map(h => (
+                        {["Date", "Student", "Grade", "Parent", "Contact", "Source", "Status", "Ref. Amt", "Synced"].map(h => (
                           <th key={h} className="px-3 py-3 text-left whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
@@ -505,7 +505,24 @@ function FriendshipQRTabInner() {
                           <td className="px-3 py-2.5 font-semibold text-slate-800">{l.studentName}</td>
                           <td className="px-3 py-2.5 text-slate-600">{l.grade}</td>
                           <td className="px-3 py-2.5 text-slate-700">{l.parentName}</td>
-                          <td className="px-3 py-2.5 text-slate-500">{l.phone}</td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <div className="flex flex-col gap-0.5">
+                              {l.phone ? (
+                                <a href={`https://wa.me/${normalizePhone(l.phone)}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="text-xs text-green-600 font-semibold hover:underline">
+                                  📞 {l.phone}
+                                </a>
+                              ) : <span className="text-xs text-slate-300">—</span>}
+                              {l.email ? (
+                                <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(l.email)}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="text-xs text-blue-600 hover:underline">
+                                  ✉ {l.email}
+                                </a>
+                              ) : null}
+                            </div>
+                          </td>
                           <td className="px-3 py-2.5">
                             <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                               style={{ background: l.source === "bulk" ? "#f0f4ff" : "#f8fafc", color: l.source === "bulk" ? NAVY : "#64748b" }}>
