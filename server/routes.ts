@@ -4677,7 +4677,7 @@ paths:
   });
 
   // Admin: create friendship school (slug + token auto-generated server-side)
-  app.post("/api/admin/alliances/friendship/schools", requireAdmin, async (req, res) => {
+  app.post("/api/admin/alliances/friendship/schools", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       const body = {
@@ -4707,7 +4707,7 @@ paths:
   });
 
   // Admin: update friendship school
-  app.put("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+  app.put("/api/admin/alliances/friendship/schools/:id", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const update = { ...req.body };
       // If the admin is manually setting contact fields, mark the record so that
@@ -4729,7 +4729,7 @@ paths:
   });
 
   // Admin: regenerate QR token
-  app.delete("/api/admin/alliances/friendship/schools/:id", requireAdmin, async (req, res) => {
+  app.delete("/api/admin/alliances/friendship/schools/:id", requireAlliancesOrAdmin, async (req, res) => {
     try {
       await storage.deleteFriendshipSchool(Number(req.params.id));
       res.json({ success: true });
@@ -4738,7 +4738,7 @@ paths:
     }
   });
 
-  app.post("/api/admin/alliances/friendship/schools/:id/regenerate-token", requireAdmin, async (req, res) => {
+  app.post("/api/admin/alliances/friendship/schools/:id/regenerate-token", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const newToken = randomBytes(16).toString("hex");
       const school = await storage.regenerateFriendshipSchoolToken(Number(req.params.id), newToken);
@@ -4763,7 +4763,7 @@ paths:
   });
 
   // Admin: update lead status / commission
-  app.patch("/api/admin/alliances/friendship/leads/:id", requireAdmin, async (req, res) => {
+  app.patch("/api/admin/alliances/friendship/leads/:id", requireAlliancesOrAdmin, async (req, res) => {
     try {
       const id = Number(req.params.id);
       if (!id) return res.status(400).json({ message: "Invalid lead id" });
