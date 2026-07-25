@@ -386,7 +386,7 @@ function FriendshipQRTabInner() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* School list */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden lg:max-h-[calc(100vh-17rem)] lg:overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center text-slate-400 text-sm">Loading…</div>
             ) : displayedSchools.length === 0 ? (
@@ -437,7 +437,7 @@ function FriendshipQRTabInner() {
         </div>
 
         {/* Leads panel */}
-        <div className="lg:col-span-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:rounded-2xl" ref={leadsPanelRef}>
+        <div className="lg:col-span-2" ref={leadsPanelRef}>
           {!selectedSchool ? (
             <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
               <div className="text-3xl mb-3">🏫</div>
