@@ -4577,21 +4577,39 @@ paths:
       const SID = SHEET_IDS.alliances;
       if (SID) {
         try {
-          const rows = await fetchSheetRange(SID, "Friendship Schools!A:R");
+          const rows = await fetchSheetRange(SID, "Friendship Schools!A:Z");
           const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-          // Debug: log unique stages found in the sheet
-          const uniqueStages = [...new Set(rows.slice(1).filter(r => r[1]?.trim()).map(r => JSON.stringify(String(r[11] ?? ""))))];
-          console.log(`[friendship-sync] ${rows.length - 1} data rows, unique stages:`, uniqueStages.join(", "));
           const mouDone = rows.slice(1)
             .filter(r => r[1] && r[1].trim() && String(r[11] ?? "").trim() === "MOU Done")
-            .map(r => ({
-              name: String(r[1]).trim(),
-              contactPerson: String(r[4] ?? "").trim() || "—",
-              contactPhone: String(r[5] ?? "").trim() || undefined,
-              sheetsTabName: String(r[1]).trim(),
-            }));
+            .map(r => {
+              const schoolName = String(r[1]).trim();
+              const location   = String(r[2] ?? "").trim();
+              // Multi-branch schools share a name but differ by location — append location
+              // so each branch gets its own QR entry.  Skip the append when the school name
+              // already ends with "- <location>" (e.g. "Euro Kids - Anand Nagar").
+              const alreadyHasLoc = location &&
+                schoolName.toLowerCase().endsWith(`- ${location.toLowerCase()}`);
+              const displayName = (location && !alreadyHasLoc)
+                ? `${schoolName} - ${location}` : schoolName;
+              return {
+                name: displayName,
+                contactPerson: String(r[4] ?? "").trim() || "—",
+                contactPhone:  String(r[5] ?? "").trim() || undefined,
+                sheetsTabName: displayName,
+              };
+            });
           const existing = await storage.listFriendshipSchools();
           const existingByName = new Map(existing.map((s: any) => [s.name.toLowerCase().trim(), s]));
+          // Auto-remove stale entries: schools with 0 leads whose name is no longer in
+          // the current MOU Done list (e.g. old name-only entries superseded by name+location ones)
+          const currentMouNamesLc = new Set(mouDone.map(s => s.name.toLowerCase()));
+          for (const school of existing) {
+            if ((school as any).leadCount > 0) continue;        // never auto-delete with leads
+            if (currentMouNamesLc.has(school.name.toLowerCase())) continue; // still live
+            // Only auto-remove schools that were synced from Sheets (no contactOverride, slug exists)
+            if ((school as any).contactOverride) continue;
+            await storage.deleteFriendshipSchool(school.id).catch(() => {});
+          }
           for (const s of mouDone) {
             const dbSchool = existingByName.get(s.name.toLowerCase());
             if (dbSchool) {
