@@ -601,21 +601,40 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           )}
           {/* Per-vertical mini breakdown — only in "all" mode */}
           {filterVertical === "all" && (
-            <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-3 gap-4 text-xs">
-              {allVerticals.map(v => (
+            <div className="mt-5 pt-5 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              {/* MOU-based verticals */}
+              {([ 
+                { name: "Brand Partners",     f: funnel.brandPartners     },
+                { name: "Corporates",         f: funnel.corporates        },
+                { name: "Friendship Schools", f: funnel.friendshipSchools },
+              ] as const).map(v => (
                 <div key={v.name}>
                   <div className="font-bold text-[#091a4f] mb-2">{v.name}</div>
-                  {["MOU Done","MOU Sent","Touchbase Done","Initial Discussion"].map(st => (
+                  {(["MOU Done","MOU Sent","Touchbase Done","Initial Discussion"] as const).map(st => (
                     <div key={st} className="flex justify-between py-0.5">
                       <span className="text-slate-500 truncate pr-1">{st}</span>
                       <span className="font-black shrink-0" style={{ color: STAGE_COLOR_HEX[st] ?? C.slate }}>
-                        <AN value={(v.name === "Brand Partners" ? funnel.brandPartners :
-                          v.name === "Corporates" ? funnel.corporates : funnel.friendshipSchools)[st] ?? 0} />
+                        <AN value={v.f[st] ?? 0} />
                       </span>
                     </div>
                   ))}
                 </div>
               ))}
+              {/* Parent Advocacy — ambassador statuses, not MOU stages */}
+              <div>
+                <div className="font-bold text-[#091a4f] mb-2">Parent Advocacy</div>
+                {([
+                  { label: "Accepted",        value: data.partnerStatusCounts.accepted,   color: C.green },
+                  { label: "To be Decided",   value: data.partnerStatusCounts.pending,    color: C.amber },
+                  { label: "Not Yet Reached", value: data.partnerStatusCounts.notReached, color: C.slate },
+                  { label: "Rejected",        value: data.partnerStatusCounts.rejected,   color: C.red   },
+                ] as const).map(s => (
+                  <div key={s.label} className="flex justify-between py-0.5">
+                    <span className="text-slate-500 truncate pr-1">{s.label}</span>
+                    <span className="font-black shrink-0" style={{ color: s.color }}><AN value={s.value} /></span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -657,89 +676,6 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         </div>
       )}
 
-      {/* ── Row 3: Categories + Team leaderboard — hidden for PA view ── */}
-      {filterVertical !== "parentAdvocacy" && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Top categories — hide when a BP category is already selected */}
-        {topCats.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
-              Top Brand Partner Categories
-            </div>
-            <div className="space-y-3">
-              {topCats.map((c, i) => (
-                <div key={c.name}>
-                  <AnimatedBarRow label={c.name} value={c.total} max={catMax} color={C.navy} rank={i} />
-                  {c.mouDone > 0 && (
-                    <div className="flex items-center gap-3 mt-1 pl-8">
-                      <div className="flex-1 min-w-0">
-                        <div className="h-1 bg-slate-50 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full bg-green-400 transition-all duration-1000"
-                            style={{ width: `${catMax > 0 ? (c.mouDone / catMax) * 100 : 0}%` }} />
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-bold text-green-600 shrink-0">
-                        <AN value={c.mouDone} /> MOU
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Team leaderboard */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5">
-            Team Leaderboard
-          </div>
-          <div className="space-y-4">
-            {topOwners.map((o, i) => (
-              <div key={o.name}>
-                <AnimatedBarRow label={o.name} value={o.total} max={ownerMax} color={C.navy} rank={i} />
-                <div className="flex gap-4 pl-8 mt-0.5">
-                  <span className="text-[10px] text-green-600 font-bold"><AN value={o.mouDone} /> MOUs</span>
-                  {o.admissions > 0 && (
-                    <span className="text-[10px] text-amber-600 font-bold"><AN value={o.admissions} /> adm</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* PA numbers */}
-          <div className="mt-6 pt-5 border-t border-slate-100">
-            <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Parent Advocacy</div>
-            <div className="flex items-end gap-6 justify-center flex-wrap">
-              {[
-                { label: "Referrals",  value: kpi.paReferrals,  color: C.indigo },
-                { label: "Admissions", value: kpi.paAdmissions, color: C.green  },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <div className="text-4xl font-black" style={{ color: s.color }}><AN value={s.value} /></div>
-                  <div className="text-xs text-slate-500 mt-1">{s.label}</div>
-                </div>
-              ))}
-              {data.paStatuses.map(st => {
-                const v = data.funnel.parentAdvocacy[st] ?? 0;
-                if (!v) return null;
-                const colors = [C.blue, C.amber, C.teal, C.purple];
-                return (
-                  <div key={st} className="text-center">
-                    <div className="text-2xl font-black" style={{ color: colors[data.paStatuses.indexOf(st) % colors.length] }}>
-                      <AN value={v} />
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{st}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-      )} {/* end filterVertical !== "parentAdvocacy" */}
 
     </div>
   );
