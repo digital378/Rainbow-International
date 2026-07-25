@@ -4432,8 +4432,8 @@ paths:
     id: number; submittedAt: Date | string; studentName: string; grade: string;
     parentName: string; phone: string; email?: string | null; source: string;
   }, tabName: string): Promise<void> {
-    const sheetId = process.env.ALLIANCES_SHEET_ID;
-    if (!sheetId) throw new Error("ALLIANCES_SHEET_ID env var not set");
+    const sheetId = SHEET_IDS.alliances;  // same sheet as auto-sync — Alliances Dashboard
+    if (!sheetId) throw new Error("Alliances sheet ID not configured");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
     const { google: goog } = await import("googleapis");
