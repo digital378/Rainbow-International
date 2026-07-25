@@ -522,7 +522,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
         </div>
         {filterVertical === "parentAdvocacy" ? (
           /* PA-specific recruitment rings */
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-6 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
             <AnimatedRing value={stats.total} max={stats.total || 1}
               color={C.amber} label="Total" sub="Ambassadors targeted" size={110} />
             <AnimatedRing value={data.partnerStatusCounts.accepted} max={stats.total || 1}
@@ -533,6 +533,8 @@ function OverviewTab({ data }: { data: AlliancesData }) {
               color={C.slate} label="Not Yet Reached" sub="Pending outreach" size={110} />
             <AnimatedRing value={data.partnerStatusCounts.rejected} max={stats.total || 1}
               color={C.red} label="Rejected" sub="Declined" size={110} />
+            <AnimatedRing value={data.kpi.paAdmissions} max={stats.total || 1}
+              color={C.teal} label="Admission Done" sub="Referrals admitted" size={110} />
           </div>
         ) : (
           /* Standard MOU pipeline rings */
@@ -1181,6 +1183,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
               { label: "Not Yet Reached",   value: psc.notReached,             color: C.slate },
               { label: "Rejected",          value: psc.rejected,               color: C.red   },
               { label: "Acceptance Rate",   value: `${acceptanceRate}%`,       color: C.amber },
+              { label: "Admission Done",    value: data.kpi.paAdmissions,      color: C.teal  },
             ].map(s => (
               <div key={s.label}
                 className="flex flex-col items-center bg-slate-50 rounded-xl px-5 py-3 min-w-[90px] border border-slate-100">
