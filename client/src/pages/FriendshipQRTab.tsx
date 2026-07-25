@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { normalizePhone } from "@/lib/friendship-url-utils";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -155,6 +156,8 @@ function FriendshipQRTabInner() {
   const [confirmRegen, setConfirmRegen] = useState<School | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<School | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [schoolSearch, setSchoolSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"alpha-asc" | "alpha-desc" | "newest" | "oldest">("alpha-asc");
 
   const handleCopyLink = (e: React.MouseEvent, s: School) => {
     e.stopPropagation();
@@ -303,6 +306,16 @@ function FriendshipQRTabInner() {
   };
 
 
+  // Filtered + sorted school list
+  const displayedSchools = schools
+    .filter(s => !schoolSearch || s.name.toLowerCase().includes(schoolSearch.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === "alpha-asc")  return a.name.localeCompare(b.name);
+      if (sortBy === "alpha-desc") return b.name.localeCompare(a.name);
+      if (sortBy === "newest")     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      /* oldest */                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+
   return (
     <div>
       {/* Stats row */}
@@ -317,7 +330,7 @@ function FriendshipQRTabInner() {
       )}
 
       {/* Action bar */}
-      <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <div className="font-bold text-slate-700 text-sm">
           {loading ? "Loading…" : `${schools.length} Friendship School${schools.length !== 1 ? "s" : ""}`}
         </div>
@@ -336,6 +349,29 @@ function FriendshipQRTabInner() {
         </div>
       </div>
 
+      {/* Search + sort bar (above cards) */}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        <input
+          type="text"
+          value={schoolSearch}
+          onChange={e => setSchoolSearch(e.target.value)}
+          placeholder="Search schools…"
+          className="flex-1 min-w-[160px] px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-amber-400 transition"
+          data-testid="input-school-search"
+        />
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value as typeof sortBy)}
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 focus:outline-none focus:border-amber-400 transition bg-white"
+          data-testid="select-school-sort"
+        >
+          <option value="alpha-asc">A → Z</option>
+          <option value="alpha-desc">Z → A</option>
+          <option value="newest">Latest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </div>
+
       {/* Main grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* School list */}
@@ -343,11 +379,13 @@ function FriendshipQRTabInner() {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-slate-400 text-sm">Loading…</div>
-            ) : schools.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-sm">No schools yet. Add one to get started.</div>
+            ) : displayedSchools.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-sm">
+                {schoolSearch ? `No schools match "${schoolSearch}"` : "No schools yet. Add one to get started."}
+              </div>
             ) : (
               <div className="divide-y divide-slate-100">
-                {schools.map(s => (
+                {displayedSchools.map(s => (
                   <div key={s.id}
                     className={`px-4 pt-4 pb-3 cursor-pointer transition-colors hover:bg-slate-50 border-l-4 ${selectedSchool?.id === s.id ? "bg-blue-50" : "border-l-transparent"}`}
                     style={selectedSchool?.id === s.id ? { borderLeftColor: NAVY } : {}}
