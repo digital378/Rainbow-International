@@ -4860,12 +4860,13 @@ paths:
 
       res.json({ updated, imported, total: statusUpdates.length });
     } catch (err: any) {
+      const msg = err?.message || String(err) || "";
+      console.error("[sync-status] error:", msg);
       // Google Sheets throws when the tab doesn't exist yet
-      const msg = err?.message || "";
-      if (msg.includes("Unable to parse range") || msg.includes("Requested entity was not found")) {
-        return res.json({ updated: 0, imported: 0, total: 0, note: "No sheet tab yet" });
+      if (msg.includes("Unable to parse range") || msg.includes("Requested entity was not found") || msg.includes("notFound")) {
+        return res.json({ updated: 0, imported: 0, total: 0, note: "No sheet tab yet: " + msg.slice(0, 120) });
       }
-      res.status(500).json({ message: "Failed to sync status from sheets" });
+      res.status(500).json({ message: msg.slice(0, 200) || "Failed to sync status from sheets" });
     }
   });
 
