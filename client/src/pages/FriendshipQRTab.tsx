@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { normalizePhone, buildWhatsAppUrl, buildEmailUrl } from "@/lib/friendship-url-utils";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -142,23 +143,6 @@ function copyPortalUrl(token: string) {
   navigator.clipboard.writeText(portalUrl(token)).catch(() => {});
 }
 
-function normalizePhone(phone: string) {
-  const d = phone.replace(/\D/g, "");
-  if (d.length === 10) return `91${d}`;
-  if (d.length === 12 && d.startsWith("91")) return d;
-  return d;
-}
-
-function buildWhatsAppUrl(phone: string, token: string, schoolName: string) {
-  const text = `Hello! Here is the Rainbow International School admission portal link for ${schoolName}:\n${portalUrl(token)}`;
-  return `https://wa.me/${normalizePhone(phone)}?text=${encodeURIComponent(text)}`;
-}
-
-function buildEmailUrl(email: string, token: string, schoolName: string) {
-  const subject = `Rainbow International School — Admission Portal Link`;
-  const body = `Hello,\n\nPlease find the admission portal link for ${schoolName} below:\n\n${portalUrl(token)}\n\nRegards,\nRainbow International School`;
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
 
 function FriendshipQRTabInner() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -418,7 +402,7 @@ function FriendshipQRTabInner() {
                           {copiedId === s.id ? "✓" : "Link"}
                         </button>
                         {s.contactPhone && (
-                          <a href={buildWhatsAppUrl(s.contactPhone, s.token, s.name)}
+                          <a href={buildWhatsAppUrl(s.contactPhone, s.token, s.name, window.location.origin)}
                             target="_blank" rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
                             className="text-xs px-2 py-1 rounded font-semibold text-center transition"
@@ -429,7 +413,7 @@ function FriendshipQRTabInner() {
                           </a>
                         )}
                         {s.contactEmail && (
-                          <a href={buildEmailUrl(s.contactEmail, s.token, s.name)}
+                          <a href={buildEmailUrl(s.contactEmail, s.token, s.name, window.location.origin)}
                             onClick={e => e.stopPropagation()}
                             className="text-xs px-2 py-1 rounded font-semibold text-center transition"
                             style={{ background: "#eff6ff", color: "#2563eb" }}
