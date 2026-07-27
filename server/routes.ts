@@ -4899,7 +4899,22 @@ paths:
     }
   }
 
+  // Serialization queue: concurrent values.append calls to the same spreadsheet
+  // can collide — both see the same "last row" and one silently overwrites the other.
+  // This promise-chain queue ensures all appends run one at a time in arrival order.
+  let _appendQueue: Promise<void> = Promise.resolve();
+  function queueAppend(
+    leads: Parameters<typeof appendLeadsToAggregateTab>[0],
+    schoolName: string
+  ): Promise<void> {
+    const task = _appendQueue.then(() => appendLeadsToAggregateTab(leads, schoolName));
+    // Keep queue alive even if an individual append fails
+    _appendQueue = task.catch(() => {});
+    return task; // Caller receives the real promise (may reject)
+  }
+
   async function appendLeadsToAggregateTab(leads: Array<{
+    id?: number;
     submittedAt: Date | string; studentName: string; grade: string;
     parentName: string; phone: string; email?: string | null; source: string;
   }>, schoolName: string): Promise<void> {
@@ -4921,6 +4936,12 @@ paths:
       valueInputOption: "USER_ENTERED",
       requestBody: { values: rows },
     });
+    // Mark every lead as confirmed in the sheet so the sync-all deletion guard works correctly
+    await Promise.all(
+      leads
+        .filter(l => l.id !== undefined)
+        .map(l => storage.markFriendshipLeadSynced(l.id!).catch(() => {}))
+    );
   }
 
   // Template download (public)
@@ -4984,8 +5005,8 @@ paths:
       console.log(`[friendship] Lead submitted: ${input.studentName} → ${school.name}`);
       res.status(201).json({ success: true, id: lead.id });
 
-      // Append to aggregate "All Friendship Leads" tab (fire-and-forget)
-      appendLeadsToAggregateTab([lead], school.name)
+      // Append to aggregate "All Friendship Leads" tab (fire-and-forget, serialised via queue)
+      queueAppend([lead], school.name)
         .catch((err: unknown) => {
           console.error(`[friendship] Aggregate tab sync failed for lead ${lead.id}:`, err instanceof Error ? err.message : String(err));
         });
@@ -5050,8 +5071,8 @@ paths:
       console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name} (${skipped.length} skipped)`);
       res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length, skippedDetails: skipped });
 
-      // Append all inserted leads to aggregate tab in one batch call (fire-and-forget)
-      appendLeadsToAggregateTab(inserted, school.name)
+      // Append all inserted leads to aggregate tab in one batch call (fire-and-forget, serialised via queue)
+      queueAppend(inserted, school.name)
         .catch((err: unknown) => {
           console.error(`[friendship] Aggregate tab bulk sync failed:`, err instanceof Error ? err.message : String(err));
         });
@@ -5353,7 +5374,7 @@ paths:
 
       // Process every school in DB
       const allSchools = await storage.listFriendshipSchools();
-      let totalUpdated = 0, totalImported = 0, totalDeleted = 0;
+      let totalUpdated = 0, totalDeleted = 0;
 
       for (const school of allSchools) {
         try {
@@ -5362,53 +5383,34 @@ paths:
           const schoolRows = rowsBySchool.get(school.name) ?? [];
 
           const statusUpdates: { phone: string; status: string }[] = [];
-          const newLeads: any[] = [];
 
           for (const r of schoolRows) {
-            const dateRaw = (r[0] || "").toString().trim();
-            const student  = (r[2] || "").toString().trim();
-            const grade    = (r[3] || "").toString().trim();
-            const parent   = (r[4] || "").toString().trim();
-            const phone    = (r[5] || "").toString().trim();
-            const email    = (r[6] || "").toString().trim();
-            const source   = (r[7] || "manual").toString().trim();
-            const status   = (r[8] || "Open").toString().trim();
+            const phone  = (r[5] || "").toString().trim();
+            const status = (r[8] || "Open").toString().trim();
             if (!phone) continue;
             if (status) statusUpdates.push({ phone, status });
-            if (!existingPhones.has(phone.replace(/\D/g, "")) && student && grade && parent) {
-              let submittedAt: Date | undefined;
-              const parsed = new Date(dateRaw);
-              if (dateRaw && !isNaN(parsed.getTime())) submittedAt = parsed;
-              newLeads.push({
-                schoolId: school.id, studentName: student, grade, parentName: parent, phone,
-                email: email || undefined,
-                source: ["manual", "bulk"].includes(source) ? source : "manual",
-                status: status || "Open", syncedToSheets: true,
-                ...(submittedAt ? { submittedAt } : {}),
-              });
-            }
           }
 
           // Delete leads absent from the entire sheet (rename-safe: check all phones not just school rows)
-          const toDelete = existing.filter(l => !allSheetPhones.has(l.phone.replace(/\D/g, "")));
+          // Only delete leads confirmed in the sheet (syncedToSheets=true).
+          // Leads still pending their first append are never treated as "removed".
+          const toDelete = existing.filter(l => l.syncedToSheets && !allSheetPhones.has(l.phone.replace(/\D/g, "")));
           const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
           const updated = await storage.bulkUpdateFriendshipLeadStatuses(school.id, statusUpdates);
-          if (newLeads.length) await storage.createFriendshipLeads(newLeads);
 
-          totalUpdated  += updated;
-          totalImported += newLeads.length;
-          totalDeleted  += deleted;
+          totalUpdated += updated;
+          totalDeleted += deleted;
 
-          if (deleted > 0 || newLeads.length > 0) {
-            console.log(`[friendship] sync-all ${school.name}: +${newLeads.length} imported, ${deleted} deleted`);
+          if (deleted > 0) {
+            console.log(`[friendship] sync-all ${school.name}: ${deleted} deleted`);
           }
         } catch (e: unknown) {
           console.error(`[friendship] sync-all school="${school.name}" error:`, e instanceof Error ? e.message : e);
         }
       }
 
-      console.log(`[friendship] sync-all complete: ${totalUpdated} updated, ${totalImported} imported, ${totalDeleted} deleted`);
-      res.json({ updated: totalUpdated, imported: totalImported, deleted: totalDeleted, schools: allSchools.length });
+      console.log(`[friendship] sync-all complete: ${totalUpdated} updated, ${totalDeleted} deleted`);
+      res.json({ updated: totalUpdated, deleted: totalDeleted, schools: allSchools.length });
     } catch (err: any) {
       const msg = err?.message || String(err) || "";
       console.error("[sync-all] error:", msg);
@@ -5448,38 +5450,12 @@ paths:
       const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
 
       const statusUpdates: { phone: string; status: string }[] = [];
-      const newLeads: any[] = [];
 
       for (const r of schoolRows) {
-        const dateRaw = (r[0] || "").toString().trim();
-        const student  = (r[2] || "").toString().trim();
-        const grade    = (r[3] || "").toString().trim();
-        const parent   = (r[4] || "").toString().trim();
-        const phone    = (r[5] || "").toString().trim();
-        const email    = (r[6] || "").toString().trim();
-        const source   = (r[7] || "manual").toString().trim();
-        const status   = (r[8] || "Open").toString().trim();
-
+        const phone  = (r[5] || "").toString().trim();
+        const status = (r[8] || "Open").toString().trim();
         if (!phone) continue;
         if (status) statusUpdates.push({ phone, status });
-
-        // Import rows that are in the sheet but missing from DB
-        if (!existingPhones.has(phone.replace(/\D/g, "")) && student && grade && parent) {
-          let submittedAt: Date | undefined;
-          if (dateRaw) {
-            const parsed = new Date(dateRaw);
-            if (!isNaN(parsed.getTime())) submittedAt = parsed;
-          }
-          newLeads.push({
-            schoolId,
-            studentName: student, grade, parentName: parent, phone,
-            email: email || undefined,
-            source: ["manual", "bulk"].includes(source) ? source : "manual",
-            status: status || "Open",
-            syncedToSheets: true,
-            ...(submittedAt ? { submittedAt } : {}),
-          });
-        }
       }
 
       // Leads in DB but absent from the sheet → delete them.
@@ -5490,7 +5466,8 @@ paths:
           .map(r => (r[5] || "").toString().replace(/\D/g, ""))
           .filter(Boolean)
       );
-      const toDelete = existing.filter(l => !allSheetPhones.has(l.phone.replace(/\D/g, "")));
+      // Only delete leads confirmed in the sheet (syncedToSheets=true).
+      const toDelete = existing.filter(l => l.syncedToSheets && !allSheetPhones.has(l.phone.replace(/\D/g, "")));
       const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
       if (deleted > 0) {
         console.log(`[friendship] sync-status: deleted ${deleted} leads removed from sheet for ${school.name}`);
