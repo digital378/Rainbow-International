@@ -5185,10 +5185,10 @@ paths:
       const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
       res.status(201).json(school);
-      // Auto-create the Sheets tab (non-blocking)
+      // Auto-create the Sheets tab (non-blocking) — skip for e2e test schools
       const sheetId = process.env.ALLIANCES_SHEET_ID;
       const auth = getAuthenticatedClient();
-      if (sheetId && auth) {
+      if (sheetId && auth && !school.name.startsWith("e2e-")) {
         import("googleapis").then(({ google: goog }) => {
           const sheets = goog.sheets({ version: "v4", auth });
           ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
@@ -5630,13 +5630,21 @@ paths:
         console.log(`[friendship] Fixed aggregate tab schema: ${AGGREGATE_TAB}`);
       }
 
-      // Identify junk tabs: e2e-vis-* pattern + tabs matching known school names
+      // Delete e2e test schools from DB first, then clean their tabs from the sheet
+      const allSchools = await storage.listFriendshipSchools();
+      const e2eSchools = allSchools.filter(s => s.name.startsWith("e2e-") || s.sheetsTabName.startsWith("e2e-"));
+      for (const s of e2eSchools) {
+        await storage.deleteFriendshipSchool(s.id).catch(() => {});
+      }
+      console.log(`[friendship] Deleted ${e2eSchools.length} e2e test schools from DB`);
+
+      // Identify junk tabs: any e2e-* tab + tabs matching known school names
       const knownSchoolNames = new Set(
         (await storage.listFriendshipSchools()).map(s => s.sheetsTabName)
       );
       const junkTabs = allTabs.filter(t =>
         t.title !== AGGREGATE_TAB &&
-        (t.title.startsWith("e2e-vis-") || knownSchoolNames.has(t.title))
+        (t.title.startsWith("e2e-") || knownSchoolNames.has(t.title))
       );
 
       let deleted = 0;
