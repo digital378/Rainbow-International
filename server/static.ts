@@ -16,9 +16,16 @@ export function serveStatic(app: Express) {
     immutable: true,
     etag: true,
     lastModified: true,
+    // Prevent express.static from redirecting /path → /path/ for directories.
+    // Without this, any directory in public/ (e.g. /amenities/, /images/)
+    // creates an infinite redirect loop with the trailing-slash stripper in index.ts.
+    redirect: false,
     setHeaders(res, filePath) {
       if (filePath.endsWith(".html")) {
-        res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
+        // No CDN caching for HTML: this site serves different HTML to crawlers vs
+        // real visitors (SSR vs SPA). Cloudflare ignores Vary: User-Agent, so any
+        // edge-cached HTML would be served to the wrong audience.
+        res.setHeader("Cache-Control", "no-store");
         return;
       }
       const base = path.basename(filePath).toLowerCase();
@@ -47,7 +54,7 @@ export function serveStatic(app: Express) {
     }
     const html = injectPageTitle(cachedIndexHtml, req.originalUrl, overrideTitle);
     const status = isKnownRoute(req.originalUrl) ? 200 : 404;
-    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=600");
+    res.setHeader("Cache-Control", "no-store");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     if (basePath === "/alliances" || basePath.startsWith("/alliances/")) {
       res.setHeader("X-Robots-Tag", "noindex, nofollow");

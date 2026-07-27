@@ -28,12 +28,12 @@ function renderHomeSSR(): string {
 <meta property="og:title" content="Rainbow International School Thane | CBSE School Since 2009" />
 <meta property="og:description" content="Rainbow International School is a CBSE school in Thane (since 2009). 3.5-acre Brahmand campus, Nursery to Class 12. Apply for the 2026-27 academic year." />
 <meta property="og:url" content="https://rainbowinternationalschool.in/" />
-<meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
+<meta property="og:image" content="https://rainbowinternationalschool.in/opengraph.jpg" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Rainbow International School Thane | CBSE School Since 2009" />
 <meta name="twitter:description" content="Rainbow International School is a CBSE school in Thane (since 2009). 3.5-acre Brahmand campus, Nursery to Class 12. Apply for the 2026-27 academic year." />
-<meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg" />
+<meta name="twitter:image" content="https://rainbowinternationalschool.in/opengraph.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet" />
@@ -45,12 +45,15 @@ function renderHomeSSR(): string {
   "name": "Rainbow International School",
   "alternateName": "RIS Thane",
   "url": "https://rainbowinternationalschool.in/",
-  "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
-  "image": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
-  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
+  "logo": "https://rainbowinternationalschool.in/favicon-192.png",
+  "image": "https://rainbowinternationalschool.in/opengraph.jpg",
+  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving students from Nursery to Class 12.",
   "foundingDate": "2009-04-01",
-  "numberOfStudents": 3000,
-  "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
+  "educationalLevel": "Nursery to Class 12",
+  "identifier": [
+    { "@type": "PropertyValue", "name": "CBSE Affiliation Number", "value": "1130661" },
+    { "@type": "PropertyValue", "name": "CBSE School Code", "value": "30562" }
+  ],
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Cosmos Arcade, Brahmand Phase 4",

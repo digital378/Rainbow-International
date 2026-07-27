@@ -373,7 +373,7 @@ export async function registerRoutes(
 
   const wpRedirects: Record<string, string> = {
     // Non-blog page redirects (legacy URL consolidation)
-    "/rainbow-preschool-international": "/pre-primary-school-thane",
+    "/rainbow-preschool-international": "https://www.rainbowpreschools.com/",
     "/fee-structure-2": "/fee-structure",
     "/cbse-curriculum": "/curriculum",
 

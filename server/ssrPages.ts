@@ -49,12 +49,12 @@ function shell(cfg: PageSSRConfig): string {
 <meta property="og:description" content="${e(cfg.description)}"/>
 <meta property="og:url" content="${e(cfg.canonical)}"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta property="og:image" content="https://rainbowinternationalschool.in/opengraph.jpg"/>
 <meta property="og:locale" content="en_IN"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="${e(seoTitle(cfg.title))}"/>
 <meta name="twitter:description" content="${e(cfg.description)}"/>
-<meta name="twitter:image" content="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"/>
+<meta name="twitter:image" content="https://rainbowinternationalschool.in/opengraph.jpg"/>
 <script type="application/ld+json">${JSON.stringify(cfg.jsonLd)}</script>
 <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>
 <style>
