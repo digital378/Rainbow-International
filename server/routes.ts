@@ -872,7 +872,7 @@ export async function registerRoutes(
 
   // ── Google OAuth + Search Console + PageSpeed ────────────────
   const GOOGLE_SCOPES = [
-    "https://www.googleapis.com/auth/webmasters.readonly",
+    "https://www.googleapis.com/auth/webmasters", // read + write (needed for sitemaps.submit)
     "https://www.googleapis.com/auth/analytics.readonly",
     "https://www.googleapis.com/auth/adwords",
     "https://www.googleapis.com/auth/spreadsheets",
@@ -1094,6 +1094,145 @@ export async function registerRoutes(
     } catch (err: any) {
       res.status(500).json({ message: "GSC pages query failed", error: err.message });
     }
+  });
+
+  // ── /api/admin/gsc/submit-sitemap — submit sitemap via Webmasters API ────────
+  // POST /api/admin/gsc/submit-sitemap?account=ris|rps
+  // Auth: ADMIN_TOKEN via Authorization: Bearer <token> or x-api-key header.
+  // Requires GOOGLE_REFRESH_TOKEN obtained with the "webmasters" (read+write)
+  // scope. If the stored token only has "webmasters.readonly", re-auth at
+  // /auth/google to upgrade it, then update the GOOGLE_REFRESH_TOKEN secret.
+  app.post("/api/admin/gsc/submit-sitemap", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (
+      !adminToken || !provided ||
+      !timingSafeEqual(
+        Buffer.from(adminToken),
+        Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)),
+      )
+    ) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const auth = getAuthenticatedClient();
+    if (!auth) {
+      return res.status(503).json({
+        message: "Google not connected. Visit /auth/google to connect.",
+      });
+    }
+    const account =
+      typeof req.query.account === "string" ? req.query.account.toLowerCase() : "ris";
+    const siteUrl = resolveGscSiteUrl(account);
+    const sitemapUrl =
+      account === "rps"
+        ? "https://www.rainbowpreschools.com/sitemap.xml"
+        : "https://rainbowinternationalschool.in/sitemap.xml";
+    try {
+      const webmasters = google.webmasters({ version: "v3", auth });
+      await webmasters.sitemaps.submit({ siteUrl, feedpath: sitemapUrl });
+      res.json({
+        ok: true,
+        account: account.toUpperCase(),
+        siteUrl,
+        sitemapUrl,
+        submittedAt: new Date().toISOString(),
+        note: "Sitemap submitted to Google Search Console. Google will schedule a recrawl of all canonical URLs within hours to days. Check the Coverage report in GSC to track 404 removal progress.",
+      });
+    } catch (err: any) {
+      const msg: string = err?.message || "";
+      const isScope =
+        /insufficient.*scope|Request had insufficient authentication scopes/i.test(msg);
+      if (isScope) {
+        return res.status(403).json({
+          message:
+            "Token lacks write scope. Re-authenticate at /auth/google (the scope has been upgraded to 'webmasters'), save the new GOOGLE_REFRESH_TOKEN secret, and retry.",
+          hint: "The stored GOOGLE_REFRESH_TOKEN was obtained with webmasters.readonly — re-auth will grant the write scope needed for sitemaps.submit.",
+          error: msg,
+        });
+      }
+      res.status(500).json({ message: "Sitemap submission failed", error: msg });
+    }
+  });
+
+  // ── /api/admin/gsc/redirect-urls — full redirect map with GSC inspection links
+  // GET /api/admin/gsc/redirect-urls
+  // Returns every legacy 301 path from the wpRedirects map as a flat list with
+  // a direct Search Console URL Inspection link for each one. Open each link in
+  // a browser and click "Request Indexing" to accelerate 404 removal from Google's
+  // index. Highest-traffic legacy URLs are sorted to the top.
+  app.get("/api/admin/gsc/redirect-urls", (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided = (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (
+      !adminToken || !provided ||
+      !timingSafeEqual(
+        Buffer.from(adminToken),
+        Buffer.from(provided.padEnd(adminToken.length).slice(0, adminToken.length)),
+      )
+    ) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const BASE = "https://rainbowinternationalschool.in";
+    // GSC URL Inspection deep-link — paste the encoded legacy URL as the `id` param
+    const GSC_INSPECT_BASE =
+      "https://search.google.com/search-console/inspect?resource_id=" +
+      encodeURIComponent("https://rainbowinternationalschool.in/") +
+      "&id=";
+
+    const entries = Object.entries(wpRedirects).map(([from, to]) => ({
+      legacyPath: from,
+      legacyUrl: `${BASE}${from}`,
+      redirectsTo: to.startsWith("http") ? to : `${BASE}${to}`,
+      // Open this URL in a browser → click "Request Indexing" in GSC UI
+      gscInspectUrl: `${GSC_INSPECT_BASE}${encodeURIComponent(`${BASE}${from}`)}`,
+    }));
+
+    // Sort highest-traffic known legacy URLs first so the manual workflow starts
+    // with the pages most likely still in Google's index as 404s.
+    const PRIORITY_PATHS = [
+      "/rainbow-school-thane",
+      "/school-cbse-thane",
+      "/cbse-school-thane",
+      "/best-school-thane",
+      "/best-cbse-school-thane",
+      "/top-cbse-school-thane",
+      "/international-school-thane",
+      "/about-us",
+      "/fees",
+      "/admission",
+      "/preschool-thane",
+      "/contact",
+      "/gallery",
+      "/about",
+      "/academics",
+    ];
+    entries.sort((a, b) => {
+      const ai = PRIORITY_PATHS.indexOf(a.legacyPath);
+      const bi = PRIORITY_PATHS.indexOf(b.legacyPath);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return 0;
+    });
+
+    res.json({
+      generatedAt: new Date().toISOString(),
+      total: entries.length,
+      instructions: [
+        "1. POST /api/admin/gsc/submit-sitemap to trigger a full sitemap recrawl via the Webmasters API.",
+        "2. For the highest-traffic legacy URLs below, open each gscInspectUrl in a browser while logged into Google Search Console.",
+        "3. Click 'Request Indexing' in the URL Inspection panel for each URL.",
+        "4. Check GSC Coverage → 'Excluded – Not found (404)' in 2–4 weeks to confirm removal.",
+      ],
+      entries,
+    });
   });
 
   app.get("/api/pagespeed", async (req, res) => {
