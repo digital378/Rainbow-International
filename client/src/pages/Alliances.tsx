@@ -540,7 +540,7 @@ function OverviewTab({ data }: { data: AlliancesData }) {
           /* Standard MOU pipeline rings */
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center">
             <AnimatedRing value={stats.total} max={stats.total || 1}
-              color={activeColor} label="Total" sub={filterBPCat || VERTICAL_OPTS.find(o => o.key === filterVertical)?.label || "Targeted Entities"} size={110} />
+              color={activeColor} label="Total" sub={filterBPCat || (filterVertical !== "all" ? VERTICAL_OPTS.find(o => o.key === filterVertical)?.label : undefined) || "Targeted Entities"} size={110} />
             <AnimatedRing value={stats.mouDone} max={stats.total || 1}
               color={C.green} label="MOU Done" sub="Tie-ups signed" size={110} />
             <AnimatedRing value={stats.mouSent} max={stats.total || 1}
