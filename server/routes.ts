@@ -4984,14 +4984,7 @@ paths:
       console.log(`[friendship] Lead submitted: ${input.studentName} → ${school.name}`);
       res.status(201).json({ success: true, id: lead.id });
 
-      appendFriendshipLeadToSheets(lead, school.sheetsTabName)
-        .then(() => storage.markFriendshipLeadSynced(lead.id))
-        .catch(async (err: unknown) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.error(`[friendship] Sheet sync failed for lead ${lead.id}: ${msg}`);
-          await storage.markFriendshipLeadSyncFailed(lead.id).catch(() => {});
-        });
-      // Also append to aggregate "All Friendship Leads" tab (fire-and-forget)
+      // Append to aggregate "All Friendship Leads" tab (fire-and-forget)
       appendLeadsToAggregateTab([lead], school.name)
         .catch((err: unknown) => {
           console.error(`[friendship] Aggregate tab sync failed for lead ${lead.id}:`, err instanceof Error ? err.message : String(err));
@@ -5057,15 +5050,6 @@ paths:
       console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name} (${skipped.length} skipped)`);
       res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length, skippedDetails: skipped });
 
-      for (const lead of inserted) {
-        appendFriendshipLeadToSheets(lead, school.sheetsTabName)
-          .then(() => storage.markFriendshipLeadSynced(lead.id))
-          .catch(async (err: unknown) => {
-            const msg = err instanceof Error ? err.message : String(err);
-            await storage.markFriendshipLeadSyncFailed(lead.id).catch(() => {});
-            console.error(`[friendship] Bulk sheet sync failed for lead ${lead.id}: ${msg}`);
-          });
-      }
       // Append all inserted leads to aggregate tab in one batch call (fire-and-forget)
       appendLeadsToAggregateTab(inserted, school.name)
         .catch((err: unknown) => {
@@ -5544,26 +5528,9 @@ paths:
     }
   });
 
-  // Admin: retry sync for all failed leads
+  // Admin: retry sync (per-school tab sync removed; aggregate tab is fire-and-forget)
   app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
-    try {
-      const failed = await storage.listFailedFriendshipLeads();
-      let synced = 0; let failedCount = 0;
-      for (const lead of failed) {
-        const school = await storage.getFriendshipSchoolById(lead.schoolId);
-        if (!school) continue;
-        try {
-          await appendFriendshipLeadToSheets(lead, school.sheetsTabName);
-          await storage.markFriendshipLeadSynced(lead.id);
-          synced++;
-        } catch {
-          failedCount++;
-        }
-      }
-      res.json({ total: failed.length, synced, failed: failedCount });
-    } catch {
-      res.status(500).json({ message: "Sync failed" });
-    }
+    res.json({ total: 0, synced: 0, failed: 0, message: "Per-school sheet sync disabled; leads go to the All Friendship Leads aggregate tab only." });
   });
 
   // Admin: one-shot sheet cleanup — fix aggregate tab schema + delete junk/per-school tabs
