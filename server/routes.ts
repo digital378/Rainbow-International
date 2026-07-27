@@ -372,10 +372,142 @@ export async function registerRoutes(
   );
 
   const wpRedirects: Record<string, string> = {
-    // Non-blog page redirects (legacy URL consolidation)
+    // ── Non-blog page redirects (legacy URL consolidation) ──────
     "/rainbow-preschool-international": "https://www.rainbowpreschools.com/",
     "/fee-structure-2": "/fee-structure",
     "/cbse-curriculum": "/curriculum",
+
+    // ── Legacy WordPress school-name slugs ──────────────────────
+    // Audit-identified URLs indexed in Google that now 404
+    "/rainbow-school-thane":                  "/",
+    "/school-cbse-thane":                     "/curriculum",
+    "/cbse-school-thane":                     "/curriculum",
+    "/rainbow-international-school-thane":    "/",
+    "/rainbow-international-school":          "/",
+    "/ris-thane":                             "/",
+    "/best-school-thane":                     "/top-schools-in-thane",
+    "/best-cbse-school-thane":                "/top-schools-in-thane",
+    "/top-cbse-school-thane":                 "/top-schools-in-thane",
+    "/international-school-thane":            "/",
+    "/school-in-thane":                       "/top-schools-in-thane",
+
+    // ── Legacy pre-primary / preschool slugs ────────────────────
+    "/preschool-thane":                       "/pre-primary-school-thane",
+    "/pre-primary":                           "/pre-primary-school-thane",
+    "/kindergarten-thane":                    "/pre-primary-school-thane",
+    "/nursery-school-thane":                  "/pre-primary-school-thane",
+    "/playschool-thane":                      "/pre-primary-school-thane",
+    "/lkg-ukg-thane":                         "/pre-primary-school-thane",
+
+    // ── Legacy About / institution slugs ────────────────────────
+    "/about":                                 "/about-rainbow-international-school",
+    "/about-us":                              "/about-rainbow-international-school",
+    "/about-rainbow":                         "/about-rainbow-international-school",
+    "/welcome":                               "/welcome-to-ris",
+    "/vision-mission":                        "/ris-vision-mission",
+    "/our-vision":                            "/ris-vision-mission",
+    "/vision":                                "/ris-vision-mission",
+    "/mission":                               "/ris-vision-mission",
+    "/philosophy":                            "/our-philosophy",
+    "/managing-committee":                    "/school-managing-committee",
+    "/committee":                             "/school-managing-committee",
+    "/chairperson":                           "/chairpersons-note",
+    "/principal-message":                     "/chairpersons-note",
+
+    // ── Legacy Academics slugs ───────────────────────────────────
+    "/academics":                             "/curriculum",
+    "/syllabus":                              "/curriculum",
+    "/curriculum-cbse":                       "/curriculum",
+    "/class-1-to-5":                          "/primary-section",
+    "/class-6-to-8":                          "/middle-school-section",
+    "/class-9-to-10":                         "/secondary-section",
+    "/class-11-to-12":                        "/senior-secondary-section",
+    "/primary":                               "/primary-section",
+    "/middle-school":                         "/middle-school-section",
+    "/secondary":                             "/secondary-section",
+    "/senior-secondary":                      "/senior-secondary-section",
+    "/high-school":                           "/secondary-section",
+
+    // ── Legacy Admissions / Fees slugs ──────────────────────────
+    "/admission":                             "/admissions",
+    "/apply":                                 "/admissions",
+    "/apply-now":                             "/admissions",
+    "/enroll":                                "/admissions",
+    "/enrolment":                             "/admissions",
+    "/fees":                                  "/fee-structure",
+    "/fee":                                   "/fee-structure",
+    "/school-fees":                           "/fee-structure",
+    "/tuition-fees":                          "/fee-structure",
+    "/application":                           "/application-form",
+
+    // ── Legacy Student Life / Facilities slugs ───────────────────
+    "/facilities":                            "/amenities",
+    "/infrastructure":                        "/amenities",
+    "/campus":                                "/amenities",
+    "/school-life":                           "/beyond-the-classroom",
+    "/student-life":                          "/beyond-the-classroom",
+    "/activities":                            "/extracurriculars",
+    "/extra-curricular":                      "/extracurriculars",
+    "/sports":                                "/extracurriculars",
+    "/co-curricular":                         "/extracurriculars",
+    "/gallery":                               "/photo-gallery",
+    "/photos":                                "/photo-gallery",
+    "/videos":                                "/photo-gallery",
+    "/safety":                                "/safety-security",
+    "/security":                              "/safety-security",
+    "/virtual-tour":                          "/photo-gallery",
+
+    // ── Legacy Achievements / Recognition slugs ──────────────────
+    "/achievements":                          "/awards-achievements",
+    "/awards":                                "/awards-achievements",
+    "/results":                               "/student-achievements",
+    "/student-results":                       "/student-achievements",
+    "/toppers":                               "/student-achievements",
+
+    // ── Legacy Contact / Enquiry slugs ──────────────────────────
+    "/contact":                               "/contact-us",
+    "/enquiry":                               "/contact-us",
+    "/inquiry":                               "/contact-us",
+    "/reach-us":                              "/contact-us",
+    "/locate-us":                             "/contact-us",
+    "/visit-us":                              "/schedule-appointment",
+    "/book-visit":                            "/schedule-appointment",
+    "/campus-visit":                          "/schedule-appointment",
+    "/book-appointment":                      "/schedule-appointment",
+
+    // ── Legacy Blog / Content slugs ──────────────────────────────
+    "/blog":                                  "/blogs",
+    "/news":                                  "/blogs",
+    "/articles":                              "/blogs",
+    "/updates":                               "/blogs",
+    "/press":                                 "/blogs",
+
+    // ── Legacy info / compliance slugs ───────────────────────────
+    "/disclosure":                            "/cbse-mandatory-public-disclosures",
+    "/cbse-disclosures":                      "/cbse-mandatory-public-disclosures",
+    "/mandatory-disclosure":                  "/cbse-mandatory-public-disclosures",
+    "/cbse-affiliation":                      "/cbse-mandatory-public-disclosures",
+    "/testimonial":                           "/testimonials",
+    "/reviews":                               "/testimonials",
+    "/faq":                                   "/faqs",
+    "/frequently-asked-questions":            "/faqs",
+    "/jobs":                                  "/career",
+    "/careers":                               "/career",
+    "/join-us":                               "/career",
+    "/vacancies":                             "/career",
+
+    // ── Legacy teacher / staff slugs ────────────────────────────
+    "/faculty":                               "/academic-team",
+    "/staff":                                 "/academic-team",
+    "/teachers":                              "/academic-team",
+    "/our-team":                              "/academic-team",
+
+    // ── WordPress system / utility pages ─────────────────────────
+    "/sitemap_index.xml":                     "/sitemap.xml",
+    "/wp-sitemap.xml":                        "/sitemap.xml",
+    "/feed":                                  "/blogs",
+    "/rss":                                   "/blogs",
+    "/rss2":                                  "/blogs",
 
     // Blog-slug redirects — auto-generated from the blog_posts table
     ...blogSlugRedirects,
@@ -384,6 +516,17 @@ export async function registerRoutes(
   for (const [from, to] of Object.entries(wpRedirects)) {
     app.get(from, (_req, res) => res.redirect(301, to));
   }
+
+  // ── WordPress wildcard paths → home or blog ──────────────────
+  // These catch indexed WordPress category/tag/archive/author pages
+  // that 404 on the current site.
+  app.get("/category/*", (_req, res) => res.redirect(301, "/blogs"));
+  app.get("/tag/*",      (_req, res) => res.redirect(301, "/blogs"));
+  app.get("/author/*",   (_req, res) => res.redirect(301, "/"));
+  app.get("/page/*",     (_req, res) => res.redirect(301, "/blogs"));
+  app.get("/wp-login.php", (_req, res) => res.redirect(301, "/"));
+  app.get("/wp-admin",   (_req, res) => res.redirect(301, "/"));
+  app.get("/wp-admin/*", (_req, res) => res.redirect(301, "/"));
 
   app.get("/wp-content/uploads/*", (req, res) => {
     if (req.path.toLowerCase().includes("fee")) {
