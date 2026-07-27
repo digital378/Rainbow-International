@@ -1,0 +1,61 @@
+Yes — proceed, but in two stages, and start by answering one question that changes the scope.
+
+═══════════════════════════════════
+STAGE 0 — INVESTIGATE FIRST (no file changes)
+═══════════════════════════════════
+
+You found that Googlebot receives a WordPress image URL for og:image while browsers receive the replit.app one. That is more significant than the wrong domain alone: this site migrated off WordPress, so something in the bot-rendering path is still sourcing legacy metadata.
+
+Report before changing anything:
+1. Where does the bot-facing og:image value come from — which file, which data source? Is it a legacy WordPress data structure, a hardcoded value, or a fallback?
+2. Is any OTHER bot-facing metadata drawn from the same legacy source — titles, meta descriptions, canonicals, structured data? Check several pages, not just the homepage.
+3. For the homepage plus three interior pages, print what the bot receives vs what the browser receives for: <title>, meta description, rel=canonical, og:image, og:url.
+
+If bot-facing metadata is broadly coming from stale legacy data, say so plainly — that becomes the priority over everything below, because it means Google is indexing the old site's metadata against the new site's URLs.
+
+═══════════════════════════════════
+STAGE 1 — SAFE FIXES (after Stage 0 report)
+═══════════════════════════════════
+
+ANTI-FABRICATION CONSTRAINT: do not invent, adjust or add any factual claim about the school — student numbers, awards, ratios, results, facilities, ratings. Several published claims are currently unverified and are being checked separately. Nothing in this stage should touch claim content.
+
+1. REDIRECT LOOP. Fix the /amenities ↔ /amenities/ conflict. Choose one canonical trailing-slash convention, apply it consistently, and ensure every URL resolves in a single hop with no loop. Confirm the same conflict does not exist on other paths — test at least ten URLs with and without trailing slashes and report any others that loop.
+
+2. OG IMAGE AND URL. Point og:image and twitter:image at the live domain (rainbowinternationalschool.in) for BOTH bot and browser paths. Remove every reference to rainbow-international.replit.app from metadata. Also confirm whether that replit.app domain is publicly reachable and indexable — if it is, block it from indexing, and report how.
+
+3. STOP CDN-CACHING HTML. HTML responses currently carry s-maxage=120. Because this site serves different HTML to crawlers than to humans, and Cloudflare ignores Vary: User-Agent, edge-cached HTML can be served to the wrong audience. Set HTML responses to Cache-Control: no-store. Do NOT change caching for JS, CSS, fonts or images — those should keep their long-lived immutable caching.
+
+4. PRESCHOOL PAGE REDIRECT. 301 /rainbow-preschool-international/ to https://www.rainbowpreschools.com/ (or its closest equivalent page if one exists). This is a deliberate brand-separation decision: the preschool brand should own preschool queries. Remove the URL from the sitemap in the same change.
+
+5. SCHEMA — FACTS ONLY. Add EducationalOrganization/School JSON-LD to the homepage using ONLY these verifiable values:
+   - name: Rainbow International School
+   - CBSE affiliation number 1130661 and school code 30562
+   - address: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
+   - grade range: Nursery to Class 12
+   - telephone, email, url, logo
+   - geo coordinates if already present in the codebase
+   DO NOT include: aggregateRating, Review nodes, award claims, student numbers, or "1 Lac+ lives impacted". Those are unverified and under separate review. Self-serving rating and review markup violates Google's structured-data policy.
+
+Hard constraints for Stage 1: no new packages; do not modify llms.txt, llms-full.txt, page copy, titles or any factual claim; do not change the human-facing design.
+
+═══════════════════════════════════
+STAGE 2 — LEGACY REDIRECT MAP (propose, don't implement)
+═══════════════════════════════════
+
+Do not guess destinations. Produce a proposed mapping table for my approval:
+
+1. Enumerate every legacy WordPress URL you can find — in redirect config, legacy data files, the old sitemap, or anywhere in the codebase.
+2. For each: propose a destination on the new site, state your confidence, and flag any where no good equivalent exists (those should 404, not redirect to the homepage).
+3. Flag any URL that currently redirects to the homepage rather than a relevant page — a homepage redirect for a specific page is treated by Google as a soft 404 and passes little value.
+
+I will supply the authoritative list from Search Console (all known URLs plus the last 16 months of top pages by clicks) so we prioritise by real traffic. Wait for it before implementing.
+
+═══════════════════════════════════
+VERIFICATION
+═══════════════════════════════════
+
+After Stage 1: typecheck and tests pass; curl the homepage and three interior pages with both a Googlebot UA and a browser UA and confirm identical, live-domain og:image and correct canonicals; confirm /amenities/ resolves in one hop; confirm HTML returns no-store and cf-cache-status is not HIT; confirm the preschool URL 301s correctly.
+
+Also: port the bot/human parity smoke test from the Rainbow Preschool project (scripts/check-bot-ssr-parity.ts) into this repo and wire it into the pre-push hook. It catches exactly the class of bug found on the sister site — bot HTML being cached and served to real visitors.
+
+Report the full diff, the Stage 0 findings, and the Stage 2 proposed mapping table.
