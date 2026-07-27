@@ -24,6 +24,7 @@ import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
+import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
@@ -1173,6 +1174,49 @@ export async function registerRoutes(
         });
       }
       res.status(500).json({ message: "Sitemap submission failed", error: msg });
+    }
+  });
+
+  // ── /api/admin/seo-check — run SEO regression checks on demand ──────────────
+  // POST /api/admin/seo-check
+  // Auth: ADMIN_TOKEN via Authorization: Bearer <token> or x-api-key header.
+  // Runs the five SEO assertions against rainbowinternationalschool.in, sends an
+  // alert email for any failures (same logic as the daily scheduled monitor),
+  // and returns the full results as JSON. Useful to trigger immediately after a
+  // production deploy to catch regressions before Google re-crawls.
+  app.post("/api/admin/seo-check", async (req, res) => {
+    res.set("Cache-Control", "no-store, private, max-age=0");
+    const adminToken = process.env.ADMIN_TOKEN;
+    const provided =
+      (req.headers["x-api-key"] as string) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+      (typeof req.query.token === "string" ? req.query.token : "");
+    if (
+      !adminToken ||
+      !provided ||
+      !timingSafeEqual(
+        Buffer.from(adminToken),
+        Buffer.from(
+          provided.padEnd(adminToken.length).slice(0, adminToken.length),
+        ),
+      )
+    ) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const results = await runAndAlert();
+      const failures = results.filter((r) => !r.passed);
+      const passCount = results.filter((r) => r.passed).length;
+      return res.json({
+        total: results.length,
+        passed: passCount,
+        failed: failures.length,
+        results,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return res.status(500).json({ message: "SEO check error", error: msg });
     }
   });
 

@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
+import { startSeoMonitor } from "./seoMonitor";
 
 const app = express();
 const httpServer = createServer(app);
@@ -146,6 +147,8 @@ app.use((req, res, next) => {
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
+    // Start the daily SEO regression monitor (fires 60 s after startup, then every 24 h).
+    startSeoMonitor();
   } else {
     const { setupVite } = await import("./vite");
     await setupVite(httpServer, app);
