@@ -629,7 +629,9 @@ export default function FriendshipPortal() {
               My Leads{leads.length > 0 ? ` (${leads.length})` : ""}
             </button>
           </div>
-          {tab === "manual" ? manualPanel : tab === "bulk" ? bulkPanel : leadsPanel}
+          <div style={{ display: tab === "manual" ? undefined : "none" }}>{manualPanel}</div>
+          <div style={{ display: tab === "bulk" ? undefined : "none" }}>{bulkPanel}</div>
+          <div style={{ display: tab === "leads" ? undefined : "none" }}>{leadsPanel}</div>
         </div>
 
         {/* ── DESKTOP: side-by-side two-column layout ────────────── */}
