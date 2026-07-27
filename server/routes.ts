@@ -1177,6 +1177,26 @@ export async function registerRoutes(
     }
   });
 
+  // ── Internal helper: fire-and-forget sitemap resubmission ───────────────────
+  // Submits the RIS sitemap to Google Search Console after content changes.
+  // Errors are logged but never thrown so callers are never blocked.
+  async function triggerSitemapResubmit(reason: string) {
+    try {
+      const auth = getAuthenticatedClient();
+      if (!auth) {
+        console.log(`[gsc] Sitemap resubmit skipped (${reason}): Google not connected`);
+        return;
+      }
+      const siteUrl = resolveGscSiteUrl("ris");
+      const sitemapUrl = "https://rainbowinternationalschool.in/sitemap.xml";
+      const webmasters = google.webmasters({ version: "v3", auth });
+      await webmasters.sitemaps.submit({ siteUrl, feedpath: sitemapUrl });
+      console.log(`[gsc] Sitemap resubmitted to GSC after ${reason}`);
+    } catch (err: any) {
+      console.error(`[gsc] Sitemap resubmit failed after ${reason}:`, err?.message || err);
+    }
+  }
+
   // ── /api/admin/seo-check — run SEO regression checks on demand ──────────────
   // POST /api/admin/seo-check
   // Auth: ADMIN_TOKEN via Authorization: Bearer <token> or x-api-key header.
@@ -3807,7 +3827,10 @@ paths:
       const validated = insertRaSchema.parse(req.body);
       const existing = await storage.getRaBySlug(validated.slug);
       if (existing) return res.status(409).json({ message: `Slug "${validated.slug}" is already taken` });
-      res.status(201).json(await storage.createRa(validated));
+      const ra = await storage.createRa(validated);
+      res.status(201).json(ra);
+      // Fire-and-forget: notify GSC about the new page without blocking the response
+      triggerSitemapResubmit(`new RA page created: ${validated.slug}`);
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to create RA" });
@@ -3827,6 +3850,8 @@ paths:
       const ra = await storage.updateRa(req.params.id, validated);
       if (!ra) return res.status(404).json({ message: "RA not found" });
       res.json(ra);
+      // Fire-and-forget: notify GSC about the updated page without blocking the response
+      triggerSitemapResubmit(`RA page updated: ${req.params.id}`);
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to update RA" });
@@ -3849,6 +3874,8 @@ paths:
       const validated = insertBlogPostSchema.parse(req.body);
       const post = await storage.upsertBlogPost(validated);
       res.status(201).json(post);
+      // Fire-and-forget: notify GSC about the new content without blocking the response
+      triggerSitemapResubmit(`new blog post published: ${validated.slug}`);
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to save blog post" });
@@ -3862,6 +3889,8 @@ paths:
       const post = await storage.updateBlogPost(req.params.slug, validated);
       if (!post) return res.status(404).json({ message: "Blog post not found" });
       res.json(post);
+      // Fire-and-forget: notify GSC about the updated content without blocking the response
+      triggerSitemapResubmit(`blog post updated: ${req.params.slug}`);
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to update blog post" });
