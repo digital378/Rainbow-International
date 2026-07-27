@@ -13,7 +13,7 @@ import {
   friendshipSchools, friendshipSchoolLeads,
 } from "@shared/schema";
 import { db } from "./db";
-import { desc, eq, gte, and, sql, count } from "drizzle-orm";
+import { desc, eq, gte, and, sql, count, inArray } from "drizzle-orm";
 
 export interface IStorage {
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
@@ -75,6 +75,7 @@ export interface IStorage {
   markFriendshipLeadSyncFailed(id: number): Promise<void>;
   updateFriendshipLead(id: number, data: { status?: string; commissionPaid?: boolean }): Promise<FriendshipSchoolLead | undefined>;
   bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { phone: string; status: string }[]): Promise<number>;
+  deleteFriendshipLeads(ids: number[]): Promise<number>;
 }
 
 export class DbStorage implements IStorage {
@@ -396,6 +397,15 @@ export class DbStorage implements IStorage {
       count += result.length;
     }
     return count;
+  }
+
+  async deleteFriendshipLeads(ids: number[]): Promise<number> {
+    if (!ids.length) return 0;
+    const result = await db
+      .delete(friendshipSchoolLeads)
+      .where(inArray(friendshipSchoolLeads.id, ids))
+      .returning({ id: friendshipSchoolLeads.id });
+    return result.length;
   }
 
   async getFriendshipLeadStats(): Promise<{ totalLeads: number; walkIns: number; admissions: number }> {

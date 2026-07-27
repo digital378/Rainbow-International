@@ -5095,10 +5095,11 @@ paths:
           // the current MOU Done list (e.g. old name-only entries superseded by name+location ones)
           const currentMouNamesLc = new Set(mouDone.map(s => s.name.toLowerCase()));
           for (const school of existing) {
-            if ((school as any).leadCount > 0) continue;        // never auto-delete with leads
-            if (currentMouNamesLc.has(school.name.toLowerCase())) continue; // still live
-            // Only auto-remove schools that were synced from Sheets (no contactOverride, slug exists)
+            if (currentMouNamesLc.has(school.name.toLowerCase())) continue; // still live in sheet
+            // Only auto-remove schools synced from Sheets — never delete ones the admin manually
+            // created with a custom contactOverride (they were added directly in the dashboard).
             if ((school as any).contactOverride) continue;
+            console.log(`[friendship] auto-removing school "${school.name}" (no longer in Friendship Schools tab)`);
             await storage.deleteFriendshipSchool(school.id).catch(() => {});
           }
           for (const s of mouDone) {
@@ -5165,6 +5166,9 @@ paths:
         slug: slugify(String(req.body.name || "")),
         token: randomBytes(16).toString("hex"),
         isActive: req.body.isActive !== false,
+        // Mark as manually-created so the auto-sync never deletes it when the
+        // sheet no longer lists it (only schools synced FROM the sheet are auto-removed).
+        contactOverride: true,
       };
       const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
@@ -5380,6 +5384,20 @@ paths:
         }
       }
 
+      // Leads in DB but absent from the sheet → delete them.
+      // Use ALL rows in the aggregate tab (not just schoolRows) so that leads appended
+      // under a previous school name (before a rename) are not mistakenly deleted.
+      const allSheetPhones = new Set(
+        allRows.slice(1)
+          .map(r => (r[5] || "").toString().replace(/\D/g, ""))
+          .filter(Boolean)
+      );
+      const toDelete = existing.filter(l => !allSheetPhones.has(l.phone.replace(/\D/g, "")));
+      const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
+      if (deleted > 0) {
+        console.log(`[friendship] sync-status: deleted ${deleted} leads removed from sheet for ${school.name}`);
+      }
+
       const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, statusUpdates);
       let imported = 0;
       if (newLeads.length) {
@@ -5387,8 +5405,8 @@ paths:
         imported = newLeads.length;
       }
 
-      console.log(`[friendship] sync-status school=${school.name}: ${updated} updated, ${imported} imported`);
-      res.json({ updated, imported, total: statusUpdates.length });
+      console.log(`[friendship] sync-status school=${school.name}: ${updated} updated, ${imported} imported, ${deleted} deleted`);
+      res.json({ updated, imported, deleted, total: statusUpdates.length });
     } catch (err: any) {
       const msg = err?.message || String(err) || "";
       console.error("[sync-status] error:", msg);
