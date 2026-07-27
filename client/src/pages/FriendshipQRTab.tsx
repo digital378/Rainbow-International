@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { normalizePhone } from "@/lib/friendship-url-utils";
+import { Phone, Mail, Check, Building2, AlertTriangle } from "lucide-react";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -420,7 +421,7 @@ function FriendshipQRTabInner() {
                         className="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
                         style={{ background: copiedId === s.id ? "#dcfce7" : "#f0fdf4", color: copiedId === s.id ? "#059669" : "#16a34a" }}
                         data-testid={`button-qr-link-${s.id}`}>
-                        {copiedId === s.id ? "✓ Copied" : "Copy Link"}
+                        {copiedId === s.id ? <><Check className="w-3 h-3 inline-block mr-0.5" />Copied</> : "Copy Link"}
                       </button>
                       <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
                         className="text-xs px-3 py-1.5 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
@@ -440,7 +441,7 @@ function FriendshipQRTabInner() {
         <div className="lg:col-span-2" ref={leadsPanelRef}>
           {!selectedSchool ? (
             <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-              <div className="text-3xl mb-3">🏫</div>
+              <Building2 className="w-10 h-10 mx-auto mb-3 text-slate-300" strokeWidth={1.5} />
               <div className="text-slate-500 text-sm">Select a school on the left to view its leads</div>
             </div>
           ) : (
@@ -459,14 +460,14 @@ function FriendshipQRTabInner() {
                           target="_blank" rel="noopener noreferrer"
                           className="font-semibold text-green-600 hover:underline"
                           data-testid="link-header-whatsapp">
-                          📞 {selectedSchool.contactPhone}
+                          <Phone className="w-3 h-3 inline-block mr-0.5" />{selectedSchool.contactPhone}
                         </a>
                       )}
                       {selectedSchool.contactEmail && (
                         <a href={`mailto:${selectedSchool.contactEmail}`}
                           className="font-semibold text-blue-600 hover:underline"
                           data-testid="link-header-email">
-                          ✉ {selectedSchool.contactEmail}
+                          <Mail className="w-3 h-3 inline-block mr-0.5" />{selectedSchool.contactEmail}
                         </a>
                       )}
                     </div>
@@ -521,14 +522,14 @@ function FriendshipQRTabInner() {
                                 <a href={`https://wa.me/${normalizePhone(l.phone)}`}
                                   target="_blank" rel="noopener noreferrer"
                                   className="text-xs text-green-600 font-semibold hover:underline">
-                                  📞 {l.phone}
+                                  <Phone className="w-3 h-3 inline-block mr-0.5" />{l.phone}
                                 </a>
                               ) : <span className="text-xs text-slate-300">—</span>}
                               {l.email ? (
                                 <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(l.email)}`}
                                   target="_blank" rel="noopener noreferrer"
                                   className="text-xs text-blue-600 hover:underline">
-                                  ✉ {l.email}
+                                  <Mail className="w-3 h-3 inline-block mr-0.5" />{l.email}
                                 </a>
                               ) : null}
                             </div>
@@ -551,7 +552,7 @@ function FriendshipQRTabInner() {
                           </td>
                           <td className="px-3 py-2.5">
                             {l.syncFailed ? <span className="text-xs text-red-500 font-semibold">Failed</span>
-                              : l.syncedToSheets ? <span className="text-xs text-green-600">✓</span>
+                              : l.syncedToSheets ? <span className="text-xs text-green-600"><Check className="w-3.5 h-3.5 inline-block" /></span>
                               : <span className="text-xs text-amber-500">Pending</span>}
                           </td>
                         </tr>
@@ -651,7 +652,7 @@ function FriendshipQRTabInner() {
       {confirmRegen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(9,26,79,0.7)" }}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-            <div className="text-3xl mb-3">⚠️</div>
+            <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-amber-400" strokeWidth={1.5} />
             <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Regenerate QR Code?</div>
             <div className="text-sm text-slate-600 mb-6">
               This will <strong>invalidate the existing QR code</strong> for <strong>{confirmRegen.name}</strong>. Printed QR cards will stop working immediately.

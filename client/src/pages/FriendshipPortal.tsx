@@ -1,5 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "wouter";
+import {
+  Lock, WifiOff, CheckCircle2, Download, FileSpreadsheet,
+  Upload, X, AlertTriangle, UserPlus, RefreshCw, ClipboardList,
+} from "lucide-react";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
@@ -93,7 +97,7 @@ export default function FriendshipPortal() {
       setLeads(data.leads ?? []);
       setLeadsLastRefreshed(new Date());
     } catch {
-      // non-fatal — leads section just stays empty
+      // non-fatal — leads section stays empty
     } finally {
       setLeadsLoading(false);
     }
@@ -112,15 +116,11 @@ export default function FriendshipPortal() {
       .then((d: School & { isActive: boolean }) => {
         if (!d.isActive) { setInactive(true); return; }
         setSchool(d);
-        // Load leads alongside school data
         loadLeads();
       })
       .catch((err: { kind?: string }) => {
-        if (err?.kind === "inactive") {
-          setInactive(true);
-        } else {
-          setNetworkError(true);
-        }
+        if (err?.kind === "inactive") setInactive(true);
+        else setNetworkError(true);
       });
   }, [token, loadLeads]);
 
@@ -162,14 +162,8 @@ export default function FriendshipPortal() {
   };
 
   const pickFile = useCallback(async (file: File) => {
-    if (!file.name.toLowerCase().endsWith(".xlsx")) {
-      setBulkError("Only .xlsx files are accepted.");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      setBulkError("File must be under 2 MB.");
-      return;
-    }
+    if (!file.name.toLowerCase().endsWith(".xlsx")) { setBulkError("Only .xlsx files are accepted."); return; }
+    if (file.size > 2 * 1024 * 1024) { setBulkError("File must be under 2 MB."); return; }
     setBulkError(""); setFileName(file.name); setSelectedFile(file);
     setParsedRows([]); setParseErrors([]);
     try {
@@ -226,10 +220,7 @@ export default function FriendshipPortal() {
     try {
       const fd = new FormData();
       fd.append("file", selectedFile);
-      const res = await fetch(`/api/alliances/friendship/bulk-upload/${token}`, {
-        method: "POST",
-        body: fd,
-      });
+      const res = await fetch(`/api/alliances/friendship/bulk-upload/${token}`, { method: "POST", body: fd });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.message || "Upload failed");
       setBulkSuccess(d.inserted ?? 0);
@@ -243,11 +234,13 @@ export default function FriendshipPortal() {
     }
   };
 
+  /* ── error / loading states ──────────────────────────────────── */
+
   if (inactive) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }}>
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border-t-4 border-amber-400">
-          <div className="text-4xl mb-4">🔒</div>
+          <Lock className="w-10 h-10 mx-auto mb-4 text-amber-400" strokeWidth={1.5} />
           <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Link No Longer Active</div>
           <div className="text-sm text-slate-500">This QR code has been deactivated or is invalid. Please contact the RIS Alliances team for an updated QR code.</div>
         </div>
@@ -259,14 +252,12 @@ export default function FriendshipPortal() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }}>
         <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center border-t-4 border-red-400">
-          <div className="text-4xl mb-4">📡</div>
+          <WifiOff className="w-10 h-10 mx-auto mb-4 text-red-400" strokeWidth={1.5} />
           <div className="font-black text-lg mb-2" style={{ color: NAVY }}>Couldn't Load Portal</div>
           <div className="text-sm text-slate-500 mb-6">Check your connection and try again. If the problem persists, contact the RIS Alliances team.</div>
-          <button
-            onClick={loadSchool}
+          <button onClick={loadSchool}
             className="px-6 py-2.5 rounded-xl font-black text-sm text-white transition-opacity hover:opacity-80"
-            style={{ background: NAVY }}
-            data-testid="button-retry">
+            style={{ background: NAVY }} data-testid="button-retry">
             Retry
           </button>
         </div>
@@ -287,8 +278,9 @@ export default function FriendshipPortal() {
   const manualPanel = (
     <div className="px-6 py-5">
       {manualSuccess > 0 && (
-        <div className="mb-4 p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold" style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
-          <span>✓</span>
+        <div className="mb-4 p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold"
+          style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{manualSuccess} lead{manualSuccess > 1 ? "s" : ""} submitted successfully. You can add another.</span>
         </div>
       )}
@@ -334,10 +326,10 @@ export default function FriendshipPortal() {
           <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2" data-testid="text-error">{manualError}</div>
         )}
         <button type="submit" disabled={submitting}
-          className="w-full py-3.5 rounded-xl font-black text-sm tracking-wide transition-all disabled:opacity-60"
+          className="w-full py-3.5 rounded-xl font-black text-sm tracking-wide transition-all disabled:opacity-60 flex items-center justify-center gap-2"
           style={{ background: submitting ? "#94a3b8" : NAVY, color: "#fff" }}
           data-testid="button-submit">
-          {submitting ? "Submitting…" : "Submit Lead →"}
+          {submitting ? "Submitting…" : "Submit Lead"}
         </button>
         <div className="text-center text-xs text-slate-400">
           Data is recorded securely for admission purposes only.
@@ -349,8 +341,9 @@ export default function FriendshipPortal() {
   const bulkPanel = (
     <div className="px-6 py-5 space-y-4">
       {bulkSuccess > 0 && (
-        <div className="p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold" style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
-          <span>✓</span>
+        <div className="p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold"
+          style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{bulkSuccess} lead{bulkSuccess !== 1 ? "s" : ""} uploaded{bulkSkipped > 0 ? ` · ${bulkSkipped} row${bulkSkipped !== 1 ? "s" : ""} skipped` : ""}!</span>
         </div>
       )}
@@ -366,10 +359,11 @@ export default function FriendshipPortal() {
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-slate-600">Upload Excel File</div>
         <a href="/api/alliances/friendship/template" download="friendship_school_template.xlsx"
-          className="text-xs font-bold px-3 py-1.5 rounded-lg border-2 transition hover:opacity-80"
+          className="text-xs font-bold px-3 py-1.5 rounded-lg border-2 transition hover:opacity-80 flex items-center gap-1.5"
           style={{ borderColor: AMBER, color: AMBER }}
           data-testid="link-download-template">
-          ⬇ Download Template
+          <Download className="w-3.5 h-3.5" />
+          Download Template
         </a>
       </div>
 
@@ -381,7 +375,10 @@ export default function FriendshipPortal() {
         style={{ borderColor: dragOver ? AMBER : "#cbd5e1", background: dragOver ? "#fffbeb" : "#f8fafc" }}
         onClick={() => document.getElementById("bulk-file-input")?.click()}
         data-testid="dropzone-bulk">
-        <div className="text-3xl mb-2">{fileName ? "📄" : "📁"}</div>
+        {fileName
+          ? <FileSpreadsheet className="w-8 h-8 mx-auto mb-2 text-green-600" strokeWidth={1.5} />
+          : <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" strokeWidth={1.5} />
+        }
         {fileName ? (
           <div>
             <div className="text-sm font-bold text-slate-700">{fileName}</div>
@@ -400,15 +397,21 @@ export default function FriendshipPortal() {
 
       {selectedFile && (
         <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-          <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs text-slate-700 font-medium truncate">{fileName}</span>
-          <button onClick={() => { setSelectedFile(null); setFileName(""); setParsedRows([]); setParseErrors([]); setBulkError(""); }} className="ml-auto text-slate-400 hover:text-red-500 text-xs">✕</button>
+          <button onClick={() => { setSelectedFile(null); setFileName(""); setParsedRows([]); setParseErrors([]); setBulkError(""); }}
+            className="ml-auto text-slate-400 hover:text-red-500 transition">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {parseErrors.length > 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
-          <div className="text-xs font-bold text-amber-700 mb-1">⚠ {parseErrors.length} row{parseErrors.length > 1 ? "s" : ""} skipped (invalid):</div>
+          <div className="text-xs font-bold text-amber-700 mb-1 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+            {parseErrors.length} row{parseErrors.length > 1 ? "s" : ""} skipped (invalid):
+          </div>
           <ul className="text-xs text-amber-600 space-y-0.5 max-h-28 overflow-y-auto">
             {parseErrors.map((e, i) => <li key={i}>• {e}</li>)}
           </ul>
@@ -459,7 +462,7 @@ export default function FriendshipPortal() {
           className="w-full py-3.5 rounded-xl font-black text-sm tracking-wide transition-all disabled:opacity-60"
           style={{ background: uploading ? "#94a3b8" : GREEN, color: "#fff" }}
           data-testid="button-upload-confirm">
-          {uploading ? "Uploading…" : `Confirm & Upload ${parsedRows.length} Lead${parsedRows.length > 1 ? "s" : ""} →`}
+          {uploading ? "Uploading…" : `Confirm & Upload ${parsedRows.length} Lead${parsedRows.length > 1 ? "s" : ""}`}
         </button>
       )}
 
@@ -473,7 +476,7 @@ export default function FriendshipPortal() {
 
   const leadsPanel = (
     <div className="px-6 py-5">
-      {/* Summary pills — only shown when there are leads */}
+      {/* Summary pills */}
       {leads.length > 0 && (
         <div className="flex gap-3 flex-wrap mb-4">
           <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#f0f4ff" }}>
@@ -493,12 +496,10 @@ export default function FriendshipPortal() {
             <div className="text-xs text-slate-500 font-medium">Walk-ins</div>
           </div>
           <div className="ml-auto flex flex-col items-end gap-1 justify-center">
-            <button
-              onClick={loadLeads}
-              disabled={leadsLoading}
-              className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition disabled:opacity-50"
-            >
-              {leadsLoading ? "Loading…" : "↻ Refresh"}
+            <button onClick={loadLeads} disabled={leadsLoading}
+              className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition disabled:opacity-50 flex items-center gap-1.5">
+              <RefreshCw className={`w-3 h-3 ${leadsLoading ? "animate-spin" : ""}`} />
+              {leadsLoading ? "Loading…" : "Refresh"}
             </button>
             {leadsLastRefreshed && (
               <div className="text-xs text-slate-400">
@@ -515,11 +516,9 @@ export default function FriendshipPortal() {
         <div className="py-10 text-center text-slate-400 text-sm">
           No leads submitted yet — use the form to add your first one.
           {!leadsLoading && (
-            <button
-              onClick={loadLeads}
-              className="block mx-auto mt-3 text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition"
-            >
-              ↻ Refresh
+            <button onClick={loadLeads}
+              className="flex items-center gap-1.5 mx-auto mt-3 text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+              <RefreshCw className="w-3 h-3" /> Refresh
             </button>
           )}
         </div>
@@ -557,12 +556,14 @@ export default function FriendshipPortal() {
   return (
     <div className="min-h-screen py-6 px-4" style={{ background: NAVY }}>
       <div className="max-w-lg md:max-w-5xl mx-auto">
+
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-4">
           <div className="h-1.5" style={{ background: AMBER }} />
           <div className="px-6 py-5" style={{ background: NAVY }}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0" style={{ background: AMBER, color: NAVY }}>RIS</div>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
+                style={{ background: AMBER, color: NAVY }}>RIS</div>
               <div>
                 <div className="font-black text-white text-base leading-tight">Rainbow International School</div>
                 <div className="text-xs text-blue-200">Alliances Portal</div>
@@ -578,26 +579,26 @@ export default function FriendshipPortal() {
         {/* ── MOBILE: tabbed layout ──────────────────────────────── */}
         <div className="md:hidden bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="flex border-b border-slate-100">
-            <button
-              onClick={() => setTab("manual")}
-              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "manual" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+            <button onClick={() => setTab("manual")}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors flex flex-col items-center gap-1 ${tab === "manual" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
               style={tab === "manual" ? { background: NAVY } : {}}
               data-testid="tab-manual">
-              ➕ Add Lead
+              <UserPlus className="w-4 h-4" />
+              Add Lead
             </button>
-            <button
-              onClick={() => setTab("bulk")}
-              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "bulk" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+            <button onClick={() => setTab("bulk")}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors flex flex-col items-center gap-1 ${tab === "bulk" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
               style={tab === "bulk" ? { background: NAVY } : {}}
               data-testid="tab-bulk">
-              📁 Bulk Upload
+              <Upload className="w-4 h-4" />
+              Bulk Upload
             </button>
-            <button
-              onClick={() => setTab("leads")}
-              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "leads" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+            <button onClick={() => setTab("leads")}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors flex flex-col items-center gap-1 ${tab === "leads" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
               style={tab === "leads" ? { background: NAVY } : {}}
               data-testid="tab-leads">
-              📋 My Leads{leads.length > 0 ? ` (${leads.length})` : ""}
+              <ClipboardList className="w-4 h-4" />
+              My Leads{leads.length > 0 ? ` (${leads.length})` : ""}
             </button>
           </div>
           {tab === "manual" ? manualPanel : tab === "bulk" ? bulkPanel : leadsPanel}
@@ -605,41 +606,46 @@ export default function FriendshipPortal() {
 
         {/* ── DESKTOP: side-by-side two-column layout ────────────── */}
         <div className="hidden md:grid md:grid-cols-2 gap-5">
-          {/* Left: individual lead form */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100" style={{ background: NAVY }}>
-              <div className="font-black text-white text-sm">➕ Add Individual Lead</div>
-              <div className="text-xs text-blue-200 mt-0.5">Fill in one student's details at a time</div>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: NAVY }}>
+              <UserPlus className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <div className="font-black text-white text-sm">Add Individual Lead</div>
+                <div className="text-xs text-blue-200 mt-0.5">Fill in one student's details at a time</div>
+              </div>
             </div>
             {manualPanel}
           </div>
 
-          {/* Right: bulk upload */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100" style={{ background: NAVY }}>
-              <div className="font-black text-white text-sm">📋 Bulk Upload</div>
-              <div className="text-xs text-blue-200 mt-0.5">Upload many students at once via Excel</div>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: NAVY }}>
+              <Upload className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <div className="font-black text-white text-sm">Bulk Upload</div>
+                <div className="text-xs text-blue-200 mt-0.5">Upload many students at once via Excel</div>
+              </div>
             </div>
             {bulkPanel}
           </div>
         </div>
 
-        {/* ── YOUR SUBMITTED LEADS (desktop only — mobile uses the My Leads tab) ── */}
+        {/* ── YOUR SUBMITTED LEADS (desktop) ─────────────────────── */}
         <div className="hidden md:block mt-6">
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            {/* Section header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3" style={{ background: NAVY }}>
-              <div>
-                <div className="font-black text-white text-sm">📋 Your Submitted Leads</div>
-                <div className="text-xs text-blue-200 mt-0.5">Status is updated by Rainbow International School</div>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3"
+              style={{ background: NAVY }}>
+              <div className="flex items-center gap-2">
+                <ClipboardList className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <div>
+                  <div className="font-black text-white text-sm">Your Submitted Leads</div>
+                  <div className="text-xs text-blue-200 mt-0.5">Status is updated by Rainbow International School</div>
+                </div>
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <button
-                  onClick={loadLeads}
-                  disabled={leadsLoading}
-                  className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-white/20 text-white/80 hover:bg-white/10 transition disabled:opacity-50"
-                >
-                  {leadsLoading ? "Loading…" : "↻ Refresh"}
+                <button onClick={loadLeads} disabled={leadsLoading}
+                  className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-white/20 text-white/80 hover:bg-white/10 transition disabled:opacity-50 flex items-center gap-1.5">
+                  <RefreshCw className={`w-3 h-3 ${leadsLoading ? "animate-spin" : ""}`} />
+                  {leadsLoading ? "Loading…" : "Refresh"}
                 </button>
                 {leadsLastRefreshed && (
                   <div className="text-xs text-blue-300">
@@ -649,7 +655,6 @@ export default function FriendshipPortal() {
               </div>
             </div>
 
-            {/* Summary pills — only shown when there are leads */}
             {leads.length > 0 && (
               <div className="px-6 py-4 border-b border-slate-100 flex gap-3 flex-wrap">
                 <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#f0f4ff" }}>
@@ -671,7 +676,6 @@ export default function FriendshipPortal() {
               </div>
             )}
 
-            {/* Body */}
             {leadsLoading && leads.length === 0 ? (
               <div className="py-10 text-center text-slate-400 text-sm">Loading your leads…</div>
             ) : leads.length === 0 ? (
