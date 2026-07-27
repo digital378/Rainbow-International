@@ -4763,6 +4763,51 @@ paths:
     });
   }
 
+  // ── Aggregate "All Friendship Leads" tab helpers ─────────────────
+  const AGGREGATE_TAB = "All Friendship Leads";
+
+  async function ensureAggregateLeadsTab(sheets: any, sheetId: string): Promise<void> {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title" });
+    const exists = (meta.data.sheets || []).some((s: any) => s.properties?.title === AGGREGATE_TAB);
+    if (!exists) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: { requests: [{ addSheet: { properties: { title: AGGREGATE_TAB } } }] },
+      });
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: sheetId,
+        range: `${AGGREGATE_TAB}!A1:I1`,
+        valueInputOption: "USER_ENTERED",
+        requestBody: { values: [["Date", "School Name", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status"]] },
+      });
+      console.log(`[friendship] Created aggregate tab: ${AGGREGATE_TAB}`);
+    }
+  }
+
+  async function appendLeadsToAggregateTab(leads: Array<{
+    submittedAt: Date | string; studentName: string; grade: string;
+    parentName: string; phone: string; email?: string | null; source: string;
+  }>, schoolName: string): Promise<void> {
+    const sheetId = SHEET_IDS.alliances;
+    if (!sheetId) throw new Error("Alliances sheet ID not configured");
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    await ensureAggregateLeadsTab(sheets, sheetId);
+    const rows = leads.map(lead => {
+      const dt = new Date(lead.submittedAt);
+      const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
+      return [dateStr, schoolName, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open"];
+    });
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId,
+      range: `${AGGREGATE_TAB}!A:I`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: rows },
+    });
+  }
+
   // Template download (public)
   app.get("/api/alliances/friendship/template", (_req, res) => {
     if (!fs.existsSync(FRIENDSHIP_TEMPLATE_PATH)) {
@@ -4779,6 +4824,31 @@ paths:
       const school = await storage.getFriendshipSchoolByToken(req.params.token);
       if (!school) return res.status(404).json({ message: "School not found" });
       res.json({ id: school.id, name: school.name, isActive: school.isActive });
+    } catch {
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
+  // Public: school leads portal — returns that school's leads for the view-only portal page.
+  // The token IS the credential; no login required. Returns only non-sensitive columns.
+  app.get("/api/school-leads/:token", async (req, res) => {
+    try {
+      const school = await storage.getFriendshipSchoolByToken(req.params.token);
+      if (!school || !school.isActive) return res.status(404).json({ message: "School not found" });
+      const leads = await storage.listFriendshipLeads(school.id, undefined, 500, 0);
+      res.json({
+        school: { name: school.name },
+        leads: leads.map(l => ({
+          id: l.id,
+          date: l.submittedAt,
+          studentName: l.studentName,
+          grade: l.grade,
+          parentName: l.parentName,
+          phone: l.phone,
+          email: l.email ?? null,
+          status: l.status,
+        })),
+      });
     } catch {
       res.status(500).json({ message: "Server error" });
     }
@@ -4805,6 +4875,11 @@ paths:
           const msg = err instanceof Error ? err.message : String(err);
           console.error(`[friendship] Sheet sync failed for lead ${lead.id}: ${msg}`);
           await storage.markFriendshipLeadSyncFailed(lead.id).catch(() => {});
+        });
+      // Also append to aggregate "All Friendship Leads" tab (fire-and-forget)
+      appendLeadsToAggregateTab([lead], school.name)
+        .catch((err: unknown) => {
+          console.error(`[friendship] Aggregate tab sync failed for lead ${lead.id}:`, err instanceof Error ? err.message : String(err));
         });
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
@@ -4876,6 +4951,11 @@ paths:
             console.error(`[friendship] Bulk sheet sync failed for lead ${lead.id}: ${msg}`);
           });
       }
+      // Append all inserted leads to aggregate tab in one batch call (fire-and-forget)
+      appendLeadsToAggregateTab(inserted, school.name)
+        .catch((err: unknown) => {
+          console.error(`[friendship] Aggregate tab bulk sync failed:`, err instanceof Error ? err.message : String(err));
+        });
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to process bulk upload" });

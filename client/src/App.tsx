@@ -68,6 +68,7 @@ const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
 const QRCard = lazy(() => import("@/pages/QRCard"));
 const FriendshipPortal = lazy(() => import("@/pages/FriendshipPortal"));
+const SchoolLeadsPortal = lazy(() => import("@/pages/SchoolLeadsPortal"));
 const FriendshipQRCard = lazy(() => import("@/pages/FriendshipQRCard"));
 const AdminFriendshipSchools = lazy(() => import("@/pages/AdminFriendshipSchools"));
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -140,6 +141,7 @@ function Router() {
       <Route path="/rps-sales" component={RpsSales} />
       <Route path="/walkin/:slug" component={WalkinForm} />
       <Route path="/alliances/friendship/:token" component={FriendshipPortal} />
+      <Route path="/school-leads/:token" component={SchoolLeadsPortal} />
       <Route path="/admin/alliances/friendship/:id/qr" component={FriendshipQRCard} />
       <Route path="/admin/alliances/friendship" component={AdminFriendshipSchools} />
       <Route path="/admin/ras/submissions" component={AdminSubmissions} />
