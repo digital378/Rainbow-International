@@ -1224,7 +1224,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referral Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Date Referred</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Incentive</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referral Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -1251,7 +1251,13 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                     <StageBadge stage={p.status} palette={PA_COLOR} label={displayLabel(p.status)} />
                   </td>
                   <td className="px-4 py-2.5 text-slate-500 text-xs">{p.dateReferred || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-xs">{p.incentiveGiven || "—"}</td>
+                  <td className="px-4 py-2.5">
+                    {p.incentiveGiven === "Paid"
+                      ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Paid</span>
+                      : p.incentiveGiven === "Pending"
+                      ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
+                      : <span className="text-slate-400 text-xs">—</span>}
+                  </td>
                 </tr>
               ))}
               {rows.length === 0 && (
