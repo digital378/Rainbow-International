@@ -509,6 +509,23 @@ export async function registerRoutes(
     "/rss":                                   "/blogs",
     "/rss2":                                  "/blogs",
 
+    // ── Search Console audit – indexed URLs not previously covered ───
+    // Verified 2026-07-27 via Search Console Performance export (16 months).
+    // Blog-post root slugs are handled by blogSlugRedirects above; only
+    // non-post, non-wildcard paths that still 404 are listed here.
+    "/6-reasons-why-cbse-is-the-best-board-in-the-country": "/blog/6-reasons-why-cbse-is-the-best-board-of-the-country",
+    "/global-brand-associations":        "/brand-partners",
+    "/global-brand-associations-copy":   "/brand-partners",
+    "/global-brand-associations-demo":   "/brand-partners",
+    "/index":                            "/",
+    "/privacy-policy-and-cookie-policy": "/",
+    "/sample-page":                      "/",
+    "/school-readiness-quiz":            "/admissions",
+    "/students-leaving-certificate":     "/",
+    "/term-of-use":                      "/",
+    "/thank-you":                        "/",
+    "/virtual-learning":                 "/blogs",
+
     // Blog-slug redirects — auto-generated from the blog_posts table
     ...blogSlugRedirects,
   };
@@ -524,6 +541,8 @@ export async function registerRoutes(
   app.get("/tag/*",      (_req, res) => res.redirect(301, "/blogs"));
   app.get("/author/*",   (_req, res) => res.redirect(301, "/"));
   app.get("/page/*",     (_req, res) => res.redirect(301, "/blogs"));
+  // WordPress capitalised /Blog/ pagination (e.g. /Blog/uncategorized/page/2/)
+  app.get("/Blog/*",     (_req, res) => res.redirect(301, "/blogs"));
   app.get("/wp-login.php", (_req, res) => res.redirect(301, "/"));
   app.get("/wp-admin",   (_req, res) => res.redirect(301, "/"));
   app.get("/wp-admin/*", (_req, res) => res.redirect(301, "/"));
