@@ -5569,19 +5569,29 @@ paths:
   // Admin: one-shot sheet cleanup — fix aggregate tab schema + delete junk/per-school tabs
   app.post("/api/admin/alliances/friendship/cleanup-sheets", requireAdmin, async (_req, res) => {
     try {
-      const sheetId = SHEET_IDS.alliances;
-      if (!sheetId) return res.status(503).json({ message: "Alliances sheet ID not configured" });
+      // School tabs may be in the env-var sheet; aggregate tab is in the hardcoded SHEET_IDS.alliances.
+      // Deduplicate so we don't double-clean when they're the same sheet.
+      const envSheetId = process.env.ALLIANCES_SHEET_ID ?? "";
+      const aggSheetId = SHEET_IDS.alliances;
+      const sheetIdsToClean = [...new Set([aggSheetId, envSheetId].filter(Boolean))];
+      if (!sheetIdsToClean.length) return res.status(503).json({ message: "Alliances sheet ID not configured" });
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(503).json({ message: "Google not connected" });
       const { google: goog } = await import("googleapis");
       const sheets = goog.sheets({ version: "v4", auth });
 
-      // Get all tabs with their numeric sheetIds
-      const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties" });
-      const allTabs: Array<{ title: string; sheetId: number }> = (meta.data.sheets || []).map((s: any) => ({
-        title: s.properties?.title ?? "",
-        sheetId: s.properties?.sheetId ?? -1,
-      }));
+      // We fix the aggregate tab from the dedicated aggSheetId sheet.
+      const sheetId = aggSheetId || envSheetId;
+
+      // Get all tabs with their numeric sheetIds — from every sheet we need to clean
+      const allTabsBySheet: Array<{ spreadsheetId: string; title: string; sheetId: number }> = [];
+      for (const sid of sheetIdsToClean) {
+        const meta = await sheets.spreadsheets.get({ spreadsheetId: sid, fields: "sheets.properties" });
+        for (const s of meta.data.sheets || []) {
+          allTabsBySheet.push({ spreadsheetId: sid, title: s.properties?.title ?? "", sheetId: s.properties?.sheetId ?? -1 });
+        }
+      }
+      const allTabs = allTabsBySheet.filter(t => t.spreadsheetId === sheetId);
 
       // Fix "All Friendship Leads" header + dropdowns (even if tab already existed)
       const aggregateTab = allTabs.find(t => t.title === AGGREGATE_TAB);
@@ -5638,29 +5648,34 @@ paths:
       }
       console.log(`[friendship] Deleted ${e2eSchools.length} e2e test schools from DB`);
 
-      // Identify junk tabs: any e2e-* tab + tabs matching known school names
+      // Identify junk tabs across ALL sheets we checked: any e2e-* tab + per-school tabs
       const knownSchoolNames = new Set(
         (await storage.listFriendshipSchools()).map(s => s.sheetsTabName)
       );
-      const junkTabs = allTabs.filter(t =>
+      const junkTabs = allTabsBySheet.filter(t =>
         t.title !== AGGREGATE_TAB &&
         (t.title.startsWith("e2e-") || knownSchoolNames.has(t.title))
       );
 
+      // Group deletions by spreadsheet so each sheet gets one batchUpdate call
+      const bySheet = new Map<string, typeof junkTabs>();
+      for (const t of junkTabs) {
+        if (!bySheet.has(t.spreadsheetId)) bySheet.set(t.spreadsheetId, []);
+        bySheet.get(t.spreadsheetId)!.push(t);
+      }
       let deleted = 0;
-      if (junkTabs.length > 0) {
+      for (const [sid, tabs] of bySheet) {
         await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: sheetId,
-          requestBody: {
-            requests: junkTabs.map(t => ({ deleteSheet: { sheetId: t.sheetId } })),
-          },
+          spreadsheetId: sid,
+          requestBody: { requests: tabs.map(t => ({ deleteSheet: { sheetId: t.sheetId } })) },
         });
-        deleted = junkTabs.length;
-        console.log(`[friendship] Deleted ${deleted} junk tabs: ${junkTabs.map(t => t.title).join(", ")}`);
+        deleted += tabs.length;
+        console.log(`[friendship] Deleted ${tabs.length} junk tabs from ${sid}: ${tabs.map(t => t.title).join(", ")}`);
       }
 
       res.json({
         aggregateTabFixed: !!aggregateTab,
+        sheetsScanned: sheetIdsToClean,
         deletedTabs: junkTabs.map(t => t.title),
         deleted,
       });
