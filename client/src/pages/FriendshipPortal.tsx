@@ -103,6 +103,34 @@ export default function FriendshipPortal() {
     }
   }, [token]);
 
+  // Auto-refresh: poll every 60s while the leads list is visible and the page is in the foreground.
+  // On mobile this only runs when the "leads" tab is active; on desktop (md+) it always runs.
+  useEffect(() => {
+    if (!school) return;
+
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop && tab !== "leads") return;
+
+    const POLL_MS = 60_000;
+
+    const tick = () => {
+      if (!document.hidden) loadLeads();
+    };
+
+    const intervalId = setInterval(tick, POLL_MS);
+
+    // Resume immediately when the user switches back to this browser tab
+    const onVisibility = () => {
+      if (!document.hidden) loadLeads();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [school, tab, loadLeads]);
+
   const loadSchool = useCallback(() => {
     setNetworkError(false);
     setInactive(false);
