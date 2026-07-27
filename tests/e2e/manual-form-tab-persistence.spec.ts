@@ -366,6 +366,58 @@ test.describe("FriendshipPortal — manual form fields survive tab switches", ()
   );
 
   /**
+   * Reload-recovery scenario: user partially fills the manual form, then the
+   * page is reloaded (e.g. triggered by a PWA update or an aggressive
+   * background-tab reload from another tab). The draft must be restored from
+   * sessionStorage so no entered data is lost.
+   */
+  test(
+    "draft is restored from sessionStorage after a full page reload",
+    async ({ page, request }) => {
+      const school = await createSchool(request);
+
+      try {
+        await page.goto(`/alliances/friendship/${school.token}`);
+        await expect(page.getByTestId("tab-manual")).toBeVisible({ timeout: 15_000 });
+
+        const studentNameInput = page.getByTestId("input-student-name").first();
+        const gradeSelect      = page.getByTestId("select-grade").first();
+        const parentNameInput  = page.getByTestId("input-parent-name").first();
+        const phoneInput       = page.getByTestId("input-phone").first();
+        const emailInput       = page.getByTestId("input-email").first();
+
+        await studentNameInput.fill(PARTIAL_FORM.studentName);
+        await gradeSelect.selectOption(PARTIAL_FORM.grade);
+        await parentNameInput.fill(PARTIAL_FORM.parentName);
+        await phoneInput.fill(PARTIAL_FORM.phone);
+        await emailInput.fill(PARTIAL_FORM.email);
+
+        // Confirm all values are written before reloading.
+        await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
+        await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(phoneInput).toHaveValue(PARTIAL_FORM.phone);
+        await expect(emailInput).toHaveValue(PARTIAL_FORM.email);
+
+        // Full page reload — simulates a PWA update or an aggressive
+        // background-tab reload triggered from another tab while the user
+        // was mid-fill. All in-memory React state is wiped.
+        await page.reload();
+        await expect(page.getByTestId("tab-manual")).toBeVisible({ timeout: 15_000 });
+
+        // Draft must be restored from sessionStorage.
+        await expect(page.getByTestId("input-student-name").first()).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(page.getByTestId("select-grade").first()).toHaveValue(PARTIAL_FORM.grade);
+        await expect(page.getByTestId("input-parent-name").first()).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(page.getByTestId("input-phone").first()).toHaveValue(PARTIAL_FORM.phone);
+        await expect(page.getByTestId("input-email").first()).toHaveValue(PARTIAL_FORM.email);
+      } finally {
+        await deleteSchool(request, school.id);
+      }
+    },
+  );
+
+  /**
    * Multiple round-trips: manual → bulk → leads → manual.
    * Each intermediate switch must not disturb the form state.
    */

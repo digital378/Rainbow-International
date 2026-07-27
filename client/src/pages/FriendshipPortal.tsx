@@ -62,12 +62,18 @@ export default function FriendshipPortal() {
   const [networkError, setNetworkError] = useState(false);
   const [tab, setTab] = useState<"manual" | "bulk" | "leads">("manual");
 
-  // Manual form state
-  const [studentName, setStudentName] = useState("");
-  const [grade, setGrade] = useState("");
-  const [parentName, setParentName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  // Manual form state — initialised from sessionStorage so a page reload
+  // (e.g. triggered by a PWA update) does not wipe a partially-filled form.
+  const draftKey = `fp_draft_${token}`;
+  const [initialDraft] = useState<Record<string, string>>(() => {
+    try { return JSON.parse(sessionStorage.getItem(`fp_draft_${token}`) ?? "{}"); }
+    catch { return {}; }
+  });
+  const [studentName, setStudentName] = useState(initialDraft.studentName ?? "");
+  const [grade, setGrade] = useState(initialDraft.grade ?? "");
+  const [parentName, setParentName] = useState(initialDraft.parentName ?? "");
+  const [phone, setPhone] = useState(initialDraft.phone ?? "");
+  const [email, setEmail] = useState(initialDraft.email ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [manualSuccess, setManualSuccess] = useState(0);
   const [manualError, setManualError] = useState("");
@@ -160,7 +166,18 @@ export default function FriendshipPortal() {
     loadSchool();
   }, [loadSchool]);
 
-  const resetManual = () => { setStudentName(""); setGrade(""); setParentName(""); setPhone(""); setEmail(""); setManualError(""); };
+  // Persist manual form draft to sessionStorage on every change so that a
+  // full page reload (e.g. PWA update, background-tab reload) can restore it.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(draftKey, JSON.stringify({ studentName, grade, parentName, phone, email }));
+    } catch { /* ignore quota / privacy errors */ }
+  }, [draftKey, studentName, grade, parentName, phone, email]);
+
+  const resetManual = () => {
+    setStudentName(""); setGrade(""); setParentName(""); setPhone(""); setEmail(""); setManualError("");
+    try { sessionStorage.removeItem(draftKey); } catch { /* ignore */ }
+  };
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
