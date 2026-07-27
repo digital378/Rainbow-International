@@ -1395,7 +1395,7 @@ function AlliancesDashboard() {
       {/* Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
         {tab === "qrLeads" ? (
-          <FriendshipQRTab />
+          <FriendshipQRTab refreshKey={fetchKey} />
         ) : (
           <>
             {isLoading && (

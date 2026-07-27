@@ -131,8 +131,8 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
   );
 }
 
-export default function FriendshipQRTab() {
-  return <FriendshipQRTabInner />;
+export default function FriendshipQRTab({ refreshKey = 0 }: { refreshKey?: number }) {
+  return <FriendshipQRTabInner refreshKey={refreshKey} />;
 }
 
 function portalUrl(token: string) {
@@ -144,7 +144,7 @@ function copyPortalUrl(token: string) {
 }
 
 
-function FriendshipQRTabInner() {
+function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,7 +153,6 @@ function FriendshipQRTabInner() {
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editSchool, setEditSchool] = useState<School | null>(null);
-  const [syncMsg, setSyncMsg] = useState("");
   const [confirmRegen, setConfirmRegen] = useState<School | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<School | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
@@ -176,44 +175,46 @@ function FriendshipQRTabInner() {
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const handleSyncStatusFromSheets = async () => {
-    if (!selectedSchool) return;
-    setSyncMsg("Syncing status from Sheets…");
-    try {
-      const res = await fetch("/api/admin/alliances/friendship/sync-status-from-sheets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeader() },
-        body: JSON.stringify({ schoolId: selectedSchool.id }),
-      });
-      const d = await res.json().catch(() => ({}));
-      if (res.ok) {
-        const parts = [];
-        if ((d.imported ?? 0) > 0) parts.push(`${d.imported} imported`);
-        if ((d.updated ?? 0) > 0) parts.push(`${d.updated} status${d.updated !== 1 ? "es" : ""} updated`);
-        setSyncMsg(parts.length ? `Done — ${parts.join(", ")}` : "Done — nothing new");
-        fetchLeads(selectedSchool);
-      } else {
-        setSyncMsg(d.message || "Sync failed");
-      }
-    } catch { setSyncMsg("Sync failed"); }
-    setTimeout(() => setSyncMsg(""), 5000);
-  };
-
   const fetchAll = async () => {
     setLoading(true);
     try {
+      // Sync all schools from aggregate sheet first (status updates + lead deletions)
+      await fetch("/api/admin/alliances/friendship/sync-all-from-sheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeader() },
+      }).catch(() => {}); // non-fatal — proceed even if sheets are unreachable
+
       const [schoolsRes, statsRes] = await Promise.all([
         fetch("/api/admin/alliances/friendship/schools", { headers: authHeader() }),
         fetch("/api/admin/alliances/friendship/stats", { headers: authHeader() }),
       ]);
-      if (schoolsRes.status === 401) { setLoading(false); return; } // auth handled at dashboard level
-      setSchools(await schoolsRes.json());
+      if (schoolsRes.status === 401) { setLoading(false); return; }
+      const updatedSchools: School[] = await schoolsRes.json();
+      setSchools(updatedSchools);
       if (statsRes.ok) setStats(await statsRes.json());
+
+      // Re-fetch leads for the currently selected school so the panel stays current.
+      // Read selectedSchool from the DOM state via the functional updater — this avoids
+      // a stale closure without adding it to the dependency array.
+      setSelectedSchool(prev => {
+        if (!prev) return prev;
+        const still = updatedSchools.find(s => s.id === prev.id) ?? null;
+        if (!still) {
+          // School was deleted — clear leads in the next tick (can't call setter inside updater)
+          setTimeout(() => setLeads([]), 0);
+          return null;
+        }
+        setTimeout(() => {
+          fetch(`/api/admin/alliances/friendship/leads?schoolId=${still.id}`, { headers: authHeader() })
+            .then(r => r.json()).then(setLeads).catch(() => {});
+        }, 0);
+        return still;
+      });
     } catch { /* silent */ }
     setLoading(false);
   };
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); }, [refreshKey]);
 
   const fetchLeads = async (school: School) => {
     setSelectedSchool(school); setLeadsLoading(true); setLeads([]);
@@ -346,11 +347,6 @@ function FriendshipQRTabInner() {
           {loading ? "Loading…" : `${schools.length} Friendship School${schools.length !== 1 ? "s" : ""}`}
         </div>
         <div className="flex gap-2">
-          {syncMsg && (
-            <span className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: AMBER + "20", color: "#92400e" }}>
-              {syncMsg}
-            </span>
-          )}
           <button onClick={openAddModal}
             className="px-4 py-1.5 rounded-lg text-xs font-black text-white transition"
             style={{ background: NAVY }}
@@ -480,11 +476,6 @@ function FriendshipQRTabInner() {
                         : { borderColor: "#dcfce7", color: GREEN, background: "#fff" }}
                       data-testid="button-qr-toggle-active">
                       {selectedSchool.isActive ? "Deactivate" : "Reactivate"}
-                    </button>
-                    <button onClick={handleSyncStatusFromSheets}
-                      className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-blue-200 text-blue-600 hover:bg-blue-50 transition"
-                      data-testid="button-qr-sync-status">
-                      ↓ Sync Status
                     </button>
                     <button onClick={() => setConfirmRegen(selectedSchool)}
                       className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-amber-200 text-amber-600 hover:bg-amber-50 transition"

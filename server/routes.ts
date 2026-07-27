@@ -5318,6 +5318,104 @@ paths:
     await Promise.all(updates);
   }
 
+  // Admin: sync ALL schools at once — reads aggregate tab once, processes every school in one pass
+  app.post("/api/admin/alliances/friendship/sync-all-from-sheets", requireAlliancesOrAdmin, async (req, res) => {
+    try {
+      const sheetId = SHEET_IDS.alliances;
+      if (!sheetId) return res.status(500).json({ message: "Alliances sheet ID not configured" });
+      const auth = getAuthenticatedClient();
+      if (!auth) return res.status(500).json({ message: "Google not connected" });
+
+      const { google: goog } = await import("googleapis");
+      const sheets = goog.sheets({ version: "v4", auth });
+
+      // Single read of the entire aggregate tab
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: `${AGGREGATE_TAB}!A:K`,
+      });
+      const allRows = response.data.values || [];
+      const dataRows = allRows.slice(1); // skip header
+
+      // Build phone set across ALL rows (used for deletion check)
+      const allSheetPhones = new Set(
+        dataRows.map(r => (r[5] || "").toString().replace(/\D/g, "")).filter(Boolean)
+      );
+
+      // Group sheet rows by school name (col B)
+      const rowsBySchool = new Map<string, typeof dataRows>();
+      for (const r of dataRows) {
+        const name = (r[1] || "").toString().trim();
+        if (!name) continue;
+        if (!rowsBySchool.has(name)) rowsBySchool.set(name, []);
+        rowsBySchool.get(name)!.push(r);
+      }
+
+      // Process every school in DB
+      const allSchools = await storage.listFriendshipSchools();
+      let totalUpdated = 0, totalImported = 0, totalDeleted = 0;
+
+      for (const school of allSchools) {
+        try {
+          const existing = await storage.listFriendshipLeads(school.id);
+          const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
+          const schoolRows = rowsBySchool.get(school.name) ?? [];
+
+          const statusUpdates: { phone: string; status: string }[] = [];
+          const newLeads: any[] = [];
+
+          for (const r of schoolRows) {
+            const dateRaw = (r[0] || "").toString().trim();
+            const student  = (r[2] || "").toString().trim();
+            const grade    = (r[3] || "").toString().trim();
+            const parent   = (r[4] || "").toString().trim();
+            const phone    = (r[5] || "").toString().trim();
+            const email    = (r[6] || "").toString().trim();
+            const source   = (r[7] || "manual").toString().trim();
+            const status   = (r[8] || "Open").toString().trim();
+            if (!phone) continue;
+            if (status) statusUpdates.push({ phone, status });
+            if (!existingPhones.has(phone.replace(/\D/g, "")) && student && grade && parent) {
+              let submittedAt: Date | undefined;
+              const parsed = new Date(dateRaw);
+              if (dateRaw && !isNaN(parsed.getTime())) submittedAt = parsed;
+              newLeads.push({
+                schoolId: school.id, studentName: student, grade, parentName: parent, phone,
+                email: email || undefined,
+                source: ["manual", "bulk"].includes(source) ? source : "manual",
+                status: status || "Open", syncedToSheets: true,
+                ...(submittedAt ? { submittedAt } : {}),
+              });
+            }
+          }
+
+          // Delete leads absent from the entire sheet (rename-safe: check all phones not just school rows)
+          const toDelete = existing.filter(l => !allSheetPhones.has(l.phone.replace(/\D/g, "")));
+          const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
+          const updated = await storage.bulkUpdateFriendshipLeadStatuses(school.id, statusUpdates);
+          if (newLeads.length) await storage.createFriendshipLeads(newLeads);
+
+          totalUpdated  += updated;
+          totalImported += newLeads.length;
+          totalDeleted  += deleted;
+
+          if (deleted > 0 || newLeads.length > 0) {
+            console.log(`[friendship] sync-all ${school.name}: +${newLeads.length} imported, ${deleted} deleted`);
+          }
+        } catch (e: unknown) {
+          console.error(`[friendship] sync-all school="${school.name}" error:`, e instanceof Error ? e.message : e);
+        }
+      }
+
+      console.log(`[friendship] sync-all complete: ${totalUpdated} updated, ${totalImported} imported, ${totalDeleted} deleted`);
+      res.json({ updated: totalUpdated, imported: totalImported, deleted: totalDeleted, schools: allSchools.length });
+    } catch (err: any) {
+      const msg = err?.message || String(err) || "";
+      console.error("[sync-all] error:", msg);
+      res.status(500).json({ message: msg.slice(0, 200) || "Sync failed" });
+    }
+  });
+
   // Admin: sync lead statuses from the aggregate "All Friendship Leads" sheet tab back into DB
   app.post("/api/admin/alliances/friendship/sync-status-from-sheets", requireAlliancesOrAdmin, async (req, res) => {
     try {
