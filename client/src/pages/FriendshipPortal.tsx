@@ -5,6 +5,42 @@ const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
 
+const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+  "Open":              { bg: "#dbeafe", text: "#1d4ed8" },
+  "Walk-in Booked":    { bg: "#ede9fe", text: "#6d28d9" },
+  "Walk-in Completed": { bg: "#fef3c7", text: "#92400e" },
+  "Closed":            { bg: "#fee2e2", text: "#b91c1c" },
+  "Future Prospect":   { bg: "#f1f5f9", text: "#475569" },
+  "Admission Done":    { bg: "#dcfce7", text: "#15803d" },
+};
+
+type Lead = {
+  id: number;
+  date: string;
+  studentName: string;
+  grade: string;
+  parentName: string;
+  phone: string;
+  email: string | null;
+  status: string;
+};
+
+function formatLeadDate(ts: string) {
+  return new Date(ts).toLocaleDateString("en-IN", {
+    day: "2-digit", month: "short", year: "numeric", timeZone: "Asia/Kolkata",
+  });
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const c = STATUS_COLORS[status] ?? { bg: "#f1f5f9", text: "#475569" };
+  return (
+    <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap"
+      style={{ background: c.bg, color: c.text }}>
+      {status}
+    </span>
+  );
+}
+
 const GRADES = [
   "Playgroup", "Nursery", "Jr. KG", "Sr. KG",
   "Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5",
@@ -43,6 +79,26 @@ export default function FriendshipPortal() {
   const [bulkError, setBulkError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
+  // Leads state
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [leadsLastRefreshed, setLeadsLastRefreshed] = useState<Date | null>(null);
+
+  const loadLeads = useCallback(async () => {
+    setLeadsLoading(true);
+    try {
+      const res = await fetch(`/api/school-leads/${token}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setLeads(data.leads ?? []);
+      setLeadsLastRefreshed(new Date());
+    } catch {
+      // non-fatal — leads section just stays empty
+    } finally {
+      setLeadsLoading(false);
+    }
+  }, [token]);
+
   const loadSchool = useCallback(() => {
     setNetworkError(false);
     setInactive(false);
@@ -56,6 +112,8 @@ export default function FriendshipPortal() {
       .then((d: School & { isActive: boolean }) => {
         if (!d.isActive) { setInactive(true); return; }
         setSchool(d);
+        // Load leads alongside school data
+        loadLeads();
       })
       .catch((err: { kind?: string }) => {
         if (err?.kind === "inactive") {
@@ -64,7 +122,7 @@ export default function FriendshipPortal() {
           setNetworkError(true);
         }
       });
-  }, [token]);
+  }, [token, loadLeads]);
 
   useEffect(() => {
     document.title = "Alliances Portal | Rainbow International School";
@@ -95,6 +153,7 @@ export default function FriendshipPortal() {
       }
       setManualSuccess(s => s + 1);
       resetManual();
+      loadLeads();
     } catch (err: any) {
       setManualError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -176,6 +235,7 @@ export default function FriendshipPortal() {
       setBulkSuccess(d.inserted ?? 0);
       setBulkSkipped(d.skipped ?? 0);
       setSelectedFile(null); setFileName("");
+      loadLeads();
     } catch (err: any) {
       setBulkError(err.message || "Upload failed. Please try again.");
     } finally {
@@ -474,6 +534,94 @@ export default function FriendshipPortal() {
             </div>
             {bulkPanel}
           </div>
+        </div>
+
+        {/* ── YOUR SUBMITTED LEADS ──────────────────────────────── */}
+        <div className="mt-6">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {/* Section header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3" style={{ background: NAVY }}>
+              <div>
+                <div className="font-black text-white text-sm">📋 Your Submitted Leads</div>
+                <div className="text-xs text-blue-200 mt-0.5">Status is updated by Rainbow International School</div>
+              </div>
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <button
+                  onClick={loadLeads}
+                  disabled={leadsLoading}
+                  className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-white/20 text-white/80 hover:bg-white/10 transition disabled:opacity-50"
+                >
+                  {leadsLoading ? "Loading…" : "↻ Refresh"}
+                </button>
+                {leadsLastRefreshed && (
+                  <div className="text-xs text-blue-300">
+                    {leadsLastRefreshed.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Summary pills — only shown when there are leads */}
+            {leads.length > 0 && (
+              <div className="px-6 py-4 border-b border-slate-100 flex gap-3 flex-wrap">
+                <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#f0f4ff" }}>
+                  <div className="text-lg font-black" style={{ color: NAVY }}>{leads.length}</div>
+                  <div className="text-xs text-slate-500 font-medium">Total</div>
+                </div>
+                <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#dcfce7" }}>
+                  <div className="text-lg font-black text-green-700">
+                    {leads.filter(l => l.status === "Admission Done").length}
+                  </div>
+                  <div className="text-xs text-slate-500 font-medium">Admissions</div>
+                </div>
+                <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#fef3c7" }}>
+                  <div className="text-lg font-black" style={{ color: "#92400e" }}>
+                    {leads.filter(l => l.status === "Walk-in Completed" || l.status === "Admission Done").length}
+                  </div>
+                  <div className="text-xs text-slate-500 font-medium">Walk-ins</div>
+                </div>
+              </div>
+            )}
+
+            {/* Body */}
+            {leadsLoading && leads.length === 0 ? (
+              <div className="py-10 text-center text-slate-400 text-sm">Loading your leads…</div>
+            ) : leads.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 text-sm px-6">
+                No leads submitted yet — use the form above to add your first one.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wide">
+                      {["#", "Date", "Student", "Grade", "Parent", "Phone", "Email", "Status"].map(h => (
+                        <th key={h} className="px-3 py-3 text-left whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leads.map((l, i) => (
+                      <tr key={l.id} className="border-t border-slate-100 hover:bg-slate-50">
+                        <td className="px-3 py-2.5 text-slate-400 text-xs">{i + 1}</td>
+                        <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{formatLeadDate(l.date)}</td>
+                        <td className="px-3 py-2.5 font-semibold text-slate-800 whitespace-nowrap">{l.studentName}</td>
+                        <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{l.grade}</td>
+                        <td className="px-3 py-2.5 text-slate-700 whitespace-nowrap">{l.parentName}</td>
+                        <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{l.phone}</td>
+                        <td className="px-3 py-2.5 text-slate-400 text-xs">{l.email || "—"}</td>
+                        <td className="px-3 py-2.5"><StatusBadge status={l.status} /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <p className="text-center text-xs mt-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Status updates are made by the RIS admissions team.
+          </p>
         </div>
       </div>
     </div>

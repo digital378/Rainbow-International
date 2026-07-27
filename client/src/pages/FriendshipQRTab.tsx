@@ -422,13 +422,6 @@ function FriendshipQRTabInner() {
                         data-testid={`button-qr-link-${s.id}`}>
                         {copiedId === s.id ? "✓ Copied" : "Copy Link"}
                       </button>
-                      <button onClick={e => { e.stopPropagation(); window.open(`/school-leads/${s.token}`, "_blank"); }}
-                        className="text-xs px-3 py-1.5 rounded-lg font-semibold transition hover:opacity-80"
-                        style={{ background: "#fff7ed", color: "#c2410c" }}
-                        title="Open school's leads portal"
-                        data-testid={`button-qr-portal-${s.id}`}>
-                        🔗 Portal
-                      </button>
                       <button onClick={e => { e.stopPropagation(); openEditModal(s); }}
                         className="text-xs px-3 py-1.5 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
                         data-testid={`button-qr-edit-${s.id}`}>Edit</button>
