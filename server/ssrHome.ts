@@ -45,8 +45,18 @@ function renderHomeSSR(): string {
   "name": "Rainbow International School",
   "alternateName": "RIS Thane",
   "url": "https://rainbowinternationalschool.in/",
-  "logo": "https://rainbowinternationalschool.in/favicon-192.png",
-  "image": "https://rainbowinternationalschool.in/opengraph.jpg",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://rainbowinternationalschool.in/favicon-192.png",
+    "width": 192,
+    "height": 192
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://rainbowinternationalschool.in/opengraph.jpg",
+    "width": 1200,
+    "height": 630
+  },
   "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving students from Nursery to Class 12.",
   "foundingDate": "2009-04-01",
   "educationalLevel": "Nursery to Class 12",
@@ -77,12 +87,12 @@ function renderHomeSSR(): string {
   ],
   "areaServed": { "@type": "City", "name": "Thane" },
   "priceRange": "$$",
-  "openingHoursSpecification": {
+  "openingHoursSpecification": [{
     "@type": "OpeningHoursSpecification",
     "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
     "opens": "09:00",
     "closes": "18:00"
-  }
+  }]
 }
 </script>
 <script type="application/ld+json">
@@ -90,7 +100,15 @@ function renderHomeSSR(): string {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Rainbow International School",
-  "url": "https://rainbowinternationalschool.in/"
+  "url": "https://rainbowinternationalschool.in/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://rainbowinternationalschool.in/blogs?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
 }
 </script>
 <script type="application/ld+json">
