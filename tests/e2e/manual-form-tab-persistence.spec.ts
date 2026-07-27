@@ -65,6 +65,32 @@ async function deleteSchool(request: APIRequestContext, id: number): Promise<voi
   });
 }
 
+/** Simulate document going hidden then visible (phone screen off → on). */
+async function cycleVisibility(page: import("@playwright/test").Page): Promise<void> {
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      value: "hidden", writable: true, configurable: true,
+    });
+    Object.defineProperty(document, "hidden", {
+      value: true, writable: true, configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+
+  // Brief pause — mimics the screen being off for a moment.
+  await page.waitForTimeout(400);
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      value: "visible", writable: true, configurable: true,
+    });
+    Object.defineProperty(document, "hidden", {
+      value: false, writable: true, configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+}
+
 /* ── test data ────────────────────────────────────────────────────────────── */
 
 const PARTIAL_FORM = {
@@ -170,6 +196,61 @@ test.describe("FriendshipPortal — manual form fields survive tab switches", ()
         await page.getByTestId("tab-manual").click();
 
         // All values must be intact.
+        await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
+        await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(phoneInput).toHaveValue(PARTIAL_FORM.phone);
+        await expect(emailInput).toHaveValue(PARTIAL_FORM.email);
+      } finally {
+        await deleteSchool(request, school.id);
+      }
+    },
+  );
+
+  /**
+   * Screen-sleep scenario: user partially fills the manual form, the phone
+   * screen turns off (document hidden) and then turns back on (document
+   * visible). All five field values must be exactly as entered — the
+   * visibilitychange event must not cause any state reset.
+   */
+  test(
+    "all five fields are preserved after document hidden → visible (screen-sleep cycle)",
+    async ({ page, request }) => {
+      const school = await createSchool(request);
+
+      try {
+        await page.goto(`/alliances/friendship/${school.token}`);
+
+        // Wait for the portal to finish loading.
+        await expect(page.getByTestId("tab-manual")).toBeVisible({ timeout: 15_000 });
+
+        // The manual tab is the default; fill in all fields.
+        // manualPanel is rendered in both mobile + desktop DOM sections, so every
+        // testid appears twice. Use .first() to target the mobile instance.
+        const studentNameInput = page.getByTestId("input-student-name").first();
+        const gradeSelect      = page.getByTestId("select-grade").first();
+        const parentNameInput  = page.getByTestId("input-parent-name").first();
+        const phoneInput       = page.getByTestId("input-phone").first();
+        const emailInput       = page.getByTestId("input-email").first();
+
+        await studentNameInput.fill(PARTIAL_FORM.studentName);
+        await gradeSelect.selectOption(PARTIAL_FORM.grade);
+        await parentNameInput.fill(PARTIAL_FORM.parentName);
+        await phoneInput.fill(PARTIAL_FORM.phone);
+        await emailInput.fill(PARTIAL_FORM.email);
+
+        // Verify values are set before simulating screen sleep.
+        await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
+        await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(phoneInput).toHaveValue(PARTIAL_FORM.phone);
+        await expect(emailInput).toHaveValue(PARTIAL_FORM.email);
+
+        // ── Simulate phone screen going to sleep then waking up ──
+        await cycleVisibility(page);
+
+        // ── Assertions after wakeup ──────────────────────────────
+        // All five field values must still be exactly as entered.
         await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
         await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
         await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
