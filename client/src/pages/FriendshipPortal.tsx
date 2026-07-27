@@ -56,7 +56,7 @@ export default function FriendshipPortal() {
   const [school, setSchool] = useState<School | null>(null);
   const [inactive, setInactive] = useState(false);
   const [networkError, setNetworkError] = useState(false);
-  const [tab, setTab] = useState<"manual" | "bulk">("manual");
+  const [tab, setTab] = useState<"manual" | "bulk" | "leads">("manual");
 
   // Manual form state
   const [studentName, setStudentName] = useState("");
@@ -471,6 +471,87 @@ export default function FriendshipPortal() {
     </div>
   );
 
+  const leadsPanel = (
+    <div className="px-6 py-5">
+      {/* Summary pills — only shown when there are leads */}
+      {leads.length > 0 && (
+        <div className="flex gap-3 flex-wrap mb-4">
+          <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#f0f4ff" }}>
+            <div className="text-lg font-black" style={{ color: NAVY }}>{leads.length}</div>
+            <div className="text-xs text-slate-500 font-medium">Total</div>
+          </div>
+          <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#dcfce7" }}>
+            <div className="text-lg font-black text-green-700">
+              {leads.filter(l => l.status === "Admission Done").length}
+            </div>
+            <div className="text-xs text-slate-500 font-medium">Admissions</div>
+          </div>
+          <div className="rounded-xl px-4 py-2 text-center min-w-[72px]" style={{ background: "#fef3c7" }}>
+            <div className="text-lg font-black" style={{ color: "#92400e" }}>
+              {leads.filter(l => l.status === "Walk-in Completed" || l.status === "Admission Done").length}
+            </div>
+            <div className="text-xs text-slate-500 font-medium">Walk-ins</div>
+          </div>
+          <div className="ml-auto flex flex-col items-end gap-1 justify-center">
+            <button
+              onClick={loadLeads}
+              disabled={leadsLoading}
+              className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition disabled:opacity-50"
+            >
+              {leadsLoading ? "Loading…" : "↻ Refresh"}
+            </button>
+            {leadsLastRefreshed && (
+              <div className="text-xs text-slate-400">
+                {leadsLastRefreshed.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {leadsLoading && leads.length === 0 ? (
+        <div className="py-10 text-center text-slate-400 text-sm">Loading your leads…</div>
+      ) : leads.length === 0 ? (
+        <div className="py-10 text-center text-slate-400 text-sm">
+          No leads submitted yet — use the form to add your first one.
+          {!leadsLoading && (
+            <button
+              onClick={loadLeads}
+              className="block mx-auto mt-3 text-xs px-3 py-1.5 rounded-lg font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition"
+            >
+              ↻ Refresh
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="overflow-x-auto -mx-6">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wide">
+                {["#", "Date", "Student", "Grade", "Parent", "Phone", "Status"].map(h => (
+                  <th key={h} className="px-3 py-3 text-left whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {leads.map((l, i) => (
+                <tr key={l.id} className="border-t border-slate-100">
+                  <td className="px-3 py-2.5 text-slate-400 text-xs">{i + 1}</td>
+                  <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{formatLeadDate(l.date)}</td>
+                  <td className="px-3 py-2.5 font-semibold text-slate-800 whitespace-nowrap">{l.studentName}</td>
+                  <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{l.grade}</td>
+                  <td className="px-3 py-2.5 text-slate-700 whitespace-nowrap">{l.parentName}</td>
+                  <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{l.phone}</td>
+                  <td className="px-3 py-2.5"><StatusBadge status={l.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+
   /* ── render ─────────────────────────────────────────────────── */
 
   return (
@@ -499,20 +580,27 @@ export default function FriendshipPortal() {
           <div className="flex border-b border-slate-100">
             <button
               onClick={() => setTab("manual")}
-              className={`flex-1 py-3.5 text-sm font-bold transition-colors ${tab === "manual" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "manual" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
               style={tab === "manual" ? { background: NAVY } : {}}
               data-testid="tab-manual">
-              ➕ Add Individual Lead
+              ➕ Add Lead
             </button>
             <button
               onClick={() => setTab("bulk")}
-              className={`flex-1 py-3.5 text-sm font-bold transition-colors ${tab === "bulk" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "bulk" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
               style={tab === "bulk" ? { background: NAVY } : {}}
               data-testid="tab-bulk">
-              📋 Bulk Upload
+              📁 Bulk Upload
+            </button>
+            <button
+              onClick={() => setTab("leads")}
+              className={`flex-1 py-3.5 text-xs font-bold transition-colors ${tab === "leads" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
+              style={tab === "leads" ? { background: NAVY } : {}}
+              data-testid="tab-leads">
+              📋 My Leads{leads.length > 0 ? ` (${leads.length})` : ""}
             </button>
           </div>
-          {tab === "manual" ? manualPanel : bulkPanel}
+          {tab === "manual" ? manualPanel : tab === "bulk" ? bulkPanel : leadsPanel}
         </div>
 
         {/* ── DESKTOP: side-by-side two-column layout ────────────── */}
@@ -536,8 +624,8 @@ export default function FriendshipPortal() {
           </div>
         </div>
 
-        {/* ── YOUR SUBMITTED LEADS ──────────────────────────────── */}
-        <div className="mt-6">
+        {/* ── YOUR SUBMITTED LEADS (desktop only — mobile uses the My Leads tab) ── */}
+        <div className="hidden md:block mt-6">
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             {/* Section header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3" style={{ background: NAVY }}>
