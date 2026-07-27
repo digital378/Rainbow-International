@@ -4840,20 +4840,62 @@ paths:
   const AGGREGATE_TAB = "All Friendship Leads";
 
   async function ensureAggregateLeadsTab(sheets: any, sheetId: string): Promise<void> {
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title" });
-    const exists = (meta.data.sheets || []).some((s: any) => s.properties?.title === AGGREGATE_TAB);
-    if (!exists) {
-      await sheets.spreadsheets.batchUpdate({
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title,sheets.properties.sheetId" });
+    const existing = (meta.data.sheets || []).find((s: any) => s.properties?.title === AGGREGATE_TAB);
+    let tabSheetId: number | undefined;
+    if (!existing) {
+      const addResp = await sheets.spreadsheets.batchUpdate({
         spreadsheetId: sheetId,
         requestBody: { requests: [{ addSheet: { properties: { title: AGGREGATE_TAB } } }] },
       });
+      tabSheetId = addResp.data.replies?.[0]?.addSheet?.properties?.sheetId;
       await sheets.spreadsheets.values.update({
         spreadsheetId: sheetId,
-        range: `${AGGREGATE_TAB}!A1:I1`,
+        range: `${AGGREGATE_TAB}!A1:K1`,
         valueInputOption: "USER_ENTERED",
-        requestBody: { values: [["Date", "School Name", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status"]] },
+        requestBody: { values: [["Date", "School Name", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Referral Amount", "Remarks"]] },
       });
       console.log(`[friendship] Created aggregate tab: ${AGGREGATE_TAB}`);
+    } else {
+      tabSheetId = existing.properties?.sheetId;
+    }
+    // Always apply/refresh dropdowns so they survive if the tab was recreated or fixed
+    if (tabSheetId !== undefined) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: {
+          requests: [
+            {
+              setDataValidation: {
+                range: { sheetId: tabSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 8, endColumnIndex: 9 },
+                rule: {
+                  condition: {
+                    type: "ONE_OF_LIST",
+                    values: [
+                      { userEnteredValue: "Open" }, { userEnteredValue: "Walk-in Booked" },
+                      { userEnteredValue: "Walk-in Completed" }, { userEnteredValue: "Closed" },
+                      { userEnteredValue: "Future Prospect" }, { userEnteredValue: "Admission Done" },
+                    ],
+                  },
+                  showCustomUi: true, strict: false,
+                },
+              },
+            },
+            {
+              setDataValidation: {
+                range: { sheetId: tabSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 9, endColumnIndex: 10 },
+                rule: {
+                  condition: {
+                    type: "ONE_OF_LIST",
+                    values: [{ userEnteredValue: "Pending" }, { userEnteredValue: "Paid" }],
+                  },
+                  showCustomUi: true, strict: false,
+                },
+              },
+            },
+          ],
+        },
+      });
     }
   }
 
@@ -4871,11 +4913,11 @@ paths:
     const rows = leads.map(lead => {
       const dt = new Date(lead.submittedAt);
       const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
-      return [dateStr, schoolName, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open"];
+      return [dateStr, schoolName, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open", "Pending", ""];
     });
     await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: `${AGGREGATE_TAB}!A:I`,
+      range: `${AGGREGATE_TAB}!A:K`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: rows },
     });
@@ -5489,6 +5531,102 @@ paths:
   // Admin: retry sync (per-school tab sync removed; aggregate tab is fire-and-forget)
   app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
     res.json({ total: 0, synced: 0, failed: 0, message: "Per-school sheet sync disabled; leads go to the All Friendship Leads aggregate tab only." });
+  });
+
+  // Admin: one-shot sheet cleanup — fix aggregate tab schema + delete junk/per-school tabs
+  app.post("/api/admin/alliances/friendship/cleanup-sheets", requireAdmin, async (_req, res) => {
+    try {
+      const sheetId = SHEET_IDS.alliances;
+      if (!sheetId) return res.status(503).json({ message: "Alliances sheet ID not configured" });
+      const auth = getAuthenticatedClient();
+      if (!auth) return res.status(503).json({ message: "Google not connected" });
+      const { google: goog } = await import("googleapis");
+      const sheets = goog.sheets({ version: "v4", auth });
+
+      // Get all tabs with their numeric sheetIds
+      const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties" });
+      const allTabs: Array<{ title: string; sheetId: number }> = (meta.data.sheets || []).map((s: any) => ({
+        title: s.properties?.title ?? "",
+        sheetId: s.properties?.sheetId ?? -1,
+      }));
+
+      // Fix "All Friendship Leads" header + dropdowns (even if tab already existed)
+      const aggregateTab = allTabs.find(t => t.title === AGGREGATE_TAB);
+      if (aggregateTab) {
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: sheetId,
+          range: `${AGGREGATE_TAB}!A1:K1`,
+          valueInputOption: "USER_ENTERED",
+          requestBody: { values: [["Date", "School Name", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Referral Amount", "Remarks"]] },
+        });
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: sheetId,
+          requestBody: {
+            requests: [
+              {
+                setDataValidation: {
+                  range: { sheetId: aggregateTab.sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 8, endColumnIndex: 9 },
+                  rule: {
+                    condition: {
+                      type: "ONE_OF_LIST",
+                      values: [
+                        { userEnteredValue: "Open" }, { userEnteredValue: "Walk-in Booked" },
+                        { userEnteredValue: "Walk-in Completed" }, { userEnteredValue: "Closed" },
+                        { userEnteredValue: "Future Prospect" }, { userEnteredValue: "Admission Done" },
+                      ],
+                    },
+                    showCustomUi: true, strict: false,
+                  },
+                },
+              },
+              {
+                setDataValidation: {
+                  range: { sheetId: aggregateTab.sheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 9, endColumnIndex: 10 },
+                  rule: {
+                    condition: {
+                      type: "ONE_OF_LIST",
+                      values: [{ userEnteredValue: "Pending" }, { userEnteredValue: "Paid" }],
+                    },
+                    showCustomUi: true, strict: false,
+                  },
+                },
+              },
+            ],
+          },
+        });
+        console.log(`[friendship] Fixed aggregate tab schema: ${AGGREGATE_TAB}`);
+      }
+
+      // Identify junk tabs: e2e-vis-* pattern + tabs matching known school names
+      const knownSchoolNames = new Set(
+        (await storage.listFriendshipSchools()).map(s => s.sheetsTabName)
+      );
+      const junkTabs = allTabs.filter(t =>
+        t.title !== AGGREGATE_TAB &&
+        (t.title.startsWith("e2e-vis-") || knownSchoolNames.has(t.title))
+      );
+
+      let deleted = 0;
+      if (junkTabs.length > 0) {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: sheetId,
+          requestBody: {
+            requests: junkTabs.map(t => ({ deleteSheet: { sheetId: t.sheetId } })),
+          },
+        });
+        deleted = junkTabs.length;
+        console.log(`[friendship] Deleted ${deleted} junk tabs: ${junkTabs.map(t => t.title).join(", ")}`);
+      }
+
+      res.json({
+        aggregateTabFixed: !!aggregateTab,
+        deletedTabs: junkTabs.map(t => t.title),
+        deleted,
+      });
+    } catch (err: any) {
+      console.error("[friendship] cleanup-sheets error:", err?.message);
+      res.status(500).json({ message: "Cleanup failed", error: err?.message });
+    }
   });
 
   app.get("/api/admin/alliances/friendship/stats", requireAlliancesOrAdmin, async (_req, res) => {
