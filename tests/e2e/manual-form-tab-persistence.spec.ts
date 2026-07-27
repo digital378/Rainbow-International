@@ -263,6 +263,109 @@ test.describe("FriendshipPortal — manual form fields survive tab switches", ()
   );
 
   /**
+   * Combined scenario: user fills the manual form, switches to the Leads tab,
+   * the screen goes to sleep and wakes up (visibility cycle) while still on
+   * the Leads tab, then the user switches back. All five field values must
+   * survive the combined tab-switch + sleep/wake.
+   */
+  test(
+    "all five fields survive switching to Leads tab then screen-sleep cycle while away",
+    async ({ page, request }) => {
+      const school = await createSchool(request);
+
+      try {
+        await page.goto(`/alliances/friendship/${school.token}`);
+        await expect(page.getByTestId("tab-manual")).toBeVisible({ timeout: 15_000 });
+
+        // Fill all five fields on the manual (default) tab.
+        // manualPanel is rendered in both mobile + desktop DOM sections, so every
+        // testid appears twice. Use .first() to target the mobile instance.
+        const studentNameInput = page.getByTestId("input-student-name").first();
+        const gradeSelect      = page.getByTestId("select-grade").first();
+        const parentNameInput  = page.getByTestId("input-parent-name").first();
+        const phoneInput       = page.getByTestId("input-phone").first();
+        const emailInput       = page.getByTestId("input-email").first();
+
+        await studentNameInput.fill(PARTIAL_FORM.studentName);
+        await gradeSelect.selectOption(PARTIAL_FORM.grade);
+        await parentNameInput.fill(PARTIAL_FORM.parentName);
+        await phoneInput.fill(PARTIAL_FORM.phone);
+        await emailInput.fill(PARTIAL_FORM.email);
+
+        // Switch away to the Leads tab — manual panel is now hidden via display:none.
+        await page.getByTestId("tab-leads").click();
+        await page.waitForTimeout(200);
+
+        // Simulate phone screen going to sleep then waking up while the manual
+        // panel is hidden and the Leads tab is active.
+        await cycleVisibility(page);
+
+        // Return to the manual tab.
+        await page.getByTestId("tab-manual").click();
+
+        // All five field values must be exactly as entered.
+        await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
+        await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(phoneInput).toHaveValue(PARTIAL_FORM.phone);
+        await expect(emailInput).toHaveValue(PARTIAL_FORM.email);
+      } finally {
+        await deleteSchool(request, school.id);
+      }
+    },
+  );
+
+  /**
+   * Combined scenario (bulk variant): user fills the manual form, switches to
+   * the Bulk tab, the screen sleeps and wakes while on the Bulk tab, then the
+   * user switches back. All five field values must survive.
+   */
+  test(
+    "all five fields survive switching to Bulk tab then screen-sleep cycle while away",
+    async ({ page, request }) => {
+      const school = await createSchool(request);
+
+      try {
+        await page.goto(`/alliances/friendship/${school.token}`);
+        await expect(page.getByTestId("tab-manual")).toBeVisible({ timeout: 15_000 });
+
+        // Fill all five fields on the manual (default) tab.
+        const studentNameInput = page.getByTestId("input-student-name").first();
+        const gradeSelect      = page.getByTestId("select-grade").first();
+        const parentNameInput  = page.getByTestId("input-parent-name").first();
+        const phoneInput       = page.getByTestId("input-phone").first();
+        const emailInput       = page.getByTestId("input-email").first();
+
+        await studentNameInput.fill(PARTIAL_FORM.studentName);
+        await gradeSelect.selectOption(PARTIAL_FORM.grade);
+        await parentNameInput.fill(PARTIAL_FORM.parentName);
+        await phoneInput.fill(PARTIAL_FORM.phone);
+        await emailInput.fill(PARTIAL_FORM.email);
+
+        // Switch away to the Bulk tab — manual panel is now hidden via display:none.
+        await page.getByTestId("tab-bulk").click();
+        await page.waitForTimeout(200);
+
+        // Simulate phone screen going to sleep then waking up while the manual
+        // panel is hidden and the Bulk tab is active.
+        await cycleVisibility(page);
+
+        // Return to the manual tab.
+        await page.getByTestId("tab-manual").click();
+
+        // All five field values must be exactly as entered.
+        await expect(studentNameInput).toHaveValue(PARTIAL_FORM.studentName);
+        await expect(gradeSelect).toHaveValue(PARTIAL_FORM.grade);
+        await expect(parentNameInput).toHaveValue(PARTIAL_FORM.parentName);
+        await expect(phoneInput).toHaveValue(PARTIAL_FORM.phone);
+        await expect(emailInput).toHaveValue(PARTIAL_FORM.email);
+      } finally {
+        await deleteSchool(request, school.id);
+      }
+    },
+  );
+
+  /**
    * Multiple round-trips: manual → bulk → leads → manual.
    * Each intermediate switch must not disturb the form state.
    */
