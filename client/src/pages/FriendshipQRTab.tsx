@@ -49,7 +49,8 @@ function formatDate(ts: string) {
 function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: Lead) => void }) {
   const [saving, setSaving] = useState(false);
 
-  if (lead.status !== "Admission Done") {
+  // Show dash only when commission status has never been set
+  if (lead.commissionPaid === null || lead.commissionPaid === undefined) {
     return <span className="text-xs text-slate-300">—</span>;
   }
 
@@ -70,8 +71,8 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
   };
 
   const paid = lead.commissionPaid === true;
-  const color = paid ? GREEN : lead.commissionPaid === false ? "#dc2626" : AMBER;
-  const label = paid ? "Paid" : lead.commissionPaid === false ? "Unpaid" : "Pending";
+  const color = paid ? GREEN : "#dc2626";
+  const label = paid ? "Paid" : "Unpaid";
 
   return (
     <button
@@ -292,14 +293,6 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
       <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <div className="font-bold text-slate-700 text-sm">
           {loading ? "Loading…" : `${schools.length} Friendship School${schools.length !== 1 ? "s" : ""}`}
-        </div>
-        <div className="flex gap-2">
-          <button onClick={openAddModal}
-            className="px-4 py-1.5 rounded-lg text-xs font-black text-white transition"
-            style={{ background: NAVY }}
-            data-testid="button-qr-add-school">
-            + Add School
-          </button>
         </div>
       </div>
 
