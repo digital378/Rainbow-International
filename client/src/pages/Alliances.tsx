@@ -1272,14 +1272,14 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 }
 
 // ── Main Dashboard ─────────────────────────────────────────────
-type TabKey = "overview" | "brandPartners" | "corporates" | "friendshipSchools" | "parentAdvocacy" | "qrLeads";
+type TabKey = "overview" | "brandPartners" | "corporates" | "friendshipSchools" | "parentAdvocacy" | "fsLeads";
 const TABS: { key: TabKey; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "brandPartners", label: "Brand Partners" },
   { key: "corporates", label: "Corporates" },
   { key: "friendshipSchools", label: "Friendship Schools" },
   { key: "parentAdvocacy", label: "Parent Advocacy" },
-  { key: "qrLeads", label: "QR Leads" },
+  { key: "fsLeads", label: "FS Leads" },
 ];
 
 function AlliancesDashboard() {
@@ -1400,7 +1400,7 @@ function AlliancesDashboard() {
 
       {/* Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 py-6">
-        {tab === "qrLeads" ? (
+        {tab === "fsLeads" ? (
           <FriendshipQRTab refreshKey={fetchKey} />
         ) : (
           <>

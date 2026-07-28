@@ -5382,13 +5382,19 @@ paths:
           const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
           const schoolRows = rowsBySchool.get(school.name) ?? [];
 
-          const statusUpdates: { phone: string; status: string }[] = [];
+          const fieldUpdates: { phone: string; status?: string; commissionPaid?: boolean | null }[] = [];
 
           for (const r of schoolRows) {
             const phone  = (r[5] || "").toString().trim();
             const status = (r[8] || "Open").toString().trim();
             if (!phone) continue;
-            if (status) statusUpdates.push({ phone, status });
+            const entry: { phone: string; status?: string; commissionPaid?: boolean | null } = { phone };
+            if (status) entry.status = status;
+            // Col J = Referral Amount: "Paid" → true, "Pending" / empty → false, absent → null (leave unchanged)
+            const refAmt = (r[9] ?? "").toString().trim().toLowerCase();
+            if (refAmt === "paid") entry.commissionPaid = true;
+            else if (refAmt === "pending" || refAmt === "") entry.commissionPaid = false;
+            fieldUpdates.push(entry);
           }
 
           // Delete leads absent from the entire sheet (rename-safe: check all phones not just school rows)
@@ -5396,7 +5402,7 @@ paths:
           // Leads still pending their first append are never treated as "removed".
           const toDelete = existing.filter(l => l.syncedToSheets && !allSheetPhones.has(l.phone.replace(/\D/g, "")));
           const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
-          const updated = await storage.bulkUpdateFriendshipLeadStatuses(school.id, statusUpdates);
+          const updated = await storage.bulkUpdateFriendshipLeadFields(school.id, fieldUpdates);
 
           totalUpdated += updated;
           totalDeleted += deleted;

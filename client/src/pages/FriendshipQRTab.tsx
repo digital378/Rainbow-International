@@ -62,7 +62,7 @@ function TokenGate({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="flex items-center justify-center py-20">
       <form onSubmit={submit} className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm border-t-4 border-amber-400">
-        <div className="font-black text-lg mb-1" style={{ color: NAVY }}>QR Leads Admin</div>
+        <div className="font-black text-lg mb-1" style={{ color: NAVY }}>FS Leads Admin</div>
         <div className="text-xs text-slate-500 mb-5">Enter your admin token to access Friendship School data.</div>
         <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Admin Token</label>
         <input type="password" value={token} onChange={e => setToken(e.target.value)}

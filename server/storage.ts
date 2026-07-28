@@ -75,6 +75,7 @@ export interface IStorage {
   markFriendshipLeadSyncFailed(id: number): Promise<void>;
   updateFriendshipLead(id: number, data: { status?: string; commissionPaid?: boolean }): Promise<FriendshipSchoolLead | undefined>;
   bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { phone: string; status: string }[]): Promise<number>;
+  bulkUpdateFriendshipLeadFields(schoolId: number, updates: { phone: string; status?: string; commissionPaid?: boolean | null }[]): Promise<number>;
   deleteFriendshipLeads(ids: number[]): Promise<number>;
 }
 
@@ -392,6 +393,23 @@ export class DbStorage implements IStorage {
       const result = await db
         .update(friendshipSchoolLeads)
         .set({ status })
+        .where(and(eq(friendshipSchoolLeads.schoolId, schoolId), eq(friendshipSchoolLeads.phone, phone)))
+        .returning({ id: friendshipSchoolLeads.id });
+      count += result.length;
+    }
+    return count;
+  }
+
+  async bulkUpdateFriendshipLeadFields(schoolId: number, updates: { phone: string; status?: string; commissionPaid?: boolean | null }[]): Promise<number> {
+    let count = 0;
+    for (const { phone, status, commissionPaid } of updates) {
+      const patch: Record<string, unknown> = {};
+      if (status !== undefined) patch.status = status;
+      if (commissionPaid !== undefined) patch.commissionPaid = commissionPaid;
+      if (Object.keys(patch).length === 0) continue;
+      const result = await db
+        .update(friendshipSchoolLeads)
+        .set(patch)
         .where(and(eq(friendshipSchoolLeads.schoolId, schoolId), eq(friendshipSchoolLeads.phone, phone)))
         .returning({ id: friendshipSchoolLeads.id });
       count += result.length;
