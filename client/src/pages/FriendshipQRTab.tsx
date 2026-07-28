@@ -132,6 +132,8 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
 }
 
 export default function FriendshipQRTab({ refreshKey = 0 }: { refreshKey?: number }) {
+  const [authed, setAuthed] = useState(!!getToken());
+  if (!authed) return <TokenGate onSuccess={() => setAuthed(true)} />;
   return <FriendshipQRTabInner refreshKey={refreshKey} />;
 }
 
