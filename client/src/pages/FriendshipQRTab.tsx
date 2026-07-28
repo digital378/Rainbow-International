@@ -5,8 +5,6 @@ import { Phone, Mail, Check, Building2, AlertTriangle } from "lucide-react";
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
-const ADMIN_AUTH_KEY = "ris_admin_auth";
-
 const STATUS_COLORS: Record<string, string> = {
   "Open": "#3b82f6",
   "Walk-in Booked": "#8b5cf6",
@@ -34,48 +32,6 @@ type Stats = {
   walkIns: number; admissions: number;
 };
 
-function getToken() {
-  try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
-}
-const authHeader = (): Record<string, string> => {
-  const t = getToken();
-  // Alliances session is handled by HttpOnly cookie set at login — no extra header needed.
-  return t ? { Authorization: `Bearer ${t}` } : {};
-};
-
-function TokenGate({ onSuccess }: { onSuccess: () => void }) {
-  const [token, setToken] = useState("");
-  const [error, setError] = useState(false);
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/admin/alliances/friendship/schools", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      try { sessionStorage.setItem(ADMIN_AUTH_KEY, token); } catch {}
-      onSuccess();
-    } else {
-      setError(true); setToken("");
-      setTimeout(() => setError(false), 600);
-    }
-  };
-  return (
-    <div className="flex items-center justify-center py-20">
-      <form onSubmit={submit} className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm border-t-4 border-amber-400">
-        <div className="font-black text-lg mb-1" style={{ color: NAVY }}>FS Leads Admin</div>
-        <div className="text-xs text-slate-500 mb-5">Enter your admin token to access Friendship School data.</div>
-        <label className="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5">Admin Token</label>
-        <input type="password" value={token} onChange={e => setToken(e.target.value)}
-          placeholder="Enter token"
-          className={`w-full px-4 py-3 rounded-lg border-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 ${error ? "border-red-400 bg-red-50" : "border-slate-200"}`}
-          data-testid="input-qr-token" />
-        {error && <div className="mt-2 text-sm text-red-600">Invalid token</div>}
-        <button type="submit" className="mt-4 w-full py-3 rounded-lg font-bold text-white text-sm" style={{ background: NAVY }}
-          data-testid="button-qr-unlock">Unlock</button>
-      </form>
-    </div>
-  );
-}
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
@@ -102,7 +58,7 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
     try {
       const res = await fetch(`/api/admin/alliances/friendship/leads/${lead.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeader() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commissionPaid: !lead.commissionPaid }),
       });
       if (res.ok) {
@@ -132,8 +88,6 @@ function CommissionToggle({ lead, onUpdate }: { lead: Lead; onUpdate: (updated: 
 }
 
 export default function FriendshipQRTab({ refreshKey = 0 }: { refreshKey?: number }) {
-  const [authed, setAuthed] = useState(!!getToken());
-  if (!authed) return <TokenGate onSuccess={() => setAuthed(true)} />;
   return <FriendshipQRTabInner refreshKey={refreshKey} />;
 }
 
@@ -183,12 +137,12 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
       // Sync all schools from aggregate sheet first (status updates + lead deletions)
       await fetch("/api/admin/alliances/friendship/sync-all-from-sheets", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeader() },
+        headers: { "Content-Type": "application/json" },
       }).catch(() => {}); // non-fatal — proceed even if sheets are unreachable
 
       const [schoolsRes, statsRes] = await Promise.all([
-        fetch("/api/admin/alliances/friendship/schools", { headers: authHeader() }),
-        fetch("/api/admin/alliances/friendship/stats", { headers: authHeader() }),
+        fetch("/api/admin/alliances/friendship/schools"),
+        fetch("/api/admin/alliances/friendship/stats"),
       ]);
       if (schoolsRes.status === 401) { setLoading(false); return; }
       const updatedSchools: School[] = await schoolsRes.json();
@@ -207,7 +161,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
           return null;
         }
         setTimeout(() => {
-          fetch(`/api/admin/alliances/friendship/leads?schoolId=${still.id}`, { headers: authHeader() })
+          fetch(`/api/admin/alliances/friendship/leads?schoolId=${still.id}`)
             .then(r => r.json()).then(setLeads).catch(() => {});
         }, 0);
         return still;
@@ -227,7 +181,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
       }, 50);
     }
     try {
-      const res = await fetch(`/api/admin/alliances/friendship/leads?schoolId=${school.id}`, { headers: authHeader() });
+      const res = await fetch(`/api/admin/alliances/friendship/leads?schoolId=${school.id}`);
       setLeads(await res.json());
     } catch { /* silent */ }
     setLeadsLoading(false);
@@ -265,7 +219,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
       const url = editSchool ? `/api/admin/alliances/friendship/schools/${editSchool.id}` : "/api/admin/alliances/friendship/schools";
       const res = await fetch(url, {
         method: editSchool ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json", ...authHeader() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const d = await res.json().catch(() => ({}));
@@ -279,7 +233,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     try {
       await fetch(`/api/admin/alliances/friendship/schools/${s.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", ...authHeader() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !s.isActive }),
       });
       fetchAll();
@@ -290,7 +244,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
   const handleRegenToken = async (s: School) => {
     try {
       const res = await fetch(`/api/admin/alliances/friendship/schools/${s.id}/regenerate-token`, {
-        method: "POST", headers: authHeader(),
+        method: "POST",
       });
       if (res.ok) { setConfirmRegen(null); fetchAll(); }
     } catch { /* silent */ }
@@ -299,7 +253,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
   const handleDelete = async (s: School) => {
     try {
       const res = await fetch(`/api/admin/alliances/friendship/schools/${s.id}`, {
-        method: "DELETE", headers: authHeader(),
+        method: "DELETE",
       });
       if (res.ok) {
         setConfirmDelete(null);
@@ -309,15 +263,6 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     } catch { /* silent */ }
   };
 
-  const handleSyncSheets = async () => {
-    setSyncMsg("Syncing…");
-    try {
-      const res = await fetch("/api/admin/alliances/friendship/sync-sheets", { method: "POST", headers: authHeader() });
-      const d = await res.json().catch(() => ({}));
-      setSyncMsg(`Done — ${d.synced ?? 0} synced, ${d.failed ?? 0} failed`);
-    } catch { setSyncMsg("Sync failed"); }
-    setTimeout(() => setSyncMsg(""), 5000);
-  };
 
 
   // Filtered + sorted school list
