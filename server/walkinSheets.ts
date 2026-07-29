@@ -1721,6 +1721,117 @@ function crmMonthSortKey(label: string): number {
   return fullYear * 12 + (m < 0 ? 0 : m);
 }
 
+/**
+ * Pure aggregation of raw CRM Leads Tracker sheet rows into KPI stats.
+ *
+ * Exported so it can be unit-tested independently of the Google Sheets API call.
+ *
+ * Expected column layout (0-based, matching the "CRM Leads Tracker" tab):
+ *   [0]  Date       — **DD/MM/YYYY** is the canonical format written by the sync
+ *                     system; YYYY-MM-DD is also accepted as a fallback.
+ *   [1]  Time
+ *   [2]  Parent's Name
+ *   [3]  Child's Name
+ *   [4]  Phone
+ *   [5]  Program
+ *   [6]  Status     — values are uppercased before comparison; recognised values:
+ *                     OPEN · FOLLOW-UP · WALK-IN BOOKED · WALK-IN COMPLETED ·
+ *                     ADMISSION DONE · CLOSED · TRANSFERRED · INTEGRATED · NEXT YEAR
+ *   [7]  Remark
+ *   [8]  Lead Owner
+ *   [9]  Source
+ *   [10] Walk-In Date
+ *   [11] Revisit Date
+ *   [12] Email ID
+ *
+ * Counting rules:
+ *   - totalLeads  = every row where col[0] (Date) is non-blank
+ *   - admissions  = rows where Status === "ADMISSION DONE" (after uppercasing)
+ *   - walkins     = rows where Status ∈ {"WALK-IN COMPLETED", "ADMISSION DONE"}
+ *   - bookings    = rows where Status === "WALK-IN BOOKED"
+ *   - Monthly bucketing uses parseCrmMonthLabel(date) on the Date column.
+ */
+export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" | "academicYear" | "generatedAt" | "cachedAt" | "byBranch"> {
+  let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
+
+  const monthMap       = new Map<string, number>();
+  const monthDetailMap = new Map<string, { leads: number; walkins: number; admissions: number; closed: number }>();
+  const sourceMap      = new Map<string, number>();
+  const ownerMap       = new Map<string, number>();
+  const statusMap      = new Map<string, number>();
+  const counsellorMap  = new Map<string, { leads: number; walkins: number; admissions: number; closed: number; open: number }>();
+  const programMap     = new Map<string, number>();
+
+  for (const row of dataRows) {
+    const date = (row[0] ?? "").toString().trim();
+    if (!date) continue; // skip completely blank rows
+
+    const status     = (row[6] ?? "").toString().trim().toUpperCase();
+    const source     = (row[9] ?? "").toString().trim() || "Unknown";
+    const leadOwner  = (row[8] ?? "").toString().trim() || null;
+    const program    = (row[5] ?? "").toString().trim() || "Unknown";
+    const monthLabel = parseCrmMonthLabel(date);
+
+    const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);
+    const isAdmission = status === "ADMISSION DONE";
+    const isClosed    = status === "CLOSED";
+    const isOpen      = ["OPEN", "FOLLOW-UP"].includes(status);
+    const isBooking   = status === "WALK-IN BOOKED";
+
+    totalLeads++;
+    if (isBooking)   bookings++;
+    if (isWalkin)    walkins++;
+    if (isAdmission) admissions++;
+
+    monthMap.set(monthLabel, (monthMap.get(monthLabel) ?? 0) + 1);
+
+    const md = monthDetailMap.get(monthLabel) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0 };
+    md.leads++;
+    if (isWalkin)    md.walkins++;
+    if (isAdmission) md.admissions++;
+    if (isClosed)    md.closed++;
+    monthDetailMap.set(monthLabel, md);
+
+    sourceMap.set(source,          (sourceMap.get(source)          ?? 0) + 1);
+    ownerMap .set(leadOwner ?? "", (ownerMap .get(leadOwner ?? "") ?? 0) + 1);
+    statusMap.set(status,          (statusMap.get(status)          ?? 0) + 1);
+    programMap.set(program,        (programMap.get(program)        ?? 0) + 1);
+
+    const key = leadOwner ?? "";
+    const cs  = counsellorMap.get(key) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0, open: 0 };
+    cs.leads++;
+    if (isWalkin)    cs.walkins++;
+    if (isAdmission) cs.admissions++;
+    if (isClosed)    cs.closed++;
+    if (isOpen)      cs.open++;
+    counsellorMap.set(key, cs);
+  }
+
+  const sortFn = (a: { month: string }, b: { month: string }) =>
+    crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
+
+  const monthly       = Array.from(monthMap, ([month, cnt]) => ({ month, cnt })).sort(sortFn);
+  const monthlyDetail = Array.from(monthDetailMap, ([month, d]) => ({ month, ...d })).sort(sortFn);
+  const bySource      = Array.from(sourceMap, ([source, cnt]) => ({ source, cnt })).sort((a, b) => b.cnt - a.cnt);
+  const byOwner       = Array.from(ownerMap, ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt })).sort((a, b) => b.cnt - a.cnt);
+  const statusBreakdown = Array.from(statusMap, ([status, cnt]) => ({ status, cnt })).sort((a, b) => b.cnt - a.cnt);
+  const byProgram     = Array.from(programMap, ([program, cnt]) => ({ program, cnt })).sort((a, b) => b.cnt - a.cnt);
+  const byCounsellor  = Array.from(counsellorMap, ([leadOwner, s]) => ({ leadOwner: leadOwner || "Unassigned", ...s }))
+    .filter(c => c.leadOwner !== "Unassigned" || c.leads > 0)
+    .sort((a, b) => b.admissions - a.admissions || b.walkins - a.walkins || b.leads - a.leads);
+
+  return {
+    kpis: { totalLeads, bookings, walkins, admissions },
+    monthly,
+    monthlyDetail,
+    bySource,
+    byOwner,
+    statusBreakdown,
+    byCounsellor,
+    byProgram,
+  };
+}
+
 export interface CrmStats {
   brand: string;
   academicYear: string;
@@ -1810,97 +1921,17 @@ export async function readCrmLeadsTrackerStats(
       });
 
       const rows = res.data.values ?? [];
-      const dataRows = rows.slice(1); // skip header row
+      const dataRows = rows.slice(1) as string[][]; // skip header row
 
-      let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
-
-      const monthMap       = new Map<string, number>();
-      const monthDetailMap = new Map<string, { leads: number; walkins: number; admissions: number; closed: number }>();
-      const sourceMap      = new Map<string, number>();
-      const ownerMap       = new Map<string, number>();
-      const statusMap      = new Map<string, number>();
-      const counsellorMap  = new Map<string, { leads: number; walkins: number; admissions: number; closed: number; open: number }>();
-      const programMap     = new Map<string, number>();
-
-      for (const row of dataRows) {
-        const date = (row[0] ?? "").toString().trim();
-        if (!date) continue; // skip completely blank rows
-
-        const status     = (row[6] ?? "").toString().trim().toUpperCase();
-        const source     = (row[9] ?? "").toString().trim() || "Unknown";
-        const leadOwner  = (row[8] ?? "").toString().trim() || null;
-        const program    = (row[5] ?? "").toString().trim() || "Unknown";
-        const monthLabel = parseCrmMonthLabel(date);
-
-        const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);
-        const isAdmission = status === "ADMISSION DONE";
-        const isClosed    = status === "CLOSED";
-        const isOpen      = ["OPEN", "FOLLOW-UP"].includes(status);
-        const isBooking   = status === "WALK-IN BOOKED";
-
-        totalLeads++;
-        if (isBooking)   bookings++;
-        if (isWalkin)    walkins++;
-        if (isAdmission) admissions++;
-
-        // monthly simple count
-        monthMap.set(monthLabel, (monthMap.get(monthLabel) ?? 0) + 1);
-
-        // monthly detail
-        const md = monthDetailMap.get(monthLabel) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0 };
-        md.leads++;
-        if (isWalkin)    md.walkins++;
-        if (isAdmission) md.admissions++;
-        if (isClosed)    md.closed++;
-        monthDetailMap.set(monthLabel, md);
-
-        sourceMap.set(source,          (sourceMap.get(source)          ?? 0) + 1);
-        ownerMap .set(leadOwner ?? "", (ownerMap .get(leadOwner ?? "") ?? 0) + 1);
-        statusMap.set(status,          (statusMap.get(status)          ?? 0) + 1);
-        programMap.set(program,        (programMap.get(program)        ?? 0) + 1);
-
-        // per-counsellor breakdown
-        const key = leadOwner ?? "";
-        const cs  = counsellorMap.get(key) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0, open: 0 };
-        cs.leads++;
-        if (isWalkin)    cs.walkins++;
-        if (isAdmission) cs.admissions++;
-        if (isClosed)    cs.closed++;
-        if (isOpen)      cs.open++;
-        counsellorMap.set(key, cs);
-      }
-
-      const sortFn = (a: { month: string }, b: { month: string }) =>
-        crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
-
-      const monthly = Array.from(monthMap, ([month, cnt]) => ({ month, cnt })).sort(sortFn);
-      const monthlyDetail = Array.from(monthDetailMap, ([month, d]) => ({ month, ...d })).sort(sortFn);
-
-      const bySource = Array.from(sourceMap, ([source, cnt]) => ({ source, cnt }))
-        .sort((a, b) => b.cnt - a.cnt);
-      const byOwner = Array.from(ownerMap, ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt }))
-        .sort((a, b) => b.cnt - a.cnt);
-      const statusBreakdown = Array.from(statusMap, ([status, cnt]) => ({ status, cnt }))
-        .sort((a, b) => b.cnt - a.cnt);
-      const byProgram = Array.from(programMap, ([program, cnt]) => ({ program, cnt }))
-        .sort((a, b) => b.cnt - a.cnt);
-      const byCounsellor = Array.from(counsellorMap, ([leadOwner, s]) => ({ leadOwner: leadOwner || "Unassigned", ...s }))
-        .filter(c => c.leadOwner !== "Unassigned" || c.leads > 0)
-        .sort((a, b) => b.admissions - a.admissions || b.walkins - a.walkins || b.leads - a.leads);
+      // Delegate to pure aggregation function (also used by unit tests)
+      const agg = aggregateCrmRows(dataRows);
 
       const now = new Date().toISOString();
       const result: CrmStats = {
         brand,
         academicYear: "2027-28",
-        kpis: { totalLeads, bookings, walkins, admissions },
-        monthly,
-        monthlyDetail,
-        bySource,
+        ...agg,
         byBranch: [], // CRM Leads Tracker has no branch column
-        byOwner,
-        statusBreakdown,
-        byCounsellor,
-        byProgram,
         generatedAt: now,
         cachedAt: now,
       };
