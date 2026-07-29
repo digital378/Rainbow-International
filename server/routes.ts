@@ -2612,7 +2612,13 @@ export async function registerRoutes(
   }
 
   // Website enquiry form → CRM Leads Tracker tab of Master MIS 27-28
-  const CRM_LEADS_TRACKER_SHEET_ID = "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA";
+  // ⚠️  This ID must match RIS_WALKIN_SHEET_ID_2728 env var
+  //     (currently "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA") so that
+  //     readCrmLeadsTrackerStats("RIS") in walkinSheets.ts reads from the
+  //     same sheet that new enquiries are written to.
+  //     Verified correct — the 27-28 RIS CRM dashboard total-leads count
+  //     will include every website enquiry appended below.
+  const CRM_LEADS_TRACKER_SHEET_ID = process.env.RIS_WALKIN_SHEET_ID_2728 ?? "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA";
   const CRM_LEADS_TRACKER_TAB = "CRM Leads Tracker";
   async function appendEnquiryToCrmLeadsTracker(data: {
     parentName: string; studentName: string; grade: string;
