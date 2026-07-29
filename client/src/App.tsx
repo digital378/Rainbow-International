@@ -63,6 +63,7 @@ const Alliances = lazy(() => import("@/pages/Alliances"));
 const Sales = lazy(() => import("@/pages/Sales"));
 const RpsSales = lazy(() => import("@/pages/RpsSales"));
 const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
+const WalkinKiosk = lazy(() => import("@/pages/WalkinKiosk"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
@@ -139,6 +140,11 @@ function Router() {
       <Route path="/sales" component={Sales} />
       <Route path="/rps-sales" component={RpsSales} />
       <Route path="/walkin/:slug" component={WalkinForm} />
+      {/* AY 2027-28 kiosk capture forms */}
+      <Route path="/walkin-ris-27-28" component={() => <WalkinKiosk brand="RIS" />} />
+      <Route path="/walkin-ris-27-28/:branchCode" component={() => <WalkinKiosk brand="RIS" />} />
+      <Route path="/walkin-rps-27-28" component={() => <WalkinKiosk brand="RPS" />} />
+      <Route path="/walkin-rps-27-28/:branchCode" component={() => <WalkinKiosk brand="RPS" />} />
       <Route path="/alliances/friendship/:token" component={FriendshipPortal} />
       <Route path="/admin/alliances/friendship/:id/qr" component={FriendshipQRCard} />
       <Route path="/admin/alliances/friendship" component={AdminFriendshipSchools} />
@@ -186,12 +192,13 @@ function DeferredExtras() {
 
   const isSalesDashboard = location === "/rps-sales" || location === "/sales";
   const isInternalDashboard = location === "/alliances";
+  const isKioskForm = location.startsWith("/walkin-ris-27-28") || location.startsWith("/walkin-rps-27-28");
 
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
-      {!isCoarsePointer && <RainbowCursor />}
-      {!isSalesDashboard && !isInternalDashboard && <ChatBot />}
+      {!isCoarsePointer && !isKioskForm && <RainbowCursor />}
+      {!isSalesDashboard && !isInternalDashboard && !isKioskForm && <ChatBot />}
     </Suspense>
   );
 }
