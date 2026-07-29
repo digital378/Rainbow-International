@@ -14,7 +14,7 @@
  *   GOOGLE_CLIENT_SECRET      — OAuth2 client secret
  *
  * Column layout (matches images shared by client, 18 cols):
- *   A  Unique ID     — LD-DD.MM.YYYY-<seqNum>
+ *   A  Unique ID     — LD-DD.MM.YYYY-{RIS|RPS}-<brandSeqNum>
  *   B  Date          — DD/MM/YYYY
  *   C  Time          — HH:MM (12h)
  *   D  Student Name
@@ -41,12 +41,70 @@
 import { google } from "googleapis";
 import { db } from "./db";
 import { walkinLeads, walkinBranches, walkinLeadAuditLog } from "@shared/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
+
+// ── Startup bootstrap ─────────────────────────────────────────────
+// Creates per-brand sequences and backfills brand_seq_num for any
+// existing rows that predate this change. Idempotent — safe to run
+// on every startup.
+export async function bootstrapWalkinSequences(): Promise<void> {
+  try {
+    // 1. Ensure the brand_seq_num column exists (idempotent DDL — safe on any environment,
+    //    including production where db:push may not have been run yet).
+    await db.execute(drizzleSql`
+      ALTER TABLE walkin_leads
+        ADD COLUMN IF NOT EXISTS brand_seq_num INTEGER;
+    `);
+
+    // 2. Create per-brand sequences (no-op if they already exist)
+    await db.execute(drizzleSql`
+      CREATE SEQUENCE IF NOT EXISTS walkin_ris_seq START WITH 1 INCREMENT BY 1;
+    `);
+    await db.execute(drizzleSql`
+      CREATE SEQUENCE IF NOT EXISTS walkin_rps_seq START WITH 1 INCREMENT BY 1;
+    `);
+
+    // 3. Backfill brand_seq_num for any rows that predate this migration,
+    //    numbering them per-brand by their original global seq_num order.
+    await db.execute(drizzleSql`
+      UPDATE walkin_leads wl
+      SET brand_seq_num = sub.rn
+      FROM (
+        SELECT id,
+               ROW_NUMBER() OVER (PARTITION BY brand ORDER BY seq_num) AS rn
+        FROM walkin_leads
+        WHERE brand_seq_num IS NULL
+      ) sub
+      WHERE wl.id = sub.id
+    `);
+
+    // 4. Advance each sequence past the current per-brand max so the next
+    //    nextval() call never collides with an already-assigned brand_seq_num.
+    const maxRows = await db.execute<{ brand: string; max_seq: string | null }>(drizzleSql`
+      SELECT brand, MAX(brand_seq_num) AS max_seq
+      FROM walkin_leads
+      GROUP BY brand
+    `);
+
+    for (const row of maxRows.rows) {
+      const seqName = row.brand === "RIS" ? "walkin_ris_seq" : "walkin_rps_seq";
+      const nextStart = (parseInt(row.max_seq ?? "0") || 0) + 1;
+      // setval(seq, n, false) means the *next* call to nextval() returns n
+      await db.execute(drizzleSql`SELECT setval(${seqName}, ${nextStart}, false)`);
+    }
+
+    console.log("[walkin/bootstrap] Per-brand sequences ready (walkin_ris_seq, walkin_rps_seq)");
+  } catch (err: any) {
+    // Log but don't crash startup — worst case, the first nextval() call will
+    // fail gracefully at lead-creation time with a clear error message.
+    console.error("[walkin/bootstrap] Sequence bootstrap failed:", err?.message);
+  }
+}
 
 // ── Column layout (single source of truth) ───────────────────────
 export const SHEET_HEADERS = [
-  "Unique ID",             // A — LD-DD.MM.YYYY-seqNum
+  "Unique ID",             // A — LD-DD.MM.YYYY-{RIS|RPS}-brandSeqNum
   "Date",                  // B
   "Time",                  // C
   "Student Name",          // D  ← mandatory (yellow)
@@ -193,7 +251,8 @@ function formatTime12h(ts: Date): string {
 // ── Row serialiser ────────────────────────────────────────────────
 // Maps a WalkinLead DB row to a flat array matching SHEET_HEADERS column order.
 export async function leadToRow(lead: WalkinLead): Promise<string[]> {
-  const uniqueId = `LD-${formatDateDotted(lead.enquiryDate)}-${(lead as any).seqNum ?? lead.id}`;
+  const seqPart = lead.brandSeqNum != null ? lead.brandSeqNum : (lead as any).seqNum ?? lead.id;
+  const uniqueId = `LD-${formatDateDotted(lead.enquiryDate)}-${lead.brand}-${seqPart}`;
   return [
     uniqueId,                                   // A  Unique ID
     formatDateDDMMYYYY(lead.enquiryDate),        // B  Date

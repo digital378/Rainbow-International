@@ -339,6 +339,14 @@ export function registerWalkinRoutes(app: Express) {
         )
         .limit(1);
 
+      // Fetch the next per-brand sequence number before inserting
+      const seqName = data.brand === "RIS" ? "walkin_ris_seq" : "walkin_rps_seq";
+      const seqResult = await db.execute<{ brandSeqNum: string }>(
+        sql`SELECT nextval(${seqName}) AS "brandSeqNum"`,
+      );
+      const brandSeqNum = Number(seqResult.rows[0]?.brandSeqNum);
+      if (!brandSeqNum) throw new Error(`Failed to fetch next sequence value for ${seqName}`);
+
       // Insert lead
       const [lead] = await db
         .insert(walkinLeads)
@@ -362,6 +370,7 @@ export function registerWalkinRoutes(app: Express) {
           walkInDate: data.walkInDate,
           revisitDate: data.revisitDate,
           createdBy: data.createdBy,
+          brandSeqNum: Number(brandSeqNum),
         })
         .returning();
 

@@ -359,7 +359,8 @@ export const walkinLeads = pgTable(
     walkInDate: text("walk_in_date"),            // YYYY-MM-DD; required for WALK-IN states
     revisitDate: text("revisit_date"),           // YYYY-MM-DD
     misCallingRemarks: text("mis_calling_remarks"),  // MIS calling notes (green col Q in sheet)
-    seqNum: serial("seq_num"),                   // auto-incrementing display number; used in Unique ID
+    seqNum: serial("seq_num"),                   // global serial (kept for backward-compat / ordering)
+    brandSeqNum: integer("brand_seq_num"),       // per-brand sequential counter; used in Unique ID
     isArchived: boolean("is_archived").notNull().default(false),
     createdBy: text("created_by").notNull().default("kiosk"),
     updatedBy: text("updated_by"),
