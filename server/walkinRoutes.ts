@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, syncDeletionsFromMaster } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -1144,6 +1144,23 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       console.error("[walkin/sheets/resync-master]", err?.message);
       res.status(500).json({ message: err?.message ?? "Resync failed" });
+    }
+  });
+
+  // ── POST /api/walkin/sheets/sync-master-deletions ─────────────
+  // Detects leads that exist in DB but were deleted from the Master MIS
+  // WALKINs tab, archives them in DB, and marks ARCHIVED in brand sheets.
+  // Explicit admin action — intentionally NOT part of auto-pull.
+  app.post("/api/walkin/sheets/sync-master-deletions", requireAdmin, async (req, res) => {
+    try {
+      const result = await syncDeletionsFromMaster();
+      const message = result.archived > 0
+        ? `Archived ${result.archived} lead(s) that were removed from Master MIS`
+        : "No missing leads found — all DB leads are present in Master MIS";
+      res.json({ message, ...result });
+    } catch (err: any) {
+      console.error("[walkin/sheets/sync-master-deletions]", err?.message);
+      res.status(500).json({ message: err?.message ?? "Sync failed" });
     }
   });
 

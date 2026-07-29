@@ -1260,6 +1260,86 @@ interface PullLogEntry {
   changes: LeadChange[];
 }
 
+function MasterDeletionSync({ token }: { token: string }) {
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ message: string; archived: number; details: Array<{ leadId: string; brand: string; parentName: string }>; errors: string[] } | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+
+  const run = async () => {
+    setBusy(true);
+    setResult(null);
+    try {
+      const r = await fetch("/api/walkin/sheets/sync-master-deletions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const d = await r.json();
+      setResult(d);
+    } catch {
+      setResult({ message: "✗ Network error", archived: 0, details: [], errors: ["Network error"] });
+    }
+    setBusy(false);
+    setConfirmed(false);
+  };
+
+  return (
+    <div className="border border-amber-200 bg-amber-50 rounded-2xl p-5 space-y-3">
+      <div className="flex items-start gap-3">
+        <span className="text-2xl leading-none mt-0.5">🗑️</span>
+        <div>
+          <h4 className="font-bold text-amber-900">Sync deletions from Master MIS</h4>
+          <p className="text-xs text-amber-800 mt-1">
+            If you manually deleted rows from the Master MIS WALKINs tab, use this to archive those leads in the DB and brand sheets.
+            The system doesn't detect row deletions automatically — this must be triggered manually.
+          </p>
+          <p className="text-xs text-amber-700 mt-1 font-semibold">
+            ⚠ This permanently archives any DB lead not currently listed in the Master sheet. Only run after intentionally deleting rows there.
+          </p>
+        </div>
+      </div>
+
+      {!result && (
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-xs text-amber-800 cursor-pointer select-none">
+            <input type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} className="accent-amber-600" />
+            I intentionally deleted rows from Master MIS and want to archive those leads
+          </label>
+        </div>
+      )}
+
+      {!result ? (
+        <button
+          onClick={run}
+          disabled={busy || !confirmed}
+          className="px-4 py-2 text-sm font-semibold rounded-lg text-white transition disabled:opacity-40"
+          style={{ background: "#b45309" }}>
+          {busy ? "Checking Master sheet…" : "Archive missing leads"}
+        </button>
+      ) : (
+        <div className={`rounded-xl p-4 space-y-2 ${result.archived > 0 ? "bg-white border border-amber-300" : "bg-green-50 border border-green-200"}`}>
+          <p className={`text-sm font-semibold ${result.archived > 0 ? "text-amber-800" : "text-green-700"}`}>{result.message}</p>
+          {result.details.length > 0 && (
+            <ul className="text-xs text-slate-600 space-y-0.5">
+              {result.details.map(d => (
+                <li key={d.leadId} className="font-mono">
+                  {d.leadId} · {d.brand} · {d.parentName || "—"}
+                </li>
+              ))}
+            </ul>
+          )}
+          {result.errors.length > 0 && (
+            <div className="text-xs text-red-600 space-y-0.5">
+              {result.errors.map((e, i) => <div key={i}>{e}</div>)}
+            </div>
+          )}
+          <button onClick={() => { setResult(null); setConfirmed(false); }}
+            className="text-xs underline text-amber-700 hover:text-amber-900">Reset</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SheetsSyncTab({ token }: { token: string }) {
   const [status, setStatus] = useState<SyncStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1425,6 +1505,9 @@ function SheetsSyncTab({ token }: { token: string }) {
         <SheetCard label="Master" envKey="MASTER_WALKIN_SHEET_ID_2728" s={status.MASTER} color="#475569"
           onResync={resyncMaster} resyncKey="MASTER" />
       </div>
+
+      {/* ── Sync deletions from Master ────────────────────────── */}
+      <MasterDeletionSync token={token} />
 
       {/* ── Instant Sync (Apps Script) ─────────────────────────── */}
       <InstantSyncSetup />

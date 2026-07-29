@@ -1308,6 +1308,102 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
   return entry;
 }
 
+// ── Sync deletions: archive DB leads missing from Master MIS ─────
+// Call this when rows have been manually deleted from the Master MIS
+// WALKINs tab. It reads the current Lead ID column from Master, finds
+// any non-archived DB leads that are no longer listed there, archives
+// them in the DB, and marks them ARCHIVED in their brand sheet.
+// This is intentionally a manual/explicit action — not part of auto-pull —
+// to avoid accidental mass-archival if the sheet read fails transiently.
+export async function syncDeletionsFromMaster(): Promise<{
+  archived: number;
+  details: Array<{ leadId: string; brand: "RIS" | "RPS"; parentName: string }>;
+  errors: string[];
+}> {
+  const result = {
+    archived: 0,
+    details: [] as Array<{ leadId: string; brand: "RIS" | "RPS"; parentName: string }>,
+    errors: [] as string[],
+  };
+
+  const auth = getAuthClient();
+  if (!auth) { result.errors.push("Google auth not configured"); return result; }
+
+  const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
+  if (!masterSheetId) { result.errors.push("MASTER_WALKIN_SHEET_ID_2728 not set"); return result; }
+
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Read just the Lead ID column from Master (col S = index 18)
+    const resp = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheetId,
+      range: `${MASTER_LEADS_TAB}!S:S`,
+    });
+
+    const rows = resp.data.values ?? [];
+    const masterLeadIds = new Set(
+      rows.slice(1) // skip header row
+        .map((r) => r[0]?.trim())
+        .filter(Boolean) as string[]
+    );
+
+    // Get all non-archived leads from DB
+    const dbLeads = await db
+      .select({ id: walkinLeads.id, brand: walkinLeads.brand, parentName: walkinLeads.parentName })
+      .from(walkinLeads)
+      .where(eq(walkinLeads.isArchived, false));
+
+    // Leads in DB but NOT in Master sheet → were deleted from Master
+    const toArchive = dbLeads.filter((l) => !masterLeadIds.has(l.id));
+
+    if (toArchive.length === 0) return result;
+
+    for (const lead of toArchive) {
+      try {
+        // Archive in DB
+        await db
+          .update(walkinLeads)
+          .set({ isArchived: true, updatedBy: "master-deletion-sync", updatedAt: new Date() })
+          .where(eq(walkinLeads.id, lead.id));
+
+        await db.insert(walkinLeadAuditLog).values({
+          leadId: lead.id,
+          field: "isArchived",
+          oldValue: "false",
+          newValue: "true",
+          changedBy: "master-deletion-sync",
+        });
+
+        // Mark ARCHIVED in brand sheet (best-effort, non-fatal)
+        if (lead.brand === "RIS" || lead.brand === "RPS") {
+          await removeLeadFromSheet(lead.brand, lead.id).catch((e: any) => {
+            result.errors.push(`${lead.id}: brand sheet ARCHIVED mark failed — ${e?.message}`);
+          });
+        }
+
+        result.archived++;
+        result.details.push({
+          leadId: lead.id,
+          brand: lead.brand as "RIS" | "RPS",
+          parentName: lead.parentName ?? "",
+        });
+
+        console.log(`[walkin/sheets] syncDeletionsFromMaster: archived ${lead.id} (${lead.brand})`);
+      } catch (e: any) {
+        result.errors.push(`${lead.id}: DB archive failed — ${e?.message}`);
+      }
+    }
+  } catch (e: any) {
+    result.errors.push(`Master sheet read failed: ${e?.message}`);
+  }
+
+  console.log(
+    `[walkin/sheets] syncDeletionsFromMaster: archived=${result.archived} errors=${result.errors.length}`
+  );
+  return result;
+}
+
 // ── Remove (archive) a lead from a brand sheet ───────────────────
 // Finds the row by Lead ID (col R) and overwrites the Status cell (col L)
 // with "ARCHIVED". Never deletes the row — keeps sheet history intact and
