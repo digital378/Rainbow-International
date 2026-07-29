@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, syncDeletionsFromMaster } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -935,14 +935,23 @@ export function registerWalkinRoutes(app: Express) {
   // ── GET /api/walkin/crm-stats ─────────────────────────────────
   // Reads the "CRM Leads Tracker" tab directly from the brand's Google
   // Sheet and returns KPIs in the same shape as /api/walkin/stats.
-  // Sheets are the source of truth for dashboards.
+  // Results are cached for 2 minutes to protect Google Sheets quota.
+  //
+  // Query params:
+  //   brand  — required; "RIS" or "RPS"
+  //   bust   — optional; any truthy value forces a fresh read (admin only)
   app.get("/api/walkin/crm-stats", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       if (!brand || !["RIS", "RPS"].includes(brand)) {
         return res.status(400).json({ message: "brand must be RIS or RPS" });
       }
-      const stats = await readCrmLeadsTrackerStats(brand as "RIS" | "RPS");
+
+      // Only admins may bypass the cache
+      const bustRequested = req.query.bust !== undefined && req.query.bust !== "0" && req.query.bust !== "false";
+      const bust = bustRequested && isAdmin(req);
+
+      const stats = await readCrmLeadsTrackerStats(brand as "RIS" | "RPS", { bust });
       res.json(stats);
     } catch (err: any) {
       console.error("[walkin/crm-stats]", err?.message);

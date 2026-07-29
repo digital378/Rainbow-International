@@ -1666,119 +1666,190 @@ export interface CrmStats {
   byCounsellor: Array<{ leadOwner: string; leads: number; walkins: number; admissions: number; closed: number; open: number }>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
+  /** ISO timestamp of when data was fetched from Google Sheets (preserved when served from cache). */
+  cachedAt: string;
+}
+
+// ── CRM stats in-memory cache (2-minute TTL) with in-flight coalescing ──
+const CRM_STATS_TTL_MS = 2 * 60 * 1000; // 2 minutes
+
+interface CrmStatsEntry {
+  data: CrmStats;
+  storedAt: number; // Date.now()
+}
+
+const crmStatsCache   = new Map<"RIS" | "RPS", CrmStatsEntry>();
+/** Holds the in-progress fetch promise so concurrent cache-miss requests share one call. */
+const crmStatsInFlight = new Map<"RIS" | "RPS", Promise<CrmStats>>();
+
+/**
+ * Invalidates the in-memory CRM stats cache for one or both brands.
+ * Called when an admin explicitly triggers a refresh.
+ */
+export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
+  if (brand) {
+    crmStatsCache.delete(brand);
+    // Don't clear in-flight — let any running fetch complete and re-populate the cache.
+  } else {
+    crmStatsCache.clear();
+  }
+  console.log(`[walkin/crm-stats] Cache busted${brand ? ` for ${brand}` : " (all brands)"}`);
 }
 
 /**
  * Reads the "CRM Leads Tracker" tab from the brand's Google Sheet and
  * returns aggregated stats in the same shape as /api/walkin/stats.
  * byBranch is always [] — the CRM tab has no branch column.
+ *
+ * Results are cached for 2 minutes.  Concurrent requests that arrive
+ * during a cache miss share a single in-flight promise so only one
+ * Google Sheets API call is made per brand per cache window.
+ * Pass `{ bust: true }` to force a fresh read (admin-only).
  */
-export async function readCrmLeadsTrackerStats(brand: "RIS" | "RPS"): Promise<CrmStats> {
-  const auth = getAuthClient();
-  if (!auth) throw new Error("Google Sheets auth not configured");
-  const sheets = google.sheets({ version: "v4", auth });
-  const sheetId = getSheetId(brand);
-  if (!sheetId) throw new Error(`Sheet ID not configured for ${brand}`);
+export async function readCrmLeadsTrackerStats(
+  brand: "RIS" | "RPS",
+  { bust = false }: { bust?: boolean } = {},
+): Promise<CrmStats> {
+  // 1. Serve a valid cached result immediately (unless busting)
+  if (!bust) {
+    const entry = crmStatsCache.get(brand);
+    if (entry && Date.now() - entry.storedAt < CRM_STATS_TTL_MS) {
+      console.log(`[walkin/crm-stats] Cache hit for ${brand}`);
+      return entry.data;
+    }
 
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `'${CRM_TAB}'!A:M`,
-  });
-
-  const rows = res.data.values ?? [];
-  const dataRows = rows.slice(1); // skip header row
-
-  let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
-
-  const monthMap       = new Map<string, number>();
-  const monthDetailMap = new Map<string, { leads: number; walkins: number; admissions: number; closed: number }>();
-  const sourceMap      = new Map<string, number>();
-  const ownerMap       = new Map<string, number>();
-  const statusMap      = new Map<string, number>();
-  const counsellorMap  = new Map<string, { leads: number; walkins: number; admissions: number; closed: number; open: number }>();
-  const programMap     = new Map<string, number>();
-
-  for (const row of dataRows) {
-    const date = (row[0] ?? "").toString().trim();
-    if (!date) continue; // skip completely blank rows
-
-    const status     = (row[6] ?? "").toString().trim().toUpperCase();
-    const source     = (row[9] ?? "").toString().trim() || "Unknown";
-    const leadOwner  = (row[8] ?? "").toString().trim() || null;
-    const program    = (row[5] ?? "").toString().trim() || "Unknown";
-    const monthLabel = parseCrmMonthLabel(date);
-
-    const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);
-    const isAdmission = status === "ADMISSION DONE";
-    const isClosed    = status === "CLOSED";
-    const isOpen      = ["OPEN", "FOLLOW-UP"].includes(status);
-    const isBooking   = status === "WALK-IN BOOKED";
-
-    totalLeads++;
-    if (isBooking)   bookings++;
-    if (isWalkin)    walkins++;
-    if (isAdmission) admissions++;
-
-    // monthly simple count
-    monthMap.set(monthLabel, (monthMap.get(monthLabel) ?? 0) + 1);
-
-    // monthly detail
-    const md = monthDetailMap.get(monthLabel) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0 };
-    md.leads++;
-    if (isWalkin)    md.walkins++;
-    if (isAdmission) md.admissions++;
-    if (isClosed)    md.closed++;
-    monthDetailMap.set(monthLabel, md);
-
-    sourceMap.set(source,          (sourceMap.get(source)          ?? 0) + 1);
-    ownerMap .set(leadOwner ?? "", (ownerMap .get(leadOwner ?? "") ?? 0) + 1);
-    statusMap.set(status,          (statusMap.get(status)          ?? 0) + 1);
-    programMap.set(program,        (programMap.get(program)        ?? 0) + 1);
-
-    // per-counsellor breakdown
-    const key = leadOwner ?? "";
-    const cs  = counsellorMap.get(key) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0, open: 0 };
-    cs.leads++;
-    if (isWalkin)    cs.walkins++;
-    if (isAdmission) cs.admissions++;
-    if (isClosed)    cs.closed++;
-    if (isOpen)      cs.open++;
-    counsellorMap.set(key, cs);
+    // 2. Coalesce concurrent misses — join the existing in-flight promise if one is running
+    const inflight = crmStatsInFlight.get(brand);
+    if (inflight) {
+      console.log(`[walkin/crm-stats] Joining in-flight request for ${brand}`);
+      return inflight;
+    }
   }
 
-  const sortFn = (a: { month: string }, b: { month: string }) =>
-    crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
+  // 3. Start a fresh fetch, register it as the in-flight promise so concurrent
+  //    cache-miss requests join the same call rather than each firing their own.
+  const fetchPromise = (async (): Promise<CrmStats> => {
+    try {
+      const auth = getAuthClient();
+      if (!auth) throw new Error("Google Sheets auth not configured");
+      const sheets = google.sheets({ version: "v4", auth });
+      const sheetId = getSheetId(brand);
+      if (!sheetId) throw new Error(`Sheet ID not configured for ${brand}`);
 
-  const monthly = Array.from(monthMap, ([month, cnt]) => ({ month, cnt })).sort(sortFn);
+      const res = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: `'${CRM_TAB}'!A:M`,
+      });
 
-  const monthlyDetail = Array.from(monthDetailMap, ([month, d]) => ({ month, ...d })).sort(sortFn);
+      const rows = res.data.values ?? [];
+      const dataRows = rows.slice(1); // skip header row
 
-  const bySource = Array.from(sourceMap, ([source, cnt]) => ({ source, cnt }))
-    .sort((a, b) => b.cnt - a.cnt);
-  const byOwner = Array.from(ownerMap, ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt }))
-    .sort((a, b) => b.cnt - a.cnt);
-  const statusBreakdown = Array.from(statusMap, ([status, cnt]) => ({ status, cnt }))
-    .sort((a, b) => b.cnt - a.cnt);
-  const byProgram = Array.from(programMap, ([program, cnt]) => ({ program, cnt }))
-    .sort((a, b) => b.cnt - a.cnt);
-  const byCounsellor = Array.from(counsellorMap, ([leadOwner, s]) => ({ leadOwner: leadOwner || "Unassigned", ...s }))
-    .filter(c => c.leadOwner !== "Unassigned" || c.leads > 0)
-    .sort((a, b) => b.admissions - a.admissions || b.walkins - a.walkins || b.leads - a.leads);
+      let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
 
-  return {
-    brand,
-    academicYear: "2027-28",
-    kpis: { totalLeads, bookings, walkins, admissions },
-    monthly,
-    monthlyDetail,
-    bySource,
-    byBranch: [], // CRM Leads Tracker has no branch column
-    byOwner,
-    statusBreakdown,
-    byCounsellor,
-    byProgram,
-    generatedAt: new Date().toISOString(),
-  };
+      const monthMap       = new Map<string, number>();
+      const monthDetailMap = new Map<string, { leads: number; walkins: number; admissions: number; closed: number }>();
+      const sourceMap      = new Map<string, number>();
+      const ownerMap       = new Map<string, number>();
+      const statusMap      = new Map<string, number>();
+      const counsellorMap  = new Map<string, { leads: number; walkins: number; admissions: number; closed: number; open: number }>();
+      const programMap     = new Map<string, number>();
+
+      for (const row of dataRows) {
+        const date = (row[0] ?? "").toString().trim();
+        if (!date) continue; // skip completely blank rows
+
+        const status     = (row[6] ?? "").toString().trim().toUpperCase();
+        const source     = (row[9] ?? "").toString().trim() || "Unknown";
+        const leadOwner  = (row[8] ?? "").toString().trim() || null;
+        const program    = (row[5] ?? "").toString().trim() || "Unknown";
+        const monthLabel = parseCrmMonthLabel(date);
+
+        const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);
+        const isAdmission = status === "ADMISSION DONE";
+        const isClosed    = status === "CLOSED";
+        const isOpen      = ["OPEN", "FOLLOW-UP"].includes(status);
+        const isBooking   = status === "WALK-IN BOOKED";
+
+        totalLeads++;
+        if (isBooking)   bookings++;
+        if (isWalkin)    walkins++;
+        if (isAdmission) admissions++;
+
+        // monthly simple count
+        monthMap.set(monthLabel, (monthMap.get(monthLabel) ?? 0) + 1);
+
+        // monthly detail
+        const md = monthDetailMap.get(monthLabel) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0 };
+        md.leads++;
+        if (isWalkin)    md.walkins++;
+        if (isAdmission) md.admissions++;
+        if (isClosed)    md.closed++;
+        monthDetailMap.set(monthLabel, md);
+
+        sourceMap.set(source,          (sourceMap.get(source)          ?? 0) + 1);
+        ownerMap .set(leadOwner ?? "", (ownerMap .get(leadOwner ?? "") ?? 0) + 1);
+        statusMap.set(status,          (statusMap.get(status)          ?? 0) + 1);
+        programMap.set(program,        (programMap.get(program)        ?? 0) + 1);
+
+        // per-counsellor breakdown
+        const key = leadOwner ?? "";
+        const cs  = counsellorMap.get(key) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0, open: 0 };
+        cs.leads++;
+        if (isWalkin)    cs.walkins++;
+        if (isAdmission) cs.admissions++;
+        if (isClosed)    cs.closed++;
+        if (isOpen)      cs.open++;
+        counsellorMap.set(key, cs);
+      }
+
+      const sortFn = (a: { month: string }, b: { month: string }) =>
+        crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
+
+      const monthly = Array.from(monthMap, ([month, cnt]) => ({ month, cnt })).sort(sortFn);
+      const monthlyDetail = Array.from(monthDetailMap, ([month, d]) => ({ month, ...d })).sort(sortFn);
+
+      const bySource = Array.from(sourceMap, ([source, cnt]) => ({ source, cnt }))
+        .sort((a, b) => b.cnt - a.cnt);
+      const byOwner = Array.from(ownerMap, ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt }))
+        .sort((a, b) => b.cnt - a.cnt);
+      const statusBreakdown = Array.from(statusMap, ([status, cnt]) => ({ status, cnt }))
+        .sort((a, b) => b.cnt - a.cnt);
+      const byProgram = Array.from(programMap, ([program, cnt]) => ({ program, cnt }))
+        .sort((a, b) => b.cnt - a.cnt);
+      const byCounsellor = Array.from(counsellorMap, ([leadOwner, s]) => ({ leadOwner: leadOwner || "Unassigned", ...s }))
+        .filter(c => c.leadOwner !== "Unassigned" || c.leads > 0)
+        .sort((a, b) => b.admissions - a.admissions || b.walkins - a.walkins || b.leads - a.leads);
+
+      const now = new Date().toISOString();
+      const result: CrmStats = {
+        brand,
+        academicYear: "2027-28",
+        kpis: { totalLeads, bookings, walkins, admissions },
+        monthly,
+        monthlyDetail,
+        bySource,
+        byBranch: [], // CRM Leads Tracker has no branch column
+        byOwner,
+        statusBreakdown,
+        byCounsellor,
+        byProgram,
+        generatedAt: now,
+        cachedAt: now,
+      };
+
+      // Populate the cache so subsequent requests within the TTL skip the fetch
+      crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
+      console.log(`[walkin/crm-stats] Fresh data fetched and cached for ${brand}`);
+      return result;
+    } finally {
+      // Always remove the in-flight entry so a future miss starts a new fetch
+      crmStatsInFlight.delete(brand);
+    }
+  })();
+
+  // Register before awaiting so concurrent arrivals see the same promise
+  crmStatsInFlight.set(brand, fetchPromise);
+  return fetchPromise;
 }
 
 // ── Auto-pull timer (every 5 minutes) ───────────────────────────
