@@ -704,6 +704,9 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     const dataRows = rows.slice(1);
     entry.rowsScanned = dataRows.length;
 
+    // Collect rows that need propagating to Master after the main loop
+    const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
+
     for (const row of dataRows) {
       const leadId = row[17]?.trim(); // column R (index 17) = Lead ID
       if (!leadId) continue;
@@ -767,8 +770,59 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         );
 
         entry.changesApplied += changes.length;
+
+        // Queue this row for Master propagation
+        pendingMasterUpdates.push({
+          leadId,
+          greenValues: [
+            row[11] ?? "",  // L Status       → Master col M
+            row[12] ?? "",  // M Admission Date → Master col N
+            row[13] ?? "",  // N Follow up Remarks → Master col O
+            row[14] ?? "",  // O Reason for Closed → Master col P
+            row[15] ?? "",  // P Trial/Revisit  → Master col Q
+            row[16] ?? "",  // Q MIS Calling Remarks → Master col R
+          ],
+        });
       } catch (e: any) {
         entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
+      }
+    }
+
+    // ── Propagate edits to Master MIS sheet ─────────────────────
+    if (pendingMasterUpdates.length > 0) {
+      const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
+      if (masterSheetId) {
+        try {
+          // Read Lead ID column from Master (column S = index 18)
+          const masterIdResp = await sheets.spreadsheets.values.get({
+            spreadsheetId: masterSheetId,
+            range: `${MASTER_LEADS_TAB}!S:S`,
+          });
+          const masterIds = masterIdResp.data.values ?? [];
+          const leadIdToMasterRow = new Map<string, number>();
+          masterIds.forEach((r, idx) => {
+            const id = r[0]?.trim();
+            if (id && idx > 0) leadIdToMasterRow.set(id, idx + 1); // 1-based row number
+          });
+
+          const batchData = pendingMasterUpdates
+            .filter(u => leadIdToMasterRow.has(u.leadId))
+            .map(u => ({
+              range: `${MASTER_LEADS_TAB}!M${leadIdToMasterRow.get(u.leadId)}:R${leadIdToMasterRow.get(u.leadId)}`,
+              values: [u.greenValues],
+            }));
+
+          if (batchData.length > 0) {
+            await sheets.spreadsheets.values.batchUpdate({
+              spreadsheetId: masterSheetId,
+              requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
+            });
+            console.log(`[walkin/sheets] Master propagated ${batchData.length} row(s) from ${brand}`);
+          }
+        } catch (e: any) {
+          console.warn(`[walkin/sheets] Master propagation failed: ${e?.message}`);
+          entry.errors.push(`Master propagation: ${e?.message}`);
+        }
       }
     }
   } catch (e: any) {
