@@ -758,7 +758,7 @@ interface LeadChange {
 
 interface PullLogEntry {
   timestamp: Date;
-  brand: "RIS" | "RPS";
+  brand: "RIS" | "RPS" | "MASTER";
   rowsScanned: number;
   changesApplied: number;
   errors: string[];
@@ -991,6 +991,204 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
   return entry;
 }
 
+// ── Master MIS → DB + Brand Sheets pull (reverse sync) ──────────
+// Reads the green columns (M–R) in the Master sheet.
+// For each changed row: updates the DB, then back-propagates to the
+// corresponding RIS or RPS brand sheet (columns L–Q).
+// No circular loop: both pulls compare against the DB; after one side
+// writes, the other side finds DB == sheet and skips.
+export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
+  const entry: PullLogEntry = {
+    timestamp: new Date(),
+    brand: "MASTER",
+    rowsScanned: 0,
+    changesApplied: 0,
+    errors: [],
+    changes: [],
+  };
+
+  const auth = getAuthClient();
+  if (!auth) {
+    entry.errors.push("Google auth not configured");
+    _pullLog.unshift(entry); if (_pullLog.length > 100) _pullLog.pop();
+    return entry;
+  }
+
+  const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
+  if (!masterSheetId) {
+    entry.errors.push("MASTER_WALKIN_SHEET_ID_2728 not set");
+    _pullLog.unshift(entry); if (_pullLog.length > 100) _pullLog.pop();
+    return entry;
+  }
+
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Read A:S — Brand(A=0) … Status(M=12) … MIS Calling(R=17) … Lead ID(S=18)
+    const resp = await sheets.spreadsheets.values.get({
+      spreadsheetId: masterSheetId,
+      range: `${MASTER_LEADS_TAB}!A:S`,
+    });
+
+    const rows = resp.data.values ?? [];
+    const dataRows = rows.slice(1); // skip header
+    entry.rowsScanned = dataRows.length;
+
+    let allowedStatuses: Set<string>;
+    try {
+      const statusRows = await db.select({ label: walkinStatuses.label }).from(walkinStatuses);
+      allowedStatuses = new Set(statusRows.map((r) => r.label));
+    } catch (e: any) {
+      entry.errors.push(`Failed to load allowed statuses — status changes skipped: ${e?.message}`);
+      allowedStatuses = new Set();
+    }
+
+    // Collect rows per brand to back-propagate to their brand sheets after the loop
+    const pendingBrandUpdates: Record<"RIS" | "RPS", Array<{ leadId: string; greenValues: string[] }>> = {
+      RIS: [],
+      RPS: [],
+    };
+
+    for (const row of dataRows) {
+      const brand = (row[0]?.trim() ?? "") as "RIS" | "RPS";
+      if (brand !== "RIS" && brand !== "RPS") continue;
+
+      const leadId = row[18]?.trim(); // col S = Lead ID
+      if (!leadId) continue;
+
+      // Green columns from Master (M–R = indices 12–17)
+      const sheetStatus      = row[12]?.trim() ?? "";              // M
+      const sheetWalkInDate  = parseDateFromSheet(row[13] ?? "");  // N Admission Date
+      const sheetRemark      = row[14]?.trim() ?? "";              // O Follow-up Remarks
+      const sheetCloseReason = row[15]?.trim() ?? "";              // P Reason for Closed
+      const sheetRevisitDate = parseDateFromSheet(row[16] ?? "");  // Q Trial/Revisit
+      const sheetMisCalling  = row[17]?.trim() ?? "";              // R MIS Calling Remarks
+
+      let existing: any;
+      try {
+        const [found] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, leadId));
+        existing = found;
+      } catch (e: any) {
+        entry.errors.push(`DB lookup failed for lead ${leadId}: ${e?.message}`);
+        continue;
+      }
+      if (!existing || existing.isArchived) continue;
+
+      type FieldChange = { field: string; oldVal: string | null; newVal: string | null };
+      const changes: FieldChange[] = [];
+      const check = (field: string, dbVal: string | null | undefined, sheetVal: string | null) => {
+        const db_ = dbVal ?? null;
+        const sh_ = sheetVal || null;
+        if (db_ !== sh_) changes.push({ field, oldVal: db_, newVal: sh_ });
+      };
+
+      if (sheetStatus) {
+        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus)) {
+          entry.errors.push(
+            `Lead ${leadId}: Master status "${sheetStatus}" not recognised — skipped`
+          );
+        } else {
+          check("status", existing.status, sheetStatus);
+        }
+      }
+      check("walkInDate",        existing.walkInDate,        sheetWalkInDate);
+      check("remark",            existing.remark,            sheetRemark || null);
+      check("closeReason",       existing.closeReason,       sheetCloseReason || null);
+      check("revisitDate",       existing.revisitDate,       sheetRevisitDate);
+      check("misCallingRemarks", existing.misCallingRemarks, sheetMisCalling || null);
+
+      if (changes.length === 0) continue;
+
+      const patch: Record<string, any> = { updatedBy: "master-sync", updatedAt: new Date() };
+      for (const c of changes) patch[c.field] = c.newVal;
+
+      try {
+        await db.update(walkinLeads).set(patch).where(eq(walkinLeads.id, leadId));
+        await Promise.all(
+          changes.map((c) =>
+            db.insert(walkinLeadAuditLog).values({
+              leadId, field: c.field,
+              oldValue: c.oldVal, newValue: c.newVal,
+              changedBy: "master-sync",
+            })
+          )
+        );
+
+        entry.changesApplied += changes.length;
+        for (const c of changes) {
+          entry.changes.push({ leadId, parentName: existing.parentName ?? "", field: c.field, oldVal: c.oldVal, newVal: c.newVal });
+        }
+
+        // Queue back-propagation to brand sheet (M–R → L–Q)
+        pendingBrandUpdates[brand].push({
+          leadId,
+          greenValues: [
+            row[12] ?? "",  // M Status           → brand col L
+            row[13] ?? "",  // N Admission Date    → brand col M
+            row[14] ?? "",  // O Follow-up Remarks → brand col N
+            row[15] ?? "",  // P Reason for Closed → brand col O
+            row[16] ?? "",  // Q Trial/Revisit     → brand col P
+            row[17] ?? "",  // R MIS Calling       → brand col Q
+          ],
+        });
+      } catch (e: any) {
+        entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
+      }
+    }
+
+    // Back-propagate to RIS / RPS brand sheets
+    for (const brand of ["RIS", "RPS"] as const) {
+      const updates = pendingBrandUpdates[brand];
+      if (updates.length === 0) continue;
+
+      const brandSheetId = getSheetId(brand);
+      if (!brandSheetId) continue;
+
+      try {
+        // Look up row numbers by Lead ID in brand sheet col R (index 17)
+        const idResp = await sheets.spreadsheets.values.get({
+          spreadsheetId: brandSheetId,
+          range: `${LEADS_TAB}!R:R`,
+        });
+        const idRows = idResp.data.values ?? [];
+        const leadIdToRow = new Map<string, number>();
+        idRows.forEach((r, idx) => {
+          const id = r[0]?.trim();
+          if (id && idx > 0) leadIdToRow.set(id, idx + 1); // 1-based
+        });
+
+        const batchData = updates
+          .filter((u) => leadIdToRow.has(u.leadId))
+          .map((u) => ({
+            range: `${LEADS_TAB}!L${leadIdToRow.get(u.leadId)}:Q${leadIdToRow.get(u.leadId)}`,
+            values: [u.greenValues],
+          }));
+
+        if (batchData.length > 0) {
+          await sheets.spreadsheets.values.batchUpdate({
+            spreadsheetId: brandSheetId,
+            requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
+          });
+          console.log(`[walkin/sheets] ${brand} sheet back-propagated ${batchData.length} row(s) from Master`);
+        }
+      } catch (e: any) {
+        console.warn(`[walkin/sheets] ${brand} back-propagation failed: ${e?.message}`);
+        entry.errors.push(`${brand} back-propagation: ${e?.message}`);
+      }
+    }
+  } catch (e: any) {
+    entry.errors.push(`Master sheet read failed: ${e?.message}`);
+  }
+
+  console.log(
+    `[walkin/sheets] Pull MASTER: scanned=${entry.rowsScanned} changes=${entry.changesApplied} errors=${entry.errors.length}`
+  );
+
+  _pullLog.unshift(entry);
+  if (_pullLog.length > 100) _pullLog.pop();
+  return entry;
+}
+
 // ── Auto-pull timer (every 5 minutes) ───────────────────────────
 export function startAutoPull(): void {
   const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
@@ -1001,6 +1199,9 @@ export function startAutoPull(): void {
     }
     try { await pullChangesFromSheet("RPS"); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
+    }
+    try { await pullChangesFromMasterSheet(); } catch (e: any) {
+      console.error("[walkin/sheets] Auto-pull MASTER failed:", e?.message);
     }
   };
 

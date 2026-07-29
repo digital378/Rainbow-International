@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet } from "./walkinSheets";
+import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -760,14 +760,20 @@ export function registerWalkinRoutes(app: Express) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     const brand = (req.body?.brand ?? "").toUpperCase();
-    if (brand !== "RIS" && brand !== "RPS") {
-      return res.status(400).json({ error: "brand must be RIS or RPS" });
+    if (brand !== "RIS" && brand !== "RPS" && brand !== "MASTER") {
+      return res.status(400).json({ error: "brand must be RIS, RPS, or MASTER" });
     }
     // Respond immediately so Apps Script doesn't hit its 30-s timeout
     res.json({ ok: true, message: "Pull triggered" });
-    pullChangesFromSheet(brand as "RIS" | "RPS").catch((e: any) =>
-      console.error("[walkin/pull-hook]", e?.message)
-    );
+    if (brand === "MASTER") {
+      pullChangesFromMasterSheet().catch((e: any) =>
+        console.error("[walkin/pull-hook]", e?.message)
+      );
+    } else {
+      pullChangesFromSheet(brand as "RIS" | "RPS").catch((e: any) =>
+        console.error("[walkin/pull-hook]", e?.message)
+      );
+    }
   });
 
   // ── GET /api/walkin/sheets/pull-log ───────────────────────────

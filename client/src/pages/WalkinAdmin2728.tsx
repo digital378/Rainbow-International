@@ -1093,12 +1093,15 @@ function QRCodesTab({ token }: { token: string }) {
 // ── InstantSyncSetup (Apps Script section) ─────────────────────
 function InstantSyncSetup() {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState<"RIS" | "RPS" | null>(null);
+  const [copied, setCopied] = useState<"RIS" | "RPS" | "MASTER" | null>(null);
 
   const webhookUrl = `${window.location.origin}/api/walkin/sheets/pull-hook`;
 
-  const makeScript = (brand: "RIS" | "RPS") =>
-`// Paste this in Google Apps Script for the ${brand} sheet
+  const makeScript = (brand: "RIS" | "RPS" | "MASTER") => {
+    const colGuard = brand === "MASTER"
+      ? "if (col < 13 || col > 18) return; // Green cols M–R only"
+      : "if (col < 12 || col > 17) return; // Green cols L–Q only";
+    return `// Paste this in Google Apps Script for the ${brand === "MASTER" ? "Master MIS" : brand} sheet
 // Extensions → Apps Script → paste → save → set up trigger (see steps below)
 
 var WEBHOOK_URL = "${webhookUrl}";
@@ -1110,7 +1113,7 @@ function onEditInstallable(e) {
   var sheet = e.range.getSheet();
   if (sheet.getName() !== "WALKINs") return;
   var col = e.range.getColumn();
-  if (col < 12 || col > 17) return; // Green cols L–Q only
+  ${colGuard}
 
   try {
     UrlFetchApp.fetch(WEBHOOK_URL, {
@@ -1124,8 +1127,9 @@ function onEditInstallable(e) {
     // Silent — 1-min background poll is the fallback
   }
 }`;
+  };
 
-  const copy = (brand: "RIS" | "RPS") => {
+  const copy = (brand: "RIS" | "RPS" | "MASTER") => {
     navigator.clipboard.writeText(makeScript(brand));
     setCopied(brand);
     setTimeout(() => setCopied(null), 2000);
@@ -1167,25 +1171,33 @@ function onEditInstallable(e) {
             <code className="bg-amber-100 px-1 rounded">PASTE_YOUR_ADMIN_TOKEN_HERE</code> in the script with it.
           </div>
 
-          {/* One script block per brand */}
-          {(["RIS", "RPS"] as const).map(brand => (
-            <div key={brand}>
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
-                  {brand} sheet
-                </span>
-                <button
-                  onClick={() => copy(brand)}
-                  className="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                >
-                  {copied === brand ? "✓ Copied!" : "Copy script"}
-                </button>
+          {/* One script block per sheet */}
+          {(["RIS", "RPS", "MASTER"] as const).map(brand => {
+            const label = brand === "MASTER" ? "Master MIS sheet" : `${brand} sheet`;
+            const badgeClass = brand === "RIS"
+              ? "bg-blue-100 text-blue-700"
+              : brand === "RPS"
+              ? "bg-red-100 text-red-700"
+              : "bg-purple-100 text-purple-700";
+            return (
+              <div key={brand}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badgeClass}`}>
+                    {label}
+                  </span>
+                  <button
+                    onClick={() => copy(brand)}
+                    className="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                  >
+                    {copied === brand ? "✓ Copied!" : "Copy script"}
+                  </button>
+                </div>
+                <pre className="bg-slate-900 text-slate-100 text-xs rounded-xl p-4 overflow-x-auto leading-relaxed">
+                  {makeScript(brand)}
+                </pre>
               </div>
-              <pre className="bg-slate-900 text-slate-100 text-xs rounded-xl p-4 overflow-x-auto leading-relaxed">
-                {makeScript(brand)}
-              </pre>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Install steps */}
           <div>
@@ -1194,9 +1206,9 @@ function onEditInstallable(e) {
               <li>Open the <strong>RIS</strong> Google Sheet → <strong>Extensions → Apps Script</strong></li>
               <li>Delete any existing code, paste the <strong>RIS script</strong> above (token filled in), press <strong>Ctrl + S</strong></li>
               <li>Click <strong>Run → onEditInstallable</strong> once and approve the Google permission prompt</li>
-              <li>Click the <strong>⏱ Triggers</strong> icon (clock on the left sidebar) → <strong>+ Add Trigger</strong></li>
-              <li>Set: function = <code className="bg-slate-100 px-1 rounded">onEditInstallable</code> · event source = <strong>From spreadsheet</strong> · event type = <strong>On edit</strong> → <strong>Save</strong></li>
-              <li>Repeat steps 1–5 for the <strong>RPS</strong> sheet using the RPS script</li>
+              <li>Click the <strong>⏱ Triggers</strong> icon → <strong>+ Add Trigger</strong> · function = <code className="bg-slate-100 px-1 rounded">onEditInstallable</code> · event = <strong>On edit</strong> → <strong>Save</strong></li>
+              <li>Repeat steps 1–4 for the <strong>RPS</strong> sheet using the RPS script</li>
+              <li>Repeat steps 1–4 for the <strong>Master MIS</strong> sheet using the Master MIS script</li>
             </ol>
           </div>
         </div>
