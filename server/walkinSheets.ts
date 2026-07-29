@@ -448,6 +448,22 @@ export const YELLOW_PROTECTION_DESCRIPTION =
 export const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10] as const;
 
 /**
+ * Description stamped on every Master-sheet read-only protection we own.
+ * Master cols A–L (0-based 0–11) are auto-populated by the sync system and
+ * must not be overwritten by sheet editors.  Green cols M–R (12–17) remain
+ * editable so MIS staff can update Status, Dates, and Remarks.
+ */
+export const MASTER_YELLOW_PROTECTION_DESCRIPTION =
+  "Master read-only columns (A–L) — protected by sync";
+
+/**
+ * All 12 0-based column indices in the Master sheet that are sync-managed
+ * (Brand, Unique ID, Date, Time, Student Name, Father/Mother Name, GRADE,
+ * Academic Year, Contact No, Email, Counsellor Name, Source).
+ */
+export const MASTER_YELLOW_COL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
+
+/**
  * Canonical allowed Status values — used both for sheet dropdowns and pull
  * validation.  Keep in sync with the walkin_statuses seed data.
  */
@@ -508,6 +524,45 @@ const buildSourceDropdownRequest = (tabSheetId: number, colIndex: number) =>
 /**
  * Pure helper — exported for unit-testing only.
  *
+ * Builds batchUpdate requests for a generic set of column protections:
+ *   1. Deletes any existing protections whose description exactly matches
+ *      `description` (prevents duplicates on repeated resyncs).
+ *   2. Adds fresh warningOnly protections for each column in `colIndices`.
+ *
+ * Protections with a different description are left untouched.
+ */
+export function buildColumnProtectionRequests(
+  tabSheetId: number,
+  existingProtections: Array<{ protectedRangeId: number; description?: string }>,
+  description: string,
+  colIndices: readonly number[],
+): object[] {
+  const deleteRequests = existingProtections
+    .filter((p) => p.description === description)
+    .map((p) => ({
+      deleteProtectedRange: { protectedRangeId: p.protectedRangeId },
+    }));
+
+  const addRequests = colIndices.map((colIndex) => ({
+    addProtectedRange: {
+      protectedRange: {
+        range: {
+          sheetId: tabSheetId,
+          startColumnIndex: colIndex,
+          endColumnIndex: colIndex + 1,
+        },
+        description,
+        warningOnly: true, // shows a caution dialog; does not block saves
+      },
+    },
+  }));
+
+  return [...deleteRequests, ...addRequests];
+}
+
+/**
+ * Pure helper — exported for unit-testing only.
+ *
  * Given the numeric sheetId of the WALKINs tab and whatever protected ranges
  * the Sheets API already reports for that tab, returns the ordered list of
  * batchUpdate requests that will:
@@ -517,31 +572,30 @@ const buildSourceDropdownRequest = (tabSheetId: number, colIndex: number) =>
  *
  * Protections whose description does NOT match are left untouched.
  */
+/** Convenience wrapper — delegates to buildColumnProtectionRequests. */
 export function buildYellowProtectionRequests(
   tabSheetId: number,
   existingProtections: Array<{ protectedRangeId: number; description?: string }>,
 ): object[] {
-  const deleteRequests = existingProtections
-    .filter((p) => p.description === YELLOW_PROTECTION_DESCRIPTION)
-    .map((p) => ({
-      deleteProtectedRange: { protectedRangeId: p.protectedRangeId },
-    }));
+  return buildColumnProtectionRequests(
+    tabSheetId,
+    existingProtections,
+    YELLOW_PROTECTION_DESCRIPTION,
+    YELLOW_COL_INDICES,
+  );
+}
 
-  const addRequests = YELLOW_COL_INDICES.map((colIndex) => ({
-    addProtectedRange: {
-      protectedRange: {
-        range: {
-          sheetId: tabSheetId,
-          startColumnIndex: colIndex,
-          endColumnIndex: colIndex + 1,
-        },
-        description: YELLOW_PROTECTION_DESCRIPTION,
-        warningOnly: true, // shows a caution dialog; does not block saves
-      },
-    },
-  }));
-
-  return [...deleteRequests, ...addRequests];
+/** Build warningOnly protection requests for Master cols A–L (indices 0–11). */
+export function buildMasterYellowProtectionRequests(
+  tabSheetId: number,
+  existingProtections: Array<{ protectedRangeId: number; description?: string }>,
+): object[] {
+  return buildColumnProtectionRequests(
+    tabSheetId,
+    existingProtections,
+    MASTER_YELLOW_PROTECTION_DESCRIPTION,
+    MASTER_YELLOW_COL_INDICES,
+  );
 }
 
 async function applyYellowColumnProtection(
@@ -574,6 +628,43 @@ async function applyYellowColumnProtection(
 
   console.log(
     `[walkin/sheets] Yellow-column protections + Status dropdown applied on tab "${LEADS_TAB}"`,
+  );
+}
+
+/**
+ * Apply warningOnly protections on Master cols A–L (indices 0–11).
+ * Green cols M–R (12–17) are intentionally left unprotected so MIS staff can
+ * continue editing Status, Dates, and Remarks directly in the sheet.
+ * Non-fatal — a failure here does not abort the resync.
+ */
+async function applyMasterYellowColumnProtection(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+): Promise<void> {
+  const meta = await sheets.spreadsheets.get({ spreadsheetId });
+  const tab = (meta.data.sheets ?? []).find(
+    (s: any) => s.properties?.title === MASTER_LEADS_TAB,
+  );
+  if (!tab) {
+    console.warn(`[walkin/sheets] Master tab "${MASTER_LEADS_TAB}" not found — skipping protection`);
+    return;
+  }
+  const tabSheetId: number = tab.properties!.sheetId!;
+  const existingProtections: any[] = tab.protectedRanges ?? [];
+
+  const requests = [
+    ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
+    buildStatusDropdownRequest(tabSheetId, 12), // col M = Status
+    buildSourceDropdownRequest(tabSheetId, 11), // col L = Source
+  ];
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: { requests },
+  });
+
+  console.log(
+    `[walkin/sheets] Master A–L protections + Status/Source dropdowns applied on tab "${MASTER_LEADS_TAB}"`,
   );
 }
 
@@ -711,27 +802,11 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
     });
   }
 
-  // Apply Status (col M=12) + Source (col L=11) dropdowns on Master — non-fatal
+  // 6. Protect Master cols A–L (read-only) + Status/Source dropdowns — non-fatal
   try {
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
-    const tab = (meta.data.sheets ?? []).find(
-      (s: any) => s.properties?.title === MASTER_LEADS_TAB,
-    );
-    if (tab) {
-      const tabSheetId: number = tab.properties!.sheetId!;
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: sheetId,
-        requestBody: {
-          requests: [
-            buildStatusDropdownRequest(tabSheetId, 12), // col M = Status
-            buildSourceDropdownRequest(tabSheetId, 11), // col L = Source
-          ],
-        },
-      });
-      console.log(`[walkin/sheets] Status + Source dropdowns applied on Master tab`);
-    }
+    await applyMasterYellowColumnProtection(sheets, sheetId);
   } catch (err: any) {
-    console.warn(`[walkin/sheets] Master dropdowns failed:`, err?.message);
+    console.warn(`[walkin/sheets] Could not apply Master column protections:`, err?.message);
   }
 
   syncStatus.MASTER.lastSyncAt = new Date();

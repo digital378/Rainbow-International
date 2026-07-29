@@ -1225,6 +1225,21 @@ function onEditInstallable(e) {
               <li>Repeat steps 1–4 for the <strong>Master MIS</strong> sheet using the Master MIS script</li>
             </ol>
           </div>
+
+          {/* Master sheet permissions note */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-900">
+            <strong>Master MIS sheet permissions</strong>
+            <p className="mt-1 text-blue-800">
+              Columns A–L are auto-populated by the sync system and are protected with a warning prompt on every resync.
+              Green columns M–R (Status, Dates, Remarks) remain editable for MIS staff.
+            </p>
+            <p className="mt-2 text-blue-800">
+              To restrict who can edit the Master sheet at all, open the sheet → <strong>Share</strong> and set
+              branch counsellors to <strong>Viewer</strong> so they cannot accidentally change the Master.
+              Only the MIS team (who updates Status/Remarks) should have <strong>Editor</strong> access.
+              RIS and RPS branch sheets should be shared as <strong>Editor</strong> with their respective branch staff.
+            </p>
+          </div>
         </div>
       )}
     </div>
