@@ -488,6 +488,18 @@ export const ALLOWED_SOURCES = [
   "Ex-Rainbow Parent",
 ] as const;
 
+/** Canonical close-reason values — keep in sync with walkin_close_reasons seed data. */
+export const ALLOWED_CLOSE_REASONS = [
+  "Location",
+  "adm done - other school",
+  "High Fees",
+  "Not Interested",
+  "Continuing in same school",
+  "Board Issue",
+  "Transfer",
+  "Autism",
+] as const;
+
 /** Build a setDataValidation request for a dropdown on rows 2-1000. */
 function buildDropdownRequest(
   tabSheetId: number,
@@ -520,6 +532,9 @@ const buildStatusDropdownRequest = (tabSheetId: number, colIndex: number) =>
 
 const buildSourceDropdownRequest = (tabSheetId: number, colIndex: number) =>
   buildDropdownRequest(tabSheetId, colIndex, ALLOWED_SOURCES);
+
+const buildCloseReasonDropdownRequest = (tabSheetId: number, colIndex: number) =>
+  buildDropdownRequest(tabSheetId, colIndex, ALLOWED_CLOSE_REASONS);
 
 /**
  * Pure helper — exported for unit-testing only.
@@ -614,11 +629,12 @@ async function applyYellowColumnProtection(
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
 
-  // 2. Build requests: yellow-column protections + Status (col L) + Source (col K) dropdowns
+  // 2. Build requests: yellow-column protections + Status (col L) + Source (col K) + Close Reason (col O) dropdowns
   const requests = [
     ...buildYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 11), // column L = Status
-    buildSourceDropdownRequest(tabSheetId, 10), // column K = Source
+    buildStatusDropdownRequest(tabSheetId, 11),       // col L = Status
+    buildSourceDropdownRequest(tabSheetId, 10),       // col K = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 14),  // col O = Reason for Closed
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -654,8 +670,9 @@ async function applyMasterYellowColumnProtection(
 
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 12), // col M = Status
-    buildSourceDropdownRequest(tabSheetId, 11), // col L = Source
+    buildStatusDropdownRequest(tabSheetId, 12),       // col M = Status
+    buildSourceDropdownRequest(tabSheetId, 11),       // col L = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 15),  // col P = Reason for Closed
   ];
 
   await sheets.spreadsheets.batchUpdate({
