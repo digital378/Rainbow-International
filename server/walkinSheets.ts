@@ -121,6 +121,41 @@ function getSheetId(brand: "RIS" | "RPS"): string | null {
   return null;
 }
 
+// ── Ensure tab exists (creates it with header row on first use) ───
+// Returns true if the tab was just created (caller may want to skip the clear step).
+async function ensureLeadsTab(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tabName: string,
+  headers: readonly string[],
+): Promise<boolean> {
+  const meta = await sheets.spreadsheets.get({ spreadsheetId });
+  const exists = (meta.data.sheets ?? []).some(
+    (s: any) => s.properties?.title === tabName,
+  );
+
+  if (exists) return false;
+
+  // Create the tab
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [{ addSheet: { properties: { title: tabName } } }],
+    },
+  });
+
+  // Write the header row immediately so the tab is never empty
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${tabName}!A1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [headers as unknown as string[]] },
+  });
+
+  console.log(`[walkin/sheets] Created tab "${tabName}" and wrote header row`);
+  return true; // caller should skip the data-clear step
+}
+
 // ── Branch name cache (short-lived, 5-min TTL) ────────────────────
 const branchCache: Map<number, { name: string; exp: number }> = new Map();
 
@@ -210,6 +245,9 @@ export async function upsertLeadToSheet(
   // Lead ID column is R = index 17
   const leadIdColLetter = "R";
 
+  // Ensure the WALKINs tab exists (creates it with header row on first use)
+  await ensureLeadsTab(sheets, sheetId, LEADS_TAB, SHEET_HEADERS);
+
   async function doUpsert(retried = false): Promise<void> {
     try {
       // Read the Lead ID column to find any existing row for this lead
@@ -292,6 +330,9 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
   const brandRow = await leadToRow(lead);
   const row = [lead.brand, ...brandRow];             // Brand in col A, rest follow
   const leadIdColLetter = "S";                        // Column S = index 18
+
+  // Ensure the WALKINs tab exists in the master sheet
+  await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
 
   async function doUpsert(retried = false): Promise<void> {
     try {
@@ -417,23 +458,29 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   // 2. Serialise all rows
   const dataRows = await Promise.all(leads.map(leadToRow));
 
-  // 3. Clear data rows (A2:end), preserving the header row
-  try {
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!A2:Z`,
-    });
-  } catch (err: any) {
-    console.warn(`[walkin/sheets] Clear failed for ${brand} (may be first-time setup):`, err?.message);
-  }
+  // 3. Ensure the WALKINs tab exists (creates it with header on first run).
+  //    If it was just created, skip the clear — there is nothing to clear.
+  const tabWasCreated = await ensureLeadsTab(sheets, sheetId, LEADS_TAB, SHEET_HEADERS);
 
-  // 4. (Re-)write header row
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId,
-    range: `${LEADS_TAB}!A1`,
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [SHEET_HEADERS as unknown as string[]] },
-  });
+  if (!tabWasCreated) {
+    // 3a. Clear existing data rows (A2:end), preserving the header row
+    try {
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: sheetId,
+        range: `${LEADS_TAB}!A2:Z`,
+      });
+    } catch (err: any) {
+      console.warn(`[walkin/sheets] Clear failed for ${brand}:`, err?.message);
+    }
+
+    // 3b. Re-write header row (ensures it's always up to date)
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${LEADS_TAB}!A1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [SHEET_HEADERS as unknown as string[]] },
+    });
+  }
 
   // 5. Batch-append data rows (only if there are leads)
   if (dataRows.length > 0) {
@@ -490,21 +537,27 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
     leads.map(async (l) => [l.brand, ...(await leadToRow(l))])
   );
 
-  // 3. Clear data rows
-  try {
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2:Z`,
-    });
-  } catch (err: any) {
-    console.warn("[walkin/sheets] Master clear failed (may be first-time setup):", err?.message);
-  }
+  // 3. Ensure the WALKINs tab exists in the master sheet.
+  //    If it was just created, skip the clear — the tab is already empty.
+  const masterTabWasCreated = await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
 
-  // 4. Write header row
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A1`,
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [MASTER_SHEET_HEADERS as unknown as string[]] },
-  });
+  if (!masterTabWasCreated) {
+    // Clear data rows
+    try {
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2:Z`,
+      });
+    } catch (err: any) {
+      console.warn("[walkin/sheets] Master clear failed:", err?.message);
+    }
+
+    // Re-write header row (ensures it stays current)
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [MASTER_SHEET_HEADERS as unknown as string[]] },
+    });
+  }
 
   // 5. Batch-append data rows
   if (dataRows.length > 0) {
