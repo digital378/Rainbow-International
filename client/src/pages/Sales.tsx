@@ -114,7 +114,8 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }} data-testid="passcode-gate">
       <form onSubmit={submit} className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-amber-400" style={{ animation: error ? "shake 0.4s" : undefined }}>
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-base">RIS</div>
+          <img src="/images/ris-logo-2.png" alt="Rainbow International School"
+            style={{ height: 48, width: "auto", flexShrink: 0 }} />
           <div>
             <div className="font-black text-lg leading-tight text-[#091a4f]">Sales Dashboard</div>
             <div className="text-xs text-slate-500">Internal · Passcode required</div>
@@ -253,7 +254,8 @@ function SalesDashboard() {
       {/* Top bar */}
       <div className="text-white py-4 px-6 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-sm">RIS</div>
+          <img src="/images/ris-logo-2.png" alt="Rainbow International School"
+            style={{ height: 40, width: "auto", flexShrink: 0 }} />
           <div>
             <div className="font-black text-lg leading-tight tracking-tight">Sales Performance Dashboard</div>
             <div className="text-xs text-blue-200">Walkin Enquiries 2026-27 · Internal Use Only</div>

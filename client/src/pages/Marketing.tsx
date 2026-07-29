@@ -187,7 +187,8 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
         style={{ animation: error ? "shake 0.4s" : undefined }}
       >
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-base">RIS</div>
+          <img src="/images/rainbow-group-logo-2.jpg" alt="Rainbow Group of Companies"
+            style={{ height: 48, width: "auto", borderRadius: 8, flexShrink: 0 }} />
           <div>
             <div className="font-black text-lg leading-tight text-[#091a4f]">Marketing Dashboard</div>
             <div className="text-xs text-slate-500">Internal · Passcode required</div>
@@ -718,7 +719,8 @@ function MarketingDashboard() {
       {/* ─── Top Bar ─── */}
       <div className="text-white py-4 px-6 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-sm">RIS</div>
+          <img src="/images/rainbow-group-logo-2.jpg" alt="Rainbow Group of Companies"
+            style={{ height: 40, width: "auto", borderRadius: 6, flexShrink: 0 }} />
           <div>
             <div className="font-black text-lg leading-tight tracking-tight">Marketing Performance Dashboard</div>
             <div className="text-xs text-blue-200">Rainbow International School &amp; Preschool — Internal Use Only</div>

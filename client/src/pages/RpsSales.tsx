@@ -91,7 +91,8 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }}>
       <form onSubmit={submit} className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-amber-400">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-md bg-amber-400 flex items-center justify-center text-[#091a4f] font-black text-base">RPS</div>
+          <img src="/images/rps-logo-2.png" alt="Rainbow Pre-School International"
+            style={{ height: 48, width: "auto", flexShrink: 0 }} />
           <div><div className="font-black text-lg leading-tight text-[#091a4f]">RPS Sales Dashboard</div><div className="text-xs text-slate-500">Internal · Passcode required</div></div>
         </div>
         <label className="block text-sm font-semibold text-slate-700 mb-2">Enter passcode</label>
@@ -360,7 +361,8 @@ function RpsDashboard() {
       <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)" }} className="px-6 py-5 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-red-700 font-black text-sm shadow-sm">RPS</div>
+            <img src="/images/rps-logo-2.png" alt="Rainbow Pre-School International"
+              style={{ height: 40, width: "auto", borderRadius: 8, flexShrink: 0 }} />
             <div>
               <div className="text-white font-black text-lg leading-tight">RPS Sales Dashboard</div>
               <div className="text-red-100 text-xs">Rainbow Preschool · 26-27 Academic Year · v2.4</div>
