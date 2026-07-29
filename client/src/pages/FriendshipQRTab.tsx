@@ -301,6 +301,12 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
       );
       const win = window.open("", "_blank");
       if (!win) { setPrintGenerating(false); return; }
+      // Embed the logo as a data URL so it works in the detached print window
+      const logoResp = await fetch("/images/ris-logo.png");
+      const logoBlob = await logoResp.blob();
+      const logoDataUrl = await new Promise<string>(res => {
+        const fr = new FileReader(); fr.onload = () => res(fr.result as string); fr.readAsDataURL(logoBlob);
+      });
       win.document.write(`<!DOCTYPE html>
 <html>
 <head>
@@ -313,49 +319,65 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     .sub{text-align:center;color:#64748b;font-size:12px;margin-bottom:20px}
     .controls{text-align:center;margin-bottom:20px}
     .btn{padding:10px 28px;background:#091a4f;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:800px;margin:0 auto}
-    .card{background:#fff;border-radius:16px;overflow:hidden;break-inside:avoid}
-    .stripe{height:6px;background:#f59e0b}
-    .hdr{background:#091a4f;padding:14px;text-align:center}
-    .badge{display:inline-block;width:36px;height:36px;background:#f59e0b;color:#091a4f;font-weight:900;font-size:10px;border-radius:8px;line-height:36px;margin-bottom:7px}
-    .hdr-title{color:#fff;font-weight:900;font-size:12px}
-    .hdr-sub{color:#bfdbfe;font-size:10px;margin-top:3px}
-    .body{padding:14px;text-align:center}
-    .scan-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#091a4f;margin-bottom:10px}
-    .body img{width:150px;height:150px;border-radius:8px}
-    .school-box{background:#f0f4ff;border-radius:10px;padding:9px 12px;margin-top:11px}
-    .slabel{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
-    .sname{font-size:14px;font-weight:900;color:#091a4f;margin-top:2px;line-height:1.2}
-    .scontact{font-size:10px;color:#64748b;margin-top:3px}
-    .url{margin-top:9px;font-size:8px;color:#94a3b8;word-break:break-all}
+    /* A5 grid: one card per page on print, 2-up for screen preview */
+    .grid{display:grid;grid-template-columns:repeat(2,148mm);gap:18px;justify-content:center;margin:0 auto}
+    .card{width:148mm;min-height:210mm;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+    .stripe{height:8px;background:#091a4f;flex-shrink:0}
+    .hdr{background:linear-gradient(160deg,#ffffff 0%,#f0f4fb 60%,#e4ecf8 100%);padding:20px 24px 18px;text-align:center;flex-shrink:0;border-bottom:1px solid #dce6f0}
+    .logo-pill{display:inline-flex;align-items:center;justify-content:center;background:#091a4f;border-radius:12px;padding:8px 14px;margin-bottom:10px}
+    .logo-pill img{height:44px;width:auto;display:block}
+    .hdr-title{color:#091a4f;font-weight:900;font-size:13px;line-height:1.3}
+    .hdr-sub{color:#5a7aa0;font-size:10px;margin-top:3px}
+    .body{padding:16px 20px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff}
+    .scan-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#091a4f;margin-bottom:12px}
+    .qr-wrap{background:#f0f4fb;border-radius:12px;padding:8px;display:inline-block}
+    .qr-wrap img{width:160px;height:160px;border-radius:6px;display:block}
+    .school-box{background:#f0f4fb;border:1px solid #dce6f0;border-radius:12px;padding:10px 14px;margin-top:14px;width:100%}
+    .slabel{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#5a7aa0}
+    .sname{font-size:15px;font-weight:900;color:#091a4f;margin-top:3px;line-height:1.2}
+    .scontact{font-size:10px;color:#5a7aa0;margin-top:3px}
+    .how{margin-top:14px;width:100%;text-align:left}
+    .how-title{font-size:9px;font-weight:700;color:#5a7aa0;margin-bottom:5px}
+    .how ol{font-size:9px;color:#64748b;padding-left:14px;line-height:1.6}
+    .url{margin-top:12px;font-size:7px;color:#94a3b8;word-break:break-all;text-align:center;line-height:1.4}
     @media print{
+      @page{size:A5 portrait;margin:0}
       body{background:#fff;padding:0}
       .controls{display:none}
-      .grid{gap:10px;max-width:none}
-      .card{box-shadow:none}
+      .grid{display:block}
+      .card{width:148mm;min-height:210mm;border-radius:0;box-shadow:none;page-break-after:always;break-after:page}
+      .card:last-child{page-break-after:avoid;break-after:avoid}
     }
   </style>
 </head>
 <body>
   <h1>Friendship School QR Codes</h1>
   <p class="sub">Rainbow International School · Strategic Alliances · ${schoolsToPrint.length} school${schoolsToPrint.length !== 1 ? "s" : ""}</p>
-  <div class="controls"><button class="btn" onclick="window.print()">🖨️ Print All</button></div>
+  <div class="controls"><button class="btn" onclick="window.print()">🖨️ Print All (A5)</button></div>
   <div class="grid">
     ${qrEntries.map(({ school, url, dataUrl }) => `
     <div class="card">
       <div class="stripe"></div>
       <div class="hdr">
-        <div class="badge">RIS</div>
+        <div class="logo-pill"><img src="${logoDataUrl}" alt="RIS" /></div>
         <div class="hdr-title">Rainbow International School</div>
         <div class="hdr-sub">Alliances Portal</div>
       </div>
       <div class="body">
         <div class="scan-label">Scan to Submit Student Details</div>
-        <img src="${dataUrl}" alt="QR for ${school.name.replace(/"/g, "&quot;")}" />
+        <div class="qr-wrap"><img src="${dataUrl}" alt="QR for ${school.name.replace(/"/g, "&quot;")}" /></div>
         <div class="school-box">
           <div class="slabel">Friendship School</div>
           <div class="sname">${school.name.replace(/</g, "&lt;")}</div>
           ${school.contactPerson && school.contactPerson !== "—" ? `<div class="scontact">Contact: ${school.contactPerson.replace(/</g, "&lt;")}</div>` : ""}
+        </div>
+        <div class="how">
+          <div class="how-title">How to submit:</div>
+          <ol>
+            <li>Scan the QR code with your phone camera</li>
+            <li>Fill in student details or upload an Excel sheet</li>
+            <li>Tap submit — data is recorded securely ✓</li>
+          </ol>
         </div>
         <div class="url">${url}</div>
       </div>
@@ -392,13 +414,6 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
           <StatCard label="Admissions" value={stats.admissions} color={GREEN} />
         </div>
       )}
-
-      {/* Action bar */}
-      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-        <div className="font-bold text-slate-700 text-sm">
-          {loading ? "Loading…" : `${schools.length} Friendship School${schools.length !== 1 ? "s" : ""}`}
-        </div>
-      </div>
 
       {/* Search + sort + print bar */}
       <div className="flex gap-2 mb-4 flex-wrap">

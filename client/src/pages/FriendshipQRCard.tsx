@@ -3,7 +3,6 @@ import { useParams } from "wouter";
 import QRCode from "qrcode";
 
 const NAVY = "#091a4f";
-const AMBER = "#f59e0b";
 
 type School = { id: number; name: string; contactPerson: string; isActive: boolean };
 
@@ -32,7 +31,6 @@ export default function FriendshipQRCard() {
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
 
-    // Prefer URL params (passed by the caller) — avoids needing auth in the new tab.
     const params = new URLSearchParams(window.location.search);
     const nameParam  = params.get("name");
     const tokenParam = params.get("token");
@@ -43,7 +41,6 @@ export default function FriendshipQRCard() {
       return;
     }
 
-    // Fallback: fetch from API (requires admin auth via cookie or Bearer token)
     const adminToken = getToken();
     fetch(`/api/admin/alliances/friendship/schools/${id}`, {
       headers: adminToken ? { Authorization: `Bearer ${adminToken}` } : {},
@@ -60,7 +57,7 @@ export default function FriendshipQRCard() {
   useEffect(() => {
     if (!portalUrl) return;
     QRCode.toDataURL(portalUrl, {
-      width: 400, margin: 2,
+      width: 500, margin: 2,
       color: { dark: NAVY, light: "#ffffff" },
       errorCorrectionLevel: "H",
     }).then(url => setQrDataUrl(url));
@@ -83,7 +80,8 @@ export default function FriendshipQRCard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start py-8 px-4" style={{ background: "#f1f5f9" }}>
+    <div className="min-h-screen flex flex-col items-center justify-start py-8 px-4 print:py-0 print:px-0 print:bg-white" style={{ background: "#f1f5f9" }}>
+      {/* Controls — hidden on print */}
       <div className="mb-6 flex gap-3 print:hidden">
         <button onClick={() => window.print()}
           className="px-6 py-2.5 rounded-lg text-white font-bold shadow-md hover:opacity-90 transition"
@@ -95,47 +93,115 @@ export default function FriendshipQRCard() {
         </a>
       </div>
 
-      <div id="qr-card" className="bg-white rounded-3xl shadow-2xl overflow-hidden" style={{ width: 360, fontFamily: "Inter, sans-serif" }} data-testid="qr-card">
-        <div className="h-2" style={{ background: AMBER }} />
+      {/* A5 card — 148 mm wide, designed to fill A5 page on print */}
+      <div
+        id="qr-card"
+        className="overflow-hidden shadow-2xl print:shadow-none"
+        style={{
+          width: "148mm",
+          minHeight: "210mm",
+          fontFamily: "Inter, sans-serif",
+          borderRadius: "20px",
+          display: "flex",
+          flexDirection: "column",
+          boxSizing: "border-box",
+        }}
+        data-testid="qr-card"
+      >
+        {/* Top navy stripe */}
+        <div style={{ height: 8, background: NAVY, flexShrink: 0 }} />
 
-        <div className="px-6 pt-5 pb-4 text-center" style={{ background: NAVY }}>
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl font-black text-base mb-3" style={{ background: AMBER, color: NAVY }}>RIS</div>
-          <div className="text-white font-black text-base leading-tight">Rainbow International School</div>
-          <div className="text-blue-200 text-xs mt-1">Alliances Portal</div>
+        {/* Header — white / powder-blue gradient */}
+        <div
+          className="text-center px-8 pt-7 pb-6"
+          style={{ background: "linear-gradient(160deg, #ffffff 0%, #f0f4fb 60%, #e4ecf8 100%)", flexShrink: 0 }}
+        >
+          {/* Logo in a navy pill so the black logo bg blends cleanly */}
+          <div
+            className="inline-flex items-center justify-center mx-auto mb-4"
+            style={{ background: NAVY, borderRadius: 16, padding: "10px 18px" }}
+          >
+            <img
+              src="/images/ris-logo.png"
+              alt="Rainbow International School"
+              style={{ height: 56, width: "auto", display: "block" }}
+            />
+          </div>
+          <div className="font-black text-lg leading-snug" style={{ color: NAVY }}>
+            Rainbow International School
+          </div>
+          <div className="text-sm mt-1" style={{ color: "#5a7aa0" }}>Alliances Portal</div>
         </div>
 
-        <div className="px-6 py-6 text-center">
-          <div className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: NAVY }}>Scan to Submit Student Details</div>
-          <div className="flex justify-center">
-            <img src={qrDataUrl} alt={`QR code for ${school.name}`} style={{ width: 200, height: 200 }} className="rounded-xl" />
+        {/* Divider */}
+        <div style={{ height: 1, background: "#dce6f0", flexShrink: 0 }} />
+
+        {/* Body */}
+        <div className="px-8 py-7 text-center flex-1 flex flex-col items-center justify-center" style={{ background: "#ffffff" }}>
+          <div
+            className="text-xs font-black uppercase tracking-widest mb-5"
+            style={{ color: NAVY, letterSpacing: "0.13em" }}
+          >
+            Scan to Submit Student Details
           </div>
 
-          <div className="mt-5 px-4 py-3 rounded-2xl" style={{ background: "#f0f4ff" }}>
-            <div className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#64748b" }}>Friendship School</div>
-            <div className="text-xl font-black leading-tight" style={{ color: NAVY }}>{school.name}</div>
-            <div className="text-xs text-slate-500 mt-1">Contact: {school.contactPerson}</div>
+          {/* QR code */}
+          <div style={{ padding: 10, background: "#f0f4fb", borderRadius: 16, display: "inline-block" }}>
+            <img
+              src={qrDataUrl}
+              alt={`QR code for ${school.name}`}
+              style={{ width: 220, height: 220, display: "block", borderRadius: 8 }}
+            />
           </div>
 
-          <div className="mt-4 text-xs text-slate-500 leading-relaxed">
-            <div className="font-semibold text-slate-600 mb-1">How to submit:</div>
-            <ol className="text-left space-y-1 pl-4">
+          {/* School box */}
+          <div
+            className="mt-7 w-full rounded-2xl px-5 py-4 text-center"
+            style={{ background: "#f0f4fb", border: "1px solid #dce6f0" }}
+          >
+            <div
+              className="text-xs font-black uppercase tracking-widest mb-1"
+              style={{ color: "#5a7aa0", letterSpacing: "0.12em" }}
+            >
+              Friendship School
+            </div>
+            <div className="font-black text-xl leading-tight" style={{ color: NAVY }}>{school.name}</div>
+            {school.contactPerson && (
+              <div className="text-sm mt-1" style={{ color: "#5a7aa0" }}>Contact: {school.contactPerson}</div>
+            )}
+          </div>
+
+          {/* How to submit */}
+          <div className="mt-6 w-full text-left">
+            <div className="text-xs font-bold mb-2" style={{ color: "#5a7aa0" }}>How to submit:</div>
+            <ol className="text-xs space-y-1.5" style={{ color: "#64748b", paddingLeft: 16 }}>
               <li>1. Scan the QR code with your phone camera</li>
               <li>2. Fill in student details or upload an Excel sheet</li>
               <li>3. Tap submit — data is recorded securely ✓</li>
             </ol>
           </div>
+
+          {/* Portal URL */}
+          <div
+            className="mt-5 w-full text-center"
+            style={{ fontSize: 9, color: "#94a3b8", wordBreak: "break-all", lineHeight: 1.4 }}
+          >
+            {portalUrl}
+          </div>
         </div>
-        <div className="h-2" style={{ background: AMBER }} />
+
+        {/* Bottom navy stripe */}
+        <div style={{ height: 8, background: NAVY, flexShrink: 0 }} />
       </div>
 
-      {/* Copyable portal link — for sharing to desktop */}
-      <div className="mt-5 w-full print:hidden" style={{ maxWidth: 360 }}>
+      {/* Copy link — hidden on print */}
+      <div className="mt-5 w-full print:hidden" style={{ maxWidth: "148mm" }}>
         <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 text-center">Share Portal Link (for Desktop)</div>
         <div className="bg-white rounded-xl border border-slate-200 px-3 py-2.5 flex items-center gap-2 shadow-sm">
           <code className="text-xs text-slate-600 flex-1 truncate select-all" data-testid="text-portal-url">{portalUrl}</code>
           <button onClick={copyLink}
             className="flex-shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg transition"
-            style={{ background: copied ? "#dcfce7" : AMBER + "20", color: copied ? "#059669" : "#92400e" }}
+            style={{ background: copied ? "#dcfce7" : "#f0f4ff", color: copied ? "#059669" : NAVY }}
             data-testid="button-copy-link">
             {copied ? "✓ Copied!" : "Copy"}
           </button>
@@ -147,9 +213,20 @@ export default function FriendshipQRCard() {
 
       <style>{`
         @media print {
+          @page { size: A5 portrait; margin: 0; }
           body { margin: 0; background: white; }
-          #qr-card { box-shadow: none; border-radius: 0; width: 100%; }
+          #qr-card {
+            width: 148mm !important;
+            min-height: 210mm !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            page-break-after: avoid;
+          }
           .print\\:hidden { display: none !important; }
+          .print\\:py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
+          .print\\:px-0 { padding-left: 0 !important; padding-right: 0 !important; }
+          .print\\:bg-white { background: white !important; }
+          .print\\:shadow-none { box-shadow: none !important; }
         }
       `}</style>
     </div>
