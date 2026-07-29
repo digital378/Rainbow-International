@@ -40,7 +40,7 @@
 
 import { google } from "googleapis";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons } from "@shared/schema";
 import { eq, and, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
@@ -836,6 +836,20 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       allowedStatuses = new Set();
     }
 
+    // Fetch the allowlist of valid close reasons from the DB once, before the loop.
+    let allowedCloseReasons: Set<string>;
+    try {
+      const closeReasonRows = await db
+        .select({ label: walkinCloseReasons.label })
+        .from(walkinCloseReasons);
+      allowedCloseReasons = new Set(closeReasonRows.map((r) => r.label));
+    } catch (e: any) {
+      // If the lookup fails, block all close-reason changes to avoid writing
+      // unvalidated values — surface the error in the pull log.
+      entry.errors.push(`Failed to load allowed close reasons — close-reason changes skipped: ${e?.message}`);
+      allowedCloseReasons = new Set();
+    }
+
     // Collect rows that need propagating to Master after the main loop
     const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
 
@@ -884,7 +898,18 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       }
       check("walkInDate",          existing.walkInDate,          sheetWalkInDate);
       check("remark",              existing.remark,              sheetRemark || null);
-      check("closeReason",         existing.closeReason,         sheetCloseReason || null);
+      if (sheetCloseReason) {
+        if (allowedCloseReasons.size > 0 && !allowedCloseReasons.has(sheetCloseReason)) {
+          // Invalid close reason from sheet — skip and surface in pull log.
+          entry.errors.push(
+            `Lead ${leadId}: sheet close reason "${sheetCloseReason}" is not a recognised close reason — skipped (valid values: ${[...allowedCloseReasons].join(", ")})`
+          );
+        } else {
+          check("closeReason", existing.closeReason, sheetCloseReason);
+        }
+      } else {
+        check("closeReason",       existing.closeReason,         null);
+      }
       check("revisitDate",         existing.revisitDate,         sheetRevisitDate);
       check("misCallingRemarks",   existing.misCallingRemarks,   sheetMisCalling || null);
 
@@ -1043,6 +1068,15 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       allowedStatuses = new Set();
     }
 
+    let allowedCloseReasons: Set<string>;
+    try {
+      const closeReasonRows = await db.select({ label: walkinCloseReasons.label }).from(walkinCloseReasons);
+      allowedCloseReasons = new Set(closeReasonRows.map((r) => r.label));
+    } catch (e: any) {
+      entry.errors.push(`Failed to load allowed close reasons — close-reason changes skipped: ${e?.message}`);
+      allowedCloseReasons = new Set();
+    }
+
     // Collect rows per brand to back-propagate to their brand sheets after the loop
     const pendingBrandUpdates: Record<"RIS" | "RPS", Array<{ leadId: string; greenValues: string[] }>> = {
       RIS: [],
@@ -1093,7 +1127,17 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       }
       check("walkInDate",        existing.walkInDate,        sheetWalkInDate);
       check("remark",            existing.remark,            sheetRemark || null);
-      check("closeReason",       existing.closeReason,       sheetCloseReason || null);
+      if (sheetCloseReason) {
+        if (allowedCloseReasons.size > 0 && !allowedCloseReasons.has(sheetCloseReason)) {
+          entry.errors.push(
+            `Lead ${leadId}: Master close reason "${sheetCloseReason}" is not a recognised close reason — skipped (valid values: ${[...allowedCloseReasons].join(", ")})`
+          );
+        } else {
+          check("closeReason", existing.closeReason, sheetCloseReason);
+        }
+      } else {
+        check("closeReason",     existing.closeReason,       null);
+      }
       check("revisitDate",       existing.revisitDate,       sheetRevisitDate);
       check("misCallingRemarks", existing.misCallingRemarks, sheetMisCalling || null);
 
