@@ -104,28 +104,30 @@ export async function bootstrapWalkinSequences(): Promise<void> {
 
 // ── Column layout (single source of truth) ───────────────────────
 export const SHEET_HEADERS = [
-  "Unique ID",             // A — LD-DD.MM.YYYY-{RIS|RPS}-brandSeqNum
-  "Date",                  // B
-  "Time",                  // C
-  "Student Name",          // D  ← mandatory (yellow)
-  "Father/Mother Name",    // E  ← mandatory (yellow)
-  "GRADE",                 // F  ← mandatory (yellow)
-  "Academic Year",         // G
-  "Contact No",            // H
-  "Email",                 // I
-  "Counsellor Name",       // J  ← mandatory (yellow)
-  "Source",                // K  ← mandatory (yellow)
-  "Status",                // L  ← green (branch-editable)
-  "Admission Date",        // M  ← green
-  "Follow up Remarks",     // N  ← green
-  "Reason for Closed",     // O  ← green
-  "Trial / Revisit",       // P  ← green
-  "MIS Calling Remarks",   // Q  ← green
-  "Lead ID",               // R  ← hidden; upsert key
+  "Unique ID",             // A(0)  — LD-DD.MM.YYYY-{RIS|RPS}-brandSeqNum
+  "Date",                  // B(1)
+  "Time",                  // C(2)
+  "Student Name",          // D(3)  ← mandatory (yellow)
+  "Father Name",           // E(4)  ← mandatory (yellow)
+  "Mother Name",           // F(5)  ← mandatory (yellow)
+  "GRADE",                 // G(6)  ← mandatory (yellow)
+  "Academic Year",         // H(7)
+  "Father Contact",        // I(8)
+  "Mother Contact",        // J(9)
+  "Email",                 // K(10)
+  "Counsellor Name",       // L(11) ← mandatory (yellow)
+  "Source",                // M(12) ← mandatory (yellow)
+  "Status",                // N(13) ← green (branch-editable)
+  "Admission Date",        // O(14) ← green
+  "Follow up Remarks",     // P(15) ← green
+  "Reason for Closed",     // Q(16) ← green
+  "Revisit 1 Date",        // R(17) ← green
+  "Revisit 2 Date",        // S(18) ← green
+  "Lead ID",               // T(19) ← hidden; upsert key
 ] as const;
 
 // Index of the Lead ID column (0-based) — used for row matching
-const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 17 → column R
+const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 19 → column T
 
 // Sheet tab name (must match the tab in the actual Google Sheet)
 const LEADS_TAB = "WALKINs";
@@ -254,24 +256,26 @@ export async function leadToRow(lead: WalkinLead): Promise<string[]> {
   const seqPart = lead.brandSeqNum != null ? lead.brandSeqNum : (lead as any).seqNum ?? lead.id;
   const uniqueId = `LD-${formatDateDotted(lead.enquiryDate)}-${lead.brand}-${seqPart}`;
   return [
-    uniqueId,                                   // A  Unique ID
-    formatDateDDMMYYYY(lead.enquiryDate),        // B  Date
-    formatTime12h(lead.createdAt),               // C  Time
-    lead.childName,                              // D  Student Name
-    lead.parentName,                             // E  Father/Mother Name
-    lead.program,                                // F  GRADE
-    lead.academicYear,                           // G  Academic Year
-    lead.phone,                                  // H  Contact No
-    lead.email ?? "",                            // I  Email
-    lead.leadOwner ?? "",                        // J  Counsellor Name
-    lead.source,                                 // K  Source
-    lead.status,                                 // L  Status
-    lead.walkInDate ? formatDateDDMMYYYY(lead.walkInDate) : "", // M  Admission Date
-    lead.remark ?? "",                           // N  Follow up Remarks
-    lead.closeReason ?? "",                      // O  Reason for Closed
-    lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "", // P  Trial / Revisit
-    lead.misCallingRemarks ?? "",                // Q  MIS Calling Remarks
-    String(lead.id),                             // R  Lead ID (hidden, upsert key)
+    uniqueId,                                            // A(0)  Unique ID
+    formatDateDDMMYYYY(lead.enquiryDate),                // B(1)  Date
+    formatTime12h(lead.createdAt),                       // C(2)  Time
+    lead.childName,                                      // D(3)  Student Name
+    lead.parentName,                                     // E(4)  Father Name
+    (lead as any).motherName ?? "",                      // F(5)  Mother Name
+    lead.program,                                        // G(6)  GRADE
+    lead.academicYear,                                   // H(7)  Academic Year
+    lead.phone,                                          // I(8)  Father Contact
+    lead.altPhone ?? "",                                 // J(9)  Mother Contact
+    lead.email ?? "",                                    // K(10) Email
+    lead.leadOwner ?? "",                                // L(11) Counsellor Name
+    lead.source,                                         // M(12) Source
+    lead.status,                                         // N(13) Status
+    lead.walkInDate ? formatDateDDMMYYYY(lead.walkInDate) : "", // O(14) Admission Date
+    lead.remark ?? "",                                   // P(15) Follow up Remarks
+    lead.closeReason ?? "",                              // Q(16) Reason for Closed
+    lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "", // R(17) Revisit 1 Date
+    (lead as any).revisitDate2 ? formatDateDDMMYYYY((lead as any).revisitDate2) : "", // S(18) Revisit 2 Date
+    String(lead.id),                                     // T(19) Lead ID (hidden, upsert key)
   ];
 }
 
@@ -301,8 +305,8 @@ export async function upsertLeadToSheet(
 
   const sheets = google.sheets({ version: "v4", auth });
   const row = await leadToRow(lead);
-  // Lead ID column is R = index 17
-  const leadIdColLetter = "R";
+  // Lead ID column is T = index 19
+  const leadIdColLetter = "T";
 
   // Ensure the WALKINs tab exists (creates it with header row on first use)
   await ensureLeadsTab(sheets, sheetId, LEADS_TAB, SHEET_HEADERS);
@@ -388,7 +392,7 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
   const sheets = google.sheets({ version: "v4", auth });
   const brandRow = await leadToRow(lead);
   const row = [lead.brand, ...brandRow];             // Brand in col A, rest follow
-  const leadIdColLetter = "S";                        // Column S = index 18
+  const leadIdColLetter = "U";                        // Column U = index 20
 
   // Ensure the WALKINs tab exists in the master sheet
   await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
@@ -435,33 +439,34 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
 }
 
 // ── Yellow-column protection ─────────────────────────────────────
-// Columns A, D, E, F, J, K (0-based: 0,3,4,5,9,10) are mandatory submission
-// fields and must not be overwritten by branch staff after the lead is captured.
-// This function idempotently replaces our own protections on those columns with
-// warningOnly=true guards so editors see a prompt before changing them.
+// Columns A, D, E, F, G, L, M (0-based: 0,3,4,5,6,11,12) are mandatory
+// submission fields and must not be overwritten by branch staff after lead
+// capture.  This function idempotently replaces our own protections on those
+// columns with warningOnly=true guards so editors see a prompt before
+// changing them.
 
 /** The exact description string stamped on every protection we own. */
 export const YELLOW_PROTECTION_DESCRIPTION =
   "Yellow submission columns — protected by sync";
 
-/** The six 0-based column indices that carry yellow (submission-field) protections. */
-export const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10] as const;
+/** The seven 0-based column indices that carry yellow (submission-field) protections. */
+export const YELLOW_COL_INDICES = [0, 3, 4, 5, 6, 11, 12] as const;
 
 /**
  * Description stamped on every Master-sheet read-only protection we own.
- * Master cols A–L (0-based 0–11) are auto-populated by the sync system and
- * must not be overwritten by sheet editors.  Green cols M–R (12–17) remain
+ * Master cols A–N (0-based 0–13) are auto-populated by the sync system and
+ * must not be overwritten by sheet editors.  Green cols O–T (14–19) remain
  * editable so MIS staff can update Status, Dates, and Remarks.
  */
 export const MASTER_YELLOW_PROTECTION_DESCRIPTION =
-  "Master read-only columns (A–L) — protected by sync";
+  "Master read-only columns (A–N) — protected by sync";
 
 /**
- * All 12 0-based column indices in the Master sheet that are sync-managed
- * (Brand, Unique ID, Date, Time, Student Name, Father/Mother Name, GRADE,
- * Academic Year, Contact No, Email, Counsellor Name, Source).
+ * All 14 0-based column indices in the Master sheet that are sync-managed
+ * (Brand, Unique ID, Date, Time, Student Name, Father Name, Mother Name, GRADE,
+ * Academic Year, Father Contact, Mother Contact, Email, Counsellor Name, Source).
  */
-export const MASTER_YELLOW_COL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
+export const MASTER_YELLOW_COL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const;
 
 /**
  * Canonical allowed Status values — used both for sheet dropdowns and pull
@@ -629,12 +634,12 @@ async function applyYellowColumnProtection(
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
 
-  // 2. Build requests: yellow-column protections + Status (col L) + Source (col K) + Close Reason (col O) dropdowns
+  // 2. Build requests: yellow-column protections + Status (col N) + Source (col M) + Close Reason (col Q) dropdowns
   const requests = [
     ...buildYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 11),       // col L = Status
-    buildSourceDropdownRequest(tabSheetId, 10),       // col K = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 14),  // col O = Reason for Closed
+    buildStatusDropdownRequest(tabSheetId, 13),       // col N = Status
+    buildSourceDropdownRequest(tabSheetId, 12),       // col M = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 16),  // col Q = Reason for Closed
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -670,9 +675,9 @@ async function applyMasterYellowColumnProtection(
 
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 12),       // col M = Status
-    buildSourceDropdownRequest(tabSheetId, 11),       // col L = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 15),  // col P = Reason for Closed
+    buildStatusDropdownRequest(tabSheetId, 14),       // col O = Status
+    buildSourceDropdownRequest(tabSheetId, 13),       // col N = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 17),  // col R = Reason for Closed
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -946,16 +951,16 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
 
     for (const row of dataRows) {
-      const leadId = row[17]?.trim(); // column R (index 17) = Lead ID
+      const leadId = row[19]?.trim(); // column T (index 19) = Lead ID
       if (!leadId) continue;
 
       // Green column values from sheet
-      const sheetStatus        = row[11]?.trim() ?? "";   // L
-      const sheetWalkInDate    = parseDateFromSheet(row[12] ?? ""); // M
-      const sheetRemark        = row[13]?.trim() ?? "";   // N
-      const sheetCloseReason   = row[14]?.trim() ?? "";   // O
-      const sheetRevisitDate   = parseDateFromSheet(row[15] ?? ""); // P
-      const sheetMisCalling    = row[16]?.trim() ?? "";   // Q
+      const sheetStatus        = row[13]?.trim() ?? "";              // N = Status
+      const sheetWalkInDate    = parseDateFromSheet(row[14] ?? "");  // O = Admission Date
+      const sheetRemark        = row[15]?.trim() ?? "";              // P = Follow up Remarks
+      const sheetCloseReason   = row[16]?.trim() ?? "";              // Q = Reason for Closed
+      const sheetRevisitDate   = parseDateFromSheet(row[17] ?? "");  // R = Revisit 1 Date
+      const sheetRevisitDate2  = parseDateFromSheet(row[18] ?? "");  // S = Revisit 2 Date
 
       // Fetch current DB record
       let existing: any;
@@ -1002,8 +1007,8 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       } else {
         check("closeReason",       existing.closeReason,         null);
       }
-      check("revisitDate",         existing.revisitDate,         sheetRevisitDate);
-      check("misCallingRemarks",   existing.misCallingRemarks,   sheetMisCalling || null);
+      check("revisitDate",          existing.revisitDate,          sheetRevisitDate);
+      check("revisitDate2",         (existing as any).revisitDate2, sheetRevisitDate2);
 
       if (changes.length === 0) continue;
 
@@ -1044,12 +1049,12 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         pendingMasterUpdates.push({
           leadId,
           greenValues: [
-            row[11] ?? "",  // L Status       → Master col M
-            row[12] ?? "",  // M Admission Date → Master col N
-            row[13] ?? "",  // N Follow up Remarks → Master col O
-            row[14] ?? "",  // O Reason for Closed → Master col P
-            row[15] ?? "",  // P Trial/Revisit  → Master col Q
-            row[16] ?? "",  // Q MIS Calling Remarks → Master col R
+            row[13] ?? "",  // N Status           → Master col O
+            row[14] ?? "",  // O Admission Date   → Master col P
+            row[15] ?? "",  // P Follow up Remarks → Master col Q
+            row[16] ?? "",  // Q Reason for Closed → Master col R
+            row[17] ?? "",  // R Revisit 1 Date   → Master col S
+            row[18] ?? "",  // S Revisit 2 Date   → Master col T
           ],
         });
       } catch (e: any) {
@@ -1062,10 +1067,10 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
       if (masterSheetId) {
         try {
-          // Read Lead ID column from Master (column S = index 18)
+          // Read Lead ID column from Master (column U = index 20)
           const masterIdResp = await sheets.spreadsheets.values.get({
             spreadsheetId: masterSheetId,
-            range: `${MASTER_LEADS_TAB}!S:S`,
+            range: `${MASTER_LEADS_TAB}!U:U`,
           });
           const masterIds = masterIdResp.data.values ?? [];
           const leadIdToMasterRow = new Map<string, number>();
@@ -1077,7 +1082,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
           const batchData = pendingMasterUpdates
             .filter(u => leadIdToMasterRow.has(u.leadId))
             .map(u => ({
-              range: `${MASTER_LEADS_TAB}!M${leadIdToMasterRow.get(u.leadId)}:R${leadIdToMasterRow.get(u.leadId)}`,
+              range: `${MASTER_LEADS_TAB}!O${leadIdToMasterRow.get(u.leadId)}:T${leadIdToMasterRow.get(u.leadId)}`,
               values: [u.greenValues],
             }));
 
@@ -1179,16 +1184,16 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       const brand = (row[0]?.trim() ?? "") as "RIS" | "RPS";
       if (brand !== "RIS" && brand !== "RPS") continue;
 
-      const leadId = row[18]?.trim(); // col S = Lead ID
+      const leadId = row[20]?.trim(); // col U (index 20) = Lead ID
       if (!leadId) continue;
 
-      // Green columns from Master (M–R = indices 12–17)
-      const sheetStatus      = row[12]?.trim() ?? "";              // M
-      const sheetWalkInDate  = parseDateFromSheet(row[13] ?? "");  // N Admission Date
-      const sheetRemark      = row[14]?.trim() ?? "";              // O Follow-up Remarks
-      const sheetCloseReason = row[15]?.trim() ?? "";              // P Reason for Closed
-      const sheetRevisitDate = parseDateFromSheet(row[16] ?? "");  // Q Trial/Revisit
-      const sheetMisCalling  = row[17]?.trim() ?? "";              // R MIS Calling Remarks
+      // Green columns from Master (O–T = indices 14–19)
+      const sheetStatus       = row[14]?.trim() ?? "";             // O = Status
+      const sheetWalkInDate   = parseDateFromSheet(row[15] ?? ""); // P = Admission Date
+      const sheetRemark       = row[16]?.trim() ?? "";             // Q = Follow-up Remarks
+      const sheetCloseReason  = row[17]?.trim() ?? "";             // R = Reason for Closed
+      const sheetRevisitDate  = parseDateFromSheet(row[18] ?? ""); // S = Revisit 1 Date
+      const sheetRevisitDate2 = parseDateFromSheet(row[19] ?? ""); // T = Revisit 2 Date
 
       let existing: any;
       try {
@@ -1230,8 +1235,8 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       } else {
         check("closeReason",     existing.closeReason,       null);
       }
-      check("revisitDate",       existing.revisitDate,       sheetRevisitDate);
-      check("misCallingRemarks", existing.misCallingRemarks, sheetMisCalling || null);
+      check("revisitDate",        existing.revisitDate,           sheetRevisitDate);
+      check("revisitDate2",       (existing as any).revisitDate2, sheetRevisitDate2);
 
       if (changes.length === 0) continue;
 
@@ -1255,16 +1260,16 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
           entry.changes.push({ leadId, parentName: existing.parentName ?? "", field: c.field, oldVal: c.oldVal, newVal: c.newVal });
         }
 
-        // Queue back-propagation to brand sheet (M–R → L–Q)
+        // Queue back-propagation to brand sheet (O–T → N–S)
         pendingBrandUpdates[brand].push({
           leadId,
           greenValues: [
-            row[12] ?? "",  // M Status           → brand col L
-            row[13] ?? "",  // N Admission Date    → brand col M
-            row[14] ?? "",  // O Follow-up Remarks → brand col N
-            row[15] ?? "",  // P Reason for Closed → brand col O
-            row[16] ?? "",  // Q Trial/Revisit     → brand col P
-            row[17] ?? "",  // R MIS Calling       → brand col Q
+            row[14] ?? "",  // O Status           → brand col N
+            row[15] ?? "",  // P Admission Date   → brand col O
+            row[16] ?? "",  // Q Follow-up Remarks → brand col P
+            row[17] ?? "",  // R Reason for Closed → brand col Q
+            row[18] ?? "",  // S Revisit 1 Date   → brand col R
+            row[19] ?? "",  // T Revisit 2 Date   → brand col S
           ],
         });
       } catch (e: any) {
@@ -1281,10 +1286,10 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       if (!brandSheetId) continue;
 
       try {
-        // Look up row numbers by Lead ID in brand sheet col R (index 17)
+        // Look up row numbers by Lead ID in brand sheet col T (index 19)
         const idResp = await sheets.spreadsheets.values.get({
           spreadsheetId: brandSheetId,
-          range: `${LEADS_TAB}!R:R`,
+          range: `${LEADS_TAB}!T:T`,
         });
         const idRows = idResp.data.values ?? [];
         const leadIdToRow = new Map<string, number>();
@@ -1296,7 +1301,7 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
         const batchData = updates
           .filter((u) => leadIdToRow.has(u.leadId))
           .map((u) => ({
-            range: `${LEADS_TAB}!L${leadIdToRow.get(u.leadId)}:Q${leadIdToRow.get(u.leadId)}`,
+            range: `${LEADS_TAB}!N${leadIdToRow.get(u.leadId)}:S${leadIdToRow.get(u.leadId)}`,
             values: [u.greenValues],
           }));
 
@@ -1352,10 +1357,10 @@ export async function syncDeletionsFromMaster(): Promise<{
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read just the Lead ID column from Master (col S = index 18)
+    // Read just the Lead ID column from Master (col U = index 20)
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheetId,
-      range: `${MASTER_LEADS_TAB}!S:S`,
+      range: `${MASTER_LEADS_TAB}!U:U`,
     });
 
     const rows = resp.data.values ?? [];
@@ -1443,10 +1448,10 @@ export async function removeLeadFromSheet(
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read Lead ID column (R) to locate the row
+    // Read Lead ID column (T = index 19) to locate the row
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!R:R`,
+      range: `${LEADS_TAB}!T:T`,
     });
     const cellValues = readResp.data.values ?? [];
 
@@ -1463,10 +1468,10 @@ export async function removeLeadFromSheet(
       return;
     }
 
-    // Overwrite Status cell (column L) with "ARCHIVED"
+    // Overwrite Status cell (column N = index 13) with "ARCHIVED"
     await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!L${sheetsRow}`,
+      range: `${LEADS_TAB}!N${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
     });
@@ -1494,10 +1499,10 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read Lead ID column (S = col index 18) to locate the row
+    // Read Lead ID column (U = index 20) to locate the row
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!S:S`,
+      range: `${MASTER_LEADS_TAB}!U:U`,
     });
     const cellValues = readResp.data.values ?? [];
 
@@ -1514,10 +1519,10 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
       return;
     }
 
-    // Overwrite Status cell (column M) with "ARCHIVED"
+    // Overwrite Status cell (column O = index 14) with "ARCHIVED"
     await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!M${sheetsRow}`,
+      range: `${MASTER_LEADS_TAB}!O${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
     });

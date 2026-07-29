@@ -99,10 +99,11 @@ const createLeadSchema = z.object({
     .refine((d) => d <= new Date().toISOString().slice(0, 10), {
       message: "enquiryDate cannot be in the future",
     }),
-  parentName: z.string().min(2, "Parent name is required (min 2 characters)").trim(),
+  parentName: z.string().min(2, "Father name is required (min 2 characters)").trim(),
+  motherName: z.string().min(2, "Mother name is required (min 2 characters)").trim(),
   childName: z.string().min(2, "Child name is required (min 2 characters)").trim(),
-  phone: z.string().min(1, "Phone is required"),
-  altPhone: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
+  phone: z.string().min(1, "Father contact is required"),
+  altPhone: z.string().min(1, "Mother contact is required"),
   email: z
     .string()
     .email("Invalid email")
@@ -133,6 +134,7 @@ const createLeadSchema = z.object({
 // Mutable fields only — brand, enquiryDate, createdBy are locked
 const updateLeadSchema = z.object({
   parentName: z.string().min(2).trim().optional(),
+  motherName: z.string().min(2).trim().optional(),
   childName: z.string().min(2).trim().optional(),
   altPhone: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
   email: z
@@ -154,6 +156,12 @@ const updateLeadSchema = z.object({
     .or(z.literal(""))
     .transform((v) => v || undefined),
   revisitDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .or(z.literal(""))
+    .transform((v) => v || undefined),
+  revisitDate2: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .optional()
@@ -297,14 +305,12 @@ export function registerWalkinRoutes(app: Express) {
         return res.status(400).json({ message: e.message });
       }
 
-      // Normalize altPhone if provided
-      let altPhone: string | undefined;
-      if (data.altPhone) {
-        try {
-          altPhone = normalizePhoneOrThrow(data.altPhone);
-        } catch {
-          altPhone = undefined; // non-fatal for alt phone
-        }
+      // Normalize altPhone (now mandatory — store raw value if normalization fails)
+      let altPhone: string = data.altPhone;
+      try {
+        altPhone = normalizePhoneOrThrow(data.altPhone);
+      } catch {
+        // non-fatal: store raw value so the lead isn't lost
       }
 
       // Derive monthLabel
@@ -356,6 +362,7 @@ export function registerWalkinRoutes(app: Express) {
           enquiryDate: data.enquiryDate,
           monthLabel,
           parentName: data.parentName,
+          motherName: data.motherName,
           childName: data.childName,
           phone,
           altPhone,
@@ -554,9 +561,9 @@ export function registerWalkinRoutes(app: Express) {
 
       // Diff and collect audit rows
       const MUTABLE_FIELDS: (keyof WalkinLead)[] = [
-        "parentName", "childName", "altPhone", "email", "program",
+        "parentName", "motherName", "childName", "altPhone", "email", "program",
         "source", "status", "closeReason", "remark", "leadOwner",
-        "walkInDate", "revisitDate", "branchId", "misCallingRemarks",
+        "walkInDate", "revisitDate", "revisitDate2", "branchId", "misCallingRemarks",
       ];
 
       const auditRows: Array<{ field: string; oldValue: string | null; newValue: string | null }> = [];

@@ -49,7 +49,8 @@ type Lookups = {
 
 type ConfirmedLead = {
   id: string;
-  parentName: string;
+  parentName: string;  // Father Name
+  motherName: string;
   childName: string;
   program: string;
   phone: string;
@@ -218,11 +219,13 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const [selectedBranchName, setSelectedBranchName] = useState("");
 
   // ── Form state
-  const [parentName, setParentName] = useState("");
+  const [parentName, setParentName] = useState("");    // Father Name
+  const [motherName, setMotherName] = useState("");
   const [childName, setChildName] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [altPhone, setAltPhone] = useState("");
+  const [altPhone, setAltPhone] = useState("");        // Mother Contact
+  const [altPhoneError, setAltPhoneError] = useState("");
   const [email, setEmail] = useState("");
   const [program, setProgram] = useState("");
   const [source, setSource] = useState("");
@@ -287,8 +290,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const resetToWelcome = useCallback(() => {
     setScreen("form");
     // Reset form — never show previous parent's data
-    setParentName(""); setChildName(""); setPhone(""); setPhoneError("");
-    setAltPhone(""); setEmail(""); setProgram(""); setSource("");
+    setParentName(""); setMotherName(""); setChildName(""); setPhone(""); setPhoneError("");
+    setAltPhone(""); setAltPhoneError(""); setEmail(""); setProgram(""); setSource("");
     setLeadOwner(""); setEnquiryDate(today()); setRemark("");
     setDuplicate(null); setDuplicateResolution("none");
     setSiblings([]);
@@ -326,9 +329,12 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     // Branch must be selected when not coming from a URL with branchCode
     if (!branchCode && !selectedBranchId) return false;
     if (!parentName.trim() || parentName.trim().length < 2) return false;
+    if (!motherName.trim() || motherName.trim().length < 2) return false;
     if (!childName.trim() || childName.trim().length < 2) return false;
     if (!phone || !("normalized" in normalizePhone(phone))) return false;
     if (phoneError) return false;
+    if (!altPhone.trim()) return false;  // Mother Contact is mandatory
+    if (altPhoneError) return false;
     if (!program) return false;
     if (!source) return false;
     if (!leadOwner) return false;
@@ -355,9 +361,10 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
           academicYear: "2027-28",
           enquiryDate,
           parentName: parentName.trim(),
+          motherName: motherName.trim(),
           childName: childName.trim(),
           phone,
-          altPhone: altPhone.trim() || undefined,
+          altPhone: altPhone.trim(),
           email: email.trim().toLowerCase() || undefined,
           program,
           source,
@@ -383,9 +390,10 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
             academicYear: "2027-28",
             enquiryDate,
             parentName: parentName.trim(),
+            motherName: motherName.trim(),
             childName: sib.name.trim(),
             phone,
-            altPhone: altPhone.trim() || undefined,
+            altPhone: altPhone.trim(),
             email: email.trim().toLowerCase() || undefined,
             program: sib.program,
             source,
@@ -440,8 +448,12 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
               {/* Summary */}
               <div className="bg-slate-50 rounded-xl px-5 py-4 text-left space-y-2 mb-6 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Parent</span>
+                  <span className="text-slate-500 font-medium">Father</span>
                   <span className="font-bold text-slate-800">{confirmedLead.parentName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500 font-medium">Mother</span>
+                  <span className="font-bold text-slate-800">{confirmedLead.motherName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">{confirmedLead.siblings?.length ? "Child 1" : "Child"}</span>
@@ -547,19 +559,35 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
               </div>
             )}
 
-            {/* Parent Name */}
-            <div>
-              <FieldLabel required>Parent / Guardian Name</FieldLabel>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input
-                  type="text"
-                  autoComplete="off"
-                  value={parentName}
-                  onChange={e => setParentName(e.target.value)}
-                  placeholder="e.g. Priya Mehta"
-                  className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-slate-500 text-base font-medium focus:outline-none transition"
-                />
+            {/* Father Name + Mother Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <FieldLabel required>Father's Name</FieldLabel>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    value={parentName}
+                    onChange={e => setParentName(e.target.value)}
+                    placeholder="e.g. Rajesh Mehta"
+                    className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-slate-500 text-base font-medium focus:outline-none transition"
+                  />
+                </div>
+              </div>
+              <div>
+                <FieldLabel required>Mother's Name</FieldLabel>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    value={motherName}
+                    onChange={e => setMotherName(e.target.value)}
+                    placeholder="e.g. Priya Mehta"
+                    className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-slate-500 text-base font-medium focus:outline-none transition"
+                  />
+                </div>
               </div>
             </div>
 
@@ -631,10 +659,10 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
               <span className="text-lg leading-none">+</span> Add Sibling Enquiry
             </button>
 
-            {/* Phone + Alt Phone */}
+            {/* Father Contact + Mother Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <FieldLabel required>Phone Number</FieldLabel>
+                <FieldLabel required>Father's Contact Number</FieldLabel>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
@@ -652,18 +680,20 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                 {phoneError && <p className="mt-1.5 text-sm text-red-600 font-medium">{phoneError}</p>}
               </div>
               <div>
-                <FieldLabel>Alternate Phone <span className="text-slate-400 font-normal normal-case tracking-normal">(optional)</span></FieldLabel>
+                <FieldLabel required>Mother's Contact Number</FieldLabel>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="tel"
                     autoComplete="off"
                     value={altPhone}
-                    onChange={e => setAltPhone(e.target.value)}
+                    onChange={e => { setAltPhone(e.target.value); setAltPhoneError(""); }}
                     placeholder="e.g. 9876543211"
-                    className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-slate-500 text-base font-medium focus:outline-none transition"
+                    className={`w-full pl-11 pr-4 py-4 rounded-xl border-2 text-base font-medium focus:outline-none transition
+                      ${altPhoneError ? "border-red-400 bg-red-50" : "border-slate-200 focus:border-slate-500"}`}
                   />
                 </div>
+                {altPhoneError && <p className="mt-1.5 text-sm text-red-600 font-medium">{altPhoneError}</p>}
               </div>
             </div>
 

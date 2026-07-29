@@ -345,10 +345,11 @@ export const walkinLeads = pgTable(
     academicYear: text("academic_year").notNull().default("2027-28"),
     enquiryDate: text("enquiry_date").notNull(), // YYYY-MM-DD; defaults to today; cannot be future
     monthLabel: text("month_label").notNull(),   // e.g. "Jun-27" — auto-derived; never user-editable
-    parentName: text("parent_name").notNull(),
+    parentName: text("parent_name").notNull(),    // Father Name
+    motherName: text("mother_name"),              // Mother Name (new; mandatory in UI)
     childName: text("child_name").notNull(),
-    phone: text("phone").notNull(),              // normalized 10-digit Indian mobile
-    altPhone: text("alt_phone"),
+    phone: text("phone").notNull(),              // Father Contact (normalized 10-digit Indian mobile)
+    altPhone: text("alt_phone"),                 // Mother Contact (mandatory in UI)
     email: text("email"),
     program: text("program").notNull(),
     source: text("source").notNull(),
@@ -357,8 +358,9 @@ export const walkinLeads = pgTable(
     remark: text("remark"),                      // free-text; never feeds analytics
     leadOwner: text("lead_owner"),
     walkInDate: text("walk_in_date"),            // YYYY-MM-DD; required for WALK-IN states
-    revisitDate: text("revisit_date"),           // YYYY-MM-DD
-    misCallingRemarks: text("mis_calling_remarks"),  // MIS calling notes (green col Q in sheet)
+    revisitDate: text("revisit_date"),           // Revisit 1 Date (YYYY-MM-DD)
+    revisitDate2: text("revisit_date_2"),         // Revisit 2 Date (YYYY-MM-DD)
+    misCallingRemarks: text("mis_calling_remarks"),  // kept for backward-compat; not in sheets
     seqNum: serial("seq_num"),                   // global serial (kept for backward-compat / ordering)
     brandSeqNum: integer("brand_seq_num"),       // per-brand sequential counter; used in Unique ID
     isArchived: boolean("is_archived").notNull().default(false),
