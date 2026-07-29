@@ -1678,6 +1678,12 @@ function AdminPanel({ token, onLogout }: { token: string; onLogout: () => void }
 export default function WalkinAdmin2728() {
   const [token, setToken] = useState<string | null>(() => getSavedToken() || null);
 
+  useEffect(() => {
+    let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
+    if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
+    meta.setAttribute("content", "noindex, nofollow");
+  }, []);
+
   if (!token) {
     return <AdminGate onSuccess={t => setToken(t)} />;
   }
