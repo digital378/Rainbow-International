@@ -334,6 +334,64 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
   await doUpsert();
 }
 
+// ── Yellow-column protection ─────────────────────────────────────
+// Columns A, D, E, F, J, K (0-based: 0,3,4,5,9,10) are mandatory submission
+// fields and must not be overwritten by branch staff after the lead is captured.
+// This function idempotently replaces our own protections on those columns with
+// warningOnly=true guards so editors see a prompt before changing them.
+async function applyYellowColumnProtection(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+): Promise<void> {
+  const PROTECTION_DESCRIPTION = "Yellow submission columns — protected by sync";
+
+  // 1. Get spreadsheet metadata so we know the numeric sheetId for the WALKINs tab
+  const meta = await sheets.spreadsheets.get({ spreadsheetId });
+  const tab = (meta.data.sheets ?? []).find(
+    (s: any) => s.properties?.title === LEADS_TAB,
+  );
+  if (!tab) {
+    console.warn(`[walkin/sheets] Tab "${LEADS_TAB}" not found — skipping protection`);
+    return;
+  }
+  const tabSheetId: number = tab.properties!.sheetId!;
+
+  // 2. Remove any previously created protections (avoid duplicates on repeated resyncs)
+  const existingProtections: any[] = tab.protectedRanges ?? [];
+  const deleteRequests = existingProtections
+    .filter((p: any) => p.description === PROTECTION_DESCRIPTION)
+    .map((p: any) => ({
+      deleteProtectedRange: { protectedRangeId: p.protectedRangeId },
+    }));
+
+  // 3. Add warning-only protections for each yellow column individually
+  //    A=0  D=3  E=4  F=5  J=9  K=10  (0-based column indices)
+  const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10];
+  const addRequests = YELLOW_COL_INDICES.map((colIndex) => ({
+    addProtectedRange: {
+      protectedRange: {
+        range: {
+          sheetId: tabSheetId,
+          startColumnIndex: colIndex,
+          endColumnIndex: colIndex + 1,
+        },
+        description: PROTECTION_DESCRIPTION,
+        warningOnly: true,   // shows a caution dialog; does not block saves
+      },
+    },
+  }));
+
+  const requests = [...deleteRequests, ...addRequests];
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: { requests },
+  });
+
+  console.log(
+    `[walkin/sheets] Yellow-column protections applied (A,D,E,F,J,K) on tab "${LEADS_TAB}"`,
+  );
+}
+
 // ── Full resync: rewrite entire WALKINs tab from DB ──────────────
 // Fetches all non-archived leads for the brand, clears data rows (keeps header),
 // then batch-appends all rows. Returns counts for the admin response.
@@ -388,7 +446,17 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
     });
   }
 
-  // 6. Update sync status
+  // 6. Protect yellow columns (A,D,E,F,J,K) — non-fatal; resync still succeeds if this fails
+  try {
+    await applyYellowColumnProtection(sheets, sheetId);
+  } catch (err: any) {
+    console.warn(
+      `[walkin/sheets] Could not apply yellow-column protections for ${brand}:`,
+      err?.message,
+    );
+  }
+
+  // 7. Update sync status
   syncStatus[brand].lastSyncAt = new Date();
   syncStatus[brand].dbCount = leads.length;
   syncStatus[brand].sheetCount = dataRows.length;
