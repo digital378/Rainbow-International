@@ -483,6 +483,41 @@ export const ALLOWED_STATUSES = [
   "NEXT YEAR",
 ] as const;
 
+/**
+ * Status values shown in the brand (RIS / RPS) WALKINs sub-sheets.
+ * "WALK-IN BOOKED" is omitted — that status is managed centrally in the
+ * Master MIS sheet only.
+ */
+export const ALLOWED_STATUSES_BRAND = ALLOWED_STATUSES.filter(
+  (s) => s !== "WALK-IN BOOKED",
+) as readonly string[];
+
+/** Grade / programme options for RIS brand sheet dropdown. */
+export const ALLOWED_GRADES_RIS = [
+  "Nursery",
+  "Junior KG",
+  "Senior KG",
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+  "Class 6", "Class 7", "Class 8", "Class 9", "Class 10",
+  "Class 11 – Science", "Class 11 – Commerce", "Class 11 – Humanities",
+  "Class 12 – Science", "Class 12 – Commerce", "Class 12 – Humanities",
+] as const;
+
+/** Grade / programme options for RPS brand sheet dropdown. */
+export const ALLOWED_GRADES_RPS = [
+  "Playgroup",
+  "Nursery",
+  "Junior KG",
+  "Senior KG",
+  "Grade 1", "Grade 2", "Grade 3", "Grade 4",
+] as const;
+
+/** Combined grade list used in the Master MIS sheet (covers both brands). */
+export const ALLOWED_GRADES_MASTER = [
+  ...ALLOWED_GRADES_RPS,
+  ...ALLOWED_GRADES_RIS,
+] as readonly string[];
+
 /** Canonical source values — keep in sync with walkin_sources seed data. */
 export const ALLOWED_SOURCES = [
   "DM",
@@ -535,11 +570,30 @@ function buildDropdownRequest(
 const buildStatusDropdownRequest = (tabSheetId: number, colIndex: number) =>
   buildDropdownRequest(tabSheetId, colIndex, ALLOWED_STATUSES);
 
+const buildBrandStatusDropdownRequest = (tabSheetId: number, colIndex: number) =>
+  buildDropdownRequest(tabSheetId, colIndex, ALLOWED_STATUSES_BRAND);
+
 const buildSourceDropdownRequest = (tabSheetId: number, colIndex: number) =>
   buildDropdownRequest(tabSheetId, colIndex, ALLOWED_SOURCES);
 
 const buildCloseReasonDropdownRequest = (tabSheetId: number, colIndex: number) =>
   buildDropdownRequest(tabSheetId, colIndex, ALLOWED_CLOSE_REASONS);
+
+/** Remove any existing data-validation from a column (e.g. email). */
+function buildClearValidationRequest(tabSheetId: number, colIndex: number): object {
+  return {
+    setDataValidation: {
+      range: {
+        sheetId: tabSheetId,
+        startRowIndex: 1,
+        endRowIndex: 1000,
+        startColumnIndex: colIndex,
+        endColumnIndex: colIndex + 1,
+      },
+      // no `rule` key → clears any existing validation on this column
+    },
+  };
+}
 
 /**
  * Pure helper — exported for unit-testing only.
@@ -621,6 +675,7 @@ export function buildMasterYellowProtectionRequests(
 async function applyYellowColumnProtection(
   sheets: ReturnType<typeof google.sheets>,
   spreadsheetId: string,
+  brand: "RIS" | "RPS",
 ): Promise<void> {
   // 1. Get spreadsheet metadata (includes protectedRanges for each tab)
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
@@ -634,12 +689,22 @@ async function applyYellowColumnProtection(
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
 
-  // 2. Build requests: yellow-column protections + Status (col N) + Source (col M) + Close Reason (col Q) dropdowns
+  const allowedGrades = brand === "RIS" ? ALLOWED_GRADES_RIS : ALLOWED_GRADES_RPS;
+
+  // 2. Build requests:
+  //    • yellow-column protections
+  //    • Grade dropdown     (col G = 6)
+  //    • Status dropdown    (col N = 13) — "WALK-IN BOOKED" excluded from brand sheets
+  //    • Source dropdown    (col M = 12)
+  //    • Close Reason       (col Q = 16)
+  //    • Clear Email        (col K = 10) — no dropdown needed on email
   const requests = [
     ...buildYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 13),       // col N = Status
-    buildSourceDropdownRequest(tabSheetId, 12),       // col M = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 16),  // col Q = Reason for Closed
+    buildDropdownRequest(tabSheetId, 6, allowedGrades),   // col G = GRADE
+    buildBrandStatusDropdownRequest(tabSheetId, 13),       // col N = Status
+    buildSourceDropdownRequest(tabSheetId, 12),            // col M = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 16),       // col Q = Reason for Closed
+    buildClearValidationRequest(tabSheetId, 10),           // col K = Email (clear any old dropdown)
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -648,7 +713,7 @@ async function applyYellowColumnProtection(
   });
 
   console.log(
-    `[walkin/sheets] Yellow-column protections + Status dropdown applied on tab "${LEADS_TAB}"`,
+    `[walkin/sheets] Yellow-column protections + dropdowns applied on tab "${LEADS_TAB}" (${brand})`,
   );
 }
 
@@ -675,9 +740,11 @@ async function applyMasterYellowColumnProtection(
 
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
-    buildStatusDropdownRequest(tabSheetId, 14),       // col O = Status
-    buildSourceDropdownRequest(tabSheetId, 13),       // col N = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 17),  // col R = Reason for Closed
+    buildDropdownRequest(tabSheetId, 7, ALLOWED_GRADES_MASTER), // col H = GRADE
+    buildStatusDropdownRequest(tabSheetId, 14),                  // col O = Status (full list incl. WALK-IN BOOKED)
+    buildSourceDropdownRequest(tabSheetId, 13),                  // col N = Source
+    buildCloseReasonDropdownRequest(tabSheetId, 17),             // col R = Reason for Closed
+    buildClearValidationRequest(tabSheetId, 11),                 // col L = Email (clear any old dropdown)
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -751,7 +818,7 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
 
   // 6. Protect yellow columns + Status/Source dropdowns — non-fatal; resync still succeeds if this fails
   try {
-    await applyYellowColumnProtection(sheets, sheetId);
+    await applyYellowColumnProtection(sheets, sheetId, brand);
   } catch (err: any) {
     console.warn(
       `[walkin/sheets] Could not apply yellow-column protections for ${brand}:`,
