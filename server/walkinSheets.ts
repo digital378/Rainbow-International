@@ -747,7 +747,8 @@ async function applyYellowColumnProtection(
     buildClearValidationRequest(tabSheetId, 15),   // col P = Follow up Remarks
     buildClearValidationRequest(tabSheetId, 17),   // col R = Revisit 1 Date
     buildClearValidationRequest(tabSheetId, 18),   // col S = Revisit 2 Date
-    buildColumnColorRequest(tabSheetId, 13, STATUS_BLUE.r, STATUS_BLUE.g, STATUS_BLUE.b), // col N = Status → blue
+    // Note: Status column background colour is managed manually in the sheet.
+    // We intentionally do NOT apply a colour here so staff corrections persist.
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -793,7 +794,7 @@ async function applyMasterYellowColumnProtection(
     buildClearValidationRequest(tabSheetId, 16),   // col Q = Follow up Remarks
     buildClearValidationRequest(tabSheetId, 18),   // col S = Revisit 1 Date
     buildClearValidationRequest(tabSheetId, 19),   // col T = Revisit 2 Date
-    buildColumnColorRequest(tabSheetId, 14, STATUS_BLUE.r, STATUS_BLUE.g, STATUS_BLUE.b), // col O = Status → blue
+    // Note: Status column background colour is managed manually in the sheet.
   ];
 
   await sheets.spreadsheets.batchUpdate({
