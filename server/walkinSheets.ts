@@ -245,7 +245,7 @@ function formatDateDotted(isoDate: string): string {
 }
 
 function formatTime12h(ts: Date): string {
-  return ts.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+  return ts.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" });
 }
 
 // ── Row serialiser ────────────────────────────────────────────────
