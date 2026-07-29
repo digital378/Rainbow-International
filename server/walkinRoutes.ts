@@ -15,6 +15,8 @@
  *   POST /api/walkin/branches             — create a branch (admin only)
  *   PATCH /api/walkin/branches/:id        — update a branch (admin only)
  *   GET  /api/walkin/branches/:code/verify-pin — verify kiosk PIN
+ *   POST /api/walkin/sheets/resync        — rewrite entire sheet from DB (admin only)
+ *   GET  /api/walkin/sheets/status        — last-sync timestamp + lead counts (admin only)
  */
 
 import { type Express } from "express";
@@ -31,6 +33,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
+import { queueUpsert, resyncBrandToSheet, getSyncStatus } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -346,6 +349,9 @@ export function registerWalkinRoutes(app: Express) {
       // Write audit row for creation
       await writeAudit(lead.id, "created", null, JSON.stringify({ brand: lead.brand, phone, program: lead.program }), data.createdBy);
 
+      // Mirror to Google Sheets (fire-and-forget — never blocks the API response)
+      queueUpsert(lead.brand as "RIS" | "RPS", lead);
+
       res.status(201).json({
         lead,
         duplicate: existingDuplicate ?? null,
@@ -557,6 +563,9 @@ export function registerWalkinRoutes(app: Express) {
       await Promise.all(
         auditRows.map((r) => writeAudit(req.params.id, r.field, r.oldValue, r.newValue, changedBy)),
       );
+
+      // Mirror update to Google Sheets (fire-and-forget)
+      queueUpsert(updated.brand as "RIS" | "RPS", updated);
 
       res.json(updated);
     } catch (err: any) {
@@ -775,6 +784,77 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       console.error("[walkin/stats]", err?.message);
       res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // ── POST /api/walkin/sheets/resync ────────────────────────────
+  // Admin-only. Rewrites the entire Leads tab for the given brand from the DB.
+  // Query params: ?brand=RIS|RPS  (required)
+  // Returns: { brand, dbCount, sheetCount, syncedAt }
+  app.post("/api/walkin/sheets/resync", requireAdmin, async (req, res) => {
+    try {
+      const brand = typeof req.query.brand === "string" ? req.query.brand.toUpperCase() : "";
+      if (brand !== "RIS" && brand !== "RPS") {
+        return res.status(400).json({ message: "brand query param must be RIS or RPS" });
+      }
+
+      const { dbCount, sheetCount } = await resyncBrandToSheet(brand as "RIS" | "RPS");
+
+      res.json({
+        brand,
+        dbCount,
+        sheetCount,
+        syncedAt: new Date().toISOString(),
+        message: `Resynced ${dbCount} leads to ${brand} sheet`,
+      });
+    } catch (err: any) {
+      console.error("[walkin/sheets/resync]", err?.message);
+      res.status(500).json({ message: err?.message ?? "Resync failed" });
+    }
+  });
+
+  // ── GET /api/walkin/sheets/status ──────────────────────────────
+  // Admin-only. Returns last-sync timestamp and lead counts for both brands.
+  app.get("/api/walkin/sheets/status", requireAdmin, async (req, res) => {
+    try {
+      const status = getSyncStatus();
+
+      // Also fetch live DB counts for comparison
+      const [risCount, rpsCount] = await Promise.all([
+        db.select({ cnt: sql<number>`cast(count(*) as int)` })
+          .from(walkinLeads)
+          .where(and(eq(walkinLeads.brand, "RIS"), eq(walkinLeads.isArchived, false))),
+        db.select({ cnt: sql<number>`cast(count(*) as int)` })
+          .from(walkinLeads)
+          .where(and(eq(walkinLeads.brand, "RPS"), eq(walkinLeads.isArchived, false))),
+      ]);
+
+      const risSheetConfigured = !!process.env.RIS_WALKIN_SHEET_ID_2728;
+      const rpsSheetConfigured = !!process.env.RPS_WALKIN_SHEET_ID_2728;
+      const googleConfigured = !!(process.env.GOOGLE_REFRESH_TOKEN && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
+      res.json({
+        googleConfigured,
+        RIS: {
+          sheetConfigured: risSheetConfigured,
+          sheetId: risSheetConfigured ? process.env.RIS_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
+          lastSyncAt: status.RIS.lastSyncAt?.toISOString() ?? null,
+          dbCount: risCount[0].cnt,
+          sheetCount: status.RIS.sheetCount,
+          lastError: status.RIS.lastError,
+        },
+        RPS: {
+          sheetConfigured: rpsSheetConfigured,
+          sheetId: rpsSheetConfigured ? process.env.RPS_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
+          lastSyncAt: status.RPS.lastSyncAt?.toISOString() ?? null,
+          dbCount: rpsCount[0].cnt,
+          sheetCount: status.RPS.sheetCount,
+          lastError: status.RPS.lastError,
+        },
+      });
+    } catch (err: any) {
+      console.error("[walkin/sheets/status]", err?.message);
+      res.status(500).json({ message: "Failed to fetch sync status" });
     }
   });
 

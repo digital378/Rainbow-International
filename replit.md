@@ -43,6 +43,51 @@ Preferred communication style: Simple, everyday language.
 - `shared/`: Code shared between frontend and backend (Drizzle schemas, Zod types).
 - `migrations/`: Database migrations.
 
+## Google Sheets One-Way Mirror (AY 2027-28)
+
+Leads captured via the walk-in kiosk are automatically mirrored to two locked Google Sheets — one per brand — so the team can view live data in Sheets without editing it. The DB is the source of truth; the sheet is read-only.
+
+### Required environment variables
+| Secret name | Description |
+|---|---|
+| `RIS_WALKIN_SHEET_ID_2728` | Google Sheets ID for "RIS Walk-in Enquiries 2027-2028" |
+| `RPS_WALKIN_SHEET_ID_2728` | Google Sheets ID for "RPS Walk-in Enquiries 2027-2028" |
+| `GOOGLE_REFRESH_TOKEN` | OAuth2 refresh token (already used by Search Console integration) |
+| `GOOGLE_CLIENT_ID` | Google OAuth2 client ID (already set) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (already set) |
+
+### One-time setup steps
+
+1. **Create the two Google Sheets manually** in the team Google account:
+   - "RIS Walk-in Enquiries 2027-2028"
+   - "RPS Walk-in Enquiries 2027-2028"
+
+2. **Get the Sheet IDs** from each sheet's URL:
+   `https://docs.google.com/spreadsheets/d/<SHEET_ID>/edit`
+   Copy the `<SHEET_ID>` portion (long alphanumeric string).
+
+3. **Share both sheets** with the Google OAuth account used for this app (the one whose `GOOGLE_REFRESH_TOKEN` is stored). Give it **Editor** access.
+
+4. **Create a "Leads" tab** in each sheet (or rename the first tab to "Leads").
+   The header row will be written automatically on the first resync.
+
+5. **Add the env vars** to Replit Secrets:
+   - `RIS_WALKIN_SHEET_ID_2728` → the RIS sheet ID from step 2
+   - `RPS_WALKIN_SHEET_ID_2728` → the RPS sheet ID from step 2
+
+6. **Trigger the initial resync** via the admin panel or directly:
+   ```
+   POST /api/walkin/sheets/resync?brand=RIS   (with X-Api-Key: <ADMIN_TOKEN>)
+   POST /api/walkin/sheets/resync?brand=RPS
+   ```
+
+7. **Lock the header row** in each sheet (select row 1 → Data → Protect range) to prevent accidental edits.
+
+### How sync works after setup
+- Every new lead and every lead update automatically queues a sheet upsert (fire-and-forget; never blocks the API).
+- The admin panel shows last-sync timestamp and DB vs sheet lead counts (`GET /api/walkin/sheets/status`).
+- If the sheet is corrupted, use "Re-sync all" to rewrite it from the DB.
+
 ## External Dependencies
 
 ### Database
