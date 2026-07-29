@@ -354,3 +354,59 @@ describe("pullChangesFromMasterSheet — close-reason validation", () => {
     expect(vi.mocked(db.update)).not.toHaveBeenCalled();
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("pullChangesFromMasterSheet — back-propagation suppressed on invalid status", () => {
+  /**
+   * These tests set the brand-sheet ID env vars so the back-propagation path
+   * is fully reachable, then assert that mockSheetsBatchUpdate (the batch write
+   * that updates the brand sheet's green columns) is never called when the
+   * Master status is invalid.
+   */
+
+  beforeEach(() => {
+    // Override the default beforeEach: set brand sheet IDs so the
+    // back-propagation block would normally execute.
+    process.env.RIS_WALKIN_SHEET_ID_2728 = "fake-ris-sheet-id";
+    process.env.RPS_WALKIN_SHEET_ID_2728 = "fake-rps-sheet-id";
+  });
+
+  it("does NOT call the brand-sheet batchUpdate when the Master status is invalid (RIS)", async () => {
+    primeMasterSheetRows([makeMasterSheetRow("RIS", "INVALID_STATUS", "42")]);
+
+    await pullChangesFromMasterSheet();
+
+    // Back-propagation must be completely suppressed — no sheet write
+    expect(mockSheetsBatchUpdate).not.toHaveBeenCalled();
+  });
+
+  it("does NOT call the brand-sheet batchUpdate when the Master status is invalid (RPS)", async () => {
+    primeMasterSheetRows([makeMasterSheetRow("RPS", "TYPO STATUS", "42")]);
+
+    await pullChangesFromMasterSheet();
+
+    expect(mockSheetsBatchUpdate).not.toHaveBeenCalled();
+  });
+
+  it("does NOT call the brand-sheet batchUpdate when the Master close reason is invalid", async () => {
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RIS", "Badd Reason", "42")]);
+
+    await pullChangesFromMasterSheet();
+
+    expect(mockSheetsBatchUpdate).not.toHaveBeenCalled();
+  });
+
+  it("DOES call the brand-sheet batchUpdate when the Master status is valid (confirms the path is live)", async () => {
+    // Seed the Lead ID column read for the brand sheet so the batch data
+    // is non-empty (lead ID 42 found at row 2).
+    mockSheetsGet
+      .mockResolvedValueOnce({ data: { values: [Array(19).fill("header"), makeMasterSheetRow("RIS", "CLOSED", "42")] } }) // master sheet read
+      .mockResolvedValueOnce({ data: { values: [["Lead ID"], ["42"]] } }); // brand sheet R:R column read
+
+    await pullChangesFromMasterSheet();
+
+    // With a valid status and a matching brand-sheet row, batchUpdate must fire
+    expect(mockSheetsBatchUpdate).toHaveBeenCalledOnce();
+  });
+});
