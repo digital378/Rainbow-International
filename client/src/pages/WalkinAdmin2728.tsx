@@ -52,10 +52,13 @@ interface Lookups {
   programs: LookupItem[]; sources: LookupItem[];
   statuses: LookupItem[]; closeReasons: LookupItem[];
 }
+interface SheetBrandStatus {
+  sheetConfigured: boolean; sheetId: string | null; lastSyncAt: string | null;
+  dbCount: number; sheetCount: number; lastError: string | null;
+}
 interface SyncStatus {
   googleConfigured: boolean;
-  RIS: { sheetConfigured: boolean; sheetId: string | null; lastSyncAt: string | null; dbCount: number; sheetCount: number; lastError: string | null };
-  RPS: { sheetConfigured: boolean; sheetId: string | null; lastSyncAt: string | null; dbCount: number; sheetCount: number; lastError: string | null };
+  RIS: SheetBrandStatus; RPS: SheetBrandStatus; MASTER: SheetBrandStatus;
 }
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -948,83 +951,95 @@ function SheetsSyncTab({ token }: { token: string }) {
 
   useEffect(() => { loadStatus(); }, [loadStatus]);
 
-  const resync = async (brand: "RIS" | "RPS") => {
-    setResyncing(r => ({ ...r, [brand]: true }));
-    setResyncMsg(m => ({ ...m, [brand]: "" }));
+  const resync = async (key: "RIS" | "RPS") => {
+    setResyncing(r => ({ ...r, [key]: true }));
+    setResyncMsg(m => ({ ...m, [key]: "" }));
     try {
-      const r = await fetch(`/api/walkin/sheets/resync?brand=${brand}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const r = await fetch(`/api/walkin/sheets/resync?brand=${key}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       const d = await r.json();
-      setResyncMsg(m => ({ ...m, [brand]: r.ok ? `✓ ${d.message}` : `✗ ${d.message}` }));
+      setResyncMsg(m => ({ ...m, [key]: r.ok ? `✓ ${d.message}` : `✗ ${d.message}` }));
       if (r.ok) loadStatus();
-    } catch { setResyncMsg(m => ({ ...m, [brand]: "✗ Network error" })); }
-    setResyncing(r => ({ ...r, [brand]: false }));
+    } catch { setResyncMsg(m => ({ ...m, [key]: "✗ Network error" })); }
+    setResyncing(r => ({ ...r, [key]: false }));
   };
 
-  const BrandCard = ({ brand }: { brand: "RIS" | "RPS" }) => {
-    if (!status) return null;
-    const s = status[brand];
-    const accentColor = brand === "RIS" ? "#091a4f" : "#c0392b";
-    return (
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-800 text-lg">{brand}</span>
-            {s.sheetConfigured ? (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sheet ID set</span>
-            ) : (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">No sheet ID</span>
-            )}
-          </div>
-          <button onClick={() => resync(brand)} disabled={resyncing[brand] || !s.sheetConfigured}
-            className="text-sm font-semibold px-4 py-1.5 rounded-lg text-white transition disabled:opacity-50"
-            style={{ background: accentColor }}>
-            {resyncing[brand] ? "Syncing…" : "Re-sync now"}
-          </button>
+  const resyncMaster = async () => {
+    setResyncing(r => ({ ...r, MASTER: true }));
+    setResyncMsg(m => ({ ...m, MASTER: "" }));
+    try {
+      const r = await fetch("/api/walkin/sheets/resync-master", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const d = await r.json();
+      setResyncMsg(m => ({ ...m, MASTER: r.ok ? `✓ ${d.message}` : `✗ ${d.message}` }));
+      if (r.ok) loadStatus();
+    } catch { setResyncMsg(m => ({ ...m, MASTER: "✗ Network error" })); }
+    setResyncing(r => ({ ...r, MASTER: false }));
+  };
+
+  const SheetCard = ({
+    label, envKey, s, color, onResync, resyncKey,
+  }: {
+    label: string; envKey: string; s: SheetBrandStatus; color: string;
+    onResync: () => void; resyncKey: string;
+  }) => (
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-slate-800 text-lg">{label}</span>
+          {s.sheetConfigured ? (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">Sheet ID set</span>
+          ) : (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">No sheet ID</span>
+          )}
         </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-slate-50 rounded-xl p-3 text-center">
-            <div className="text-2xl font-black" style={{ color: accentColor }}>{s.dbCount}</div>
-            <div className="text-xs text-slate-500 mt-0.5">Leads in DB</div>
-          </div>
-          <div className="bg-slate-50 rounded-xl p-3 text-center">
-            <div className="text-2xl font-black text-slate-400">{s.sheetCount}</div>
-            <div className="text-xs text-slate-500 mt-0.5">Rows in Sheet</div>
-          </div>
-        </div>
-
-        {s.dbCount !== s.sheetCount && s.sheetConfigured && (
-          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            ⚠ Count mismatch — run Re-sync now to fix
-          </div>
-        )}
-
-        <div className="text-xs space-y-1 text-slate-500">
-          <div>Last sync: {s.lastSyncAt ? new Date(s.lastSyncAt).toLocaleString() : "Never"}</div>
-          {s.sheetId && <div>Sheet ID: <span className="font-mono">{s.sheetId}</span></div>}
-          {s.lastError && <div className="text-red-600">Last error: {s.lastError}</div>}
-        </div>
-
-        {resyncMsg[brand] && (
-          <div className={`text-sm rounded-lg px-3 py-2 ${resyncMsg[brand].startsWith("✓") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-            {resyncMsg[brand]}
-          </div>
-        )}
-
-        {!s.sheetConfigured && (
-          <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
-            Set <span className="font-mono">{brand}_WALKIN_SHEET_ID_2728</span> in Replit Secrets to enable sync.
-          </div>
-        )}
+        <button onClick={onResync} disabled={resyncing[resyncKey] || !s.sheetConfigured}
+          className="text-sm font-semibold px-4 py-1.5 rounded-lg text-white transition disabled:opacity-50"
+          style={{ background: color }}>
+          {resyncing[resyncKey] ? "Syncing…" : "Re-sync now"}
+        </button>
       </div>
-    );
-  };
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-slate-50 rounded-xl p-3 text-center">
+          <div className="text-2xl font-black" style={{ color }}>{s.dbCount}</div>
+          <div className="text-xs text-slate-500 mt-0.5">Leads in DB</div>
+        </div>
+        <div className="bg-slate-50 rounded-xl p-3 text-center">
+          <div className="text-2xl font-black text-slate-400">{s.sheetCount}</div>
+          <div className="text-xs text-slate-500 mt-0.5">Rows in Sheet</div>
+        </div>
+      </div>
+
+      {s.dbCount !== s.sheetCount && s.sheetConfigured && (
+        <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          ⚠ Count mismatch — run Re-sync now to fix
+        </div>
+      )}
+
+      <div className="text-xs space-y-1 text-slate-500">
+        <div>Last sync: {s.lastSyncAt ? new Date(s.lastSyncAt).toLocaleString() : "Never"}</div>
+        {s.sheetId && <div>Sheet ID: <span className="font-mono">{s.sheetId}</span></div>}
+        {s.lastError && <div className="text-red-600">Last error: {s.lastError}</div>}
+      </div>
+
+      {resyncMsg[resyncKey] && (
+        <div className={`text-sm rounded-lg px-3 py-2 ${resyncMsg[resyncKey].startsWith("✓") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+          {resyncMsg[resyncKey]}
+        </div>
+      )}
+
+      {!s.sheetConfigured && (
+        <div className="text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2">
+          Set <span className="font-mono">{envKey}</span> in environment to enable sync.
+        </div>
+      )}
+    </div>
+  );
 
   if (loading) return <div className="text-sm text-slate-400 p-4">Loading…</div>;
   if (!status) return <div className="text-sm text-red-600 p-4">Failed to load sync status</div>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500">Mirror all leads to Google Sheets for read-only access by the team.</p>
         <button onClick={loadStatus} className="text-xs text-slate-400 hover:text-slate-600 underline">Refresh</button>
@@ -1036,9 +1051,23 @@ function SheetsSyncTab({ token }: { token: string }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <BrandCard brand="RIS" />
-        <BrandCard brand="RPS" />
+      {/* Per-brand sheets */}
+      <div>
+        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Brand Sheets</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SheetCard label="RIS" envKey="RIS_WALKIN_SHEET_ID_2728" s={status.RIS} color="#091a4f"
+            onResync={() => resync("RIS")} resyncKey="RIS" />
+          <SheetCard label="RPS" envKey="RPS_WALKIN_SHEET_ID_2728" s={status.RPS} color="#c0392b"
+            onResync={() => resync("RPS")} resyncKey="RPS" />
+        </div>
+      </div>
+
+      {/* Master combined sheet */}
+      <div>
+        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Master Sheet (RIS + RPS combined)</h4>
+        <p className="text-xs text-slate-500 mb-3">All leads from both schools in one sheet. Includes a "Brand" column so you can filter by school.</p>
+        <SheetCard label="Master" envKey="MASTER_WALKIN_SHEET_ID_2728" s={status.MASTER} color="#475569"
+          onResync={resyncMaster} resyncKey="MASTER" />
       </div>
     </div>
   );

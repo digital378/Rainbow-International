@@ -33,7 +33,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, resyncBrandToSheet, getSyncStatus } from "./walkinSheets";
+import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -945,6 +945,18 @@ export function registerWalkinRoutes(app: Express) {
     }
   });
 
+  // ── POST /api/walkin/sheets/resync-master ─────────────────────
+  // Rewrites the entire master (combined RIS + RPS) sheet from DB.
+  app.post("/api/walkin/sheets/resync-master", requireAdmin, async (req, res) => {
+    try {
+      const { dbCount, sheetCount } = await resyncMasterSheet();
+      res.json({ message: `Resynced ${dbCount} leads (RIS + RPS) to master sheet`, dbCount, sheetCount });
+    } catch (err: any) {
+      console.error("[walkin/sheets/resync-master]", err?.message);
+      res.status(500).json({ message: err?.message ?? "Resync failed" });
+    }
+  });
+
   // ── GET /api/walkin/sheets/status ──────────────────────────────
   // Admin-only. Returns last-sync timestamp and lead counts for both brands.
   app.get("/api/walkin/sheets/status", requireAdmin, async (req, res) => {
@@ -963,6 +975,7 @@ export function registerWalkinRoutes(app: Express) {
 
       const risSheetConfigured = !!process.env.RIS_WALKIN_SHEET_ID_2728;
       const rpsSheetConfigured = !!process.env.RPS_WALKIN_SHEET_ID_2728;
+      const masterSheetConfigured = !!process.env.MASTER_WALKIN_SHEET_ID_2728;
       const googleConfigured = !!(process.env.GOOGLE_REFRESH_TOKEN && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
       res.json({
@@ -982,6 +995,14 @@ export function registerWalkinRoutes(app: Express) {
           dbCount: rpsCount[0].cnt,
           sheetCount: status.RPS.sheetCount,
           lastError: status.RPS.lastError,
+        },
+        MASTER: {
+          sheetConfigured: masterSheetConfigured,
+          sheetId: masterSheetConfigured ? process.env.MASTER_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
+          lastSyncAt: status.MASTER.lastSyncAt?.toISOString() ?? null,
+          dbCount: (risCount[0].cnt ?? 0) + (rpsCount[0].cnt ?? 0),
+          sheetCount: status.MASTER.sheetCount,
+          lastError: status.MASTER.lastError,
         },
       });
     } catch (err: any) {

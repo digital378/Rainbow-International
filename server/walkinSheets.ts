@@ -72,6 +72,18 @@ const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 17 → column R
 // Sheet tab name (must match the tab in the actual Google Sheet)
 const LEADS_TAB = "WALKINs";
 
+// ── Master (combined RIS + RPS) sheet ────────────────────────────
+// Same column layout as brand sheets but with "Brand" prepended as column A.
+export const MASTER_SHEET_HEADERS = [
+  "Brand",
+  ...SHEET_HEADERS,
+] as const;
+
+// Lead ID column index in the master sheet (0-based; "S" = index 18)
+const MASTER_LEAD_ID_COL_INDEX = MASTER_SHEET_HEADERS.length - 1; // 18
+
+const MASTER_LEADS_TAB = "WALKINs";
+
 // ── In-memory sync status ────────────────────────────────────────
 interface SyncStatus {
   lastSyncAt: Date | null;
@@ -80,9 +92,10 @@ interface SyncStatus {
   lastError: string | null;
 }
 
-const syncStatus: Record<"RIS" | "RPS", SyncStatus> = {
-  RIS: { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
-  RPS: { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
+const syncStatus: Record<"RIS" | "RPS" | "MASTER", SyncStatus> = {
+  RIS:    { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
+  RPS:    { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
+  MASTER: { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
 };
 
 export function getSyncStatus() {
@@ -260,6 +273,65 @@ export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
   upsertLeadToSheet(brand, lead).catch((err) => {
     console.error("[walkin/sheets] Unexpected queue error:", err?.message);
   });
+  upsertLeadToMasterSheet(lead).catch((err) => {
+    console.error("[walkin/sheets] Master upsert queue error:", err?.message);
+  });
+}
+
+// ── Upsert a single lead into the master (combined) sheet ────────
+export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
+  const auth = getAuthClient();
+  if (!auth) return;
+  const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
+  if (!sheetId) {
+    console.warn("[walkin/sheets] MASTER_WALKIN_SHEET_ID_2728 not set — skipping master upsert");
+    return;
+  }
+
+  const sheets = google.sheets({ version: "v4", auth });
+  const brandRow = await leadToRow(lead);
+  const row = [lead.brand, ...brandRow];             // Brand in col A, rest follow
+  const leadIdColLetter = "S";                        // Column S = index 18
+
+  async function doUpsert(retried = false): Promise<void> {
+    try {
+      const readResp = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId!,
+        range: `${MASTER_LEADS_TAB}!${leadIdColLetter}:${leadIdColLetter}`,
+      });
+      const cellValues = readResp.data.values ?? [];
+      let existingRowIndex = -1;
+      for (let i = 1; i < cellValues.length; i++) {
+        if (cellValues[i]?.[0] === String(lead.id)) { existingRowIndex = i; break; }
+      }
+
+      if (existingRowIndex >= 0) {
+        const sheetsRow = existingRowIndex + 1;
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A${sheetsRow}`,
+          valueInputOption: "USER_ENTERED", requestBody: { values: [row] },
+        });
+      } else {
+        await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A1`,
+          valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
+          requestBody: { values: [row] },
+        });
+      }
+
+      syncStatus.MASTER.lastSyncAt = new Date();
+      syncStatus.MASTER.lastError = null;
+    } catch (err: any) {
+      if (!retried && err?.code === 429) {
+        await new Promise((r) => setTimeout(r, 2000));
+        return doUpsert(true);
+      }
+      syncStatus.MASTER.lastError = err?.message ?? "Unknown error";
+      console.error(`[walkin/sheets] Master upsert failed for lead ${lead.id}:`, err?.message);
+    }
+  }
+
+  await doUpsert();
 }
 
 // ── Full resync: rewrite entire WALKINs tab from DB ──────────────
@@ -323,5 +395,63 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   syncStatus[brand].lastError = null;
 
   console.log(`[walkin/sheets] Resynced ${brand}: ${leads.length} leads written to sheet`);
+  return { dbCount: leads.length, sheetCount: dataRows.length };
+}
+
+// ── Full resync for the master (combined) sheet ──────────────────
+// Fetches all non-archived leads for both brands, clears data rows,
+// writes the combined header row, then batch-appends all leads sorted by date.
+export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount: number }> {
+  const auth = getAuthClient();
+  if (!auth) throw new Error("Google auth not configured (GOOGLE_REFRESH_TOKEN missing)");
+
+  const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
+  if (!sheetId) throw new Error("MASTER_WALKIN_SHEET_ID_2728 env var not set");
+
+  const sheets = google.sheets({ version: "v4", auth });
+
+  // 1. Fetch all non-archived leads (both brands), ordered by date
+  const leads = await db
+    .select()
+    .from(walkinLeads)
+    .where(eq(walkinLeads.isArchived, false))
+    .orderBy(walkinLeads.enquiryDate, walkinLeads.id);
+
+  // 2. Serialise — prepend Brand column to each row
+  const dataRows = await Promise.all(
+    leads.map(async (l) => [l.brand, ...(await leadToRow(l))])
+  );
+
+  // 3. Clear data rows
+  try {
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2:Z`,
+    });
+  } catch (err: any) {
+    console.warn("[walkin/sheets] Master clear failed (may be first-time setup):", err?.message);
+  }
+
+  // 4. Write header row
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A1`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [MASTER_SHEET_HEADERS as unknown as string[]] },
+  });
+
+  // 5. Batch-append data rows
+  if (dataRows.length > 0) {
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2`,
+      valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
+      requestBody: { values: dataRows },
+    });
+  }
+
+  syncStatus.MASTER.lastSyncAt = new Date();
+  syncStatus.MASTER.dbCount = leads.length;
+  syncStatus.MASTER.sheetCount = dataRows.length;
+  syncStatus.MASTER.lastError = null;
+
+  console.log(`[walkin/sheets] Master resynced: ${leads.length} leads (RIS + RPS combined)`);
   return { dbCount: leads.length, sheetCount: dataRows.length };
 }
