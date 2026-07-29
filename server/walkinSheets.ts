@@ -439,13 +439,58 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
 // fields and must not be overwritten by branch staff after the lead is captured.
 // This function idempotently replaces our own protections on those columns with
 // warningOnly=true guards so editors see a prompt before changing them.
+
+/** The exact description string stamped on every protection we own. */
+export const YELLOW_PROTECTION_DESCRIPTION =
+  "Yellow submission columns — protected by sync";
+
+/** The six 0-based column indices that carry yellow (submission-field) protections. */
+export const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10] as const;
+
+/**
+ * Pure helper — exported for unit-testing only.
+ *
+ * Given the numeric sheetId of the WALKINs tab and whatever protected ranges
+ * the Sheets API already reports for that tab, returns the ordered list of
+ * batchUpdate requests that will:
+ *   1. Delete any existing protections we own (description matches exactly) to
+ *      prevent duplicates accumulating across repeated resyncs.
+ *   2. Add fresh warningOnly protections for each yellow column.
+ *
+ * Protections whose description does NOT match are left untouched.
+ */
+export function buildYellowProtectionRequests(
+  tabSheetId: number,
+  existingProtections: Array<{ protectedRangeId: number; description?: string }>,
+): object[] {
+  const deleteRequests = existingProtections
+    .filter((p) => p.description === YELLOW_PROTECTION_DESCRIPTION)
+    .map((p) => ({
+      deleteProtectedRange: { protectedRangeId: p.protectedRangeId },
+    }));
+
+  const addRequests = YELLOW_COL_INDICES.map((colIndex) => ({
+    addProtectedRange: {
+      protectedRange: {
+        range: {
+          sheetId: tabSheetId,
+          startColumnIndex: colIndex,
+          endColumnIndex: colIndex + 1,
+        },
+        description: YELLOW_PROTECTION_DESCRIPTION,
+        warningOnly: true, // shows a caution dialog; does not block saves
+      },
+    },
+  }));
+
+  return [...deleteRequests, ...addRequests];
+}
+
 async function applyYellowColumnProtection(
   sheets: ReturnType<typeof google.sheets>,
   spreadsheetId: string,
 ): Promise<void> {
-  const PROTECTION_DESCRIPTION = "Yellow submission columns — protected by sync";
-
-  // 1. Get spreadsheet metadata so we know the numeric sheetId for the WALKINs tab
+  // 1. Get spreadsheet metadata (includes protectedRanges for each tab)
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
   const tab = (meta.data.sheets ?? []).find(
     (s: any) => s.properties?.title === LEADS_TAB,
@@ -455,33 +500,11 @@ async function applyYellowColumnProtection(
     return;
   }
   const tabSheetId: number = tab.properties!.sheetId!;
-
-  // 2. Remove any previously created protections (avoid duplicates on repeated resyncs)
   const existingProtections: any[] = tab.protectedRanges ?? [];
-  const deleteRequests = existingProtections
-    .filter((p: any) => p.description === PROTECTION_DESCRIPTION)
-    .map((p: any) => ({
-      deleteProtectedRange: { protectedRangeId: p.protectedRangeId },
-    }));
 
-  // 3. Add warning-only protections for each yellow column individually
-  //    A=0  D=3  E=4  F=5  J=9  K=10  (0-based column indices)
-  const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10];
-  const addRequests = YELLOW_COL_INDICES.map((colIndex) => ({
-    addProtectedRange: {
-      protectedRange: {
-        range: {
-          sheetId: tabSheetId,
-          startColumnIndex: colIndex,
-          endColumnIndex: colIndex + 1,
-        },
-        description: PROTECTION_DESCRIPTION,
-        warningOnly: true,   // shows a caution dialog; does not block saves
-      },
-    },
-  }));
+  // 2. Build requests (delete our old ones + add fresh ones)
+  const requests = buildYellowProtectionRequests(tabSheetId, existingProtections);
 
-  const requests = [...deleteRequests, ...addRequests];
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: { requests },
