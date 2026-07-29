@@ -462,8 +462,22 @@ export const ALLOWED_STATUSES = [
   "NEXT YEAR",
 ] as const;
 
-/** Build a setDataValidation request for a Status dropdown on rows 2-1000. */
-function buildStatusDropdownRequest(tabSheetId: number, colIndex: number): object {
+/** Canonical source values — keep in sync with walkin_sources seed data. */
+export const ALLOWED_SOURCES = [
+  "DM",
+  "DW",
+  "Referral",
+  "Telephonic",
+  "Staff Reference",
+  "Ex-Rainbow Parent",
+] as const;
+
+/** Build a setDataValidation request for a dropdown on rows 2-1000. */
+function buildDropdownRequest(
+  tabSheetId: number,
+  colIndex: number,
+  options: readonly string[],
+): object {
   return {
     setDataValidation: {
       range: {
@@ -476,7 +490,7 @@ function buildStatusDropdownRequest(tabSheetId: number, colIndex: number): objec
       rule: {
         condition: {
           type: "ONE_OF_LIST",
-          values: ALLOWED_STATUSES.map((s) => ({ userEnteredValue: s })),
+          values: options.map((s) => ({ userEnteredValue: s })),
         },
         showCustomUi: true,  // renders as a dropdown arrow
         strict: false,       // warning-only; won't block existing non-list values
@@ -484,6 +498,12 @@ function buildStatusDropdownRequest(tabSheetId: number, colIndex: number): objec
     },
   };
 }
+
+const buildStatusDropdownRequest = (tabSheetId: number, colIndex: number) =>
+  buildDropdownRequest(tabSheetId, colIndex, ALLOWED_STATUSES);
+
+const buildSourceDropdownRequest = (tabSheetId: number, colIndex: number) =>
+  buildDropdownRequest(tabSheetId, colIndex, ALLOWED_SOURCES);
 
 /**
  * Pure helper — exported for unit-testing only.
@@ -540,10 +560,11 @@ async function applyYellowColumnProtection(
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
 
-  // 2. Build requests: yellow-column protections + Status dropdown (col L = index 11)
+  // 2. Build requests: yellow-column protections + Status (col L) + Source (col K) dropdowns
   const requests = [
     ...buildYellowProtectionRequests(tabSheetId, existingProtections),
     buildStatusDropdownRequest(tabSheetId, 11), // column L = Status
+    buildSourceDropdownRequest(tabSheetId, 10), // column K = Source
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -605,18 +626,17 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
     });
   }
 
-  // 5. Batch-append data rows (only if there are leads)
+  // 5. Write data rows (OVERWRITE uses existing empty cells; avoids row-shift that loses validation)
   if (dataRows.length > 0) {
-    await sheets.spreadsheets.values.append({
+    await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: `${LEADS_TAB}!A2`,
       valueInputOption: "USER_ENTERED",
-      insertDataOption: "INSERT_ROWS",
       requestBody: { values: dataRows },
     });
   }
 
-  // 6. Protect yellow columns (A,D,E,F,J,K) — non-fatal; resync still succeeds if this fails
+  // 6. Protect yellow columns + Status/Source dropdowns — non-fatal; resync still succeeds if this fails
   try {
     await applyYellowColumnProtection(sheets, sheetId);
   } catch (err: any) {
@@ -682,16 +702,16 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
     });
   }
 
-  // 5. Batch-append data rows
+  // 5. Write data rows (OVERWRITE — avoids row-shift that strips data validation)
   if (dataRows.length > 0) {
-    await sheets.spreadsheets.values.append({
+    await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2`,
-      valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
+      valueInputOption: "USER_ENTERED",
       requestBody: { values: dataRows },
     });
   }
 
-  // Apply Status dropdown on Master (col M = index 12) — non-fatal
+  // Apply Status (col M=12) + Source (col L=11) dropdowns on Master — non-fatal
   try {
     const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
     const tab = (meta.data.sheets ?? []).find(
@@ -701,12 +721,17 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
       const tabSheetId: number = tab.properties!.sheetId!;
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId: sheetId,
-        requestBody: { requests: [buildStatusDropdownRequest(tabSheetId, 12)] },
+        requestBody: {
+          requests: [
+            buildStatusDropdownRequest(tabSheetId, 12), // col M = Status
+            buildSourceDropdownRequest(tabSheetId, 11), // col L = Source
+          ],
+        },
       });
-      console.log(`[walkin/sheets] Status dropdown applied on Master tab (col M)`);
+      console.log(`[walkin/sheets] Status + Source dropdowns applied on Master tab`);
     }
   } catch (err: any) {
-    console.warn(`[walkin/sheets] Master status dropdown failed:`, err?.message);
+    console.warn(`[walkin/sheets] Master dropdowns failed:`, err?.message);
   }
 
   syncStatus.MASTER.lastSyncAt = new Date();
