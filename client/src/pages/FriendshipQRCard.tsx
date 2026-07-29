@@ -116,17 +116,11 @@ export default function FriendshipQRCard() {
           className="text-center px-8 pt-7 pb-6"
           style={{ background: "linear-gradient(160deg, #ffffff 0%, #f0f4fb 60%, #e4ecf8 100%)", flexShrink: 0 }}
         >
-          {/* Logo in a navy pill so the black logo bg blends cleanly */}
-          <div
-            className="inline-flex items-center justify-center mx-auto mb-4"
-            style={{ background: NAVY, borderRadius: 16, padding: "10px 18px" }}
-          >
-            <img
-              src="/images/ris-logo.png"
-              alt="Rainbow International School"
-              style={{ height: 56, width: "auto", display: "block" }}
-            />
-          </div>
+          <img
+            src="/images/ris-logo.png"
+            alt="Rainbow International School"
+            style={{ height: 80, width: "auto", display: "inline-block", borderRadius: 10, marginBottom: 12 }}
+          />
           <div className="font-black text-lg leading-snug" style={{ color: NAVY }}>
             Rainbow International School
           </div>

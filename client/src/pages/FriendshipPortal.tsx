@@ -598,31 +598,36 @@ export default function FriendshipPortal() {
 
   /* ── render ─────────────────────────────────────────────────── */
 
+  const GRAD = "linear-gradient(160deg, #ffffff 0%, #f0f4fb 60%, #e4ecf8 100%)";
+
   return (
-    <div className="min-h-screen py-6 px-4" style={{ background: NAVY }}>
+    <div className="min-h-screen py-6 px-4" style={{ background: "linear-gradient(160deg, #f0f4fb 0%, #e4ecf8 100%)" }}>
       <div className="max-w-lg md:max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-4">
-          <div className="h-1.5" style={{ background: AMBER }} />
-          <div className="px-6 py-5" style={{ background: NAVY }}>
+        <div className="rounded-2xl shadow-xl overflow-hidden mb-4" style={{ border: "1px solid #dce6f0" }}>
+          {/* Top navy stripe */}
+          <div style={{ height: 6, background: NAVY }} />
+          <div className="px-6 py-5" style={{ background: GRAD }}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center font-black text-sm flex-shrink-0"
-                style={{ background: AMBER, color: NAVY }}>RIS</div>
+              <img src="/images/ris-logo.png" alt="Rainbow International School"
+                style={{ height: 48, width: "auto", borderRadius: 8, flexShrink: 0 }} />
               <div>
-                <div className="font-black text-white text-base leading-tight">Rainbow International School</div>
-                <div className="text-xs text-blue-200">Alliances Portal</div>
+                <div className="font-black text-base leading-tight" style={{ color: NAVY }}>Rainbow International School</div>
+                <div className="text-xs mt-0.5" style={{ color: "#5a7aa0" }}>Alliances Portal</div>
               </div>
             </div>
-            <div className="mt-4 bg-white/10 rounded-xl px-4 py-3">
-              <div className="text-xs text-blue-200 uppercase tracking-wide font-semibold">Submitting for</div>
-              <div className="text-white font-black text-xl mt-0.5">{school.name}</div>
+            <div className="mt-4 rounded-xl px-4 py-3" style={{ background: "#dce6f0" }}>
+              <div className="text-xs uppercase tracking-wide font-semibold" style={{ color: "#5a7aa0" }}>Submitting for</div>
+              <div className="font-black text-xl mt-0.5" style={{ color: NAVY }}>{school.name}</div>
             </div>
           </div>
+          {/* Bottom navy stripe */}
+          <div style={{ height: 6, background: NAVY }} />
         </div>
 
         {/* ── MOBILE: tabbed layout ──────────────────────────────── */}
-        <div className="md:hidden bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="md:hidden bg-white rounded-2xl shadow-lg overflow-hidden" style={{ border: "1px solid #dce6f0" }}>
           <div className="flex border-b border-slate-100">
             <button onClick={() => setTab("manual")}
               className={`flex-1 py-3.5 text-xs font-bold transition-colors flex flex-col items-center gap-1 ${tab === "manual" ? "text-white" : "text-slate-500 hover:text-slate-700"}`}
@@ -653,23 +658,23 @@ export default function FriendshipPortal() {
 
         {/* ── DESKTOP: side-by-side two-column layout ────────────── */}
         <div className="hidden md:grid md:grid-cols-2 gap-5">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: NAVY }}>
-              <UserPlus className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ border: "1px solid #dce6f0" }}>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: GRAD }}>
+              <UserPlus className="w-4 h-4 flex-shrink-0" style={{ color: NAVY }} />
               <div>
-                <div className="font-black text-white text-sm">Add Individual Lead</div>
-                <div className="text-xs text-blue-200 mt-0.5">Fill in one student's details at a time</div>
+                <div className="font-black text-sm" style={{ color: NAVY }}>Add Individual Lead</div>
+                <div className="text-xs mt-0.5" style={{ color: "#5a7aa0" }}>Fill in one student's details at a time</div>
               </div>
             </div>
             {manualPanel}
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: NAVY }}>
-              <Upload className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ border: "1px solid #dce6f0" }}>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2" style={{ background: GRAD }}>
+              <Upload className="w-4 h-4 flex-shrink-0" style={{ color: NAVY }} />
               <div>
-                <div className="font-black text-white text-sm">Bulk Upload</div>
-                <div className="text-xs text-blue-200 mt-0.5">Upload many students at once via Excel</div>
+                <div className="font-black text-sm" style={{ color: NAVY }}>Bulk Upload</div>
+                <div className="text-xs mt-0.5" style={{ color: "#5a7aa0" }}>Upload many students at once via Excel</div>
               </div>
             </div>
             {bulkPanel}
@@ -678,24 +683,25 @@ export default function FriendshipPortal() {
 
         {/* ── YOUR SUBMITTED LEADS (desktop) ─────────────────────── */}
         <div className="hidden md:block mt-6">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden" style={{ border: "1px solid #dce6f0" }}>
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3"
-              style={{ background: NAVY }}>
+              style={{ background: GRAD }}>
               <div className="flex items-center gap-2">
-                <ClipboardList className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <ClipboardList className="w-4 h-4 flex-shrink-0" style={{ color: NAVY }} />
                 <div>
-                  <div className="font-black text-white text-sm">Your Submitted Leads</div>
-                  <div className="text-xs text-blue-200 mt-0.5">Status is updated by Rainbow International School</div>
+                  <div className="font-black text-sm" style={{ color: NAVY }}>Your Submitted Leads</div>
+                  <div className="text-xs mt-0.5" style={{ color: "#5a7aa0" }}>Status is updated by Rainbow International School</div>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <button onClick={loadLeads} disabled={leadsLoading}
-                  className="text-xs px-3 py-1.5 rounded-lg font-semibold border border-white/20 text-white/80 hover:bg-white/10 transition disabled:opacity-50 flex items-center gap-1.5">
+                  className="text-xs px-3 py-1.5 rounded-lg font-semibold border transition disabled:opacity-50 flex items-center gap-1.5"
+                  style={{ borderColor: "#dce6f0", color: NAVY, background: "white" }}>
                   <RefreshCw className={`w-3 h-3 ${leadsLoading ? "animate-spin" : ""}`} />
                   {leadsLoading ? "Loading…" : "Refresh"}
                 </button>
                 {leadsLastRefreshed && (
-                  <div className="text-xs text-blue-300">
+                  <div className="text-xs" style={{ color: "#5a7aa0" }}>
                     {leadsLastRefreshed.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                   </div>
                 )}
@@ -758,7 +764,7 @@ export default function FriendshipPortal() {
             )}
           </div>
 
-          <p className="text-center text-xs mt-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+          <p className="text-center text-xs mt-4" style={{ color: "#5a7aa0" }}>
             Status updates are made by the RIS admissions team.
           </p>
         </div>

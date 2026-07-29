@@ -1,0 +1,185 @@
+Replit Build Prompt — Rainbow Admissions & Marketing Command Center (Academic Year 2027–28)
+
+How to use this: Paste this entire document into the Replit AI Agent as your build brief. It is written as direct instructions to the Agent. Sections marked [CONFIRM] contain placeholder values (branch names, staff names, contact numbers) that you must replace with your real values before or during the build — do not let the Agent invent them.
+
+0. What you are building (one-paragraph summary)
+
+Build a production-grade, mobile-first web application called "Rainbow Admissions Command Center" that captures school-admission walk-in enquiries through QR-code-driven branded forms, stores them in a reliable, validated database (not loose spreadsheets), auto-mirrors the data into Google Sheets for Academic Year 2027–28, and displays everything on fresh, creative, live dashboards at new URL slugs. The system serves two completely separate brands — Rainbow International School (RIS) and Rainbow International Pre-School (RPS) — which must never share logos, colours, data, or dashboards. The core goal is to eliminate the data-entry errors (wrong date formats, deleted cells, overwritten fields, broken formulas) that happen today when branches type directly into shared spreadsheets.
+
+1. Background & problem being solved
+
+Today, each branch types leads directly into shared Google Sheets. This causes recurring, expensive problems that this app must structurally prevent:
+
+Inconsistent dates — the same column mixes 16-Jun-25, 2025-10-30, and 2025-11-08.
+Broken phone numbers — random country codes, and two numbers jammed into one cell (9773254922/ 9082114342).
+Manually typed "Month" column that is often wrong (an October date tagged "Sep-25").
+Overwritten / shifted cells — e.g. a child's-name cell that literally reads "CLOSED".
+Broken dashboards — summary tabs full of #REF! and #DIV/0! because a human edited a formula cell.
+
+Design principle: humans should never again type free-form into a structured data field, and no one except the system should be able to write to the record of truth. Every value is captured through validated inputs; every record is immutable-by-default with a full change history.
+
+2. The two brands — GOLDEN RULE (do not violate)
+
+This is a hard architectural constraint, not a styling preference. RIS and RPS must be kept 100% separate across data, forms, QR codes, dashboards, logos, and colours. Never mix them, never take one brand's screen and swap the label to the other. The only screen allowed to show both is a neutral, opt-in "Group Overview" that uses a neutral palette and shows the two brands side-by-side without blending their identities.
+
+Attribute	Rainbow International School (RIS)	Rainbow International Pre-School (RPS)
+Full name (never abbreviate in UI headers)	Rainbow International School	Rainbow International Pre-School
+Level	CBSE, K–12	Playgroup to Kindergarten (~1.5–5.5 yrs)
+Primary brand colour	Deep navy 
+#10174F	Red 
+#EC210F
+Logo file (I will upload these)	RIS-logo.png (tagline "PASSION FOR EXCELLENCE")	RPS-logo.png (tagline "The Future Begins Here")
+Tone / feel	Confident, aspirational, professional, trustworthy	Warm, caring, playful, joyful, reassuring
+
+Logo rules: never stretch, distort, recolour, crop, or rotate a logo; keep clear space around it; each brand's screens use only its own logo.
+
+Colour rules: RIS theme is built on 
+#10174F; RPS theme is built on 
+#EC210F. You may derive tints/shades and neutrals for good UI contrast, but do not introduce a second "brand" colour or use one brand's colour anywhere on the other brand's screens.
+
+Copy rules (for any parent-facing text such as form headers or confirmation screens): trust-first tone. Allowed CTAs: Enquire Now, Schedule a Campus Visit, Book a School Tour, Speak With Our Admissions Team, Learn More, Admissions Open. Banned: "No. 1 / Best / World-Class / guaranteed", and fake urgency ("only 2 seats left / last chance / apply immediately"). Do not invent facilities, fees, dates, rankings, awards, or contact details anywhere — use a visible [CONFIRM] placeholder instead.
+
+3. Recommended technology stack
+
+Build a single full-stack app on Replit:
+
+Framework: Next.js (App Router, TypeScript) — its file-based routing cleanly gives us the required slugs.
+Styling: Tailwind CSS + shadcn/ui components. Fully responsive; tablet/kiosk-first for the capture form.
+Charts: Recharts (funnels, bars, lines, donuts).
+Database: PostgreSQL (use Replit's built-in Postgres) via Prisma ORM. This database is the single source of truth.
+Auth: Email + password with role-based access (use NextAuth credentials provider or a well-structured custom auth). Passwords hashed (bcrypt). Session-based.
+QR generation: qrcode npm package.
+Google Sheets mirror: googleapis with a Google service account (see §9). This is a one-way DB → Sheets sync so the spreadsheet is always a clean, read-only reflection of the database.
+Spreadsheet export: exceljs for on-demand .xlsx downloads.
+Env management: all secrets in Replit Secrets (never hard-coded).
+
+If any library choice conflicts with the Replit environment, pick the closest stable equivalent and note the substitution in the README — but do not change the architecture (Postgres = source of truth, Sheets = mirror).
+
+4. Data model (Prisma schema)
+
+Create these tables. Use enums for controlled vocabularies so bad values are impossible at the database level.
+
+Brand enum: RIS, RPS.
+
+Branch: id, name, brand (Brand), code (short slug, e.g. brahmand), isActive (bool). Seed from the [CONFIRM] branch list in §11.
+
+User: id, name, email (unique), passwordHash, role (enum: BRANCH_STAFF, HO, MANAGEMENT, ADMIN), brand (nullable — null = all brands), branchId (nullable — null = all branches), isActive.
+
+Lead (the core record):
+
+id (uuid)
+brand (Brand) — set by which form was used; immutable after creation
+branchId (FK Branch)
+academicYear (string, default "2027-28")
+enquiryDate (date; defaults to today; cannot be in the future)
+monthLabel (string; auto-derived from enquiryDate, e.g. "Jun-27"; never user-editable)
+parentName (string, required)
+childName (string, required)
+phone (string, required, normalized to 10 digits, see §6)
+altPhone (string, optional, normalized)
+email (string, optional, validated)
+program (enum/lookup, brand-specific — see §5)
+source (enum/lookup — see §5)
+status (enum/lookup — see §5; default OPEN)
+closeReason (enum/lookup, optional; required only when status is a closed/lost state — see §5)
+remark (free text, optional — the ONLY free-text field, and it never feeds analytics)
+leadOwner (lookup of staff names — see §11 [CONFIRM])
+walkInDate (date, optional)
+revisitDate (date, optional)
+isArchived (bool, default false) — soft delete only
+createdById (FK User), createdAt, updatedById (FK User), updatedAt
+Add a DB index on (brand, branchId, enquiryDate) and on phone.
+
+LeadAuditLog: id, leadId (FK), field, oldValue, newValue, changedById (FK User), changedAt. Write one row for every field change and for create/archive/restore. This is the tamper-evidence layer.
+
+Lookup tables (so Admin can add values without a code change): Program, Source, Status, CloseReason — each with id, label, brand (nullable for shared), sortOrder, isActive. Seed them with the exact values in §5.
+
+5. Controlled vocabularies (seed these EXACTLY — harvested from the real 26–27 sheets)
+
+These are dropdowns only. No free typing. Admin can extend later.
+
+RIS programs (grades): Nursery, Junior KG, Senior KG, Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 7, Class 8, Class 9, Class 10, Class 11 – Science, Class 11 – Commerce, Class 11 – Humanities, Class 12 – Science, Class 12 – Commerce, Class 12 – Humanities.
+
+RPS programs: Playgroup, Nursery, Junior KG, Senior KG. [CONFIRM] add Daycare / any others if you offer them.
+
+Sources (both brands): Google, Meta, WhatsApp, Telephonic, Walk-in, Referral, Hoarding/Banner, Website. [CONFIRM] trim/extend to your real channels.
+
+Status workflow (both brands): OPEN → WALK-IN BOOKED → WALK-IN COMPLETED → ADMISSION DONE (won). Terminal/other states: CLOSED (lost), TRANSFERRED, INTEGRATED, NEXT YEAR (AY 28-29).
+
+Enforce sensible transitions (e.g. cannot go straight from OPEN to ADMISSION DONE without a walk-in — warn but allow with a reason, your call, but log it).
+When status is set to CLOSED, closeReason becomes required.
+When WALK-IN BOOKED or WALK-IN COMPLETED, walkInDate becomes required.
+
+Close reasons (seed exactly — these are your real "why we lost the lead" tags): Location, Distance, No seats, High Fees, Not Interested, Admission Done – Other School, Rainbow Parent, Board Issue, Continuing in Same School, Transfer to RPS, Transfer to RIS, Autism/LD/Not Eligible, Did Not Enquire, Job Enquiry, Invalid Number, Duplicate, Other. (Never allow a blank/BLANK reason — that was a data-quality problem before. If unknown, force Other + a remark.)
+
+6. Validation rules (this is the heart of the fix — implement strictly)
+
+Apply on the client (instant feedback) and re-validate on the server (never trust the client):
+
+Phone: accept digits only; strip spaces, +, -, /, and a leading 91/0; the result must be exactly 10 digits and start 6–9 (Indian mobile). Reject anything else with a clear inline message. Store the clean 10-digit value. If a user tries to enter two numbers, the second goes into the separate altPhone field.
+Duplicate detection: on submit, if the same phone already exists for the same brand in AY 27-28, show a non-blocking warning ("This number already enquired on {date} for {program} at {branch}") and let staff choose View existing or Create anyway (a sibling/second child is valid). Log the decision.
+Email: optional; if present, must match a standard email pattern; lowercase-normalize.
+Dates: date-picker input only — no typed date strings. Store as real dates. enquiryDate defaults to today and cannot be in the future. walkInDate/revisitDate cannot be before enquiryDate.
+Month: auto-derived from enquiryDate; not shown as an input; always correct.
+Names: required, trimmed, title-cased for display; min 2 chars.
+Program / Source / Status / Close reason / Branch / Lead owner: dropdowns bound to the lookup tables — impossible to enter an off-list value.
+Required-field gating: the submit button stays disabled until all required fields are valid.
+No destructive actions for staff: staff can never delete a record or edit a locked field (brand, enquiryDate, createdBy). "Delete" = archive (soft), reversible only by Admin, always logged.
+7. The QR walk-in capture experience
+
+Who uses it: front-desk staff on a tablet/kiosk at each branch reception, the moment a parent says "I want to enquire."
+
+How it's reached: a printed QR code per brand (and optionally per branch — see §8) that opens the branded capture form. The QR points to the brand's capture URL.
+
+Form screens (kiosk mode):
+
+Branded welcome / start screen — brand logo, brand-colour background, a warm trust-first line (e.g. RIS: "Welcome to Rainbow International School — let's begin your enquiry." / RPS: "Welcome to Rainbow International Pre-School — happy beginnings start here."), and a big "Start Enquiry" button.
+Capture form — large, touch-friendly fields in this order: Branch (pre-selected if per-branch QR) · Parent's Name · Child's Name · Phone · Alternate Phone (optional) · Email (optional) · Program (brand-specific dropdown) · Source (how did you hear about us) · Lead Owner (staff picking up the enquiry) · Enquiry Date (defaults today, editable via picker) · Remark (optional). Status defaults to OPEN; walk-in/revisit dates are set later from the admin/leads view, not on the kiosk.
+Confirmation screen — "Enquiry saved ✓", shows a summary, then auto-resets to the welcome screen after ~6 seconds (or a "New Enquiry" button) so the next parent can be served. Never expose the previous parent's data to the next.
+
+Kiosk safeguards: a short staff PIN (or logged-in staff session) to open the form so it can't be abused by passers-by; the form only writes, never lists/searches other leads.
+
+On submit: write to Postgres → append the change to the audit log → the record instantly appears on the dashboards → queue the Google Sheets mirror sync.
+
+8. Routes & slugs (create exactly these)
+
+Public / kiosk capture (branded):
+
+/walkin-ris-27-28 — RIS branded capture form (navy theme, RIS logo).
+/walkin-rps-27-28 — RPS branded capture form (red theme, RPS logo).
+[CONFIRM] optional per-branch variants, e.g. /walkin-ris-27-28/brahmand, that pre-select the branch.
+
+Dashboards (fresh, live) — these mirror your existing naming with the new year suffix:
+
+/marketing-27-28 — marketing/lead-source dashboard (Group-level or split by brand tabs).
+/sales-27-28 — RIS admissions funnel dashboard (navy theme, RIS logo).
+/rps-sales-27-28 — RPS admissions funnel dashboard (red theme, RPS logo).
+/overview-27-28 — neutral Group Overview showing RIS and RPS side by side.
+
+Operations & admin (login required):
+
+/login
+/leads — searchable, filterable master table with inline edit + per-record change history (replaces staff editing the raw sheet).
+/admin — manage users, branches, dropdown lookups, view full audit log, trigger/inspect Sheet sync, download .xlsx exports, generate/print QR codes.
+
+Every dashboard slug must be shareable and load live data from the database. Guard /leads and /admin behind auth; dashboards can be login-gated too [CONFIRM] (recommended, since the current ones appear to be).
+
+9. Google Sheets for AY 2027–28 (the app creates and owns them)
+
+The client explicitly wants the AY 27-28 spreadsheets created and kept in sync. Implement this as a one-way mirror so the sheet is always clean and humans don't type into it.
+
+On first setup (an Admin action, "Provision AY 27-28 Sheets"): using a Google service account, create two spreadsheets:
+
+"RIS Walk-in Enquiries 2027-2028"
+"RPS Walk-in Enquiries 2027-2028"
+
+Each spreadsheet has:
+
+A Leads tab with a locked, formatted header row using these columns (order matters — this matches and cleans up the current sheets): Enquiry Date · Month · Academic Year · Branch · Parent's Name · Child's Name · Phone · Alt Phone · Email · Program · Source · Status · Close Reason · Remark · Lead Owner · Walk-in Date · Revisit Date · Created By · Created At · Last Updated.
+A Dashboard tab with correct, locked funnel formulas (no #REF!): grade-wise Leads Received → Booking Done → Walk-in Done → Admission Done, plus conversion percentages against targets Lead→Booking 70%, Booking→Walk-in 80%, Walk-in→Admission 40% (these targets came from your current sheet). Use QUERY/COUNTIFS that reference the Leads tab so they never break.
+Protected ranges / view-only sharing so branch users can look but not edit; only the service account writes.
+Data-validation dropdowns on the relevant columns mirroring §5 (defense in depth).
+
+Ongoing sync: every create/update/archive in the app upserts the corresponding row in the correct brand's sheet (match on Lead id stored in a hidden column). Provide an Admin "Re-sync now" button and show last-sync status. Never write RIS data into the RPS sheet or vice-versa.
+
+Setup notes for the README: list the exact steps to create the Google Cloud service account, enable the Sheets + Drive APIs, share/create target files, and which env vars to set (GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, RIS_SHEET_ID, RPS_SHEET_ID). If the sheets are auto-created, capture and store their IDs automatically. Also provide .xlsx download as a no-Google-account fallback.
