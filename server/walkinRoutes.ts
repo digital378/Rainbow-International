@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -907,6 +907,24 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       console.error("[walkin/stats]", err?.message);
       res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // ── GET /api/walkin/crm-stats ─────────────────────────────────
+  // Reads the "CRM Leads Tracker" tab directly from the brand's Google
+  // Sheet and returns KPIs in the same shape as /api/walkin/stats.
+  // Sheets are the source of truth for dashboards.
+  app.get("/api/walkin/crm-stats", async (req, res) => {
+    try {
+      const brand = typeof req.query.brand === "string" ? req.query.brand : null;
+      if (!brand || !["RIS", "RPS"].includes(brand)) {
+        return res.status(400).json({ message: "brand must be RIS or RPS" });
+      }
+      const stats = await readCrmLeadsTrackerStats(brand as "RIS" | "RPS");
+      res.json(stats);
+    } catch (err: any) {
+      console.error("[walkin/crm-stats]", err?.message);
+      res.status(500).json({ message: "Failed to fetch CRM stats from sheet" });
     }
   });
 

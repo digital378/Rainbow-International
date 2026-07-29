@@ -283,8 +283,8 @@ function Dashboard() {
   const fetchData = useCallback(() => {
     setLoading(true);
     Promise.all([
-      fetch("/api/walkin/stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-      fetch("/api/walkin/stats?brand=RPS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/walkin/crm-stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/walkin/crm-stats?brand=RPS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
       fetch("/api/walkin/branches?active=false").then(r => r.ok ? r.json() : []),
     ]).then(([ris, rps, brs]: [Stats, Stats, Branch[]]) => {
       if (!cancelled.current) { setRisStats(ris); setRpsStats(rps); setBranches(brs); setError(null); setLastFetch(new Date()); }
@@ -330,7 +330,7 @@ function Dashboard() {
           <div>
             <div className="font-black text-lg text-white leading-tight">Marketing Dashboard · AY 2027-28</div>
             <div className="text-xs text-blue-200 flex items-center gap-2">
-              Rainbow Group · Lead source & funnel analytics · Live DB
+              Rainbow Group · Lead source & funnel analytics · Live from CRM Leads Tracker
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500 text-white text-[10px] font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />LIVE
               </span>
@@ -365,7 +365,7 @@ function Dashboard() {
       <div className="max-w-7xl mx-auto p-6">
         <DashboardContent stats={activeStats} branches={branches} tab={tab} />
         <div className="mt-8 text-center text-xs text-slate-400">
-          Live from walkin_leads table · AY 2027-28 · auto-refreshes every 60 seconds
+          Live from CRM Leads Tracker · AY 2027-28 · auto-refreshes every 60 seconds
           <a href="/leads" className="ml-3 underline" style={{ color: AMBER }}>Manage Leads →</a>
           <a href="/overview-27-28" className="ml-3 underline" style={{ color: AMBER }}>Group Overview →</a>
         </div>

@@ -83,7 +83,7 @@ function Dashboard() {
   const fetchData = useCallback(() => {
     setLoading(true);
     Promise.all([
-      fetch("/api/walkin/stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/walkin/crm-stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
       fetch("/api/walkin/branches?active=false").then(r => r.ok ? r.json() : []),
     ]).then(([stats, brs]: [Stats, Branch[]]) => {
       if (!cancelled.current) { setData(stats); setBranches(brs); setError(null); setLastFetch(new Date()); }
@@ -134,7 +134,7 @@ function Dashboard() {
           <div>
             <div className="font-black text-lg text-white leading-tight">RIS Sales Dashboard · AY 2027-28</div>
             <div className="text-xs text-blue-200 flex items-center gap-2">
-              Live from DB · Rainbow International School
+              Live from CRM Leads Tracker · Rainbow International School
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500 text-white text-[10px] font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />LIVE
               </span>
@@ -289,7 +289,7 @@ function Dashboard() {
 
         {/* Footer note */}
         <div className="text-center text-xs text-slate-400">
-          Data from AY 2027-28 walkin_leads table · RIS only · auto-refreshes every 60 seconds
+          Live from CRM Leads Tracker · AY 2027-28 · RIS only · auto-refreshes every 60 seconds
           <a href="/leads" className="ml-3 underline" style={{ color: AMBER }}>Manage Leads →</a>
         </div>
       </div>

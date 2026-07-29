@@ -132,8 +132,8 @@ function Dashboard() {
   const fetchData = useCallback(() => {
     setLoading(true);
     Promise.all([
-      fetch("/api/walkin/stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-      fetch("/api/walkin/stats?brand=RPS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/walkin/crm-stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch("/api/walkin/crm-stats?brand=RPS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
     ]).then(([ris, rps]: [Stats, Stats]) => {
       if (!cancelled.current) { setRisStats(ris); setRpsStats(rps); setError(null); setLastFetch(new Date()); }
     }).catch(e => { if (!cancelled.current) setError(String(e)); })

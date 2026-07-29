@@ -1354,6 +1354,127 @@ export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
   });
 }
 
+// ── CRM Leads Tracker — sheet reader & stats aggregator ──────────
+// Reads the "CRM Leads Tracker" tab (not WALKINs) directly from the
+// brand's Google Sheet and computes dashboard KPIs.
+// Column layout (0-based, row 1 = header):
+//   A(0)=Date  B(1)=Time  C(2)=Parent's Name  D(3)=Child's Name
+//   E(4)=Phone  F(5)=Program  G(6)=Status  H(7)=Remark
+//   I(8)=Lead Owner  J(9)=Source  K(10)=Walk-In Date
+//   L(11)=Revisit Date  M(12)=Email ID
+
+const CRM_TAB = "CRM Leads Tracker";
+
+const CRM_MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/** Parse DD/MM/YYYY or YYYY-MM-DD → "Mon-YY" month label. */
+function parseCrmMonthLabel(raw: string): string {
+  const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (dmy) {
+    const m = parseInt(dmy[2], 10) - 1;
+    const y = parseInt(dmy[3], 10);
+    return `${CRM_MONTH_NAMES[m] ?? "Unk"}-${String(y).slice(2)}`;
+  }
+  const ymd = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (ymd) {
+    const m = parseInt(ymd[2], 10) - 1;
+    const y = parseInt(ymd[1], 10);
+    return `${CRM_MONTH_NAMES[m] ?? "Unk"}-${String(y).slice(2)}`;
+  }
+  return "Unknown";
+}
+
+/** Sort key for "Mon-YY" labels that works across year boundaries. */
+function crmMonthSortKey(label: string): number {
+  const [mon, yr] = label.split("-");
+  const m = CRM_MONTH_NAMES.indexOf(mon);
+  const y = parseInt(yr, 10);
+  const fullYear = y < 50 ? 2000 + y : 1900 + y;
+  return fullYear * 12 + (m < 0 ? 0 : m);
+}
+
+export interface CrmStats {
+  brand: string;
+  academicYear: string;
+  kpis: { totalLeads: number; bookings: number; walkins: number; admissions: number };
+  monthly: Array<{ month: string; cnt: number }>;
+  bySource: Array<{ source: string; cnt: number }>;
+  byBranch: Array<{ branchId: number | null; cnt: number }>;
+  byOwner: Array<{ leadOwner: string | null; cnt: number }>;
+  statusBreakdown: Array<{ status: string; cnt: number }>;
+  generatedAt: string;
+}
+
+/**
+ * Reads the "CRM Leads Tracker" tab from the brand's Google Sheet and
+ * returns aggregated stats in the same shape as /api/walkin/stats.
+ * byBranch is always [] — the CRM tab has no branch column.
+ */
+export async function readCrmLeadsTrackerStats(brand: "RIS" | "RPS"): Promise<CrmStats> {
+  const auth = getAuthClient();
+  if (!auth) throw new Error("Google Sheets auth not configured");
+  const sheets = google.sheets({ version: "v4", auth });
+  const sheetId = getSheetId(brand);
+  if (!sheetId) throw new Error(`Sheet ID not configured for ${brand}`);
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `'${CRM_TAB}'!A:M`,
+  });
+
+  const rows = res.data.values ?? [];
+  const dataRows = rows.slice(1); // skip header row
+
+  let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
+
+  const monthMap  = new Map<string, number>();
+  const sourceMap = new Map<string, number>();
+  const ownerMap  = new Map<string, number>();
+  const statusMap = new Map<string, number>();
+
+  for (const row of dataRows) {
+    const date = (row[0] ?? "").toString().trim();
+    if (!date) continue; // skip completely blank rows
+
+    const status    = (row[6] ?? "").toString().trim().toUpperCase();
+    const source    = (row[9] ?? "").toString().trim() || "Unknown";
+    const leadOwner = (row[8] ?? "").toString().trim() || null;
+    const monthLabel = parseCrmMonthLabel(date);
+
+    totalLeads++;
+
+    if (status === "WALK-IN BOOKED") bookings++;
+    if (["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status)) walkins++;
+    if (status === "ADMISSION DONE") admissions++;
+
+    monthMap .set(monthLabel,         (monthMap .get(monthLabel)         ?? 0) + 1);
+    sourceMap.set(source,             (sourceMap.get(source)             ?? 0) + 1);
+    ownerMap .set(leadOwner ?? "",    (ownerMap .get(leadOwner ?? "")    ?? 0) + 1);
+    statusMap.set(status,             (statusMap.get(status)             ?? 0) + 1);
+  }
+
+  const monthly = Array.from(monthMap, ([month, cnt]) => ({ month, cnt }))
+    .sort((a, b) => crmMonthSortKey(a.month) - crmMonthSortKey(b.month));
+  const bySource = Array.from(sourceMap, ([source, cnt]) => ({ source, cnt }))
+    .sort((a, b) => b.cnt - a.cnt);
+  const byOwner = Array.from(ownerMap, ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt }))
+    .sort((a, b) => b.cnt - a.cnt);
+  const statusBreakdown = Array.from(statusMap, ([status, cnt]) => ({ status, cnt }))
+    .sort((a, b) => b.cnt - a.cnt);
+
+  return {
+    brand,
+    academicYear: "2027-28",
+    kpis: { totalLeads, bookings, walkins, admissions },
+    monthly,
+    bySource,
+    byBranch: [], // CRM Leads Tracker has no branch column
+    byOwner,
+    statusBreakdown,
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 // ── Auto-pull timer (every 5 minutes) ───────────────────────────
 export function startAutoPull(): void {
   const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
