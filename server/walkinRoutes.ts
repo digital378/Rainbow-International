@@ -28,6 +28,9 @@ import {
 } from "@shared/schema";
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
+import { createRequire } from "node:module";
+const _require = createRequire(import.meta.url);
+const XLSX = _require("xlsx") as typeof import("xlsx");
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -357,7 +360,7 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/leads", requireAdmin, async (req, res) => {
     try {
       const {
-        brand, branchId, status, dateFrom, dateTo, phone: phoneQ,
+        brand, branchId, status, leadOwner, dateFrom, dateTo, phone: phoneQ,
         search, page = "1", pageSize = "50", includeArchived,
       } = req.query as Record<string, string>;
 
@@ -369,6 +372,7 @@ export function registerWalkinRoutes(app: Express) {
       if (brand) conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
       if (status) conditions.push(eq(walkinLeads.status, status));
+      if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
       if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
       if (dateTo) conditions.push(lte(walkinLeads.enquiryDate, dateTo));
       if (!includeArchived || includeArchived !== "true") {
@@ -412,22 +416,26 @@ export function registerWalkinRoutes(app: Express) {
   });
 
   // ── GET /api/walkin/leads/export ─────────────────────────────
+  // Supports ?format=xlsx (default) or ?format=csv
   app.get("/api/walkin/leads/export", requireAdmin, async (req, res) => {
     try {
-      const { brand, branchId, status, dateFrom, dateTo } = req.query as Record<string, string>;
+      const {
+        brand, branchId, status, leadOwner, dateFrom, dateTo,
+      } = req.query as Record<string, string>;
+      const format = typeof req.query.format === "string" ? req.query.format : "xlsx";
 
       const conditions: any[] = [eq(walkinLeads.isArchived, false)];
-      if (brand) conditions.push(eq(walkinLeads.brand, brand));
+      if (brand)    conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
-      if (status) conditions.push(eq(walkinLeads.status, status));
+      if (status)   conditions.push(eq(walkinLeads.status, status));
+      if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
       if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
-      if (dateTo) conditions.push(lte(walkinLeads.enquiryDate, dateTo));
+      if (dateTo)   conditions.push(lte(walkinLeads.enquiryDate, dateTo));
 
       const rows = await db.select().from(walkinLeads)
         .where(and(...conditions))
         .orderBy(desc(walkinLeads.enquiryDate));
 
-      // Build CSV (xlsx dependency lives in Task 5 / admin-panel; CSV works standalone)
       const HEADERS = [
         "Enquiry Date", "Month", "Academic Year", "Brand", "Branch ID",
         "Parent Name", "Child Name", "Phone", "Alt Phone", "Email",
@@ -435,29 +443,38 @@ export function registerWalkinRoutes(app: Express) {
         "Lead Owner", "Walk-in Date", "Revisit Date",
         "Created By", "Created At", "Updated At", "ID",
       ];
-
-      const escape = (v: string | null | undefined) => {
-        const s = v ?? "";
-        if (s.includes(",") || s.includes('"') || s.includes("\n")) {
-          return `"${s.replace(/"/g, '""')}"`;
-        }
-        return s;
-      };
-
-      const csvRows = rows.map((r) => [
-        r.enquiryDate, r.monthLabel, r.academicYear, r.brand, String(r.branchId ?? ""),
+      const dataRows = rows.map((r) => [
+        r.enquiryDate, r.monthLabel, r.academicYear, r.brand, r.branchId ?? "",
         r.parentName, r.childName, r.phone, r.altPhone ?? "", r.email ?? "",
         r.program, r.source, r.status, r.closeReason ?? "", r.remark ?? "",
         r.leadOwner ?? "", r.walkInDate ?? "", r.revisitDate ?? "",
         r.createdBy, r.createdAt.toISOString(), r.updatedAt.toISOString(), r.id,
-      ].map(escape).join(","));
+      ]);
 
-      const csv = [HEADERS.join(","), ...csvRows].join("\n");
-      const filename = `walkin-leads-${brand || "all"}-${new Date().toISOString().slice(0, 10)}.csv`;
+      const baseName = `walkin-leads-${brand || "all"}-${new Date().toISOString().slice(0, 10)}`;
 
-      res.setHeader("Content-Type", "text/csv");
-      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-      res.send(csv);
+      if (format === "csv") {
+        const escape = (v: string | number | null | undefined) => {
+          const s = String(v ?? "");
+          return (s.includes(",") || s.includes('"') || s.includes("\n"))
+            ? `"${s.replace(/"/g, '""')}"` : s;
+        };
+        const csv = [HEADERS.join(","), ...dataRows.map(r => r.map(escape).join(","))].join("\n");
+        res.setHeader("Content-Type", "text/csv");
+        res.setHeader("Content-Disposition", `attachment; filename="${baseName}.csv"`);
+        return res.send(csv);
+      }
+
+      // Default: xlsx
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([HEADERS, ...dataRows]);
+      ws["!cols"] = [10,8,10,6,9,20,18,13,13,22,18,14,18,22,30,18,10,10,12,22,22,38].map(w => ({ wch: w }));
+      XLSX.utils.book_append_sheet(wb, ws, "Leads");
+      const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename="${baseName}.xlsx"`);
+      res.send(buf);
     } catch (err: any) {
       console.error("[walkin/leads/export]", err?.message);
       res.status(500).json({ message: "Export failed" });
