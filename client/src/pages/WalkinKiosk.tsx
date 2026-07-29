@@ -206,21 +206,16 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const cfg = BRAND[brand];
 
   // ── Screen state
-  type Screen = "welcome" | "form" | "confirm";
-  const [screen, setScreen] = useState<Screen>("welcome");
+  type Screen = "form" | "confirm";
+  const [screen, setScreen] = useState<Screen>("form");
 
   // ── Lookups
   const [lookups, setLookups] = useState<Lookups | null>(null);
   const [lookupsError, setLookupsError] = useState("");
 
-  // ── Branch / PIN state
+  // ── Branch state
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const [selectedBranchName, setSelectedBranchName] = useState("");
-  const [pin, setPin] = useState("");
-  const [pinError, setPinError] = useState("");
-  const [pinLoading, setPinLoading] = useState(false);
-  const [pinVerified, setPinVerified] = useState(false);
-  const pinInputRef = useRef<HTMLInputElement>(null);
 
   // ── Form state
   const [parentName, setParentName] = useState("");
@@ -276,13 +271,6 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
       .catch(() => setLookupsError("Could not load form data. Please refresh."));
   }, [brand, branchCode]);
 
-  // ── Auto-focus PIN input on welcome screen
-  useEffect(() => {
-    if (screen === "welcome" && !pinVerified) {
-      setTimeout(() => pinInputRef.current?.focus(), 100);
-    }
-  }, [screen, pinVerified]);
-
   // ── Countdown timer for confirmation screen
   useEffect(() => {
     if (screen !== "confirm") return;
@@ -297,11 +285,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetToWelcome = useCallback(() => {
-    setScreen("welcome");
-    setPin("");
-    setPinError("");
-    setPinVerified(false);
-    // Reset form too — never show previous parent's data
+    setScreen("form");
+    // Reset form — never show previous parent's data
     setParentName(""); setChildName(""); setPhone(""); setPhoneError("");
     setAltPhone(""); setEmail(""); setProgram(""); setSource("");
     setLeadOwner(""); setEnquiryDate(today()); setRemark("");
@@ -311,29 +296,6 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     // Keep branch selection if URL-based, clear if manually chosen
     if (!branchCode) { setSelectedBranchId(null); setSelectedBranchName(""); }
   }, [branchCode]);
-
-  // ── PIN verification
-  const verifyPin = async () => {
-    if (!selectedBranchId || !pin) {
-      setPinError("Please enter the staff PIN to continue.");
-      return;
-    }
-    const branch = lookups?.branches.find(b => b.id === selectedBranchId);
-    if (!branch) return;
-
-    setPinLoading(true); setPinError("");
-    try {
-      const res = await fetch(`/api/walkin/branches/${branch.code}/verify-pin?pin=${encodeURIComponent(pin)}`);
-      if (res.status === 401) { setPinError("Incorrect PIN. Please try again."); setPin(""); pinInputRef.current?.focus(); return; }
-      if (!res.ok) { setPinError("Verification failed. Please try again."); return; }
-      setPinVerified(true);
-      setScreen("form");
-    } catch {
-      setPinError("Network error. Please try again.");
-    } finally {
-      setPinLoading(false);
-    }
-  };
 
   // ── Phone blur: normalize + duplicate check
   const handlePhoneBlur = async () => {
@@ -361,6 +323,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
 
   // ── Form validation
   const isFormValid = () => {
+    // Branch must be selected when not coming from a URL with branchCode
+    if (!branchCode && !selectedBranchId) return false;
     if (!parentName.trim() || parentName.trim().length < 2) return false;
     if (!childName.trim() || childName.trim().length < 2) return false;
     if (!phone || !("normalized" in normalizePhone(phone))) return false;
@@ -451,107 +415,7 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const accentStyle = { background: cfg.primary };
 
   // ──────────────────────────────────────────────────────────
-  // SCREEN 1: WELCOME
-  // ──────────────────────────────────────────────────────────
-  if (screen === "welcome" || screen === "form" && !pinVerified) {
-    const noBranches = lookups && lookups.branches.length === 0;
-    const branchSelected = selectedBranchId !== null;
-
-    return (
-      <div style={bgStyle} className="flex flex-col items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="bg-white rounded-2xl p-4 shadow-lg mb-5 inline-block">
-              <img src={cfg.logoSrc} alt={cfg.logoAlt} style={{ height: 80, width: "auto" }} />
-            </div>
-            <h1 className="text-white font-black text-2xl text-center leading-snug">{cfg.greeting}</h1>
-            <p className="text-white/70 text-sm mt-2 text-center">{cfg.subGreeting}</p>
-          </div>
-
-          {/* Card */}
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-            <div className="px-6 py-5">
-              {lookupsError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex gap-2">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  {lookupsError}
-                </div>
-              )}
-
-              {/* Branch selector — only if no branchCode in URL */}
-              {!branchCode && lookups && (
-                <div className="mb-5">
-                  <FieldLabel required>Select Branch</FieldLabel>
-                  <SelectInput
-                    value={selectedBranchId?.toString() ?? ""}
-                    onChange={e => {
-                      const id = parseInt(e.target.value, 10);
-                      const b = lookups.branches.find(x => x.id === id);
-                      setSelectedBranchId(id || null);
-                      setSelectedBranchName(b?.name ?? "");
-                    }}
-                    placeholder="— Select your branch —"
-                  >
-                    {lookups.branches.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </SelectInput>
-                  {noBranches && (
-                    <p className="mt-2 text-sm text-amber-600">No active branches configured yet. Please contact the administrator.</p>
-                  )}
-                </div>
-              )}
-
-              {branchCode && selectedBranchName && (
-                <div className="mb-5 px-3 py-2 rounded-lg text-sm font-semibold" style={{ background: cfg.light, color: cfg.primary }}>
-                  📍 {selectedBranchName}
-                </div>
-              )}
-
-              {/* PIN entry */}
-              <div className="mb-5">
-                <FieldLabel required>Staff PIN</FieldLabel>
-                <div className="flex gap-3">
-                  <input
-                    ref={pinInputRef}
-                    type="password"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    autoComplete="off"
-                    value={pin}
-                    onChange={e => { setPin(e.target.value); setPinError(""); }}
-                    onKeyDown={e => e.key === "Enter" && branchSelected && verifyPin()}
-                    placeholder="Enter PIN"
-                    disabled={!branchSelected || !lookups}
-                    className={`flex-1 px-4 py-4 rounded-xl border-2 text-base font-mono tracking-[0.4em] focus:outline-none transition text-center
-                      ${pinError ? "border-red-400 bg-red-50" : "border-slate-200 focus:border-slate-500"}
-                      ${(!branchSelected || !lookups) ? "opacity-50 cursor-not-allowed bg-slate-50" : "bg-white"}`}
-                  />
-                  <button
-                    onClick={verifyPin}
-                    disabled={!pin || !branchSelected || pinLoading || !lookups}
-                    className="px-6 py-4 rounded-xl font-black text-white text-sm transition disabled:opacity-50"
-                    style={accentStyle}
-                  >
-                    {pinLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Unlock"}
-                  </button>
-                </div>
-                {pinError && <p className="mt-2 text-sm text-red-600 font-medium">{pinError}</p>}
-              </div>
-
-              <p className="text-xs text-slate-400 text-center">
-                Ask a staff member to enter the branch PIN to begin the enquiry process.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ──────────────────────────────────────────────────────────
-  // SCREEN 3: CONFIRMATION
+  // SCREEN 2: CONFIRMATION
   // ──────────────────────────────────────────────────────────
   if (screen === "confirm" && confirmedLead) {
     return (
@@ -650,6 +514,38 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
           <div style={{ height: 5, background: cfg.primary }} />
 
           <div className="px-6 py-6 space-y-5">
+
+            {/* Lookups error */}
+            {lookupsError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex gap-2">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                {lookupsError}
+              </div>
+            )}
+
+            {/* Branch selector — only shown when no branchCode in URL */}
+            {!branchCode && lookups && (
+              <div>
+                <FieldLabel required>Select Branch</FieldLabel>
+                <SelectInput
+                  value={selectedBranchId?.toString() ?? ""}
+                  onChange={e => {
+                    const id = parseInt(e.target.value, 10);
+                    const b = lookups.branches.find(x => x.id === id);
+                    setSelectedBranchId(id || null);
+                    setSelectedBranchName(b?.name ?? "");
+                  }}
+                  placeholder="— Select your branch —"
+                >
+                  {lookups.branches.map(b => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </SelectInput>
+                {lookups.branches.length === 0 && (
+                  <p className="mt-2 text-sm text-amber-600">No active branches configured yet. Please contact the administrator.</p>
+                )}
+              </div>
+            )}
 
             {/* Parent Name */}
             <div>

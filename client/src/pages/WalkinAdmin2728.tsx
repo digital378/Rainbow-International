@@ -164,8 +164,8 @@ function BranchesTab({ token }: { token: string }) {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Branch | null>(null);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", brand: "RIS", code: "", pin: "0000" });
-  const [editForm, setEditForm] = useState({ name: "", pin: "", isActive: true });
+  const [form, setForm] = useState({ name: "", brand: "RIS", code: "" });
+  const [editForm, setEditForm] = useState({ name: "", isActive: true });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<Branch | null>(null);
@@ -190,7 +190,7 @@ function BranchesTab({ token }: { token: string }) {
         method: "POST", headers: hdrs(token),
         body: JSON.stringify(form),
       });
-      if (r.ok) { setAdding(false); setForm({ name: "", brand: "RIS", code: "", pin: "1234" }); load(); }
+      if (r.ok) { setAdding(false); setForm({ name: "", brand: "RIS", code: "" }); load(); }
       else { const d = await r.json(); setMsg(d.message || "Failed"); }
     } catch { setMsg("Network error"); }
     setSaving(false);
@@ -211,7 +211,7 @@ function BranchesTab({ token }: { token: string }) {
 
   const startEdit = (b: Branch) => {
     setEditing(b);
-    setEditForm({ name: b.name, pin: b.pin, isActive: b.isActive });
+    setEditForm({ name: b.name, isActive: b.isActive });
     setMsg("");
   };
 
@@ -249,11 +249,8 @@ function BranchesTab({ token }: { token: string }) {
               <option value="RPS">RPS</option>
             </select>
           </InputRow>
-          <InputRow label="Code (URL slug, lowercase)">
+          <InputRow label="Code (URL slug, lowercase)" className="col-span-2">
             <input className={inp()} value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }))} required placeholder="brahmand" />
-          </InputRow>
-          <InputRow label="Kiosk PIN (4-8 digits)">
-            <input className={inp()} value={form.pin} onChange={e => setForm(f => ({ ...f, pin: e.target.value }))} required placeholder="1234" maxLength={8} />
           </InputRow>
           {msg && <div className="col-span-2 text-sm text-red-600">{msg}</div>}
           <div className="col-span-2 flex gap-2">
@@ -267,7 +264,7 @@ function BranchesTab({ token }: { token: string }) {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              {["Name", "Brand", "Code", "PIN", "Status", "Form URL", ""].map(h => (
+              {["Name", "Brand", "Code", "Status", "Form URL", ""].map(h => (
                 <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500">{h}</th>
               ))}
             </tr>
@@ -280,7 +277,6 @@ function BranchesTab({ token }: { token: string }) {
                   <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${b.brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>{b.brand}</span>
                 </td>
                 <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{b.code}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{b.pin}</td>
                 <td className="px-3 py-2.5"><Badge active={b.isActive} /></td>
                 <td className="px-3 py-2.5 text-xs text-slate-400 max-w-[160px] truncate">
                   /walkin-{b.brand.toLowerCase()}-27-28/{b.code}
@@ -294,7 +290,7 @@ function BranchesTab({ token }: { token: string }) {
               </tr>
             ))}
             {branches.length === 0 && (
-              <tr><td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-400">No branches yet</td></tr>
+              <tr><td colSpan={6} className="px-3 py-6 text-center text-sm text-slate-400">No branches yet</td></tr>
             )}
           </tbody>
         </table>
@@ -306,9 +302,6 @@ function BranchesTab({ token }: { token: string }) {
             <h4 className="font-bold text-slate-800">Edit: {editing.name}</h4>
             <InputRow label="Name">
               <input className={inp()} value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
-            </InputRow>
-            <InputRow label="PIN">
-              <input className={inp()} value={editForm.pin} onChange={e => setEditForm(f => ({ ...f, pin: e.target.value }))} maxLength={8} />
             </InputRow>
             <InputRow label="Status">
               <select className={inp()} value={String(editForm.isActive)} onChange={e => setEditForm(f => ({ ...f, isActive: e.target.value === "true" }))}>

@@ -672,7 +672,7 @@ export function registerWalkinRoutes(app: Express) {
         name: z.string().min(2),
         brand: z.enum(["RIS", "RPS"]),
         code: z.string().min(2).regex(/^[a-z0-9-]+$/, "code must be lowercase letters, numbers, and hyphens"),
-        pin: z.string().min(4).max(8),
+        pin: z.string().min(4).max(8).optional().default("0000"),
         isActive: z.boolean().default(true),
       });
       const parsed = schema.safeParse(req.body);
