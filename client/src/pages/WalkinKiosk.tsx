@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "wouter";
 import { normalizePhone } from "@shared/phoneNormalizer";
-import { CheckCircle2, ChevronDown, Loader2, AlertTriangle, User, Phone, Mail, CalendarDays, MessageSquare } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2, AlertTriangle, User, Phone, Mail, CalendarDays, MessageSquare, Search } from "lucide-react";
 
 // ── Brand Config ──────────────────────────────────────────────
 
@@ -115,6 +115,85 @@ function SelectInput(props: React.SelectHTMLAttributes<HTMLSelectElement> & { pl
         {children}
       </select>
       <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+    </div>
+  );
+}
+
+// ── Counsellor searchable picker ─────────────────────────────
+
+function CounsellorPicker({
+  value,
+  onChange,
+  options,
+  primary,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  primary: string;
+}) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync when parent resets value to ""
+  useEffect(() => { setQuery(value); }, [value]);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = query.trim()
+    ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  const select = (name: string) => {
+    onChange(name);
+    setQuery(name);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        <input
+          type="text"
+          value={query}
+          autoComplete="off"
+          placeholder="Type to search counsellor…"
+          onChange={e => { setQuery(e.target.value); onChange(""); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          className="w-full pl-11 pr-4 py-4 rounded-xl border-2 text-base font-medium focus:outline-none transition border-slate-200"
+          style={open ? { borderColor: primary } : undefined}
+        />
+      </div>
+      {open && (
+        <div className="absolute z-50 w-full bg-white border-2 border-slate-200 rounded-xl shadow-2xl mt-1 overflow-hidden">
+          <div className="max-h-56 overflow-y-auto">
+            {filtered.length === 0 ? (
+              <div className="px-4 py-3 text-sm text-slate-400 italic">No counsellor matches "{query}"</div>
+            ) : (
+              filtered.map(name => (
+                <button
+                  key={name}
+                  type="button"
+                  onMouseDown={e => { e.preventDefault(); select(name); }}
+                  className="w-full text-left px-4 py-3 text-base font-medium hover:bg-slate-50 transition border-b border-slate-50 last:border-0"
+                  style={value === name ? { color: primary, fontWeight: 700, background: `${primary}08` } : undefined}
+                >
+                  {name}
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -760,9 +839,12 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <FieldLabel required>Counsellor Name</FieldLabel>
-                <SelectInput value={leadOwner} onChange={e => setLeadOwner(e.target.value)} placeholder="— Select counsellor —">
-                  {lookups?.staff.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                </SelectInput>
+                <CounsellorPicker
+                  value={leadOwner}
+                  onChange={setLeadOwner}
+                  options={(lookups?.staff ?? []).map(s => s.name)}
+                  primary={cfg.primary}
+                />
               </div>
               <div>
                 <FieldLabel required>Enquiry Date</FieldLabel>
