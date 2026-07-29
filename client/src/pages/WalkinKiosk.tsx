@@ -55,6 +55,8 @@ type ConfirmedLead = {
   phone: string;
   enquiryDate: string;
   monthLabel: string;
+  siblingName?: string;
+  siblingProgram?: string;
 };
 
 type DuplicateInfo = {
@@ -160,6 +162,11 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const [duplicateResolution, setDuplicateResolution] = useState<"none" | "continue" | "viewed">("none");
   const [checkingDuplicate, setCheckingDuplicate] = useState(false);
 
+  // ── Sibling state
+  const [hasSibling, setHasSibling] = useState(false);
+  const [siblingName, setSiblingName] = useState("");
+  const [siblingProgram, setSiblingProgram] = useState("");
+
   // ── Submit state
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -223,6 +230,7 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     setAltPhone(""); setEmail(""); setProgram(""); setSource("");
     setLeadOwner(""); setEnquiryDate(today()); setRemark("");
     setDuplicate(null); setDuplicateResolution("none");
+    setHasSibling(false); setSiblingName(""); setSiblingProgram("");
     setSubmitError(""); setConfirmedLead(null);
     // Keep branch selection if URL-based, clear if manually chosen
     if (!branchCode) { setSelectedBranchId(null); setSelectedBranchName(""); }
@@ -287,6 +295,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     if (!enquiryDate) return false;
     if (enquiryDate > today()) return false;
     if (duplicate && duplicateResolution === "none") return false;
+    if (hasSibling && (!siblingName.trim() || siblingName.trim().length < 2)) return false;
+    if (hasSibling && !siblingProgram) return false;
     return true;
   };
 
@@ -320,7 +330,37 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
       });
       const data = await res.json();
       if (!res.ok) { setSubmitError(data.message || "Submission failed. Please try again."); return; }
-      setConfirmedLead(data.lead);
+
+      // Submit sibling lead if requested
+      if (hasSibling && siblingName.trim() && siblingProgram) {
+        await fetch("/api/walkin/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            brand,
+            branchId: selectedBranchId,
+            academicYear: "2027-28",
+            enquiryDate,
+            parentName: parentName.trim(),
+            childName: siblingName.trim(),
+            phone,
+            altPhone: altPhone.trim() || undefined,
+            email: email.trim().toLowerCase() || undefined,
+            program: siblingProgram,
+            source,
+            leadOwner: leadOwner || undefined,
+            remark: remark.trim() || undefined,
+            status: "OPEN",
+            createdBy: leadOwner || "kiosk",
+            _duplicateResolution: "continue",
+          }),
+        });
+      }
+
+      setConfirmedLead({
+        ...data.lead,
+        ...(hasSibling && siblingName.trim() ? { siblingName: siblingName.trim(), siblingProgram } : {}),
+      });
       setScreen("confirm");
     } catch {
       setSubmitError("Network error. Please check your connection and try again.");
@@ -449,7 +489,9 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                 style={{ background: cfg.light }}>
                 <CheckCircle2 className="w-9 h-9" style={{ color: cfg.primary }} strokeWidth={2} />
               </div>
-              <h2 className="text-2xl font-black mb-1" style={{ color: cfg.primary }}>Enquiry Saved ✓</h2>
+              <h2 className="text-2xl font-black mb-1" style={{ color: cfg.primary }}>
+                {confirmedLead.siblingName ? "2 Enquiries Saved ✓" : "Enquiry Saved ✓"}
+              </h2>
               <p className="text-slate-500 text-sm mb-6">{cfg.confirmNote}</p>
 
               {/* Summary */}
@@ -459,14 +501,26 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                   <span className="font-bold text-slate-800">{confirmedLead.parentName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Child</span>
+                  <span className="text-slate-500 font-medium">Child 1</span>
                   <span className="font-bold text-slate-800">{confirmedLead.childName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500 font-medium">Program</span>
                   <span className="font-bold text-slate-800">{confirmedLead.program}</span>
                 </div>
-                <div className="flex justify-between">
+                {confirmedLead.siblingName && (
+                  <>
+                    <div className="border-t border-slate-200 pt-2 flex justify-between">
+                      <span className="text-slate-500 font-medium">Child 2 (Sibling)</span>
+                      <span className="font-bold text-slate-800">{confirmedLead.siblingName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500 font-medium">Program</span>
+                      <span className="font-bold text-slate-800">{confirmedLead.siblingProgram}</span>
+                    </div>
+                  </>
+                )}
+                <div className="border-t border-slate-200 pt-2 flex justify-between">
                   <span className="text-slate-500 font-medium">Phone</span>
                   <span className="font-bold text-slate-800">{confirmedLead.phone}</span>
                 </div>
@@ -549,6 +603,48 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                 />
               </div>
             </div>
+
+            {/* Sibling toggle */}
+            <div>
+              <button
+                type="button"
+                onClick={() => { setHasSibling(s => !s); setSiblingName(""); setSiblingProgram(""); }}
+                className="flex items-center gap-2.5 text-sm font-semibold transition"
+                style={{ color: hasSibling ? cfg.primary : "#64748b" }}
+              >
+                <span className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition ${hasSibling ? "" : "border-slate-300"}`}
+                  style={hasSibling ? { borderColor: cfg.primary } : {}}>
+                  {hasSibling && <span className="w-2.5 h-2.5 rounded-sm" style={{ background: cfg.primary }} />}
+                </span>
+                Enquiry for sibling too?
+              </button>
+            </div>
+
+            {hasSibling && (
+              <div className="rounded-xl border-2 border-dashed p-4 space-y-4" style={{ borderColor: cfg.primary + "55" }}>
+                <div className="text-xs font-bold uppercase tracking-widest" style={{ color: cfg.primary }}>Sibling Details</div>
+                <div>
+                  <FieldLabel required>Sibling's Name</FieldLabel>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      autoComplete="off"
+                      value={siblingName}
+                      onChange={e => setSiblingName(e.target.value)}
+                      placeholder="e.g. Ananya Mehta"
+                      className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-slate-500 text-base font-medium focus:outline-none transition"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <FieldLabel required>Sibling's Program / Grade</FieldLabel>
+                  <SelectInput value={siblingProgram} onChange={e => setSiblingProgram(e.target.value)} placeholder="— Select program —">
+                    {lookups?.programs.map(p => <option key={p.id} value={p.label}>{p.label}</option>)}
+                  </SelectInput>
+                </div>
+              </div>
+            )}
 
             {/* Phone + Alt Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
