@@ -803,9 +803,24 @@ export function registerWalkinRoutes(app: Express) {
       } else if (brandParam === "MASTER") {
         masterResult = pullChangesFromMasterSheet();
       } else {
-        // ALL — pull from RIS, RPS, and Master
-        brandResults.push(pullChangesFromSheet("RIS"), pullChangesFromSheet("RPS"));
+        // ALL — MASTER must run first so its DB writes land before the brand pulls
+        // compare brand-sheet values against the DB.  Running them in parallel risks
+        // a race where a brand pull reads the brand sheet (old value), sees it differs
+        // from the DB (already updated by MASTER), and reverts the master change.
         masterResult = pullChangesFromMasterSheet();
+        const masterEntry0 = await masterResult;
+        brandResults.push(pullChangesFromSheet("RIS"), pullChangesFromSheet("RPS"));
+        const brandEntries0 = await Promise.all(brandResults);
+        const allEntries0 = [masterEntry0, ...brandEntries0];
+        return res.json({
+          results: allEntries0,
+          summary: allEntries0.map((r) => ({
+            brand: r.brand,
+            rowsScanned: r.rowsScanned,
+            changesApplied: r.changesApplied,
+            errors: r.errors,
+          })),
+        });
       }
 
       const [brandEntries, masterEntry] = await Promise.all([

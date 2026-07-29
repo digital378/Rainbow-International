@@ -1480,14 +1480,18 @@ export function startAutoPull(): void {
   const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
 
   const run = async () => {
+    // MASTER must run first so its DB writes land before the brand pulls compare
+    // brand-sheet values against the DB.  Running MASTER last (or in parallel)
+    // risks a brand pull seeing brand-sheet (old) ≠ DB (updated by MASTER) and
+    // reverting the master-originated change in the same or next cycle.
+    try { await pullChangesFromMasterSheet(); } catch (e: any) {
+      console.error("[walkin/sheets] Auto-pull MASTER failed:", e?.message);
+    }
     try { await pullChangesFromSheet("RIS"); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull RIS failed:", e?.message);
     }
     try { await pullChangesFromSheet("RPS"); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
-    }
-    try { await pullChangesFromMasterSheet(); } catch (e: any) {
-      console.error("[walkin/sheets] Auto-pull MASTER failed:", e?.message);
     }
   };
 
