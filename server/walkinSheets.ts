@@ -40,8 +40,8 @@
 
 import { google } from "googleapis";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons } from "@shared/schema";
-import { eq, and, sql as drizzleSql } from "drizzle-orm";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms } from "@shared/schema";
+import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
 // ── Startup bootstrap ─────────────────────────────────────────────
@@ -518,6 +518,58 @@ export const ALLOWED_GRADES_MASTER = [
   ...ALLOWED_GRADES_RIS,
 ] as readonly string[];
 
+// ── Dynamic grade helpers (DB-backed) ────────────────────────────
+// These replace the hardcoded constants at resync time so that any grade
+// added/renamed in the admin panel is reflected in the sheet dropdown on the
+// next resync without a code change.
+
+/**
+ * Fetch active grade labels for a specific brand (RIS or RPS) plus any
+ * brand-agnostic grades (brand IS NULL), ordered by sort_order then label.
+ * Falls back to the hardcoded constant if the DB query fails.
+ */
+async function fetchGradesForBrand(brand: "RIS" | "RPS"): Promise<string[]> {
+  try {
+    const rows = await db
+      .select({ label: walkinPrograms.label })
+      .from(walkinPrograms)
+      .where(
+        and(
+          eq(walkinPrograms.isActive, true),
+          or(eq(walkinPrograms.brand, brand), isNull(walkinPrograms.brand)),
+        ),
+      )
+      .orderBy(walkinPrograms.sortOrder, walkinPrograms.label);
+    if (rows.length > 0) return rows.map((r) => r.label);
+  } catch (err: any) {
+    console.warn(`[walkin/sheets] fetchGradesForBrand(${brand}) failed — using hardcoded fallback:`, err?.message);
+  }
+  return brand === "RIS" ? [...ALLOWED_GRADES_RIS] : [...ALLOWED_GRADES_RPS];
+}
+
+/**
+ * Fetch all active grade labels (both brands + shared), de-duplicated,
+ * ordered by sort_order then label.  Used for the Master MIS sheet dropdown.
+ * Falls back to the hardcoded ALLOWED_GRADES_MASTER if the DB query fails.
+ */
+async function fetchGradesForMaster(): Promise<string[]> {
+  try {
+    const rows = await db
+      .select({ label: walkinPrograms.label })
+      .from(walkinPrograms)
+      .where(eq(walkinPrograms.isActive, true))
+      .orderBy(walkinPrograms.sortOrder, walkinPrograms.label);
+    if (rows.length > 0) {
+      // De-duplicate while preserving order (shared grades appear once)
+      const seen = new Set<string>();
+      return rows.map((r) => r.label).filter((l) => !seen.has(l) && seen.add(l));
+    }
+  } catch (err: any) {
+    console.warn("[walkin/sheets] fetchGradesForMaster() failed — using hardcoded fallback:", err?.message);
+  }
+  return [...ALLOWED_GRADES_MASTER];
+}
+
 /** Canonical source values — keep in sync with walkin_sources seed data. */
 export const ALLOWED_SOURCES = [
   "DM",
@@ -713,6 +765,7 @@ async function applyYellowColumnProtection(
   sheets: ReturnType<typeof google.sheets>,
   spreadsheetId: string,
   brand: "RIS" | "RPS",
+  allowedGrades: readonly string[],
 ): Promise<void> {
   // 1. Get spreadsheet metadata (includes protectedRanges for each tab)
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
@@ -725,8 +778,6 @@ async function applyYellowColumnProtection(
   }
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
-
-  const allowedGrades = brand === "RIS" ? ALLOWED_GRADES_RIS : ALLOWED_GRADES_RPS;
 
   // 2. Build requests:
   //    • yellow-column protections
@@ -770,6 +821,7 @@ async function applyYellowColumnProtection(
 async function applyMasterYellowColumnProtection(
   sheets: ReturnType<typeof google.sheets>,
   spreadsheetId: string,
+  allowedGrades: readonly string[],
 ): Promise<void> {
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
   const tab = (meta.data.sheets ?? []).find(
@@ -784,7 +836,7 @@ async function applyMasterYellowColumnProtection(
 
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
-    buildDropdownRequest(tabSheetId, 7, ALLOWED_GRADES_MASTER),                    // col H = GRADE (dropdown)
+    buildDropdownRequest(tabSheetId, 7, allowedGrades),                            // col H = GRADE (dropdown)
     buildStatusDropdownRequest(tabSheetId, 14),                                    // col O = Status (dropdown)
     buildSourceDropdownRequest(tabSheetId, 13),                                    // col N = Source (dropdown)
     buildCloseReasonDropdownRequest(tabSheetId, 17),                               // col R = Reason for Closed (dropdown)
@@ -868,7 +920,8 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
 
   // 6. Protect yellow columns + Status/Source dropdowns — non-fatal; resync still succeeds if this fails
   try {
-    await applyYellowColumnProtection(sheets, sheetId, brand);
+    const grades = await fetchGradesForBrand(brand);
+    await applyYellowColumnProtection(sheets, sheetId, brand, grades);
   } catch (err: any) {
     console.warn(
       `[walkin/sheets] Could not apply yellow-column protections for ${brand}:`,
@@ -943,7 +996,8 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
 
   // 6. Protect Master cols A–L (read-only) + Status/Source dropdowns — non-fatal
   try {
-    await applyMasterYellowColumnProtection(sheets, sheetId);
+    const masterGrades = await fetchGradesForMaster();
+    await applyMasterYellowColumnProtection(sheets, sheetId, masterGrades);
   } catch (err: any) {
     console.warn(`[walkin/sheets] Could not apply Master column protections:`, err?.message);
   }
