@@ -53,6 +53,8 @@ WALKIN_SHEET_ID = "1R5evjW6gVYIB6nyR1dmIdiWp1qMTui4J9wQovmUkakw"
 WALKIN_SHEET_TAB = "RA Checkin"
 ALLIANCES_SHEET_ID = "1eTo457sA4SXnlQoEthHclcnr2WO_YG6cosUfhcrRmxA"
 ALLIANCES_PASSCODE = "ALL8"
+RIS_WALKIN_SHEET_ID_2728 = "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA"
+RPS_WALKIN_SHEET_ID_2728 = "1cai6w40yIbCcAn6KvjrQomgu4BpBVh_yB00UqKaHEXA"
 
 [postMerge]
 path = "scripts/post-merge.sh"

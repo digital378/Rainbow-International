@@ -12,6 +12,30 @@
  *   GOOGLE_REFRESH_TOKEN      — OAuth2 refresh token with spreadsheets scope
  *   GOOGLE_CLIENT_ID          — OAuth2 client ID
  *   GOOGLE_CLIENT_SECRET      — OAuth2 client secret
+ *
+ * Column layout (matches images shared by client, 18 cols):
+ *   A  Unique ID     — LD-DD.MM.YYYY-<seqNum>
+ *   B  Date          — DD/MM/YYYY
+ *   C  Time          — HH:MM (12h)
+ *   D  Student Name
+ *   E  Father/Mother Name
+ *   F  GRADE
+ *   G  Academic Year
+ *   H  Contact No
+ *   I  Email
+ *   J  Counsellor Name
+ *   K  Source
+ *   L  Status         ← green (branch-editable in sheet)
+ *   M  Admission Date ← green
+ *   N  Follow up Remarks ← green
+ *   O  Reason for Closed ← green
+ *   P  Trial / Revisit   ← green
+ *   Q  MIS Calling Remarks ← green
+ *   R  Lead ID        — hidden; used for upsert row-matching
+ *
+ * Yellow columns (A,D,E,F,J,K) = mandatory at submission; sheet owner–only edit.
+ * Green columns (L-Q) = editable by branch staff in sheet.
+ * Set up range protection in Google Sheets manually (Data → Protect ranges).
  */
 
 import { google } from "googleapis";
@@ -21,36 +45,32 @@ import { eq, and } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
 // ── Column layout (single source of truth) ───────────────────────
-// Order matches the task spec exactly. Lead ID is the last (hidden) column.
 export const SHEET_HEADERS = [
-  "Enquiry Date",
-  "Month",
-  "Academic Year",
-  "Branch",
-  "Parent's Name",
-  "Child's Name",
-  "Phone",
-  "Alt Phone",
-  "Email",
-  "Program",
-  "Source",
-  "Status",
-  "Close Reason",
-  "Remark",
-  "Lead Owner",
-  "Walk-in Date",
-  "Revisit Date",
-  "Created By",
-  "Created At",
-  "Last Updated",
-  "Lead ID",            // col index 20 — used for upsert matching; hide in sheet
+  "Unique ID",             // A — LD-DD.MM.YYYY-seqNum
+  "Date",                  // B
+  "Time",                  // C
+  "Student Name",          // D  ← mandatory (yellow)
+  "Father/Mother Name",    // E  ← mandatory (yellow)
+  "GRADE",                 // F  ← mandatory (yellow)
+  "Academic Year",         // G
+  "Contact No",            // H
+  "Email",                 // I
+  "Counsellor Name",       // J  ← mandatory (yellow)
+  "Source",                // K  ← mandatory (yellow)
+  "Status",                // L  ← green (branch-editable)
+  "Admission Date",        // M  ← green
+  "Follow up Remarks",     // N  ← green
+  "Reason for Closed",     // O  ← green
+  "Trial / Revisit",       // P  ← green
+  "MIS Calling Remarks",   // Q  ← green
+  "Lead ID",               // R  ← hidden; upsert key
 ] as const;
 
-// Index of the Lead ID column (0-based), used for row matching
-const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 20
+// Index of the Lead ID column (0-based) — used for row matching
+const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 17 → column R
 
-// Tab name in both sheets
-const LEADS_TAB = "Leads";
+// Sheet tab name (must match the tab in the actual Google Sheet)
+const LEADS_TAB = "WALKINs";
 
 // ── In-memory sync status ────────────────────────────────────────
 interface SyncStatus {
@@ -105,37 +125,51 @@ async function resolveBranchName(branchId: number | null | undefined): Promise<s
   return name;
 }
 
+// ── Date/time helpers ─────────────────────────────────────────────
+function formatDateDDMMYYYY(isoDate: string): string {
+  // Input: "2026-07-29", Output: "29/07/2026"
+  const [y, m, d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatDateDotted(isoDate: string): string {
+  // Input: "2026-07-29", Output: "29.07.2026"
+  const [y, m, d] = isoDate.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+function formatTime12h(ts: Date): string {
+  return ts.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
 // ── Row serialiser ────────────────────────────────────────────────
 // Maps a WalkinLead DB row to a flat array matching SHEET_HEADERS column order.
 export async function leadToRow(lead: WalkinLead): Promise<string[]> {
-  const branchName = await resolveBranchName(lead.branchId ?? null);
+  const uniqueId = `LD-${formatDateDotted(lead.enquiryDate)}-${(lead as any).seqNum ?? lead.id}`;
   return [
-    lead.enquiryDate,
-    lead.monthLabel,
-    lead.academicYear,
-    branchName,
-    lead.parentName,
-    lead.childName,
-    lead.phone,
-    lead.altPhone ?? "",
-    lead.email ?? "",
-    lead.program,
-    lead.source,
-    lead.status,
-    lead.closeReason ?? "",
-    lead.remark ?? "",
-    lead.leadOwner ?? "",
-    lead.walkInDate ?? "",
-    lead.revisitDate ?? "",
-    lead.createdBy,
-    lead.createdAt.toISOString(),
-    lead.updatedAt.toISOString(),
-    lead.id,
+    uniqueId,                                   // A  Unique ID
+    formatDateDDMMYYYY(lead.enquiryDate),        // B  Date
+    formatTime12h(lead.createdAt),               // C  Time
+    lead.childName,                              // D  Student Name
+    lead.parentName,                             // E  Father/Mother Name
+    lead.program,                                // F  GRADE
+    lead.academicYear,                           // G  Academic Year
+    lead.phone,                                  // H  Contact No
+    lead.email ?? "",                            // I  Email
+    lead.leadOwner ?? "",                        // J  Counsellor Name
+    lead.source,                                 // K  Source
+    lead.status,                                 // L  Status
+    lead.walkInDate ? formatDateDDMMYYYY(lead.walkInDate) : "", // M  Admission Date
+    lead.remark ?? "",                           // N  Follow up Remarks
+    lead.closeReason ?? "",                      // O  Reason for Closed
+    lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "", // P  Trial / Revisit
+    "",                                          // Q  MIS Calling Remarks (filled in sheet)
+    String(lead.id),                             // R  Lead ID (hidden, upsert key)
   ];
 }
 
 // ── Upsert a single lead into the correct brand sheet ────────────
-// Find the row by Lead ID in the last column; update if found, append if not.
+// Find the row by Lead ID in column R; update if found, append if not.
 // Retries once on HTTP 429 (rate-limit) after a 2-second pause.
 export async function upsertLeadToSheet(
   brand: "RIS" | "RPS",
@@ -160,20 +194,22 @@ export async function upsertLeadToSheet(
 
   const sheets = google.sheets({ version: "v4", auth });
   const row = await leadToRow(lead);
+  // Lead ID column is R = index 17
+  const leadIdColLetter = "R";
 
   async function doUpsert(retried = false): Promise<void> {
     try {
       // Read the Lead ID column to find any existing row for this lead
       const readResp = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId!,
-        range: `${LEADS_TAB}!U:U`, // column U = index 20 (Lead ID)
+        range: `${LEADS_TAB}!${leadIdColLetter}:${leadIdColLetter}`,
       });
 
       const cellValues = readResp.data.values ?? [];
       // Row 0 = header, data starts at row 1 (1-based row 2 in Sheets)
       let existingRowIndex = -1;
       for (let i = 1; i < cellValues.length; i++) {
-        if (cellValues[i]?.[0] === lead.id) {
+        if (cellValues[i]?.[0] === String(lead.id)) {
           existingRowIndex = i; // 0-based index in the values array
           break;
         }
@@ -226,7 +262,7 @@ export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
   });
 }
 
-// ── Full resync: rewrite entire Leads tab from DB ────────────────
+// ── Full resync: rewrite entire WALKINs tab from DB ──────────────
 // Fetches all non-archived leads for the brand, clears data rows (keeps header),
 // then batch-appends all rows. Returns counts for the admin response.
 export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
@@ -248,7 +284,7 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
     .where(and(eq(walkinLeads.brand, brand), eq(walkinLeads.isArchived, false)))
     .orderBy(walkinLeads.enquiryDate);
 
-  // 2. Serialise all rows (branch name lookups are cached)
+  // 2. Serialise all rows
   const dataRows = await Promise.all(leads.map(leadToRow));
 
   // 3. Clear data rows (A2:end), preserving the header row
@@ -258,7 +294,6 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
       range: `${LEADS_TAB}!A2:Z`,
     });
   } catch (err: any) {
-    // If tab doesn't exist yet, this may fail — we'll recover below
     console.warn(`[walkin/sheets] Clear failed for ${brand} (may be first-time setup):`, err?.message);
   }
 

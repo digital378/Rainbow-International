@@ -42,7 +42,7 @@ interface Branch {
 }
 interface StaffMember {
   id: number; name: string; brand: string | null;
-  isActive: boolean; sortOrder: number;
+  branchId: number | null; isActive: boolean; sortOrder: number;
 }
 interface LookupItem {
   id: number; label: string; brand: string | null;
@@ -324,8 +324,8 @@ function DragHandle(props: React.HTMLAttributes<HTMLDivElement>) {
 }
 
 // ── SortableStaffRow ───────────────────────────────────────────
-function SortableStaffRow({ s, onEdit }: {
-  s: StaffMember;
+function SortableStaffRow({ s, branchLabel, onEdit }: {
+  s: StaffMember; branchLabel: string;
   onEdit: (s: StaffMember) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: s.id });
@@ -342,6 +342,7 @@ function SortableStaffRow({ s, onEdit }: {
       </td>
       <td className="px-3 py-2.5 font-medium">{s.name}</td>
       <td className="px-3 py-2.5 text-xs text-slate-500">{s.brand ?? "Both"}</td>
+      <td className="px-3 py-2.5 text-xs text-slate-500">{branchLabel}</td>
       <td className="px-3 py-2.5"><Badge active={s.isActive} /></td>
       <td className="px-3 py-2.5">
         <Btn small variant="ghost" onClick={() => onEdit(s)}>Edit</Btn>
@@ -353,11 +354,12 @@ function SortableStaffRow({ s, onEdit }: {
 // ── StaffTab ───────────────────────────────────────────────────
 function StaffTab({ token }: { token: string }) {
   const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", brand: "" as "" | "RIS" | "RPS" });
+  const [form, setForm] = useState({ name: "", brand: "" as "" | "RIS" | "RPS", branchId: "" as "" | number });
   const [editing, setEditing] = useState<StaffMember | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", isActive: true });
+  const [editForm, setEditForm] = useState({ name: "", branchId: null as number | null, isActive: true });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -369,19 +371,31 @@ function StaffTab({ token }: { token: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const r = await fetch("/api/walkin/staff", { headers: { Authorization: `Bearer ${token}` } });
-      setStaff(await r.json());
+      const [sr, br] = await Promise.all([
+        fetch("/api/walkin/staff", { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/walkin/branches?active=false", { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      setStaff(await sr.json());
+      setBranches(await br.json());
     } finally { setLoading(false); }
   }, [token]);
+
+  const branchLabel = (branchId: number | null) =>
+    branchId ? (branches.find(b => b.id === branchId)?.name ?? `Branch #${branchId}`) : "All branches";
 
   useEffect(() => { load(); }, [load]);
 
   const addStaff = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMsg("");
     try {
-      const body = { name: form.name, brand: form.brand || null, sortOrder: staff.length * 10 };
+      const body = {
+        name: form.name,
+        brand: form.brand || null,
+        branchId: form.branchId ? Number(form.branchId) : null,
+        sortOrder: staff.length * 10,
+      };
       const r = await fetch("/api/walkin/staff", { method: "POST", headers: hdrs(token), body: JSON.stringify(body) });
-      if (r.ok) { setAdding(false); setForm({ name: "", brand: "" }); load(); }
+      if (r.ok) { setAdding(false); setForm({ name: "", brand: "", branchId: "" }); load(); }
       else { const d = await r.json(); setMsg(d.message || "Failed"); }
     } catch { setMsg("Network error"); }
     setSaving(false);
@@ -427,19 +441,27 @@ function StaffTab({ token }: { token: string }) {
       {adding && (
         <form onSubmit={addStaff} className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-2 gap-3">
           <InputRow label="Name">
-            <input className={inp()} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required placeholder="Staff name" />
+            <input className={inp()} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required placeholder="Counsellor name" />
           </InputRow>
           <InputRow label="Brand (leave blank for both)">
-            <select className={inp()} value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value as any }))}>
+            <select className={inp()} value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value as any, branchId: "" }))}>
               <option value="">Both (RIS + RPS)</option>
               <option value="RIS">RIS only</option>
               <option value="RPS">RPS only</option>
             </select>
           </InputRow>
+          <InputRow label="Assigned Branch" className="col-span-2">
+            <select className={inp()} value={String(form.branchId)} onChange={e => setForm(f => ({ ...f, branchId: e.target.value ? Number(e.target.value) : "" }))}>
+              <option value="">All branches (no restriction)</option>
+              {branches.filter(b => !form.brand || b.brand === form.brand).map(b => (
+                <option key={b.id} value={b.id}>{b.name} ({b.brand})</option>
+              ))}
+            </select>
+          </InputRow>
           {msg && <div className="col-span-2 text-sm text-red-600">{msg}</div>}
           <div className="col-span-2 flex gap-2">
             <Btn type="submit" disabled={saving}>{saving ? "Saving…" : "Add"}</Btn>
-            <Btn variant="ghost" onClick={() => setAdding(false)}>Cancel</Btn>
+            <Btn variant="ghost" type="button" onClick={() => setAdding(false)}>Cancel</Btn>
           </div>
         </form>
       )}
@@ -449,7 +471,7 @@ function StaffTab({ token }: { token: string }) {
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="w-8" />
-              {["Name", "Brand", "Status", ""].map(h => (
+              {["Name", "Brand", "Branch", "Status", ""].map(h => (
                 <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500">{h}</th>
               ))}
             </tr>
@@ -460,7 +482,8 @@ function StaffTab({ token }: { token: string }) {
                 {staff.map(s => (
                   <SortableStaffRow
                     key={s.id} s={s}
-                    onEdit={s => { setEditing(s); setEditForm({ name: s.name, isActive: s.isActive }); setMsg(""); }}
+                    branchLabel={branchLabel(s.branchId)}
+                    onEdit={s => { setEditing(s); setEditForm({ name: s.name, branchId: s.branchId, isActive: s.isActive }); setMsg(""); }}
                   />
                 ))}
                 {staff.length === 0 && (
@@ -478,6 +501,14 @@ function StaffTab({ token }: { token: string }) {
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm space-y-4" onClick={e => e.stopPropagation()}>
             <h4 className="font-bold text-slate-800">Edit: {editing.name}</h4>
             <InputRow label="Name"><input className={inp()} value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} /></InputRow>
+            <InputRow label="Assigned Branch">
+              <select className={inp()} value={editForm.branchId ?? ""} onChange={e => setEditForm(f => ({ ...f, branchId: e.target.value ? Number(e.target.value) : null }))}>
+                <option value="">All branches (no restriction)</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name} ({b.brand})</option>
+                ))}
+              </select>
+            </InputRow>
             <InputRow label="Status">
               <select className={inp()} value={String(editForm.isActive)} onChange={e => setEditForm(f => ({ ...f, isActive: e.target.value === "true" }))}>
                 <option value="true">Active</option>

@@ -175,58 +175,61 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/lookups", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
+      const branchCode = typeof req.query.branchCode === "string" ? req.query.branchCode : null;
       const includeInactive = isAdmin(req) && req.query.includeInactive === "true";
-
       const activeFilter = includeInactive ? undefined : true;
+
+      // When a branchCode is provided (kiosk QR scan), pre-fetch that branch's ID so
+      // the staff dropdown only shows RAs assigned to that specific branch (plus unassigned RAs).
+      let specificBranchId: number | null = null;
+      if (branchCode && brand) {
+        const [br] = await db.select({ id: walkinBranches.id })
+          .from(walkinBranches)
+          .where(and(eq(walkinBranches.code, branchCode), eq(walkinBranches.brand, brand)));
+        specificBranchId = br?.id ?? null;
+      }
 
       const [programs, sources, statuses_rows, closeReasons, staff, branches] = await Promise.all([
         db.select().from(walkinPrograms)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinPrograms.isActive, activeFilter) : undefined,
-              brand ? or(eq(walkinPrograms.brand, brand), isNull(walkinPrograms.brand)) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinPrograms.isActive, activeFilter) : undefined,
+            brand ? or(eq(walkinPrograms.brand, brand), isNull(walkinPrograms.brand)) : undefined,
+          ))
           .orderBy(walkinPrograms.sortOrder),
         db.select().from(walkinSources)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinSources.isActive, activeFilter) : undefined,
-              brand ? or(eq(walkinSources.brand, brand), isNull(walkinSources.brand)) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinSources.isActive, activeFilter) : undefined,
+            brand ? or(eq(walkinSources.brand, brand), isNull(walkinSources.brand)) : undefined,
+          ))
           .orderBy(walkinSources.sortOrder),
         db.select().from(walkinStatuses)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinStatuses.isActive, activeFilter) : undefined,
-              brand ? or(eq(walkinStatuses.brand, brand), isNull(walkinStatuses.brand)) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinStatuses.isActive, activeFilter) : undefined,
+            brand ? or(eq(walkinStatuses.brand, brand), isNull(walkinStatuses.brand)) : undefined,
+          ))
           .orderBy(walkinStatuses.sortOrder),
         db.select().from(walkinCloseReasons)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinCloseReasons.isActive, activeFilter) : undefined,
-              brand ? or(eq(walkinCloseReasons.brand, brand), isNull(walkinCloseReasons.brand)) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinCloseReasons.isActive, activeFilter) : undefined,
+            brand ? or(eq(walkinCloseReasons.brand, brand), isNull(walkinCloseReasons.brand)) : undefined,
+          ))
           .orderBy(walkinCloseReasons.sortOrder),
         db.select().from(walkinStaff)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinStaff.isActive, activeFilter) : undefined,
-              brand ? or(eq(walkinStaff.brand, brand), isNull(walkinStaff.brand)) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinStaff.isActive, activeFilter) : undefined,
+            // Branch filter: if a specific branch was scanned, show only that branch's staff
+            // (or staff with no branch assignment — they float across all branches of the brand)
+            specificBranchId != null
+              ? or(eq(walkinStaff.branchId, specificBranchId), isNull(walkinStaff.branchId))
+              : undefined,
+            brand ? or(eq(walkinStaff.brand, brand), isNull(walkinStaff.brand)) : undefined,
+          ))
           .orderBy(walkinStaff.sortOrder),
         db.select().from(walkinBranches)
-          .where(
-            and(
-              activeFilter != null ? eq(walkinBranches.isActive, activeFilter) : undefined,
-              brand ? eq(walkinBranches.brand, brand) : undefined,
-            ),
-          )
+          .where(and(
+            activeFilter != null ? eq(walkinBranches.isActive, activeFilter) : undefined,
+            brand ? eq(walkinBranches.brand, brand) : undefined,
+          ))
           .orderBy(walkinBranches.name),
       ]);
 
@@ -826,6 +829,7 @@ export function registerWalkinRoutes(app: Express) {
       const schema = z.object({
         name: z.string().min(2, "Name must be at least 2 characters"),
         brand: z.enum(["RIS", "RPS"]).optional().nullable(),
+        branchId: z.number().int().nullable().optional(),
         sortOrder: z.number().int().default(0),
       });
       const parsed = schema.safeParse(req.body);
@@ -843,6 +847,7 @@ export function registerWalkinRoutes(app: Express) {
       const schema = z.object({
         name: z.string().min(2).optional(),
         brand: z.enum(["RIS", "RPS"]).optional().nullable(),
+        branchId: z.number().int().nullable().optional(),
         isActive: z.boolean().optional(),
         sortOrder: z.number().int().optional(),
       });

@@ -331,6 +331,7 @@ export const walkinStaff = pgTable("walkin_staff", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   brand: text("brand"), // null = all brands
+  branchId: integer("branch_id").references(() => walkinBranches.id), // null = all branches of their brand
   isActive: boolean("is_active").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
 });
@@ -357,6 +358,7 @@ export const walkinLeads = pgTable(
     leadOwner: text("lead_owner"),
     walkInDate: text("walk_in_date"),            // YYYY-MM-DD; required for WALK-IN states
     revisitDate: text("revisit_date"),           // YYYY-MM-DD
+    seqNum: serial("seq_num"),                   // auto-incrementing display number; used in Unique ID
     isArchived: boolean("is_archived").notNull().default(false),
     createdBy: text("created_by").notNull().default("kiosk"),
     updatedBy: text("updated_by"),

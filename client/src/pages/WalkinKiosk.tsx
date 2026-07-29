@@ -176,7 +176,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
 
   // ── Load lookups on mount
   useEffect(() => {
-    fetch(`/api/walkin/lookups?brand=${brand}`)
+    const qs = branchCode ? `&branchCode=${encodeURIComponent(branchCode)}` : "";
+    fetch(`/api/walkin/lookups?brand=${brand}${qs}`)
       .then(r => r.ok ? r.json() : Promise.reject("Failed to load"))
       .then((data: Lookups) => {
         setLookups(data);
@@ -282,6 +283,7 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     if (phoneError) return false;
     if (!program) return false;
     if (!source) return false;
+    if (!leadOwner) return false;
     if (!enquiryDate) return false;
     if (enquiryDate > today()) return false;
     if (duplicate && duplicateResolution === "none") return false;
@@ -651,8 +653,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
             {/* Lead Owner + Enquiry Date */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <FieldLabel>Lead Owner <span className="text-slate-400 font-normal normal-case tracking-normal">(staff)</span></FieldLabel>
-                <SelectInput value={leadOwner} onChange={e => setLeadOwner(e.target.value)} placeholder="— Select staff member —">
+                <FieldLabel required>Counsellor Name</FieldLabel>
+                <SelectInput value={leadOwner} onChange={e => setLeadOwner(e.target.value)} placeholder="— Select counsellor —">
                   {lookups?.staff.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                 </SelectInput>
               </div>
