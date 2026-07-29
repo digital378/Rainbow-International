@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import QRCode from "qrcode";
 import { normalizePhone } from "@/lib/friendship-url-utils";
 import { Phone, Mail, Check, Building2, AlertTriangle } from "lucide-react";
 
@@ -115,6 +116,9 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [schoolSearch, setSchoolSearch] = useState("");
   const [sortBy, setSortBy] = useState<"alpha-asc" | "alpha-desc" | "newest" | "oldest">("alpha-asc");
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedForPrint, setSelectedForPrint] = useState<Set<number>>(new Set());
+  const [printGenerating, setPrintGenerating] = useState(false);
   const leadsPanelRef = useRef<HTMLDivElement>(null);
 
   const handleCopyLink = (e: React.MouseEvent, s: School) => {
@@ -264,7 +268,107 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     } catch { /* silent */ }
   };
 
+  const openPrintModal = () => {
+    // Pre-select all schools
+    setSelectedForPrint(new Set(schools.map(s => s.id)));
+    setShowPrintModal(true);
+  };
 
+  const togglePrintSchool = (id: number) => {
+    setSelectedForPrint(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handlePrintSelected = async () => {
+    if (selectedForPrint.size === 0) return;
+    setPrintGenerating(true);
+    try {
+      const origin = window.location.origin;
+      const schoolsToPrint = schools.filter(s => selectedForPrint.has(s.id));
+      const qrEntries = await Promise.all(
+        schoolsToPrint.map(async s => {
+          const url = `${origin}/alliances/friendship/${s.token}`;
+          const dataUrl = await QRCode.toDataURL(url, {
+            width: 320, margin: 2,
+            color: { dark: "#091a4f", light: "#ffffff" },
+            errorCorrectionLevel: "H",
+          });
+          return { school: s, url, dataUrl };
+        })
+      );
+      const win = window.open("", "_blank");
+      if (!win) { setPrintGenerating(false); return; }
+      win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>QR Codes — Friendship Schools</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,sans-serif;background:#f1f5f9;padding:24px}
+    h1{text-align:center;color:#091a4f;font-size:18px;font-weight:900;margin-bottom:6px}
+    .sub{text-align:center;color:#64748b;font-size:12px;margin-bottom:20px}
+    .controls{text-align:center;margin-bottom:20px}
+    .btn{padding:10px 28px;background:#091a4f;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:800px;margin:0 auto}
+    .card{background:#fff;border-radius:16px;overflow:hidden;break-inside:avoid}
+    .stripe{height:6px;background:#f59e0b}
+    .hdr{background:#091a4f;padding:14px;text-align:center}
+    .badge{display:inline-block;width:36px;height:36px;background:#f59e0b;color:#091a4f;font-weight:900;font-size:10px;border-radius:8px;line-height:36px;margin-bottom:7px}
+    .hdr-title{color:#fff;font-weight:900;font-size:12px}
+    .hdr-sub{color:#bfdbfe;font-size:10px;margin-top:3px}
+    .body{padding:14px;text-align:center}
+    .scan-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#091a4f;margin-bottom:10px}
+    .body img{width:150px;height:150px;border-radius:8px}
+    .school-box{background:#f0f4ff;border-radius:10px;padding:9px 12px;margin-top:11px}
+    .slabel{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+    .sname{font-size:14px;font-weight:900;color:#091a4f;margin-top:2px;line-height:1.2}
+    .scontact{font-size:10px;color:#64748b;margin-top:3px}
+    .url{margin-top:9px;font-size:8px;color:#94a3b8;word-break:break-all}
+    @media print{
+      body{background:#fff;padding:0}
+      .controls{display:none}
+      .grid{gap:10px;max-width:none}
+      .card{box-shadow:none}
+    }
+  </style>
+</head>
+<body>
+  <h1>Friendship School QR Codes</h1>
+  <p class="sub">Rainbow International School · Strategic Alliances · ${schoolsToPrint.length} school${schoolsToPrint.length !== 1 ? "s" : ""}</p>
+  <div class="controls"><button class="btn" onclick="window.print()">🖨️ Print All</button></div>
+  <div class="grid">
+    ${qrEntries.map(({ school, url, dataUrl }) => `
+    <div class="card">
+      <div class="stripe"></div>
+      <div class="hdr">
+        <div class="badge">RIS</div>
+        <div class="hdr-title">Rainbow International School</div>
+        <div class="hdr-sub">Alliances Portal</div>
+      </div>
+      <div class="body">
+        <div class="scan-label">Scan to Submit Student Details</div>
+        <img src="${dataUrl}" alt="QR for ${school.name.replace(/"/g, "&quot;")}" />
+        <div class="school-box">
+          <div class="slabel">Friendship School</div>
+          <div class="sname">${school.name.replace(/</g, "&lt;")}</div>
+          ${school.contactPerson && school.contactPerson !== "—" ? `<div class="scontact">Contact: ${school.contactPerson.replace(/</g, "&lt;")}</div>` : ""}
+        </div>
+        <div class="url">${url}</div>
+      </div>
+      <div class="stripe"></div>
+    </div>`).join("")}
+  </div>
+</body>
+</html>`);
+      win.document.close();
+      setShowPrintModal(false);
+    } catch { /* silent */ }
+    setPrintGenerating(false);
+  };
 
   // Filtered + sorted school list
   const displayedSchools = schools
@@ -296,20 +400,20 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
         </div>
       </div>
 
-      {/* Search + sort bar (above cards) */}
+      {/* Search + sort + print bar */}
       <div className="flex gap-2 mb-4 flex-wrap">
         <input
           type="text"
           value={schoolSearch}
           onChange={e => setSchoolSearch(e.target.value)}
           placeholder="Search schools…"
-          className="flex-1 min-w-[160px] px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-amber-400 transition"
+          className="flex-1 min-w-[120px] px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-slate-400 transition"
           data-testid="input-school-search"
         />
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as typeof sortBy)}
-          className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 focus:outline-none focus:border-amber-400 transition bg-white"
+          className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 focus:outline-none focus:border-slate-400 transition bg-white"
           data-testid="select-school-sort"
         >
           <option value="alpha-asc">A → Z</option>
@@ -317,6 +421,21 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
           <option value="newest">Latest first</option>
           <option value="oldest">Oldest first</option>
         </select>
+        <button
+          onClick={openPrintModal}
+          disabled={schools.length === 0}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold text-white transition disabled:opacity-50 shrink-0"
+          style={{ background: NAVY }}
+          data-testid="button-print-qr-codes"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+          <span className="hidden sm:inline">Print QR Codes</span>
+          <span className="sm:hidden">Print</span>
+        </button>
       </div>
 
       {/* Main grid */}
@@ -496,6 +615,84 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
           )}
         </div>
       </div>
+
+      {/* Print QR Codes Modal */}
+      {showPrintModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background: "rgba(9,26,79,0.7)" }}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col" style={{ maxHeight: "85vh" }}>
+            {/* Header */}
+            <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-1">
+                <div className="font-black text-lg" style={{ color: NAVY }}>Print QR Codes</div>
+                <button onClick={() => setShowPrintModal(false)} className="text-slate-400 hover:text-slate-600 transition">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="text-xs text-slate-500">Select schools to include in the print sheet</div>
+              {/* Select all / clear */}
+              <div className="flex gap-3 mt-3">
+                <button
+                  onClick={() => setSelectedForPrint(new Set(schools.map(s => s.id)))}
+                  className="text-xs font-semibold text-[#091a4f] hover:underline"
+                >Select all ({schools.length})</button>
+                <span className="text-slate-300">|</span>
+                <button
+                  onClick={() => setSelectedForPrint(new Set())}
+                  className="text-xs font-semibold text-slate-500 hover:underline"
+                >Clear</button>
+              </div>
+            </div>
+            {/* School list */}
+            <div className="overflow-y-auto flex-1 px-6 py-3 divide-y divide-slate-100">
+              {schools.map(s => (
+                <label key={s.id} className="flex items-center gap-3 py-2.5 cursor-pointer hover:bg-slate-50 -mx-2 px-2 rounded-lg transition">
+                  <input
+                    type="checkbox"
+                    checked={selectedForPrint.has(s.id)}
+                    onChange={() => togglePrintSchool(s.id)}
+                    className="w-4 h-4 accent-[#091a4f] shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-slate-800 truncate">{s.name}</div>
+                    {s.contactPerson && s.contactPerson !== "—" && (
+                      <div className="text-xs text-slate-400 truncate">{s.contactPerson}</div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div className="text-sm text-slate-500">
+                {selectedForPrint.size === 0
+                  ? "None selected"
+                  : <><span className="font-bold text-[#091a4f]">{selectedForPrint.size}</span> school{selectedForPrint.size !== 1 ? "s" : ""} selected</>}
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => setShowPrintModal(false)}
+                  className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition">
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePrintSelected}
+                  disabled={selectedForPrint.size === 0 || printGenerating}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold text-white transition disabled:opacity-50"
+                  style={{ background: NAVY }}
+                  data-testid="button-print-selected"
+                >
+                  {printGenerating ? (
+                    <><svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" /></svg> Generating…</>
+                  ) : (
+                    <><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" /></svg> Print {selectedForPrint.size} QR{selectedForPrint.size !== 1 ? "s" : ""}</>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Modal */}
       {showModal && (
