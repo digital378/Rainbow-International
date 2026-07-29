@@ -505,26 +505,92 @@ const LOOKUP_SECTIONS: Array<{ key: keyof Lookups; label: string; table: string 
 ];
 
 // ── SortableLookupRow ──────────────────────────────────────────
-function SortableLookupRow({ item, onToggle }: { item: LookupItem; onToggle: (item: LookupItem) => void }) {
+function SortableLookupRow({ item, onToggle, onRename }: {
+  item: LookupItem;
+  onToggle: (item: LookupItem) => void;
+  onRename: (item: LookupItem, newLabel: string) => Promise<void>;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(item.label);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     background: isDragging ? "#f8fafc" : undefined,
   };
+
+  const startEdit = () => {
+    setDraft(item.label);
+    setEditing(true);
+    // focus after render
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const cancel = () => {
+    setEditing(false);
+    setDraft(item.label);
+  };
+
+  const save = async () => {
+    const trimmed = draft.trim();
+    if (!trimmed || trimmed === item.label) { cancel(); return; }
+    setSaving(true);
+    await onRename(item, trimmed);
+    setSaving(false);
+    setEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") { e.preventDefault(); save(); }
+    if (e.key === "Escape") cancel();
+  };
+
   return (
     <div ref={setNodeRef} style={style} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
         <DragHandle {...attributes} {...listeners} />
-        <span className={`text-sm ${item.isActive ? "text-slate-800" : "text-slate-400 line-through"}`}>{item.label}</span>
+        {editing ? (
+          <input
+            ref={inputRef}
+            value={draft}
+            onChange={e => setDraft(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="flex-1 min-w-0 px-2 py-0.5 text-sm border border-amber-400 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-300"
+          />
+        ) : (
+          <span className={`text-sm ${item.isActive ? "text-slate-800" : "text-slate-400 line-through"}`}>{item.label}</span>
+        )}
       </div>
-      <div className="flex items-center gap-3">
-        {item.brand && <span className="text-xs text-slate-400">{item.brand}</span>}
-        <button onClick={() => onToggle(item)}
-          className={`text-xs font-semibold px-2 py-0.5 rounded-full transition ${item.isActive ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600" : "bg-red-100 text-red-500 hover:bg-green-100 hover:text-green-700"}`}>
-          {item.isActive ? "Deactivate" : "Activate"}
-        </button>
+      <div className="flex items-center gap-2 ml-2 shrink-0">
+        {item.brand && !editing && <span className="text-xs text-slate-400">{item.brand}</span>}
+        {editing ? (
+          <>
+            <button onClick={save} disabled={saving}
+              className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition disabled:opacity-50">
+              {saving ? "…" : "Save"}
+            </button>
+            <button onClick={cancel} disabled={saving}
+              className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={startEdit}
+              title="Rename"
+              className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
+              ✏ Edit
+            </button>
+            <button onClick={() => onToggle(item)}
+              className={`text-xs font-semibold px-2 py-0.5 rounded-full transition ${item.isActive ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600" : "bg-red-100 text-red-500 hover:bg-green-100 hover:text-green-700"}`}>
+              {item.isActive ? "Deactivate" : "Activate"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -551,6 +617,13 @@ function LookupSection({ label, items: initialItems, table, token, onRefresh }: 
   const toggle = async (item: LookupItem) => {
     await fetch(`/api/walkin/lookups/${table}/${item.id}`, {
       method: "PATCH", headers: hdrs(token), body: JSON.stringify({ isActive: !item.isActive }),
+    });
+    onRefresh();
+  };
+
+  const rename = async (item: LookupItem, newLabel: string) => {
+    await fetch(`/api/walkin/lookups/${table}/${item.id}`, {
+      method: "PATCH", headers: hdrs(token), body: JSON.stringify({ label: newLabel }),
     });
     onRefresh();
   };
@@ -602,7 +675,7 @@ function LookupSection({ label, items: initialItems, table, token, onRefresh }: 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
               {items.map(item => (
-                <SortableLookupRow key={item.id} item={item} onToggle={toggle} />
+                <SortableLookupRow key={item.id} item={item} onToggle={toggle} onRename={rename} />
               ))}
             </SortableContext>
           </DndContext>
