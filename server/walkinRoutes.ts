@@ -771,6 +771,29 @@ export function registerWalkinRoutes(app: Express) {
     }
   });
 
+  // ── POST /api/walkin/sheets/pull-hook ────────────────────────
+  // Called by Google Apps Script onEdit trigger for instant Sheet→DB→Master sync.
+  // Authenticated by x-admin-token header (same token as admin panel).
+  // Responds immediately; pull runs async so Apps Script doesn't time out.
+  app.post("/api/walkin/sheets/pull-hook", async (req, res) => {
+    const provided =
+      (req.headers["x-admin-token"] as string | undefined) ||
+      (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+    const adminToken = process.env.ADMIN_TOKEN;
+    if (!adminToken || !provided || provided !== adminToken) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const brand = (req.body?.brand ?? "").toUpperCase();
+    if (brand !== "RIS" && brand !== "RPS") {
+      return res.status(400).json({ error: "brand must be RIS or RPS" });
+    }
+    // Respond immediately so Apps Script doesn't hit its 30-s timeout
+    res.json({ ok: true, message: "Pull triggered" });
+    pullChangesFromSheet(brand as "RIS" | "RPS").catch((e: any) =>
+      console.error("[walkin/pull-hook]", e?.message)
+    );
+  });
+
   // ── GET /api/walkin/sheets/pull-log ───────────────────────────
   // Returns the last 50 sheet-pull log entries for the admin panel.
   app.get("/api/walkin/sheets/pull-log", requireAdmin, async (req, res) => {

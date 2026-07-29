@@ -864,7 +864,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
 
 // ── Auto-pull timer (every 5 minutes) ───────────────────────────
 export function startAutoPull(): void {
-  const INTERVAL_MS = 5 * 60 * 1000;
+  const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
 
   const run = async () => {
     try { await pullChangesFromSheet("RIS"); } catch (e: any) {

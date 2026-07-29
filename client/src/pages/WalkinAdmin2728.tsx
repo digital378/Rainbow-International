@@ -1090,6 +1090,121 @@ function QRCodesTab({ token }: { token: string }) {
   );
 }
 
+// ── InstantSyncSetup (Apps Script section) ─────────────────────
+function InstantSyncSetup() {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState<"RIS" | "RPS" | null>(null);
+
+  const webhookUrl = `${window.location.origin}/api/walkin/sheets/pull-hook`;
+
+  const makeScript = (brand: "RIS" | "RPS") =>
+`// Paste this in Google Apps Script for the ${brand} sheet
+// Extensions → Apps Script → paste → save → set up trigger (see steps below)
+
+var WEBHOOK_URL = "${webhookUrl}";
+var ADMIN_TOKEN = "PASTE_YOUR_ADMIN_TOKEN_HERE";
+var BRAND       = "${brand}";
+
+function onEditInstallable(e) {
+  if (!e || !e.range) return;
+  var sheet = e.range.getSheet();
+  if (sheet.getName() !== "WALKINs") return;
+  var col = e.range.getColumn();
+  if (col < 12 || col > 17) return; // Green cols L–Q only
+
+  try {
+    UrlFetchApp.fetch(WEBHOOK_URL, {
+      method          : "post",
+      contentType     : "application/json",
+      headers         : { "x-admin-token": ADMIN_TOKEN },
+      payload         : JSON.stringify({ brand: BRAND }),
+      muteHttpExceptions: true
+    });
+  } catch (err) {
+    // Silent — 1-min background poll is the fallback
+  }
+}`;
+
+  const copy = (brand: "RIS" | "RPS") => {
+    navigator.clipboard.writeText(makeScript(brand));
+    setCopied(brand);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div className="border border-emerald-200 rounded-2xl overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 bg-emerald-50 hover:bg-emerald-100 transition text-left"
+      >
+        <div>
+          <span className="font-semibold text-emerald-800 text-sm">⚡ Instant Sync Setup</span>
+          <span className="ml-2 text-xs text-emerald-600 hidden sm:inline">One-time Apps Script setup for zero lag</span>
+        </div>
+        <span className="text-emerald-600 text-sm">{open ? "▲" : "▼"}</span>
+      </button>
+
+      {open && (
+        <div className="p-5 space-y-5 bg-white border-t border-emerald-100">
+          <p className="text-sm text-slate-600">
+            Install this script once in each sheet. Every time a counsellor edits a green column
+            (Status, Dates, Remarks) the server is called <strong>immediately</strong> — no polling delay.
+            The 1-minute background pull stays active as a fallback.
+          </p>
+
+          {/* Webhook URL */}
+          <div>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Webhook URL</div>
+            <div className="bg-slate-100 rounded-lg px-3 py-2 font-mono text-xs text-slate-700 break-all select-all">
+              {webhookUrl}
+            </div>
+          </div>
+
+          {/* Token note */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+            <strong>Before you paste:</strong> open the <strong>Replit Secrets panel</strong>, copy the value of{" "}
+            <code className="bg-amber-100 px-1 rounded">ADMIN_TOKEN</code>, and replace{" "}
+            <code className="bg-amber-100 px-1 rounded">PASTE_YOUR_ADMIN_TOKEN_HERE</code> in the script with it.
+          </div>
+
+          {/* One script block per brand */}
+          {(["RIS", "RPS"] as const).map(brand => (
+            <div key={brand}>
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
+                  {brand} sheet
+                </span>
+                <button
+                  onClick={() => copy(brand)}
+                  className="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                >
+                  {copied === brand ? "✓ Copied!" : "Copy script"}
+                </button>
+              </div>
+              <pre className="bg-slate-900 text-slate-100 text-xs rounded-xl p-4 overflow-x-auto leading-relaxed">
+                {makeScript(brand)}
+              </pre>
+            </div>
+          ))}
+
+          {/* Install steps */}
+          <div>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">How to install (once per sheet)</div>
+            <ol className="text-sm text-slate-700 space-y-2 list-decimal list-inside">
+              <li>Open the <strong>RIS</strong> Google Sheet → <strong>Extensions → Apps Script</strong></li>
+              <li>Delete any existing code, paste the <strong>RIS script</strong> above (token filled in), press <strong>Ctrl + S</strong></li>
+              <li>Click <strong>Run → onEditInstallable</strong> once and approve the Google permission prompt</li>
+              <li>Click the <strong>⏱ Triggers</strong> icon (clock on the left sidebar) → <strong>+ Add Trigger</strong></li>
+              <li>Set: function = <code className="bg-slate-100 px-1 rounded">onEditInstallable</code> · event source = <strong>From spreadsheet</strong> · event type = <strong>On edit</strong> → <strong>Save</strong></li>
+              <li>Repeat steps 1–5 for the <strong>RPS</strong> sheet using the RPS script</li>
+            </ol>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── SheetsSyncTab ──────────────────────────────────────────────
 interface PullLogEntry {
   timestamp: string; brand: string;
@@ -1261,12 +1376,15 @@ function SheetsSyncTab({ token }: { token: string }) {
           onResync={resyncMaster} resyncKey="MASTER" />
       </div>
 
+      {/* ── Instant Sync (Apps Script) ─────────────────────────── */}
+      <InstantSyncSetup />
+
       {/* Sheet → DB pull log */}
       <div>
         <div className="flex items-start justify-between mb-2 gap-3">
           <div className="flex-1">
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sheet → DB Auto-Pull Log</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Every 5 min the system reads green columns (Status, Dates, Remarks) from both sheets and writes any changes back to the DB with an audit entry.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Every 1 min the system reads green columns (Status, Dates, Remarks) from both sheets and writes any changes back to the DB and Master MIS. With the Apps Script below, changes sync instantly.</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
