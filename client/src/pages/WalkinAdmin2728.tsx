@@ -587,12 +587,13 @@ const LOOKUP_SECTIONS: Array<{ key: keyof Lookups; label: string; table: string 
 function SortableLookupRow({ item, onToggle, onRename }: {
   item: LookupItem;
   onToggle: (item: LookupItem) => void;
-  onRename: (item: LookupItem, newLabel: string) => Promise<void>;
+  onRename: (item: LookupItem, newLabel: string) => Promise<string | null>;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.label);
   const [saving, setSaving] = useState(false);
+  const [renameError, setRenameError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const style = {
@@ -612,15 +613,22 @@ function SortableLookupRow({ item, onToggle, onRename }: {
   const cancel = () => {
     setEditing(false);
     setDraft(item.label);
+    setRenameError(null);
   };
 
   const save = async () => {
     const trimmed = draft.trim();
     if (!trimmed || trimmed === item.label) { cancel(); return; }
     setSaving(true);
-    await onRename(item, trimmed);
+    setRenameError(null);
+    const err = await onRename(item, trimmed);
     setSaving(false);
-    setEditing(false);
+    if (err) {
+      setRenameError(err);
+      // stay in editing mode so the user can correct the label
+    } else {
+      setEditing(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -633,13 +641,16 @@ function SortableLookupRow({ item, onToggle, onRename }: {
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <DragHandle {...attributes} {...listeners} />
         {editing ? (
-          <input
-            ref={inputRef}
-            value={draft}
-            onChange={e => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 min-w-0 px-2 py-0.5 text-sm border border-amber-400 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-300"
-          />
+          <div className="flex-1 min-w-0">
+            <input
+              ref={inputRef}
+              value={draft}
+              onChange={e => { setDraft(e.target.value); setRenameError(null); }}
+              onKeyDown={handleKeyDown}
+              className={`w-full px-2 py-0.5 text-sm border rounded-md focus:outline-none focus:ring-2 ${renameError ? "border-red-400 focus:ring-red-300" : "border-amber-400 focus:ring-amber-300"}`}
+            />
+            {renameError && <p className="mt-0.5 text-xs text-red-600">{renameError}</p>}
+          </div>
         ) : (
           <span className={`text-sm ${item.isActive ? "text-slate-800" : "text-slate-400 line-through"}`}>{item.label}</span>
         )}
@@ -700,11 +711,17 @@ function LookupSection({ label, items: initialItems, table, token, onRefresh }: 
     onRefresh();
   };
 
-  const rename = async (item: LookupItem, newLabel: string) => {
-    await fetch(`/api/walkin/lookups/${table}/${item.id}`, {
-      method: "PATCH", headers: hdrs(token), body: JSON.stringify({ label: newLabel }),
-    });
-    onRefresh();
+  const rename = async (item: LookupItem, newLabel: string): Promise<string | null> => {
+    try {
+      const r = await fetch(`/api/walkin/lookups/${table}/${item.id}`, {
+        method: "PATCH", headers: hdrs(token), body: JSON.stringify({ label: newLabel }),
+      });
+      if (r.ok) { onRefresh(); return null; }
+      const d = await r.json();
+      return d.message || "Failed to rename";
+    } catch {
+      return "Network error";
+    }
   };
 
   const add = async (e: React.FormEvent) => {

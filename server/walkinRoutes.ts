@@ -920,6 +920,19 @@ export function registerWalkinRoutes(app: Express) {
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
 
+      // Duplicate-label check (case-insensitive) before inserting
+      const newLabelLower = parsed.data.label.trim().toLowerCase();
+      let existing: any[] = [];
+      if (table === "programs")           existing = await db.select().from(walkinPrograms);
+      else if (table === "sources")       existing = await db.select().from(walkinSources);
+      else if (table === "statuses")      existing = await db.select().from(walkinStatuses);
+      else if (table === "close-reasons") existing = await db.select().from(walkinCloseReasons);
+      else return res.status(400).json({ message: "Invalid table; use programs | sources | statuses | close-reasons" });
+      const clash = existing.some((r: any) => r.label.trim().toLowerCase() === newLabelLower);
+      if (clash) {
+        return res.status(409).json({ message: `"${parsed.data.label}" already exists in this list. Please choose a different name.` });
+      }
+
       let row: any;
       if (table === "programs")      [row] = await db.insert(walkinPrograms).values(parsed.data).returning();
       else if (table === "sources")  [row] = await db.insert(walkinSources).values(parsed.data).returning();
@@ -948,6 +961,20 @@ export function registerWalkinRoutes(app: Express) {
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+
+      // Duplicate-label check (case-insensitive) when renaming
+      if (parsed.data.label !== undefined) {
+        const newLabelLower = parsed.data.label.trim().toLowerCase();
+        let existing: any[] = [];
+        if (table === "programs")           existing = await db.select().from(walkinPrograms).where(ne(walkinPrograms.id, id));
+        else if (table === "sources")       existing = await db.select().from(walkinSources).where(ne(walkinSources.id, id));
+        else if (table === "statuses")      existing = await db.select().from(walkinStatuses).where(ne(walkinStatuses.id, id));
+        else if (table === "close-reasons") existing = await db.select().from(walkinCloseReasons).where(ne(walkinCloseReasons.id, id));
+        const clash = existing.some((r: any) => r.label.trim().toLowerCase() === newLabelLower);
+        if (clash) {
+          return res.status(409).json({ message: `"${parsed.data.label}" already exists in this list. Please choose a different name.` });
+        }
+      }
 
       let row: any;
       if (table === "programs")      [row] = await db.update(walkinPrograms).set(parsed.data).where(eq(walkinPrograms.id, id)).returning();
