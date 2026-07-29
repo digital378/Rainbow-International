@@ -897,7 +897,7 @@ export function registerWalkinRoutes(app: Express) {
   });
 
   // ── GET /api/walkin/staff ─────────────────────────────────────
-  // Public: active only. Admin: all (including inactive).
+  // Public: active only. Admin: all (including inactive) + lead counts.
   app.get("/api/walkin/staff", async (req, res) => {
     try {
       const admin = isAdmin(req);
@@ -908,7 +908,32 @@ export function registerWalkinRoutes(app: Express) {
       const rows = await db.select().from(walkinStaff)
         .where(conditions.length ? and(...conditions) : undefined)
         .orderBy(walkinStaff.sortOrder);
-      res.json(rows);
+
+      if (!admin) {
+        return res.json(rows);
+      }
+
+      // For admin requests, fetch open lead counts grouped by leadOwner name
+      const leadCounts = await db
+        .select({
+          leadOwner: walkinLeads.leadOwner,
+          count: sql<number>`cast(count(*) as int)`,
+        })
+        .from(walkinLeads)
+        .where(eq(walkinLeads.isArchived, false))
+        .groupBy(walkinLeads.leadOwner);
+
+      const countMap = new Map<string, number>();
+      for (const row of leadCounts) {
+        if (row.leadOwner) countMap.set(row.leadOwner, row.count);
+      }
+
+      const rowsWithCounts = rows.map(s => ({
+        ...s,
+        leadCount: countMap.get(s.name) ?? 0,
+      }));
+
+      res.json(rowsWithCounts);
     } catch (err: any) {
       res.status(500).json({ message: "Failed to fetch staff" });
     }

@@ -43,6 +43,7 @@ interface Branch {
 interface StaffMember {
   id: number; name: string; brand: string | null;
   branchId: number | null; isActive: boolean; sortOrder: number;
+  leadCount?: number;
 }
 interface LookupItem {
   id: number; label: string; brand: string | null;
@@ -368,6 +369,7 @@ function SortableStaffRow({ s, branchLabel, onEdit }: {
     opacity: isDragging ? 0.5 : 1,
     background: isDragging ? "#f8fafc" : undefined,
   };
+  const leadCount = s.leadCount ?? 0;
   return (
     <tr ref={setNodeRef} style={style} className="border-b border-slate-100 hover:bg-slate-50">
       <td className="px-1 py-2.5 w-8">
@@ -377,6 +379,12 @@ function SortableStaffRow({ s, branchLabel, onEdit }: {
       <td className="px-3 py-2.5 text-xs text-slate-500">{s.brand ?? "Both"}</td>
       <td className="px-3 py-2.5 text-xs text-slate-500">{branchLabel}</td>
       <td className="px-3 py-2.5"><Badge active={s.isActive} /></td>
+      <td className="px-3 py-2.5 text-center">
+        {leadCount > 0
+          ? <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{leadCount}</span>
+          : <span className="text-xs text-slate-300">—</span>
+        }
+      </td>
       <td className="px-3 py-2.5">
         <Btn small variant="ghost" onClick={() => onEdit(s)}>Edit</Btn>
       </td>
@@ -512,8 +520,8 @@ function StaffTab({ token }: { token: string }) {
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="w-8" />
-              {["Name", "Brand", "Branch", "Status", ""].map(h => (
-                <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500">{h}</th>
+              {["Name", "Brand", "Branch", "Status", "Leads", ""].map(h => (
+                <th key={h} className={`px-3 py-2.5 text-left text-xs font-semibold text-slate-500${h === "Leads" ? " text-center" : ""}`}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -528,7 +536,7 @@ function StaffTab({ token }: { token: string }) {
                   />
                 ))}
                 {staff.length === 0 && (
-                  <tr><td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-400">No staff members yet</td></tr>
+                  <tr><td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-400">No staff members yet</td></tr>
                 )}
               </tbody>
             </SortableContext>
@@ -556,6 +564,12 @@ function StaffTab({ token }: { token: string }) {
                 <option value="false">Inactive</option>
               </select>
             </InputRow>
+            {!editForm.isActive && (editing?.leadCount ?? 0) > 0 && (
+              <div className="flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-sm text-amber-800">
+                <span className="mt-0.5 shrink-0 text-amber-500">⚠️</span>
+                <span>This counsellor owns <strong>{editing!.leadCount}</strong> open lead{editing!.leadCount === 1 ? "" : "s"}. Consider reassigning them before deactivating.</span>
+              </div>
+            )}
             {msg && <div className="text-sm text-red-600">{msg}</div>}
             <div className="flex gap-2">
               <Btn onClick={saveStaff} disabled={saving}>{saving ? "Saving…" : "Save"}</Btn>
