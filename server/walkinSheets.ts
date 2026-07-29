@@ -40,7 +40,7 @@
 
 import { google } from "googleapis";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses } from "@shared/schema";
 import { eq, and, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
@@ -727,6 +727,21 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     const dataRows = rows.slice(1);
     entry.rowsScanned = dataRows.length;
 
+    // Fetch the allowlist of valid statuses from the DB once, before the loop.
+    // Only the `name` column is needed; brand-specific + global statuses are both valid.
+    let allowedStatuses: Set<string>;
+    try {
+      const statusRows = await db
+        .select({ label: walkinStatuses.label })
+        .from(walkinStatuses);
+      allowedStatuses = new Set(statusRows.map((r) => r.label));
+    } catch (e: any) {
+      // If the lookup fails, fall back to blocking all status changes so we never
+      // write an unvalidated value — and surface the error in the pull log.
+      entry.errors.push(`Failed to load allowed statuses — status changes skipped: ${e?.message}`);
+      allowedStatuses = new Set();
+    }
+
     // Collect rows that need propagating to Master after the main loop
     const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
 
@@ -763,7 +778,16 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         if (db_ !== sh_) changes.push({ field, oldVal: db_, newVal: sh_ });
       };
 
-      if (sheetStatus) check("status", existing.status, sheetStatus);
+      if (sheetStatus) {
+        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus)) {
+          // Invalid status from sheet — skip and surface in pull log so an admin can investigate.
+          entry.errors.push(
+            `Lead ${leadId}: sheet status "${sheetStatus}" is not a recognised status — skipped (valid values: ${[...allowedStatuses].join(", ")})`
+          );
+        } else {
+          check("status", existing.status, sheetStatus);
+        }
+      }
       check("walkInDate",          existing.walkInDate,          sheetWalkInDate);
       check("remark",              existing.remark,              sheetRemark || null);
       check("closeReason",         existing.closeReason,         sheetCloseReason || null);
