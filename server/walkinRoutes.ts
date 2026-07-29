@@ -33,7 +33,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus } from "./walkinSheets";
+import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -161,6 +161,7 @@ const updateLeadSchema = z.object({
     .or(z.literal(""))
     .transform((v) => v || undefined),
   branchId: z.number().int().positive().optional(),
+  misCallingRemarks: z.string().optional(),
   updatedBy: z.string().default("admin"),
 });
 
@@ -547,7 +548,7 @@ export function registerWalkinRoutes(app: Express) {
       const MUTABLE_FIELDS: (keyof WalkinLead)[] = [
         "parentName", "childName", "altPhone", "email", "program",
         "source", "status", "closeReason", "remark", "leadOwner",
-        "walkInDate", "revisitDate", "branchId",
+        "walkInDate", "revisitDate", "branchId", "misCallingRemarks",
       ];
 
       const auditRows: Array<{ field: string; oldValue: string | null; newValue: string | null }> = [];
@@ -701,6 +702,43 @@ export function registerWalkinRoutes(app: Express) {
     }
   });
 
+  // ── DELETE /api/walkin/branches/:id ──────────────────────────
+  app.delete("/api/walkin/branches/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid id" });
+
+      // Refuse if any leads or staff are assigned to this branch
+      const [leadCount] = await db
+        .select({ cnt: sql<number>`cast(count(*) as int)` })
+        .from(walkinLeads)
+        .where(eq(walkinLeads.branchId, id));
+      if (leadCount.cnt > 0) {
+        return res.status(409).json({
+          message: `Cannot delete: ${leadCount.cnt} lead(s) are assigned to this branch. Reassign them first.`,
+        });
+      }
+      const [staffCount] = await db
+        .select({ cnt: sql<number>`cast(count(*) as int)` })
+        .from(walkinStaff)
+        .where(eq(walkinStaff.branchId, id));
+      if (staffCount.cnt > 0) {
+        return res.status(409).json({
+          message: `Cannot delete: ${staffCount.cnt} staff member(s) are assigned to this branch. Reassign them first.`,
+        });
+      }
+
+      const [deleted] = await db
+        .delete(walkinBranches)
+        .where(eq(walkinBranches.id, id))
+        .returning();
+      if (!deleted) return res.status(404).json({ message: "Branch not found" });
+      res.json({ message: "Branch deleted", branch: deleted });
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to delete branch" });
+    }
+  });
+
   // ── GET /api/walkin/branches/:code/verify-pin ────────────────
   // Verifies a kiosk PIN for a given branch code. Returns branch info (without PIN) on success.
   app.get("/api/walkin/branches/:code/verify-pin", async (req, res) => {
@@ -722,6 +760,12 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       res.status(500).json({ message: "PIN verification failed" });
     }
+  });
+
+  // ── GET /api/walkin/sheets/pull-log ───────────────────────────
+  // Returns the last 50 sheet-pull log entries for the admin panel.
+  app.get("/api/walkin/sheets/pull-log", requireAdmin, async (req, res) => {
+    res.json(getPullLog().slice(0, 50));
   });
 
   // ── GET /api/walkin/stats ─────────────────────────────────────
@@ -1010,6 +1054,9 @@ export function registerWalkinRoutes(app: Express) {
       res.status(500).json({ message: "Failed to fetch sync status" });
     }
   });
+
+  // Start auto-pull: every 5 minutes, read green columns from both sheets and sync back to DB
+  startAutoPull();
 
   console.log("[walkin] Routes registered");
 }

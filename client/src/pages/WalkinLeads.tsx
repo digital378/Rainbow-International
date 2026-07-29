@@ -17,6 +17,7 @@ type Lead = {
   phone: string; altPhone: string | null; email: string | null; program: string;
   source: string; status: string; closeReason: string | null; remark: string | null;
   leadOwner: string | null; walkInDate: string | null; revisitDate: string | null;
+  misCallingRemarks: string | null;
   isArchived: boolean; createdBy: string; updatedBy: string | null;
   createdAt: string; updatedAt: string;
 };
@@ -122,6 +123,7 @@ function EditPanel({
     revisitDate: lead.revisitDate || "",
     leadOwner: lead.leadOwner || "",
     remark: lead.remark || "",
+    misCallingRemarks: lead.misCallingRemarks || "",
     branchId: lead.branchId ? String(lead.branchId) : "",
   });
   const [saving, setSaving] = useState(false);
@@ -162,6 +164,7 @@ function EditPanel({
           revisitDate: form.revisitDate || undefined,
           leadOwner: form.leadOwner || undefined,
           remark: form.remark || undefined,
+          misCallingRemarks: form.misCallingRemarks || undefined,
           branchId: form.branchId ? parseInt(form.branchId, 10) : undefined,
           updatedBy: "admin",
         }),
@@ -290,13 +293,23 @@ function EditPanel({
             </F>
           </div>
 
-          <F label="Remark">
+          <F label="Follow-up Remarks">
             <textarea
               className={`${inputCls} resize-none`}
-              rows={3}
+              rows={2}
               value={form.remark}
               onChange={set("remark")}
               placeholder="Internal notes…"
+            />
+          </F>
+
+          <F label="MIS Calling Remarks">
+            <textarea
+              className={`${inputCls} resize-none`}
+              rows={2}
+              value={form.misCallingRemarks}
+              onChange={set("misCallingRemarks")}
+              placeholder="MIS calling notes (synced with sheet col Q)…"
             />
           </F>
 

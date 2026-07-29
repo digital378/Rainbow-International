@@ -40,7 +40,7 @@
 
 import { google } from "googleapis";
 import { db } from "./db";
-import { walkinLeads, walkinBranches } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
@@ -176,7 +176,7 @@ export async function leadToRow(lead: WalkinLead): Promise<string[]> {
     lead.remark ?? "",                           // N  Follow up Remarks
     lead.closeReason ?? "",                      // O  Reason for Closed
     lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "", // P  Trial / Revisit
-    "",                                          // Q  MIS Calling Remarks (filled in sheet)
+    lead.misCallingRemarks ?? "",                // Q  MIS Calling Remarks
     String(lead.id),                             // R  Lead ID (hidden, upsert key)
   ];
 }
@@ -454,4 +454,175 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
 
   console.log(`[walkin/sheets] Master resynced: ${leads.length} leads (RIS + RPS combined)`);
   return { dbCount: leads.length, sheetCount: dataRows.length };
+}
+
+// ── Sheet → DB pull (two-way sync) ──────────────────────────────
+// Reads the green columns (L-Q) for every row in a brand sheet.
+// For each row whose Lead ID (col R) exists in the DB, compares values
+// and writes back any differences to the DB plus an audit entry.
+
+interface PullLogEntry {
+  timestamp: Date;
+  brand: "RIS" | "RPS";
+  rowsScanned: number;
+  changesApplied: number;
+  errors: string[];
+}
+
+const _pullLog: PullLogEntry[] = [];
+
+export function getPullLog(): PullLogEntry[] {
+  return [..._pullLog];
+}
+
+/** Parse a DD/MM/YYYY sheet date back to YYYY-MM-DD for the DB. */
+function parseDateFromSheet(d: string): string | null {
+  if (!d || d.trim() === "") return null;
+  const parts = d.trim().split("/");
+  if (parts.length !== 3) return null;
+  const [dd, mm, yyyy] = parts;
+  if (!yyyy || !mm || !dd) return null;
+  return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+}
+
+export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLogEntry> {
+  const entry: PullLogEntry = {
+    timestamp: new Date(),
+    brand,
+    rowsScanned: 0,
+    changesApplied: 0,
+    errors: [],
+  };
+
+  const auth = getAuthClient();
+  if (!auth) {
+    entry.errors.push("Google auth not configured");
+    _pullLog.unshift(entry);
+    if (_pullLog.length > 100) _pullLog.pop();
+    return entry;
+  }
+
+  const sheetId = getSheetId(brand);
+  if (!sheetId) {
+    entry.errors.push(`${brand}_WALKIN_SHEET_ID_2728 not set`);
+    _pullLog.unshift(entry);
+    if (_pullLog.length > 100) _pullLog.pop();
+    return entry;
+  }
+
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Read all data columns A:R from the sheet
+    const resp = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${LEADS_TAB}!A:R`,
+    });
+
+    const rows = resp.data.values ?? [];
+    // Row 0 = header, data starts at 1
+    const dataRows = rows.slice(1);
+    entry.rowsScanned = dataRows.length;
+
+    for (const row of dataRows) {
+      const leadId = row[17]?.trim(); // column R (index 17) = Lead ID
+      if (!leadId) continue;
+
+      // Green column values from sheet
+      const sheetStatus        = row[11]?.trim() ?? "";   // L
+      const sheetWalkInDate    = parseDateFromSheet(row[12] ?? ""); // M
+      const sheetRemark        = row[13]?.trim() ?? "";   // N
+      const sheetCloseReason   = row[14]?.trim() ?? "";   // O
+      const sheetRevisitDate   = parseDateFromSheet(row[15] ?? ""); // P
+      const sheetMisCalling    = row[16]?.trim() ?? "";   // Q
+
+      // Fetch current DB record
+      let existing: any;
+      try {
+        const [found] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, leadId));
+        existing = found;
+      } catch (e: any) {
+        entry.errors.push(`DB lookup failed for lead ${leadId}: ${e?.message}`);
+        continue;
+      }
+      if (!existing || existing.isArchived) continue;
+
+      // Compare each green field and collect changes
+      type FieldChange = { field: string; oldVal: string | null; newVal: string | null };
+      const changes: FieldChange[] = [];
+
+      const check = (field: string, dbVal: string | null | undefined, sheetVal: string | null) => {
+        const db_ = dbVal ?? null;
+        const sh_ = sheetVal || null; // treat empty string as null
+        if (db_ !== sh_) changes.push({ field, oldVal: db_, newVal: sh_ });
+      };
+
+      if (sheetStatus) check("status", existing.status, sheetStatus);
+      check("walkInDate",          existing.walkInDate,          sheetWalkInDate);
+      check("remark",              existing.remark,              sheetRemark || null);
+      check("closeReason",         existing.closeReason,         sheetCloseReason || null);
+      check("revisitDate",         existing.revisitDate,         sheetRevisitDate);
+      check("misCallingRemarks",   existing.misCallingRemarks,   sheetMisCalling || null);
+
+      if (changes.length === 0) continue;
+
+      // Build patch
+      const patch: Record<string, any> = { updatedBy: "sheet-sync", updatedAt: new Date() };
+      for (const c of changes) patch[c.field] = c.newVal;
+
+      try {
+        await db.update(walkinLeads).set(patch).where(eq(walkinLeads.id, leadId));
+
+        // Write audit rows
+        await Promise.all(
+          changes.map((c) =>
+            db.insert(walkinLeadAuditLog).values({
+              leadId,
+              field: c.field,
+              oldValue: c.oldVal,
+              newValue: c.newVal,
+              changedBy: "sheet-sync",
+            })
+          )
+        );
+
+        entry.changesApplied += changes.length;
+      } catch (e: any) {
+        entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
+      }
+    }
+  } catch (e: any) {
+    entry.errors.push(`Sheet read failed: ${e?.message}`);
+    syncStatus[brand].lastError = e?.message ?? "Pull failed";
+  }
+
+  console.log(
+    `[walkin/sheets] Pull ${brand}: scanned=${entry.rowsScanned} changes=${entry.changesApplied} errors=${entry.errors.length}`
+  );
+
+  _pullLog.unshift(entry);
+  if (_pullLog.length > 100) _pullLog.pop();
+  return entry;
+}
+
+// ── Auto-pull timer (every 5 minutes) ───────────────────────────
+export function startAutoPull(): void {
+  const INTERVAL_MS = 5 * 60 * 1000;
+
+  const run = async () => {
+    try { await pullChangesFromSheet("RIS"); } catch (e: any) {
+      console.error("[walkin/sheets] Auto-pull RIS failed:", e?.message);
+    }
+    try { await pullChangesFromSheet("RPS"); } catch (e: any) {
+      console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
+    }
+  };
+
+  // First run after 30 seconds so startup isn't slowed
+  setTimeout(() => {
+    run();
+    setInterval(run, INTERVAL_MS);
+  }, 30_000);
+
+  console.log("[walkin/sheets] Auto-pull scheduled every 5 minutes");
 }

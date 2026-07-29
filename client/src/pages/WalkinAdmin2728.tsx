@@ -164,10 +164,13 @@ function BranchesTab({ token }: { token: string }) {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Branch | null>(null);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", brand: "RIS", code: "", pin: "1234" });
+  const [form, setForm] = useState({ name: "", brand: "RIS", code: "", pin: "0000" });
   const [editForm, setEditForm] = useState({ name: "", pin: "", isActive: true });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<Branch | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteMsg, setDeleteMsg] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -212,6 +215,20 @@ function BranchesTab({ token }: { token: string }) {
     setMsg("");
   };
 
+  const deleteBranch = async () => {
+    if (!deleteConfirm) return;
+    setDeleting(true); setDeleteMsg("");
+    try {
+      const r = await fetch(`/api/walkin/branches/${deleteConfirm.id}`, {
+        method: "DELETE", headers: { Authorization: `Bearer ${token}` },
+      });
+      const d = await r.json();
+      if (r.ok) { setDeleteConfirm(null); load(); }
+      else setDeleteMsg(d.message || "Delete failed");
+    } catch { setDeleteMsg("Network error"); }
+    setDeleting(false);
+  };
+
   if (loading) return <div className="text-sm text-slate-400 p-4">Loading…</div>;
 
   return (
@@ -250,7 +267,7 @@ function BranchesTab({ token }: { token: string }) {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              {["Name", "Brand", "Code", "PIN", "Status", "Kiosk URL", ""].map(h => (
+              {["Name", "Brand", "Code", "PIN", "Status", "Form URL", ""].map(h => (
                 <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500">{h}</th>
               ))}
             </tr>
@@ -269,7 +286,10 @@ function BranchesTab({ token }: { token: string }) {
                   /walkin-{b.brand.toLowerCase()}-27-28/{b.code}
                 </td>
                 <td className="px-3 py-2.5">
-                  <Btn small variant="ghost" onClick={() => startEdit(b)}>Edit</Btn>
+                  <div className="flex gap-1">
+                    <Btn small variant="ghost" onClick={() => startEdit(b)}>Edit</Btn>
+                    <Btn small variant="danger" onClick={() => { setDeleteConfirm(b); setDeleteMsg(""); }}>Delete</Btn>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -300,6 +320,23 @@ function BranchesTab({ token }: { token: string }) {
             <div className="flex gap-2">
               <Btn onClick={saveBranch} disabled={saving}>{saving ? "Saving…" : "Save"}</Btn>
               <Btn variant="ghost" onClick={() => setEditing(null)}>Cancel</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setDeleteConfirm(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm space-y-4" onClick={e => e.stopPropagation()}>
+            <h4 className="font-bold text-red-700">Delete branch?</h4>
+            <p className="text-sm text-slate-600">
+              <b>{deleteConfirm.name}</b> ({deleteConfirm.brand}) will be permanently deleted.
+            </p>
+            <p className="text-xs text-slate-400">Any leads or staff assigned to this branch must be reassigned first.</p>
+            {deleteMsg && <div className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{deleteMsg}</div>}
+            <div className="flex gap-2">
+              <Btn variant="danger" onClick={deleteBranch} disabled={deleting}>{deleting ? "Deleting…" : "Yes, Delete"}</Btn>
+              <Btn variant="ghost" onClick={() => setDeleteConfirm(null)}>Cancel</Btn>
             </div>
           </div>
         </div>
@@ -1044,17 +1081,28 @@ function QRCodesTab({ token }: { token: string }) {
 }
 
 // ── SheetsSyncTab ──────────────────────────────────────────────
+interface PullLogEntry {
+  timestamp: string; brand: string;
+  rowsScanned: number; changesApplied: number; errors: string[];
+}
+
 function SheetsSyncTab({ token }: { token: string }) {
   const [status, setStatus] = useState<SyncStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [resyncing, setResyncing] = useState<Record<string, boolean>>({});
   const [resyncMsg, setResyncMsg] = useState<Record<string, string>>({});
+  const [pullLog, setPullLog] = useState<PullLogEntry[]>([]);
+  const [showLog, setShowLog] = useState(false);
 
   const loadStatus = useCallback(async () => {
     setLoading(true);
     try {
-      const r = await fetch("/api/walkin/sheets/status", { headers: { Authorization: `Bearer ${token}` } });
-      if (r.ok) setStatus(await r.json());
+      const [sr, lr] = await Promise.all([
+        fetch("/api/walkin/sheets/status",   { headers: { Authorization: `Bearer ${token}` } }),
+        fetch("/api/walkin/sheets/pull-log", { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      if (sr.ok) setStatus(await sr.json());
+      if (lr.ok) setPullLog(await lr.json());
     } finally { setLoading(false); }
   }, [token]);
 
@@ -1177,6 +1225,58 @@ function SheetsSyncTab({ token }: { token: string }) {
         <p className="text-xs text-slate-500 mb-3">All leads from both schools in one sheet. Includes a "Brand" column so you can filter by school.</p>
         <SheetCard label="Master" envKey="MASTER_WALKIN_SHEET_ID_2728" s={status.MASTER} color="#475569"
           onResync={resyncMaster} resyncKey="MASTER" />
+      </div>
+
+      {/* Sheet → DB pull log */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sheet → DB Auto-Pull Log</h4>
+            <p className="text-xs text-slate-500 mt-0.5">Every 5 min the system reads green columns (Status, Dates, Remarks) from both sheets and writes any changes back to the DB with an audit entry.</p>
+          </div>
+          <button onClick={() => setShowLog(l => !l)} className="text-xs text-slate-500 underline hover:text-slate-700">
+            {showLog ? "Hide" : "Show"} log ({pullLog.length})
+          </button>
+        </div>
+
+        {showLog && (
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+            {pullLog.length === 0 ? (
+              <div className="text-sm text-slate-400 text-center py-6">No pull runs yet — first run in ~30 s after server start.</div>
+            ) : (
+              <table className="w-full text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    {["Time", "Brand", "Scanned", "Changes", "Errors"].map(h => (
+                      <th key={h} className="px-3 py-2 text-left font-semibold text-slate-500">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {pullLog.map((entry, i) => (
+                    <tr key={i} className={`border-b border-slate-50 ${entry.errors.length > 0 ? "bg-red-50" : ""}`}>
+                      <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
+                        {new Date(entry.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${entry.brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
+                          {entry.brand}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 tabular-nums">{entry.rowsScanned}</td>
+                      <td className="px-3 py-2 tabular-nums font-semibold" style={{ color: entry.changesApplied > 0 ? "#059669" : undefined }}>
+                        {entry.changesApplied}
+                      </td>
+                      <td className="px-3 py-2 text-red-600 max-w-[200px] truncate" title={entry.errors.join("; ")}>
+                        {entry.errors.length > 0 ? entry.errors[0] : <span className="text-slate-300">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
