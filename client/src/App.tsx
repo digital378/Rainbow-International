@@ -65,6 +65,10 @@ const RpsSales = lazy(() => import("@/pages/RpsSales"));
 const WalkinForm = lazy(() => import("@/pages/WalkinForm"));
 const WalkinKiosk = lazy(() => import("@/pages/WalkinKiosk"));
 const WalkinLeads = lazy(() => import("@/pages/WalkinLeads"));
+const WalkinSales2728 = lazy(() => import("@/pages/WalkinSales2728"));
+const WalkinRpsSales2728 = lazy(() => import("@/pages/WalkinRpsSales2728"));
+const WalkinMarketing2728 = lazy(() => import("@/pages/WalkinMarketing2728"));
+const WalkinOverview2728 = lazy(() => import("@/pages/WalkinOverview2728"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
@@ -148,6 +152,11 @@ function Router() {
       <Route path="/walkin-rps-27-28/:branchCode" component={() => <WalkinKiosk brand="RPS" />} />
       {/* AY 2027-28 Admin leads management */}
       <Route path="/leads" component={WalkinLeads} />
+      {/* AY 2027-28 Dashboards */}
+      <Route path="/sales-27-28" component={WalkinSales2728} />
+      <Route path="/rps-sales-27-28" component={WalkinRpsSales2728} />
+      <Route path="/marketing-27-28" component={WalkinMarketing2728} />
+      <Route path="/overview-27-28" component={WalkinOverview2728} />
       <Route path="/alliances/friendship/:token" component={FriendshipPortal} />
       <Route path="/admin/alliances/friendship/:id/qr" component={FriendshipQRCard} />
       <Route path="/admin/alliances/friendship" component={AdminFriendshipSchools} />
@@ -193,7 +202,9 @@ function DeferredExtras() {
     idle(() => setReady(true));
   }, []);
 
-  const isSalesDashboard = location === "/rps-sales" || location === "/sales";
+  const isSalesDashboard = location === "/rps-sales" || location === "/sales"
+    || location === "/sales-27-28" || location === "/rps-sales-27-28"
+    || location === "/marketing-27-28" || location === "/overview-27-28";
   const isInternalDashboard = location === "/alliances";
   const isKioskForm = location.startsWith("/walkin-ris-27-28") || location.startsWith("/walkin-rps-27-28") || location === "/leads";
 
