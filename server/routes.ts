@@ -2646,8 +2646,8 @@ export async function registerRoutes(
           data.grade,         // F  Program
           "OPEN",             // G  Status
           "",                 // H  Remark
-          "",                 // I  Lead Owner
-          data.source ?? "",  // J  Source
+          "Head Office",      // I  Lead Owner  — all website enquiries default to Head Office
+          "Google",           // J  Source      — all website enquiries come via Google/web
           "",                 // K  Walk-In Date
           "",                 // L  Revisit Date
           data.email ?? "",   // M  Email ID
