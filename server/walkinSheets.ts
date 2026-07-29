@@ -448,6 +448,44 @@ export const YELLOW_PROTECTION_DESCRIPTION =
 export const YELLOW_COL_INDICES = [0, 3, 4, 5, 9, 10] as const;
 
 /**
+ * Canonical allowed Status values — used both for sheet dropdowns and pull
+ * validation.  Keep in sync with the walkin_statuses seed data.
+ */
+export const ALLOWED_STATUSES = [
+  "OPEN",
+  "WALK-IN BOOKED",
+  "WALK-IN COMPLETED",
+  "ADMISSION DONE",
+  "CLOSED",
+  "TRANSFERRED",
+  "INTEGRATED",
+  "NEXT YEAR",
+] as const;
+
+/** Build a setDataValidation request for a Status dropdown on rows 2-1000. */
+function buildStatusDropdownRequest(tabSheetId: number, colIndex: number): object {
+  return {
+    setDataValidation: {
+      range: {
+        sheetId: tabSheetId,
+        startRowIndex: 1,      // row 2 (0-based, skips header)
+        endRowIndex: 1000,     // covers plenty of data rows
+        startColumnIndex: colIndex,
+        endColumnIndex: colIndex + 1,
+      },
+      rule: {
+        condition: {
+          type: "ONE_OF_LIST",
+          values: ALLOWED_STATUSES.map((s) => ({ userEnteredValue: s })),
+        },
+        showCustomUi: true,  // renders as a dropdown arrow
+        strict: false,       // warning-only; won't block existing non-list values
+      },
+    },
+  };
+}
+
+/**
  * Pure helper — exported for unit-testing only.
  *
  * Given the numeric sheetId of the WALKINs tab and whatever protected ranges
@@ -502,8 +540,11 @@ async function applyYellowColumnProtection(
   const tabSheetId: number = tab.properties!.sheetId!;
   const existingProtections: any[] = tab.protectedRanges ?? [];
 
-  // 2. Build requests (delete our old ones + add fresh ones)
-  const requests = buildYellowProtectionRequests(tabSheetId, existingProtections);
+  // 2. Build requests: yellow-column protections + Status dropdown (col L = index 11)
+  const requests = [
+    ...buildYellowProtectionRequests(tabSheetId, existingProtections),
+    buildStatusDropdownRequest(tabSheetId, 11), // column L = Status
+  ];
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
@@ -511,7 +552,7 @@ async function applyYellowColumnProtection(
   });
 
   console.log(
-    `[walkin/sheets] Yellow-column protections applied (A,D,E,F,J,K) on tab "${LEADS_TAB}"`,
+    `[walkin/sheets] Yellow-column protections + Status dropdown applied on tab "${LEADS_TAB}"`,
   );
 }
 
@@ -648,6 +689,24 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
       valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
       requestBody: { values: dataRows },
     });
+  }
+
+  // Apply Status dropdown on Master (col M = index 12) — non-fatal
+  try {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId });
+    const tab = (meta.data.sheets ?? []).find(
+      (s: any) => s.properties?.title === MASTER_LEADS_TAB,
+    );
+    if (tab) {
+      const tabSheetId: number = tab.properties!.sheetId!;
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: { requests: [buildStatusDropdownRequest(tabSheetId, 12)] },
+      });
+      console.log(`[walkin/sheets] Status dropdown applied on Master tab (col M)`);
+    }
+  } catch (err: any) {
+    console.warn(`[walkin/sheets] Master status dropdown failed:`, err?.message);
   }
 
   syncStatus.MASTER.lastSyncAt = new Date();
