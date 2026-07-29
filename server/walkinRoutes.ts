@@ -14,7 +14,6 @@
  *   GET  /api/walkin/branches             — list branches
  *   POST /api/walkin/branches             — create a branch (admin only)
  *   PATCH /api/walkin/branches/:id        — update a branch (admin only)
- *   GET  /api/walkin/branches/:code/verify-pin — verify kiosk PIN
  *   POST /api/walkin/sheets/resync        — rewrite entire sheet from DB (admin only)
  *   GET  /api/walkin/sheets/status        — last-sync timestamp + lead counts (admin only)
  */
@@ -745,29 +744,6 @@ export function registerWalkinRoutes(app: Express) {
       res.json({ message: "Branch deleted", branch: deleted });
     } catch (err: any) {
       res.status(500).json({ message: "Failed to delete branch" });
-    }
-  });
-
-  // ── GET /api/walkin/branches/:code/verify-pin ────────────────
-  // Verifies a kiosk PIN for a given branch code. Returns branch info (without PIN) on success.
-  app.get("/api/walkin/branches/:code/verify-pin", async (req, res) => {
-    try {
-      const pin = typeof req.query.pin === "string" ? req.query.pin : "";
-      const [branch] = await db
-        .select()
-        .from(walkinBranches)
-        .where(and(eq(walkinBranches.code, req.params.code), eq(walkinBranches.isActive, true)));
-
-      if (!branch) return res.status(404).json({ message: "Branch not found or inactive" });
-
-      if (!pin || branch.pin !== pin) {
-        return res.status(401).json({ message: "Incorrect PIN" });
-      }
-
-      const { pin: _pin, ...safe } = branch;
-      res.json(safe);
-    } catch (err: any) {
-      res.status(500).json({ message: "PIN verification failed" });
     }
   });
 
