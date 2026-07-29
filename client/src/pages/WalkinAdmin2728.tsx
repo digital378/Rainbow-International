@@ -760,80 +760,166 @@ function LookupsTab({ token }: { token: string }) {
 }
 
 // ── PDF export helper ──────────────────────────────────────────
-async function downloadQRPdf(branches: Branch[]) {
+async function downloadQRPdf(branches: Branch[], layout: "1up" | "2up" = "1up") {
   const { jsPDF } = await import("jspdf");
 
   const PAGE_W = 210; // A4 mm
   const PAGE_H = 297;
-  const QR_SIZE = 120; // mm
   const NAV_COLOR: [number, number, number] = [9, 26, 79]; // #091a4f
 
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-  for (let i = 0; i < branches.length; i++) {
-    const branch = branches[i];
-    if (i > 0) doc.addPage();
+  // Pre-generate all QR data URLs
+  const qrDataUrls: string[] = await Promise.all(
+    branches.map(branch => {
+      const brandSlug = branch.brand.toLowerCase();
+      const kioskUrl = `${window.location.origin}/walkin-${brandSlug}-27-28/${branch.code}`;
+      return QRCode.toDataURL(kioskUrl, {
+        width: 600,
+        margin: 2,
+        color: { dark: "#091a4f", light: "#ffffff" },
+      });
+    })
+  );
 
-    const brandSlug = branch.brand.toLowerCase();
-    const kioskUrl = `${window.location.origin}/walkin-${brandSlug}-27-28/${branch.code}`;
+  if (layout === "1up") {
+    // ── 1-up: one QR per page ──────────────────────────────────
+    const QR_SIZE = 120;
 
-    // Generate QR as data URL (high res for print)
-    const qrDataUrl = await QRCode.toDataURL(kioskUrl, {
-      width: 600,
-      margin: 2,
-      color: { dark: "#091a4f", light: "#ffffff" },
-    });
+    for (let i = 0; i < branches.length; i++) {
+      const branch = branches[i];
+      if (i > 0) doc.addPage();
 
-    // ── Brand header bar ──
-    const isRIS = branch.brand === "RIS";
-    const brandColor: [number, number, number] = isRIS ? NAV_COLOR : [160, 32, 32];
-    doc.setFillColor(...brandColor);
-    doc.rect(0, 0, PAGE_W, 22, "F");
+      const brandSlug = branch.brand.toLowerCase();
+      const kioskUrl = `${window.location.origin}/walkin-${brandSlug}-27-28/${branch.code}`;
+      const qrDataUrl = qrDataUrls[i];
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text(branch.brand, 12, 14);
+      const isRIS = branch.brand === "RIS";
+      const brandColor: [number, number, number] = isRIS ? NAV_COLOR : [160, 32, 32];
 
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text("Rainbow International School  ·  Walk-in Kiosk  ·  AY 2027-28", PAGE_W - 10, 14, { align: "right" });
+      // Brand header bar
+      doc.setFillColor(...brandColor);
+      doc.rect(0, 0, PAGE_W, 22, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text(branch.brand, 12, 14);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text("Rainbow International School  ·  Walk-in Kiosk  ·  AY 2027-28", PAGE_W - 10, 14, { align: "right" });
 
-    // ── Branch name ──
-    doc.setTextColor(...NAV_COLOR);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(30);
-    doc.text(branch.name, PAGE_W / 2, 52, { align: "center" });
+      // Branch name
+      doc.setTextColor(...NAV_COLOR);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(30);
+      doc.text(branch.name, PAGE_W / 2, 52, { align: "center" });
 
-    // ── Subtitle ──
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(100, 100, 120);
-    doc.text("Scan to register your visit", PAGE_W / 2, 63, { align: "center" });
+      // Subtitle
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 120);
+      doc.text("Scan to register your visit", PAGE_W / 2, 63, { align: "center" });
 
-    // ── QR code ──
-    const qrX = (PAGE_W - QR_SIZE) / 2;
-    const qrY = 72;
-    doc.addImage(qrDataUrl, "PNG", qrX, qrY, QR_SIZE, QR_SIZE);
+      // QR code
+      const qrX = (PAGE_W - QR_SIZE) / 2;
+      const qrY = 72;
+      doc.addImage(qrDataUrl, "PNG", qrX, qrY, QR_SIZE, QR_SIZE);
 
-    // ── URL label ──
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(130, 130, 150);
-    doc.text(kioskUrl, PAGE_W / 2, qrY + QR_SIZE + 8, { align: "center" });
+      // URL label
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(130, 130, 150);
+      doc.text(kioskUrl, PAGE_W / 2, qrY + QR_SIZE + 8, { align: "center" });
 
-    // ── Footer separator ──
-    doc.setDrawColor(220, 220, 230);
-    doc.setLineWidth(0.3);
-    doc.line(12, PAGE_H - 18, PAGE_W - 12, PAGE_H - 18);
+      // Footer separator
+      doc.setDrawColor(220, 220, 230);
+      doc.setLineWidth(0.3);
+      doc.line(12, PAGE_H - 18, PAGE_W - 12, PAGE_H - 18);
+      doc.setFontSize(8);
+      doc.setTextColor(160, 160, 175);
+      doc.text("Rainbow International School  ·  Walk-in Kiosk", PAGE_W / 2, PAGE_H - 10, { align: "center" });
+    }
+  } else {
+    // ── 2-up: two QRs side-by-side per page ───────────────────
+    // Each cell is half the page width
+    const CELL_W = PAGE_W / 2; // 105 mm
+    const QR_SIZE = 75;
+    const HEADER_H = 18;
 
-    doc.setFontSize(8);
-    doc.setTextColor(160, 160, 175);
-    doc.text("Rainbow International School  ·  Walk-in Kiosk", PAGE_W / 2, PAGE_H - 10, { align: "center" });
+    for (let pageIdx = 0; pageIdx * 2 < branches.length; pageIdx++) {
+      if (pageIdx > 0) doc.addPage();
+
+      for (let slot = 0; slot < 2; slot++) {
+        const branchIdx = pageIdx * 2 + slot;
+        if (branchIdx >= branches.length) break;
+
+        const branch = branches[branchIdx];
+        const brandSlug = branch.brand.toLowerCase();
+        const kioskUrl = `${window.location.origin}/walkin-${brandSlug}-27-28/${branch.code}`;
+        const qrDataUrl = qrDataUrls[branchIdx];
+
+        const isRIS = branch.brand === "RIS";
+        const brandColor: [number, number, number] = isRIS ? NAV_COLOR : [160, 32, 32];
+        const cellX = slot * CELL_W;
+        const cellCx = cellX + CELL_W / 2;
+
+        // Vertical divider between cells
+        if (slot === 1) {
+          doc.setDrawColor(220, 220, 230);
+          doc.setLineWidth(0.3);
+          doc.line(CELL_W, 0, CELL_W, PAGE_H);
+        }
+
+        // Brand header bar
+        doc.setFillColor(...brandColor);
+        doc.rect(cellX, 0, CELL_W, HEADER_H, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.text(branch.brand, cellX + 8, 12);
+        doc.setFontSize(7);
+        doc.setFont("helvetica", "normal");
+        doc.text("Walk-in Kiosk · AY 2027-28", cellX + CELL_W - 6, 12, { align: "right" });
+
+        // Branch name
+        doc.setTextColor(...NAV_COLOR);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(20);
+        doc.text(branch.name, cellCx, HEADER_H + 22, { align: "center" });
+
+        // Subtitle
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 120);
+        doc.text("Scan to register your visit", cellCx, HEADER_H + 32, { align: "center" });
+
+        // QR code — centred horizontally, placed below the subtitle
+        const qrX = cellX + (CELL_W - QR_SIZE) / 2;
+        const qrY = HEADER_H + 38;
+        doc.addImage(qrDataUrl, "PNG", qrX, qrY, QR_SIZE, QR_SIZE);
+
+        // URL label
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(6);
+        doc.setTextColor(130, 130, 150);
+        // Truncate long URLs gracefully inside 95mm
+        doc.text(kioskUrl, cellCx, qrY + QR_SIZE + 7, { align: "center", maxWidth: CELL_W - 10 });
+
+        // Footer note at bottom of cell
+        doc.setFontSize(7);
+        doc.setTextColor(170, 170, 185);
+        doc.text("Rainbow International School", cellCx, PAGE_H - 8, { align: "center" });
+      }
+
+      // Horizontal footer line
+      doc.setDrawColor(220, 220, 230);
+      doc.setLineWidth(0.3);
+      doc.line(6, PAGE_H - 14, PAGE_W - 6, PAGE_H - 14);
+    }
   }
 
   const timestamp = new Date().toISOString().slice(0, 10);
-  doc.save(`ris-qr-codes-${timestamp}.pdf`);
+  doc.save(`ris-qr-codes-${layout}-${timestamp}.pdf`);
 }
 
 // ── QRCodesTab ─────────────────────────────────────────────────
@@ -880,6 +966,7 @@ function QRCodesTab({ token }: { token: string }) {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "RIS" | "RPS">("all");
+  const [pdfLayout, setPdfLayout] = useState<"1up" | "2up">("1up");
   const [pdfGenerating, setPdfGenerating] = useState(false);
 
   useEffect(() => {
@@ -895,7 +982,7 @@ function QRCodesTab({ token }: { token: string }) {
     if (shown.length === 0 || pdfGenerating) return;
     setPdfGenerating(true);
     try {
-      await downloadQRPdf(shown);
+      await downloadQRPdf(shown, pdfLayout);
     } finally {
       setPdfGenerating(false);
     }
@@ -915,7 +1002,21 @@ function QRCodesTab({ token }: { token: string }) {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          {/* Layout toggle */}
+          <div className="flex items-center rounded-lg border border-slate-200 overflow-hidden text-xs font-bold">
+            {(["1up", "2up"] as const).map(layout => (
+              <button
+                key={layout}
+                onClick={() => setPdfLayout(layout)}
+                className={`px-3 py-2 transition ${pdfLayout === layout ? "text-white" : "bg-white text-slate-500 hover:bg-slate-50"}`}
+                style={pdfLayout === layout ? { background: NAV } : {}}
+                title={layout === "1up" ? "One QR per page (large)" : "Two QRs per page (saves paper)"}
+              >
+                {layout === "1up" ? "1-up" : "2-up"}
+              </button>
+            ))}
+          </div>
           <Btn variant="ghost" onClick={handleDownloadPdf} disabled={pdfGenerating || shown.length === 0}>
             {pdfGenerating ? "Generating…" : "⬇ Download PDF"}
           </Btn>
