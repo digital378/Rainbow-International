@@ -723,12 +723,21 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
 // For each row whose Lead ID (col R) exists in the DB, compares values
 // and writes back any differences to the DB plus an audit entry.
 
+interface LeadChange {
+  leadId: string;
+  parentName: string;
+  field: string;
+  oldVal: string | null;
+  newVal: string | null;
+}
+
 interface PullLogEntry {
   timestamp: Date;
   brand: "RIS" | "RPS";
   rowsScanned: number;
   changesApplied: number;
   errors: string[];
+  changes: LeadChange[];
 }
 
 const _pullLog: PullLogEntry[] = [];
@@ -754,6 +763,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     rowsScanned: 0,
     changesApplied: 0,
     errors: [],
+    changes: [],
   };
 
   const auth = getAuthClient();
@@ -876,6 +886,17 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         );
 
         entry.changesApplied += changes.length;
+
+        // Record per-lead change detail in the pull log entry
+        for (const c of changes) {
+          entry.changes.push({
+            leadId,
+            parentName: existing.parentName ?? "",
+            field: c.field,
+            oldVal: c.oldVal,
+            newVal: c.newVal,
+          });
+        }
 
         // Queue this row for Master propagation
         pendingMasterUpdates.push({

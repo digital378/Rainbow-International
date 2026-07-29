@@ -1206,9 +1206,17 @@ function onEditInstallable(e) {
 }
 
 // ── SheetsSyncTab ──────────────────────────────────────────────
+interface LeadChange {
+  leadId: string;
+  parentName: string;
+  field: string;
+  oldVal: string | null;
+  newVal: string | null;
+}
 interface PullLogEntry {
   timestamp: string; brand: string;
   rowsScanned: number; changesApplied: number; errors: string[];
+  changes: LeadChange[];
 }
 
 function SheetsSyncTab({ token }: { token: string }) {
@@ -1220,6 +1228,7 @@ function SheetsSyncTab({ token }: { token: string }) {
   const [showLog, setShowLog] = useState(false);
   const [pulling, setPulling] = useState(false);
   const [pullResult, setPullResult] = useState<string>("");
+  const [expandedLog, setExpandedLog] = useState<number | null>(null);
 
   const loadStatus = useCallback(async () => {
     setLoading(true);
@@ -1414,31 +1423,77 @@ function SheetsSyncTab({ token }: { token: string }) {
               <table className="w-full text-xs">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    {["Time", "Brand", "Scanned", "Changes", "Errors"].map(h => (
+                    {["Time", "Brand", "Scanned", "Changes", "Errors", ""].map(h => (
                       <th key={h} className="px-3 py-2 text-left font-semibold text-slate-500">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {pullLog.map((entry, i) => (
-                    <tr key={i} className={`border-b border-slate-50 ${entry.errors.length > 0 ? "bg-red-50" : ""}`}>
-                      <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
-                        {new Date(entry.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${entry.brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
-                          {entry.brand}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 tabular-nums">{entry.rowsScanned}</td>
-                      <td className="px-3 py-2 tabular-nums font-semibold" style={{ color: entry.changesApplied > 0 ? "#059669" : undefined }}>
-                        {entry.changesApplied}
-                      </td>
-                      <td className="px-3 py-2 text-red-600 max-w-[200px] truncate" title={entry.errors.join("; ")}>
-                        {entry.errors.length > 0 ? entry.errors[0] : <span className="text-slate-300">—</span>}
-                      </td>
-                    </tr>
-                  ))}
+                  {pullLog.map((entry, i) => {
+                    const isExpanded = expandedLog === i;
+                    const hasDetail = entry.changes?.length > 0 || entry.errors.length > 0;
+                    return (
+                      <>
+                        <tr
+                          key={`row-${i}`}
+                          className={`border-b border-slate-100 ${entry.errors.length > 0 ? "bg-red-50" : ""} ${hasDetail ? "cursor-pointer hover:bg-slate-50" : ""}`}
+                          onClick={() => hasDetail && setExpandedLog(isExpanded ? null : i)}
+                        >
+                          <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
+                            {new Date(entry.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td className="px-3 py-2">
+                            <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${entry.brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
+                              {entry.brand}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 tabular-nums">{entry.rowsScanned}</td>
+                          <td className="px-3 py-2 tabular-nums font-semibold" style={{ color: entry.changesApplied > 0 ? "#059669" : undefined }}>
+                            {entry.changesApplied}
+                          </td>
+                          <td className="px-3 py-2 text-red-600 max-w-[180px] truncate" title={entry.errors.join("; ")}>
+                            {entry.errors.length > 0 ? entry.errors[0] : <span className="text-slate-300">—</span>}
+                          </td>
+                          <td className="px-3 py-2 text-slate-400 text-right whitespace-nowrap">
+                            {hasDetail ? (isExpanded ? "▲" : "▼") : null}
+                          </td>
+                        </tr>
+                        {isExpanded && (
+                          <tr key={`detail-${i}`} className="border-b border-slate-100 bg-slate-50">
+                            <td colSpan={6} className="px-4 py-3">
+                              {entry.changes?.length > 0 && (
+                                <div className="mb-2">
+                                  <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Updated leads</div>
+                                  <div className="space-y-1">
+                                    {entry.changes.map((c, ci) => (
+                                      <div key={ci} className="flex items-center gap-2 text-[11px]">
+                                        <span className="font-mono text-slate-400 shrink-0">#{c.leadId}</span>
+                                        <span className="font-semibold text-slate-700 shrink-0">{c.parentName || "—"}</span>
+                                        <span className="text-slate-500 shrink-0">{c.field}:</span>
+                                        <span className="text-red-500 line-through shrink-0">{c.oldVal ?? "—"}</span>
+                                        <span className="text-slate-400 shrink-0">→</span>
+                                        <span className="text-emerald-700 font-semibold shrink-0">{c.newVal ?? "—"}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {entry.errors.length > 0 && (
+                                <div>
+                                  <div className="text-[10px] font-semibold text-red-500 uppercase tracking-wider mb-1.5">Errors</div>
+                                  <div className="space-y-0.5">
+                                    {entry.errors.map((e, ei) => (
+                                      <div key={ei} className="text-[11px] text-red-600">{e}</div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
