@@ -495,8 +495,8 @@ export const ALLOWED_STATUSES_BRAND = ALLOWED_STATUSES.filter(
 /** Grade / programme options for RIS brand sheet dropdown. */
 export const ALLOWED_GRADES_RIS = [
   "Nursery",
-  "Junior KG",
-  "Senior KG",
+  "Jr. KG",
+  "Sr. KG",
   "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
   "Class 6", "Class 7", "Class 8", "Class 9", "Class 10",
   "Class 11 – Science", "Class 11 – Commerce", "Class 11 – Humanities",
@@ -507,8 +507,8 @@ export const ALLOWED_GRADES_RIS = [
 export const ALLOWED_GRADES_RPS = [
   "Playgroup",
   "Nursery",
-  "Junior KG",
-  "Senior KG",
+  "Jr. KG",
+  "Sr. KG",
   "Grade 1", "Grade 2", "Grade 3", "Grade 4",
 ] as const;
 

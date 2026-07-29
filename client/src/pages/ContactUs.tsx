@@ -13,9 +13,11 @@ import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingD
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
-  "Class I", "Class II", "Class III", "Class IV", "Class V",
-  "Class VI", "Class VII", "Class VIII",
-  "Class IX", "Class X", "Class XI", "Class XII",
+  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
+  "Class 6", "Class 7", "Class 8",
+  "Class 9", "Class 10",
+  "Class 11 – Science", "Class 11 – Commerce", "Class 11 – Humanities",
+  "Class 12 – Science", "Class 12 – Commerce", "Class 12 – Humanities",
 ];
 
 const contactItems = [
