@@ -590,6 +590,14 @@ export async function registerRoutes(
         grade: validatedData.grade,
         phone: validatedData.phone,
       }).catch((err) => console.error("[inquiry] Sheet append error:", err));
+      appendEnquiryToCrmLeadsTracker({
+        parentName: validatedData.parentName,
+        studentName: validatedData.studentName,
+        grade: validatedData.grade,
+        phone: validatedData.phone,
+        email: validatedData.email ?? "",
+        source: validatedData.source ?? "",
+      }).catch((err) => console.error("[inquiry] CRM Leads Tracker append error:", err));
       res.status(201).json(inquiry);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -624,6 +632,12 @@ export async function registerRoutes(
         grade: "",
         phone: validatedData.phone,
       }).catch((err) => console.error("[callback] Sheet append error:", err));
+      appendEnquiryToCrmLeadsTracker({
+        parentName: validatedData.name,
+        studentName: "",
+        grade: "",
+        phone: validatedData.phone,
+      }).catch((err) => console.error("[callback] CRM Leads Tracker append error:", err));
       res.status(201).json(saved);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -2595,6 +2609,52 @@ export async function registerRoutes(
       },
     });
     console.log(`[sheet] Appended enquiry row — ${data.parentName} / ${data.phone}`);
+  }
+
+  // Website enquiry form → CRM Leads Tracker tab of Master MIS 27-28
+  const CRM_LEADS_TRACKER_SHEET_ID = "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA";
+  const CRM_LEADS_TRACKER_TAB = "CRM Leads Tracker";
+  async function appendEnquiryToCrmLeadsTracker(data: {
+    parentName: string; studentName: string; grade: string;
+    phone: string; email?: string; source?: string;
+  }): Promise<void> {
+    const auth = getAuthenticatedClient();
+    if (!auth) throw new Error("Google not connected");
+    const { google: goog } = await import("googleapis");
+    const sheets = goog.sheets({ version: "v4", auth });
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    const dd   = now.getDate().toString().padStart(2, "0");
+    const mm   = (now.getMonth() + 1).toString().padStart(2, "0");
+    const yyyy = now.getFullYear();
+    const dateStr = `${dd}/${mm}/${yyyy}`;                    // DD/MM/YYYY — canonical CRM format
+    const hh  = now.getHours();
+    const min = now.getMinutes().toString().padStart(2, "0");
+    const ampm = hh >= 12 ? "PM" : "AM";
+    const h12 = (hh % 12 || 12).toString().padStart(2, "0");
+    const timeStr = `${h12}:${min} ${ampm}`;
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: CRM_LEADS_TRACKER_SHEET_ID,
+      range: `${CRM_LEADS_TRACKER_TAB}!A:M`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[
+          dateStr,            // A  Date
+          timeStr,            // B  Time
+          data.parentName,    // C  Parent's Name
+          data.studentName,   // D  Child's Name
+          data.phone,         // E  Phone
+          data.grade,         // F  Program
+          "OPEN",             // G  Status
+          "",                 // H  Remark
+          "",                 // I  Lead Owner
+          data.source ?? "",  // J  Source
+          "",                 // K  Walk-In Date
+          "",                 // L  Revisit Date
+          data.email ?? "",   // M  Email ID
+        ]],
+      },
+    });
+    console.log(`[crm-sheet] Appended to CRM Leads Tracker — ${data.parentName} / ${data.phone}`);
   }
 
   // RPS walk-in check-ins sync to the RPS master sheet ("RA Checkin" tab)
