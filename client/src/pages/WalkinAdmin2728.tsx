@@ -145,9 +145,9 @@ function Btn({ onClick, children, variant = "primary", disabled, small, classNam
   );
 }
 
-function InputRow({ label, children }: { label: string; children: React.ReactNode }) {
+function InputRow({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className={`flex flex-col gap-1${className ? ` ${className}` : ""}`}>
       <label className="text-xs font-semibold text-slate-600">{label}</label>
       {children}
     </div>
@@ -455,10 +455,18 @@ function StaffTab({ token }: { token: string }) {
           </InputRow>
           <InputRow label="Assigned Branch" className="col-span-2">
             <select className={inp()} value={String(form.branchId)} onChange={e => setForm(f => ({ ...f, branchId: e.target.value ? Number(e.target.value) : "" }))}>
-              <option value="">All branches (no restriction)</option>
-              {branches.filter(b => !form.brand || b.brand === form.brand).map(b => (
-                <option key={b.id} value={b.id}>{b.name} ({b.brand})</option>
-              ))}
+              <option value="">— All branches (no restriction) —</option>
+              {(["RIS", "RPS"] as const).map(brand => {
+                const brandBranches = branches.filter(b => b.brand === brand);
+                if (brandBranches.length === 0) return null;
+                return (
+                  <optgroup key={brand} label={brand}>
+                    {brandBranches.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </optgroup>
+                );
+              })}
             </select>
           </InputRow>
           {msg && <div className="col-span-2 text-sm text-red-600">{msg}</div>}
