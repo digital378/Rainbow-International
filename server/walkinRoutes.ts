@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -623,8 +623,16 @@ export function registerWalkinRoutes(app: Express) {
 
       await writeAudit(req.params.id, "archived", "false", "true", changedBy);
 
-      // Mirror archival to Google Sheets (fire-and-forget — never blocks the API response)
-      queueRemove(existing.brand as "RIS" | "RPS", existing.id);
+      // Mirror archival to Google Sheets (fire-and-forget — never blocks the API response).
+      // Use a full brand resync so the archived row is physically removed from the sheet
+      // (consistent with how syncDeletionsFromMaster handles deletions from the Master MIS).
+      const archiveBrand = existing.brand as "RIS" | "RPS";
+      resyncBrandToSheet(archiveBrand).catch((err) => {
+        console.error(`[walkin/leads/archive] Brand sheet resync failed (${archiveBrand}):`, err?.message);
+      });
+      removeLeadFromMasterSheet(existing.id).catch((err) => {
+        console.error("[walkin/leads/archive] Master sheet removal failed:", err?.message);
+      });
 
       res.json(updated);
     } catch (err: any) {
