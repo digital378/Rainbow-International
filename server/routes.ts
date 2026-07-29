@@ -26,6 +26,7 @@ import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
 import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
+import { registerWalkinRoutes } from "./walkinRoutes";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
   pdf: new Set(["application/pdf", "application/octet-stream"]),
@@ -3730,6 +3731,11 @@ paths:
     }
     next();
   }
+
+  // ── AY 2027-28 Walk-in Admissions Capture System ─────────────
+  // Must be registered BEFORE /api/walkin/:slug so specific paths like
+  // /api/walkin/leads and /api/walkin/branches are not swallowed by the RA slug route.
+  registerWalkinRoutes(app);
 
   // Public: get RA info by slug (used by walkin form to display RA name)
   app.get("/api/walkin/:slug/info", async (req, res) => {

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, jsonb, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, jsonb, serial, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -282,3 +282,111 @@ export const insertWalkinCheckinSchema = createInsertSchema(walkinCheckins).omit
 
 export type InsertWalkinCheckin = z.infer<typeof insertWalkinCheckinSchema>;
 export type WalkinCheckin = typeof walkinCheckins.$inferSelect;
+
+// ── AY 2027-28 Walk-in Admissions Capture System ─────────────
+
+export const walkinBranches = pgTable("walkin_branches", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  brand: text("brand").notNull(), // "RIS" or "RPS"
+  code: text("code").notNull().unique(), // short slug, e.g. "brahmand"
+  pin: text("pin").notNull().default("1234"), // kiosk access PIN
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const walkinPrograms = pgTable("walkin_programs", {
+  id: serial("id").primaryKey(),
+  label: text("label").notNull(),
+  brand: text("brand"), // null = shared; "RIS" or "RPS" for brand-specific
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const walkinSources = pgTable("walkin_sources", {
+  id: serial("id").primaryKey(),
+  label: text("label").notNull(),
+  brand: text("brand"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const walkinStatuses = pgTable("walkin_statuses", {
+  id: serial("id").primaryKey(),
+  label: text("label").notNull(),
+  brand: text("brand"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const walkinCloseReasons = pgTable("walkin_close_reasons", {
+  id: serial("id").primaryKey(),
+  label: text("label").notNull(),
+  brand: text("brand"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const walkinStaff = pgTable("walkin_staff", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  brand: text("brand"), // null = all brands
+  isActive: boolean("is_active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+});
+
+export const walkinLeads = pgTable(
+  "walkin_leads",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    brand: text("brand").notNull(),          // "RIS" or "RPS" — immutable after creation
+    branchId: integer("branch_id").references(() => walkinBranches.id),
+    academicYear: text("academic_year").notNull().default("2027-28"),
+    enquiryDate: text("enquiry_date").notNull(), // YYYY-MM-DD; defaults to today; cannot be future
+    monthLabel: text("month_label").notNull(),   // e.g. "Jun-27" — auto-derived; never user-editable
+    parentName: text("parent_name").notNull(),
+    childName: text("child_name").notNull(),
+    phone: text("phone").notNull(),              // normalized 10-digit Indian mobile
+    altPhone: text("alt_phone"),
+    email: text("email"),
+    program: text("program").notNull(),
+    source: text("source").notNull(),
+    status: text("status").notNull().default("OPEN"),
+    closeReason: text("close_reason"),           // required when status = CLOSED
+    remark: text("remark"),                      // free-text; never feeds analytics
+    leadOwner: text("lead_owner"),
+    walkInDate: text("walk_in_date"),            // YYYY-MM-DD; required for WALK-IN states
+    revisitDate: text("revisit_date"),           // YYYY-MM-DD
+    isArchived: boolean("is_archived").notNull().default(false),
+    createdBy: text("created_by").notNull().default("kiosk"),
+    updatedBy: text("updated_by"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("walkin_leads_brand_branch_date_idx").on(t.brand, t.branchId, t.enquiryDate),
+    index("walkin_leads_phone_idx").on(t.phone),
+  ],
+);
+
+export const walkinLeadAuditLog = pgTable("walkin_lead_audit_log", {
+  id: serial("id").primaryKey(),
+  leadId: varchar("lead_id").notNull().references(() => walkinLeads.id),
+  field: text("field").notNull(),     // field name that changed, or "created" / "archived"
+  oldValue: text("old_value"),
+  newValue: text("new_value"),
+  changedBy: text("changed_by").notNull().default("system"),
+  changedAt: timestamp("changed_at").defaultNow().notNull(),
+});
+
+// ── Types ─────────────────────────────────────────────────────
+export type WalkinBranch = typeof walkinBranches.$inferSelect;
+export type InsertWalkinBranch = typeof walkinBranches.$inferInsert;
+export type WalkinLead = typeof walkinLeads.$inferSelect;
+export type InsertWalkinLead = typeof walkinLeads.$inferInsert;
+export type WalkinLeadAuditLog = typeof walkinLeadAuditLog.$inferSelect;
+export type WalkinProgram = typeof walkinPrograms.$inferSelect;
+export type WalkinSource = typeof walkinSources.$inferSelect;
+export type WalkinStatus = typeof walkinStatuses.$inferSelect;
+export type WalkinCloseReason = typeof walkinCloseReasons.$inferSelect;
+export type WalkinStaffMember = typeof walkinStaff.$inferSelect;
