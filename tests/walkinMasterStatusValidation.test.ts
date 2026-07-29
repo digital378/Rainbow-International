@@ -1,12 +1,15 @@
 /**
- * Unit tests for status validation inside pullChangesFromMasterSheet().
+ * Unit tests for status and close-reason validation inside
+ * pullChangesFromMasterSheet().
  *
  * The Master MIS sheet uses a separate pull path (`pullChangesFromMasterSheet`)
  * that reads a 19-column layout (Brand prepended as col A, Lead ID in col S).
- * Status lives in col M (index 12) instead of col L used by brand sheets.
+ * Status lives in col M (index 12) and Reason for Closed in col P (index 15),
+ * instead of the brand-sheet positions.
  *
- * When the Status column contains an unrecognised value the code must:
- *   1. NOT update the DB record's status.
+ * When the Status or Reason for Closed column contains an unrecognised value
+ * the code must:
+ *   1. NOT update the DB record for that field.
  *   2. Push an error message that names the bad value into the pull log entry.
  *
  * Both `googleapis` and `../server/db` are mocked so no real network or DB
@@ -119,6 +122,26 @@ function makeMasterSheetRow(
   row[0]  = brand;   // A — Brand
   row[12] = status;  // M — Status
   row[18] = leadId;  // S — Lead ID
+  return row;
+}
+
+/**
+ * Build a 19-column Master sheet row (A–S) that carries only a close reason.
+ *   A  (index  0) = Brand
+ *   P  (index 15) = Reason for Closed
+ *   S  (index 18) = Lead ID (upsert key)
+ * Status (index 12) and all other columns are left as empty strings so only
+ * the close-reason validation path is exercised.
+ */
+function makeMasterSheetRowWithCloseReason(
+  brand: string,
+  closeReason: string,
+  leadId: string,
+): string[] {
+  const row: string[] = Array(19).fill("");
+  row[0]  = brand;        // A — Brand
+  row[15] = closeReason;  // P — Reason for Closed
+  row[18] = leadId;       // S — Lead ID
   return row;
 }
 
@@ -256,6 +279,78 @@ describe("pullChangesFromMasterSheet — status validation", () => {
     const errorMsg = result.errors.find((e) => e.includes("not recognised"));
     expect(errorMsg).toBeDefined();
     expect(errorMsg).toContain('"ADMISSSION"');
+    expect(vi.mocked(db.update)).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("pullChangesFromMasterSheet — close-reason validation", () => {
+
+  it("records an error that names the bad value when the Master sheet close reason is unrecognised", async () => {
+    const badReason = "Not Intersted"; // intentional typo
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RIS", badReason, "42")]);
+
+    const result = await pullChangesFromMasterSheet();
+
+    expect(result.errors.length).toBeGreaterThan(0);
+    const errorMsg = result.errors.find((e) => e.includes("not a recognised close reason"));
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toContain(`"${badReason}"`);
+  });
+
+  it("does NOT update the DB record when the Master sheet close reason is invalid", async () => {
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RIS", "CLOSEDD", "42")]); // extra D typo
+
+    await pullChangesFromMasterSheet();
+
+    expect(vi.mocked(db.update)).not.toHaveBeenCalled();
+  });
+
+  it("includes the lead ID in the error message so staff can trace an invalid close reason", async () => {
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RIS", "Fee Isue", "42")]); // typo
+
+    const result = await pullChangesFromMasterSheet();
+
+    const errorMsg = result.errors.find((e) => e.includes("not a recognised close reason"));
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toContain("42");
+  });
+
+  it("does not increment changesApplied when only an invalid close reason is present", async () => {
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RPS", "REASON_TYPO", "42")]);
+
+    const result = await pullChangesFromMasterSheet();
+
+    expect(result.changesApplied).toBe(0);
+  });
+
+  it("accepts a valid close reason, updates the DB, and logs no close-reason errors", async () => {
+    // "CLOSED" is present in VALID_STATUSES which the mock also returns for
+    // the walkinCloseReasons lookup (both share the same fields-based mock path).
+    // DB lead has closeReason=null so this will register as a change.
+    primeMasterSheetRows([makeMasterSheetRowWithCloseReason("RIS", "CLOSED", "42")]);
+
+    const result = await pullChangesFromMasterSheet();
+
+    const validationErrors = result.errors.filter((e) =>
+      e.includes("not a recognised close reason"),
+    );
+    expect(validationErrors).toHaveLength(0);
+    expect(vi.mocked(db.update)).toHaveBeenCalled();
+  });
+
+  it("rejects an invalid close reason from an RPS row just as it does for RIS", async () => {
+    primeMasterSheetRows([
+      makeMasterSheetRowWithCloseReason("RPS", "Dissatisifed", "42"), // misspelling
+    ]);
+
+    const result = await pullChangesFromMasterSheet();
+
+    expect(result.errors.length).toBeGreaterThan(0);
+    const errorMsg = result.errors.find((e) => e.includes("not a recognised close reason"));
+    expect(errorMsg).toBeDefined();
+    expect(errorMsg).toContain('"Dissatisifed"');
     expect(vi.mocked(db.update)).not.toHaveBeenCalled();
   });
 });
