@@ -13,6 +13,23 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import QRCode from "qrcode";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 // ── Constants ──────────────────────────────────────────────────
 const ADMIN_AUTH_KEY = "ris_admin_auth";
@@ -288,16 +305,66 @@ function BranchesTab({ token }: { token: string }) {
   );
 }
 
+// ── DragHandle ─────────────────────────────────────────────────
+function DragHandle(props: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      title="Drag to reorder"
+      className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 select-none px-1 flex items-center"
+      style={{ touchAction: "none" }}
+    >
+      <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
+        <circle cx="3" cy="3"  r="1.5"/><circle cx="9" cy="3"  r="1.5"/>
+        <circle cx="3" cy="10" r="1.5"/><circle cx="9" cy="10" r="1.5"/>
+        <circle cx="3" cy="17" r="1.5"/><circle cx="9" cy="17" r="1.5"/>
+      </svg>
+    </div>
+  );
+}
+
+// ── SortableStaffRow ───────────────────────────────────────────
+function SortableStaffRow({ s, onEdit }: {
+  s: StaffMember;
+  onEdit: (s: StaffMember) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: s.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: isDragging ? "#f8fafc" : undefined,
+  };
+  return (
+    <tr ref={setNodeRef} style={style} className="border-b border-slate-100 hover:bg-slate-50">
+      <td className="px-1 py-2.5 w-8">
+        <DragHandle {...attributes} {...listeners} />
+      </td>
+      <td className="px-3 py-2.5 font-medium">{s.name}</td>
+      <td className="px-3 py-2.5 text-xs text-slate-500">{s.brand ?? "Both"}</td>
+      <td className="px-3 py-2.5"><Badge active={s.isActive} /></td>
+      <td className="px-3 py-2.5">
+        <Btn small variant="ghost" onClick={() => onEdit(s)}>Edit</Btn>
+      </td>
+    </tr>
+  );
+}
+
 // ── StaffTab ───────────────────────────────────────────────────
 function StaffTab({ token }: { token: string }) {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ name: "", brand: "" as "" | "RIS" | "RPS", sortOrder: 0 });
+  const [form, setForm] = useState({ name: "", brand: "" as "" | "RIS" | "RPS" });
   const [editing, setEditing] = useState<StaffMember | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", isActive: true, sortOrder: 0 });
+  const [editForm, setEditForm] = useState({ name: "", isActive: true });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -312,9 +379,9 @@ function StaffTab({ token }: { token: string }) {
   const addStaff = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMsg("");
     try {
-      const body = { name: form.name, brand: form.brand || null, sortOrder: form.sortOrder };
+      const body = { name: form.name, brand: form.brand || null, sortOrder: staff.length * 10 };
       const r = await fetch("/api/walkin/staff", { method: "POST", headers: hdrs(token), body: JSON.stringify(body) });
-      if (r.ok) { setAdding(false); setForm({ name: "", brand: "", sortOrder: 0 }); load(); }
+      if (r.ok) { setAdding(false); setForm({ name: "", brand: "" }); load(); }
       else { const d = await r.json(); setMsg(d.message || "Failed"); }
     } catch { setMsg("Network error"); }
     setSaving(false);
@@ -330,6 +397,24 @@ function StaffTab({ token }: { token: string }) {
     setSaving(false);
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = staff.findIndex(s => s.id === active.id);
+    const newIndex = staff.findIndex(s => s.id === over.id);
+    const reordered = arrayMove(staff, oldIndex, newIndex);
+    setStaff(reordered);
+    // Persist new sortOrder for all items
+    await Promise.all(
+      reordered.map((s, i) =>
+        fetch(`/api/walkin/staff/${s.id}`, {
+          method: "PATCH", headers: hdrs(token),
+          body: JSON.stringify({ sortOrder: i * 10 }),
+        }),
+      ),
+    );
+  };
+
   if (loading) return <div className="text-sm text-slate-400 p-4">Loading…</div>;
 
   return (
@@ -340,7 +425,7 @@ function StaffTab({ token }: { token: string }) {
       </div>
 
       {adding && (
-        <form onSubmit={addStaff} className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-3 gap-3">
+        <form onSubmit={addStaff} className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-2 gap-3">
           <InputRow label="Name">
             <input className={inp()} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required placeholder="Staff name" />
           </InputRow>
@@ -351,11 +436,8 @@ function StaffTab({ token }: { token: string }) {
               <option value="RPS">RPS only</option>
             </select>
           </InputRow>
-          <InputRow label="Sort Order">
-            <input type="number" className={inp()} value={form.sortOrder} onChange={e => setForm(f => ({ ...f, sortOrder: parseInt(e.target.value) || 0 }))} />
-          </InputRow>
-          {msg && <div className="col-span-3 text-sm text-red-600">{msg}</div>}
-          <div className="col-span-3 flex gap-2">
+          {msg && <div className="col-span-2 text-sm text-red-600">{msg}</div>}
+          <div className="col-span-2 flex gap-2">
             <Btn type="submit" disabled={saving}>{saving ? "Saving…" : "Add"}</Btn>
             <Btn variant="ghost" onClick={() => setAdding(false)}>Cancel</Btn>
           </div>
@@ -366,36 +448,36 @@ function StaffTab({ token }: { token: string }) {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              {["Name", "Brand", "Sort", "Status", ""].map(h => (
+              <th className="w-8" />
+              {["Name", "Brand", "Status", ""].map(h => (
                 <th key={h} className="px-3 py-2.5 text-left text-xs font-semibold text-slate-500">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody>
-            {staff.map(s => (
-              <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50">
-                <td className="px-3 py-2.5 font-medium">{s.name}</td>
-                <td className="px-3 py-2.5 text-xs text-slate-500">{s.brand ?? "Both"}</td>
-                <td className="px-3 py-2.5 text-xs text-slate-400">{s.sortOrder}</td>
-                <td className="px-3 py-2.5"><Badge active={s.isActive} /></td>
-                <td className="px-3 py-2.5">
-                  <Btn small variant="ghost" onClick={() => { setEditing(s); setEditForm({ name: s.name, isActive: s.isActive, sortOrder: s.sortOrder }); setMsg(""); }}>Edit</Btn>
-                </td>
-              </tr>
-            ))}
-            {staff.length === 0 && (
-              <tr><td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-400">No staff members yet</td></tr>
-            )}
-          </tbody>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={staff.map(s => s.id)} strategy={verticalListSortingStrategy}>
+              <tbody>
+                {staff.map(s => (
+                  <SortableStaffRow
+                    key={s.id} s={s}
+                    onEdit={s => { setEditing(s); setEditForm({ name: s.name, isActive: s.isActive }); setMsg(""); }}
+                  />
+                ))}
+                {staff.length === 0 && (
+                  <tr><td colSpan={5} className="px-3 py-6 text-center text-sm text-slate-400">No staff members yet</td></tr>
+                )}
+              </tbody>
+            </SortableContext>
+          </DndContext>
         </table>
       </div>
+      <p className="text-xs text-slate-400">Drag rows to reorder — order is saved automatically.</p>
 
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditing(null)}>
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm space-y-4" onClick={e => e.stopPropagation()}>
             <h4 className="font-bold text-slate-800">Edit: {editing.name}</h4>
             <InputRow label="Name"><input className={inp()} value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} /></InputRow>
-            <InputRow label="Sort Order"><input type="number" className={inp()} value={editForm.sortOrder} onChange={e => setEditForm(f => ({ ...f, sortOrder: parseInt(e.target.value) || 0 }))} /></InputRow>
             <InputRow label="Status">
               <select className={inp()} value={String(editForm.isActive)} onChange={e => setEditForm(f => ({ ...f, isActive: e.target.value === "true" }))}>
                 <option value="true">Active</option>
@@ -422,14 +504,49 @@ const LOOKUP_SECTIONS: Array<{ key: keyof Lookups; label: string; table: string 
   { key: "closeReasons", label: "Close Reasons", table: "close-reasons" },
 ];
 
-function LookupSection({ label, items, table, token, onRefresh }: {
+// ── SortableLookupRow ──────────────────────────────────────────
+function SortableLookupRow({ item, onToggle }: { item: LookupItem; onToggle: (item: LookupItem) => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: isDragging ? "#f8fafc" : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50">
+      <div className="flex items-center gap-2">
+        <DragHandle {...attributes} {...listeners} />
+        <span className={`text-sm ${item.isActive ? "text-slate-800" : "text-slate-400 line-through"}`}>{item.label}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        {item.brand && <span className="text-xs text-slate-400">{item.brand}</span>}
+        <button onClick={() => onToggle(item)}
+          className={`text-xs font-semibold px-2 py-0.5 rounded-full transition ${item.isActive ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600" : "bg-red-100 text-red-500 hover:bg-green-100 hover:text-green-700"}`}>
+          {item.isActive ? "Deactivate" : "Activate"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function LookupSection({ label, items: initialItems, table, token, onRefresh }: {
   label: string; items: LookupItem[]; table: string; token: string; onRefresh: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<LookupItem[]>(initialItems);
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+
+  // Sync when parent refreshes
+  useEffect(() => { setItems(initialItems); }, [initialItems]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const toggle = async (item: LookupItem) => {
     await fetch(`/api/walkin/lookups/${table}/${item.id}`, {
@@ -443,12 +560,29 @@ function LookupSection({ label, items, table, token, onRefresh }: {
     setSaving(true); setMsg("");
     try {
       const r = await fetch(`/api/walkin/lookups/${table}`, {
-        method: "POST", headers: hdrs(token), body: JSON.stringify({ label: newLabel.trim() }),
+        method: "POST", headers: hdrs(token), body: JSON.stringify({ label: newLabel.trim(), sortOrder: items.length * 10 }),
       });
       if (r.ok) { setNewLabel(""); setAdding(false); onRefresh(); }
       else { const d = await r.json(); setMsg(d.message || "Failed"); }
     } catch { setMsg("Network error"); }
     setSaving(false);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = items.findIndex(i => i.id === active.id);
+    const newIndex = items.findIndex(i => i.id === over.id);
+    const reordered = arrayMove(items, oldIndex, newIndex);
+    setItems(reordered);
+    await Promise.all(
+      reordered.map((item, idx) =>
+        fetch(`/api/walkin/lookups/${table}/${item.id}`, {
+          method: "PATCH", headers: hdrs(token),
+          body: JSON.stringify({ sortOrder: idx * 10 }),
+        }),
+      ),
+    );
   };
 
   const active = items.filter(i => i.isActive).length;
@@ -465,19 +599,13 @@ function LookupSection({ label, items, table, token, onRefresh }: {
 
       {open && (
         <div className="divide-y divide-slate-100">
-          {items.map(item => (
-            <div key={item.id} className="flex items-center justify-between px-4 py-2.5 hover:bg-slate-50">
-              <span className={`text-sm ${item.isActive ? "text-slate-800" : "text-slate-400 line-through"}`}>{item.label}</span>
-              <div className="flex items-center gap-3">
-                {item.brand && <span className="text-xs text-slate-400">{item.brand}</span>}
-                <span className="text-xs text-slate-400">#{item.sortOrder}</span>
-                <button onClick={() => toggle(item)}
-                  className={`text-xs font-semibold px-2 py-0.5 rounded-full transition ${item.isActive ? "bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-600" : "bg-red-100 text-red-500 hover:bg-green-100 hover:text-green-700"}`}>
-                  {item.isActive ? "Deactivate" : "Activate"}
-                </button>
-              </div>
-            </div>
-          ))}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={items.map(i => i.id)} strategy={verticalListSortingStrategy}>
+              {items.map(item => (
+                <SortableLookupRow key={item.id} item={item} onToggle={toggle} />
+              ))}
+            </SortableContext>
+          </DndContext>
 
           <div className="px-4 py-3 bg-slate-50">
             {adding ? (
