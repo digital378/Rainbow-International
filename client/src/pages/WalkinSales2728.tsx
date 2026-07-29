@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Line,
@@ -123,6 +123,43 @@ function Empty({ msg = "No data yet" }: { msg?: string }) {
   return <div className="h-48 flex items-center justify-center text-slate-400 text-sm">{msg}</div>;
 }
 
+/* ── Month Range Filter ────────────────────────── */
+function MonthRangeFilter({
+  months, from, to, onFrom, onTo, accent,
+}: { months: string[]; from: string | null; to: string | null; onFrom: (v: string | null) => void; onTo: (v: string | null) => void; accent: string }) {
+  if (months.length === 0) return null;
+  const isFiltered = !!(from || to);
+  return (
+    <div className="bg-slate-50 border-b border-slate-200 px-6 py-2">
+      <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Month range</span>
+        <select value={from ?? ""}
+          onChange={e => onFrom(e.target.value || null)}
+          className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+          <option value="">From: All</option>
+          {months.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <span className="text-slate-400 text-xs">—</span>
+        <select value={to ?? ""}
+          onChange={e => onTo(e.target.value || null)}
+          className="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+          <option value="">To: All</option>
+          {months.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
+        {isFiltered && (
+          <button onClick={() => { onFrom(null); onTo(null); }}
+            className="text-xs underline text-slate-500 hover:text-slate-700">Clear</button>
+        )}
+        {isFiltered && (
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "#fef3c7", color: accent }}>
+            Filtered · KPIs reflect selected range
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ── Main Dashboard ────────────────────────────── */
 function Dashboard() {
   const [data, setData]       = useState<Stats | null>(null);
@@ -130,6 +167,8 @@ function Dashboard() {
   const [error, setError]     = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [filterFrom, setFilterFrom] = useState<string | null>(null);
+  const [filterTo,   setFilterTo]   = useState<string | null>(null);
   const cancelled = useRef(false);
 
   const fetchData = useCallback(() => {
@@ -151,6 +190,9 @@ function Dashboard() {
     return () => { cancelled.current = true; clearInterval(iv); };
   }, [fetchData]);
 
+  // Reset filter when switching tabs
+  useEffect(() => { setFilterFrom(null); setFilterTo(null); }, [activeTab]);
+
   if (loading && !data) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#f1f5f9" }}>
       <div className="text-slate-500">Loading RIS 2027-28 data…</div>
@@ -170,8 +212,44 @@ function Dashboard() {
   const { kpis, monthly, monthlyDetail = [], bySource, byOwner, statusBreakdown, byCounsellor = [], byProgram = [] } = data;
   const openLeads   = statusBreakdown.filter(s => ["OPEN","FOLLOW-UP"].includes(s.status)).reduce((a,s) => a+s.cnt, 0);
   const closedLeads = statusBreakdown.find(s => s.status === "CLOSED")?.cnt ?? 0;
-  const convPct     = kpis.totalLeads > 0 ? (kpis.admissions / kpis.totalLeads) * 100 : 0;
-  const wiConvPct   = kpis.walkins    > 0 ? (kpis.admissions / kpis.walkins)    * 100 : 0;
+
+  // Available months for the picker (in data order)
+  const availableMonths = useMemo(() => monthlyDetail.map(m => m.month), [monthlyDetail]);
+
+  // Filtered month detail slice
+  const filteredDetail = useMemo(() => {
+    if (!filterFrom && !filterTo) return monthlyDetail;
+    const fromIdx = filterFrom ? availableMonths.indexOf(filterFrom) : 0;
+    const toIdx   = filterTo   ? availableMonths.indexOf(filterTo)   : availableMonths.length - 1;
+    const lo = Math.min(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
+    const hi = Math.max(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
+    return monthlyDetail.slice(lo, hi + 1);
+  }, [monthlyDetail, availableMonths, filterFrom, filterTo]);
+
+  const isFiltered = !!(filterFrom || filterTo);
+
+  // KPIs recalculated for the filtered range
+  const activeKpis = useMemo(() => {
+    if (!isFiltered) return kpis;
+    return {
+      totalLeads: filteredDetail.reduce((a, m) => a + m.leads, 0),
+      bookings:   kpis.bookings, // no per-month breakdown available
+      walkins:    filteredDetail.reduce((a, m) => a + m.walkins, 0),
+      admissions: filteredDetail.reduce((a, m) => a + m.admissions, 0),
+    };
+  }, [filteredDetail, kpis, isFiltered]);
+
+  const filteredMonthly = useMemo(
+    () => filteredDetail.map(m => ({ month: m.month, cnt: m.leads })),
+    [filteredDetail],
+  );
+  const filteredClosed = useMemo(
+    () => filteredDetail.reduce((a, m) => a + m.closed, 0),
+    [filteredDetail],
+  );
+
+  const convPct   = activeKpis.totalLeads > 0 ? (activeKpis.admissions / activeKpis.totalLeads) * 100 : 0;
+  const wiConvPct = activeKpis.walkins    > 0 ? (activeKpis.admissions / activeKpis.walkins)    * 100 : 0;
 
   return (
     <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
@@ -211,31 +289,39 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* ── Month filter strip ── */}
+      <MonthRangeFilter
+        months={availableMonths}
+        from={filterFrom} to={filterTo}
+        onFrom={setFilterFrom} onTo={setFilterTo}
+        accent={AMBER}
+      />
+
       <div className="max-w-7xl mx-auto p-6 space-y-8">
 
         {/* ════ OVERVIEW TAB ════ */}
         {activeTab === "overview" && <>
           <div>
-            <SectionTitle sub="Live from CRM Leads Tracker · AY 2027-28">Lead Funnel · RIS</SectionTitle>
+            <SectionTitle sub={isFiltered ? `Filtered · ${filterFrom ?? "start"} → ${filterTo ?? "end"}` : "Live from CRM Leads Tracker · AY 2027-28"}>Lead Funnel · RIS</SectionTitle>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <KpiCard label="Total Leads"      value={fmt(kpis.totalLeads)}  sub="All enquiries"       />
-              <KpiCard label="Walk-in Booked"   value={fmt(kpis.bookings)}    sub="Scheduled"           accent={PURPLE} />
-              <KpiCard label="Walk-in Done"     value={fmt(kpis.walkins)}     sub="Visited school"      accent={BLUE}   />
-              <KpiCard label="Admissions"       value={fmt(kpis.admissions)}  sub="Confirmed"           accent={GREEN}  />
-              <KpiCard label="Lead → Adm %"     value={pct(convPct)}          sub="Conversion rate"     accent={AMBER}  />
-              <KpiCard label="Walk-in → Adm %"  value={pct(wiConvPct)}        sub="Visit conversion"    accent={AMBER}  />
+              <KpiCard label="Total Leads"      value={fmt(activeKpis.totalLeads)}  sub="All enquiries"       />
+              <KpiCard label="Walk-in Booked"   value={fmt(activeKpis.bookings)}    sub={isFiltered ? "Full year" : "Scheduled"}  accent={PURPLE} />
+              <KpiCard label="Walk-in Done"     value={fmt(activeKpis.walkins)}     sub="Visited school"      accent={BLUE}   />
+              <KpiCard label="Admissions"       value={fmt(activeKpis.admissions)}  sub="Confirmed"           accent={GREEN}  />
+              <KpiCard label="Lead → Adm %"     value={pct(convPct)}                sub="Conversion rate"     accent={AMBER}  />
+              <KpiCard label="Walk-in → Adm %"  value={pct(wiConvPct)}              sub="Visit conversion"    accent={AMBER}  />
             </div>
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <KpiCard label="Open Pipeline" value={fmt(openLeads)}   sub="Open + Follow-up" accent={BLUE} />
-              <KpiCard label="Closed"        value={fmt(closedLeads)} sub="Not proceeding"   accent={RED}  />
+              <KpiCard label="Open Pipeline" value={fmt(openLeads)}                    sub={isFiltered ? "Full year" : "Open + Follow-up"} accent={BLUE} />
+              <KpiCard label="Closed"        value={fmt(isFiltered ? filteredClosed : closedLeads)} sub={isFiltered ? "Selected range" : "Not proceeding"} accent={RED}  />
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {monthly.length === 0
+            {filteredMonthly.length === 0
               ? <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200"><Empty msg="No monthly data yet" /></div>
               : <ChartCard title="Monthly Lead Volume">
-                  <BarChart data={monthly.map(m => ({ name: m.month, Leads: m.cnt }))}>
+                  <BarChart data={filteredMonthly.map(m => ({ name: m.month, Leads: m.cnt }))}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                     <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
@@ -262,10 +348,10 @@ function Dashboard() {
 
         {/* ════ TRENDS TAB ════ */}
         {activeTab === "trends" && <>
-          <SectionTitle sub="Month-by-month lead and admission volumes">Monthly Trends</SectionTitle>
+          <SectionTitle sub={isFiltered ? `Filtered · ${filterFrom ?? "start"} → ${filterTo ?? "end"}` : "Month-by-month lead and admission volumes"}>Monthly Trends</SectionTitle>
           {monthlyDetail.length === 0 ? <Empty msg="No trend data yet — leads will appear here once the CRM sheet is populated" /> : <>
             <ChartCard title="Leads vs Admissions by Month" height={320}>
-              <ComposedChart data={monthlyDetail.map(m => ({ name: m.month, Leads: m.leads, "Walk-ins": m.walkins, Admissions: m.admissions }))}>
+              <ComposedChart data={filteredDetail.map(m => ({ name: m.month, Leads: m.leads, "Walk-ins": m.walkins, Admissions: m.admissions }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
@@ -279,7 +365,7 @@ function Dashboard() {
 
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100">
-                <div className="text-sm font-bold" style={{ color: NAVY }}>Month-by-Month Breakdown</div>
+                <div className="text-sm font-bold" style={{ color: NAVY }}>Month-by-Month Breakdown{isFiltered ? " · filtered" : ""}</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -294,7 +380,7 @@ function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {[...monthlyDetail].reverse().map(m => {
+                    {[...filteredDetail].reverse().map(m => {
                       const conv = m.leads > 0 ? (m.admissions / m.leads * 100) : 0;
                       return (
                         <tr key={m.month} className="hover:bg-slate-50">
@@ -308,11 +394,11 @@ function Dashboard() {
                       );
                     })}
                     <tr className="bg-slate-50 font-bold">
-                      <td className="px-4 py-3" style={{ color: NAVY }}>Total</td>
-                      <td className="px-4 py-3 text-right tabular-nums">{fmt(kpis.totalLeads)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: BLUE }}>{fmt(kpis.walkins)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: GREEN }}>{fmt(kpis.admissions)}</td>
-                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: RED }}>{fmt(closedLeads)}</td>
+                      <td className="px-4 py-3" style={{ color: NAVY }}>{isFiltered ? "Subtotal" : "Total"}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{fmt(activeKpis.totalLeads)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: BLUE }}>{fmt(activeKpis.walkins)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: GREEN }}>{fmt(activeKpis.admissions)}</td>
+                      <td className="px-4 py-3 text-right tabular-nums" style={{ color: RED }}>{fmt(filteredClosed)}</td>
                       <td className="px-4 py-3 text-right tabular-nums" style={{ color: AMBER }}>{pct(convPct)}</td>
                     </tr>
                   </tbody>
@@ -325,6 +411,11 @@ function Dashboard() {
         {/* ════ ANALYTICS TAB ════ */}
         {activeTab === "analytics" && <>
           <SectionTitle sub="Lead distribution by source and programme">Analytics</SectionTitle>
+          {isFiltered && (
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm bg-amber-50 border border-amber-200 text-amber-800">
+              <span className="font-semibold">⚠ Full-year view —</span> source and programme breakdowns are not yet filtered by month range. Use the Trends tab for month-scoped figures.
+            </div>
+          )}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
               <div className="text-sm font-bold mb-4" style={{ color: NAVY }}>By Source</div>
@@ -380,6 +471,11 @@ function Dashboard() {
         {/* ════ COUNSELLORS TAB ════ */}
         {activeTab === "counsellors" && <>
           <SectionTitle sub="Per-counsellor lead and conversion performance">Counsellor Leaderboard</SectionTitle>
+          {isFiltered && (
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm bg-amber-50 border border-amber-200 text-amber-800">
+              <span className="font-semibold">⚠ Full-year view —</span> counsellor rows and totals show the full academic year, not the selected month range.
+            </div>
+          )}
           {byCounsellor.length === 0
             ? <Empty msg="No counsellor data yet — assign Lead Owner in the CRM sheet to see rankings" />
             : (
@@ -417,13 +513,16 @@ function Dashboard() {
                     </tbody>
                     <tfoot>
                       <tr className="bg-slate-50 font-bold border-t-2 border-slate-200">
-                        <td className="px-4 py-3" colSpan={2} style={{ color: NAVY }}>Total</td>
+                        <td className="px-4 py-3" colSpan={2} style={{ color: NAVY }}>
+                          Total
+                          {isFiltered && <span className="ml-1 text-xs font-normal text-slate-400">(full year)</span>}
+                        </td>
                         <td className="px-4 py-3 text-right tabular-nums">{fmt(kpis.totalLeads)}</td>
                         <td className="px-4 py-3 text-right tabular-nums" style={{ color: BLUE }}>{fmt(kpis.walkins)}</td>
                         <td className="px-4 py-3 text-right tabular-nums" style={{ color: GREEN }}>{fmt(kpis.admissions)}</td>
                         <td className="px-4 py-3 text-right tabular-nums" style={{ color: BLUE }}>{fmt(openLeads)}</td>
                         <td className="px-4 py-3 text-right tabular-nums" style={{ color: RED }}>{fmt(closedLeads)}</td>
-                        <td className="px-4 py-3 text-right tabular-nums" style={{ color: AMBER }}>{pct(convPct)}</td>
+                        <td className="px-4 py-3 text-right tabular-nums" style={{ color: AMBER }}>{pct(kpis.totalLeads > 0 ? (kpis.admissions / kpis.totalLeads) * 100 : 0)}</td>
                       </tr>
                     </tfoot>
                   </table>
