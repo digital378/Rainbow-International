@@ -1419,7 +1419,7 @@ function SheetsSyncTab({ token }: { token: string }) {
         <div className="flex items-start justify-between mb-2 gap-3">
           <div className="flex-1">
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sheet → DB Auto-Pull Log</h4>
-            <p className="text-xs text-slate-500 mt-0.5">Every 1 min the system reads green columns (Status, Dates, Remarks) from both sheets and writes any changes back to the DB and Master MIS. With the Apps Script below, changes sync instantly.</p>
+            <p className="text-xs text-slate-500 mt-0.5">Every 1 min the system reads green columns from RIS, RPS, <strong>and Master MIS</strong> sheets — writing changes to the DB and back-propagating Master edits to the matching brand sheet. With the Apps Script above, changes sync instantly.</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
@@ -1469,7 +1469,7 @@ function SheetsSyncTab({ token }: { token: string }) {
                             {new Date(entry.timestamp).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                           </td>
                           <td className="px-3 py-2">
-                            <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${entry.brand === "RIS" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-700"}`}>
+                            <span className={`font-bold px-1.5 py-0.5 rounded text-[10px] ${entry.brand === "RIS" ? "bg-blue-100 text-blue-700" : entry.brand === "MASTER" ? "bg-purple-100 text-purple-700" : "bg-red-100 text-red-700"}`}>
                               {entry.brand}
                             </span>
                           </td>

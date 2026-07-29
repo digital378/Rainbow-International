@@ -786,23 +786,37 @@ export function registerWalkinRoutes(app: Express) {
   });
 
   // ── POST /api/walkin/sheets/pull ──────────────────────────────
-  // Manually trigger a Sheet→DB pull for one or both brands.
-  // ?brand=RIS|RPS  (optional; defaults to both)
+  // Manually trigger a Sheet→DB pull for one or all brands.
+  // ?brand=RIS|RPS|MASTER  (optional; defaults to all three)
   // Runs synchronously so the response includes the result.
   app.post("/api/walkin/sheets/pull", requireAdmin, async (req, res) => {
-    const brandParam = typeof req.query.brand === "string" ? req.query.brand.toUpperCase() : "BOTH";
-    const brands: Array<"RIS" | "RPS"> =
-      brandParam === "RIS" ? ["RIS"] :
-      brandParam === "RPS" ? ["RPS"] :
-      ["RIS", "RPS"];
+    const brandParam = typeof req.query.brand === "string" ? req.query.brand.toUpperCase() : "ALL";
 
     try {
-      const results = await Promise.all(
-        brands.map((b) => pullChangesFromSheet(b))
-      );
+      const brandResults: Array<ReturnType<typeof pullChangesFromSheet>> = [];
+      let masterResult: ReturnType<typeof pullChangesFromMasterSheet> | null = null;
+
+      if (brandParam === "RIS") {
+        brandResults.push(pullChangesFromSheet("RIS"));
+      } else if (brandParam === "RPS") {
+        brandResults.push(pullChangesFromSheet("RPS"));
+      } else if (brandParam === "MASTER") {
+        masterResult = pullChangesFromMasterSheet();
+      } else {
+        // ALL — pull from RIS, RPS, and Master
+        brandResults.push(pullChangesFromSheet("RIS"), pullChangesFromSheet("RPS"));
+        masterResult = pullChangesFromMasterSheet();
+      }
+
+      const [brandEntries, masterEntry] = await Promise.all([
+        Promise.all(brandResults),
+        masterResult,
+      ]);
+
+      const allEntries = masterEntry ? [...brandEntries, masterEntry] : brandEntries;
       res.json({
-        results,
-        summary: results.map((r) => ({
+        results: allEntries,
+        summary: allEntries.map((r) => ({
           brand: r.brand,
           rowsScanned: r.rowsScanned,
           changesApplied: r.changesApplied,
