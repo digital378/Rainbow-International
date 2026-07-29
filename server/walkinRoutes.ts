@@ -169,53 +169,68 @@ const updateLeadSchema = z.object({
 export function registerWalkinRoutes(app: Express) {
 
   // ── GET /api/walkin/lookups ────────────────────────────────────
-  // Returns all active lookup values for the kiosk form dropdowns.
-  // Accepts optional ?brand=RIS|RPS to filter brand-specific lookups.
+  // Returns lookup values for the kiosk form dropdowns.
+  // ?brand=RIS|RPS   — filter brand-specific lookups
+  // ?includeInactive — admin only; includes inactive items for the admin panel
   app.get("/api/walkin/lookups", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
+      const includeInactive = isAdmin(req) && req.query.includeInactive === "true";
 
-      const [programs, sources, statuses, closeReasons, staff, branches] = await Promise.all([
+      const activeFilter = includeInactive ? undefined : true;
+
+      const [programs, sources, statuses_rows, closeReasons, staff, branches] = await Promise.all([
         db.select().from(walkinPrograms)
           .where(
             and(
-              eq(walkinPrograms.isActive, true),
-              brand
-                ? or(eq(walkinPrograms.brand, brand), isNull(walkinPrograms.brand))
-                : undefined,
+              activeFilter != null ? eq(walkinPrograms.isActive, activeFilter) : undefined,
+              brand ? or(eq(walkinPrograms.brand, brand), isNull(walkinPrograms.brand)) : undefined,
             ),
           )
           .orderBy(walkinPrograms.sortOrder),
         db.select().from(walkinSources)
-          .where(eq(walkinSources.isActive, true))
+          .where(
+            and(
+              activeFilter != null ? eq(walkinSources.isActive, activeFilter) : undefined,
+              brand ? or(eq(walkinSources.brand, brand), isNull(walkinSources.brand)) : undefined,
+            ),
+          )
           .orderBy(walkinSources.sortOrder),
         db.select().from(walkinStatuses)
-          .where(eq(walkinStatuses.isActive, true))
+          .where(
+            and(
+              activeFilter != null ? eq(walkinStatuses.isActive, activeFilter) : undefined,
+              brand ? or(eq(walkinStatuses.brand, brand), isNull(walkinStatuses.brand)) : undefined,
+            ),
+          )
           .orderBy(walkinStatuses.sortOrder),
         db.select().from(walkinCloseReasons)
-          .where(eq(walkinCloseReasons.isActive, true))
+          .where(
+            and(
+              activeFilter != null ? eq(walkinCloseReasons.isActive, activeFilter) : undefined,
+              brand ? or(eq(walkinCloseReasons.brand, brand), isNull(walkinCloseReasons.brand)) : undefined,
+            ),
+          )
           .orderBy(walkinCloseReasons.sortOrder),
         db.select().from(walkinStaff)
           .where(
             and(
-              eq(walkinStaff.isActive, true),
-              brand
-                ? or(eq(walkinStaff.brand, brand), isNull(walkinStaff.brand))
-                : undefined,
+              activeFilter != null ? eq(walkinStaff.isActive, activeFilter) : undefined,
+              brand ? or(eq(walkinStaff.brand, brand), isNull(walkinStaff.brand)) : undefined,
             ),
           )
           .orderBy(walkinStaff.sortOrder),
         db.select().from(walkinBranches)
           .where(
             and(
-              eq(walkinBranches.isActive, true),
+              activeFilter != null ? eq(walkinBranches.isActive, activeFilter) : undefined,
               brand ? eq(walkinBranches.brand, brand) : undefined,
             ),
           )
           .orderBy(walkinBranches.name),
       ]);
 
-      res.json({ programs, sources, statuses, closeReasons, staff, branches });
+      res.json({ programs, sources, statuses: statuses_rows, closeReasons, staff, branches });
     } catch (err: any) {
       console.error("[walkin/lookups]", err?.message);
       res.status(500).json({ message: "Failed to fetch lookups" });
@@ -784,6 +799,118 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       console.error("[walkin/stats]", err?.message);
       res.status(500).json({ message: "Failed to fetch stats" });
+    }
+  });
+
+  // ── GET /api/walkin/staff ─────────────────────────────────────
+  // Public: active only. Admin: all (including inactive).
+  app.get("/api/walkin/staff", async (req, res) => {
+    try {
+      const admin = isAdmin(req);
+      const brand = typeof req.query.brand === "string" ? req.query.brand : null;
+      const conditions: any[] = [];
+      if (!admin) conditions.push(eq(walkinStaff.isActive, true));
+      if (brand) conditions.push(or(eq(walkinStaff.brand, brand), isNull(walkinStaff.brand)));
+      const rows = await db.select().from(walkinStaff)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(walkinStaff.sortOrder);
+      res.json(rows);
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to fetch staff" });
+    }
+  });
+
+  // ── POST /api/walkin/staff ────────────────────────────────────
+  app.post("/api/walkin/staff", requireAdmin, async (req, res) => {
+    try {
+      const schema = z.object({
+        name: z.string().min(2, "Name must be at least 2 characters"),
+        brand: z.enum(["RIS", "RPS"]).optional().nullable(),
+        sortOrder: z.number().int().default(0),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      const [row] = await db.insert(walkinStaff).values(parsed.data).returning();
+      res.status(201).json(row);
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to create staff member" });
+    }
+  });
+
+  // ── PATCH /api/walkin/staff/:id ───────────────────────────────
+  app.patch("/api/walkin/staff/:id", requireAdmin, async (req, res) => {
+    try {
+      const schema = z.object({
+        name: z.string().min(2).optional(),
+        brand: z.enum(["RIS", "RPS"]).optional().nullable(),
+        isActive: z.boolean().optional(),
+        sortOrder: z.number().int().optional(),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      const [row] = await db.update(walkinStaff).set(parsed.data)
+        .where(eq(walkinStaff.id, parseInt(req.params.id, 10))).returning();
+      if (!row) return res.status(404).json({ message: "Staff member not found" });
+      res.json(row);
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to update staff member" });
+    }
+  });
+
+  // ── POST /api/walkin/lookups/:table ───────────────────────────
+  // Add a new lookup item to one of the four lookup tables.
+  // table: programs | sources | statuses | close-reasons
+  app.post("/api/walkin/lookups/:table", requireAdmin, async (req, res) => {
+    try {
+      const table = req.params.table;
+      const schema = z.object({
+        label: z.string().min(1, "Label is required"),
+        brand: z.enum(["RIS", "RPS"]).optional().nullable(),
+        sortOrder: z.number().int().default(0),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+
+      let row: any;
+      if (table === "programs")      [row] = await db.insert(walkinPrograms).values(parsed.data).returning();
+      else if (table === "sources")  [row] = await db.insert(walkinSources).values(parsed.data).returning();
+      else if (table === "statuses") [row] = await db.insert(walkinStatuses).values(parsed.data).returning();
+      else if (table === "close-reasons") [row] = await db.insert(walkinCloseReasons).values(parsed.data).returning();
+      else return res.status(400).json({ message: "Invalid table; use programs | sources | statuses | close-reasons" });
+
+      res.status(201).json(row);
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to add lookup item" });
+    }
+  });
+
+  // ── PATCH /api/walkin/lookups/:table/:id ─────────────────────
+  // Update label, isActive, or sortOrder of a single lookup item.
+  app.patch("/api/walkin/lookups/:table/:id", requireAdmin, async (req, res) => {
+    try {
+      const table = req.params.table;
+      const id = parseInt(req.params.id, 10);
+      if (isNaN(id)) return res.status(400).json({ message: "Invalid id" });
+
+      const schema = z.object({
+        label: z.string().min(1).optional(),
+        isActive: z.boolean().optional(),
+        sortOrder: z.number().int().optional(),
+      });
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+
+      let row: any;
+      if (table === "programs")      [row] = await db.update(walkinPrograms).set(parsed.data).where(eq(walkinPrograms.id, id)).returning();
+      else if (table === "sources")  [row] = await db.update(walkinSources).set(parsed.data).where(eq(walkinSources.id, id)).returning();
+      else if (table === "statuses") [row] = await db.update(walkinStatuses).set(parsed.data).where(eq(walkinStatuses.id, id)).returning();
+      else if (table === "close-reasons") [row] = await db.update(walkinCloseReasons).set(parsed.data).where(eq(walkinCloseReasons.id, id)).returning();
+      else return res.status(400).json({ message: "Invalid table; use programs | sources | statuses | close-reasons" });
+
+      if (!row) return res.status(404).json({ message: "Item not found" });
+      res.json(row);
+    } catch (err: any) {
+      res.status(500).json({ message: "Failed to update lookup item" });
     }
   });
 

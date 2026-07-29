@@ -69,6 +69,7 @@ const WalkinSales2728 = lazy(() => import("@/pages/WalkinSales2728"));
 const WalkinRpsSales2728 = lazy(() => import("@/pages/WalkinRpsSales2728"));
 const WalkinMarketing2728 = lazy(() => import("@/pages/WalkinMarketing2728"));
 const WalkinOverview2728 = lazy(() => import("@/pages/WalkinOverview2728"));
+const WalkinAdmin2728 = lazy(() => import("@/pages/WalkinAdmin2728"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
@@ -152,6 +153,8 @@ function Router() {
       <Route path="/walkin-rps-27-28/:branchCode" component={() => <WalkinKiosk brand="RPS" />} />
       {/* AY 2027-28 Admin leads management */}
       <Route path="/leads" component={WalkinLeads} />
+      {/* AY 2027-28 Admin panel */}
+      <Route path="/admin/walkin-2728" component={WalkinAdmin2728} />
       {/* AY 2027-28 Dashboards */}
       <Route path="/sales-27-28" component={WalkinSales2728} />
       <Route path="/rps-sales-27-28" component={WalkinRpsSales2728} />
@@ -206,7 +209,7 @@ function DeferredExtras() {
     || location === "/sales-27-28" || location === "/rps-sales-27-28"
     || location === "/marketing-27-28" || location === "/overview-27-28";
   const isInternalDashboard = location === "/alliances";
-  const isKioskForm = location.startsWith("/walkin-ris-27-28") || location.startsWith("/walkin-rps-27-28") || location === "/leads";
+  const isKioskForm = location.startsWith("/walkin-ris-27-28") || location.startsWith("/walkin-rps-27-28") || location === "/leads" || location === "/admin/walkin-2728";
 
   if (!ready) return null;
   return (
