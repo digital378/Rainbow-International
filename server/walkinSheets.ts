@@ -1189,6 +1189,127 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
   return entry;
 }
 
+// ── Remove (archive) a lead from a brand sheet ───────────────────
+// Finds the row by Lead ID (col R) and overwrites the Status cell (col L)
+// with "ARCHIVED". Never deletes the row — keeps sheet history intact and
+// avoids disturbing range protections tied to row indices.
+export async function removeLeadFromSheet(
+  brand: "RIS" | "RPS",
+  leadId: string,
+): Promise<void> {
+  const auth = getAuthClient();
+  if (!auth) {
+    console.warn("[walkin/sheets] Google auth not configured — skipping sheet removal");
+    return;
+  }
+  const sheetId = getSheetId(brand);
+  if (!sheetId) {
+    console.warn(`[walkin/sheets] ${brand}_WALKIN_SHEET_ID_2728 not set — skipping removal`);
+    return;
+  }
+
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Read Lead ID column (R) to locate the row
+    const readResp = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${LEADS_TAB}!R:R`,
+    });
+    const cellValues = readResp.data.values ?? [];
+
+    let sheetsRow = -1;
+    for (let i = 1; i < cellValues.length; i++) {
+      if (cellValues[i]?.[0] === String(leadId)) {
+        sheetsRow = i + 1; // convert 0-based array index to 1-based Sheets row
+        break;
+      }
+    }
+
+    if (sheetsRow < 0) {
+      console.warn(`[walkin/sheets] Lead ${leadId} not found in ${brand} sheet — nothing to remove`);
+      return;
+    }
+
+    // Overwrite Status cell (column L) with "ARCHIVED"
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${LEADS_TAB}!L${sheetsRow}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [["ARCHIVED"]] },
+    });
+
+    console.log(`[walkin/sheets] Marked lead ${leadId} as ARCHIVED in ${brand} sheet (row ${sheetsRow})`);
+    syncStatus[brand].lastSyncAt = new Date();
+    syncStatus[brand].lastError = null;
+  } catch (err: any) {
+    syncStatus[brand].lastError = err?.message ?? "Unknown error";
+    console.error(`[walkin/sheets] removeLeadFromSheet failed for lead ${leadId} (${brand}):`, err?.message);
+  }
+}
+
+// ── Remove (archive) a lead from the Master MIS sheet ────────────
+// Same approach: find by Lead ID (col S) and overwrite Status (col M).
+export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
+  const auth = getAuthClient();
+  if (!auth) return;
+  const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
+  if (!sheetId) {
+    console.warn("[walkin/sheets] MASTER_WALKIN_SHEET_ID_2728 not set — skipping master removal");
+    return;
+  }
+
+  try {
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Read Lead ID column (S = col index 18) to locate the row
+    const readResp = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${MASTER_LEADS_TAB}!S:S`,
+    });
+    const cellValues = readResp.data.values ?? [];
+
+    let sheetsRow = -1;
+    for (let i = 1; i < cellValues.length; i++) {
+      if (cellValues[i]?.[0] === String(leadId)) {
+        sheetsRow = i + 1;
+        break;
+      }
+    }
+
+    if (sheetsRow < 0) {
+      console.warn(`[walkin/sheets] Lead ${leadId} not found in Master sheet — nothing to remove`);
+      return;
+    }
+
+    // Overwrite Status cell (column M) with "ARCHIVED"
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${MASTER_LEADS_TAB}!M${sheetsRow}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [["ARCHIVED"]] },
+    });
+
+    console.log(`[walkin/sheets] Marked lead ${leadId} as ARCHIVED in Master sheet (row ${sheetsRow})`);
+    syncStatus.MASTER.lastSyncAt = new Date();
+    syncStatus.MASTER.lastError = null;
+  } catch (err: any) {
+    syncStatus.MASTER.lastError = err?.message ?? "Unknown error";
+    console.error(`[walkin/sheets] removeLeadFromMasterSheet failed for lead ${leadId}:`, err?.message);
+  }
+}
+
+// ── Fire-and-forget wrapper for archival sheet updates ────────────
+// Never throws — sheet failure must not block the API response.
+export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
+  removeLeadFromSheet(brand, leadId).catch((err) => {
+    console.error("[walkin/sheets] Unexpected remove error:", err?.message);
+  });
+  removeLeadFromMasterSheet(leadId).catch((err) => {
+    console.error("[walkin/sheets] Master remove error:", err?.message);
+  });
+}
+
 // ── Auto-pull timer (every 5 minutes) ───────────────────────────
 export function startAutoPull(): void {
   const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook

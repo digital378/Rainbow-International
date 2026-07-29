@@ -32,7 +32,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -615,6 +615,9 @@ export function registerWalkinRoutes(app: Express) {
         .returning();
 
       await writeAudit(req.params.id, "archived", "false", "true", changedBy);
+
+      // Mirror archival to Google Sheets (fire-and-forget — never blocks the API response)
+      queueRemove(existing.brand as "RIS" | "RPS", existing.id);
 
       res.json(updated);
     } catch (err: any) {
