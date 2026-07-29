@@ -652,6 +652,83 @@ function LookupsTab({ token }: { token: string }) {
   );
 }
 
+// ── PDF export helper ──────────────────────────────────────────
+async function downloadQRPdf(branches: Branch[]) {
+  const { jsPDF } = await import("jspdf");
+
+  const PAGE_W = 210; // A4 mm
+  const PAGE_H = 297;
+  const QR_SIZE = 120; // mm
+  const NAV_COLOR: [number, number, number] = [9, 26, 79]; // #091a4f
+
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  for (let i = 0; i < branches.length; i++) {
+    const branch = branches[i];
+    if (i > 0) doc.addPage();
+
+    const brandSlug = branch.brand.toLowerCase();
+    const kioskUrl = `${window.location.origin}/walkin-${brandSlug}-27-28/${branch.code}`;
+
+    // Generate QR as data URL (high res for print)
+    const qrDataUrl = await QRCode.toDataURL(kioskUrl, {
+      width: 600,
+      margin: 2,
+      color: { dark: "#091a4f", light: "#ffffff" },
+    });
+
+    // ── Brand header bar ──
+    const isRIS = branch.brand === "RIS";
+    const brandColor: [number, number, number] = isRIS ? NAV_COLOR : [160, 32, 32];
+    doc.setFillColor(...brandColor);
+    doc.rect(0, 0, PAGE_W, 22, "F");
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(branch.brand, 12, 14);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text("Rainbow International School  ·  Walk-in Kiosk  ·  AY 2027-28", PAGE_W - 10, 14, { align: "right" });
+
+    // ── Branch name ──
+    doc.setTextColor(...NAV_COLOR);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(30);
+    doc.text(branch.name, PAGE_W / 2, 52, { align: "center" });
+
+    // ── Subtitle ──
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 120);
+    doc.text("Scan to register your visit", PAGE_W / 2, 63, { align: "center" });
+
+    // ── QR code ──
+    const qrX = (PAGE_W - QR_SIZE) / 2;
+    const qrY = 72;
+    doc.addImage(qrDataUrl, "PNG", qrX, qrY, QR_SIZE, QR_SIZE);
+
+    // ── URL label ──
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(130, 130, 150);
+    doc.text(kioskUrl, PAGE_W / 2, qrY + QR_SIZE + 8, { align: "center" });
+
+    // ── Footer separator ──
+    doc.setDrawColor(220, 220, 230);
+    doc.setLineWidth(0.3);
+    doc.line(12, PAGE_H - 18, PAGE_W - 12, PAGE_H - 18);
+
+    doc.setFontSize(8);
+    doc.setTextColor(160, 160, 175);
+    doc.text("Rainbow International School  ·  Walk-in Kiosk", PAGE_W / 2, PAGE_H - 10, { align: "center" });
+  }
+
+  const timestamp = new Date().toISOString().slice(0, 10);
+  doc.save(`ris-qr-codes-${timestamp}.pdf`);
+}
+
 // ── QRCodesTab ─────────────────────────────────────────────────
 function QRCard({ branch, token }: { branch: Branch; token: string }) {
   const [dataUrl, setDataUrl] = useState<string>("");
@@ -696,6 +773,7 @@ function QRCodesTab({ token }: { token: string }) {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "RIS" | "RPS">("all");
+  const [pdfGenerating, setPdfGenerating] = useState(false);
 
   useEffect(() => {
     fetch("/api/walkin/branches?active=false", { headers: { Authorization: `Bearer ${token}` } })
@@ -705,6 +783,16 @@ function QRCodesTab({ token }: { token: string }) {
   const printAll = () => window.print();
 
   const shown = filter === "all" ? branches : branches.filter(b => b.brand === filter);
+
+  const handleDownloadPdf = async () => {
+    if (shown.length === 0 || pdfGenerating) return;
+    setPdfGenerating(true);
+    try {
+      await downloadQRPdf(shown);
+    } finally {
+      setPdfGenerating(false);
+    }
+  };
 
   if (loading) return <div className="text-sm text-slate-400 p-4">Loading…</div>;
 
@@ -720,7 +808,12 @@ function QRCodesTab({ token }: { token: string }) {
             </button>
           ))}
         </div>
-        <Btn variant="ghost" onClick={printAll}>🖨 Print All</Btn>
+        <div className="flex gap-2">
+          <Btn variant="ghost" onClick={handleDownloadPdf} disabled={pdfGenerating || shown.length === 0}>
+            {pdfGenerating ? "Generating…" : "⬇ Download PDF"}
+          </Btn>
+          <Btn variant="ghost" onClick={printAll}>🖨 Print All</Btn>
+        </div>
       </div>
 
       {shown.length === 0 ? (
