@@ -33,7 +33,7 @@ import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm
 import { createRequire } from "node:module";
 const _require = createRequire(import.meta.url);
 const XLSX = _require("xlsx") as typeof import("xlsx");
-import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog } from "./walkinSheets";
+import { queueUpsert, resyncBrandToSheet, resyncMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -775,6 +775,36 @@ export function registerWalkinRoutes(app: Express) {
   // Returns the last 50 sheet-pull log entries for the admin panel.
   app.get("/api/walkin/sheets/pull-log", requireAdmin, async (req, res) => {
     res.json(getPullLog().slice(0, 50));
+  });
+
+  // ── POST /api/walkin/sheets/pull ──────────────────────────────
+  // Manually trigger a Sheet→DB pull for one or both brands.
+  // ?brand=RIS|RPS  (optional; defaults to both)
+  // Runs synchronously so the response includes the result.
+  app.post("/api/walkin/sheets/pull", requireAdmin, async (req, res) => {
+    const brandParam = typeof req.query.brand === "string" ? req.query.brand.toUpperCase() : "BOTH";
+    const brands: Array<"RIS" | "RPS"> =
+      brandParam === "RIS" ? ["RIS"] :
+      brandParam === "RPS" ? ["RPS"] :
+      ["RIS", "RPS"];
+
+    try {
+      const results = await Promise.all(
+        brands.map((b) => pullChangesFromSheet(b))
+      );
+      res.json({
+        results,
+        summary: results.map((r) => ({
+          brand: r.brand,
+          rowsScanned: r.rowsScanned,
+          changesApplied: r.changesApplied,
+          errors: r.errors,
+        })),
+      });
+    } catch (err: any) {
+      console.error("[walkin/sheets/pull]", err?.message);
+      res.status(500).json({ message: err?.message ?? "Pull failed" });
+    }
   });
 
   // ── GET /api/walkin/stats ─────────────────────────────────────

@@ -373,25 +373,36 @@ function HistoryModal({ lead, token, onClose }: { lead: Lead; token: string; onC
           {!loading && rows.length === 0 && <div className="text-slate-400 text-sm text-center py-8">No history recorded yet</div>}
           {!loading && rows.length > 0 && (
             <div className="space-y-3">
-              {rows.map(row => (
-                <div key={row.id} className="flex gap-3 text-xs">
-                  <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: row.field === "created" ? GREEN : row.field === "archived" ? RED : AMBER }} />
-                  <div className="flex-1">
-                    <div className="font-semibold text-slate-700">{row.field === "created" ? "Lead created" : row.field === "archived" ? "Lead archived" : `${row.field} changed`}</div>
-                    {row.field !== "created" && row.field !== "archived" && (
-                      <div className="text-slate-500">
-                        <span className="line-through mr-1">{row.oldValue || "—"}</span>
-                        <span className="text-slate-400 mr-1">→</span>
-                        <span className="font-medium text-slate-700">{row.newValue || "—"}</span>
+              {rows.map(row => {
+                const isSheetSync = row.changedBy === "sheet-sync";
+                const dotColor = row.field === "created" ? GREEN : row.field === "archived" ? RED : isSheetSync ? "#0ea5e9" : AMBER;
+                return (
+                  <div key={row.id} className={`flex gap-3 text-xs rounded-lg px-2 py-1 -mx-2 ${isSheetSync ? "bg-sky-50" : ""}`}>
+                    <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: dotColor }} />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-slate-700">
+                          {row.field === "created" ? "Lead created" : row.field === "archived" ? "Lead archived" : `${row.field} changed`}
+                        </span>
+                        {isSheetSync && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 uppercase tracking-wide">Sheet sync</span>
+                        )}
                       </div>
-                    )}
-                    {row.field === "created" && row.newValue && (
-                      <div className="text-slate-400 font-mono text-[10px] truncate">{row.newValue}</div>
-                    )}
-                    <div className="text-slate-400 mt-0.5">{fmt(row.changedAt)} · by {row.changedBy}</div>
+                      {row.field !== "created" && row.field !== "archived" && (
+                        <div className="text-slate-500">
+                          <span className="line-through mr-1">{row.oldValue || "—"}</span>
+                          <span className="text-slate-400 mr-1">→</span>
+                          <span className="font-medium text-slate-700">{row.newValue || "—"}</span>
+                        </div>
+                      )}
+                      {row.field === "created" && row.newValue && (
+                        <div className="text-slate-400 font-mono text-[10px] truncate">{row.newValue}</div>
+                      )}
+                      <div className="text-slate-400 mt-0.5">{fmt(row.changedAt)} · by {row.changedBy}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

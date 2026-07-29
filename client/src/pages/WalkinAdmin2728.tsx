@@ -1110,6 +1110,8 @@ function SheetsSyncTab({ token }: { token: string }) {
   const [resyncMsg, setResyncMsg] = useState<Record<string, string>>({});
   const [pullLog, setPullLog] = useState<PullLogEntry[]>([]);
   const [showLog, setShowLog] = useState(false);
+  const [pulling, setPulling] = useState(false);
+  const [pullResult, setPullResult] = useState<string>("");
 
   const loadStatus = useCallback(async () => {
     setLoading(true);
@@ -1147,6 +1149,28 @@ function SheetsSyncTab({ token }: { token: string }) {
       if (r.ok) loadStatus();
     } catch { setResyncMsg(m => ({ ...m, MASTER: "✗ Network error" })); }
     setResyncing(r => ({ ...r, MASTER: false }));
+  };
+
+  const triggerPull = async () => {
+    setPulling(true);
+    setPullResult("");
+    try {
+      const r = await fetch("/api/walkin/sheets/pull", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const d = await r.json();
+      if (r.ok) {
+        const summary = (d.summary as Array<{ brand: string; rowsScanned: number; changesApplied: number; errors: string[] }>)
+          .map(s => `${s.brand}: scanned ${s.rowsScanned}, ${s.changesApplied} change(s)${s.errors.length ? `, ${s.errors.length} error(s)` : ""}`)
+          .join(" · ");
+        setPullResult(`✓ ${summary}`);
+        // Reload pull log to show the new entry
+        const lr = await fetch("/api/walkin/sheets/pull-log", { headers: { Authorization: `Bearer ${token}` } });
+        if (lr.ok) setPullLog(await lr.json());
+        setShowLog(true);
+      } else {
+        setPullResult(`✗ ${d.message ?? "Pull failed"}`);
+      }
+    } catch { setPullResult("✗ Network error"); }
+    setPulling(false);
   };
 
   const SheetCard = ({
@@ -1246,15 +1270,30 @@ function SheetsSyncTab({ token }: { token: string }) {
 
       {/* Sheet → DB pull log */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <div>
+        <div className="flex items-start justify-between mb-2 gap-3">
+          <div className="flex-1">
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sheet → DB Auto-Pull Log</h4>
             <p className="text-xs text-slate-500 mt-0.5">Every 5 min the system reads green columns (Status, Dates, Remarks) from both sheets and writes any changes back to the DB with an audit entry.</p>
           </div>
-          <button onClick={() => setShowLog(l => !l)} className="text-xs text-slate-500 underline hover:text-slate-700">
-            {showLog ? "Hide" : "Show"} log ({pullLog.length})
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={triggerPull}
+              disabled={pulling}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition"
+            >
+              {pulling ? "Pulling…" : "Pull now"}
+            </button>
+            <button onClick={() => setShowLog(l => !l)} className="text-xs text-slate-500 underline hover:text-slate-700">
+              {showLog ? "Hide" : "Show"} log ({pullLog.length})
+            </button>
+          </div>
         </div>
+
+        {pullResult && (
+          <div className={`text-xs rounded-lg px-3 py-2 mb-2 ${pullResult.startsWith("✓") ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+            {pullResult}
+          </div>
+        )}
 
         {showLog && (
           <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
