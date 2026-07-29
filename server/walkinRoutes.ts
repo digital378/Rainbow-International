@@ -29,9 +29,7 @@ import {
 } from "@shared/schema";
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
-import { createRequire } from "node:module";
-const _require = createRequire(import.meta.url);
-const XLSX = _require("xlsx") as typeof import("xlsx");
+import * as XLSX from "xlsx";
 import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
