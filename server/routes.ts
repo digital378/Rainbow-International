@@ -2647,7 +2647,7 @@ export async function registerRoutes(
           "OPEN",             // G  Status
           "",                 // H  Remark
           "Head Office",      // I  Lead Owner  — all website enquiries default to Head Office
-          "Google",           // J  Source      — all website enquiries come via Google/web
+          "GOOGLE",           // J  Source      — all website enquiries come via Google/web
           "",                 // K  Walk-In Date
           "",                 // L  Revisit Date
           data.email ?? "",   // M  Email ID
