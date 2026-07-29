@@ -596,6 +596,43 @@ function buildClearValidationRequest(tabSheetId: number, colIndex: number): obje
 }
 
 /**
+ * Paint every cell in `colIndex` (rows 0–999, header inclusive) with a
+ * solid background colour.  Used to keep the Status column visually
+ * distinct from the other editable (cyan) columns.
+ *
+ * Colour reference (for consistency):
+ *   Blue  #6FA8DC  {r:0.435, g:0.659, b:0.863} — Status (branch-editable, key field)
+ */
+function buildColumnColorRequest(
+  tabSheetId: number,
+  colIndex: number,
+  red: number,
+  green: number,
+  blue: number,
+): object {
+  return {
+    repeatCell: {
+      range: {
+        sheetId: tabSheetId,
+        startRowIndex: 0,      // include header row
+        endRowIndex: 1000,
+        startColumnIndex: colIndex,
+        endColumnIndex: colIndex + 1,
+      },
+      cell: {
+        userEnteredFormat: {
+          backgroundColor: { red, green, blue },
+        },
+      },
+      fields: "userEnteredFormat.backgroundColor",
+    },
+  };
+}
+
+// Convenience: the standard "Status blue" used on all three sheets
+const STATUS_BLUE = { r: 0.435, g: 0.659, b: 0.863 } as const; // #6FA8DC
+
+/**
  * Pure helper — exported for unit-testing only.
  *
  * Builds batchUpdate requests for a generic set of column protections:
@@ -700,11 +737,17 @@ async function applyYellowColumnProtection(
   //    • Clear Email        (col K = 10) — no dropdown needed on email
   const requests = [
     ...buildYellowProtectionRequests(tabSheetId, existingProtections),
-    buildDropdownRequest(tabSheetId, 6, allowedGrades),   // col G = GRADE
-    buildBrandStatusDropdownRequest(tabSheetId, 13),       // col N = Status
-    buildSourceDropdownRequest(tabSheetId, 12),            // col M = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 16),       // col Q = Reason for Closed
-    buildClearValidationRequest(tabSheetId, 10),           // col K = Email (clear any old dropdown)
+    buildDropdownRequest(tabSheetId, 6, allowedGrades),                            // col G = GRADE (dropdown)
+    buildBrandStatusDropdownRequest(tabSheetId, 13),                               // col N = Status (dropdown)
+    buildSourceDropdownRequest(tabSheetId, 12),                                    // col M = Source (dropdown)
+    buildCloseReasonDropdownRequest(tabSheetId, 16),                               // col Q = Reason for Closed (dropdown)
+    // Clear stale validation from columns that should be free-text / date pickers
+    buildClearValidationRequest(tabSheetId, 10),   // col K = Email
+    buildClearValidationRequest(tabSheetId, 14),   // col O = Admission Date
+    buildClearValidationRequest(tabSheetId, 15),   // col P = Follow up Remarks
+    buildClearValidationRequest(tabSheetId, 17),   // col R = Revisit 1 Date
+    buildClearValidationRequest(tabSheetId, 18),   // col S = Revisit 2 Date
+    buildColumnColorRequest(tabSheetId, 13, STATUS_BLUE.r, STATUS_BLUE.g, STATUS_BLUE.b), // col N = Status → blue
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -740,11 +783,17 @@ async function applyMasterYellowColumnProtection(
 
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
-    buildDropdownRequest(tabSheetId, 7, ALLOWED_GRADES_MASTER), // col H = GRADE
-    buildStatusDropdownRequest(tabSheetId, 14),                  // col O = Status (full list incl. WALK-IN BOOKED)
-    buildSourceDropdownRequest(tabSheetId, 13),                  // col N = Source
-    buildCloseReasonDropdownRequest(tabSheetId, 17),             // col R = Reason for Closed
-    buildClearValidationRequest(tabSheetId, 11),                 // col L = Email (clear any old dropdown)
+    buildDropdownRequest(tabSheetId, 7, ALLOWED_GRADES_MASTER),                    // col H = GRADE (dropdown)
+    buildStatusDropdownRequest(tabSheetId, 14),                                    // col O = Status (dropdown)
+    buildSourceDropdownRequest(tabSheetId, 13),                                    // col N = Source (dropdown)
+    buildCloseReasonDropdownRequest(tabSheetId, 17),                               // col R = Reason for Closed (dropdown)
+    // Clear stale validation from columns that should be free-text / date pickers
+    buildClearValidationRequest(tabSheetId, 11),   // col L = Email
+    buildClearValidationRequest(tabSheetId, 15),   // col P = Admission Date
+    buildClearValidationRequest(tabSheetId, 16),   // col Q = Follow up Remarks
+    buildClearValidationRequest(tabSheetId, 18),   // col S = Revisit 1 Date
+    buildClearValidationRequest(tabSheetId, 19),   // col T = Revisit 2 Date
+    buildColumnColorRequest(tabSheetId, 14, STATUS_BLUE.r, STATUS_BLUE.g, STATUS_BLUE.b), // col O = Status → blue
   ];
 
   await sheets.spreadsheets.batchUpdate({
@@ -1431,6 +1480,17 @@ export async function syncDeletionsFromMaster(): Promise<{
     });
 
     const rows = resp.data.values ?? [];
+
+    // Safety guard: the first cell must be the "Lead ID" header.
+    // If it's missing the API likely returned a truncated/empty response
+    // (transient failure) — bail out rather than mass-archiving everything.
+    if (rows[0]?.[0]?.trim() !== "Lead ID") {
+      result.errors.push(
+        "Master sheet header sanity check failed (expected 'Lead ID' in col U row 1) — skipping deletion sync to avoid accidental mass-archival"
+      );
+      return result;
+    }
+
     const masterLeadIds = new Set(
       rows.slice(1) // skip header row
         .map((r) => r[0]?.trim())
@@ -1448,6 +1508,9 @@ export async function syncDeletionsFromMaster(): Promise<{
 
     if (toArchive.length === 0) return result;
 
+    // Track which brands need a full sheet resync after archiving
+    const brandsToResync = new Set<"RIS" | "RPS">();
+
     for (const lead of toArchive) {
       try {
         // Archive in DB
@@ -1464,13 +1527,6 @@ export async function syncDeletionsFromMaster(): Promise<{
           changedBy: "master-deletion-sync",
         });
 
-        // Mark ARCHIVED in brand sheet (best-effort, non-fatal)
-        if (lead.brand === "RIS" || lead.brand === "RPS") {
-          await removeLeadFromSheet(lead.brand, lead.id).catch((e: any) => {
-            result.errors.push(`${lead.id}: brand sheet ARCHIVED mark failed — ${e?.message}`);
-          });
-        }
-
         result.archived++;
         result.details.push({
           leadId: lead.id,
@@ -1478,10 +1534,22 @@ export async function syncDeletionsFromMaster(): Promise<{
           parentName: lead.parentName ?? "",
         });
 
+        if (lead.brand === "RIS" || lead.brand === "RPS") {
+          brandsToResync.add(lead.brand);
+        }
+
         console.log(`[walkin/sheets] syncDeletionsFromMaster: archived ${lead.id} (${lead.brand})`);
       } catch (e: any) {
         result.errors.push(`${lead.id}: DB archive failed — ${e?.message}`);
       }
+    }
+
+    // Full resync so archived rows are physically removed from brand sheets
+    // (cheaper than row-by-row deletion and leaves the sheet clean)
+    for (const brand of brandsToResync) {
+      await resyncBrandToSheet(brand).catch((e: any) => {
+        result.errors.push(`${brand} sheet resync after archiving failed — ${e?.message}`);
+      });
     }
   } catch (e: any) {
     result.errors.push(`Master sheet read failed: ${e?.message}`);
@@ -1869,6 +1937,14 @@ export function startAutoPull(): void {
     }
     try { await pullChangesFromSheet("RPS"); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
+    }
+    // Deletion sync: archive DB leads whose rows were deleted from the Master
+    // sheet and rewrite affected brand sheets so the rows disappear.
+    // Runs last (after status pulls) so any in-flight status updates from
+    // this cycle are already written to DB before we check what's missing.
+    // Protected by a header sanity check inside syncDeletionsFromMaster.
+    try { await syncDeletionsFromMaster(); } catch (e: any) {
+      console.error("[walkin/sheets] Auto-pull deletion-sync failed:", e?.message);
     }
   };
 
