@@ -1781,23 +1781,29 @@ function crmMonthSortKey(label: string): number {
  *
  * Exported so it can be unit-tested independently of the Google Sheets API call.
  *
- * Expected column layout (0-based, matching the "CRM Leads Tracker" tab):
+ * Expected column layout (0-based, matching the live "CRM Leads Tracker" tab).
+ *
+ * IMPORTANT — spot-checked against the live RPS sheet on 2026-07-30:
+ * The live sheet contains a "Centre" column at position [6] that is absent
+ * from the original design doc. All columns from Status onwards are therefore
+ * shifted one position to the right compared to the earlier draft layout.
+ *
  *   [0]  Date       — **DD/MM/YYYY** is the canonical format written by the sync
  *                     system; YYYY-MM-DD is also accepted as a fallback.
  *   [1]  Time
  *   [2]  Parent's Name
  *   [3]  Child's Name
- *   [4]  Phone
+ *   [4]  Phone Number
  *   [5]  Program
- *   [6]  Status     — values are uppercased before comparison; recognised values:
+ *   [6]  Centre     — branch / centre name (not used for KPI aggregation)
+ *   [7]  Status     — values are uppercased before comparison; recognised values:
  *                     OPEN · FOLLOW-UP · WALK-IN BOOKED · WALK-IN COMPLETED ·
  *                     ADMISSION DONE · CLOSED · TRANSFERRED · INTEGRATED · NEXT YEAR
- *   [7]  Remark
- *   [8]  Lead Owner
- *   [9]  Source
- *   [10] Walk-In Date
- *   [11] Revisit Date
- *   [12] Email ID
+ *   [8]  Remark
+ *   [9]  Lead Owner
+ *   [10] Source
+ *   [11] Walk-In Date
+ *   [12] Revisit Date
  *
  * Counting rules:
  *   - totalLeads  = every row where col[0] (Date) is non-blank
@@ -1821,10 +1827,10 @@ export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" |
     const date = (row[0] ?? "").toString().trim();
     if (!date) continue; // skip completely blank rows
 
-    const status     = (row[6] ?? "").toString().trim().toUpperCase();
-    const source     = (row[9] ?? "").toString().trim() || "Unknown";
-    const leadOwner  = (row[8] ?? "").toString().trim() || null;
-    const program    = (row[5] ?? "").toString().trim() || "Unknown";
+    const status     = (row[7] ?? "").toString().trim().toUpperCase();  // [7] Status (Centre is at [6])
+    const source     = (row[10] ?? "").toString().trim() || "Unknown"; // [10] Source
+    const leadOwner  = (row[9] ?? "").toString().trim() || null;       // [9] Lead Owner
+    const program    = (row[5] ?? "").toString().trim() || "Unknown";  // [5] Program
     const monthLabel = parseCrmMonthLabel(date);
 
     const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);

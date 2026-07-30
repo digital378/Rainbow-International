@@ -13,10 +13,13 @@
  *
  * No real Google Sheets or database calls are made; all I/O is mocked.
  *
- * Column layout used (0-based, matching the live "CRM Leads Tracker" tab):
- *   [0] Date  [1] Time  [2] Parent  [3] Child  [4] Phone  [5] Program
- *   [6] Status  [7] Remark  [8] Lead Owner  [9] Source
- *   [10] Walk-In Date  [11] Revisit Date  [12] Email ID
+ * Column layout used (0-based) — spot-checked against the live RPS sheet
+ * on 2026-07-30. The live sheet has a "Centre" column at [6] that shifts
+ * Status and all subsequent columns one position to the right:
+ *
+ *   [0] Date  [1] Time  [2] Parent's Name  [3] Child's Name  [4] Phone Number
+ *   [5] Program  [6] Centre  [7] Status  [8] Remark  [9] Lead Owner
+ *   [10] Source  [11] Walk-In Date  [12] Revisit Date
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -71,36 +74,42 @@ import { readCrmLeadsTrackerStats, bustCrmStatsCache } from "../server/walkinShe
 // totalLeads = 12, bookings = 2, walkins = 5 (idx2+idx3+idx7+idx8+idx11),
 // admissions = 3 (idx3, idx8, idx11)
 
+// Columns: [0] Date  [1] Time  [2] Parent's Name  [3] Child's Name  [4] Phone Number
+//          [5] Program  [6] Centre  [7] Status  [8] Remark  [9] Lead Owner
+//          [10] Source  [11] Walk-In Date  [12] Revisit Date
+// NOTE: "Centre" at [6] was confirmed against the live RPS sheet on 2026-07-30.
+//       Status is at [7] (not [6] as in the original design doc).
 const RPS_HEADER = [
-  "Date", "Time", "Parent Name", "Child Name", "Phone", "Program",
-  "Status", "Remark", "Lead Owner", "Source", "Walk-In Date", "Revisit Date", "Email",
+  "Date", "Time", "Parent's Name", "Child's Name", "Phone Number", "Program",
+  "Centre", "Status", "Remark", "Lead Owner", "Source", "Walk-In Date", "Revisit Date",
 ];
 
 const RPS_DATA_ROWS: string[][] = [
+  //           [0]           [1]     [2]               [3]          [4]           [5]          [6]       [7]                   [8]  [9]       [10]         [11]           [12]
   // idx0
-  ["01/07/2027", "09:00", "Anjali Mehta",   "Riya M",    "9000000001", "Nursery",   "OPEN",               "", "Deepa",  "Walk-In",  "",           "", ""],
+  ["01/07/2027", "09:00", "Anjali Mehta",   "Riya M",    "9000000001", "Nursery",   "Main", "OPEN",               "", "Deepa",  "Walk-In",  "",           ""],
   // idx1
-  ["02/07/2027", "10:00", "Suresh Rao",     "Arjun R",   "9000000002", "Junior KG", "WALK-IN BOOKED",     "", "Kavita", "Social",   "",           "", ""],
+  ["02/07/2027", "10:00", "Suresh Rao",     "Arjun R",   "9000000002", "Junior KG", "Main", "WALK-IN BOOKED",     "", "Kavita", "Social",   "",           ""],
   // idx2
-  ["03/07/2027", "11:00", "Priya Nair",     "Anaya N",   "9000000003", "Senior KG", "WALK-IN COMPLETED",  "", "Deepa",  "Referral", "05/07/2027", "", ""],
+  ["03/07/2027", "11:00", "Priya Nair",     "Anaya N",   "9000000003", "Senior KG", "Main", "WALK-IN COMPLETED",  "", "Deepa",  "Referral", "05/07/2027", ""],
   // idx3
-  ["04/07/2027", "12:00", "Mohan Das",      "Dev D",     "9000000004", "Class 1",   "ADMISSION DONE",     "", "Kavita", "Online",   "06/07/2027", "", ""],
+  ["04/07/2027", "12:00", "Mohan Das",      "Dev D",     "9000000004", "Class 1",   "Main", "ADMISSION DONE",     "", "Kavita", "Online",   "06/07/2027", ""],
   // idx4
-  ["05/07/2027", "13:00", "Lata Pillai",    "Sneha P",   "9000000005", "Nursery",   "CLOSED",             "", "Deepa",  "Walk-In",  "",           "", ""],
+  ["05/07/2027", "13:00", "Lata Pillai",    "Sneha P",   "9000000005", "Nursery",   "Main", "CLOSED",             "", "Deepa",  "Walk-In",  "",           ""],
   // idx5
-  ["06/07/2027", "14:00", "Rahul Iyer",     "Meera I",   "9000000006", "Junior KG", "WALK-IN BOOKED",     "", "Kavita", "Referral", "",           "", ""],
+  ["06/07/2027", "14:00", "Rahul Iyer",     "Meera I",   "9000000006", "Junior KG", "Main", "WALK-IN BOOKED",     "", "Kavita", "Referral", "",           ""],
   // idx6
-  ["07/07/2027", "09:30", "Sunita Verma",   "Karan V",   "9000000007", "Class 2",   "FOLLOW-UP",          "", "Deepa",  "Social",   "",           "", ""],
+  ["07/07/2027", "09:30", "Sunita Verma",   "Karan V",   "9000000007", "Class 2",   "Main", "FOLLOW-UP",          "", "Deepa",  "Social",   "",           ""],
   // idx7
-  ["08/07/2027", "10:30", "Ganesh Sharma",  "Pooja S",   "9000000008", "Senior KG", "WALK-IN COMPLETED",  "", "Kavita", "Online",   "09/07/2027", "", ""],
+  ["08/07/2027", "10:30", "Ganesh Sharma",  "Pooja S",   "9000000008", "Senior KG", "Main", "WALK-IN COMPLETED",  "", "Kavita", "Online",   "09/07/2027", ""],
   // idx8
-  ["09/07/2027", "11:30", "Rekha Gupta",    "Rohan G",   "9000000009", "Nursery",   "ADMISSION DONE",     "", "Deepa",  "Walk-In",  "10/07/2027", "", ""],
+  ["09/07/2027", "11:30", "Rekha Gupta",    "Rohan G",   "9000000009", "Nursery",   "Main", "ADMISSION DONE",     "", "Deepa",  "Walk-In",  "10/07/2027", ""],
   // idx9
-  ["10/07/2027", "12:30", "Vikram Singh",   "Tanvi S",   "9000000010", "Class 1",   "OPEN",               "", "Kavita", "Social",   "",           "", ""],
+  ["10/07/2027", "12:30", "Vikram Singh",   "Tanvi S",   "9000000010", "Class 1",   "Main", "OPEN",               "", "Kavita", "Social",   "",           ""],
   // idx10
-  ["11/07/2027", "13:30", "Nandita Joshi",  "Aditya J",  "9000000011", "Junior KG", "CLOSED",             "", "Deepa",  "Referral", "",           "", ""],
+  ["11/07/2027", "13:30", "Nandita Joshi",  "Aditya J",  "9000000011", "Junior KG", "Main", "CLOSED",             "", "Deepa",  "Referral", "",           ""],
   // idx11
-  ["12/07/2027", "14:30", "Prakash Kumar",  "Preethi K", "9000000012", "Class 2",   "ADMISSION DONE",     "", "Kavita", "Online",   "13/07/2027", "", ""],
+  ["12/07/2027", "14:30", "Prakash Kumar",  "Preethi K", "9000000012", "Class 2",   "Main", "ADMISSION DONE",     "", "Kavita", "Online",   "13/07/2027", ""],
 ];
 
 // Hand-verified expected KPIs
