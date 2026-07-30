@@ -25,6 +25,8 @@ type Stats = {
   byCounsellor: Array<CounsellorStat>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
+  dataSource?: "sheet" | "tab_missing" | "empty";
+  warning?: string;
 };
 
 type Tab = "overview" | "trends" | "analytics" | "counsellors";
@@ -276,6 +278,21 @@ function Dashboard() {
             className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">Lock</button>
         </div>
       </div>
+
+      {/* ── Data-source warning banner ── */}
+      {data.dataSource && data.dataSource !== "sheet" && data.warning && (
+        <div className="bg-amber-50 border-b border-amber-300 px-6 py-3">
+          <div className="max-w-7xl mx-auto flex items-start gap-3">
+            <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
+            <div>
+              <span className="font-semibold text-amber-800 text-sm">
+                {data.dataSource === "tab_missing" ? "Sheet tab not found" : "No data in sheet tab"}
+              </span>
+              <span className="text-amber-700 text-sm ml-2">{data.warning}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Tab bar ── */}
       <div className="sticky top-0 z-10 border-b border-slate-200 shadow-sm bg-white">

@@ -1806,7 +1806,7 @@ function crmMonthSortKey(label: string): number {
  *   - bookings    = rows where Status === "WALK-IN BOOKED"
  *   - Monthly bucketing uses parseCrmMonthLabel(date) on the Date column.
  */
-export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" | "academicYear" | "generatedAt" | "cachedAt" | "byBranch"> {
+export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" | "academicYear" | "generatedAt" | "cachedAt" | "byBranch" | "dataSource" | "warning"> {
   let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
 
   const monthMap       = new Map<string, number>();
@@ -1902,6 +1902,18 @@ export interface CrmStats {
   generatedAt: string;
   /** ISO timestamp of when data was fetched from Google Sheets (preserved when served from cache). */
   cachedAt: string;
+  /**
+   * Indicates the origin / health of the data:
+   *   "sheet"       — data was read successfully from the CRM Leads Tracker tab
+   *   "tab_missing" — the tab does not exist in the spreadsheet; all KPIs are zero
+   *   "empty"       — the tab exists but contains no data rows; all KPIs are zero
+   */
+  dataSource: "sheet" | "tab_missing" | "empty";
+  /**
+   * Present when dataSource is "tab_missing" or "empty".
+   * Human-readable explanation suitable for display in the admin panel.
+   */
+  warning?: string;
 }
 
 // ── CRM stats in-memory cache (2-minute TTL) with in-flight coalescing ──
@@ -1970,18 +1982,81 @@ export async function readCrmLeadsTrackerStats(
       const sheetId = getSheetId(brand);
       if (!sheetId) throw new Error(`Sheet ID not configured for ${brand}`);
 
-      const res = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range: `'${CRM_TAB}'!A:M`,
-      });
+      let rows: string[][];
+      let tabMissing = false;
 
-      const rows = res.data.values ?? [];
-      const dataRows = rows.slice(1) as string[][]; // skip header row
+      try {
+        const res = await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetId,
+          range: `'${CRM_TAB}'!A:M`,
+        });
+        rows = (res.data.values ?? []) as string[][];
+      } catch (fetchErr: any) {
+        // Google Sheets returns a 400 "Unable to parse range" error when the
+        // named tab does not exist in the spreadsheet.
+        const msg: string = fetchErr?.message ?? "";
+        const isRangeParse =
+          msg.includes("Unable to parse range") ||
+          msg.includes("Requested entity was not found") ||
+          fetchErr?.code === 400;
+        if (isRangeParse) {
+          tabMissing = true;
+          rows = [];
+          console.warn(
+            `[walkin/crm-stats] "${CRM_TAB}" tab not found in ${brand} sheet — returning zero stats with warning`,
+          );
+        } else {
+          // Unrecognised error — propagate so the route returns 500
+          throw fetchErr;
+        }
+      }
+
+      const dataRows = rows.slice(1); // skip header row
+
+      const now = new Date().toISOString();
+
+      if (tabMissing) {
+        // Tab is absent — build a zero-stat result with a clear warning so the
+        // frontend can show a "no data" state rather than misleading zeros.
+        const emptyAgg = aggregateCrmRows([]);
+        const result: CrmStats = {
+          brand,
+          academicYear: "2027-28",
+          ...emptyAgg,
+          byBranch: [],
+          generatedAt: now,
+          cachedAt: now,
+          dataSource: "tab_missing",
+          warning: `The "${CRM_TAB}" tab was not found in the ${brand} Google Sheet. Please create the tab and populate it before reading CRM stats.`,
+        };
+        // Cache the missing-tab result briefly (same TTL) to avoid hammering the API
+        crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
+        return result;
+      }
+
+      if (dataRows.length === 0) {
+        // Tab exists but has no data rows after the header
+        console.warn(
+          `[walkin/crm-stats] "${CRM_TAB}" tab in ${brand} sheet is empty — returning zero stats with warning`,
+        );
+        const emptyAgg = aggregateCrmRows([]);
+        const result: CrmStats = {
+          brand,
+          academicYear: "2027-28",
+          ...emptyAgg,
+          byBranch: [],
+          generatedAt: now,
+          cachedAt: now,
+          dataSource: "empty",
+          warning: `The "${CRM_TAB}" tab in the ${brand} sheet exists but contains no data rows. Stats will be zero until rows are added.`,
+        };
+        crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
+        return result;
+      }
 
       // Delegate to pure aggregation function (also used by unit tests)
       const agg = aggregateCrmRows(dataRows);
 
-      const now = new Date().toISOString();
       const result: CrmStats = {
         brand,
         academicYear: "2027-28",
@@ -1989,6 +2064,7 @@ export async function readCrmLeadsTrackerStats(
         byBranch: [], // CRM Leads Tracker has no branch column
         generatedAt: now,
         cachedAt: now,
+        dataSource: "sheet",
       };
 
       // Populate the cache so subsequent requests within the TTL skip the fetch

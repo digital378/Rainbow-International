@@ -25,6 +25,8 @@ type Stats = {
   byCounsellor: Array<CounsellorStat>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
+  dataSource?: "sheet" | "tab_missing" | "empty";
+  warning?: string;
 };
 
 type BrandTab = "combined" | "RIS" | "RPS";
@@ -581,6 +583,21 @@ function Dashboard() {
             className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">Lock</button>
         </div>
       </div>
+
+      {/* Data-source warnings for either brand */}
+      {[risStats, rpsStats].filter(s => s?.dataSource && s.dataSource !== "sheet" && s.warning).map(s => (
+        <div key={s!.brand} className="bg-amber-50 border-b border-amber-300 px-6 py-3">
+          <div className="max-w-7xl mx-auto flex items-start gap-3">
+            <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
+            <div>
+              <span className="font-semibold text-amber-800 text-sm">
+                {s!.brand} — {s!.dataSource === "tab_missing" ? "Sheet tab not found" : "No data in sheet tab"}:
+              </span>
+              <span className="text-amber-700 text-sm ml-1">{s!.warning}</span>
+            </div>
+          </div>
+        </div>
+      ))}
 
       {/* Brand tab bar */}
       <div className="sticky top-0 z-10 border-b border-slate-200 shadow-sm bg-white">

@@ -13,6 +13,8 @@ type Stats = {
   byOwner: Array<{ leadOwner: string | null; cnt: number }>;
   statusBreakdown: Array<{ status: string; cnt: number }>;
   generatedAt: string;
+  dataSource?: "sheet" | "tab_missing" | "empty";
+  warning?: string;
 };
 
 const pct = (n: number) => `${n.toFixed(1)}%`;
@@ -224,6 +226,19 @@ function Dashboard() {
             <div className="mt-4 text-center text-sm text-slate-400">No leads captured yet in AY 2027-28 — bars will populate as enquiries come in</div>
           )}
         </div>
+
+        {/* Data-source warnings for either brand */}
+        {[risStats, rpsStats].filter(s => s?.dataSource && s.dataSource !== "sheet" && s.warning).map(s => (
+          <div key={s!.brand} className="bg-amber-50 border border-amber-300 rounded-xl px-5 py-3 flex items-start gap-3">
+            <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
+            <div>
+              <span className="font-semibold text-amber-800 text-sm">
+                {s!.brand} — {s!.dataSource === "tab_missing" ? "Sheet tab not found" : "No data in sheet tab"}:
+              </span>
+              <span className="text-amber-700 text-sm ml-1">{s!.warning}</span>
+            </div>
+          </div>
+        ))}
 
         {/* Side-by-side brand cards */}
         <div className="grid md:grid-cols-2 gap-6">
