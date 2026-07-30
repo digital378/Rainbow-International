@@ -53,10 +53,20 @@ export default function ApplicationForm() {
     onError: () => toast({ title: "Submission failed", description: "Please try again or call us directly.", variant: "destructive" }),
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    let value = e.target.value;
+    if (e.target.name === "phone") value = value.replace(/\D/g, "").slice(0, 10);
+    setForm(prev => ({ ...prev, [e.target.name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); mutation.mutate(form); };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{10}$/.test(form.phone)) {
+      toast({ title: "Invalid phone number", description: "Please enter a valid 10-digit mobile number.", variant: "destructive" });
+      return;
+    }
+    mutation.mutate(form);
+  };
 
   const inp = "w-full border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white";
   const lbl = "block text-sm font-semibold text-gray-700 mb-1";
@@ -163,7 +173,7 @@ export default function ApplicationForm() {
                   </div>
                   <div>
                     <label className={lbl}>Mobile Number *</label>
-                    <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inp} data-testid="input-phone" />
+                    <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="10-digit mobile number" inputMode="numeric" maxLength={10} className={inp} data-testid="input-phone" />
                   </div>
                   <div>
                     <label className={lbl}>Email Address *</label>

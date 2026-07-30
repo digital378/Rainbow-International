@@ -108,7 +108,7 @@ export function HeroForm() {
               </div>
               <div>
                 <label htmlFor="hero-phone" className="sr-only">Phone Number</label>
-                <input {...register("phone")} id="hero-phone" placeholder="Phone Number *" type="tel" data-testid="input-hero-phone" className={inp(!!errors.phone)} />
+                <input {...register("phone")} id="hero-phone" placeholder="10-digit mobile number *" type="tel" inputMode="numeric" maxLength={10} onInput={e => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} data-testid="input-hero-phone" className={inp(!!errors.phone)} />
                 {errors.phone && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.phone.message}</p>}
               </div>
             </div>

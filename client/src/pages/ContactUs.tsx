@@ -182,7 +182,7 @@ export default function ContactUs() {
                       </div>
                       <div>
                         <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Phone Number *</label>
-                        <input {...register("phone")} placeholder="Enter phone number" type="tel" data-testid="input-contact-phone" className={inputBase} />
+                        <input {...register("phone")} placeholder="10-digit mobile number" type="tel" inputMode="numeric" maxLength={10} onInput={e => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} data-testid="input-contact-phone" className={inputBase} />
                         {errors.phone && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.phone.message}</p>}
                       </div>
                     </div>

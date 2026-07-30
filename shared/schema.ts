@@ -30,7 +30,7 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({
   source: true,
 }).extend({
   parentName: z.string().min(1, "Parent name is required"),
-  phone: z.string().min(1, "Phone number is required"),
+  phone: z.string().regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
   studentName: z.string().min(1, "Child's name is required"),
   grade: z.string().min(1, "Please select a class"),
   preferredTime: z.string().optional().or(z.literal("")),
@@ -76,6 +76,8 @@ export const callbackRequests = pgTable("callback_requests", {
 export const insertCallbackRequestSchema = createInsertSchema(callbackRequests).omit({
   id: true,
   createdAt: true,
+}).extend({
+  phone: z.string().regex(/^\d{10}$/, "Please enter a valid 10-digit mobile number"),
 });
 
 export type InsertCallbackRequest = z.infer<typeof insertCallbackRequestSchema>;
