@@ -103,6 +103,18 @@ function StatusBadge({ status, archived }: { status: string; archived: boolean }
   return <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${cls}`}>{status}</span>;
 }
 
+// ── Shared form-field wrapper (must be module-level — not inside a component) ──
+function F({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-slate-600 mb-1">
+        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 // ── Edit Panel ───────────────────────────────────────────────────
 function EditPanel({
   lead, lookups, token, onSave, onClose,
@@ -181,15 +193,6 @@ function EditPanel({
       setSaving(false);
     }
   };
-
-  const F = ({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
-    <div>
-      <label className="block text-xs font-semibold text-slate-600 mb-1">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      {children}
-    </div>
-  );
 
   const inputCls = "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400";
   const selectCls = inputCls;
