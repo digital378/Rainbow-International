@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "wouter";
 import QRCode from "qrcode";
+import html2canvas from "html2canvas";
 
 const NAVY = "#091a4f";
 
@@ -17,12 +18,39 @@ export default function FriendshipQRCard() {
   const [notFound, setNotFound] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const copyLink = () => {
     navigator.clipboard.writeText(portalUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  const handleDownload = async (format: "png" | "jpg") => {
+    const card = cardRef.current;
+    if (!card || !school) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(card, {
+        scale: 3,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        allowTaint: true,
+      });
+      const slug = school.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+      const link = document.createElement("a");
+      link.download = `qr-card-${slug}.${format}`;
+      link.href = format === "jpg"
+        ? canvas.toDataURL("image/jpeg", 0.95)
+        : canvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Download failed", err);
+    }
+    setDownloading(false);
   };
 
   useEffect(() => {
@@ -57,7 +85,7 @@ export default function FriendshipQRCard() {
   useEffect(() => {
     if (!portalUrl) return;
     QRCode.toDataURL(portalUrl, {
-      width: 500, margin: 2,
+      width: 600, margin: 2,
       color: { dark: NAVY, light: "#ffffff" },
       errorCorrectionLevel: "H",
     }).then(url => setQrDataUrl(url));
@@ -82,29 +110,40 @@ export default function FriendshipQRCard() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start py-8 px-4 print:py-0 print:px-0 print:bg-white" style={{ background: "#f1f5f9" }}>
       {/* Controls — hidden on print */}
-      <div className="mb-6 flex gap-3 print:hidden">
+      <div className="mb-6 flex gap-2 flex-wrap justify-center print:hidden">
         <button onClick={() => window.print()}
-          className="px-6 py-2.5 rounded-lg text-white font-bold shadow-md hover:opacity-90 transition"
+          className="px-5 py-2.5 rounded-lg text-white font-bold shadow-md hover:opacity-90 transition text-sm"
           style={{ background: NAVY }} data-testid="button-print">
           🖨️ Print Card
         </button>
-        <a href="/admin/alliances/friendship" className="px-6 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 font-semibold hover:bg-white transition">
+        <button onClick={() => handleDownload("png")} disabled={downloading}
+          className="px-5 py-2.5 rounded-lg text-white font-bold shadow-md hover:opacity-90 transition text-sm disabled:opacity-60"
+          style={{ background: "#0f766e" }} data-testid="button-download-png">
+          {downloading ? "Saving…" : "⬇ Download PNG"}
+        </button>
+        <button onClick={() => handleDownload("jpg")} disabled={downloading}
+          className="px-5 py-2.5 rounded-lg text-white font-bold shadow-md hover:opacity-90 transition text-sm disabled:opacity-60"
+          style={{ background: "#0369a1" }} data-testid="button-download-jpg">
+          {downloading ? "Saving…" : "⬇ Download JPG"}
+        </button>
+        <a href="/admin/alliances/friendship" className="px-5 py-2.5 rounded-lg border-2 border-slate-300 text-slate-600 font-semibold hover:bg-white transition text-sm">
           ← Back
         </a>
       </div>
 
-      {/* A5 card — 148 mm wide, designed to fill A5 page on print */}
+      {/* A5 card */}
       <div
+        ref={cardRef}
         id="qr-card"
         className="overflow-hidden shadow-2xl print:shadow-none"
         style={{
           width: "148mm",
-          minHeight: "210mm",
-          fontFamily: "Inter, sans-serif",
-          borderRadius: "20px",
+          fontFamily: "Inter, system-ui, sans-serif",
+          borderRadius: "16px",
           display: "flex",
           flexDirection: "column",
           boxSizing: "border-box",
+          background: "#ffffff",
         }}
         data-testid="qr-card"
       >
@@ -114,24 +153,34 @@ export default function FriendshipQRCard() {
         {/* Header — white / powder-blue gradient */}
         <div
           className="text-center px-8 pt-7 pb-6"
-          style={{ background: "linear-gradient(160deg, #ffffff 0%, #f0f4fb 60%, #e4ecf8 100%)", flexShrink: 0 }}
+          style={{
+            background: "linear-gradient(160deg, #ffffff 0%, #f0f4fb 60%, #e4ecf8 100%)",
+            flexShrink: 0,
+            borderBottom: "1px solid #dce6f0",
+          }}
         >
           <img
             src="/images/ris-logo.png"
             alt="Rainbow International School"
-            style={{ height: 80, width: "auto", display: "inline-block", borderRadius: 10, marginBottom: 12 }}
+            crossOrigin="anonymous"
+            style={{ height: 72, width: "auto", display: "inline-block", borderRadius: 8, marginBottom: 10 }}
           />
-          <div className="font-black text-lg leading-snug" style={{ color: NAVY }}>
+          <div className="font-black text-base leading-snug" style={{ color: NAVY }}>
             Rainbow International School
           </div>
-          <div className="text-sm mt-1" style={{ color: "#5a7aa0" }}>Alliances Portal</div>
+          <div className="text-xs mt-1" style={{ color: "#5a7aa0" }}>Alliances Portal</div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: 1, background: "#dce6f0", flexShrink: 0 }} />
-
         {/* Body */}
-        <div className="px-8 py-7 text-center flex-1 flex flex-col items-center justify-center" style={{ background: "#ffffff" }}>
+        <div
+          className="px-8 py-6 text-center"
+          style={{
+            background: "#ffffff",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
           <div
             className="text-xs font-black uppercase tracking-widest mb-5"
             style={{ color: NAVY, letterSpacing: "0.13em" }}
@@ -140,7 +189,7 @@ export default function FriendshipQRCard() {
           </div>
 
           {/* QR code */}
-          <div style={{ padding: 10, background: "#f0f4fb", borderRadius: 16, display: "inline-block" }}>
+          <div style={{ padding: 10, background: "#f0f4fb", borderRadius: 14, display: "inline-block" }}>
             <img
               src={qrDataUrl}
               alt={`QR code for ${school.name}`}
@@ -150,7 +199,7 @@ export default function FriendshipQRCard() {
 
           {/* School box */}
           <div
-            className="mt-7 w-full rounded-2xl px-5 py-4 text-center"
+            className="mt-6 w-full rounded-2xl px-5 py-4 text-center"
             style={{ background: "#f0f4fb", border: "1px solid #dce6f0" }}
           >
             <div
@@ -166,7 +215,7 @@ export default function FriendshipQRCard() {
           </div>
 
           {/* How to submit */}
-          <div className="mt-6 w-full text-left">
+          <div className="mt-5 w-full text-left">
             <div className="text-xs font-bold mb-2" style={{ color: "#5a7aa0" }}>How to submit:</div>
             <ol className="text-xs space-y-1.5" style={{ color: "#64748b", paddingLeft: 16 }}>
               <li>1. Scan the QR code with your phone camera</li>
@@ -177,7 +226,7 @@ export default function FriendshipQRCard() {
 
           {/* Portal URL */}
           <div
-            className="mt-5 w-full text-center"
+            className="mt-4 w-full text-center"
             style={{ fontSize: 9, color: "#94a3b8", wordBreak: "break-all", lineHeight: 1.4 }}
           >
             {portalUrl}
@@ -208,19 +257,19 @@ export default function FriendshipQRCard() {
       <style>{`
         @media print {
           @page { size: A5 portrait; margin: 0; }
-          body { margin: 0; background: white; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          html, body { margin: 0; padding: 0; background: white !important; }
+          .print\\:hidden { display: none !important; }
+          /* Pin the card to exactly fill the A5 page */
           #qr-card {
+            position: fixed !important;
+            inset: 0 !important;
             width: 148mm !important;
-            min-height: 210mm !important;
+            height: 210mm !important;
             border-radius: 0 !important;
             box-shadow: none !important;
-            page-break-after: avoid;
+            overflow: hidden !important;
           }
-          .print\\:hidden { display: none !important; }
-          .print\\:py-0 { padding-top: 0 !important; padding-bottom: 0 !important; }
-          .print\\:px-0 { padding-left: 0 !important; padding-right: 0 !important; }
-          .print\\:bg-white { background: white !important; }
-          .print\\:shadow-none { box-shadow: none !important; }
         }
       `}</style>
     </div>

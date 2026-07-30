@@ -314,39 +314,42 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
   <title>QR Codes — Friendship Schools</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Inter,sans-serif;background:#f1f5f9;padding:24px}
+    body{font-family:Inter,system-ui,sans-serif;background:#f1f5f9;padding:24px}
     h1{text-align:center;color:#091a4f;font-size:18px;font-weight:900;margin-bottom:6px}
     .sub{text-align:center;color:#64748b;font-size:12px;margin-bottom:20px}
-    .controls{text-align:center;margin-bottom:20px}
+    .controls{text-align:center;margin-bottom:24px}
     .btn{padding:10px 28px;background:#091a4f;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
-    /* A5 grid: one card per page on print, 2-up for screen preview */
-    .grid{display:grid;grid-template-columns:repeat(2,148mm);gap:18px;justify-content:center;margin:0 auto}
-    .card{width:148mm;min-height:210mm;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+    /* Screen: 2-up preview grid */
+    .grid{display:grid;grid-template-columns:repeat(2,148mm);gap:20px;justify-content:center;margin:0 auto}
+    /* Card — matches FriendshipQRCard.tsx exactly */
+    .card{width:148mm;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(9,26,79,0.12)}
     .stripe{height:8px;background:#091a4f;flex-shrink:0}
-    .hdr{background:linear-gradient(160deg,#ffffff 0%,#f0f4fb 60%,#e4ecf8 100%);padding:20px 24px 18px;text-align:center;flex-shrink:0;border-bottom:1px solid #dce6f0}
-    .logo-pill{display:inline-flex;align-items:center;justify-content:center;background:#091a4f;border-radius:12px;padding:8px 14px;margin-bottom:10px}
-    .logo-pill img{height:44px;width:auto;display:block}
-    .hdr-title{color:#091a4f;font-weight:900;font-size:13px;line-height:1.3}
+    /* Header: white-to-powder-blue gradient, plain logo (no dark pill) */
+    .hdr{background:linear-gradient(160deg,#ffffff 0%,#f0f4fb 60%,#e4ecf8 100%);padding:24px 32px 20px;text-align:center;flex-shrink:0;border-bottom:1px solid #dce6f0}
+    .hdr img.logo{height:72px;width:auto;display:inline-block;border-radius:8px;margin-bottom:10px}
+    .hdr-title{color:#091a4f;font-weight:900;font-size:14px;line-height:1.3}
     .hdr-sub{color:#5a7aa0;font-size:10px;margin-top:3px}
-    .body{padding:16px 20px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff}
-    .scan-label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#091a4f;margin-bottom:12px}
-    .qr-wrap{background:#f0f4fb;border-radius:12px;padding:8px;display:inline-block}
-    .qr-wrap img{width:160px;height:160px;border-radius:6px;display:block}
-    .school-box{background:#f0f4fb;border:1px solid #dce6f0;border-radius:12px;padding:10px 14px;margin-top:14px;width:100%}
-    .slabel{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#5a7aa0}
-    .sname{font-size:15px;font-weight:900;color:#091a4f;margin-top:3px;line-height:1.2}
-    .scontact{font-size:10px;color:#5a7aa0;margin-top:3px}
-    .how{margin-top:14px;width:100%;text-align:left}
-    .how-title{font-size:9px;font-weight:700;color:#5a7aa0;margin-bottom:5px}
-    .how ol{font-size:9px;color:#64748b;padding-left:14px;line-height:1.6}
-    .url{margin-top:12px;font-size:7px;color:#94a3b8;word-break:break-all;text-align:center;line-height:1.4}
+    /* Body */
+    .body{padding:20px 28px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;background:#fff}
+    .scan-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;color:#091a4f;margin-bottom:14px}
+    .qr-wrap{background:#f0f4fb;border-radius:14px;padding:10px;display:inline-block}
+    .qr-wrap img{width:210px;height:210px;border-radius:8px;display:block}
+    .school-box{background:#f0f4fb;border:1px solid #dce6f0;border-radius:14px;padding:12px 16px;margin-top:18px;width:100%;text-align:center}
+    .slabel{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#5a7aa0}
+    .sname{font-size:17px;font-weight:900;color:#091a4f;margin-top:4px;line-height:1.2}
+    .scontact{font-size:11px;color:#5a7aa0;margin-top:4px}
+    .how{margin-top:16px;width:100%;text-align:left}
+    .how-title{font-size:10px;font-weight:700;color:#5a7aa0;margin-bottom:6px}
+    .how ol{font-size:10px;color:#64748b;padding-left:16px;line-height:1.7}
+    .url{margin-top:14px;font-size:8px;color:#94a3b8;word-break:break-all;text-align:center;line-height:1.4}
     @media print{
       @page{size:A5 portrait;margin:0}
-      body{background:#fff;padding:0}
-      .controls{display:none}
-      .grid{display:block}
-      .card{width:148mm;min-height:210mm;border-radius:0;box-shadow:none;page-break-after:always;break-after:page}
-      .card:last-child{page-break-after:avoid;break-after:avoid}
+      *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+      html,body{margin:0;padding:0;width:148mm;background:white !important}
+      h1,.sub,.controls{display:none !important}
+      .grid{display:block !important;margin:0 !important;padding:0 !important}
+      .card{width:148mm !important;height:210mm !important;border-radius:0 !important;box-shadow:none !important;page-break-after:always !important;break-after:page !important;overflow:hidden !important;margin:0 !important}
+      .card:last-child{page-break-after:avoid !important;break-after:avoid !important}
     }
   </style>
 </head>
@@ -359,7 +362,7 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     <div class="card">
       <div class="stripe"></div>
       <div class="hdr">
-        <div class="logo-pill"><img src="${logoDataUrl}" alt="RIS" /></div>
+        <img class="logo" src="${logoDataUrl}" alt="Rainbow International School" />
         <div class="hdr-title">Rainbow International School</div>
         <div class="hdr-sub">Alliances Portal</div>
       </div>
