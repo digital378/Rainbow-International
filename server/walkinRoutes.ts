@@ -59,6 +59,35 @@ function requireAdmin(
   next();
 }
 
+/**
+ * Returns true if the request carries a valid token for the given brand.
+ * Accepts either:
+ *   - the master ADMIN_TOKEN (full access, any brand), OR
+ *   - the brand-specific token (RIS_ADMIN_TOKEN / RPS_ADMIN_TOKEN) for
+ *     read-only access scoped to that brand.
+ *
+ * Used by the Training Performance Platform to pull dashboard data via API.
+ */
+function isBrandAuthorized(req: Express["request"], brand: string): boolean {
+  if (isAdmin(req)) return true; // master token always works
+  const brandUpper = brand.toUpperCase();
+  const envKey = brandUpper === "RIS" ? "RIS_ADMIN_TOKEN" : brandUpper === "RPS" ? "RPS_ADMIN_TOKEN" : null;
+  if (!envKey) return false;
+  const brandToken = process.env[envKey];
+  if (!brandToken) return false;
+  const provided =
+    (req.headers["x-api-key"] as string) ||
+    (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
+    (typeof req.query.token === "string" ? req.query.token : "");
+  if (!provided) return false;
+  const padded = provided.padEnd(brandToken.length).slice(0, brandToken.length);
+  try {
+    return timingSafeEqual(Buffer.from(brandToken), Buffer.from(padded));
+  } catch {
+    return false;
+  }
+}
+
 /** Derive "Mon-YY" label from a YYYY-MM-DD date string, e.g. "2027-06-15" → "Jun-27" */
 function deriveMonthLabel(dateStr: string): string {
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -864,6 +893,17 @@ export function registerWalkinRoutes(app: Express) {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       const ay = typeof req.query.ay === "string" ? req.query.ay : "2027-28";
 
+      // Require auth: brand token (RIS/RPS) for scoped access; master ADMIN_TOKEN for all
+      if (brand) {
+        if (!isBrandAuthorized(req, brand)) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+      } else {
+        if (!isAdmin(req)) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+      }
+
       const conditions: any[] = [
         eq(walkinLeads.academicYear, ay),
         eq(walkinLeads.isArchived, false),
@@ -951,6 +991,11 @@ export function registerWalkinRoutes(app: Express) {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       if (!brand || !["RIS", "RPS"].includes(brand)) {
         return res.status(400).json({ message: "brand must be RIS or RPS" });
+      }
+
+      // Require brand token (or master ADMIN_TOKEN)
+      if (!isBrandAuthorized(req, brand)) {
+        return res.status(401).json({ message: "Unauthorized" });
       }
 
       // Only admins may bypass the cache
