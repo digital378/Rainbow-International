@@ -27,6 +27,7 @@ import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
 import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
+import { bustCrmStatsCache } from "./walkinSheets";
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
   pdf: new Set(["application/pdf", "application/octet-stream"]),
@@ -597,7 +598,7 @@ export async function registerRoutes(
         phone: validatedData.phone,
         email: validatedData.email ?? "",
         source: validatedData.source ?? "",
-      }).catch((err) => console.error("[inquiry] CRM Leads Tracker append error:", err));
+      }).then(() => bustCrmStatsCache("RIS")).catch((err) => console.error("[inquiry] CRM Leads Tracker append error:", err));
       res.status(201).json(inquiry);
     } catch (error: any) {
       if (error.name === "ZodError") {
@@ -637,7 +638,7 @@ export async function registerRoutes(
         studentName: "",
         grade: "",
         phone: validatedData.phone,
-      }).catch((err) => console.error("[callback] CRM Leads Tracker append error:", err));
+      }).then(() => bustCrmStatsCache("RIS")).catch((err) => console.error("[callback] CRM Leads Tracker append error:", err));
       res.status(201).json(saved);
     } catch (error: any) {
       if (error.name === "ZodError") {
