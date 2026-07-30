@@ -5,7 +5,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
 import { startSeoMonitor } from "./seoMonitor";
-import { bootstrapWalkinSequences } from "./walkinSheets";
+import { bootstrapWalkinSequences, bootstrapWalkinLookups } from "./walkinSheets";
 
 const app = express();
 const httpServer = createServer(app);
@@ -134,6 +134,7 @@ app.use((req, res, next) => {
 (async () => {
   await autoSeedBlogsIfEmpty();
   await bootstrapWalkinSequences();
+  await bootstrapWalkinLookups();
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

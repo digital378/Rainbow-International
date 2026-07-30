@@ -40,7 +40,7 @@
 
 import { google } from "googleapis";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 
@@ -99,6 +99,143 @@ export async function bootstrapWalkinSequences(): Promise<void> {
     // Log but don't crash startup — worst case, the first nextval() call will
     // fail gracefully at lead-creation time with a clear error message.
     console.error("[walkin/bootstrap] Sequence bootstrap failed:", err?.message);
+  }
+}
+
+/**
+ * Seeds branches, programs, sources, statuses, close reasons, and staff
+ * into the DB on first startup — idempotent (skips each table if it already
+ * has rows).  This ensures production has real data after a fresh deploy.
+ */
+export async function bootstrapWalkinLookups(): Promise<void> {
+  try {
+    // ── Branches ──────────────────────────────────────────────────
+    const branchRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_branches`,
+    );
+    if (parseInt(branchRows.rows[0]?.cnt ?? "0") === 0) {
+      await db.insert(walkinBranches).values([
+        { name: "Brahmand",      brand: "RIS", code: "brahmand",      pin: "0000", isActive: true },
+        { name: "Dhokali",       brand: "RPS", code: "dhokali",       pin: "0000", isActive: true },
+        { name: "Kasarwadavali", brand: "RPS", code: "kasarwadavali", pin: "0000", isActive: true },
+        { name: "Anand Nagar",   brand: "RPS", code: "anand-nagar",   pin: "0000", isActive: true },
+        { name: "Aggarwal",      brand: "RPS", code: "aggarwal",      pin: "0000", isActive: true },
+        { name: "Hariniwas",     brand: "RPS", code: "hariniwas",     pin: "0000", isActive: true },
+        { name: "Kalwa",         brand: "RPS", code: "kalwa",         pin: "0000", isActive: true },
+      ]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Branches seeded");
+    }
+
+    // ── Programs ──────────────────────────────────────────────────
+    const progRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_programs`,
+    );
+    if (parseInt(progRows.rows[0]?.cnt ?? "0") === 0) {
+      const risPrograms = [
+        { label: "Pre-Nursery", brand: "RIS", sortOrder: -1, isActive: true },
+        { label: "Nursery",     brand: "RIS", sortOrder:  0, isActive: true },
+        { label: "Jr. KG",      brand: "RIS", sortOrder:  1, isActive: true },
+        { label: "Sr. KG",      brand: "RIS", sortOrder:  2, isActive: true },
+        ...["Class 1","Class 2","Class 3","Class 4","Class 5","Class 6","Class 7","Class 8","Class 9","Class 10"]
+          .map((label, i) => ({ label, brand: "RIS", sortOrder: 3 + i, isActive: true })),
+        { label: "Class 11 \u2013 Science",     brand: "RIS", sortOrder: 13, isActive: true },
+        { label: "Class 11 \u2013 Commerce",    brand: "RIS", sortOrder: 14, isActive: true },
+        { label: "Class 11 \u2013 Humanities",  brand: "RIS", sortOrder: 15, isActive: true },
+        { label: "Class 12 \u2013 Science",     brand: "RIS", sortOrder: 16, isActive: true },
+        { label: "Class 12 \u2013 Commerce",    brand: "RIS", sortOrder: 17, isActive: true },
+        { label: "Class 12 \u2013 Humanities",  brand: "RIS", sortOrder: 18, isActive: true },
+      ];
+      const rpsPrograms = [
+        { label: "Playgroup", brand: "RPS", sortOrder: 0, isActive: true },
+        { label: "Nursery",   brand: "RPS", sortOrder: 1, isActive: true },
+        { label: "Jr. KG",    brand: "RPS", sortOrder: 2, isActive: true },
+        { label: "Sr. KG",    brand: "RPS", sortOrder: 3, isActive: true },
+        { label: "Grade 1",   brand: "RPS", sortOrder: 4, isActive: true },
+        { label: "Grade 2",   brand: "RPS", sortOrder: 5, isActive: true },
+        { label: "Grade 3",   brand: "RPS", sortOrder: 6, isActive: true },
+        { label: "Grade 4",   brand: "RPS", sortOrder: 7, isActive: true },
+      ];
+      await db.insert(walkinPrograms).values([...risPrograms, ...rpsPrograms]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Programs seeded");
+    }
+
+    // ── Sources ───────────────────────────────────────────────────
+    const srcRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_sources`,
+    );
+    if (parseInt(srcRows.rows[0]?.cnt ?? "0") === 0) {
+      await db.insert(walkinSources).values([
+        { label: "DM",                brand: null, sortOrder: 0, isActive: true },
+        { label: "DW",                brand: null, sortOrder: 1, isActive: true },
+        { label: "Referral",          brand: null, sortOrder: 2, isActive: true },
+        { label: "Telephonic",        brand: null, sortOrder: 3, isActive: true },
+        { label: "Staff Reference",   brand: null, sortOrder: 4, isActive: true },
+        { label: "Ex-Rainbow Parent", brand: null, sortOrder: 5, isActive: true },
+      ]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Sources seeded");
+    }
+
+    // ── Statuses ──────────────────────────────────────────────────
+    const statRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_statuses`,
+    );
+    if (parseInt(statRows.rows[0]?.cnt ?? "0") === 0) {
+      await db.insert(walkinStatuses).values([
+        { label: "OPEN",               brand: null, sortOrder: 0, isActive: true },
+        { label: "WALK-IN BOOKED",     brand: null, sortOrder: 1, isActive: true },
+        { label: "WALK-IN COMPLETED",  brand: null, sortOrder: 2, isActive: true },
+        { label: "ADMISSION DONE",     brand: null, sortOrder: 3, isActive: true },
+        { label: "CLOSED",             brand: null, sortOrder: 4, isActive: true },
+        { label: "TRANSFERRED",        brand: null, sortOrder: 5, isActive: true },
+        { label: "INTEGRATED",         brand: null, sortOrder: 6, isActive: true },
+        { label: "NEXT YEAR",          brand: null, sortOrder: 7, isActive: true },
+      ]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Statuses seeded");
+    }
+
+    // ── Close Reasons ─────────────────────────────────────────────
+    const crRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_close_reasons`,
+    );
+    if (parseInt(crRows.rows[0]?.cnt ?? "0") === 0) {
+      await db.insert(walkinCloseReasons).values([
+        { label: "Location",                  brand: null, sortOrder: 0, isActive: true },
+        { label: "adm done - other school",   brand: null, sortOrder: 1, isActive: true },
+        { label: "High Fees",                 brand: null, sortOrder: 2, isActive: true },
+        { label: "Not Interested",            brand: null, sortOrder: 3, isActive: true },
+        { label: "Continuing in same school", brand: null, sortOrder: 4, isActive: true },
+        { label: "Board Issue",               brand: null, sortOrder: 5, isActive: true },
+        { label: "Transfer",                  brand: null, sortOrder: 6, isActive: true },
+        { label: "Autism",                    brand: null, sortOrder: 7, isActive: true },
+      ]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Close reasons seeded");
+    }
+
+    // ── Staff ─────────────────────────────────────────────────────
+    // Only seed real staff if no active (non-placeholder) staff exist
+    const staffRows = await db.execute<{ cnt: string }>(
+      drizzleSql`SELECT COUNT(*)::int AS cnt FROM walkin_staff WHERE is_active = true AND name NOT LIKE '[CONFIRM]%'`,
+    );
+    if (parseInt(staffRows.rows[0]?.cnt ?? "0") === 0) {
+      const rpsStaff = [
+        "Aarti","Amruta","Asma Shaikh","Bhumika Jha","Charushila","Deeksha Pujari",
+        "Dipisha Wagh","Gauri Randhir","Jaisika Ujawane","Madhuri","Mahima Patel",
+        "Mintu Singh","Neelanjali","Neha Shelar","Niharika Joshi","Pooja Bohini",
+        "Preeti Nanda","Prisha Uderani","Priyanka","Rajani","Sheetal Gaikwad",
+        "Shilpa Sikdar","Simran","Snehal Kadam","Snehal Shetty","Swamini Waradkar","Varija",
+      ].map((name, i) => ({ name, brand: "RPS", isActive: true, sortOrder: i }));
+
+      const risStaff = [
+        "Anagha","Kavya","Lavina","Pradnya","Sheetal","Shweta","Srishti","Swarika Ma'am",
+      ].map((name, i) => ({ name, brand: "RIS", isActive: true, sortOrder: i }));
+
+      await db.insert(walkinStaff).values([...rpsStaff, ...risStaff]).onConflictDoNothing();
+      console.log("[walkin/bootstrap] Staff seeded");
+    }
+
+    console.log("[walkin/bootstrap] Lookups ready");
+  } catch (err: any) {
+    console.error("[walkin/bootstrap] Lookup bootstrap failed:", err?.message);
   }
 }
 
