@@ -1949,28 +1949,28 @@ export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
 }
 
 /**
- * Reads the "CRM Leads Tracker" tab from the brand's Google Sheet and
- * returns aggregated stats in the same shape as /api/walkin/stats.
- * byBranch is always [] — the CRM tab has no branch column.
+ * Returns aggregated CRM stats for a brand by querying the walkin_leads
+ * database table directly — the single source of truth.
  *
- * Results are cached for 2 minutes.  Concurrent requests that arrive
- * during a cache miss share a single in-flight promise so only one
- * Google Sheets API call is made per brand per cache window.
+ * The Google Sheet "CRM Leads Tracker" tab is no longer read here;
+ * all leads entered by RAs via the /leads panel live in the DB.
+ *
+ * Results are cached for 2 minutes.  Concurrent cache-miss requests
+ * share a single in-flight promise (no duplicate DB queries).
  * Pass `{ bust: true }` to force a fresh read (admin-only).
  */
 export async function readCrmLeadsTrackerStats(
   brand: "RIS" | "RPS",
   { bust = false }: { bust?: boolean } = {},
 ): Promise<CrmStats> {
-  // 1. Serve a valid cached result immediately (unless busting)
+  // 1. Serve cached result immediately (unless busting)
   if (!bust) {
     const entry = crmStatsCache.get(brand);
     if (entry && Date.now() - entry.storedAt < CRM_STATS_TTL_MS) {
       console.log(`[walkin/crm-stats] Cache hit for ${brand}`);
       return entry.data;
     }
-
-    // 2. Coalesce concurrent misses — join the existing in-flight promise if one is running
+    // 2. Coalesce concurrent cache-miss requests
     const inflight = crmStatsInFlight.get(brand);
     if (inflight) {
       console.log(`[walkin/crm-stats] Joining in-flight request for ${brand}`);
@@ -1978,112 +1978,122 @@ export async function readCrmLeadsTrackerStats(
     }
   }
 
-  // 3. Start a fresh fetch, register it as the in-flight promise so concurrent
-  //    cache-miss requests join the same call rather than each firing their own.
   const fetchPromise = (async (): Promise<CrmStats> => {
     try {
-      const auth = getAuthClient();
-      if (!auth) throw new Error("Google Sheets auth not configured");
-      const sheets = google.sheets({ version: "v4", auth });
-      const sheetId = getSheetId(brand);
-      if (!sheetId) throw new Error(`Sheet ID not configured for ${brand}`);
-
-      let rows: string[][];
-      let tabMissing = false;
-
-      try {
-        const res = await sheets.spreadsheets.values.get({
-          spreadsheetId: sheetId,
-          range: `'${CRM_TAB}'!A:M`,
-        });
-        rows = (res.data.values ?? []) as string[][];
-      } catch (fetchErr: any) {
-        // Google Sheets returns a 400 "Unable to parse range" error when the
-        // named tab does not exist in the spreadsheet.
-        const msg: string = fetchErr?.message ?? "";
-        const isRangeParse =
-          msg.includes("Unable to parse range") ||
-          msg.includes("Requested entity was not found") ||
-          fetchErr?.code === 400;
-        if (isRangeParse) {
-          tabMissing = true;
-          rows = [];
-          console.warn(
-            `[walkin/crm-stats] "${CRM_TAB}" tab not found in ${brand} sheet — returning zero stats with warning`,
-          );
-        } else {
-          // Unrecognised error — propagate so the route returns 500
-          throw fetchErr;
-        }
-      }
-
-      const dataRows = rows.slice(1); // skip header row
+      // Read all non-archived leads for this brand + AY from the DB
+      const leads = await db
+        .select({
+          monthLabel:  walkinLeads.monthLabel,
+          status:      walkinLeads.status,
+          source:      walkinLeads.source,
+          leadOwner:   walkinLeads.leadOwner,
+          program:     walkinLeads.program,
+          branchId:    walkinLeads.branchId,
+        })
+        .from(walkinLeads)
+        .where(
+          and(
+            eq(walkinLeads.brand, brand),
+            eq(walkinLeads.academicYear, "2027-28"),
+            eq(walkinLeads.isArchived, false),
+          ),
+        );
 
       const now = new Date().toISOString();
 
-      if (tabMissing) {
-        // Tab is absent — build a zero-stat result with a clear warning so the
-        // frontend can show a "no data" state rather than misleading zeros.
-        const emptyAgg = aggregateCrmRows([]);
-        const result: CrmStats = {
-          brand,
-          academicYear: "2027-28",
-          ...emptyAgg,
-          byBranch: [],
-          generatedAt: now,
-          cachedAt: now,
-          dataSource: "tab_missing",
-          warning: `The "${CRM_TAB}" tab was not found in the ${brand} Google Sheet. Please create the tab and populate it before reading CRM stats.`,
-        };
-        // Cache the missing-tab result briefly (same TTL) to avoid hammering the API
-        crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
-        return result;
+      // Aggregate KPIs in the same shape as aggregateCrmRows
+      let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
+      const monthMap        = new Map<string, number>();
+      const monthDetailMap  = new Map<string, { leads: number; walkins: number; admissions: number; closed: number }>();
+      const sourceMap       = new Map<string, number>();
+      const ownerMap        = new Map<string, number>();
+      const statusMap       = new Map<string, number>();
+      const counsellorMap   = new Map<string, { leads: number; walkins: number; admissions: number; closed: number; open: number }>();
+      const programMap      = new Map<string, number>();
+      const branchMap       = new Map<number | null, number>();
+
+      for (const row of leads) {
+        const status  = (row.status    ?? "").trim().toUpperCase();
+        const source  = (row.source    ?? "Unknown").trim();
+        const owner   = (row.leadOwner ?? "").trim();
+        const program = (row.program   ?? "Unknown").trim();
+        const month   = (row.monthLabel ?? "").trim() || "Unknown";
+        const bid     = row.branchId ?? null;
+
+        const isWalkin    = ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(status);
+        const isAdmission = status === "ADMISSION DONE";
+        const isClosed    = status === "CLOSED";
+        const isOpen      = ["OPEN", "FOLLOW-UP"].includes(status);
+        const isBooking   = status === "WALK-IN BOOKED";
+
+        totalLeads++;
+        if (isBooking)   bookings++;
+        if (isWalkin)    walkins++;
+        if (isAdmission) admissions++;
+
+        monthMap.set(month, (monthMap.get(month) ?? 0) + 1);
+
+        const md = monthDetailMap.get(month) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0 };
+        md.leads++;
+        if (isWalkin)    md.walkins++;
+        if (isAdmission) md.admissions++;
+        if (isClosed)    md.closed++;
+        monthDetailMap.set(month, md);
+
+        sourceMap.set(source, (sourceMap.get(source) ?? 0) + 1);
+        ownerMap .set(owner,  (ownerMap .get(owner)  ?? 0) + 1);
+        statusMap.set(status, (statusMap.get(status) ?? 0) + 1);
+        programMap.set(program, (programMap.get(program) ?? 0) + 1);
+        branchMap .set(bid,   (branchMap .get(bid)   ?? 0) + 1);
+
+        const cs = counsellorMap.get(owner) ?? { leads: 0, walkins: 0, admissions: 0, closed: 0, open: 0 };
+        cs.leads++;
+        if (isWalkin)    cs.walkins++;
+        if (isAdmission) cs.admissions++;
+        if (isClosed)    cs.closed++;
+        if (isOpen)      cs.open++;
+        counsellorMap.set(owner, cs);
       }
 
-      if (dataRows.length === 0) {
-        // Tab exists but has no data rows after the header
-        console.warn(
-          `[walkin/crm-stats] "${CRM_TAB}" tab in ${brand} sheet is empty — returning zero stats with warning`,
-        );
-        const emptyAgg = aggregateCrmRows([]);
-        const result: CrmStats = {
-          brand,
-          academicYear: "2027-28",
-          ...emptyAgg,
-          byBranch: [],
-          generatedAt: now,
-          cachedAt: now,
-          dataSource: "empty",
-          warning: `The "${CRM_TAB}" tab in the ${brand} sheet exists but contains no data rows. Stats will be zero until rows are added.`,
-        };
-        crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
-        return result;
-      }
+      const sortFn = (a: { month: string }, b: { month: string }) =>
+        crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
 
-      // Delegate to pure aggregation function (also used by unit tests)
-      const agg = aggregateCrmRows(dataRows);
+      const monthly         = Array.from(monthMap,       ([month, cnt]) => ({ month, cnt })).sort(sortFn);
+      const monthlyDetail   = Array.from(monthDetailMap, ([month, d])   => ({ month, ...d })).sort(sortFn);
+      const bySource        = Array.from(sourceMap,      ([source, cnt]) => ({ source, cnt })).sort((a, b) => b.cnt - a.cnt);
+      const byOwner         = Array.from(ownerMap,       ([leadOwner, cnt]) => ({ leadOwner: leadOwner || null, cnt })).sort((a, b) => b.cnt - a.cnt);
+      const statusBreakdown = Array.from(statusMap,      ([status, cnt]) => ({ status, cnt })).sort((a, b) => b.cnt - a.cnt);
+      const byProgram       = Array.from(programMap,     ([program, cnt]) => ({ program, cnt })).sort((a, b) => b.cnt - a.cnt);
+      const byBranch        = Array.from(branchMap,      ([branchId, cnt]) => ({ branchId, cnt })).sort((a, b) => b.cnt - a.cnt);
+      const byCounsellor    = Array.from(counsellorMap,  ([leadOwner, s]) => ({ leadOwner: leadOwner || "Unassigned", ...s }))
+        .filter(c => c.leadOwner !== "Unassigned" || c.leads > 0)
+        .sort((a, b) => b.admissions - a.admissions || b.walkins - a.walkins || b.leads - a.leads);
 
       const result: CrmStats = {
         brand,
         academicYear: "2027-28",
-        ...agg,
-        byBranch: [], // CRM Leads Tracker has no branch column
+        kpis: { totalLeads, bookings, walkins, admissions },
+        monthly,
+        monthlyDetail,
+        bySource,
+        byBranch,
+        byOwner,
+        statusBreakdown,
+        byCounsellor,
+        byProgram,
         generatedAt: now,
         cachedAt: now,
-        dataSource: "sheet",
+        dataSource: "sheet", // "sheet" = data is good; frontend shows no warning
       };
 
-      // Populate the cache so subsequent requests within the TTL skip the fetch
       crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
-      console.log(`[walkin/crm-stats] Fresh data fetched and cached for ${brand}`);
+      console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
       return result;
     } finally {
-      // Always remove the in-flight entry so a future miss starts a new fetch
       crmStatsInFlight.delete(brand);
     }
   })();
 
-  // Register before awaiting so concurrent arrivals see the same promise
   crmStatsInFlight.set(brand, fetchPromise);
   return fetchPromise;
 }
