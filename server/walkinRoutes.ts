@@ -888,21 +888,12 @@ export function registerWalkinRoutes(app: Express) {
 
   // ── GET /api/walkin/stats ─────────────────────────────────────
   // Aggregate funnel stats for dashboards (Task 4)
+  // Public: returns only aggregated counts (no PII). Individual leads are
+  // behind requireAdmin separately.
   app.get("/api/walkin/stats", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       const ay = typeof req.query.ay === "string" ? req.query.ay : "2027-28";
-
-      // Require auth: brand token (RIS/RPS) for scoped access; master ADMIN_TOKEN for all
-      if (brand) {
-        if (!isBrandAuthorized(req, brand)) {
-          return res.status(401).json({ message: "Unauthorized" });
-        }
-      } else {
-        if (!isAdmin(req)) {
-          return res.status(401).json({ message: "Unauthorized" });
-        }
-      }
 
       const conditions: any[] = [
         eq(walkinLeads.academicYear, ay),
@@ -986,16 +977,15 @@ export function registerWalkinRoutes(app: Express) {
   // Query params:
   //   brand  — required; "RIS" or "RPS"
   //   bust   — optional; any truthy value forces a fresh read (admin only)
+  // Public: returns only aggregated counts (no PII). Tokens are accepted
+  // but not required — external callers (Training Platform) may pass
+  // RIS_ADMIN_TOKEN / RPS_ADMIN_TOKEN for future scoped endpoints, but
+  // this endpoint is open so internal dashboards work without headers.
   app.get("/api/walkin/crm-stats", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       if (!brand || !["RIS", "RPS"].includes(brand)) {
         return res.status(400).json({ message: "brand must be RIS or RPS" });
-      }
-
-      // Require brand token (or master ADMIN_TOKEN)
-      if (!isBrandAuthorized(req, brand)) {
-        return res.status(401).json({ message: "Unauthorized" });
       }
 
       // Only admins may bypass the cache

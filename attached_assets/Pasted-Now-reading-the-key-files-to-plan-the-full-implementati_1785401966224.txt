@@ -1,0 +1,44 @@
+Now reading the key files to plan the full implementation — month filters + new CRM API integration:
+
+
+4 actions
+Good — Build mode confirmed. Let me read the exact lines I need to edit before making all changes:
+
+
+4 actions
+Now I have the exact code. Let me implement everything in one parallel batch — month filters for department + employee, new Rainbow CRM API integration in live_api.py, and environment variable setup:
+
+
+4 actions
+Now I have everything I need. Implementing all changes in one parallel batch — month filters (department + employee), new Rainbow CRM API, and env var:
+
+
+12 actions
+All 11 edits applied. Now setting the env var and restarting the workflow in parallel:
+
+
+6 actions
+Flask is up and running cleanly. Let me set RAINBOW_APP_URL properly:
+
+
+7 actions
+App is running. Let me verify the department and employee routes load cleanly:
+
+
+3 actions
+All code changes are applied and the app is running clean. Let me propose follow-up tasks:
+
+
+2 actions
+Everything is done. Here's what was delivered:
+
+Month filters on department & employee pages
+
+Department page — a dropdown in the header switches between "All months (YTD)" and individual months. Selecting a month swaps the 8-tile YTD KPI strip to a compact 3-tile view (walk-ins / admissions / conversion), updates the leaderboard badge to "(snapshot)", re-ranks counselors from DB snapshots for that month, and refreshes the bar chart — all without a page reload.
+Employee profile — a calendar dropdown sits above the KPI tiles. Picking a different period instantly swaps the tiles to that period's cumulative DB snapshot.
+Rainbow International CRM integration
+
+Added get_crm_stats(brand) to live_api.py — calls GET {RAINBOW_APP_URL}/api/walkin/crm-stats?brand=RIS|RPS, uses the brand-specific token (RIS_ADMIN_TOKEN / RPS_ADMIN_TOKEN), caches for 2 minutes, degrades gracefully to {} on any error.
+RAINBOW_APP_URL is now set to https://rainbow-international.replit.app.
+Department page gets a "Lead Funnel (CRM)" card showing Total Leads → Bookings → Walk-ins → Admissions plus a leads-by-source bar breakdown. If the CRM is unreachable, the card is silently hidden.
+Dashboard route already fetches crm_stats and passes it to dashboard.html — Task #31 covers wiring it into the template
