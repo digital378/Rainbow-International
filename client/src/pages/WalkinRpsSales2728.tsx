@@ -194,6 +194,42 @@ function Dashboard() {
   // Reset filter when switching tabs
   useEffect(() => { setFilterFrom(null); setFilterTo(null); }, [activeTab]);
 
+  // ── All derived/memoised values MUST live before any early return (Rules of Hooks) ──
+  const _md   = data?.monthlyDetail ?? [];
+  const _kpis = data?.kpis;
+  const isFiltered = !!(filterFrom || filterTo);
+
+  const availableMonths = useMemo(() => _md.map(m => m.month), [_md]);
+
+  const filteredDetail = useMemo(() => {
+    if (!filterFrom && !filterTo) return _md;
+    const fromIdx = filterFrom ? availableMonths.indexOf(filterFrom) : 0;
+    const toIdx   = filterTo   ? availableMonths.indexOf(filterTo)   : availableMonths.length - 1;
+    const lo = Math.min(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
+    const hi = Math.max(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
+    return _md.slice(lo, hi + 1);
+  }, [_md, availableMonths, filterFrom, filterTo]);
+
+  const activeKpis = useMemo(() => {
+    if (!_kpis) return { totalLeads: 0, bookings: 0, walkins: 0, admissions: 0 };
+    if (!isFiltered) return _kpis;
+    return {
+      totalLeads: filteredDetail.reduce((a, m) => a + m.leads, 0),
+      bookings:   _kpis.bookings,
+      walkins:    filteredDetail.reduce((a, m) => a + m.walkins, 0),
+      admissions: filteredDetail.reduce((a, m) => a + m.admissions, 0),
+    };
+  }, [filteredDetail, _kpis, isFiltered]);
+
+  const filteredMonthly = useMemo(
+    () => filteredDetail.map(m => ({ month: m.month, cnt: m.leads })),
+    [filteredDetail],
+  );
+  const filteredClosed = useMemo(
+    () => filteredDetail.reduce((a, m) => a + m.closed, 0),
+    [filteredDetail],
+  );
+
   if (loading && !data) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#f8fafc" }}>
       <div className="text-center">
@@ -216,41 +252,6 @@ function Dashboard() {
   const { kpis, monthly, monthlyDetail = [], bySource, byOwner, statusBreakdown, byCounsellor = [], byProgram = [] } = data;
   const openLeads   = statusBreakdown.filter(s => ["OPEN","FOLLOW-UP"].includes(s.status)).reduce((a,s) => a+s.cnt, 0);
   const closedLeads = statusBreakdown.find(s => s.status === "CLOSED")?.cnt ?? 0;
-
-  // Available months for the picker (in data order)
-  const availableMonths = useMemo(() => monthlyDetail.map(m => m.month), [monthlyDetail]);
-
-  // Filtered month detail slice
-  const filteredDetail = useMemo(() => {
-    if (!filterFrom && !filterTo) return monthlyDetail;
-    const fromIdx = filterFrom ? availableMonths.indexOf(filterFrom) : 0;
-    const toIdx   = filterTo   ? availableMonths.indexOf(filterTo)   : availableMonths.length - 1;
-    const lo = Math.min(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
-    const hi = Math.max(fromIdx < 0 ? 0 : fromIdx, toIdx < 0 ? availableMonths.length - 1 : toIdx);
-    return monthlyDetail.slice(lo, hi + 1);
-  }, [monthlyDetail, availableMonths, filterFrom, filterTo]);
-
-  const isFiltered = !!(filterFrom || filterTo);
-
-  // KPIs recalculated for the filtered range
-  const activeKpis = useMemo(() => {
-    if (!isFiltered) return kpis;
-    return {
-      totalLeads: filteredDetail.reduce((a, m) => a + m.leads, 0),
-      bookings:   kpis.bookings, // no per-month breakdown available
-      walkins:    filteredDetail.reduce((a, m) => a + m.walkins, 0),
-      admissions: filteredDetail.reduce((a, m) => a + m.admissions, 0),
-    };
-  }, [filteredDetail, kpis, isFiltered]);
-
-  const filteredMonthly = useMemo(
-    () => filteredDetail.map(m => ({ month: m.month, cnt: m.leads })),
-    [filteredDetail],
-  );
-  const filteredClosed = useMemo(
-    () => filteredDetail.reduce((a, m) => a + m.closed, 0),
-    [filteredDetail],
-  );
 
   const convPct   = activeKpis.totalLeads > 0 ? (activeKpis.admissions / activeKpis.totalLeads) * 100 : 0;
   const wiConvPct = activeKpis.walkins    > 0 ? (activeKpis.admissions / activeKpis.walkins)    * 100 : 0;
