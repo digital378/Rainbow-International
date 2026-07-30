@@ -328,8 +328,6 @@ function Dashboard() {
           <div>
             <SectionTitle sub={isFiltered ? `Filtered · ${filterFrom ?? "start"} → ${filterTo ?? "end"}` : "Live from CRM Leads Tracker · AY 2027-28"}>Lead Funnel · RPS</SectionTitle>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <KpiCard label="Total Leads"     value={fmt(activeKpis.totalLeads)}  sub="All enquiries"    />
-              <KpiCard label="Walk-in Booked"  value={fmt(activeKpis.bookings)}    sub={isFiltered ? "Full year" : "Scheduled"}  accent={PURPLE} />
               <KpiCard label="Walk-in Done"    value={fmt(activeKpis.walkins)}     sub="Visited school"   accent={BLUE}   />
               <KpiCard label="Admissions"      value={fmt(activeKpis.admissions)}  sub="Confirmed"        accent={GREEN}  />
               <KpiCard label="Lead → Adm %"    value={pct(convPct)}                sub="Conversion rate"  accent={AMBER}  />
