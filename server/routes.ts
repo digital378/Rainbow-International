@@ -366,7 +366,9 @@ export async function registerRoutes(
   registerSpainArgentinaSSR(app);
 
   // Independence Day 2026 static blog — registered before SSR so ssrBlog does not intercept it
-  app.use("/blog/independence-day-2026", express.static(path.resolve("./blog-pages/independence-day-2026"), { index: "index.html" }));
+  // redirect:false prevents express.static from adding a trailing slash, which would
+  // loop with the global trailing-slash stripper in server/index.ts (ERR_TOO_MANY_REDIRECTS).
+  app.use("/blog/independence-day-2026", express.static(path.resolve("./blog-pages/independence-day-2026"), { index: "index.html", redirect: false }));
   app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.resolve("./blog-pages/independence-day-2026/index.html")));
 
   registerSSRRoutes(app);
