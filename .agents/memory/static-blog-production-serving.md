@@ -38,5 +38,18 @@ await cp("blog-pages", "dist/blog-pages", { recursive: true });
 - CWD = project root → `<root>/blog-pages/` ✓
 - CWD = dist/ → `dist/blog-pages/` ✓ (because we copied it)
 
+## Image paths — use absolute paths from client/public/
+
+Never use relative image paths (e.g. `images/img-01.webp`) in a static blog HTML file served without a trailing slash. The browser resolves `images/img-01.webp` from `/blog/independence-day-2026` as `/blog/images/img-01.webp` — one level too shallow — which hits the blog router and redirects to `/blogs`.
+
+**Correct:** put images in `client/public/blog-assets/<slug>/` and reference them as `/blog-assets/<slug>/img-01.webp` (absolute path from root).
+
+Also add a dedicated `express.static` route for `/blog-assets/` in `server/routes.ts` alongside the `/uploads` route. Vite dev middleware does NOT reliably serve `publicDir` through the Express pipeline — the explicit route is required for dev. Production gets them automatically via `dist/public/` after `vite build` (Vite copies `client/public/` → `dist/public/`).
+
 ## How to apply
-Every new standalone static blog page added to `blog-pages/<slug>/` needs all three steps above. See `blog-pages/independence-day-2026/` as the reference implementation.
+Every new standalone static blog page added to `blog-pages/<slug>/`:
+1. Register static middleware with `redirect: false` and `process.cwd()`-based path (before `registerSSRRoutes`)
+2. Put images in `client/public/blog-assets/<slug>/`; reference them as `/blog-assets/<slug>/img-...`
+3. Ensure `app.use("/blog-assets", express.static(...))` exists in `routes.ts` for dev coverage
+4. Build script copies `blog-pages/` into `dist/` for production coverage
+See `blog-pages/independence-day-2026/` as the reference implementation.

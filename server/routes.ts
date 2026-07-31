@@ -355,6 +355,16 @@ export async function registerRoutes(
     immutable: false,
   }));
 
+  // Serve static blog assets (images, etc.) from client/public/blog-assets/.
+  // In dev mode Vite middleware does not reliably serve publicDir files through
+  // the Express pipeline, so we register an explicit static route here.
+  // In production, dist/public/blog-assets/ is already covered by serveStatic(),
+  // but having this route earlier is harmless and ensures consistent behaviour.
+  app.use("/blog-assets", express.static(path.join(process.cwd(), "client/public/blog-assets"), {
+    maxAge: "7d",
+    redirect: false,
+  }));
+
   // SSR must be registered BEFORE wpRedirects so that search engine bots receive
   // fully-rendered HTML for all registered paths. For bots, the SSR handler returns
   // early with HTML. For regular browsers, SSR calls next() and the redirect fires.
