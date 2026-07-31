@@ -364,15 +364,20 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,.48);text-align:center
   transition:width .15s,height .15s,background .25s,opacity .3s;
   will-change:transform;opacity:0;
 }
-#cursor-ring{
+#cursor-chakra{
   position:fixed;top:0;left:0;
-  width:36px;height:36px;border-radius:50%;
-  border:2px solid rgba(9,26,79,.38);
+  width:44px;height:44px;
   pointer-events:none;z-index:99998;
   transform:translate(-50%,-50%);
-  transition:width .22s,height .22s,border-color .22s,
-             border-width .22s,background .22s,opacity .3s;
   will-change:transform;opacity:0;
+  color:rgba(9,26,79,.5);
+  transition:opacity .3s,color .35s;
+}
+#cursor-chakra svg{
+  width:100%;height:100%;
+  overflow:visible;
+  transition:filter .35s;
+  filter:none;
 }
 #cursor-spotlight{
   position:fixed;top:0;left:0;
@@ -384,31 +389,22 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,.48);text-align:center
 }
 /* dark-section state */
 body.c-dark #cursor-dot{background:var(--amber)}
-body.c-dark #cursor-ring{border-color:rgba(251,191,36,.55)}
+body.c-dark #cursor-chakra{color:rgba(251,191,36,.9)}
+body.c-dark #cursor-chakra svg{filter:drop-shadow(0 0 7px rgba(251,191,36,.65))}
 body.c-dark #cursor-spotlight{opacity:1}
 /* hover link / button */
 body.c-hover #cursor-dot{width:6px;height:6px;background:var(--amber)}
-body.c-hover #cursor-ring{
-  width:52px;height:52px;
-  border-color:rgba(251,191,36,.68);
-  background:rgba(251,191,36,.06);
-}
+body.c-hover #cursor-chakra{color:rgba(251,191,36,.88)}
+body.c-hover #cursor-chakra svg{filter:drop-shadow(0 0 5px rgba(251,191,36,.5))}
 /* hover slogan card */
 body.c-slogan #cursor-dot{background:var(--saffron)}
-body.c-slogan #cursor-ring{
-  width:52px;height:52px;
-  border-color:rgba(255,153,51,.68);
-  background:rgba(255,153,51,.06);
-}
+body.c-slogan #cursor-chakra{color:rgba(255,153,51,.88)}
+body.c-slogan #cursor-chakra svg{filter:drop-shadow(0 0 5px rgba(255,153,51,.45))}
 /* hover quiz / flip / fact card */
-body.c-big #cursor-ring{
-  width:66px;height:66px;
-  border-color:rgba(13,59,134,.3);
-  background:rgba(13,59,134,.04);
-}
+body.c-big #cursor-chakra{color:rgba(13,59,134,.58)}
 /* mouse left viewport */
 body.c-out #cursor-dot,
-body.c-out #cursor-ring,
+body.c-out #cursor-chakra,
 body.c-out #cursor-spotlight{opacity:0!important}
 </style>
 </head>
@@ -416,7 +412,7 @@ body.c-out #cursor-spotlight{opacity:0!important}
 
 <!-- Custom cursor elements (hidden on touch / keyboard-only devices via CSS) -->
 <div id="cursor-dot" aria-hidden="true"></div>
-<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-chakra" aria-hidden="true"></div>
 <div id="cursor-spotlight" aria-hidden="true"></div>
 
 <div id="progress-bar" role="progressbar" aria-label="Reading progress"></div>
@@ -1286,47 +1282,67 @@ function unlockBonus() {
 buildMCQ(QUIZ_Q, 'quiz-body', 'q');
 </script>
 
-<!-- ── Custom Cursor Animation ──────────────────────────────────── -->
+<!-- ── Ashoka Chakra Cursor Animation ──────────────────────────── -->
 <script>
 (function(){
-  /* Skip entirely on touch / coarse-pointer devices (phones, tablets) */
+  /* Skip on touch / coarse-pointer devices (phones, tablets) */
   if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
 
-  var dot  = document.getElementById('cursor-dot');
-  var ring = document.getElementById('cursor-ring');
-  var spot = document.getElementById('cursor-spotlight');
-  if (!dot || !ring || !spot) return;
+  var dot      = document.getElementById('cursor-dot');
+  var chakraEl = document.getElementById('cursor-chakra');
+  var spot     = document.getElementById('cursor-spotlight');
+  if (!dot || !chakraEl || !spot) return;
 
-  /* Current mouse position */
-  var mx = -300, my = -300;
-  /* Ring position (spring-lagged) */
-  var rx = -300, ry = -300;
-  /* Spotlight position (even slower lag) */
-  var sx = -300, sy = -300;
+  /* ── Build Ashoka Chakra SVG (24-spoked wheel) ─────────────── */
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 40 40');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('aria-hidden', 'true');
 
-  var entered = false; /* becomes true after first mousemove */
-
-  /* Dark sections that trigger the spotlight + amber colour shift */
-  var DARK_IDS = ['hero', 'tryst'];
-
-  /* Determine which cursor state to apply based on element under cursor */
-  function hoverState(target) {
-    var el = target;
-    for (var i = 0; i < 6; i++) {
-      if (!el || el === document.body) break;
-      if (el.matches('.slogan-card'))                          return 'slogan';
-      if (el.matches('.quiz-q, .flip-card, .fact-card'))       return 'big';
-      if (el.matches(
-        'a, button, [role="button"], .tab-btn, ' +
-        '.faq-item, .gallery-img-wrap, ' +
-        '.share-btn, .back-to-top, .dl-btn'
-      ))                                                        return 'hover';
-      el = el.parentElement;
-    }
-    return '';
+  function mkEl(tag, attrs) {
+    var el = document.createElementNS(NS, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
   }
 
-  /* Check whether (x,y) is inside a dark section */
+  /* Outer ring */
+  svg.appendChild(mkEl('circle', {cx:'20',cy:'20',r:'18','stroke-width':'1.8'}));
+  /* Inner hub */
+  svg.appendChild(mkEl('circle', {cx:'20',cy:'20',r:'2.8','stroke-width':'1.5'}));
+  /* 24 spokes at 15° intervals — inner r=4, outer r=16 */
+  for (var i = 0; i < 24; i++) {
+    var rad = i * 15 * Math.PI / 180;
+    var c = Math.cos(rad), s = Math.sin(rad);
+    svg.appendChild(mkEl('line', {
+      x1:(20 + 4*c).toFixed(2),  y1:(20 + 4*s).toFixed(2),
+      x2:(20 + 16*c).toFixed(2), y2:(20 + 16*s).toFixed(2),
+      'stroke-width':'1'
+    }));
+  }
+  chakraEl.appendChild(svg);
+
+  /* ── State ─────────────────────────────────────────────────── */
+  var mx = -400, my = -400;          /* live pointer */
+  var rx = -400, ry = -400;          /* chakra spring position */
+  var sx = -400, sy = -400;          /* spotlight spring position */
+  var prevMx = -400, prevMy = -400;  /* last frame pointer (for velocity) */
+  var prevTime = performance.now();
+
+  var rotation    = 0;    /* cumulative rotation in degrees */
+  var idleSpeed   = 82;   /* deg/s at rest (~4.4 s per revolution) */
+  var boostSpeed  = 0;    /* extra deg/s from mouse velocity */
+
+  var scale        = 1;   /* current (spring) */
+  var scaleTarget  = 1;   /* target */
+  var clickDown    = false;
+
+  var entered = false;
+  var DARK_IDS = ['hero', 'tryst'];
+
+  /* ── Helpers ─────────────────────────────────────────────────*/
   function inDark(x, y) {
     for (var i = 0; i < DARK_IDS.length; i++) {
       var sec = document.getElementById(DARK_IDS[i]);
@@ -1337,58 +1353,93 @@ buildMCQ(QUIZ_Q, 'quiz-body', 'q');
     return false;
   }
 
-  /* RAF animation loop — uses transform for GPU compositing */
+  function hoverState(target) {
+    var el = target;
+    for (var i = 0; i < 6; i++) {
+      if (!el || el === document.body) break;
+      if (el.matches('.slogan-card'))                            return 'slogan';
+      if (el.matches('.flip-card,.fact-card,.mcq-card'))         return 'big';
+      if (el.matches('a,button,[role="button"],.tab-btn,.faq-item,.gallery-img-wrap,.share-btn,.back-to-top,.dl-btn,.mcq-opt')) return 'hover';
+      el = el.parentElement;
+    }
+    return '';
+  }
+
+  /* ── RAF loop ─────────────────────────────────────────────── */
   function tick() {
-    /* Spring lerp: ring trails ~120 ms; spotlight trails ~200 ms */
+    var now = performance.now();
+    var dt  = Math.min((now - prevTime) / 1000, 0.05); /* cap 50 ms */
+    prevTime = now;
+
+    /* Chakra spring position (~110 ms trail) */
     rx += (mx - rx) * 0.13;
     ry += (my - ry) * 0.13;
+    /* Spotlight (~200 ms trail) */
     sx += (mx - sx) * 0.075;
     sy += (my - sy) * 0.075;
 
-    dot.style.transform  = 'translate(calc(' + mx + 'px - 50%), calc(' + my + 'px - 50%))';
-    ring.style.transform = 'translate(calc(' + rx + 'px - 50%), calc(' + ry + 'px - 50%))';
-    spot.style.transform = 'translate(calc(' + sx + 'px - 50%), calc(' + sy + 'px - 50%))';
+    /* Mouse velocity → spin boost */
+    var dmx = mx - prevMx, dmy = my - prevMy;
+    var spd = Math.sqrt(dmx*dmx + dmy*dmy) / Math.max(dt, 0.016);
+    prevMx = mx; prevMy = my;
+
+    var targetBoost = Math.min(spd * 1.6, 900);
+    boostSpeed += (targetBoost - boostSpeed) * 0.07; /* ease acceleration */
+
+    rotation += (idleSpeed + boostSpeed) * dt;
+
+    /* Scale spring */
+    var rawTarget = clickDown ? 0.62 : scaleTarget;
+    scale += (rawTarget - scale) * 0.14;
+
+    /* Apply — all in one transform string */
+    dot.style.transform =
+      'translate(calc('+mx+'px - 50%),calc('+my+'px - 50%))';
+    chakraEl.style.transform =
+      'translate(calc('+rx+'px - 50%),calc('+ry+'px - 50%))' +
+      ' rotate('+rotation.toFixed(1)+'deg)' +
+      ' scale('+scale.toFixed(3)+')';
+    spot.style.transform =
+      'translate(calc('+sx+'px - 50%),calc('+sy+'px - 50%))';
 
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 
-  /* Mouse tracking */
+  /* ── Events ──────────────────────────────────────────────── */
   document.addEventListener('mousemove', function(e) {
-    mx = e.clientX;
-    my = e.clientY;
+    mx = e.clientX; my = e.clientY;
 
     if (!entered) {
-      /* Snap ring + spotlight to cursor on first move to avoid slide-in from corner */
+      /* Snap on first move — prevent slide-in from off-screen */
       rx = mx; ry = my; sx = mx; sy = my;
-      dot.style.opacity  = '1';
-      ring.style.opacity = '1';
+      prevMx = mx; prevMy = my;
+      dot.style.opacity      = '1';
+      chakraEl.style.opacity = '1';
       entered = true;
     }
 
     var body = document.body;
-    body.classList.remove('c-out', 'c-dark', 'c-hover', 'c-slogan', 'c-big');
-
-    if (inDark(mx, my))        body.classList.add('c-dark');
+    body.classList.remove('c-out','c-dark','c-hover','c-slogan','c-big');
+    if (inDark(mx, my)) body.classList.add('c-dark');
     var hs = hoverState(e.target);
-    if (hs)                    body.classList.add('c-' + hs);
-  }, { passive: true });
+    if (hs) body.classList.add('c-'+hs);
 
-  /* Hide when pointer leaves the viewport */
-  document.addEventListener('mouseleave', function() {
-    document.body.classList.add('c-out');
-  });
-  document.addEventListener('mouseenter', function() {
-    document.body.classList.remove('c-out');
-  });
+    /* Scale targets per hover state */
+    scaleTarget = (hs==='hover'||hs==='slogan') ? 1.48
+                : hs==='big'                    ? 1.78
+                : 1.0;
+  }, { passive:true });
 
-  /* Mousedown: briefly compress dot for click feedback */
+  document.addEventListener('mouseleave', function() { document.body.classList.add('c-out'); });
+  document.addEventListener('mouseenter', function() { document.body.classList.remove('c-out'); });
+
+  /* Click: compress chakra + kick spin */
   document.addEventListener('mousedown', function() {
-    dot.style.transform = 'translate(calc(' + mx + 'px - 50%), calc(' + my + 'px - 50%)) scale(0.6)';
+    clickDown  = true;
+    boostSpeed = Math.max(boostSpeed, 450); /* kick spin on click */
   });
-  document.addEventListener('mouseup', function() {
-    dot.style.transform = ''; /* let RAF reclaim it next tick */
-  });
+  document.addEventListener('mouseup', function() { clickDown = false; });
 })();
 </script>
 </body>
