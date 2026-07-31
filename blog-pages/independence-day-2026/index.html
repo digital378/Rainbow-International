@@ -176,10 +176,10 @@ strong{font-weight:700}
 
 /* ── DOWNLOAD GALLERY ────────────────────────────────────────── */
 .gallery-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-.gallery-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s}
+.gallery-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
 .gallery-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
-.gallery-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
-.gallery-info{padding:12px 14px}
+.gallery-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;flex-shrink:0}
+.gallery-info{padding:12px 14px;flex:1}
 .gallery-label{font-size:.76rem;font-weight:700;color:var(--navy);margin-bottom:3px;line-height:1.4}
 .gallery-platform{font-size:.68rem;color:var(--text-muted);margin-bottom:10px}
 .download-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--navy);color:var(--white);text-align:center;padding:9px;font-size:.78rem;font-weight:700;transition:background .2s;text-decoration:none}
@@ -210,24 +210,56 @@ strong{font-weight:700}
 .history-table tr:nth-child(even) td{background:var(--green-lt)}
 .history-table td:first-child{font-weight:700;color:var(--navy);white-space:nowrap}
 
-/* ── QUIZ ────────────────────────────────────────────────────── */
-.quiz-score-bar{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:16px 24px;display:flex;align-items:center;gap:20px;margin-bottom:24px;flex-wrap:wrap}
-.quiz-score-bar .score-num{font-size:1.5rem;font-weight:900;color:var(--amber);font-family:var(--font-heading)}
-.quiz-score-bar .badge{background:rgba(255,255,255,.12);border-radius:20px;padding:4px 16px;font-size:.82rem}
-.quiz-q{background:var(--navy);color:var(--white);border-radius:8px 8px 0 0;padding:15px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.91rem;font-weight:600;margin-top:10px;user-select:none;transition:background .2s;font-family:var(--font-body)}
-.quiz-q:hover{background:var(--primary-blue)}
-.quiz-q.answered{background:#1a3a1a}
-.q-prefix{margin-right:8px;transition:color .2s}
-.q-chevron [data-lucide]{width:14px;height:14px;transition:transform .3s}
-.quiz-q.open .q-chevron [data-lucide]{transform:rotate(90deg)}
-.quiz-answer{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease;background:var(--saffron-lt);border-left:4px solid var(--green);border-radius:0 0 8px 8px;padding:0 20px}
-.quiz-answer.revealed{max-height:500px;opacity:1;padding:16px 20px}
-.quiz-answer p{font-size:.88rem;line-height:1.75;margin:0;color:var(--text)}
-#bonus-section{margin-top:36px;padding-top:28px;border-top:2px dashed var(--amber);display:none}
+/* ── MCQ QUIZ ────────────────────────────────────────────────── */
+.quiz-score-bar{background:var(--navy);color:var(--white);border-radius:var(--radius);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.quiz-score-bar .score-num{font-size:1.8rem;font-weight:900;color:var(--amber);font-family:var(--font-heading);line-height:1}
+.quiz-score-label{font-size:.72rem;opacity:.6;display:block;margin-bottom:-2px;letter-spacing:.04em;text-transform:uppercase}
+.quiz-score-total{font-size:.88rem;opacity:.5;margin-left:1px}
+.quiz-score-bar .badge{background:rgba(255,255,255,.12);border-radius:20px;padding:4px 16px;font-size:.82rem;white-space:nowrap}
+.quiz-intro{color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem}
+.mcq-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-sm)}
+.mcq-hd{background:var(--navy);color:var(--white);padding:11px 20px;display:flex;justify-content:space-between;align-items:center}
+.mcq-num{font-size:.73rem;font-weight:700;font-family:var(--font-heading);background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;letter-spacing:.05em}
+.mcq-status{font-size:.82rem;font-weight:700}
+.mcq-status.correct{color:#86efac}
+.mcq-status.wrong{color:#fca5a5}
+.mcq-question{padding:16px 20px 10px;font-size:.95rem;font-weight:600;color:var(--navy);font-family:var(--font-heading);line-height:1.45}
+.mcq-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 20px 18px}
+.mcq-opt{background:var(--off-white);border:2px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;font-weight:500;color:var(--text);cursor:pointer;text-align:left;transition:background .15s,border-color .15s;font-family:var(--font-body);display:flex;align-items:flex-start;gap:10px;line-height:1.45}
+.mcq-opt-letter{background:var(--border);border-radius:4px;padding:1px 7px;font-size:.73rem;font-weight:800;color:var(--navy);flex-shrink:0;font-family:var(--font-heading);margin-top:1px;transition:background .15s,color .15s}
+.mcq-opt:hover:not(:disabled){background:var(--saffron-lt);border-color:var(--saffron)}
+.mcq-opt:hover:not(:disabled) .mcq-opt-letter{background:var(--saffron);color:var(--white)}
+.mcq-opt:disabled{cursor:not-allowed}
+.mcq-opt.correct{background:#dcfce7;border-color:#22c55e}
+.mcq-opt.correct .mcq-opt-letter{background:#22c55e;color:#fff}
+.mcq-opt.wrong{background:#fee2e2;border-color:#ef4444}
+.mcq-opt.wrong .mcq-opt-letter{background:#ef4444;color:#fff}
+.mcq-opt.faded{opacity:.35}
+.mcq-exp{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s ease;background:var(--saffron-lt);border-top:3px solid var(--amber)}
+.mcq-exp.open{max-height:300px;padding:14px 20px}
+.mcq-exp p{font-size:.87rem;line-height:1.78;margin:0;color:var(--text)}
+#bonus-section{margin-top:36px;padding-top:28px;border-top:2px dashed var(--amber)}
 .bonus-label{background:var(--amber);color:var(--navy);font-weight:900;padding:8px 20px;border-radius:6px;display:inline-block;margin-bottom:20px;font-size:.88rem;font-family:var(--font-heading)}
 .bonus-score-bar{background:var(--saffron-lt);border:1px solid var(--saffron);border-radius:8px;padding:12px 20px;margin-bottom:16px;font-size:.9rem;color:var(--navy)}
 #unlock-bonus-btn{background:var(--amber);color:var(--navy);border:none;border-radius:8px;padding:14px 28px;font-size:.95rem;font-weight:900;cursor:pointer;margin-top:20px;display:none;font-family:var(--font-heading)}
 #unlock-bonus-btn:hover{opacity:.88}
+/* ── SCHOOLS INTERLINK ────────────────────────────────────────── */
+.schools-section{padding:60px 0;background:var(--navy)}
+.schools-hd{color:var(--white);font-size:1.65rem;text-align:center;margin-bottom:.4rem}
+.schools-sub{color:rgba(255,255,255,.55);text-align:center;font-size:.9rem;margin-bottom:0}
+.schools-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:2rem}
+.school-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:var(--radius);padding:26px 24px}
+.school-card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.school-card-name{color:var(--white);font-family:var(--font-heading);font-size:1rem;font-weight:800;line-height:1.3;margin-bottom:3px}
+.school-card-tag{color:rgba(255,255,255,.5);font-size:.75rem;line-height:1.4}
+.school-badge{background:var(--amber);color:var(--navy);font-size:.67rem;font-weight:900;padding:3px 10px;border-radius:20px;font-family:var(--font-heading);white-space:nowrap;flex-shrink:0;margin-top:2px}
+.school-links{display:flex;flex-wrap:wrap;gap:7px}
+.school-link{background:rgba(255,255,255,.08);color:rgba(255,255,255,.82);font-size:.78rem;font-weight:600;padding:7px 13px;border-radius:6px;text-decoration:none;transition:background .15s,color .15s;font-family:var(--font-body);border:1px solid rgba(255,255,255,.1)}
+.school-link:hover{background:var(--amber);color:var(--navy);text-decoration:none;border-color:var(--amber)}
+@media(max-width:640px){
+  .schools-grid{grid-template-columns:1fr}
+  .mcq-opts{grid-template-columns:1fr}
+}
 
 /* ── ACTIVITIES ──────────────────────────────────────────────── */
 .activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:2rem}
@@ -874,76 +906,17 @@ body.c-out #cursor-spotlight{opacity:0!important}
 <section id="quiz" class="section section-white" aria-label="Independence Day Quiz">
   <div class="container">
     <h2>Independence Day Quiz — Test Your Knowledge! 🇮🇳</h2>
+    <p class="quiz-intro">Pick the correct answer from the four options. Every question has exactly one right answer — can you score 15/15?</p>
     <div class="quiz-score-bar">
-      <span>Answered <span id="quiz-score" class="score-num">0</span> / 15</span>
+      <div><span class="quiz-score-label">Score</span><span id="quiz-score" class="score-num">0</span><span class="quiz-score-total">&thinsp;/ 15</span></div>
       <span id="quiz-badge" class="badge">Getting Started</span>
     </div>
-
-    <div id="q-q1" class="quiz-q" onclick="revealAnswer('q1')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q1')"><span><span class="q-prefix">Q1.</span> When does India celebrate Independence Day?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q1" class="quiz-answer"><p>Every year on <strong>August 15</strong>. India gained independence on August 15, 1947, when power was formally transferred from British to Indian hands at midnight.</p></div>
-
-    <div id="q-q2" class="quiz-q" onclick="revealAnswer('q2')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q2')"><span><span class="q-prefix">Q2.</span> Which Independence Day anniversary is India celebrating in 2026?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q2" class="quiz-answer"><p>India's <strong>80th Independence Day</strong>. Counting 1947 as the 1st, 2026 (1947 + 79 = 2026) is the 80th anniversary.</p></div>
-
-    <div id="q-q3" class="quiz-q" onclick="revealAnswer('q3')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q3')"><span><span class="q-prefix">Q3.</span> Who delivered the famous "Tryst with Destiny" speech?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q3" class="quiz-answer"><p><strong>Jawaharlal Nehru</strong>, India's first Prime Minister. He delivered it at midnight on August 14–15, 1947, to the Constituent Assembly, broadcast live on All India Radio.</p></div>
-
-    <div id="q-q4" class="quiz-q" onclick="revealAnswer('q4')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q4')"><span><span class="q-prefix">Q4.</span> What does the Ashoka Chakra on the Indian flag represent?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q4" class="quiz-answer"><p>It represents the <strong>eternal wheel of dharma (law and righteousness)</strong> and the principle of progress — the idea that life must always move forward. It derives from the Lion Capital of Ashoka at Sarnath.</p></div>
-
-    <div id="q-q5" class="quiz-q" onclick="revealAnswer('q5')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q5')"><span><span class="q-prefix">Q5.</span> How many spokes does the Ashoka Chakra have?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q5" class="quiz-answer"><p><strong>24 spokes</strong> — representing the 24 hours of the day, symbolising that the nation and its values must be active round the clock.</p></div>
-
-    <div id="q-q6" class="quiz-q" onclick="revealAnswer('q6')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q6')"><span><span class="q-prefix">Q6.</span> Who designed the Indian national flag?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q6" class="quiz-answer"><p><strong>Pingali Venkayya</strong>, a freedom fighter and linguist from Andhra Pradesh. He created the design in 1921; it was formally adopted on July 22, 1947.</p></div>
-
-    <div id="q-q7" class="quiz-q" onclick="revealAnswer('q7')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q7')"><span><span class="q-prefix">Q7.</span> What do the three colours of the Indian flag represent?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q7" class="quiz-answer"><p><strong>Saffron (Kesari)</strong> — courage, sacrifice &amp; the spirit of renunciation. <strong>White</strong> — peace, purity &amp; truth. <strong>Green</strong> — faith, fertility &amp; prosperity.</p></div>
-
-    <div id="q-q8" class="quiz-q" onclick="revealAnswer('q8')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q8')"><span><span class="q-prefix">Q8.</span> Who is known as the Father of the Nation?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q8" class="quiz-answer"><p><strong>Mahatma Gandhi</strong> (Mohandas Karamchand Gandhi), for his leadership of India's non-violent independence movement and his philosophy of Satyagraha (truth-force).</p></div>
-
-    <div id="q-q9" class="quiz-q" onclick="revealAnswer('q9')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q9')"><span><span class="q-prefix">Q9.</span> What was the Dandi March and when did it happen?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q9" class="quiz-answer"><p>The <strong>Dandi March (Salt Satyagraha)</strong> was a 240-mile march led by Mahatma Gandhi from March 12 to April 5, <strong>1930</strong>, to protest the British salt tax. It sparked mass civil disobedience and drew global attention.</p></div>
-
-    <div id="q-q10" class="quiz-q" onclick="revealAnswer('q10')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q10')"><span><span class="q-prefix">Q10.</span> When was the Quit India Movement launched, and what was Gandhi's call?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q10" class="quiz-answer"><p>Launched on <strong>August 8, 1942</strong>. Gandhi gave the battle cry: <strong>"Do or Die" (Karo ya Maro)</strong> — demanding that Britain leave India immediately.</p></div>
-
-    <div id="q-q11" class="quiz-q" onclick="revealAnswer('q11')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q11')"><span><span class="q-prefix">Q11.</span> What is India's national anthem?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q11" class="quiz-answer"><p><strong>"Jana Gana Mana"</strong> — written and composed by Nobel laureate Rabindranath Tagore. Officially adopted as the national anthem on January 24, 1950.</p></div>
-
-    <div id="q-q12" class="quiz-q" onclick="revealAnswer('q12')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q12')"><span><span class="q-prefix">Q12.</span> Who wrote India's national anthem "Jana Gana Mana"?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q12" class="quiz-answer"><p><strong>Rabindranath Tagore</strong>, the first Asian Nobel laureate (Literature, 1913). He wrote it originally in Bengali; it was adopted in its Sanskrit-inflected form as the national anthem.</p></div>
-
-    <div id="q-q13" class="quiz-q" onclick="revealAnswer('q13')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q13')"><span><span class="q-prefix">Q13.</span> What is India's national animal?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q13" class="quiz-answer"><p>The <strong>Bengal Tiger</strong> (Panthera tigris tigris). Declared the national animal in 1973 under Project Tiger.</p></div>
-
-    <div id="q-q14" class="quiz-q" onclick="revealAnswer('q14')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q14')"><span><span class="q-prefix">Q14.</span> Fill in the blank: India is the world's ________ democracy.</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q14" class="quiz-answer"><p><strong>Largest</strong>. India has over 960 million registered voters — more than the populations of the US and EU combined. General elections are held every 5 years.</p></div>
-
-    <div id="q-q15" class="quiz-q" onclick="revealAnswer('q15')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('q15')"><span><span class="q-prefix">Q15.</span> Who was India's first Prime Minister?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-    <div id="ans-q15" class="quiz-answer"><p><strong>Jawaharlal Nehru</strong>, who served from August 15, 1947, until his death on May 27, 1964 — the longest-serving PM in India's history (nearly 17 years).</p></div>
-
-    <button id="unlock-bonus-btn" onclick="unlockBonus()">🎖 Unlock Bonus Round!</button>
-
-    <div id="bonus-section">
+    <div id="quiz-body"></div>
+    <button id="unlock-bonus-btn" onclick="unlockBonus()" style="display:none">🎖 Unlock Bonus Round!</button>
+    <div id="bonus-section" style="display:none">
       <div class="bonus-label">Bonus Round — For True Patriots!</div>
-      <div class="bonus-score-bar">Bonus: <span id="bonus-score" class="score-num">0</span> / 5</div>
-
-      <div id="q-b1" class="quiz-q" onclick="revealAnswer('b1',true)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('b1',true)"><span><span class="q-prefix">B1.</span> What does "Vande Mataram" mean, and who wrote it?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-      <div id="ans-b1" class="quiz-answer"><p>"Vande Mataram" means <strong>"I bow to thee, Mother"</strong> — a salutation to the motherland. Written by <strong>Bankimchandra Chattopadhyay</strong> in his 1882 novel Anandamath. It served as the rallying cry for India's independence movement.</p></div>
-
-      <div id="q-b2" class="quiz-q" onclick="revealAnswer('b2',true)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('b2',true)"><span><span class="q-prefix">B2.</span> In which city is the Red Fort, where the PM hoists the flag?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-      <div id="ans-b2" class="quiz-answer"><p><strong>New Delhi</strong>. Red Fort (Lal Qila) was built by Mughal Emperor Shah Jahan in the 17th century. India's first flag was hoisted there on August 15, 1947.</p></div>
-
-      <div id="q-b3" class="quiz-q" onclick="revealAnswer('b3',true)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('b3',true)"><span><span class="q-prefix">B3.</span> Who was the last Viceroy of India?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-      <div id="ans-b3" class="quiz-answer"><p><strong>Lord Louis Mountbatten</strong>, who served as the last Viceroy from March 1947 and oversaw the transfer of power on August 15, 1947.</p></div>
-
-      <div id="q-b4" class="quiz-q" onclick="revealAnswer('b4',true)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('b4',true)"><span><span class="q-prefix">B4.</span> What is the full name of the INC, and when was it founded?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-      <div id="ans-b4" class="quiz-answer"><p><strong>Indian National Congress</strong>, founded in <strong>1885</strong> by A O Hume, Dadabhai Naoroji, and Dinshaw Wacha. It became the primary vehicle of India's independence movement.</p></div>
-
-      <div id="q-b5" class="quiz-q" onclick="revealAnswer('b5',true)" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')revealAnswer('b5',true)"><span><span class="q-prefix">B5.</span> What does "Sarfaroshi ki Tamanna" mean, and who wrote it?</span><span class="q-chevron"><i data-lucide="chevron-right"></i></span></div>
-      <div id="ans-b5" class="quiz-answer"><p>It means <strong>"The desire / longing for sacrifice"</strong>. Written by <strong>Ram Prasad Bismil</strong> in 1921. Full line: "Sarfaroshi ki tamanna ab hamare dil mein hai, dekhna hai zor kitna baazu-e-qaatil mein hai."</p></div>
+      <div class="bonus-score-bar">Bonus Score: <span id="bonus-score" class="score-num">0</span> / 5</div>
+      <div id="bonus-body"></div>
     </div>
   </div>
 </section>
@@ -984,6 +957,51 @@ body.c-out #cursor-spotlight{opacity:0!important}
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)" tabindex="0" onkeydown="if(event.key==='Enter')toggleFaq(this)"><span>Who was the first person to hoist the Indian national flag at Red Fort?</span><i data-lucide="plus"></i></div><div class="faq-a"><p><strong>Jawaharlal Nehru</strong>, India's first Prime Minister, hoisted the Indian national flag at Red Fort on <strong>August 15, 1947</strong>. This tradition has continued unbroken every year since.</p></div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)" tabindex="0" onkeydown="if(event.key==='Enter')toggleFaq(this)"><span>What is the "Tryst with Destiny" speech?</span><i data-lucide="plus"></i></div><div class="faq-a"><p>"Tryst with Destiny" is the famous speech delivered by Jawaharlal Nehru at <strong>midnight on August 14–15, 1947</strong>. It begins: <em>"At the stroke of the midnight hour, when the world sleeps, India will awake to life and freedom."</em></p></div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)" tabindex="0" onkeydown="if(event.key==='Enter')toggleFaq(this)"><span>How can students celebrate Independence Day at home?</span><i data-lucide="plus"></i></div><div class="faq-a"><p>Students can celebrate by <strong>watching the national flag-hoisting ceremony</strong> on television, reading about freedom fighters, writing essays or practising speeches, creating patriotic artwork, sharing Independence Day greetings, and participating in community events.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RAINBOW SCHOOLS INTERLINK ─────────────────────────────── -->
+<section class="schools-section" aria-label="Explore Rainbow Schools">
+  <div class="container">
+    <h2 class="schools-hd">Explore Rainbow Schools</h2>
+    <p class="schools-sub">Rainbow International School &amp; Rainbow Preschools International — nurturing curious, confident children since 1998.</p>
+    <div class="schools-grid">
+      <div class="school-card">
+        <div class="school-card-hd">
+          <div>
+            <div class="school-card-name">Rainbow International School</div>
+            <div class="school-card-tag">CBSE Grades Nursery–12 · Thane, Maharashtra</div>
+          </div>
+          <span class="school-badge">K–12</span>
+        </div>
+        <div class="school-links">
+          <a href="https://rainbowinternationalschool.in" class="school-link" target="_blank" rel="noopener">🏫 Home</a>
+          <a href="https://rainbowinternationalschool.in/about-us" class="school-link" target="_blank" rel="noopener">ℹ️ About Us</a>
+          <a href="https://rainbowinternationalschool.in/academics" class="school-link" target="_blank" rel="noopener">📚 Academics</a>
+          <a href="https://rainbowinternationalschool.in/admissions" class="school-link" target="_blank" rel="noopener">🎓 Admissions</a>
+          <a href="https://rainbowinternationalschool.in/gallery" class="school-link" target="_blank" rel="noopener">🖼️ Gallery</a>
+          <a href="https://rainbowinternationalschool.in/blog" class="school-link" target="_blank" rel="noopener">📖 Blog</a>
+          <a href="https://rainbowinternationalschool.in/contact-us" class="school-link" target="_blank" rel="noopener">📞 Contact Us</a>
+          <a href="https://rainbowinternationalschool.in/career" class="school-link" target="_blank" rel="noopener">💼 Career</a>
+        </div>
+      </div>
+      <div class="school-card">
+        <div class="school-card-hd">
+          <div>
+            <div class="school-card-name">Rainbow Preschools International</div>
+            <div class="school-card-tag">Age 1.5–5.5 · Playgroup · Nursery · KG · Thane</div>
+          </div>
+          <span class="school-badge">Pre-K</span>
+        </div>
+        <div class="school-links">
+          <a href="https://www.rainbowpreschools.com" class="school-link" target="_blank" rel="noopener">🏫 Home</a>
+          <a href="https://www.rainbowpreschools.com/playgroup" class="school-link" target="_blank" rel="noopener">🌸 Playgroup</a>
+          <a href="https://www.rainbowpreschools.com/nursery" class="school-link" target="_blank" rel="noopener">🌱 Nursery</a>
+          <a href="https://www.rainbowpreschools.com/kindergarten" class="school-link" target="_blank" rel="noopener">🌟 Kindergarten</a>
+          <a href="https://www.rainbowpreschools.com/preschool-admissions" class="school-link" target="_blank" rel="noopener">🎓 Admissions</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1131,48 +1149,141 @@ function toggleFaq(qEl) {
   }
 }
 
-// ── QUIZ ──────────────────────────────────────────────────────
-var quizScore = 0, bonusScore = 0;
-var quizRevealed = new Set(), bonusRevealed = new Set();
-function revealAnswer(qId, isBonus) {
-  var set = isBonus ? bonusRevealed : quizRevealed;
-  if (set.has(qId)) return;
-  set.add(qId);
-  var ansEl = document.getElementById('ans-' + qId);
-  var qEl = document.getElementById('q-' + qId);
-  if (ansEl) ansEl.classList.add('revealed');
-  if (qEl) {
-    qEl.classList.add('answered','open');
-    var prefix = qEl.querySelector('.q-prefix');
-    if (prefix) prefix.textContent = '✓';
-    var chev = qEl.querySelector('.q-chevron [data-lucide]');
-    if (chev) { chev.setAttribute('data-lucide','check'); lucide.createIcons({nodes:[chev]}); }
+// ── MCQ QUIZ ──────────────────────────────────────────────────
+var QUIZ_Q = [
+  { q:'When does India celebrate Independence Day?',
+    opts:['July 4','August 15','January 26','November 26'], ans:1,
+    exp:'India celebrates Independence Day every year on <strong>August 15</strong>. On this date in 1947, power was formally transferred from British to Indian hands at midnight.' },
+  { q:'Which Independence Day anniversary is India celebrating in 2026?',
+    opts:['75th','77th','79th','80th'], ans:3,
+    exp:'India is celebrating its <strong>80th Independence Day</strong>. Counting 1947 as the 1st, the year 2026 (1947 + 79 = 2026) marks the 80th anniversary.' },
+  { q:'Who delivered the famous \u201cTryst with Destiny\u201d speech?',
+    opts:['Mahatma Gandhi','Jawaharlal Nehru','Sardar Patel','B.R. Ambedkar'], ans:1,
+    exp:'<strong>Jawaharlal Nehru</strong>, India\u2019s first Prime Minister, delivered this iconic speech at midnight on August 14\u201315, 1947, broadcast live on All India Radio.' },
+  { q:'What does the Ashoka Chakra on the Indian flag represent?',
+    opts:['\u0130ndia\u2019s 24 states','The spinning-wheel tradition','The eternal wheel of dharma','The lion capital of Sarnath'], ans:2,
+    exp:'The Ashoka Chakra represents the <strong>eternal wheel of dharma (law and righteousness)</strong> \u2014 symbolising that India must always move forward and never stand still.' },
+  { q:'How many spokes does the Ashoka Chakra have?',
+    opts:['12','16','24','48'], ans:2,
+    exp:'The Ashoka Chakra has exactly <strong>24 spokes</strong> \u2014 one for each hour of the day, symbolising that the law of dharma must be active around the clock.' },
+  { q:'Who designed the Indian national flag?',
+    opts:['Jawaharlal Nehru','Mahatma Gandhi','Rabindranath Tagore','Pingali Venkayya'], ans:3,
+    exp:'<strong>Pingali Venkayya</strong>, a freedom fighter from Andhra Pradesh, designed the flag. He presented over 30 designs before the final was formally adopted on July 22, 1947.' },
+  { q:'What does the Saffron (Kesari) colour on the Indian flag represent?',
+    opts:['Peace and purity','Faith and prosperity','Courage and sacrifice','Truth and equality'], ans:2,
+    exp:'<strong>Saffron (Kesari)</strong> represents courage, sacrifice, and the spirit of renunciation \u2014 the qualities of the freedom fighters who gave their lives for India.' },
+  { q:'Who is known as the Father of the Nation?',
+    opts:['Jawaharlal Nehru','Subhas Chandra Bose','Mahatma Gandhi','Bhagat Singh'], ans:2,
+    exp:'<strong>Mahatma Gandhi</strong> (Mohandas Karamchand Gandhi) is the Father of the Nation, for leading India\u2019s non-violent independence movement through Satyagraha.' },
+  { q:'When did the Dandi March (Salt Satyagraha) take place?',
+    opts:['1919','1930','1942','1947'], ans:1,
+    exp:'The <strong>Dandi March</strong> took place from March 12 to April 5, <strong>1930</strong>. Gandhi led a 240-mile march to protest the British salt tax, sparking mass civil disobedience.' },
+  { q:'The Quit India Movement was launched in?',
+    opts:['1935','1939','1942','1945'], ans:2,
+    exp:'The Quit India Movement was launched on <strong>August 8, 1942</strong>. Gandhi gave the call: <strong>\u201cDo or Die\u201d (Karo ya Maro)</strong>, demanding that Britain immediately leave India.' },
+  { q:'What is India\u2019s national anthem?',
+    opts:['Vande Mataram','Sare Jahan se Achha','Jana Gana Mana','Aye Watan'], ans:2,
+    exp:'India\u2019s national anthem is <strong>\u201cJana Gana Mana\u201d</strong>, written and composed by Rabindranath Tagore and officially adopted on January 24, 1950.' },
+  { q:'Who wrote India\u2019s national anthem \u201cJana Gana Mana\u201d?',
+    opts:['Sarojini Naidu','Bankim Chandra Chattopadhyay','Subramania Bharati','Rabindranath Tagore'], ans:3,
+    exp:'<strong>Rabindranath Tagore</strong> \u2014 poet and Nobel laureate (Literature, 1913) \u2014 wrote Jana Gana Mana originally in Bengali. It was adopted in its Sanskrit-inflected form.' },
+  { q:'What is India\u2019s national animal?',
+    opts:['Asian Lion','Indian Elephant','Peacock','Bengal Tiger'], ans:3,
+    exp:'India\u2019s national animal is the <strong>Bengal Tiger</strong> (Panthera tigris tigris), declared so in 1973 under Project Tiger to protect the endangered species.' },
+  { q:'India is the world\u2019s ________ democracy.',
+    opts:['Oldest','Wealthiest','Largest','Youngest'], ans:2,
+    exp:'India is the world\u2019s <strong>largest democracy</strong>, with over 960 million registered voters \u2014 more than the combined populations of the United States and Europe.' },
+  { q:'Who was India\u2019s first Prime Minister?',
+    opts:['Sardar Patel','B.R. Ambedkar','Rajendra Prasad','Jawaharlal Nehru'], ans:3,
+    exp:'<strong>Jawaharlal Nehru</strong> became India\u2019s first Prime Minister on August 15, 1947, and served until his death on May 27, 1964 \u2014 nearly 17 years in office.' }
+];
+var BONUS_Q = [
+  { q:'\u201cVande Mataram\u201d \u2014 what does it mean?',
+    opts:['Long live India','Victory to Bharat','I bow to thee, Mother','Hail the motherland'], ans:2,
+    exp:'"Vande Mataram" means <strong>\u201cI bow to thee, Mother\u201d</strong>. Written by <strong>Bankim Chandra Chattopadhyay</strong> in his 1882 novel <em>Anandamath</em>, it became the rallying cry of India\u2019s independence movement.' },
+  { q:'The Red Fort, where the PM hoists the national flag, is in which city?',
+    opts:['Mumbai','Kolkata','Agra','New Delhi'], ans:3,
+    exp:'Red Fort (Lal Qila) is in <strong>New Delhi</strong>. Built by Emperor Shah Jahan in the 17th century, it has been the site of every Independence Day flag-hoisting since August 15, 1947.' },
+  { q:'Who was the last Viceroy of India?',
+    opts:['Lord Curzon','Lord Linlithgow','Lord Wavell','Lord Mountbatten'], ans:3,
+    exp:'<strong>Lord Louis Mountbatten</strong> was the last Viceroy, appointed in March 1947. He oversaw the transfer of power on August 15, 1947, and became India\u2019s first Governor-General.' },
+  { q:'The Indian National Congress (INC) was founded in?',
+    opts:['1857','1875','1885','1905'], ans:2,
+    exp:'The Indian National Congress was founded in <strong>1885</strong> by A.O. Hume, Dadabhai Naoroji, and Dinshaw Wacha. It became the primary vehicle for India\u2019s independence movement.' },
+  { q:'Who wrote the patriotic poem \u201cSarfaroshi ki Tamanna\u201d?',
+    opts:['Bhagat Singh','Chandrashekhar Azad','Sukhdev','Ram Prasad Bismil'], ans:3,
+    exp:'"Sarfaroshi ki Tamanna" was written by <strong>Ram Prasad Bismil</strong> in 1921. It means \u201cthe longing for sacrifice\u201d \u2014 it became a battle-cry of the independence movement.' }
+];
+var mcqScores = {main:0,bonus:0};
+var mcqAnswered = {};
+function buildMCQ(questions, containerId, prefix) {
+  var LETTERS = ['A','B','C','D'];
+  var html = '';
+  questions.forEach(function(item, i) {
+    var qId = prefix + (i + 1);
+    var optsHtml = item.opts.map(function(opt, j) {
+      return '<button class="mcq-opt" id="opt-' + qId + '-' + j +
+        '" onclick="pickOption(\'' + qId + '\',' + j + ',' + item.ans + ',\'' + prefix + '\')">' +
+        '<span class="mcq-opt-letter">' + LETTERS[j] + '</span>' +
+        '<span class="mcq-opt-text">' + opt + '</span></button>';
+    }).join('');
+    html += '<div class="mcq-card" id="mcq-' + qId + '">' +
+      '<div class="mcq-hd"><span class="mcq-num">' + (prefix === 'q' ? 'Q' : 'B') + (i + 1) + '</span>' +
+      '<span class="mcq-status" id="st-' + qId + '"></span></div>' +
+      '<p class="mcq-question">' + item.q + '</p>' +
+      '<div class="mcq-opts">' + optsHtml + '</div>' +
+      '<div class="mcq-exp" id="exp-' + qId + '"><p>' + item.exp + '</p></div>' +
+      '</div>';
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+function pickOption(qId, chosen, correct, prefix) {
+  if (mcqAnswered[qId]) return;
+  mcqAnswered[qId] = true;
+  var isCorrect = (chosen === correct);
+  var isBonus = (prefix === 'b');
+  for (var j = 0; j < 4; j++) {
+    var btn = document.getElementById('opt-' + qId + '-' + j);
+    if (!btn) continue;
+    btn.disabled = true;
+    if (j === correct) btn.classList.add('correct');
+    else if (j === chosen) btn.classList.add('wrong');
+    else btn.classList.add('faded');
   }
-  if (isBonus) {
-    bonusScore++;
-    var bs = document.getElementById('bonus-score');
-    if (bs) bs.textContent = bonusScore;
-  } else {
-    quizScore++;
-    document.getElementById('quiz-score').textContent = quizScore;
-    updateBadge(quizScore);
-    if (quizScore >= 15) document.getElementById('unlock-bonus-btn').style.display = 'inline-block';
+  var exp = document.getElementById('exp-' + qId);
+  if (exp) exp.classList.add('open');
+  var st = document.getElementById('st-' + qId);
+  if (st) { st.textContent = isCorrect ? '\u2713 Correct!' : '\u2717 Incorrect'; st.className = 'mcq-status ' + (isCorrect ? 'correct' : 'wrong'); }
+  if (isCorrect) {
+    if (isBonus) {
+      mcqScores.bonus++;
+      var bs = document.getElementById('bonus-score');
+      if (bs) bs.textContent = mcqScores.bonus;
+    } else {
+      mcqScores.main++;
+      var sc = document.getElementById('quiz-score');
+      if (sc) sc.textContent = mcqScores.main;
+      updateBadge(mcqScores.main);
+      if (mcqScores.main >= QUIZ_Q.length) document.getElementById('unlock-bonus-btn').style.display = 'inline-block';
+    }
   }
 }
 function updateBadge(score) {
   var badge = document.getElementById('quiz-badge');
   if (!badge) return;
-  if (score >= 15) badge.textContent = '🏆 Independence Day Champion!';
-  else if (score >= 10) badge.textContent = '🔥 Almost There!';
-  else if (score >= 5) badge.textContent = '⭐ Doing Great!';
+  if (score >= 15) badge.textContent = '\uD83C\uDFC6 Independence Day Champion!';
+  else if (score >= 10) badge.textContent = '\uD83D\uDD25 Almost There!';
+  else if (score >= 5) badge.textContent = '\u2B50 Doing Great!';
   else badge.textContent = 'Getting Started';
 }
 function unlockBonus() {
   var b = document.getElementById('bonus-section');
   b.style.display = 'block';
   document.getElementById('unlock-bonus-btn').style.display = 'none';
-  b.scrollIntoView({behavior:'smooth',block:'start'});
+  buildMCQ(BONUS_Q, 'bonus-body', 'b');
+  b.scrollIntoView({behavior:'smooth', block:'start'});
 }
+buildMCQ(QUIZ_Q, 'quiz-body', 'q');
 </script>
 
 <!-- ── Custom Cursor Animation ──────────────────────────────────── -->
