@@ -314,9 +314,78 @@ footer{background:var(--navy-dark);color:rgba(255,255,255,.48);text-align:center
 @media print{
   #toc-mobile,#back-to-top,.share-row,#progress-bar{display:none!important}
 }
+
+/* ── Custom Cursor (pointer devices only) ──────────────────────── */
+@media (hover:hover) and (pointer:fine){
+  body{cursor:none}
+  a,button,[role="button"],
+  .tab-btn,.slogan-card,.flip-card,.fact-card,
+  .quiz-q,.faq-item,.gallery-img-wrap,
+  .share-btn,.back-to-top,.dl-btn{cursor:none}
+}
+#cursor-dot{
+  position:fixed;top:0;left:0;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--saffron);
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:width .15s,height .15s,background .25s,opacity .3s;
+  will-change:transform;opacity:0;
+}
+#cursor-ring{
+  position:fixed;top:0;left:0;
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid rgba(9,26,79,.38);
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:width .22s,height .22s,border-color .22s,
+             border-width .22s,background .22s,opacity .3s;
+  will-change:transform;opacity:0;
+}
+#cursor-spotlight{
+  position:fixed;top:0;left:0;
+  width:340px;height:340px;border-radius:50%;
+  pointer-events:none;z-index:99997;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(251,191,36,.14) 0%,transparent 68%);
+  opacity:0;transition:opacity .45s;will-change:transform,opacity;
+}
+/* dark-section state */
+body.c-dark #cursor-dot{background:var(--amber)}
+body.c-dark #cursor-ring{border-color:rgba(251,191,36,.55)}
+body.c-dark #cursor-spotlight{opacity:1}
+/* hover link / button */
+body.c-hover #cursor-dot{width:6px;height:6px;background:var(--amber)}
+body.c-hover #cursor-ring{
+  width:52px;height:52px;
+  border-color:rgba(251,191,36,.68);
+  background:rgba(251,191,36,.06);
+}
+/* hover slogan card */
+body.c-slogan #cursor-dot{background:var(--saffron)}
+body.c-slogan #cursor-ring{
+  width:52px;height:52px;
+  border-color:rgba(255,153,51,.68);
+  background:rgba(255,153,51,.06);
+}
+/* hover quiz / flip / fact card */
+body.c-big #cursor-ring{
+  width:66px;height:66px;
+  border-color:rgba(13,59,134,.3);
+  background:rgba(13,59,134,.04);
+}
+/* mouse left viewport */
+body.c-out #cursor-dot,
+body.c-out #cursor-ring,
+body.c-out #cursor-spotlight{opacity:0!important}
 </style>
 </head>
 <body>
+
+<!-- Custom cursor elements (hidden on touch / keyboard-only devices via CSS) -->
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+<div id="cursor-spotlight" aria-hidden="true"></div>
 
 <div id="progress-bar" role="progressbar" aria-label="Reading progress"></div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -1104,6 +1173,112 @@ function unlockBonus() {
   document.getElementById('unlock-bonus-btn').style.display = 'none';
   b.scrollIntoView({behavior:'smooth',block:'start'});
 }
+</script>
+
+<!-- ── Custom Cursor Animation ──────────────────────────────────── -->
+<script>
+(function(){
+  /* Skip entirely on touch / coarse-pointer devices (phones, tablets) */
+  if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+  var dot  = document.getElementById('cursor-dot');
+  var ring = document.getElementById('cursor-ring');
+  var spot = document.getElementById('cursor-spotlight');
+  if (!dot || !ring || !spot) return;
+
+  /* Current mouse position */
+  var mx = -300, my = -300;
+  /* Ring position (spring-lagged) */
+  var rx = -300, ry = -300;
+  /* Spotlight position (even slower lag) */
+  var sx = -300, sy = -300;
+
+  var entered = false; /* becomes true after first mousemove */
+
+  /* Dark sections that trigger the spotlight + amber colour shift */
+  var DARK_IDS = ['hero', 'tryst'];
+
+  /* Determine which cursor state to apply based on element under cursor */
+  function hoverState(target) {
+    var el = target;
+    for (var i = 0; i < 6; i++) {
+      if (!el || el === document.body) break;
+      if (el.matches('.slogan-card'))                          return 'slogan';
+      if (el.matches('.quiz-q, .flip-card, .fact-card'))       return 'big';
+      if (el.matches(
+        'a, button, [role="button"], .tab-btn, ' +
+        '.faq-item, .gallery-img-wrap, ' +
+        '.share-btn, .back-to-top, .dl-btn'
+      ))                                                        return 'hover';
+      el = el.parentElement;
+    }
+    return '';
+  }
+
+  /* Check whether (x,y) is inside a dark section */
+  function inDark(x, y) {
+    for (var i = 0; i < DARK_IDS.length; i++) {
+      var sec = document.getElementById(DARK_IDS[i]);
+      if (!sec) continue;
+      var r = sec.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+    }
+    return false;
+  }
+
+  /* RAF animation loop — uses transform for GPU compositing */
+  function tick() {
+    /* Spring lerp: ring trails ~120 ms; spotlight trails ~200 ms */
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    sx += (mx - sx) * 0.075;
+    sy += (my - sy) * 0.075;
+
+    dot.style.transform  = 'translate(calc(' + mx + 'px - 50%), calc(' + my + 'px - 50%))';
+    ring.style.transform = 'translate(calc(' + rx + 'px - 50%), calc(' + ry + 'px - 50%))';
+    spot.style.transform = 'translate(calc(' + sx + 'px - 50%), calc(' + sy + 'px - 50%))';
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* Mouse tracking */
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+
+    if (!entered) {
+      /* Snap ring + spotlight to cursor on first move to avoid slide-in from corner */
+      rx = mx; ry = my; sx = mx; sy = my;
+      dot.style.opacity  = '1';
+      ring.style.opacity = '1';
+      entered = true;
+    }
+
+    var body = document.body;
+    body.classList.remove('c-out', 'c-dark', 'c-hover', 'c-slogan', 'c-big');
+
+    if (inDark(mx, my))        body.classList.add('c-dark');
+    var hs = hoverState(e.target);
+    if (hs)                    body.classList.add('c-' + hs);
+  }, { passive: true });
+
+  /* Hide when pointer leaves the viewport */
+  document.addEventListener('mouseleave', function() {
+    document.body.classList.add('c-out');
+  });
+  document.addEventListener('mouseenter', function() {
+    document.body.classList.remove('c-out');
+  });
+
+  /* Mousedown: briefly compress dot for click feedback */
+  document.addEventListener('mousedown', function() {
+    dot.style.transform = 'translate(calc(' + mx + 'px - 50%), calc(' + my + 'px - 50%)) scale(0.6)';
+  });
+  document.addEventListener('mouseup', function() {
+    dot.style.transform = ''; /* let RAF reclaim it next tick */
+  });
+})();
 </script>
 </body>
 </html>
