@@ -17,7 +17,17 @@ interface BlogPost {
   intro: string;
 }
 
-const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General"];
+const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General", "Events"];
+
+const PINNED_BLOG = {
+  slug: "independence-day-2026",
+  title: "Independence Day 2026: Essays, Speeches, Slogans, History & More",
+  date: "25 Jul 2026",
+  cat: "Events",
+  intro: "India's 80th Independence Day — August 15, 2026. Complete resource for students, parents & teachers: essays in English, Hindi & Marathi, school speeches, slogans, freedom fighters, quiz, fun facts & free patriotic images.",
+  href: "/blog/independence-day-2026",
+  isExternal: true,
+};
 
 
 export default function Blogs() {
@@ -108,6 +118,33 @@ export default function Blogs() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              {/* Pinned Independence Day 2026 card — always first when category matches */}
+              {(activeCategory === "All" || activeCategory === "Events") &&
+                (!searchQuery || PINNED_BLOG.title.toLowerCase().includes(searchQuery.toLowerCase())) && (
+                <a
+                  href={PINNED_BLOG.href}
+                  data-testid="card-blog-independence-day-2026"
+                  className="group block rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  style={{ borderColor: "#e2e8f0", borderTop: "3px solid #FF9933" }}
+                >
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5" style={{ color: "#f97316" }}>
+                        🇮🇳 {PINNED_BLOG.cat}
+                        <span className="ml-1 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">NEW</span>
+                      </span>
+                      <span className="text-xs text-gray-400">{PINNED_BLOG.date}</span>
+                    </div>
+                    <h3 className="text-base font-bold text-gray-800 leading-snug group-hover:text-blue-800 transition-colors line-clamp-2 mb-3">
+                      {PINNED_BLOG.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">{PINNED_BLOG.intro}</p>
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "#0d3b86" }}>
+                      Read More <ArrowRight size={14} />
+                    </span>
+                  </div>
+                </a>
+              )}
               {filtered.map((blog) => (
                 <Link
                   key={blog.slug}
@@ -132,7 +169,7 @@ export default function Blogs() {
                   </div>
                 </Link>
               ))}
-              {filtered.length === 0 && !isLoading && (
+              {filtered.length === 0 && !isLoading && !(activeCategory === "All" || activeCategory === "Events") && (
                 <div className="col-span-3 text-center py-16 text-gray-400">
                   No articles found. Try a different search or category.
                 </div>
