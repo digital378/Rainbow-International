@@ -366,10 +366,14 @@ export async function registerRoutes(
   registerSpainArgentinaSSR(app);
 
   // Independence Day 2026 static blog — registered before SSR so ssrBlog does not intercept it
+  // process.cwd() = project root in both dev (tsx server/index.ts) and production
+  // (node dist/index.cjs). blog-pages/ is also copied into dist/ by the build script
+  // so it is present whether production runs from the root or just dist/.
   // redirect:false prevents express.static from adding a trailing slash, which would
   // loop with the global trailing-slash stripper in server/index.ts (ERR_TOO_MANY_REDIRECTS).
-  app.use("/blog/independence-day-2026", express.static(path.resolve("./blog-pages/independence-day-2026"), { index: "index.html", redirect: false }));
-  app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.resolve("./blog-pages/independence-day-2026/index.html")));
+  const blogDir = path.join(process.cwd(), "blog-pages/independence-day-2026");
+  app.use("/blog/independence-day-2026", express.static(blogDir, { index: "index.html", redirect: false }));
+  app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.join(blogDir, "index.html")));
 
   registerSSRRoutes(app);
 
