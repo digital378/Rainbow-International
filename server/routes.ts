@@ -364,6 +364,11 @@ export async function registerRoutes(
   registerHomeSSR(app);
   registerPageSSR(app);
   registerSpainArgentinaSSR(app);
+
+  // Independence Day 2026 static blog — registered before SSR so ssrBlog does not intercept it
+  app.use("/blog/independence-day-2026", express.static(path.resolve("./blog-pages/independence-day-2026"), { index: "index.html" }));
+  app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.resolve("./blog-pages/independence-day-2026/index.html")));
+
   registerSSRRoutes(app);
 
   // Blog-slug redirects are derived automatically from the blog_posts table — every
