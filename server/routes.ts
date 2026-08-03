@@ -2051,10 +2051,19 @@ export async function registerRoutes(
       // Each entry maps both bare "MONTHNAME" and "MONTHNAME TOTAL" → "Mon-YY".
       // The `seen` set in parseSchoolRows handles ambiguity (section-1 TOTAL rows
       // always precede section-2 prior-year historical bare rows, so TOTAL wins).
-      const _AY_SCHOOL_MONTHS = [
-        "Aug-25","Sep-25","Oct-25","Nov-25","Dec-25",
-        "Jan-26","Feb-26","Mar-26","Apr-26","May-26","Jun-26","Jul-26",
-      ];
+      // Dynamically generate months for the previous and current academic year
+      // (AY starts in August) so this never needs manual updating at AY rollover.
+      const _SHORT_MONTHS_AY = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const _ayNow = new Date();
+      const _curAYStart = _ayNow.getMonth() >= 7 ? _ayNow.getFullYear() : _ayNow.getFullYear() - 1;
+      const _AY_SCHOOL_MONTHS: string[] = [];
+      for (const _ays of [_curAYStart - 1, _curAYStart]) {
+        for (let _m = 0; _m < 12; _m++) {
+          const _abs = 7 + _m;
+          const _yr  = _ays + Math.floor(_abs / 12);
+          _AY_SCHOOL_MONTHS.push(`${_SHORT_MONTHS_AY[_abs % 12]}-${String(_yr).slice(2)}`);
+        }
+      }
       const _MONTH_ABBR_TO_UPPER: Record<string,string> = {
         Jan:"JANUARY",Feb:"FEBRUARY",Mar:"MARCH",Apr:"APRIL",May:"MAY",Jun:"JUNE",
         Jul:"JULY",Aug:"AUGUST",Sep:"SEPTEMBER",Oct:"OCTOBER",Nov:"NOVEMBER",Dec:"DECEMBER",
@@ -2230,10 +2239,15 @@ export async function registerRoutes(
         "June":"Jun 25","July":"Jul 25","August":"Aug 25","September":"Sep 25",
         "October":"Oct 25","November":"Nov 25","December":"Dec 25",
         "January":"Jan 26","February":"Feb 26","March":"Mar 26","April":"Apr 26","May":"May 26",
-        "June26":"Jun 26",   // sentinel: 2nd bare "June" → Jun 26
-        "July26":"Jul 26",   // sentinel: 2nd bare "July" → Jul 26
-        "June 2026":"Jun 26",  // school renamed row to "June 2026"
-        "July 2026":"Jul 26",  // school renamed row to "July 2026"
+        "June26":"Jun 26",    // sentinel: 2nd bare "June" → Jun 26
+        "July26":"Jul 26",    // sentinel: 2nd bare "July" → Jul 26
+        "August26":"Aug 26",  // sentinel: 2nd bare "August" → Aug 26
+        "June 2026":"Jun 26",    // school renamed row to "June 2026"
+        "July 2026":"Jul 26",    // school renamed row to "July 2026"
+        "August 2026":"Aug 26",  // school renamed row to "August 2026"
+        "September 2026":"Sep 26","October 2026":"Oct 26","November 2026":"Nov 26",
+        "December 2026":"Dec 26","January 2027":"Jan 27","February 2027":"Feb 27",
+        "March 2027":"Mar 27","April 2027":"Apr 27","May 2027":"May 27",
       };
       const parseSpendRows = (rows: string[][]): Array<{month:string;salaries:number;meta:number;google:number;adSpend:number}> => {
         // Find header row: must contain both "meta" and "google" (partial, case-insensitive)
@@ -2267,8 +2281,9 @@ export async function registerRoutes(
           if (rawMonth.toUpperCase().startsWith("TOTAL")) break;
           // If "June" or "July" appears a second time in the sheet, it's the 2026 occurrence
           const lookupKey =
-            (rawMonth === "June" && seenInThisSheet.has("Jun 25")) ? "June26" :
-            (rawMonth === "July" && seenInThisSheet.has("Jul 25")) ? "July26" :
+            (rawMonth === "June"   && seenInThisSheet.has("Jun 25")) ? "June26" :
+            (rawMonth === "July"   && seenInThisSheet.has("Jul 25")) ? "July26" :
+            (rawMonth === "August" && seenInThisSheet.has("Aug 25")) ? "August26" :
             rawMonth;
           const mapped = SPEND_MONTH_MAP[lookupKey];
           if (!mapped) continue;
@@ -2288,13 +2303,19 @@ export async function registerRoutes(
         JUNE: "Jun 25", JULY: "Jul 25", AUGUST: "Aug 25", SEPTEMBER: "Sep 25",
         OCTOBER: "Oct 25", NOVEMBER: "Nov 25", DECEMBER: "Dec 25", JANUARY: "Jan 26",
         FEBRUARY: "Feb 26", MARCH: "Mar 26", APRIL: "Apr 26", MAY: "May 26",
-        // School renamed current-cycle month rows to include the year (e.g. "July 2026")
+        // AY 25-26: school renamed current-cycle month rows to include the year
         "JUNE 2026": "Jun 26", "JULY 2026": "Jul 26",
+        // AY 26-27: year-qualified entries (school continues the same naming pattern)
+        "AUGUST 2026": "Aug 26", "SEPTEMBER 2026": "Sep 26", "OCTOBER 2026": "Oct 26",
+        "NOVEMBER 2026": "Nov 26", "DECEMBER 2026": "Dec 26",
+        "JANUARY 2027": "Jan 27", "FEBRUARY 2027": "Feb 27", "MARCH 2027": "Mar 27",
+        "APRIL 2027": "Apr 27", "MAY 2027": "May 27",
       };
       const monthlyTotals: any[] = [];
       const mayWeeklyCombined: any[] = [];
       let inMay = false;
-      let passedMay = false; // tracks when we've seen the MAY row, so next JUNE = Jun 26
+      let passedMay   = false; // tracks when we've seen MAY, so next bare JUNE/JULY = 2026
+      let passedJul26 = false; // tracks when we've seen Jul 26, so next bare AUGUST = 2026
 
       for (const row of masterRows) {
         const label = String(row[1] ?? "").trim();
@@ -2302,10 +2323,13 @@ export async function registerRoutes(
         if (label.toUpperCase().startsWith("TOTAL")) break;
         let monthVal = MONTH_MAP[label.toUpperCase()];
         // After seeing MAY (May 26), subsequent JUNE/JULY rows are 2026, not 2025
-        if (passedMay && label.toUpperCase() === "JUNE") monthVal = "Jun 26";
-        if (passedMay && label.toUpperCase() === "JULY") monthVal = "Jul 26";
+        if (passedMay   && label.toUpperCase() === "JUNE")   monthVal = "Jun 26";
+        if (passedMay   && label.toUpperCase() === "JULY")   monthVal = "Jul 26";
+        // After seeing Jul 26, bare AUGUST = Aug 26 (new AY started)
+        if (passedJul26 && label.toUpperCase() === "AUGUST") monthVal = "Aug 26";
         if (monthVal) {
-          if (monthVal === "May 26") passedMay = true;
+          if (monthVal === "May 26") passedMay   = true;
+          if (monthVal === "Jul 26") passedJul26 = true;
           inMay = monthVal === "May 26";
           const leads = parseN(row[2]); const spend = parseINR(row[20]);
           if (leads > 0 || spend > 0) {

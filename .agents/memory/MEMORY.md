@@ -1,3 +1,4 @@
+- [AY Rollover Pitfall](ay-rollover-pitfall.md) — every August, 3 server/routes.ts maps must be extended for new AY months or current-month data shows as zeros.
 - [RIS CRM Walk-In Date column](ris-crm-walkin-date.md) — RIS sheet col K = "Walk-In Date"; CLOSED+non-empty K = "CLOSED AFTER WALKIN" equivalent; must use effectiveStatus for booking counts.
 - [RIS CRM GRADE_MAP variants](ris-crm-grade-map.md) — GRADE_MAP must cover "Grade N", "Jr. KG", "Sr. KG", "LKG", "UKG" etc.; unknown grades fall to "Other" (never skip); totals use Object.values() sum.
 - [Express wildcard req.path bug](express-wildcard-req-path.md) — inside `app.use("*", handler)`, req.path is always "/"; use req.originalUrl for the real path.
