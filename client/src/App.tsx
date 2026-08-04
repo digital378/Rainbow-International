@@ -70,6 +70,7 @@ const WalkinRpsSales2728 = lazy(() => import("@/pages/WalkinRpsSales2728"));
 const WalkinMarketing2728 = lazy(() => import("@/pages/WalkinMarketing2728"));
 const WalkinOverview2728 = lazy(() => import("@/pages/WalkinOverview2728"));
 const WalkinAdmin2728 = lazy(() => import("@/pages/WalkinAdmin2728"));
+const Internal = lazy(() => import("@/pages/Internal"));
 const AdminRAs = lazy(() => import("@/pages/AdminRAs"));
 const AdminSubmissions = lazy(() => import("@/pages/AdminSubmissions"));
 const AdminBlog = lazy(() => import("@/pages/AdminBlog"));
@@ -167,6 +168,7 @@ function Router() {
       <Route path="/admin/ras/:slug/qr" component={QRCard} />
       <Route path="/admin/ras" component={AdminRAs} />
       <Route path="/admin/blog" component={AdminBlog} />
+      <Route path="/internal" component={Internal} />
       <Route component={NotFound} />
     </Switch>
     </Suspense>
