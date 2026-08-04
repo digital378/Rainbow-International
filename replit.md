@@ -8,6 +8,9 @@ A full-stack replication of the Rainbow International School website, a CBSE-aff
 
 Preferred communication style: Simple, everyday language.
 
+**Project conventions:**
+- Anytime a new dashboard is created or a dashboard passcode is changed, the `/internal` staff directory page (`client/src/pages/Internal.tsx`) MUST be updated in the same change — name, URL/slug, passcode, and description. This is not optional.
+
 ## System Architecture
 
 ### Frontend
