@@ -7,99 +7,12 @@ import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { Link } from "wouter";
 import { ChevronDown, Search, ChevronRight } from "lucide-react";
+import { FAQ_PAGE_CATEGORIES, ALL_FAQS_PAGE_ITEMS, buildFaqPageLd, type FaqCategory } from "@shared/faqData";
+import { ROUTE_SEO } from "@shared/routeSeo";
 
-interface FAQ {
-  q: string;
-  a: string;
-  links?: { label: string; href: string }[];
-}
-
-interface FAQCategory {
-  id: string;
-  title: string;
-  faqs: FAQ[];
-}
-
-const faqCategories: FAQCategory[] = [
-  {
-    id: "admissions",
-    title: "Admissions",
-    faqs: [
-      { q: "What is the admission process at Rainbow International School?", a: "The admission process includes submitting an online application form, followed by an interaction session with the child and parents. For senior classes (Class 9 onwards), there is a written assessment. Applications are accepted on a first-come, first-served basis, subject to seat availability.", links: [{ label: "Apply Online", href: "/application-form" }, { label: "Schedule a Visit", href: "/schedule-appointment" }] },
-      { q: "What is the age criteria for admission?", a: "For Nursery, the child should be 2.5 years old as on 31st March of the academic year. For Jr KG, the child should be 3.5 years, and for Sr KG, 4.5 years. For Class 1, the child must be 6 years old as on 31st March. Age criteria follow CBSE norms." },
-      { q: "When do admissions open for the new academic year?", a: "Admissions for the academic year 2026–27 are currently open. We recommend applying early as seats fill up quickly, especially for Pre-Primary and Grade 1." },
-      { q: "Is there a waiting list?", a: "Yes, once a class reaches full capacity, applicants are placed on a waiting list. Families on the waiting list are contacted if a seat becomes available." },
-      { q: "Can my child join mid-year?", a: "Mid-year admissions are possible subject to seat availability. Please contact our admissions office to check current availability for the desired class." },
-    ],
-  },
-  {
-    id: "fees",
-    title: "Fees",
-    faqs: [
-      { q: "What is the fee structure?", a: "The fee structure varies by grade level. Detailed fee information is shared during the admission interaction or upon request. Rainbow offers a transparent fee policy with no hidden charges." },
-      { q: "Are there any sibling discounts?", a: "Yes, Rainbow International School offers a sibling discount for families enrolling more than one child. Details are available from the admissions office." },
-      { q: "What are the payment options?", a: "Fees can be paid annually, semi-annually, or quarterly. Payment is accepted via bank transfer, cheque, or online payment. EMI options are not currently available." },
-      { q: "Is the transport fee separate?", a: "Yes, the transport fee is charged separately based on the distance of pickup and drop. GPS-tracked buses cover 30+ routes across Thane.", links: [{ label: "Learn About Transport", href: "/amenities" }] },
-    ],
-  },
-  {
-    id: "academics",
-    title: "Academics & Curriculum",
-    faqs: [
-      { q: "Which board is Rainbow International School affiliated to?", a: "Rainbow International School is affiliated to the Central Board of Secondary Education (CBSE), New Delhi. Our affiliation number is 1130661.", links: [{ label: "CBSE Public Disclosures", href: "/cbse-mandatory-public-disclosures" }] },
-      { q: "What streams are available in Class 11–12?", a: "We offer three streams in the Senior Secondary section: Science (Physics, Chemistry, Mathematics/Biology), Commerce (Accountancy, Business Studies, Economics), and Humanities (Psychology, Sociology, Political Science, History).", links: [{ label: "Senior Secondary Section", href: "/senior-secondary-section" }] },
-      { q: "What teaching methodology does the school follow?", a: "Rainbow follows a Multiple Intelligence-based pedagogy that combines experiential learning, project-based activities, digital integration, and collaborative learning. This ensures holistic development across all intelligences — linguistic, logical, spatial, musical, kinesthetic, interpersonal, intrapersonal, and naturalistic.", links: [{ label: "Our Philosophy", href: "/our-philosophy" }] },
-      { q: "Does the school provide extra coaching for board exams?", a: "Yes, starting from Class 9, the school provides structured revision programmes, mock tests, doubt-clearing sessions, and personalised support to help students prepare for CBSE board examinations." },
-      { q: "How does the school support students with learning difficulties?", a: "Rainbow has a dedicated counselling team that works with students who need additional academic or emotional support. Individualised learning plans, remedial classes, and parent counselling are part of our inclusive education approach." },
-    ],
-  },
-  {
-    id: "safety",
-    title: "Safety & Security",
-    faqs: [
-      { q: "What safety measures are in place?", a: "The campus has 200+ CCTV cameras, trained security guards at all entry and exit points, fire safety systems, an on-campus infirmary with a paediatrician, card-based entry for parents, and GPS-tracked school buses with attendants on every route.", links: [{ label: "Safety & Security Details", href: "/safety-security" }] },
-      { q: "Is there a school nurse or doctor?", a: "Yes, Rainbow has a full-time infirmary staffed by trained medical professionals. A visiting paediatrician is available for regular health check-ups and emergencies." },
-      { q: "How does the school handle bullying?", a: "Rainbow has a zero-tolerance policy for bullying. The school counsellor conducts regular anti-bullying workshops. Any reported incidents are investigated promptly, and appropriate action is taken in coordination with parents." },
-    ],
-  },
-  {
-    id: "timings",
-    title: "Timings & Calendar",
-    faqs: [
-      { q: "What are the school timings?", a: "Pre-Primary (Nursery to Sr KG): 8:30 AM to 12:30 PM. Primary (Class 1–5): 7:30 AM to 2:00 PM. Middle & Secondary (Class 6–12): 7:30 AM to 2:30 PM. Timings may vary slightly for special activities." },
-      { q: "How many days a week does the school operate?", a: "The school operates Monday to Saturday. Saturdays typically have a shorter schedule and are used for enrichment activities, sports, or special programmes." },
-      { q: "When does the academic year start?", a: "The academic year begins in June and ends in April, following the CBSE academic calendar. A detailed academic calendar is shared with parents at the start of the year.", links: [{ label: "Academic Calendar", href: "/academic-calendar" }] },
-    ],
-  },
-  {
-    id: "transport",
-    title: "Transport",
-    faqs: [
-      { q: "Does the school provide bus transport?", a: "Yes, Rainbow operates a fleet of GPS-tracked school buses covering 30+ routes across all of Thane. Each bus has a trained attendant. Parents can track the bus location in real time via the school app." },
-      { q: "What areas does the bus service cover?", a: "Bus routes cover all major areas across Thane. New routes are added based on demand. Please contact the transport office for route availability in your specific area." },
-      { q: "Is the transport fee charged monthly or annually?", a: "Transport fees are charged along with the tuition fees on a quarterly or annual basis, depending on the payment plan chosen by the parent." },
-    ],
-  },
-  {
-    id: "extracurriculars",
-    title: "Extracurriculars",
-    faqs: [
-      { q: "What extracurricular activities are available?", a: "Rainbow offers 30+ activities including swimming, skating, football, cricket, basketball, taekwondo, chess, robotics, coding, art, music, dance, drama, public speaking, MUN, and organic farming.", links: [{ label: "Extracurriculars", href: "/extracurriculars" }, { label: "Beyond the Classroom", href: "/beyond-the-classroom" }] },
-      { q: "Are extracurricular activities included in the fees?", a: "Most in-school activities are included in the tuition fee. Specialised coaching programmes (e.g., advanced swimming, competitive sports, robotics) may have a nominal additional charge." },
-      { q: "Does the school participate in inter-school competitions?", a: "Yes, students regularly participate and win at district, state, and national-level competitions in academics, sports, arts, and cultural events.", links: [{ label: "Awards & Achievements", href: "/awards-achievements" }] },
-    ],
-  },
-  {
-    id: "facilities",
-    title: "Facilities",
-    faqs: [
-      { q: "What facilities does the campus have?", a: "The 3.5-acre campus includes smart classrooms, science and computer labs, a library, swimming pool, skating rink, football field, cricket ground, basketball and tennis courts, amphitheatre, art and music rooms, an organic farm, and a dedicated infirmary.", links: [{ label: "Amenities & Facilities", href: "/amenities" }] },
-      { q: "Does the school have a cafeteria?", a: "Yes, Rainbow has a cafeteria that serves nutritious meals and snacks. The menu is curated to ensure balanced nutrition. Outside food vendors are not permitted." },
-      { q: "Is there a library?", a: "Yes, the school has a well-stocked library with age-appropriate books across genres — fiction, non-fiction, reference, comics, and periodicals. Library periods are a regular part of the timetable." },
-      { q: "Does the school use digital/smart classrooms?", a: "Yes, all classrooms from Class 1 onwards are equipped with interactive smart boards and digital learning tools. The pre-primary section uses age-appropriate audio-visual aids." },
-    ],
-  },
-];
+// FAQ content lives in shared/faqData.ts — the same data the server uses
+// to inject FAQPage JSON-LD into the raw HTML. Edit it there, not here.
+const faqCategories: FaqCategory[] = FAQ_PAGE_CATEGORIES;
 
 const allFaqs = faqCategories.flatMap(cat => cat.faqs.map(f => ({ ...f, category: cat.title })));
 
@@ -127,21 +40,13 @@ export default function FAQsPage() {
     }))
     .filter(cat => cat.faqs.length > 0);
 
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: allFaqs.map(f => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
+  const faqJsonLd = buildFaqPageLd(ALL_FAQS_PAGE_ITEMS);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="FAQs — Admissions, Fees, Academics & More | Rainbow International School"
-        description="Find answers to 30+ frequently asked questions about Rainbow International School, Thane — admissions, fees, curriculum, safety, timings, transport, extracurriculars, and facilities."
+        description={ROUTE_SEO["/faqs"].description}
         keywords="rainbow international school faq, school admission questions thane, CBSE school faq, school fees thane, rainbow school admissions, school timings thane"
         canonical="https://rainbowinternationalschool.in/faqs"
         breadcrumbs={[

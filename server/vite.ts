@@ -5,7 +5,7 @@ import viteConfig from "../vite.config";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
-import { injectPageTitle, isKnownRoute, resolveBlogTitle } from "./pageTitles";
+import { injectSeoHead, isKnownRoute, resolveBlogTitle } from "./pageTitles";
 
 const viteLogger = createLogger();
 
@@ -56,7 +56,7 @@ export async function setupVite(server: Server, app: Express) {
       if (blogMatch) {
         overrideTitle = (await resolveBlogTitle(blogMatch[1])) ?? undefined;
       }
-      const pageWithTitle = injectPageTitle(page, req.originalUrl, overrideTitle);
+      const pageWithTitle = injectSeoHead(page, req.originalUrl, overrideTitle);
       const status = isKnownRoute(req.originalUrl) ? 200 : 404;
       const basePath2 = req.originalUrl.split("?")[0].replace(/\/$/, "");
       if (basePath2 === "/alliances" || basePath2.startsWith("/alliances/")) {

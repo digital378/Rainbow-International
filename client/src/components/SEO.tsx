@@ -63,7 +63,19 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
     const existingScripts = document.querySelectorAll('script[data-seo-jsonld]');
     existingScripts.forEach(s => s.remove());
 
+    // The server injects JSON-LD into the raw HTML (tagged with
+    // data-seo-server-jsonld="<@type>"). When this component is about to add
+    // the same schema type client-side, remove the server copy first so
+    // JS-rendering crawlers never see duplicate BreadcrumbList/FAQPage/etc.
+    // Server types we don't replace (e.g. EducationalOrganization) stay.
+    const removeServerScript = (type: string) => {
+      document
+        .querySelectorAll(`script[data-seo-server-jsonld="${type}"]`)
+        .forEach(s => s.remove());
+    };
+
     if (breadcrumbs && breadcrumbs.length > 0) {
+      removeServerScript("BreadcrumbList");
       const breadcrumbLd = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
@@ -82,6 +94,18 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
     }
 
     if (jsonLd) {
+      // Remove server-injected scripts whose @type the client is replacing.
+      // Handles both plain {"@type": X} and {"@graph": [...]} payloads.
+      const clientTypes = new Set<string>();
+      const collect = (node: Record<string, unknown>) => {
+        const t = node["@type"];
+        (Array.isArray(t) ? t : [t]).forEach(v => v && clientTypes.add(String(v)));
+      };
+      collect(jsonLd);
+      const graph = jsonLd["@graph"];
+      if (Array.isArray(graph)) graph.forEach(n => n && typeof n === "object" && collect(n as Record<string, unknown>));
+      clientTypes.forEach(removeServerScript);
+
       const script = document.createElement("script");
       script.type = "application/ld+json";
       script.setAttribute("data-seo-jsonld", "page");

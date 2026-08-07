@@ -1,6 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { blogPostsTable } from "@shared/schema";
+import { ROUTE_SEO, buildBreadcrumbLd, routeCanonical, HOME_ORG_LD } from "@shared/routeSeo";
+import { ALL_FAQS_PAGE_ITEMS, ADMISSIONS_FAQS, buildFaqPageLd } from "@shared/faqData";
 
 export async function resolveBlogTitle(slug: string): Promise<string | null> {
   try {
@@ -96,13 +98,64 @@ function escHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export function injectPageTitle(html: string, reqPath: string, overrideTitle?: string): string {
+/** Serialize JSON-LD safely for inline <script> (no `</script>` breakout). */
+function ldJson(obj: unknown): string {
+  return JSON.stringify(obj).replace(/</g, "\\u003c");
+}
+
+/**
+ * Inject per-route SEO head tags into the SPA shell — title, description,
+ * canonical, and JSON-LD. This is the single server-side injection
+ * mechanism; both the dev (vite.ts) and production (static.ts) servers
+ * call it. AI crawlers do not execute JavaScript, so nothing here may be
+ * left to client-side code.
+ *
+ * Blog routes keep title-only injection — /blog/* is served full SSR by
+ * ssrBlog.ts and never relies on this shell.
+ */
+export function injectSeoHead(html: string, reqPath: string, overrideTitle?: string): string {
   const basePath = (reqPath.split("?")[0].replace(/\/$/, "") || "/");
   const title = overrideTitle ?? PAGE_TITLES[basePath];
-  if (!title) return html;
-  const safe = escHtml(title);
-  return html
-    .replace(/<title>[^<]*<\/title>/, `<title>${safe}</title>`)
-    .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/,  `$1${safe}$2`)
-    .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,  `$1${safe}$2`);
+  let out = html;
+  if (title) {
+    const safe = escHtml(title);
+    out = out
+      .replace(/<title>[^<]*<\/title>/, `<title>${safe}</title>`)
+      .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/,  `$1${safe}$2`)
+      .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,  `$1${safe}$2`);
+  }
+
+  // Blog posts (and any route without SEO config) get title-only injection.
+  const seo = overrideTitle ? undefined : ROUTE_SEO[basePath];
+  if (!seo) return out;
+
+  const desc = escHtml(seo.description);
+  const canonical = routeCanonical(basePath);
+  out = out
+    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${desc}$2`)
+    .replace(/(<meta\s+property="og:description"\s+content=")[^"]*(")/, `$1${desc}$2`)
+    .replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, `$1${desc}$2`);
+
+  // Canonical + JSON-LD go in just before </head>. index.html ships no
+  // canonical link at all, so this is an insert, not a replace.
+  const jsonLdBlocks: unknown[] = [buildBreadcrumbLd(basePath, seo.crumb)];
+  if (basePath === "/") jsonLdBlocks.push(HOME_ORG_LD);
+  if (basePath === "/faqs") jsonLdBlocks.push(buildFaqPageLd(ALL_FAQS_PAGE_ITEMS));
+  if (basePath === "/admissions") jsonLdBlocks.push(buildFaqPageLd(ADMISSIONS_FAQS));
+
+  // Each script is tagged with its schema @type via data-seo-server-jsonld
+  // so the client-side SEO component can dedupe after hydration (it removes
+  // a server script only when it is about to add the same type itself).
+  const injection =
+    `\n    <link rel="canonical" href="${canonical}" />` +
+    jsonLdBlocks
+      .map((ld) => {
+        const type = (ld as Record<string, unknown>)["@type"];
+        const marker = Array.isArray(type) ? type[0] : String(type);
+        return `\n    <script type="application/ld+json" data-seo-server-jsonld="${escHtml(marker)}">${ldJson(ld)}</script>`;
+      })
+      .join("") +
+    `\n  </head>`;
+  out = out.replace(/<\/head>/, injection);
+  return out;
 }

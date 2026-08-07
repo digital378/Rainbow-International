@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { getFormTrackingData } from "@/lib/analytics";
 import { buildFaqPageSchema } from "@/components/WaveOneSeoBlock";
+import { ADMISSIONS_FAQS } from "@shared/faqData";
+import { ROUTE_SEO } from "@shared/routeSeo";
 import {
   CheckCircle, Phone, MessageCircle, MapPin, CalendarCheck,
   ClipboardList, UserCheck, BadgeCheck, GraduationCap, ChevronRight, Star, Shield, Bus, BookOpen,
@@ -107,17 +109,9 @@ const testimonials = [
   { name: "Ratish Pradhan",  initials: "RP", color: "#7c3aed", review: "We are very happy with the school, authorities and management. Teachers are nice and ensure all kids get the required attention." },
 ];
 
-const PAGE_FAQS = [
-  { q: "Which board is Rainbow International School affiliated to?",   a: "Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi. Affiliation No. 1130661." },
-  { q: "Which classes are admissions open for in 2026-27?",           a: "Admissions are open for Nursery to Class 12 for the 2026-27 academic year, subject to seat availability per class." },
-  { q: "What is the admission process at RIS?",                        a: "Submit an enquiry online or by phone → counsellor calls back → campus visit and counselling session → student interaction and document review → admission confirmation on fee payment." },
-  { q: "Is school transport available?",                               a: "Yes. GPS-tracked school buses with trained attendants cover Brahmand, Ghodbunder Road, Manpada and 30+ routes across Thane." },
-  { q: "What documents are required for admission?",                   a: "Birth certificate, Aadhaar (child and parent), passport photos, address proof, previous school transfer certificate, last two years' report cards, and a medical fitness certificate." },
-  { q: "Is there an admission interaction or assessment?",             a: "For Nursery to Class 8 there is no written test — an informal interaction session is held. For Class 9 and above, a written assessment in core subjects is required." },
-  { q: "How can parents book a campus visit?",                         a: "Book through the enquiry form on this page, call the admission desk at +91 82915 68972, or WhatsApp us. Campus visits are available Mon–Sat, 9 AM–5 PM." },
-  { q: "What are the school timings?",                                 a: "School hours are Monday to Saturday, 9:00 AM to 6:00 PM (office). Academic hours for students vary by section; confirmed at the time of admission." },
-  { q: "Are senior secondary streams available?",                      a: "Yes. Class 11 and 12 are offered in three CBSE streams: Science (PCM / PCB), Commerce, and Humanities, with JEE, NEET and CUET prep support." },
-];
+// FAQ content lives in shared/faqData.ts — the same data the server uses
+// to inject FAQPage JSON-LD into the raw HTML. Edit it there, not here.
+const PAGE_FAQS = ADMISSIONS_FAQS;
 
 // ── Sub-component ─────────────────────────────────────────────────────────────
 
@@ -188,13 +182,13 @@ export default function Admissions() {
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="Admissions Open 2026–27 | CBSE School in Thane"
-        description="Admissions open at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire, book a campus visit or apply today."
+        description={ROUTE_SEO["/admissions"].description}
         keywords="admissions open in Thane, CBSE school admission in Thane, Nursery admission in Thane, Class 1 admission in Thane, Class 11 admission in Thane, school admission near me, CBSE school admission 2026-27"
         canonical="https://rainbowinternationalschool.in/admissions"
         appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Admissions 2026-27", href: "https://rainbowinternationalschool.in/admissions" },
+          { name: ROUTE_SEO["/admissions"].crumb, href: "https://rainbowinternationalschool.in/admissions" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",

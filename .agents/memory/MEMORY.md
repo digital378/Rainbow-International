@@ -8,3 +8,4 @@
 - [SSR blog routing architecture](ssr-blog-routing.md) — ssrBlog.ts serves SSR HTML to ALL visitors; React SPA never runs for /blog/*. Custom slugs need a dedicated Express route registered BEFORE registerSSRRoutes(app) in routes.ts.
 - [Friendship Schools Sync System](friendship-sync-system.md) — DB is master; sheet is status-editing surface only; REFRESH = sync-all-from-sheets; syncedToSheets guard prevents false deletions; concurrent appends need queueAppend serialization.
 - [Static blog production serving](static-blog-production-serving.md) — standalone HTML pages need redirect:false + process.cwd() path + copy blog-pages into dist/ during build or images 404 in production.
+- [SEO single source of truth](seo-single-source.md) — route SEO lives only in shared/routeSeo.ts, FAQ content only in shared/faqData.ts; 3 rendering paths import them; never re-add inline copies.

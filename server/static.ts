@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { injectPageTitle, isKnownRoute, resolveBlogTitle } from "./pageTitles";
+import { injectSeoHead, isKnownRoute, resolveBlogTitle } from "./pageTitles";
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(__dirname, "public");
@@ -52,7 +52,7 @@ export function serveStatic(app: Express) {
     if (blogMatch) {
       overrideTitle = (await resolveBlogTitle(blogMatch[1])) ?? undefined;
     }
-    const html = injectPageTitle(cachedIndexHtml, req.originalUrl, overrideTitle);
+    const html = injectSeoHead(cachedIndexHtml, req.originalUrl, overrideTitle);
     const status = isKnownRoute(req.originalUrl) ? 200 : 404;
     res.setHeader("Cache-Control", "no-store");
     res.setHeader("Content-Type", "text/html; charset=utf-8");

@@ -1,5 +1,7 @@
 import type { Express } from "express";
 import { CRAWLER_UA_RE } from "./crawlerUa";
+import { ROUTE_SEO, routeCanonical } from "@shared/routeSeo";
+import { ALL_FAQS_PAGE_ITEMS, ADMISSIONS_FAQS, buildFaqPageLd } from "@shared/faqData";
 
 function e(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -2306,10 +2308,23 @@ const pages: PageSSRConfig[] = [
 
 export function registerPageSSR(app: Express) {
   for (const page of pages) {
+    // shared/routeSeo.ts is the single source of truth for descriptions and
+    // canonicals (also used by the SPA-shell injector in pageTitles.ts).
+    // shared/faqData.ts is the single source of truth for FAQPage schema —
+    // the FAQ routes must serve the same questions to bots that the visible
+    // page and the injected shell serve to everyone else.
+    const seo = ROUTE_SEO[page.path];
+    const faqLd =
+      page.path === "/faqs" ? buildFaqPageLd(ALL_FAQS_PAGE_ITEMS)
+      : page.path === "/admissions" ? buildFaqPageLd(ADMISSIONS_FAQS)
+      : undefined;
+    const cfg: PageSSRConfig = seo
+      ? { ...page, description: seo.description, canonical: routeCanonical(page.path), ...(faqLd ? { jsonLd: faqLd } : {}) }
+      : page;
     app.get(page.path, (req, res, next) => {
       const ua = (req.headers["user-agent"] || "").toLowerCase();
       if (BOT_RE.test(ua)) {
-        const html = shell(page);
+        const html = shell(cfg);
         res.setHeader("Content-Type", "text/html; charset=utf-8");
         res.setHeader("X-Rendered-By", "Express SSR");
         return res.send(html);
