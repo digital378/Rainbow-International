@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { isCrawlerUa } from "./crawlerUa";
 
 function e(str: string): string {
   return String(str)
@@ -844,8 +845,8 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
 
 export function registerHomeSSR(app: Express) {
   app.get("/", (req, res, next) => {
-    const ua = (req.headers["user-agent"] || "").toLowerCase();
-    const isBot = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsappbot|telegrambot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot/i.test(ua);
+    const ua = req.headers["user-agent"] || "";
+    const isBot = isCrawlerUa(ua);
 
     if (isBot) {
       const html = renderHomeSSR();

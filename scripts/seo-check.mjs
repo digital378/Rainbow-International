@@ -2,12 +2,16 @@
 /**
  * SEO regression check script — rainbowinternationalschool.in
  *
- * Verifies five critical SEO fixes:
+ * Verifies six critical SEO guarantees:
  *   1. og:image present on homepage
  *   2. Cache-Control: no-store on HTML (no s-maxage)
  *   3. /amenities returns 200 (no redirect loop)
  *   4. /preschool-thane 301-redirects to /pre-primary-school-thane
  *   5. Homepage JSON-LD contains EducationalOrganization schema
+ *   6. Every crawler UA in shared/crawler-uas.json receives full SSR
+ *      (exactly one <h1> + self-referencing canonical) on every
+ *      non-blog SSR route — this is what keeps the gated page path
+ *      from silently drifting away from the always-SSR blog path.
  *
  * Exit code 0 = all pass, 1 = one or more failures.
  *
@@ -16,10 +20,42 @@
  *   node scripts/seo-check.mjs https://my-staging-url.com   # checks any base URL
  */
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+
 const BASE = process.argv[2] || "https://rainbowinternationalschool.in";
 const BOT_UA =
   "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
 const TIMEOUT_MS = 15_000;
+
+// Canonical URLs are hardcoded to the production domain in the SSR
+// templates, so self-referencing assertions always target this origin,
+// even when BASE points at a staging/dev server.
+const PROD_ORIGIN = "https://rainbowinternationalschool.in";
+
+// Crawler UA substrings — the SAME list the server's gated page-SSR
+// handlers use (server/crawlerUa.ts). Loaded from the shared JSON so the
+// check can never drift from the runtime allow-list.
+const CRAWLER_UAS = JSON.parse(
+  readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), "../shared/crawler-uas.json"),
+    "utf8",
+  ),
+).substrings;
+
+// Every non-blog route that has a gated SSR handler. The homepage is
+// served by server/ssrHome.ts; the rest by server/ssrPages.ts.
+const SSR_PAGE_ROUTES = [
+  "/",
+  "/admissions",
+  "/fee-structure",
+  "/curriculum",
+  "/contact-us",
+  "/top-schools-in-thane",
+  "/school-near-brahmand-thane",
+  "/blogs",
+];
 
 let passed = 0;
 let failed = 0;
@@ -41,17 +77,28 @@ function fail(name, detail = "") {
 /**
  * Fetch a page without following redirects.
  * @param {string} path
+ * @param {string} [ua] - User-Agent header (defaults to Googlebot)
  * @returns {Promise<{ res: Response; body: string }>}
  */
-async function fetchPage(path) {
+async function fetchPage(path, ua = BOT_UA) {
   const url = `${BASE}${path}`;
   const res = await fetch(url, {
     redirect: "manual",
-    headers: { "User-Agent": BOT_UA },
+    headers: { "User-Agent": ua },
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   const body = res.status < 300 ? await res.text() : "";
   return { res, body };
+}
+
+/** Run async work over items with a bounded concurrency pool. */
+async function pool(items, size, worker) {
+  const queue = [...items];
+  await Promise.all(
+    Array.from({ length: Math.min(size, queue.length) }, async () => {
+      while (queue.length) await worker(queue.shift());
+    }),
+  );
 }
 
 async function runChecks() {
@@ -137,6 +184,57 @@ async function runChecks() {
     }
   } catch (err) {
     fail("Homepage JSON-LD contains EducationalOrganization schema", String(err));
+  }
+
+  // ── 6. Every crawler UA gets full SSR on every non-blog SSR route ─────────
+  // The blog path serves SSR to all visitors, but the page path is gated on a
+  // UA allow-list. This matrix catches the allow-list silently dropping a bot
+  // (it has happened before — AI crawlers got the empty SPA shell while
+  // robots.txt invited them). For every route × UA we require exactly one
+  // <h1> and a self-referencing canonical.
+  console.log(
+    `  …  crawler SSR matrix: ${CRAWLER_UAS.length} UAs × ${SSR_PAGE_ROUTES.length} routes`,
+  );
+  const matrixFailures = [];
+  const jobs = [];
+  for (const route of SSR_PAGE_ROUTES) {
+    for (const ua of CRAWLER_UAS) jobs.push({ route, ua });
+  }
+  await pool(jobs, 8, async ({ route, ua }) => {
+    try {
+      const { res, body } = await fetchPage(route, ua);
+      if (res.status !== 200) {
+        matrixFailures.push(`${ua} on ${route}: status ${res.status}`);
+        return;
+      }
+      const h1Count = (body.match(/<h1[\s>]/gi) || []).length;
+      if (h1Count !== 1) {
+        matrixFailures.push(
+          `${ua} on ${route}: ${h1Count} <h1> (SSR shell not served?)`,
+        );
+        return;
+      }
+      const expectedCanonical =
+        route === "/" ? `${PROD_ORIGIN}/` : `${PROD_ORIGIN}${route}`;
+      if (!body.includes(`rel="canonical" href="${expectedCanonical}"`)) {
+        matrixFailures.push(
+          `${ua} on ${route}: canonical is not self-referencing (expected ${expectedCanonical})`,
+        );
+      }
+    } catch (err) {
+      matrixFailures.push(`${ua} on ${route}: ${String(err)}`);
+    }
+  });
+  if (matrixFailures.length === 0) {
+    pass("All crawler UAs receive full SSR on non-blog routes");
+  } else {
+    fail(
+      "All crawler UAs receive full SSR on non-blog routes",
+      matrixFailures.slice(0, 10).join(" | ") +
+        (matrixFailures.length > 10
+          ? ` | …and ${matrixFailures.length - 10} more`
+          : ""),
+    );
   }
 
   // ── Summary ───────────────────────────────────────────────────────────────

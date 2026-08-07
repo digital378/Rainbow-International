@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { CRAWLER_UA_RE } from "./crawlerUa";
 
 function e(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -9,7 +10,9 @@ function seoTitle(t: string, appendSiteName: boolean = true): string {
   return t.includes("Rainbow International") ? t : `${t} | Rainbow International School`;
 }
 
-const BOT_RE = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsappbot|telegrambot|applebot|semrushbot|ahrefsbot|mj12bot|dotbot|petalbot|bytespider|gptbot|claudebot/i;
+// Shared crawler UA list — see server/crawlerUa.ts (source of truth:
+// shared/crawler-uas.json). Do not reintroduce an inline regex here.
+const BOT_RE = CRAWLER_UA_RE;
 
 interface PageSSRConfig {
   path: string;
