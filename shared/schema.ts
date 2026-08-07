@@ -163,7 +163,12 @@ export const blogPostsTable = pgTable("blog_posts", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const insertBlogPostSchema = createInsertSchema(blogPostsTable).omit({
+export const insertBlogPostSchema = createInsertSchema(blogPostsTable, {
+  sections: z.array(z.object({ heading: z.string().optional(), body: z.string(), list: z.array(z.string()).optional() })).optional(),
+  relatedSlugs: z.array(z.string()).optional(),
+  internalLinks: z.array(z.object({ label: z.string(), href: z.string() })).optional(),
+  faqs: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
+}).omit({
   id: true,
   createdAt: true,
 });

@@ -6,7 +6,7 @@ import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
 import { z } from "zod";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema, type InsertFriendshipLead } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 
 // ── Restricted public input schema for friendship lead submission ─
@@ -617,7 +617,7 @@ export async function registerRoutes(
         grade: validatedData.grade,
         phone: validatedData.phone,
         email: validatedData.email ?? "",
-        source: validatedData.source ?? "",
+        source: typeof req.body?.source === "string" ? req.body.source : "",
       }).then(() => bustCrmStatsCache("RIS")).catch((err) => console.error("[inquiry] CRM Leads Tracker append error:", err));
       res.status(201).json(inquiry);
     } catch (error: any) {
@@ -5573,12 +5573,27 @@ paths:
       const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
 
       const statusUpdates: { phone: string; status: string }[] = [];
+      const newLeads: InsertFriendshipLead[] = [];
 
       for (const r of schoolRows) {
         const phone  = (r[5] || "").toString().trim();
         const status = (r[8] || "Open").toString().trim();
         if (!phone) continue;
         if (status) statusUpdates.push({ phone, status });
+        // Rows present in the sheet but missing from the DB → import them
+        if (!existingPhones.has(phone.replace(/\D/g, ""))) {
+          newLeads.push({
+            schoolId,
+            studentName: (r[2] || "").toString().trim() || "Unknown",
+            grade: (r[3] || "").toString().trim() || "Unknown",
+            parentName: (r[4] || "").toString().trim() || "Unknown",
+            phone,
+            email: (r[6] || "").toString().trim() || null,
+            source: "manual",
+            status: status || "Open",
+            remarks: (r[10] || "").toString().trim() || null,
+          });
+        }
       }
 
       // Leads in DB but absent from the sheet → delete them.
@@ -5689,8 +5704,8 @@ paths:
       });
       const tabMap: Record<string, number> = {};
       for (const s of (meta.data.sheets || [])) {
-        if (s.properties?.title !== undefined && s.properties?.sheetId !== undefined) {
-          tabMap[s.properties.title] = s.properties.sheetId as number;
+        if (s.properties?.title != null && s.properties?.sheetId != null) {
+          tabMap[s.properties.title] = s.properties.sheetId;
         }
       }
 

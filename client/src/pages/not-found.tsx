@@ -7,7 +7,7 @@ import { SEO } from "@/components/SEO";
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <SEO title="Page Not Found | Rainbow International School" robots="noindex, follow" />
+      <SEO title="Page Not Found | Rainbow International School" description="The page you're looking for doesn't exist or has been moved." robots="noindex, follow" />
       <ScrollProgress />
       <Navbar />
       <main className="flex-grow flex items-center justify-center py-20">

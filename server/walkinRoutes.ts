@@ -18,7 +18,7 @@
  *   GET  /api/walkin/sheets/status        — last-sync timestamp + lead counts (admin only)
  */
 
-import { type Express } from "express";
+import { type Express, type Request, type Response, type NextFunction } from "express";
 import { timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { db } from "./db";
@@ -51,9 +51,9 @@ function isAdmin(req: Express["request"]): boolean {
 }
 
 function requireAdmin(
-  req: Express["request"],
-  res: Express["response"],
-  next: Express["nextFunction"],
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) {
   if (!isAdmin(req)) return res.status(401).json({ message: "Unauthorized" });
   next();

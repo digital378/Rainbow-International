@@ -99,7 +99,7 @@ function getToken() {
   try { return sessionStorage.getItem("ris_admin_auth") || ""; } catch { return ""; }
 }
 
-const authHeader = () => {
+const authHeader = (): Record<string, string> => {
   const t = getToken();
   return t ? { Authorization: `Bearer ${t}` } : {};
 };
