@@ -547,7 +547,6 @@ export async function registerRoutes(
     "/school-readiness-quiz":            "/admissions",
     "/students-leaving-certificate":     "/",
     "/term-of-use":                      "/",
-    "/thank-you":                        "/",
     "/virtual-learning":                 "/blogs",
 
     // Blog-slug redirects — auto-generated from the blog_posts table

@@ -70,9 +70,63 @@ const PAGE_TITLES: Record<string, string> = {
   "/sales": "Admissions | Rainbow International School",
 };
 
+/**
+ * Pages that must never appear in search results. Keep this policy here,
+ * alongside the server-side head injector, so both Vite development and the
+ * production static server emit the tag before React has a chance to run.
+ *
+ * Dashboard access controls are a separate concern: this prevents indexing
+ * even where a page is deliberately reachable to staff who hold its existing
+ * passcode or API credential.
+ */
+const NOINDEX_EXACT_PATHS = new Set([
+  "/admin/blog",
+  "/admin/alliances/friendship",
+  "/admin/ras",
+  "/admin/ras/submissions",
+  "/admin/walkin-2728",
+  "/sales",
+  "/marketing",
+  "/rps-sales",
+  "/declaration",
+  "/marketing-27-28",
+  "/sales-27-28",
+  "/rps-sales-27-28",
+  "/internal",
+  "/alliances",
+  "/thank-you",
+  "/book-list",
+  "/leads",
+  "/overview-27-28",
+]);
+
+/** True when a document must receive server-rendered noindex metadata. */
+export function isNoindexPath(reqPath: string): boolean {
+  const basePath = (reqPath.split("?")[0].replace(/\/$/, "") || "/");
+  if (NOINDEX_EXACT_PATHS.has(basePath)) return true;
+
+  // All currently registered routes in these namespaces are intentionally
+  // non-indexable: staff pages, lead-capture/kiosk forms, tokenized
+  // friendship portals, and printable QR cards.
+  return (
+    basePath.startsWith("/admin/") ||
+    basePath.startsWith("/walkin/") ||
+    basePath === "/walkin-ris-27-28" ||
+    basePath.startsWith("/walkin-ris-27-28/") ||
+    basePath === "/walkin-rps-27-28" ||
+    basePath.startsWith("/walkin-rps-27-28/") ||
+    basePath.startsWith("/alliances/friendship/")
+  );
+}
+
 const STATIC_KNOWN_PATHS = new Set([
   ...Object.keys(PAGE_TITLES),
   "/marketing",
+  "/alliances",
+  "/internal",
+  "/marketing-27-28",
+  "/sales-27-28",
+  "/rps-sales-27-28",
   "/admin/ras/submissions",
   "/admin/ras",
   "/admin/blog",
@@ -123,6 +177,21 @@ export function injectSeoHead(html: string, reqPath: string, overrideTitle?: str
       .replace(/<title>[^<]*<\/title>/, `<title>${safe}</title>`)
       .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/,  `$1${safe}$2`)
       .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,  `$1${safe}$2`);
+  }
+
+  // These routes are intentionally not indexable, including routes that do
+  // not have public SEO metadata. Insert a server-rendered tag so crawlers
+  // see it without executing the React bundle.
+  if (isNoindexPath(basePath) || !isKnownRoute(basePath)) {
+    const robotsTag = `<meta name="robots" content="noindex,nofollow">`;
+    if (/<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i.test(out)) {
+      out = out.replace(
+        /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
+        robotsTag,
+      );
+    } else {
+      out = out.replace(/<\/head>/i, `    ${robotsTag}\n  </head>`);
+    }
   }
 
   // Blog posts (and any route without SEO config) get title-only injection.

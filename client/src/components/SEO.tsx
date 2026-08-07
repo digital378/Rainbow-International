@@ -1,5 +1,43 @@
 import { useEffect } from "react";
 
+// Must match the server-side document policy in server/pageTitles.ts.
+// Keeping this small client mirror lets the SEO component reset robots tags
+// correctly when a visitor navigates between protected and public SPA routes.
+const NOINDEX_EXACT_PATHS = new Set([
+  "/admin/blog",
+  "/admin/alliances/friendship",
+  "/admin/ras",
+  "/admin/ras/submissions",
+  "/admin/walkin-2728",
+  "/sales",
+  "/marketing",
+  "/rps-sales",
+  "/declaration",
+  "/marketing-27-28",
+  "/sales-27-28",
+  "/rps-sales-27-28",
+  "/internal",
+  "/alliances",
+  "/thank-you",
+  "/book-list",
+  "/leads",
+  "/overview-27-28",
+]);
+
+function isNoindexPath(pathname: string): boolean {
+  const path = pathname.replace(/\/$/, "") || "/";
+  return (
+    NOINDEX_EXACT_PATHS.has(path) ||
+    path.startsWith("/admin/") ||
+    path.startsWith("/walkin/") ||
+    path === "/walkin-ris-27-28" ||
+    path.startsWith("/walkin-ris-27-28/") ||
+    path === "/walkin-rps-27-28" ||
+    path.startsWith("/walkin-rps-27-28/") ||
+    path.startsWith("/alliances/friendship/")
+  );
+}
+
 interface BreadcrumbItem {
   name: string;
   href: string;
@@ -37,7 +75,14 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
 
     setMeta("description", description);
     if (keywords) setMeta("keywords", keywords);
-    setMeta("robots", robots || "index, follow");
+    // Server-side route policy is authoritative for protected documents.
+    // Make the same decision from the current browser path so client-side
+    // navigation from a protected page back to a public route resets the tag
+    // rather than carrying `noindex` forward.
+    setMeta(
+      "robots",
+      isNoindexPath(window.location.pathname) ? "noindex,nofollow" : (robots || "index, follow"),
+    );
     setMeta("og:title", fullTitle, true);
     setMeta("og:description", description, true);
     setMeta("og:image", ogImage || defaultImage, true);
