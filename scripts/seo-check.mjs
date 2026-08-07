@@ -44,18 +44,30 @@ const CRAWLER_UAS = JSON.parse(
   ),
 ).substrings;
 
-// Every non-blog route that has a gated SSR handler. The homepage is
-// served by server/ssrHome.ts; the rest by server/ssrPages.ts.
-const SSR_PAGE_ROUTES = [
-  "/",
-  "/admissions",
-  "/fee-structure",
-  "/curriculum",
-  "/contact-us",
-  "/top-schools-in-thane",
-  "/school-near-brahmand-thane",
-  "/blogs",
-];
+// Every non-blog route that has a gated SSR handler, derived from the
+// SAME config that registers the routes (the `pages` array in
+// server/ssrPages.ts) so the matrix can never drift when pages are
+// added or removed. The homepage ("/") is served by server/ssrHome.ts
+// and is prepended explicitly.
+const SSR_PAGE_ROUTES = (() => {
+  const src = readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), "../server/ssrPages.ts"),
+    "utf8",
+  );
+  const routes = [...src.matchAll(/^\s*path:\s*"(\/[^"]*)",\s*$/gm)].map((m) => m[1]);
+  const unique = [...new Set(routes)];
+  if (unique.length < 20) {
+    // Parse safety net: if server/ssrPages.ts is refactored so this regex
+    // no longer finds the page config, fail loudly instead of silently
+    // shrinking the regression matrix.
+    console.error(
+      `FATAL: only ${unique.length} SSR page routes parsed from server/ssrPages.ts — ` +
+        "the page config format may have changed; update the parser in scripts/seo-check.mjs.",
+    );
+    process.exit(1);
+  }
+  return ["/", ...unique];
+})();
 
 let passed = 0;
 let failed = 0;
