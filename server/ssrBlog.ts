@@ -1,6 +1,13 @@
 import type { Express } from "express";
 import { storage } from "./storage";
 import type { BlogPost } from "@shared/schema";
+import { renderImmersiveArticle } from "./ssrBlogImmersive";
+
+/**
+ * Slugs that render with the immersive layout instead of the standard article
+ * layout. Everything not listed here keeps the original markup byte-for-byte.
+ */
+const IMMERSIVE_SLUGS = new Set<string>(["ai-in-schools"]);
 
 function e(str: string | undefined | null): string {
   if (!str) return "";
@@ -66,6 +73,10 @@ async function renderBlogSSR(slug: string): Promise<string | null> {
     if (rel) relatedPosts.push(rel);
   }
   const related = relatedPosts;
+
+  if (IMMERSIVE_SLUGS.has(slug)) {
+    return renderImmersiveArticle(post, related);
+  }
 
   const sectionsHtml = post.sections
     .map((sec) => {

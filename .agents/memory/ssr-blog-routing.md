@@ -26,3 +26,19 @@ Express routes match in registration order. The wildcard `/blog/:slug` in `ssrBl
 ## Template reference
 
 `server/ssrSpainArgentina.ts` is the canonical example of a custom SSR blog handler — it includes: Article + FAQPage + BreadcrumbList JSON-LD, TOC, callout boxes, tables, FAQ accordion with inline JS, full RIS navbar/footer (copied CSS from ssrBlog.ts), scroll progress bar, sidebar with match-details widget, CTA box, tags, and inline editorial NOTE comments for time-sensitive content.
+
+## Second pattern: per-slug layout branch (no separate route)
+
+When a slug keeps the *normal* `/blog/:slug` data flow but needs a different visual
+layout, do not register a separate route — branch inside the existing renderer on an
+opt-in slug set, and keep the `<head>` metadata, JSON-LD, navbar, contact strip and
+footer in one shared module that both layouts import.
+
+**Why:** duplicating the chrome is how the SEO surface silently drifts between layouts —
+one copy gets a canonical fix and the other does not. A shared module makes drift
+impossible, and an opt-in set means every unlisted post is provably untouched.
+
+**How to verify a layout change did not leak:** capture `curl` output for a few other
+slugs before the change and `diff` after — they must be byte-identical. Then diff the
+changed page's own `<head>` meta tags and JSON-LD blocks against its own "before"
+capture; those must be byte-identical too, even though the body changed completely.
