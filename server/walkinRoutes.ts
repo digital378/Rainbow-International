@@ -657,8 +657,10 @@ export function registerWalkinRoutes(app: Express) {
       resyncBrandToSheet(archiveBrand).catch((err) => {
         console.error(`[walkin/leads/archive] Brand sheet resync failed (${archiveBrand}):`, err?.message);
       });
-      removeLeadFromMasterSheet(existing.id).catch((err) => {
-        console.error("[walkin/leads/archive] Master sheet removal failed:", err?.message);
+      // Use a full master resync so the archived row is physically removed
+      // (same approach as the brand sheet resync above — no ghost ARCHIVED rows).
+      resyncMasterSheet().catch((err) => {
+        console.error("[walkin/leads/archive] Master sheet resync failed:", err?.message);
       });
 
       res.json(updated);
