@@ -236,6 +236,91 @@ function renderPage(): string {
     .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); }
     .footer-bottom-inner { max-width: 1280px; margin: 0 auto; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.35); }
     .footer-bottom-inner a { color: rgba(255,255,255,0.35); text-decoration: none; }
+
+    /* ── Matchday Learning Arena: page-specific immersive layer ── */
+    :root { --arena-navy:#07183f; --arena-blue:#0d3b86; --arena-sky:#eaf4ff; --arena-orange:#f97316; --arena-gold:#fbbf24; --arena-ink:#15213c; }
+    body { background: linear-gradient(180deg, #f7fbff 0, #fff 42rem); color: var(--arena-ink); }
+    .navbar { border-bottom: 1px solid rgba(13,59,134,.08); }
+    .hero {
+      background:
+        radial-gradient(circle at 50% -35%, rgba(255,255,255,.34), transparent 36%),
+        radial-gradient(circle at 10% 5%, rgba(34,120,255,.22), transparent 26%),
+        linear-gradient(125deg, #07163f 0%, #0b2e72 52%, #09235a 100%);
+      isolation: isolate; min-height: 480px; padding: 74px 16px 94px;
+    }
+    .hero::before { content:""; position:absolute; inset:0; z-index:-1; opacity:.28; background-image:linear-gradient(rgba(255,255,255,.11) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,.11) 1px,transparent 1px); background-size:42px 42px; transform:perspective(450px) rotateX(62deg) scale(1.65) translateY(27%); transform-origin:center bottom; }
+    .hero::after { content:""; position:absolute; z-index:-1; inset:auto -15% -95px; height:230px; border-radius:50% 50% 0 0; background:radial-gradient(ellipse at center, rgba(52,184,104,.66) 0 1%, rgba(22,132,75,.6) 1.5%, rgba(10,92,59,.58) 56%, transparent 57%); box-shadow:0 -8px 0 rgba(255,255,255,.07), 0 -26px 70px rgba(0,0,0,.22); }
+    .arena-light { position:absolute; width:17rem; height:17rem; border-radius:50%; pointer-events:none; filter:blur(1px); opacity:.56; background:radial-gradient(circle, rgba(255,255,255,.58) 0 2px, rgba(251,191,36,.18) 10%, transparent 61%); z-index:-1; }
+    .arena-light-left { left:-4rem; top:1rem; } .arena-light-right { right:-4rem; top:2.5rem; }
+    .arena-ball { position:absolute; right:11%; top:60px; width:72px; height:72px; z-index:-1; opacity:.20; border:2px solid #fff; border-radius:50%; transform:rotate(-18deg); }
+    .arena-ball::before, .arena-ball::after { content:""; position:absolute; border:2px solid #fff; border-radius:50%; }
+    .arena-ball::before { width:23px; height:23px; left:21px; top:21px; } .arena-ball::after { width:110px; height:26px; left:-21px; top:19px; border-left:0; border-right:0; }
+    .hero-inner { max-width:940px; }
+    .hero-cat { box-shadow:0 7px 0 rgba(104,37,3,.3), 0 14px 30px rgba(0,0,0,.16); }
+    .hero h1 { max-width:900px; margin-left:auto; margin-right:auto; text-shadow:0 4px 18px rgba(0,0,0,.24); }
+    .hero-meta, .byline { text-shadow:0 2px 10px rgba(0,0,0,.25); }
+    .freshness-note { backdrop-filter:blur(7px); box-shadow:0 5px 20px rgba(0,0,0,.14); }
+    .finale-card { position:relative; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; max-width:630px; margin:28px auto -18px; padding:14px 20px; overflow:hidden; border:1px solid rgba(255,255,255,.32); border-radius:20px; color:#fff; background:linear-gradient(108deg, rgba(97,188,234,.3), rgba(255,255,255,.14) 48%, rgba(222,54,63,.24)); box-shadow:0 19px 0 rgba(4,16,51,.16), 0 25px 52px rgba(0,0,0,.28); backdrop-filter:blur(12px); transform:perspective(900px) rotateX(3deg); }
+    .finale-card::before { content:""; position:absolute; inset:0; background:linear-gradient(120deg, transparent 0 38%, rgba(255,255,255,.15) 40%, transparent 44%); pointer-events:none; }
+    .finale-side { position:relative; z-index:1; display:flex; flex-direction:column; gap:2px; } .finale-side--right { align-items:flex-end; text-align:right; }
+    .finale-country { font-family:'League Spartan',sans-serif; font-size:clamp(17px,2.6vw,24px); font-weight:900; letter-spacing:.025em; }
+    .finale-label { color:rgba(255,255,255,.72); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+    .finale-vs { position:relative; z-index:1; width:54px; height:54px; display:grid; place-items:center; border:2px solid rgba(251,191,36,.8); border-radius:50%; color:var(--arena-gold); font-family:'League Spartan',sans-serif; font-size:15px; font-weight:900; box-shadow:0 0 0 7px rgba(251,191,36,.12), inset 0 0 20px rgba(251,191,36,.16); }
+    .page-main { position:relative; background:linear-gradient(180deg, #f7fbff 0, #fff 520px); }
+    .page-container { max-width:1280px; padding-top:52px; }
+    article { max-width:880px; }
+    .matchday-article > * { position:relative; }
+    .toc { position:relative; overflow:hidden; background:linear-gradient(120deg, #eff7ff, #f8fbff); border-color:#c9dff8; box-shadow:0 12px 26px rgba(13,59,134,.07); }
+    .toc::after { content:""; position:absolute; width:145px; height:145px; border:18px solid rgba(13,59,134,.06); border-radius:50%; right:-48px; bottom:-66px; }
+    .toc-title, .section-h2 { letter-spacing:.01em; }
+    .arena-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:0 0 34px; }
+    .arena-metric { min-height:115px; padding:17px 14px; border:1px solid #d9e8fb; border-radius:18px; background:linear-gradient(145deg,#fff,#edf6ff); box-shadow:0 8px 0 #d7e7f9, 0 13px 26px rgba(13,59,134,.09); text-align:center; transition:transform .22s ease, box-shadow .22s ease; }
+    .arena-metric:nth-child(2) { background:linear-gradient(145deg,#fffdf8,#fff3d9); border-color:#f8dfac; box-shadow:0 8px 0 #f7e1b5,0 13px 26px rgba(171,91,7,.09); }
+    .arena-metric:nth-child(3) { background:linear-gradient(145deg,#fff,#eff9f4); border-color:#cdebd9; box-shadow:0 8px 0 #d7eddf,0 13px 26px rgba(11,117,67,.08); }
+    .arena-metric:nth-child(4) { background:linear-gradient(145deg,#fff,#fff0e9); border-color:#ffd9c2; box-shadow:0 8px 0 #ffe1d0,0 13px 26px rgba(217,84,8,.08); }
+    .arena-metric:hover { transform:translateY(-4px); box-shadow:0 12px 0 #d7e7f9,0 19px 31px rgba(13,59,134,.13); }
+    .arena-metric strong { display:block; color:var(--arena-blue); font-family:'League Spartan',sans-serif; font-size:32px; line-height:1; font-weight:900; }
+    .arena-metric span { display:block; margin-top:7px; color:#52617d; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; }
+    .intro-para { margin-bottom:28px; padding:23px 25px; border:1px solid #d9e8fb; border-left:5px solid var(--arena-orange); border-radius:0 18px 18px 0; background:linear-gradient(90deg,#fff 0,#f8fbff 100%); box-shadow:0 10px 25px rgba(13,59,134,.06); }
+    .section-h2 { display:flex; align-items:center; gap:11px; margin-top:54px; padding-bottom:11px; border-bottom:1px solid #dce9f9; }
+    .section-h2::before { content:""; width:10px; height:30px; flex:0 0 auto; border-radius:8px; background:linear-gradient(180deg,var(--arena-orange),var(--arena-gold)); box-shadow:0 4px 9px rgba(249,115,22,.27); }
+    .section-h3 { padding-left:13px; border-left:3px solid #fbbf24; }
+    .body-para { color:#3c4960; }
+    .body-list { padding:17px 18px; border:1px solid #e0edf9; border-radius:16px; background:rgba(248,252,255,.76); }
+    .callout { position:relative; overflow:hidden; border-width:1px 1px 1px 5px; box-shadow:0 11px 23px rgba(13,59,134,.06); }
+    .callout::after { content:""; position:absolute; width:90px; height:90px; right:-35px; bottom:-40px; border:14px solid rgba(13,59,134,.06); border-radius:50%; }
+    .table-wrap { width:100%; max-width:100%; border-color:#d7e6f6; box-shadow:0 12px 28px rgba(13,59,134,.08); }
+    thead th { background:linear-gradient(115deg,#09235a,#0d3b86); }
+    tbody tr:hover { background:#fff5df; }
+    #the-final { margin-top:66px; padding:18px 20px; border:1px solid #c7d9f1; border-radius:17px; background:linear-gradient(105deg,#071b4b,#0d3b86); color:#fff; box-shadow:0 13px 0 #c5d7ef,0 23px 36px rgba(7,24,63,.18); }
+    #the-final::before { background:linear-gradient(180deg,#fbbf24,#fff); }
+    .ris-vs-banner { margin:32px 0; box-shadow:0 13px 0 #c7d8ed,0 24px 42px rgba(9,26,79,.20); }
+    .conclusion-box { position:relative; overflow:hidden; background:linear-gradient(130deg,#f2f8ff,#fffaf0); border-color:#d7e6f7; box-shadow:0 12px 25px rgba(13,59,134,.07); }
+    .conclusion-box::after { content:""; position:absolute; right:-42px; top:-50px; width:170px; height:170px; border:20px solid rgba(249,115,22,.08); border-radius:50%; }
+    .cta-box { position:relative; overflow:hidden; box-shadow:0 14px 0 #071f51,0 25px 46px rgba(7,24,63,.22); }
+    .cta-box::before { content:""; position:absolute; inset:-50% auto auto -8%; width:220px; height:220px; border:26px solid rgba(255,255,255,.1); border-radius:50%; }
+    .cta-box > * { position:relative; z-index:1; }
+    aside { align-self:flex-start; }
+    @media(min-width:1024px) { aside { position:sticky; top:86px; } }
+    .sidebar-box, .sidebar-match, .admissions-box { border-color:#dce8f5; box-shadow:0 10px 25px rgba(13,59,134,.08); }
+    .sidebar-match { background:linear-gradient(145deg,#fff,#f0f7ff); }
+    a:focus-visible, button:focus-visible { outline:3px solid var(--arena-gold); outline-offset:3px; border-radius:4px; }
+    @media(max-width:767px) {
+      .hero { min-height:0; padding:56px 16px 72px; }
+      .arena-light { width:12rem; height:12rem; } .arena-ball { opacity:.13; right:-12px; top:20px; }
+      .finale-card { gap:10px; padding:13px 14px; border-radius:16px; } .finale-country { font-size:16px; } .finale-vs { width:42px; height:42px; font-size:12px; }
+      .arena-metrics { grid-template-columns:repeat(2,1fr); gap:13px; } .arena-metric { min-height:101px; } .arena-metric strong { font-size:28px; }
+      .intro-para { padding:18px; font-size:16px; } .section-h2 { margin-top:42px; }
+      #the-final { margin-top:48px; padding:15px; } .content-row { gap:34px; }
+      .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .contact-strip-inner { grid-template-columns:repeat(2,minmax(0,1fr)); padding:32px 16px; gap:14px; }
+      .contact-card { min-width:0; max-width:100%; padding:20px 10px; }
+      .contact-card > div { min-width:0; max-width:100%; }
+      .contact-card p { min-width:0; max-width:100%; overflow-wrap:anywhere; word-break:break-word; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto; } .hero::before, .finale-card, .arena-metric, .arena-metric:hover { transform:none !important; transition:none !important; }
+    }
   </style>
   <!-- Drop-in animations for this post only -->
   <link rel="stylesheet" href="/animations.css" />
@@ -264,7 +349,10 @@ function renderPage(): string {
   </ul>
 </nav>
 
-<div class="hero">
+  <div class="hero">
+    <span class="arena-light arena-light-left" aria-hidden="true"></span>
+    <span class="arena-light arena-light-right" aria-hidden="true"></span>
+    <span class="arena-ball" aria-hidden="true"></span>
   <div class="hero-inner">
     <span class="hero-cat">Learning Beyond the Classroom</span>
     <h1>What the Spain vs Argentina World Cup Final Can Teach Your Child</h1>
@@ -279,6 +367,17 @@ function renderPage(): string {
          Once the final is played on July 19, update the score predictions, paraphrased voices,
          and "records still possible" language to turn this preview into a recap. -->
     <span class="freshness-note">⏰ Pre-match preview — update after July 19 final</span>
+    <div class="finale-card tilt" aria-label="Spain versus Argentina final match card">
+      <div class="finale-side">
+        <span class="finale-label">European champions</span>
+        <span class="finale-country">Spain</span>
+      </div>
+      <span class="finale-vs" aria-hidden="true">VS</span>
+      <div class="finale-side finale-side--right">
+        <span class="finale-label">South American champions</span>
+        <span class="finale-country">Argentina</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -294,7 +393,7 @@ function renderPage(): string {
   <div class="page-container">
     <div class="content-row">
 
-      <article>
+      <article class="matchday-article">
 
         <!-- Table of Contents -->
         <nav class="toc" aria-label="Table of contents">
@@ -312,6 +411,13 @@ function renderPage(): string {
             <li><a href="#conclusion">Conclusion</a></li>
           </ol>
         </nav>
+
+        <section class="arena-metrics" aria-label="World Cup 2026 at a glance">
+          <div class="arena-metric"><strong>48</strong><span>Teams in play</span></div>
+          <div class="arena-metric"><strong>12</strong><span>Groups to follow</span></div>
+          <div class="arena-metric"><strong>104</strong><span>Matches to explore</span></div>
+          <div class="arena-metric"><strong>16</strong><span>Host cities</span></div>
+        </section>
 
         <!-- Intro -->
         <p class="intro-para">If dinner conversations at home have suddenly turned into match-time negotiations, you're not alone. The FIFA World Cup 2026 — running from June 11 to July 19 — is well underway, and it's hard to find a household in Thane where it hasn't taken over the TV remote at least once this month.</p>
