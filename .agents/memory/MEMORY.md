@@ -9,4 +9,5 @@
 - [Friendship Schools Sync System](friendship-sync-system.md) — DB is master; sheet is status-editing surface only; REFRESH = sync-all-from-sheets; syncedToSheets guard prevents false deletions; concurrent appends need queueAppend serialization.
 - [Static blog production serving](static-blog-production-serving.md) — standalone HTML pages need redirect:false + process.cwd() path + copy blog-pages into dist/ during build or images 404 in production.
 - [SSR vs SPA link conflict](ssr-vs-spa-link-conflict.md) — link SSR routes with plain `<a>`; a wouter `Link` + duplicate SPA route silently renders the stale React page on click-through.
+- [Publish image size limit](publish-image-size-limit.md) — .gitignore alone won't shrink the image; already-tracked archives need `git rm --cached` too, or publishing keeps failing at 8 GiB.
 - [SEO single source of truth](seo-single-source.md) — route SEO lives only in shared/routeSeo.ts, FAQ content only in shared/faqData.ts; 3 rendering paths import them; never re-add inline copies.
