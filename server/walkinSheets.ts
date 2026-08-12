@@ -2057,6 +2057,12 @@ export interface CrmStats {
    * Human-readable explanation suitable for display in the admin panel.
    */
   warning?: string;
+  /**
+   * True when the response is served from the last-known-good cache because
+   * the live fetch (DB or Sheets) failed during this request cycle.
+   * The `cachedAt` field indicates when the data was originally fetched.
+   */
+  stale?: true;
 }
 
 // ── CRM stats in-memory cache (2-minute TTL) with in-flight coalescing ──
@@ -2070,6 +2076,11 @@ interface CrmStatsEntry {
 const crmStatsCache   = new Map<"RIS" | "RPS", CrmStatsEntry>();
 /** Holds the in-progress fetch promise so concurrent cache-miss requests share one call. */
 const crmStatsInFlight = new Map<"RIS" | "RPS", Promise<CrmStats>>();
+/**
+ * Last successfully fetched data per brand — never cleared by bustCrmStatsCache.
+ * Used as a stale fallback when the live fetch fails (e.g. DB / Sheets outage).
+ */
+const crmStatsLastGood = new Map<"RIS" | "RPS", CrmStatsEntry>();
 
 /**
  * Invalidates the in-memory CRM stats cache for one or both brands.
@@ -2223,9 +2234,23 @@ export async function readCrmLeadsTrackerStats(
         dataSource: "sheet", // "sheet" = data is good; frontend shows no warning
       };
 
-      crmStatsCache.set(brand, { data: result, storedAt: Date.now() });
+      const entry: CrmStatsEntry = { data: result, storedAt: Date.now() };
+      crmStatsCache.set(brand, entry);
+      crmStatsLastGood.set(brand, entry);
       console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
       return result;
+    } catch (fetchErr: any) {
+      // On any fetch failure, serve the last-known-good data with stale:true so
+      // the dashboard keeps showing real numbers instead of zeros or a 500.
+      const lastGood = crmStatsLastGood.get(brand);
+      if (lastGood) {
+        console.warn(
+          `[walkin/crm-stats] Fetch failed for ${brand} — serving stale cache from ${new Date(lastGood.storedAt).toISOString()}. Error: ${fetchErr?.message}`,
+        );
+        return { ...lastGood.data, stale: true };
+      }
+      // No prior data at all — propagate so the route returns 500
+      throw fetchErr;
     } finally {
       crmStatsInFlight.delete(brand);
     }
