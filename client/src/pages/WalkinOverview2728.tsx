@@ -13,8 +13,7 @@ type Stats = {
   byOwner: Array<{ leadOwner: string | null; cnt: number }>;
   statusBreakdown: Array<{ status: string; cnt: number }>;
   generatedAt: string;
-  dataSource?: "sheet" | "tab_missing" | "empty";
-  warning?: string;
+
 };
 
 const pct = (n: number) => `${n.toFixed(1)}%`;
@@ -131,11 +130,13 @@ function Dashboard() {
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const cancelled = useRef(false);
 
-  const fetchData = useCallback(() => {
+  const fetchData = useCallback((bust = false) => {
     setLoading(true);
+    const qs = bust ? "?brand=RIS&ay=2027-28&bust=1" : "?brand=RIS&ay=2027-28";
+    const qsRps = bust ? "?brand=RPS&ay=2027-28&bust=1" : "?brand=RPS&ay=2027-28";
     Promise.all([
-      fetch("/api/walkin/crm-stats?brand=RIS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-      fetch("/api/walkin/crm-stats?brand=RPS&ay=2027-28").then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch(`/api/walkin/crm-stats${qs}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch(`/api/walkin/crm-stats${qsRps}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
     ]).then(([ris, rps]: [Stats, Stats]) => {
       if (!cancelled.current) { setRisStats(ris); setRpsStats(rps); setError(null); setLastFetch(new Date()); }
     }).catch(e => { if (!cancelled.current) setError(String(e)); })
@@ -157,7 +158,7 @@ function Dashboard() {
       <div className="bg-white rounded-xl p-8 max-w-md shadow border border-red-200">
         <div className="text-red-600 font-bold mb-2">Failed to load data</div>
         <div className="text-sm text-slate-600 mb-4">{error}</div>
-        <button onClick={fetchData} className="px-4 py-2 rounded-lg text-white font-semibold" style={{ background: NAVY }}>Retry</button>
+        <button onClick={() => fetchData()} className="px-4 py-2 rounded-lg text-white font-semibold" style={{ background: NAVY }}>Retry</button>
       </div>
     </div>
   );
@@ -186,7 +187,7 @@ function Dashboard() {
         <div className="flex items-center gap-3 text-xs text-slate-400">
           {lastFetch && `Updated: ${lastFetch.toLocaleTimeString()}`}
           {loading && " · refreshing…"}
-          <button onClick={fetchData} className="px-3 py-1.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50">↻ Refresh</button>
+          <button onClick={() => fetchData()} className="px-3 py-1.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50">↻ Refresh</button>
         </div>
       </div>
 
@@ -227,18 +228,6 @@ function Dashboard() {
           )}
         </div>
 
-        {/* Data-source warnings for either brand */}
-        {[risStats, rpsStats].filter(s => s?.dataSource && s.dataSource !== "sheet" && s.warning).map(s => (
-          <div key={s!.brand} className="bg-amber-50 border border-amber-300 rounded-xl px-5 py-3 flex items-start gap-3">
-            <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
-            <div>
-              <span className="font-semibold text-amber-800 text-sm">
-                {s!.brand} — {s!.dataSource === "tab_missing" ? "Sheet tab not found" : "No data in sheet tab"}:
-              </span>
-              <span className="text-amber-700 text-sm ml-1">{s!.warning}</span>
-            </div>
-          </div>
-        ))}
 
         {/* Side-by-side brand cards */}
         <div className="grid md:grid-cols-2 gap-6">

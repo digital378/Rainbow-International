@@ -2046,17 +2046,10 @@ export interface CrmStats {
   /** ISO timestamp of when data was fetched from Google Sheets (preserved when served from cache). */
   cachedAt: string;
   /**
-   * Indicates the origin / health of the data:
-   *   "sheet"       — data was read successfully from the CRM Leads Tracker tab
-   *   "tab_missing" — the tab does not exist in the spreadsheet; all KPIs are zero
-   *   "empty"       — the tab exists but contains no data rows; all KPIs are zero
+   * Indicates the origin / health of the data.
+   * Always "sheet" — data was read successfully from the DB (walkin_leads table).
    */
-  dataSource: "sheet" | "tab_missing" | "empty";
-  /**
-   * Present when dataSource is "tab_missing" or "empty".
-   * Human-readable explanation suitable for display in the admin panel.
-   */
-  warning?: string;
+  dataSource: "sheet";
   /**
    * True when the response is served from the last-known-good cache because
    * the live fetch (DB or Sheets) failed during this request cycle.
@@ -2096,6 +2089,7 @@ export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
   console.log(`[walkin/crm-stats] Cache busted${brand ? ` for ${brand}` : " (all brands)"}`);
 }
 
+/**
 /**
  * Returns aggregated CRM stats for a brand by querying the walkin_leads
  * database table directly — the single source of truth.

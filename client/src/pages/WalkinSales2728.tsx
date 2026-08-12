@@ -25,8 +25,7 @@ type Stats = {
   byCounsellor: Array<CounsellorStat>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
-  dataSource?: "sheet" | "tab_missing" | "empty";
-  warning?: string;
+
 };
 
 type Tab = "overview" | "trends" | "analytics" | "counsellors";
@@ -173,9 +172,10 @@ function Dashboard() {
   const [filterTo,   setFilterTo]   = useState<string | null>(null);
   const cancelled = useRef(false);
 
-  const fetchData = useCallback(() => {
+  const fetchData = useCallback((bust = false) => {
     setLoading(true);
-    fetch("/api/walkin/crm-stats?brand=RIS&ay=2027-28")
+    const url = bust ? "/api/walkin/crm-stats?brand=RIS&ay=2027-28&bust=1" : "/api/walkin/crm-stats?brand=RIS&ay=2027-28";
+    fetch(url)
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
       .then((d: Stats) => { if (!cancelled.current) { setData(d); setError(null); setLastFetch(new Date()); } })
       .catch(e => { if (!cancelled.current) setError(String(e)); })
@@ -241,7 +241,7 @@ function Dashboard() {
       <div className="bg-white rounded-xl p-8 max-w-md shadow border border-red-200">
         <div className="text-red-600 font-bold mb-2">Failed to load data</div>
         <div className="text-sm text-slate-600 mb-4">{error}</div>
-        <button onClick={fetchData} className="px-4 py-2 rounded-lg text-white font-semibold" style={{ background: NAVY }}>Retry</button>
+        <button onClick={() => fetchData()} className="px-4 py-2 rounded-lg text-white font-semibold" style={{ background: NAVY }}>Retry</button>
       </div>
     </div>
   );
@@ -273,26 +273,12 @@ function Dashboard() {
         <div className="flex items-center gap-3 text-xs text-blue-200">
           {lastFetch && `Updated: ${lastFetch.toLocaleTimeString()}`}
           {loading && " · refreshing…"}
-          <button onClick={fetchData} className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300">Refresh</button>
+          <button onClick={() => fetchData()} className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300">Refresh</button>
           <button onClick={() => { try { sessionStorage.removeItem(AUTH_KEY); } catch {} window.location.reload(); }}
             className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">Lock</button>
         </div>
       </div>
 
-      {/* ── Data-source warning banner ── */}
-      {data.dataSource && data.dataSource !== "sheet" && data.warning && (
-        <div className="bg-amber-50 border-b border-amber-300 px-6 py-3">
-          <div className="max-w-7xl mx-auto flex items-start gap-3">
-            <span className="text-amber-500 mt-0.5 flex-shrink-0">⚠️</span>
-            <div>
-              <span className="font-semibold text-amber-800 text-sm">
-                {data.dataSource === "tab_missing" ? "Sheet tab not found" : "No data in sheet tab"}
-              </span>
-              <span className="text-amber-700 text-sm ml-2">{data.warning}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Tab bar ── */}
       <div className="sticky top-0 z-10 border-b border-slate-200 shadow-sm bg-white">
