@@ -91,6 +91,37 @@ Leads captured via the walk-in kiosk are automatically mirrored to two locked Go
 - The admin panel shows last-sync timestamp and DB vs sheet lead counts (`GET /api/walkin/sheets/status`).
 - If the sheet is corrupted, use "Re-sync all" to rewrite it from the DB.
 
+## Large File Uploads & Publishing Size Limit
+
+Replit publishing fails with **"image size is over the limit of 8 GiB"** when the total workspace disk usage (all files, not just Git-tracked ones) exceeds 8 GiB. `.gitignore` and `git rm --cached` do **not** help because the image builder scans the full workspace, not the Git tree.
+
+### Check before publishing
+
+```bash
+npm run disk:check
+```
+
+This reports the top-10 largest directories and warns when total size crosses **6 GiB** — giving 2 GiB of headroom before the hard limit. Run it before every publish if the workspace has grown recently.
+
+### Where `attached_assets/` grows
+
+Every file uploaded to the Replit chat is auto-saved into `attached_assets/`. It currently holds ~612 MB of images and videos that are actively served by the app and must stay. However, ad-hoc reference images, design screenshots, and other one-off uploads that are **not** served by the app should be kept out of this directory.
+
+### What to do instead of uploading large files to the chat
+
+| Scenario | Recommended approach |
+|---|---|
+| Reference images / design mockups (not served) | Upload to an external host (Google Drive, Dropbox) and share a link |
+| Videos served by the app | Use Replit Object Storage — upload via the Object Storage panel, then reference the public URL in code |
+| Logos / icons / images served by the app | Keep in `attached_assets/` but remove originals after optimising (use WebP, compress) |
+
+### If the workspace is already over 6 GiB
+
+1. Run `npm run disk:check` to see which directories are largest.
+2. Remove non-served files from `attached_assets/` (verify nothing in `server/` or `client/` imports them first).
+3. Move large served files (videos, hi-res images) to Replit Object Storage and update the references.
+4. Re-run `npm run disk:check` until it shows ✅ before publishing.
+
 ## External Dependencies
 
 ### Database

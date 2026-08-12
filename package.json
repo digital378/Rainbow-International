@@ -11,7 +11,8 @@
     "test": "node --import tsx/esm tests/friendship-url-utils.test.mjs && vitest run && npx playwright test",
     "check": "NODE_OPTIONS=--max-old-space-size=4096 tsc",
     "db:push": "drizzle-kit push",
-    "seo:check": "node scripts/seo-check.mjs"
+    "seo:check": "node scripts/seo-check.mjs",
+    "disk:check": "bash scripts/check-disk-size.sh"
   },
   "dependencies": {
     "@babylonjs/core": "^9.20.0",
