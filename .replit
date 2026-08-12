@@ -14,6 +14,14 @@ run = ["node", "dist/index.cjs"]
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 63371
+externalPort = 3001
+
+[[ports]]
+localPort = 63516
+externalPort = 3000
+
 [env]
 PORT = "5000"
 
