@@ -1,6 +1,60 @@
 #!/bin/bash
 set -e
 
+# The post-merge environment does not reliably put node/npm on PATH, which
+# fails the script with "npm: command not found". Resolve a usable Node
+# toolchain before doing anything else.
+#
+# Version matters: Node 20.11 ships a crypto module that breaks the Vite build
+# with "crypto.hash is not a function", so prefer >= 20.12 and never fall back
+# to an arbitrary interpreter from the Nix store.
+ensure_node_on_path() {
+  if command -v npm >/dev/null 2>&1 && command -v node >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Prefer the interpreter the running app is already using, if any.
+  local running
+  running="$(pgrep -f 'node .*tsx|tsx server' 2>/dev/null | head -1)"
+  if [ -n "$running" ]; then
+    local exe_dir
+    exe_dir="$(dirname "$(readlink -f "/proc/$running/exe" 2>/dev/null)" 2>/dev/null)"
+    if [ -n "$exe_dir" ] && [ -x "$exe_dir/npm" ]; then
+      PATH="$exe_dir:$PATH"
+      export PATH
+      return 0
+    fi
+  fi
+
+  # Otherwise pick the newest Node >= 20.12 that ships npm.
+  local best_dir="" best_ver=0 dir ver major minor num
+  for dir in /nix/store/*-nodejs-2[0-9]*/bin; do
+    [ -x "$dir/node" ] && [ -x "$dir/npm" ] || continue
+    ver="$("$dir/node" -v 2>/dev/null)" || continue
+    ver="${ver#v}"
+    major="${ver%%.*}"
+    minor="${ver#*.}"; minor="${minor%%.*}"
+    [ -n "$major" ] && [ -n "$minor" ] || continue
+    num=$((major * 1000 + minor))
+    [ "$num" -ge 20012 ] || continue
+    if [ "$num" -gt "$best_ver" ]; then
+      best_ver=$num
+      best_dir=$dir
+    fi
+  done
+
+  if [ -n "$best_dir" ]; then
+    PATH="$best_dir:$PATH"
+    export PATH
+    return 0
+  fi
+
+  echo "[post-merge] ERROR: could not locate a Node >= 20.12 toolchain with npm." >&2
+  return 1
+}
+ensure_node_on_path
+echo "[post-merge] Using node $(node -v) / npm $(npm -v)"
+
 echo "[post-merge] Installing dependencies…"
 install_dependencies() {
   if npm install --no-audit --no-fund; then
