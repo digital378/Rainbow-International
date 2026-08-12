@@ -156,8 +156,7 @@ function renderPage(): string {
     .faq-item.open .faq-icon { transform: rotate(180deg); }
     /* Mind-blowing facts */
     .facts-list { list-style: none; display: flex; flex-direction: column; gap: 20px; margin: 16px 0; }
-    .fact-item { display: flex; gap: 14px; align-items: flex-start; }
-    .fact-emoji { font-size: 26px; flex-shrink: 0; }
+     .fact-item { display: block; }
     .fact-title { font-family: 'League Spartan', sans-serif; font-size: 15px; font-weight: 800; color: #0d3b86; margin-bottom: 4px; }
     .fact-body { font-size: 14px; color: #374151; line-height: 1.7; }
     /* Messi records */
@@ -744,13 +743,13 @@ function renderPage(): string {
 
         <h3 class="section-h3">7 Mind-Blowing Facts About This World Cup Final</h3>
         <ul class="facts-list">
-          <li class="fact-item"><span class="fact-emoji">👶</span><div><div class="fact-title">1. A baby in the photo, now in the final</div><p class="fact-body">In 2007, Lamine Yamal was photographed as a newborn baby alongside Lionel Messi at a charity event. On Sunday, that baby — now 19 years old — plays against Messi in the World Cup Final.</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">📅</span><div><div class="fact-title">2. 20-year age gap</div><p class="fact-body">Lamine Yamal is 19, Lionel Messi is 39 — the widest gap between two finalists' lead players in World Cup final history.</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">🏆</span><div><div class="fact-title">3. First EURO vs Copa America final</div><p class="fact-body">The first-ever World Cup final between the reigning European Champions (Spain, Euro 2024) and the reigning South American Champions (Argentina, Copa America 2024).</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">⚡</span><div><div class="fact-title">4. Argentina's incredible comeback record</div><p class="fact-body">Six come-from-behind victories in this World Cup alone — more than any other team, including a 2–0 comeback against Egypt and two late goals against England in the semifinal.</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">🛡️</span><div><div class="fact-title">5. Spain's fortress defence</div><p class="fact-body">Spain have conceded only one goal in seven matches — an extraordinary record at this level.</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">📊</span><div><div class="fact-title">6. The final was predicted before it happened</div><p class="fact-body">Nate Silver's statistical model had Argentina and Spain as co-favourites before the tournament even kicked off.</p></div></li>
-          <li class="fact-item"><span class="fact-emoji">🌙</span><div><div class="fact-title">7. India stays up late — for both teams</div><p class="fact-body">Fans in Thane watching on IST will see the final kick off at roughly 12:30 AM Monday morning (July 20). Parents — just this once, maybe let them stay up.</p></div></li>
+           <li class="fact-item"><div class="fact-title">1. A baby in the photo, now in the final</div><p class="fact-body">In 2007, Lamine Yamal was photographed as a newborn baby alongside Lionel Messi at a charity event. On Sunday, that baby — now 19 years old — plays against Messi in the World Cup Final.</p></li>
+           <li class="fact-item"><div class="fact-title">2. 20-year age gap</div><p class="fact-body">Lamine Yamal is 19, Lionel Messi is 39 — the widest gap between two finalists' lead players in World Cup final history.</p></li>
+           <li class="fact-item"><div class="fact-title">3. First EURO vs Copa America final</div><p class="fact-body">The first-ever World Cup final between the reigning European Champions (Spain, Euro 2024) and the reigning South American Champions (Argentina, Copa America 2024).</p></li>
+           <li class="fact-item"><div class="fact-title">4. Argentina's incredible comeback record</div><p class="fact-body">Six come-from-behind victories in this World Cup alone — more than any other team, including a 2–0 comeback against Egypt and two late goals against England in the semifinal.</p></li>
+           <li class="fact-item"><div class="fact-title">5. Spain's fortress defence</div><p class="fact-body">Spain have conceded only one goal in seven matches — an extraordinary record at this level.</p></li>
+           <li class="fact-item"><div class="fact-title">6. The final was predicted before it happened</div><p class="fact-body">Nate Silver's statistical model had Argentina and Spain as co-favourites before the tournament even kicked off.</p></li>
+           <li class="fact-item"><div class="fact-title">7. India stays up late — for both teams</div><p class="fact-body">Fans in Thane watching on IST will see the final kick off at roughly 12:30 AM Monday morning (July 20). Parents — just this once, maybe let them stay up.</p></li>
         </ul>
 
         <!-- Conclusion -->

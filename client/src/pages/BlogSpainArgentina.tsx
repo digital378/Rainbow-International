@@ -923,43 +923,35 @@ export default function BlogSpainArgentina() {
             <ol className="list-none space-y-4 mb-8">
               {[
                 {
-                  icon: "👶",
                   title: "A baby in the photo, now in the final",
                   body: "In 2007, Lamine Yamal was photographed as a newborn baby alongside Lionel Messi at a charity event. On Sunday, that baby — now 19 years old — plays against Messi in the World Cup Final.",
                 },
                 {
-                  icon: "📅",
                   title: "20-year age gap",
                   body: "Lamine Yamal is 19, Lionel Messi is 39 — the widest gap between two finalists' lead players in World Cup final history.",
                 },
                 {
-                  icon: "🏆",
                   title: "First EURO vs Copa America final",
                   body: "The first-ever World Cup final between the reigning European Champions (Spain, Euro 2024) and the reigning South American Champions (Argentina, Copa America 2024).",
                 },
                 {
-                  icon: "⚡",
                   title: "Argentina's incredible comeback record",
                   body: "Six come-from-behind victories in this World Cup alone — more than any other team, including a 2–0 comeback against Egypt and two late goals against England in the semifinal.",
                 },
                 {
-                  icon: "🛡️",
                   title: "Spain's fortress defence",
                   body: "Spain have conceded only one goal in seven matches — an extraordinary record at this level.",
                 },
                 {
-                  icon: "📊",
                   title: "The final was predicted before it happened",
                   body: "Nate Silver's statistical model had Argentina and Spain as co-favourites before the tournament even kicked off.",
                 },
                 {
-                  icon: "🌙",
                   title: "India stays up late — for both teams",
                   body: "Fans in Thane watching on IST will see the final kick off at roughly 12:30 AM Monday morning (July 20). Parents — just this once, maybe let them stay up.",
                 },
               ].map((fact, i) => (
                 <li key={i} className="flex gap-4 items-start">
-                  <span className="text-2xl shrink-0">{fact.icon}</span>
                   <div>
                     <p className="font-bold text-[#0d3b86] text-sm md:text-base mb-1">
                       {i + 1}. {fact.title}
