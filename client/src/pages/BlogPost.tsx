@@ -332,7 +332,7 @@ export default function BlogPost() {
               <h2 className="text-2xl font-black mb-8 text-center" style={{ color: "#0d3b86" }}>Related Articles</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {related.map((rel) => (
-                  <Link key={rel.slug} href={`/blog/${rel.slug}`} className="group block rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow bg-white">
+                  <a key={rel.slug} href={`/blog/${rel.slug}`} className="group block rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow bg-white">
                     <div className="p-5">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{rel.cat}</span>
                       <h3 className="text-base font-bold mt-2 leading-snug text-gray-800 group-hover:text-blue-800 transition-colors line-clamp-3">
@@ -340,7 +340,7 @@ export default function BlogPost() {
                       </h3>
                       <p className="text-xs text-gray-500 mt-2">{rel.date}</p>
                     </div>
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>

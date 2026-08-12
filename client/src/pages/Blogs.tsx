@@ -4,7 +4,6 @@ import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
-import { Link } from "wouter";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useQuery } from "@tanstack/react-query";
 
@@ -145,8 +144,11 @@ export default function Blogs() {
                   </div>
                 </a>
               )}
+              {/* Plain anchor: /blog/:slug is server-rendered, so these must be
+                  real navigations. A wouter Link would keep the SPA mounted and
+                  render the old client-side article instead. */}
               {filtered.map((blog) => (
-                <Link
+                <a
                   key={blog.slug}
                   href={`/blog/${blog.slug}`}
                   data-testid={`card-blog-${blog.slug}`}
@@ -167,7 +169,7 @@ export default function Blogs() {
                       Read More <ArrowRight size={14} />
                     </span>
                   </div>
-                </Link>
+                </a>
               ))}
               {filtered.length === 0 && !isLoading && !(activeCategory === "All" || activeCategory === "Events") && (
                 <div className="col-span-3 text-center py-16 text-gray-400">
