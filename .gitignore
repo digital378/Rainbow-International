@@ -4,3 +4,11 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Local archives and tooling caches are not needed at runtime.
+# Publishing honors these rules, so keep them out of the deployment image.
+.cache/
+.agents/
+.local/
+source.zip
+attached_assets/*.zip
