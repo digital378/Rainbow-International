@@ -1,0 +1,23 @@
+Setup complete. Final report:
+
+Skills already available (no action needed)
+
+Project-level (.agents/skills/): 19 skills already covering frontend-design, ui-ux-pro-max, web-design-guidelines, vercel-react-best-practices, vercel-composition-patterns, next-best-practices, seo-audit, audit-website, browser-use, and more.
+Replit-managed (.local/skills/): testing (Playwright), code-review, diagnostics, package-management, deployment, security-scan, threat-modeling, replit-docs, media-generation, etc. — left untouched per your instructions.
+Skills installed (project-level, via the supported CLI mechanism)
+
+Skill	Source	Install command	Why
+git-guardrails-claude-code	mattpocock/skills (218K installs)	npx skills add mattpocock/skills@git-guardrails-claude-code -y	Blocks destructive git ops (push, reset --hard, branch -D) — closest fit for "Git/GitHub workflows," none existed
+typescript-advanced-types	wshobson/agents (59.8K installs)	npx skills add wshobson/agents@typescript-advanced-types -y	No dedicated TypeScript skill existed; this covers generics/conditional types/utility types
+accessibility	addyosmani/web-quality-skills (43.7K installs, Google Chrome team)	npx skills add addyosmani/web-quality-skills@accessibility -y	WCAG 2.2 audit guidance; no dedicated a11y skill existed
+Note: -g (global) install failed with "PromptScript does not support global skill installation" — this environment only supports project-level installs, so all three landed in .agents/skills/ instead. Confirmed discoverable (valid SKILL.md frontmatter in each).
+
+MCP servers — 21st, context7, Cloudflare, Google Maps Platform, and Notion are all already configured in this repl, matching your other project exactly. Nothing missing, nothing to set up, no OAuth/authorization needed.
+
+Shell tools — all already present: git 2.53.0, gh 2.88.1, git-lfs 3.6.1, jq 1.7.1, ripgrep 14.1.1, curl 8.7.1, wget 1.25.0, node v20.20.0/npm 10.8.2, python3.11.14. Nothing installed.
+
+Package files changed: only skills-lock.json (the Skills CLI's own lockfile, auto-updated by the installs above). package.json/package-lock.json untouched.
+
+Application files confirmed unchanged — git status --short shows only the 3 new skill directories, the updated skills-lock.json, and your uploaded instructions file. No changes to client/, server/, shared/, routes, blog content, SEO files, or workflow/deployment config.
+
+Follow-up authorization needed: none.
