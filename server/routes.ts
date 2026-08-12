@@ -6,7 +6,7 @@ import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
 import { z } from "zod";
-import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema, type InsertFriendshipLead } from "@shared/schema";
+import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema, type InsertFriendshipLead, walkinLeads, callbackRequests } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
 
 // ── Restricted public input schema for friendship lead submission ─
@@ -28,6 +28,21 @@ import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
+import { db } from "./db";
+
+/** Derive "Mon-YY" month label from a YYYY-MM-DD date string (e.g. "2027-06-15" → "Jun-27"). */
+function crmMonthLabel(dateStr: string): string {
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const [yearStr, monthStr] = dateStr.split("-");
+  const month = parseInt(monthStr, 10) - 1;
+  const year  = parseInt(yearStr,  10) % 100;
+  return `${months[month]}-${String(year).padStart(2, "0")}`;
+}
+
+/** Return today's date in YYYY-MM-DD format, adjusted to IST. */
+function todayIST(): string {
+  return new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+}
 
 const RESUME_ALLOWED_MIMES_BY_EXT: Record<string, Set<string>> = {
   pdf: new Set(["application/pdf", "application/octet-stream"]),
@@ -642,8 +657,32 @@ export async function registerRoutes(
   app.post("/api/callback-requests", async (req, res) => {
     try {
       const validatedData = insertCallbackRequestSchema.parse(req.body);
-      const saved = await storage.createCallbackRequest(validatedData);
-      // Fire-and-forget email
+      // Atomic transaction: both the callback_requests row and the walkin_leads
+      // row are committed together so neither can exist without the other.
+      // A failure in either insert propagates as a 500 — no partial state.
+      const enquiryDate = todayIST();
+      const saved = await db.transaction(async (tx) => {
+        const [callbackRow] = await tx.insert(callbackRequests).values(validatedData).returning();
+        await tx.insert(walkinLeads).values({
+          brand:        "RIS",
+          academicYear: "2027-28",
+          enquiryDate,
+          monthLabel:   crmMonthLabel(enquiryDate),
+          parentName:   validatedData.name,
+          childName:    "",
+          phone:        validatedData.phone,
+          program:      "Callback Request",
+          source:       "Website",
+          createdBy:    "website",
+        });
+        return callbackRow;
+      });
+      // Invalidate the stats cache only after the transaction commits.
+      // bustCrmStatsCache also increments the generation counter, which prevents
+      // any pre-transaction in-flight fetch from overwriting the fresh result.
+      bustCrmStatsCache("RIS");
+      // Fire-and-forget side effects (email + sheet appends) — these don't affect
+      // dashboard data and must not block the response.
       sendCallbackEmail(validatedData).catch((err) =>
         console.error("[callback] Email error:", err)
       );
@@ -658,7 +697,7 @@ export async function registerRoutes(
         studentName: "",
         grade: "",
         phone: validatedData.phone,
-      }).then(() => bustCrmStatsCache("RIS")).catch((err) => console.error("[callback] CRM Leads Tracker append error:", err));
+      }).catch((err) => console.error("[callback] CRM Leads Tracker append error:", err));
       res.status(201).json(saved);
     } catch (error: any) {
       if (error.name === "ZodError") {

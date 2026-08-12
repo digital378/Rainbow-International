@@ -1,10 +1,11 @@
 /**
- * Integration test: CRM stats cache behaviour.
+ * Integration test: CRM stats cache behaviour — website enquiry and callback-request paths.
  *
  * Confirms that:
  *   1. `readCrmLeadsTrackerStats` serves a cached result on a second call
  *      (no extra DB query is made within the TTL).
- *   2. `bustCrmStatsCache` invalidates that cache entry.
+ *   2. `bustCrmStatsCache` — called by /api/inquiries and /api/callback-requests
+ *      after appending — invalidates that cache entry.
  *   3. The very next `readCrmLeadsTrackerStats` call makes a fresh DB query
  *      instead of returning the stale cached result.
  *
@@ -96,7 +97,7 @@ beforeEach(() => {
   bustCrmStatsCache();
 });
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
+// ── Tests: website-enquiry path ───────────────────────────────────────────────
 describe("CRM stats cache-bust after website enquiry", () => {
 
   it("caches the result so a second call within the TTL skips the DB query", async () => {
@@ -184,5 +185,118 @@ describe("CRM stats cache-bust after website enquiry", () => {
     const result = await readCrmLeadsTrackerStats("RIS");
     expect(result.kpis.totalLeads).toBe(7);
     expect(mockDbWhere).toHaveBeenCalledTimes(2);
+  });
+});
+
+// ── Tests: callback-request path ─────────────────────────────────────────────
+//
+// The /api/callback-requests handler atomically inserts into callback_requests
+// and walkin_leads (in a DB transaction), then calls bustCrmStatsCache("RIS").
+//
+// These tests confirm the cache-bust pattern used by that route actually
+// invalidates the CRM stats cache so the next dashboard read returns fresh data.
+describe("CRM stats cache-bust after callback request", () => {
+  it("cache is invalidated when bustCrmStatsCache fires after the DB transaction commits", async () => {
+    // Before: 2 leads; after the walkin_leads row is committed: 3 leads
+    mockDbWhere
+      .mockResolvedValueOnce(makeDbRows(2))
+      .mockResolvedValueOnce(makeDbRows(3));
+
+    // Warm the cache (state before the callback request)
+    const before = await readCrmLeadsTrackerStats("RIS");
+    expect(before.kpis.totalLeads).toBe(2);
+    expect(mockDbWhere).toHaveBeenCalledTimes(1);
+
+    // Simulate what /api/callback-requests does after the transaction commits
+    bustCrmStatsCache("RIS");
+
+    // The next /api/walkin/crm-stats read must NOT serve the stale cached value
+    const after = await readCrmLeadsTrackerStats("RIS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(2); // fresh DB query made
+    expect(after.kpis.totalLeads).toBe(3);        // updated total returned
+  });
+
+  it("callback-request bust does not invalidate the RPS cache (brand isolation)", async () => {
+    mockDbWhere.mockResolvedValue(makeDbRows(4));
+
+    // Warm both brand caches
+    await readCrmLeadsTrackerStats("RIS");
+    await readCrmLeadsTrackerStats("RPS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(2);
+
+    // Callback request only busts RIS (the route always calls bustCrmStatsCache("RIS"))
+    bustCrmStatsCache("RIS");
+
+    // RPS cache should still be valid — no extra DB query
+    await readCrmLeadsTrackerStats("RPS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(2);
+
+    // RIS must re-fetch
+    await readCrmLeadsTrackerStats("RIS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(3);
+  });
+
+  it("dashboard total reflects the new callback-request lead on the very next read after bust", async () => {
+    // 5 leads before and 6 after a callback request is committed
+    mockDbWhere
+      .mockResolvedValueOnce(makeDbRows(5))
+      .mockResolvedValueOnce(makeDbRows(6));
+
+    await readCrmLeadsTrackerStats("RIS"); // warm cache
+
+    bustCrmStatsCache("RIS");
+
+    const fresh = await readCrmLeadsTrackerStats("RIS");
+    expect(fresh.kpis.totalLeads).toBe(6);
+    expect(mockDbWhere).toHaveBeenCalledTimes(2);
+  });
+});
+
+// ── Tests: generation guard — stale in-flight fetch cannot overwrite fresh cache ─
+//
+// Scenario: a cache-miss fetch starts (deferred), a bust fires (insert committed),
+// a fresh fetch starts and settles with the new total, then the original deferred
+// fetch finally resolves with the stale total.
+//
+// The generation counter in bustCrmStatsCache / readCrmLeadsTrackerStats ensures
+// the stale result is discarded and the fresh result stays in cache.
+describe("Generation guard — stale in-flight fetch discarded after bust", () => {
+  it("stale pre-bust in-flight fetch settling after a bust cannot overwrite the fresh post-bust cache result", async () => {
+    // -- Step 1: warm the cache --
+    mockDbWhere.mockResolvedValueOnce(makeDbRows(3));
+    await readCrmLeadsTrackerStats("RIS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(1);
+
+    // -- Step 2: bust (generation 0 → 1), starting a deferred stale re-fetch --
+    bustCrmStatsCache("RIS");
+
+    let resolveStale!: (rows: ReturnType<typeof makeDbRows>) => void;
+    const staleReadPending = new Promise<ReturnType<typeof makeDbRows>>(
+      (resolve) => { resolveStale = resolve; }
+    );
+    mockDbWhere.mockReturnValueOnce(staleReadPending); // paused — won't resolve yet
+
+    // Start the stale read (generation=1) — hangs waiting for staleReadPending
+    const staleReadPromise = readCrmLeadsTrackerStats("RIS");
+    expect(mockDbWhere).toHaveBeenCalledTimes(2); // deferred DB query started
+
+    // -- Step 3: second bust (generation 1 → 2), simulating the callback route
+    //    committing its transaction and calling bustCrmStatsCache("RIS") --
+    bustCrmStatsCache("RIS");
+
+    // -- Step 4: fresh post-bust read resolves immediately with 4 leads --
+    mockDbWhere.mockResolvedValueOnce(makeDbRows(4));
+    const fresh = await readCrmLeadsTrackerStats("RIS");
+    expect(fresh.kpis.totalLeads).toBe(4); // fresh result
+    expect(mockDbWhere).toHaveBeenCalledTimes(3); // three DB queries so far
+
+    // -- Step 5: resolve the stale read with the pre-insert total --
+    resolveStale(makeDbRows(3));
+    await staleReadPromise; // wait for it to finish processing
+
+    // -- Step 6: cache must still hold the fresh result (4, not 3) --
+    const cached = await readCrmLeadsTrackerStats("RIS");
+    expect(cached.kpis.totalLeads).toBe(4);        // stale overwrite prevented
+    expect(mockDbWhere).toHaveBeenCalledTimes(3);   // no new DB query (still cached)
   });
 });

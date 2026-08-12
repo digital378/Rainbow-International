@@ -2070,6 +2070,13 @@ const crmStatsCache   = new Map<"RIS" | "RPS", CrmStatsEntry>();
 /** Holds the in-progress fetch promise so concurrent cache-miss requests share one call. */
 const crmStatsInFlight = new Map<"RIS" | "RPS", Promise<CrmStats>>();
 /**
+ * Monotonically-increasing generation counter per brand.
+ * Incremented on every bust so that a pre-bust in-flight fetch, when it
+ * eventually settles, can detect that it is no longer the current generation
+ * and must discard its result instead of overwriting the fresh cache entry.
+ */
+const crmStatsGeneration = new Map<"RIS" | "RPS", number>();
+/**
  * Last successfully fetched data per brand — never cleared by bustCrmStatsCache.
  * Used as a stale fallback when the live fetch fails (e.g. DB / Sheets outage).
  */
@@ -2081,10 +2088,17 @@ const crmStatsLastGood = new Map<"RIS" | "RPS", CrmStatsEntry>();
  */
 export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
   if (brand) {
+    // Increment generation so any in-flight fetch that started before this bust
+    // will see a mismatch when it settles and will discard its stale result.
+    crmStatsGeneration.set(brand, (crmStatsGeneration.get(brand) ?? 0) + 1);
     crmStatsCache.delete(brand);
-    // Don't clear in-flight — let any running fetch complete and re-populate the cache.
+    crmStatsInFlight.delete(brand);
   } else {
+    for (const b of ["RIS", "RPS"] as const) {
+      crmStatsGeneration.set(b, (crmStatsGeneration.get(b) ?? 0) + 1);
+    }
     crmStatsCache.clear();
+    crmStatsInFlight.clear();
   }
   console.log(`[walkin/crm-stats] Cache busted${brand ? ` for ${brand}` : " (all brands)"}`);
 }
@@ -2119,6 +2133,11 @@ export async function readCrmLeadsTrackerStats(
       return inflight;
     }
   }
+
+  // Capture the generation before any async work.  A bust that fires while
+  // this fetch is in-flight will increment the generation; if it no longer
+  // matches when we try to write to cache, we discard the stale result.
+  const myGeneration = crmStatsGeneration.get(brand) ?? 0;
 
   const fetchPromise = (async (): Promise<CrmStats> => {
     try {
@@ -2228,10 +2247,17 @@ export async function readCrmLeadsTrackerStats(
         dataSource: "sheet", // "sheet" = data is good; frontend shows no warning
       };
 
-      const entry: CrmStatsEntry = { data: result, storedAt: Date.now() };
-      crmStatsCache.set(brand, entry);
-      crmStatsLastGood.set(brand, entry);
-      console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
+      // Only write cache if our generation is still current — a bust that fired
+      // while we were querying the DB will have incremented the generation, so
+      // we must discard this stale result rather than overwriting the fresh one.
+      if ((crmStatsGeneration.get(brand) ?? 0) === myGeneration) {
+        const entry: CrmStatsEntry = { data: result, storedAt: Date.now() };
+        crmStatsCache.set(brand, entry);
+        crmStatsLastGood.set(brand, entry);
+        console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
+      } else {
+        console.log(`[walkin/crm-stats] Discarding stale in-flight result for ${brand} (generation mismatch — bust fired during fetch)`);
+      }
       return result;
     } catch (fetchErr: any) {
       // On any fetch failure, serve the last-known-good data with stale:true so
@@ -2246,7 +2272,15 @@ export async function readCrmLeadsTrackerStats(
       // No prior data at all — propagate so the route returns 500
       throw fetchErr;
     } finally {
-      crmStatsInFlight.delete(brand);
+      // Only clear the in-flight entry when our generation is still current.
+      // A bust increments the generation AND clears the in-flight map, so if
+      // the generation no longer matches a newer fetch is now in-flight and we
+      // must not remove it.  Only one fetch can be active per generation, so
+      // the generation check is a safe proxy for identity without a
+      // self-referential fetchPromise comparison.
+      if ((crmStatsGeneration.get(brand) ?? 0) === myGeneration) {
+        crmStatsInFlight.delete(brand);
+      }
     }
   })();
 
