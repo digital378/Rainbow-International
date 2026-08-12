@@ -1,21 +1,24 @@
 /**
- * End-to-end happy-path tests for the RPS CRM dashboard data pipeline.
+ * End-to-end happy-path tests for the RIS CRM dashboard data pipeline.
  *
- * Verifies that when the walkin_leads DB table has RPS leads:
- *   1. readCrmLeadsTrackerStats("RPS") returns dataSource === "sheet"
+ * Mirrors crmRpsHappyPath.test.ts for the RIS brand.
+ *
+ * Verifies that when the walkin_leads DB table has RIS leads:
+ *   1. readCrmLeadsTrackerStats("RIS") returns dataSource === "sheet"
  *   2. kpis.totalLeads > 0 (no silent zero-out)
  *   3. Individual KPIs (totalLeads, admissions, walkins, bookings) match
  *      a hand-counted synthetic dataset
  *   4. The `warning` field is absent (so the frontend banner does NOT render)
- *   5. brand field equals "RPS"
+ *   5. brand field equals "RIS"
  *
  * No real database or Google Sheets calls are made; all I/O is mocked.
  *
- * NOTE: readCrmLeadsTrackerStats was migrated from reading Google Sheets
- * directly to reading the walkin_leads DB table (the single source of truth).
- * Tests here mock the Drizzle ORM select chain accordingly.
+ * NOTE: readCrmLeadsTrackerStats reads the walkin_leads DB table (the single
+ * source of truth), not the Google Sheet directly.  The RIS sheet column
+ * layout (Status at [6], no Centre column) is irrelevant here — KPIs are
+ * derived from the DB status field, not raw sheet columns.
  *
- * Synthetic dataset — 12 rows, all in Jul-27:
+ * Synthetic dataset — 12 rows, all in Aug-26 (current academic year):
  *
  *   idx0  OPEN
  *   idx1  WALK-IN BOOKED      → booking
@@ -57,7 +60,6 @@ vi.mock("../shared/schema", () => ({
     academicYear: "academicYear",
     isArchived:   "isArchived",
   },
-  // Other exports referenced at module load time
   walkinBranches:      {},
   walkinLeadAuditLog:  {},
   walkinStatuses:      {},
@@ -92,6 +94,7 @@ import { readCrmLeadsTrackerStats, bustCrmStatsCache } from "../server/walkinShe
 
 // ── Synthetic DB rows ─────────────────────────────────────────────────────────
 // Shape matches the columns selected in readCrmLeadsTrackerStats.
+// RIS-specific programs reflect the real grade range (Pre-Nursery through Class 12).
 interface FakeLead {
   monthLabel: string;
   status: string;
@@ -101,19 +104,31 @@ interface FakeLead {
   branchId: number | null;
 }
 
-const RPS_DB_ROWS: FakeLead[] = [
-  { monthLabel: "Jul-27", status: "OPEN",               source: "Walk-In",  leadOwner: "Deepa",  program: "Nursery",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "WALK-IN BOOKED",     source: "Social",   leadOwner: "Kavita", program: "Junior KG", branchId: 1 },
-  { monthLabel: "Jul-27", status: "WALK-IN COMPLETED",  source: "Referral", leadOwner: "Deepa",  program: "Senior KG", branchId: 1 },
-  { monthLabel: "Jul-27", status: "ADMISSION DONE",     source: "Online",   leadOwner: "Kavita", program: "Class 1",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "CLOSED",             source: "Walk-In",  leadOwner: "Deepa",  program: "Nursery",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "WALK-IN BOOKED",     source: "Referral", leadOwner: "Kavita", program: "Junior KG", branchId: 1 },
-  { monthLabel: "Jul-27", status: "FOLLOW-UP",          source: "Social",   leadOwner: "Deepa",  program: "Class 2",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "WALK-IN COMPLETED",  source: "Online",   leadOwner: "Kavita", program: "Senior KG", branchId: 1 },
-  { monthLabel: "Jul-27", status: "ADMISSION DONE",     source: "Walk-In",  leadOwner: "Deepa",  program: "Nursery",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "OPEN",               source: "Social",   leadOwner: "Kavita", program: "Class 1",   branchId: 1 },
-  { monthLabel: "Jul-27", status: "CLOSED",             source: "Referral", leadOwner: "Deepa",  program: "Junior KG", branchId: 1 },
-  { monthLabel: "Jul-27", status: "ADMISSION DONE",     source: "Online",   leadOwner: "Kavita", program: "Class 2",   branchId: 1 },
+const RIS_DB_ROWS: FakeLead[] = [
+  // idx0  OPEN
+  { monthLabel: "Aug-26", status: "OPEN",              source: "Walk-In",   leadOwner: "Anjali",  program: "Jr. KG",    branchId: 2 },
+  // idx1  WALK-IN BOOKED → booking
+  { monthLabel: "Aug-26", status: "WALK-IN BOOKED",    source: "Social",    leadOwner: "Priya",   program: "Nursery",   branchId: 2 },
+  // idx2  WALK-IN COMPLETED → walkin
+  { monthLabel: "Aug-26", status: "WALK-IN COMPLETED", source: "Referral",  leadOwner: "Anjali",  program: "Sr. KG",    branchId: 2 },
+  // idx3  ADMISSION DONE → walkin + admission
+  { monthLabel: "Aug-26", status: "ADMISSION DONE",    source: "Online",    leadOwner: "Priya",   program: "Class 1",   branchId: 2 },
+  // idx4  CLOSED
+  { monthLabel: "Aug-26", status: "CLOSED",            source: "Walk-In",   leadOwner: "Anjali",  program: "Pre-Nursery", branchId: 2 },
+  // idx5  WALK-IN BOOKED → booking
+  { monthLabel: "Aug-26", status: "WALK-IN BOOKED",    source: "Referral",  leadOwner: "Priya",   program: "Jr. KG",    branchId: 2 },
+  // idx6  FOLLOW-UP
+  { monthLabel: "Aug-26", status: "FOLLOW-UP",         source: "Social",    leadOwner: "Anjali",  program: "Class 3",   branchId: 2 },
+  // idx7  WALK-IN COMPLETED → walkin
+  { monthLabel: "Aug-26", status: "WALK-IN COMPLETED", source: "Online",    leadOwner: "Priya",   program: "Sr. KG",    branchId: 2 },
+  // idx8  ADMISSION DONE → walkin + admission
+  { monthLabel: "Aug-26", status: "ADMISSION DONE",    source: "Walk-In",   leadOwner: "Anjali",  program: "Nursery",   branchId: 2 },
+  // idx9  OPEN
+  { monthLabel: "Aug-26", status: "OPEN",              source: "Social",    leadOwner: "Priya",   program: "Class 2",   branchId: 2 },
+  // idx10 CLOSED
+  { monthLabel: "Aug-26", status: "CLOSED",            source: "Referral",  leadOwner: "Anjali",  program: "Class 5",   branchId: 2 },
+  // idx11 ADMISSION DONE → walkin + admission
+  { monthLabel: "Aug-26", status: "ADMISSION DONE",    source: "Online",    leadOwner: "Priya",   program: "Class 4",   branchId: 2 },
 ];
 
 // Hand-verified expected KPIs
@@ -129,97 +144,130 @@ beforeEach(() => {
   mockDbSelect.mockClear();
   mockDbFrom.mockClear();
   mockDbWhere.mockClear();
-  // Restore the default chain shape after any per-test overrides
   mockDbFrom.mockImplementation(() => ({ where: mockDbWhere }));
   mockDbSelect.mockImplementation(() => ({ from: mockDbFrom }));
-  mockDbWhere.mockResolvedValue(RPS_DB_ROWS);
+  mockDbWhere.mockResolvedValue(RIS_DB_ROWS);
   bustCrmStatsCache();
 });
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
-describe("RPS CRM dashboard — happy path (DB populated)", () => {
+describe("RIS CRM dashboard — happy path (DB populated)", () => {
 
   it("returns dataSource === 'sheet' when the DB has data rows", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.dataSource).toBe("sheet");
   });
 
   it("kpis.totalLeads is greater than zero", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.kpis.totalLeads).toBeGreaterThan(0);
   });
 
   it("totalLeads matches the DB row count", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.kpis.totalLeads).toBe(EXPECTED.totalLeads);
   });
 
   it("admissions matches ADMISSION DONE rows", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.kpis.admissions).toBe(EXPECTED.admissions);
   });
 
   it("walkins counts WALK-IN COMPLETED + ADMISSION DONE rows", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.kpis.walkins).toBe(EXPECTED.walkins);
   });
 
   it("bookings counts only WALK-IN BOOKED rows", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.kpis.bookings).toBe(EXPECTED.bookings);
   });
 
   it("warning field is absent when data is healthy (so frontend banner does not render)", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     expect(stats.warning).toBeUndefined();
   });
 
-  it("brand field equals 'RPS'", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
-    expect(stats.brand).toBe("RPS");
+  it("brand field equals 'RIS'", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    expect(stats.brand).toBe("RIS");
   });
 
   it("queries the database (db.select is called)", async () => {
-    await readCrmLeadsTrackerStats("RPS");
+    await readCrmLeadsTrackerStats("RIS");
     expect(mockDbSelect).toHaveBeenCalled();
   });
 
   it("statusBreakdown totals equal totalLeads", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     const sum = stats.statusBreakdown.reduce((a, s) => a + s.cnt, 0);
     expect(sum).toBe(stats.kpis.totalLeads);
   });
 
   it("monthly totals sum to totalLeads", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     const sum = stats.monthly.reduce((a, m) => a + m.cnt, 0);
     expect(sum).toBe(stats.kpis.totalLeads);
   });
 
-  it("all 12 rows land in Jul-27 (all monthLabels are Jul-27)", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
-    expect(stats.monthly).toEqual([{ month: "Jul-27", cnt: 12 }]);
+  it("all 12 rows land in Aug-26 (all monthLabels are Aug-26)", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    expect(stats.monthly).toEqual([{ month: "Aug-26", cnt: 12 }]);
+  });
+
+  it("bySource totals equal totalLeads", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    const sum = stats.bySource.reduce((a, s) => a + s.cnt, 0);
+    expect(sum).toBe(stats.kpis.totalLeads);
+  });
+
+  it("byProgram totals equal totalLeads", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    const sum = stats.byProgram.reduce((a, p) => a + p.cnt, 0);
+    expect(sum).toBe(stats.kpis.totalLeads);
+  });
+
+  it("byCounsellor walkins sum equals kpis.walkins", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    const sum = stats.byCounsellor.reduce((a, c) => a + c.walkins, 0);
+    expect(sum).toBe(stats.kpis.walkins);
+  });
+
+  it("byCounsellor admissions sum equals kpis.admissions", async () => {
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    const sum = stats.byCounsellor.reduce((a, c) => a + c.admissions, 0);
+    expect(sum).toBe(stats.kpis.admissions);
   });
 });
 
-// ── Warning-banner condition mirroring the frontend guard ─────────────────────
+// ── Warning-banner condition mirroring the frontend TSX guard ─────────────────
 // The dashboard renders the banner when:
 //   data.dataSource && data.dataSource !== "sheet" && data.warning
 // These tests confirm the condition is correctly absent for the happy path.
-describe("Warning banner condition — frontend guard verification", () => {
+describe("RIS warning banner condition — frontend guard verification", () => {
+
   it("banner does NOT show when dataSource is 'sheet' (healthy data)", async () => {
-    const stats = await readCrmLeadsTrackerStats("RPS");
-    // Replicate the exact TSX guard: dataSource !== "sheet" && warning exists
+    const stats = await readCrmLeadsTrackerStats("RIS");
+    // Replicate the exact TSX guard
     const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
     expect(bannerShouldShow).toBe(false);
   });
 
   it("banner condition evaluates to false when DB returns zero leads", async () => {
     mockDbWhere.mockResolvedValueOnce([]);
-    const stats = await readCrmLeadsTrackerStats("RPS");
+    const stats = await readCrmLeadsTrackerStats("RIS");
     // DB path always returns dataSource "sheet" — banner never shows from DB path
     const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
     expect(bannerShouldShow).toBe(false);
     expect(stats.kpis.totalLeads).toBe(0);
+  });
+
+  it("result is consistent between two calls within the cache TTL", async () => {
+    const first  = await readCrmLeadsTrackerStats("RIS");
+    const second = await readCrmLeadsTrackerStats("RIS");
+    // Second call is served from cache — DB queried only once
+    expect(mockDbSelect).toHaveBeenCalledTimes(1);
+    expect(second.kpis.totalLeads).toBe(first.kpis.totalLeads);
+    expect(second.dataSource).toBe("sheet");
   });
 });
