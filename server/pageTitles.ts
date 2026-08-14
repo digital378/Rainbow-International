@@ -3,6 +3,7 @@ import { db } from "./db";
 import { blogPostsTable } from "@shared/schema";
 import { ROUTE_SEO, buildBreadcrumbLd, routeCanonical, HOME_ORG_LD } from "@shared/routeSeo";
 import { ALL_FAQS_PAGE_ITEMS, ADMISSIONS_FAQS, buildFaqPageLd } from "@shared/faqData";
+import { blogSlugFromPath, isKnownBlogSlug } from "./blogRoutes";
 
 export async function resolveBlogTitle(slug: string): Promise<string | null> {
   try {
@@ -133,7 +134,6 @@ const STATIC_KNOWN_PATHS = new Set([
 ]);
 
 const DYNAMIC_KNOWN_PATTERNS: RegExp[] = [
-  /^\/blog\/[^/]+$/,
   /^\/walkin\/[^/]+$/,
   /^\/admin\/ras\/[^/]+\/qr$/,
 ];
@@ -141,6 +141,13 @@ const DYNAMIC_KNOWN_PATTERNS: RegExp[] = [
 export function isKnownRoute(reqPath: string): boolean {
   const basePath = (reqPath.split("?")[0].replace(/\/$/, "") || "/");
   if (STATIC_KNOWN_PATHS.has(basePath)) return true;
+  // Blog URLs are resolved against the registry rather than a blanket
+  // /blog/<anything> pattern. That pattern returned 200 for every conceivable
+  // blog URL, so a post that did not exist looked valid to search engines
+  // (a soft 404). Real posts — database-backed or code-owned — are known here
+  // the moment they are created; anything else is honestly reported missing.
+  const blogSlug = blogSlugFromPath(basePath);
+  if (blogSlug) return isKnownBlogSlug(blogSlug);
   return DYNAMIC_KNOWN_PATTERNS.some((re) => re.test(basePath));
 }
 

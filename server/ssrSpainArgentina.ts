@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { registerCodeOwnedBlogSlug } from "./blogRoutes";
 
 const SLUG = "spain-vs-argentina-world-cup-2026-final-lessons";
 const CANONICAL = `https://rainbowinternationalschool.in/blog/${SLUG}`;
@@ -937,6 +938,8 @@ function renderPage(): string {
 }
 
 export function registerSpainArgentinaSSR(app: Express) {
+  // Declare this code-owned page so no legacy redirect can ever hijack its URL.
+  registerCodeOwnedBlogSlug(SLUG);
   app.get(`/blog/${SLUG}`, (_req, res) => {
     try {
       const html = renderPage();

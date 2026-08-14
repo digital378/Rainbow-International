@@ -25,6 +25,16 @@ import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
 import { registerRakshaBandhan2026SSR } from "./ssrRakshaBandhan2026";
+import {
+  registerCodeOwnedBlogSlug,
+  primeBlogSlugCache,
+  getKnownBlogSlugs,
+  noteBlogSlugAdded,
+  noteBlogSlugRemoved,
+  getRegistryCounts,
+  createLegacyRedirectRouter,
+  isKnownBlogSlug,
+} from "./blogRoutes";
 import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
@@ -399,6 +409,7 @@ export async function registerRoutes(
   // redirect:false prevents express.static from adding a trailing slash, which would
   // loop with the global trailing-slash stripper in server/index.ts (ERR_TOO_MANY_REDIRECTS).
   const blogDir = path.join(process.cwd(), "blog-pages/independence-day-2026");
+  registerCodeOwnedBlogSlug("independence-day-2026");
   app.use("/blog/independence-day-2026", express.static(blogDir, { index: "index.html", redirect: false }));
   app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.join(blogDir, "index.html")));
 
@@ -407,9 +418,15 @@ export async function registerRoutes(
   // Blog-slug redirects are derived automatically from the blog_posts table — every
   // post gets a /slug → /blog/slug redirect so old WordPress backlinks resolve
   // correctly. No manual entry is needed when a new post is added.
+  // Prime the blog-slug registry from the database. Code-owned pages have
+  // already registered themselves above, so from here on the registry knows
+  // every legitimate blog URL and can shield them from the redirects below.
   const blogSlugs = await storage.getAllBlogSlugs();
-  const blogSlugRedirects = Object.fromEntries(
-    blogSlugs.map((slug) => [`/${slug}`, `/blog/${slug}`])
+  primeBlogSlugCache(blogSlugs);
+  const registry = getRegistryCounts();
+  console.log(
+    `[blogRoutes] Protected blog URLs: ${registry.database} from database + ` +
+    `${registry.codeOwned} code-owned = ${getKnownBlogSlugs().length} total`
   );
 
   const wpRedirects: Record<string, string> = {
@@ -566,42 +583,66 @@ export async function registerRoutes(
     "/term-of-use":                      "/",
     "/virtual-learning":                 "/blogs",
 
-    // Blog-slug redirects — auto-generated from the blog_posts table
-    ...blogSlugRedirects,
+    // Blog-post root slugs (/<slug> → /blog/<slug>) are NOT listed here. They are
+    // served by a dynamic handler below that reads the live registry, so posts
+    // created after startup are covered without a restart.
   };
 
+  // Every legacy redirect below is registered on this guarded router, never on
+  // `app` directly. The router short-circuits for any URL in the blog registry,
+  // so a rule here can never hijack a page we actually built — which is exactly
+  // the failure that made a live post redirect to /blogs.
+  const legacy = createLegacyRedirectRouter();
+  app.use(legacy);
+
   for (const [from, to] of Object.entries(wpRedirects)) {
-    app.get(from, (_req, res) => res.redirect(301, to));
+    legacy.get(from, (_req, res) => res.redirect(301, to));
   }
 
   // ── WordPress wildcard paths → home or blog ──────────────────
   // These catch indexed WordPress category/tag/archive/author pages
   // that 404 on the current site.
-  app.get("/category/*", (_req, res) => res.redirect(301, "/blogs"));
-  app.get("/tag/*",      (_req, res) => res.redirect(301, "/blogs"));
-  app.get("/author/*",   (_req, res) => res.redirect(301, "/"));
-  app.get("/page/*",     (_req, res) => res.redirect(301, "/blogs"));
+  legacy.get("/category/*", (_req, res) => res.redirect(301, "/blogs"));
+  legacy.get("/tag/*",      (_req, res) => res.redirect(301, "/blogs"));
+  legacy.get("/author/*",   (_req, res) => res.redirect(301, "/"));
+  legacy.get("/page/*",     (_req, res) => res.redirect(301, "/blogs"));
   // WordPress capitalised /Blog/ pagination (e.g. /Blog/uncategorized/page/2/).
-  // Express routing is case-INSENSITIVE by default, so "/Blog/*" would also match
-  // real "/blog/<slug>" URLs and answer them with a *permanent* redirect to /blogs.
-  // Any visitor who hit a new post's URL before it shipped would then have that 301
-  // cached by their browser forever and could never reach the published page. Match
-  // the capitalised path explicitly so only genuine legacy WordPress URLs redirect.
-  app.get("/Blog/*", (req, res, next) => {
+  // Express routing is case-INSENSITIVE by default, so "/Blog/*" also matches a
+  // real "/blog/<slug>" URL. The registry guard on this router already exempts
+  // every known blog page, and this explicit check keeps unknown lowercase blog
+  // URLs from being answered with a permanent, browser-cached redirect.
+  legacy.get("/Blog/*", (req, res, next) => {
     const rawPath = req.originalUrl.split("?")[0];
     if (!rawPath.startsWith("/Blog/")) return next();
     res.redirect(301, "/blogs");
   });
-  app.get("/wp-login.php", (_req, res) => res.redirect(301, "/"));
-  app.get("/wp-admin",   (_req, res) => res.redirect(301, "/"));
-  app.get("/wp-admin/*", (_req, res) => res.redirect(301, "/"));
+  // Root-slug backlinks: /<slug> → /blog/<slug>. Resolved against the live
+  // registry on every request rather than a startup snapshot, so a post created
+  // through the admin panel is covered the moment it is saved. Registered last
+  // among the legacy rules so it never shadows a real page or a named redirect.
+  legacy.get("/:slug", (req, res, next) => {
+    const slug = req.params.slug;
+    if (!isKnownBlogSlug(slug)) return next();
+    res.redirect(301, `/blog/${slug.toLowerCase()}`);
+  });
 
-  app.get("/wp-content/uploads/*", (req, res) => {
-    if (req.path.toLowerCase().includes("fee")) {
+  legacy.get("/wp-login.php", (_req, res) => res.redirect(301, "/"));
+  legacy.get("/wp-admin",   (_req, res) => res.redirect(301, "/"));
+  legacy.get("/wp-admin/*", (_req, res) => res.redirect(301, "/"));
+
+  legacy.get("/wp-content/uploads/*", (req, res) => {
+    if (req.originalUrl.toLowerCase().includes("fee")) {
       return res.redirect(301, "/fee-structure");
     }
     return res.redirect(301, "/");
   });
+
+  // NOTE: a /blog/<slug> that is not in the registry is answered with a real 404
+  // by the SPA fallback (see isKnownRoute in server/pageTitles.ts), which reads
+  // the same registry. The visitor still gets the styled "Article Not Found"
+  // screen, but search engines receive an honest status instead of a soft 404.
+  // Missing posts are deliberately NOT redirected to /blogs: that behaviour is
+  // what made a real page look swallowed, and browsers cache 301s permanently.
 
   // ── Blog Posts ──────────────────────────────────────────────
   app.get("/api/blog-posts", async (req, res) => {
@@ -4040,6 +4081,8 @@ paths:
       const { insertBlogPostSchema } = await import("@shared/schema");
       const validated = insertBlogPostSchema.parse(req.body);
       const post = await storage.upsertBlogPost(validated);
+      // Protect the new URL immediately — no server restart required.
+      noteBlogSlugAdded(post.slug);
       res.status(201).json(post);
       // Fire-and-forget: notify GSC about the new content without blocking the response
       triggerSitemapResubmit(`new blog post published: ${validated.slug}`);
@@ -4055,6 +4098,9 @@ paths:
       const validated = insertBlogPostSchema.parse(req.body);
       const post = await storage.updateBlogPost(req.params.slug, validated);
       if (!post) return res.status(404).json({ message: "Blog post not found" });
+      // A rename changes the live URL: protect the new slug, release the old one.
+      if (post.slug !== req.params.slug) noteBlogSlugRemoved(req.params.slug);
+      noteBlogSlugAdded(post.slug);
       res.json(post);
       // Fire-and-forget: notify GSC about the updated content without blocking the response
       triggerSitemapResubmit(`blog post updated: ${req.params.slug}`);
@@ -4069,6 +4115,7 @@ paths:
       const post = await storage.getBlogPostBySlug(req.params.slug);
       if (!post) return res.status(404).json({ message: "Blog post not found" });
       await storage.deleteBlogPost(req.params.slug);
+      noteBlogSlugRemoved(req.params.slug);
       res.json({ success: true });
     } catch {
       res.status(500).json({ message: "Failed to delete blog post" });
