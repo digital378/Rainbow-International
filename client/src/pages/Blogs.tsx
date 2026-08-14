@@ -43,6 +43,24 @@ const pinnedCards: BlogCard[] = CODE_OWNED_BLOGS.map((b) => ({
 
 const pinnedSlugs = new Set(pinnedCards.map((c) => c.slug));
 
+/**
+ * Build the href for a listing card.
+ *
+ * Code-owned pages briefly sat behind a case-insensitive legacy redirect that
+ * answered with a *permanent* (301) redirect to /blogs. Browsers cache those
+ * indefinitely and stop asking the server, so a visitor who hit the bad URL
+ * once keeps bouncing to /blogs even though the route is long since fixed.
+ *
+ * A cached redirect is keyed on the full URL including its query string, so a
+ * single harmless parameter misses the poisoned entry and reaches the real
+ * page. The server ignores the parameter and the page's canonical tag still
+ * points at the clean URL, so search engines only ever see /blog/<slug>.
+ */
+function cardHref(blog: BlogCard): string {
+  const path = `/blog/${blog.slug}`;
+  return blog.pinned ? `${path}?ref=blogs` : path;
+}
+
 
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -147,7 +165,7 @@ export default function Blogs() {
               {filtered.map((blog) => (
                 <a
                   key={blog.slug}
-                  href={`/blog/${blog.slug}`}
+                  href={cardHref(blog)}
                   data-testid={`card-blog-${blog.slug}`}
                   className="group block rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
                   style={
