@@ -1,0 +1,67 @@
+RIS Raksha Bandhan Immersive Blog (SEO-optimized for traffic)
+
+Strategy note (for you, not the Agent): this brief is based on your actual Google Search Console data. Your Independence Day 2026 post is your #1 page (1,191 clicks / 76.5k impressions in 28 days) because it targets student/parent utility queries — speech, essay, PDF. This page replicates that proven pattern for Raksha Bandhan, with the immersive 3D as the hook on top. Build in Replit, but PUBLISH at rainbowinternationalschool.in/blog/raksha-bandhan-2026 — your domain's authority is what makes it rank.
+
+Copy everything below this line into Replit Agent as your first message.
+
+Build a single-page immersive 3D scroll-story blog page: "Raksha Bandhan 2026 — The Thread That Binds Us" for Rainbow International School (CBSE, Thane). Static site (HTML/CSS/JS, no backend), Three.js for 3D, GSAP ScrollTrigger for scroll animation. The page has TWO jobs: (1) a cinematic immersive story at the top, (2) a deep, crawlable, SEO-optimized content library below it that ranks on Google for student/parent festival queries.
+
+BRAND RULES (strict — never break)
+For Rainbow International School (RIS) only, CBSE K–12, Thane. Logo tagline: "Passion for Excellence". Never reference "Rainbow International Pre-School".
+Primary colour: deep navy #10174F, dominant throughout. White 
+#FFFFFF and warm cream 
+#FFF6E8 used generously — the page must feel bright, premium, trustworthy, school-appropriate. Gold 
+#F5B428 / saffron 
+#FF8A3D as thin accents only (rules, kickers, buttons, the rakhi artwork).
+I will upload the official RIS logo — place on clean navy/white space, never recolour, stretch, crop, or redraw.
+Typography: Playfair Display (headlines) + Poppins (body). Max text width ~65ch, generous line-height.
+Never invent school facts (fees, events, awards, rankings, numbers, facilities). Use visible [Insert verified link] placeholders for links/contacts.
+No superlatives ("No. 1", "best school") and no fake urgency. CTAs: "Explore Our Campus", "Speak With Our Admissions Team", "Learn More".
+Footer note: "All visuals on this page are illustrative artwork created for this festive story; they do not depict real students, staff, or campus facilities."
+SEO REQUIREMENTS (critical — this is why the page exists)
+Title tag: Raksha Bandhan 2026: Date, Speech, Essay & Activities for Students | Rainbow International School
+Meta description (~155 chars): mention date (28 August 2026), speech, essay, 10 lines, activities for kids, wishes.
+H1: "Raksha Bandhan 2026: The Thread That Binds Us" — exactly one H1; logical H2/H3 hierarchy below.
+All text content must be plain, crawlable HTML in the initial page load. The 3D layer is progressive enhancement only — content must be fully readable with JavaScript disabled.
+Performance: load Three.js with defer; initialize the 3D scene only after first paint (or on first scroll); hero text is the LCP element, not the canvas; compress everything; target Lighthouse ≥90 mobile performance. Core Web Vitals directly affect ranking.
+Structured data (JSON-LD): Article (with datePublished, author = Rainbow International School), FAQPage (from the FAQ section below), and BreadcrumbList.
+Open Graph + Twitter Card tags with a 1200×630 festive OG image (generate a simple navy/gold one with the title).
+Canonical URL: https://rainbowinternationalschool.in/blog/raksha-bandhan-2026.
+Descriptive alt text on all images/illustrations using natural keyword phrasing.
+
+Target keyword map (weave naturally into headings and copy, never stuffed):
+
+Primary: raksha bandhan 2026, raksha bandhan 2026 date
+High-intent utility: raksha bandhan speech in english for students, raksha bandhan essay in english, 10 lines on raksha bandhan, raksha bandhan speech pdf
+Parent/activity: rakhi making ideas for kids, raksha bandhan activities for school students, raksha bandhan craft ideas
+Long-tail: why do we celebrate raksha bandhan, story of raksha bandhan for kids, raksha bandhan wishes for brother and sister
+PAGE STRUCTURE
+Part A — Immersive story (top ~35% of page, dark navy, cinematic)
+Hero: RIS logo, H1, date badge "Friday · 28 August 2026 · Shravana Purnima", scroll cue. 3D rakhi floats beside (never behind) the title. Also render the H1 and date as real HTML text.
+Three short scroll chapters with the 3D rakhi travelling opposite the text: what the thread means → raksha + bandhan explained → the festival's values in school life (friendship, mentorship, care — connect to RIS's spirit of learning and holistic growth, no invented programmes).
+Interactive: Tie a rakhi of your own — 3D rakhi in a card: drag to rotate, 4 colour themes, "Tie the Thread" button → knot/confetti animation + rotating festive wish.
+Part B — Utility content library (bright cream/white sections, navy text, school-publication feel; this is the SEO engine — write it fully, warm and well-crafted, not thin)
+When is Raksha Bandhan 2026? Date & significance (H2) — Friday, 28 August 2026, Shravana Purnima; explain the full-moon timing and that the traditional tying window is that morning per the panchang (advise families to confirm locally). Include a small elegant date-card graphic.
+The story of Raksha Bandhan for kids (H2) — 3 legends told as legend: Krishna & Draupadi, Yama & Yamuna, Rani Karnavati & Humayun. Warm storytelling, age-appropriate.
+Raksha Bandhan speech in English for students (H2) — TWO complete ready-to-use speeches: a 1-minute speech (~150 words) for primary students and a 2–3 minute speech (~350 words) for secondary students. This is the highest-traffic content type — make them excellent.
+Raksha Bandhan essay & 10 lines (H2) — one ~300-word essay and a "10 lines on Raksha Bandhan" list for younger students.
+Rakhi making ideas & activities for kids (H2) — 5 crafts/activities with steps (paper quilling rakhi, thread-and-bead rakhi, promise cards, gratitude circle, sweets to make together).
+Raksha Bandhan wishes & messages (H2) — 12 short wishes for brothers, sisters, friends; easy to copy.
+Download section — a "Download Speech & Essay PDF" button (generate a clean printable PDF of sections 6–7, navy/white with the RIS logo). PDF queries are high-CTR in your niche.
+FAQ (H2, mirrors the FAQPage JSON-LD) — 6 questions: When is Raksha Bandhan in 2026? Why do we celebrate it? What is the story behind it? What time should the rakhi be tied? What does raksha bandhan mean? How can schools celebrate it?
+Closing & CTAs — warm wishes from the RIS family, trust-first CTA buttons (placeholder links), footer with logo, tagline, disclaimer, [Insert school website · contact details].
+IMMERSIVE / 3D SPEC
+Fixed WebGL canvas behind Part A only: detailed 3D rakhi (gold ring, red medallion, beads, silk thread) on a camera-choreographed scroll path, always opposite the text column; drifting gold particles; flickering diya lamps. Part B is standard bright content — no 3D behind it (keeps it fast and readable).
+A thin vertical "thread" scroll-progress indicator with a travelling knot.
+Parallax garland/diya illustrated divider between Part A and Part B.
+Mobile-first; cap devicePixelRatio at 2; fewer particles on mobile; pause rendering when tab hidden; graceful static-illustration fallback without WebGL; respect prefers-reduced-motion.
+Semantic HTML, keyboard-accessible controls, WCAG AA contrast, zero console errors. Test at 1440px and 390px.
+
+After the first build, wait for my review — I will iterate on colours, copy, pacing, and SEO details.
+
+Post-publish checklist (for you, outside Replit — do these the day it goes live)
+Publish at rainbowinternationalschool.in/blog/raksha-bandhan-2026 and submit the URL in Google Search Console → URL Inspection → Request Indexing.
+Add internal links TO this page from your two highest-traffic pages: the Independence Day 2026 post and the homepage ("Celebrating Raksha Bandhan 2026 →").
+Add it to your blog index and XML sitemap.
+Share the link: parent WhatsApp groups, Instagram (reel teaser screen-recording the 3D scroll + link in bio), Facebook, and a Google Business Profile post.
+After the festival, do NOT delete the page — next July, update it to "Raksha Bandhan 2027" with the new date and keep the URL. Evergreen festival URLs compound rankings year over year (this is exactly how big publishers dominate these queries).
