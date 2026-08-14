@@ -1,5 +1,4 @@
 import type { Express } from "express";
-import { registerCodeOwnedBlogSlug } from "./blogRoutes";
 
 const SLUG = "raksha-bandhan-2026";
 const CANONICAL = `https://rainbowinternationalschool.in/blog/${SLUG}`;
@@ -216,8 +215,6 @@ For students, Raksha Bandhan is a chance to think about the promises we make eve
 }
 
 export function registerRakshaBandhan2026SSR(app: Express) {
-  // Declare this code-owned page so no legacy redirect can ever hijack its URL.
-  registerCodeOwnedBlogSlug(SLUG);
   app.get(`/blog/${SLUG}`, (_req, res) => {
     try {
       res.setHeader("Content-Type", "text/html; charset=utf-8");

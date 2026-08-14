@@ -25,6 +25,7 @@ import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
 import { registerRakshaBandhan2026SSR } from "./ssrRakshaBandhan2026";
+import { CODE_OWNED_BLOG_SLUGS } from "@shared/codeOwnedBlogs";
 import {
   registerCodeOwnedBlogSlug,
   primeBlogSlugCache,
@@ -409,11 +410,15 @@ export async function registerRoutes(
   // redirect:false prevents express.static from adding a trailing slash, which would
   // loop with the global trailing-slash stripper in server/index.ts (ERR_TOO_MANY_REDIRECTS).
   const blogDir = path.join(process.cwd(), "blog-pages/independence-day-2026");
-  registerCodeOwnedBlogSlug("independence-day-2026");
   app.use("/blog/independence-day-2026", express.static(blogDir, { index: "index.html", redirect: false }));
   app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.join(blogDir, "index.html")));
 
   registerSSRRoutes(app);
+
+  // Declare every code-owned blog page from the shared manifest, so a page that
+  // lives in code (not in blog_posts) is protected from legacy redirects AND
+  // shows up in the /blogs listing from the same single entry.
+  for (const slug of CODE_OWNED_BLOG_SLUGS) registerCodeOwnedBlogSlug(slug);
 
   // Blog-slug redirects are derived automatically from the blog_posts table — every
   // post gets a /slug → /blog/slug redirect so old WordPress backlinks resolve

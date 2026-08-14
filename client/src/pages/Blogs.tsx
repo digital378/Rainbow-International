@@ -6,6 +6,7 @@ import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useQuery } from "@tanstack/react-query";
+import { CODE_OWNED_BLOGS, type CodeOwnedBlog } from "@shared/codeOwnedBlogs";
 
 interface BlogPost {
   id: string;
@@ -14,26 +15,40 @@ interface BlogPost {
   date: string;
   cat: string;
   intro: string;
+  publishedAt?: string;
 }
+
+/** A listing card, whether it came from the database or from code. */
+type BlogCard = BlogPost & Pick<CodeOwnedBlog, "accentColor" | "emoji" | "badge"> & { pinned: boolean };
 
 const categories = ["All", "CBSE School", "School", "Education", "Technology in Education", "Parenting", "Student Life", "Student Wellness", "Admissions", "Sports", "Study Tips", "General", "Events"];
 
-const PINNED_BLOG = {
-  slug: "independence-day-2026",
-  title: "Independence Day 2026: Essays, Speeches, Slogans, History & More",
-  date: "25 Jul 2026",
-  cat: "Events",
-  intro: "India's 80th Independence Day — August 15, 2026. Complete resource for students, parents & teachers: essays in English, Hindi & Marathi, school speeches, slogans, freedom fighters, quiz, fun facts & free patriotic images.",
-  href: "/blog/independence-day-2026",
-  isExternal: true,
-};
+/* Code-owned pages (custom SSR / static HTML) have no blog_posts row, so the
+   /api/blog-posts response never contains them. They are declared once in
+   shared/codeOwnedBlogs.ts and pinned to the top of the listing here — that is
+   the only reason they are visible on this page at all. */
+const pinnedCards: BlogCard[] = CODE_OWNED_BLOGS.map((b) => ({
+  id: `code-owned-${b.slug}`,
+  slug: b.slug,
+  title: b.title,
+  date: b.date,
+  cat: b.cat,
+  intro: b.intro,
+  publishedAt: b.publishedAt,
+  accentColor: b.accentColor,
+  emoji: b.emoji,
+  badge: b.badge,
+  pinned: true,
+})).sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""));
+
+const pinnedSlugs = new Set(pinnedCards.map((c) => c.slug));
 
 
 export default function Blogs() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: allBlogs = [], isLoading } = useQuery<BlogPost[]>({
+  const { data: dbBlogs = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog-posts"],
     select: (posts) =>
       posts.map((p) => ({
@@ -45,6 +60,15 @@ export default function Blogs() {
         intro: p.intro,
       })),
   });
+
+  // Code-owned pages first, then the database posts. If a slug ever exists in
+  // both places the code-owned entry wins, so a card can never appear twice.
+  const allBlogs: BlogCard[] = [
+    ...pinnedCards,
+    ...dbBlogs
+      .filter((p) => !pinnedSlugs.has(p.slug))
+      .map((p) => ({ ...p, pinned: false })),
+  ];
 
   const filtered = allBlogs.filter(b => {
     const matchesCat = activeCategory === "All" || b.cat === activeCategory;
@@ -117,33 +141,6 @@ export default function Blogs() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-              {/* Pinned Independence Day 2026 card — always first when category matches */}
-              {(activeCategory === "All" || activeCategory === "Events") &&
-                (!searchQuery || PINNED_BLOG.title.toLowerCase().includes(searchQuery.toLowerCase())) && (
-                <a
-                  href={PINNED_BLOG.href}
-                  data-testid="card-blog-independence-day-2026"
-                  className="group block rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
-                  style={{ borderColor: "#e2e8f0", borderTop: "3px solid #FF9933" }}
-                >
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5" style={{ color: "#f97316" }}>
-                        🇮🇳 {PINNED_BLOG.cat}
-                        <span className="ml-1 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">NEW</span>
-                      </span>
-                      <span className="text-xs text-gray-400">{PINNED_BLOG.date}</span>
-                    </div>
-                    <h3 className="text-base font-bold text-gray-800 leading-snug group-hover:text-blue-800 transition-colors line-clamp-2 mb-3">
-                      {PINNED_BLOG.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">{PINNED_BLOG.intro}</p>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "#0d3b86" }}>
-                      Read More <ArrowRight size={14} />
-                    </span>
-                  </div>
-                </a>
-              )}
               {/* Plain anchor: /blog/:slug is server-rendered, so these must be
                   real navigations. A wouter Link would keep the SPA mounted and
                   render the old client-side article instead. */}
@@ -152,11 +149,21 @@ export default function Blogs() {
                   key={blog.slug}
                   href={`/blog/${blog.slug}`}
                   data-testid={`card-blog-${blog.slug}`}
-                  className="group block rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  className="group block rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  style={
+                    blog.pinned && blog.accentColor
+                      ? { borderColor: "#e2e8f0", borderTop: `3px solid ${blog.accentColor}` }
+                      : { borderColor: "#f3f4f6" }
+                  }
                 >
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#f97316" }}>{blog.cat}</span>
+                      <span className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5" style={{ color: "#f97316" }}>
+                        {blog.emoji ? `${blog.emoji} ` : ""}{blog.cat}
+                        {blog.badge && (
+                          <span className="ml-1 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{blog.badge}</span>
+                        )}
+                      </span>
                       <span className="text-xs text-gray-400">{blog.date}</span>
                     </div>
                     <h3 className="text-base font-bold text-gray-800 leading-snug group-hover:text-blue-800 transition-colors line-clamp-2 mb-3">
@@ -171,7 +178,7 @@ export default function Blogs() {
                   </div>
                 </a>
               ))}
-              {filtered.length === 0 && !isLoading && !(activeCategory === "All" || activeCategory === "Events") && (
+              {filtered.length === 0 && (
                 <div className="col-span-3 text-center py-16 text-gray-400">
                   No articles found. Try a different search or category.
                 </div>
