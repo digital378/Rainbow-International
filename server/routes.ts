@@ -24,6 +24,7 @@ import { registerSSRRoutes } from "./ssrBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
+import { registerRakshaBandhan2026SSR } from "./ssrRakshaBandhan2026";
 import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
@@ -389,6 +390,7 @@ export async function registerRoutes(
   registerHomeSSR(app);
   registerPageSSR(app);
   registerSpainArgentinaSSR(app);
+  registerRakshaBandhan2026SSR(app);
 
   // Independence Day 2026 static blog — registered before SSR so ssrBlog does not intercept it
   // process.cwd() = project root in both dev (tsx server/index.ts) and production

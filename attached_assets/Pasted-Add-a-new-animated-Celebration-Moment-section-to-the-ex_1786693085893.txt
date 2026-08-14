@@ -1,0 +1,38 @@
+Add a new animated "Celebration Moment" section to the existing Raksha Bandhan page,
+placed between the story chapters and the interactive rakhi section. Do NOT change any
+existing headings, copy, or SEO content.
+
+ASSET
+- Use assets/rakhi-kids.png (transparent PNG: two students in navy uniforms tying a
+  rakhi). Never crop, recolor, flip, or distort the characters. Keep aspect ratio.
+- Serve it lazily (loading="lazy") with explicit width/height to avoid layout shift.
+  If you convert to WebP for size, preserve full transparency and keep a PNG fallback.
+
+MOTION DESIGN (GSAP + ScrollTrigger; transforms and opacity only)
+1. Entrance: when the section scrolls into view (once), the illustration rises 40px,
+   fades in, and settles with a soft overshoot (back.out easing), 0.9s.
+2. Idle loop: gentle float (translateY ±10px, ~4s ease-in-out yoyo) plus a subtle
+   breathing scale between 1.0 and 1.015 so the characters feel alive.
+3. Depth tilt: wrap the image in a perspective container; on desktop, mouse position
+   tilts it max 6° on X/Y with smooth lerping. Disable tilt on touch devices.
+4. Golden sparkles: 24 small glowing particles (canvas or CSS) in gold #F5B428 and
+   cream, drifting slowly upward around the characters, twinkling at random phases.
+5. Soft radial gold glow (~12% opacity) behind the characters, slowly pulsing.
+6. Scroll parallax: the illustration scrolls slightly slower than the surrounding
+   text (ScrollTrigger scrub, ~0.85 speed factor).
+7. Tap/click delight: a one-time confetti burst in navy #10174F, gold, and saffron,
+   plus a small speech-bubble caption "Happy Raksha Bandhan!" (aria-live="polite").
+
+CAPTION & COMPLIANCE
+- Below the image, a short caption in brand style: "The joy of tying the knot of
+  protection — Raksha Bandhan at the heart of our Rainbow family." 
+- Keep the site-wide footer disclaimer intact (illustrative artwork, not real students).
+
+PERFORMANCE & ACCESSIBILITY
+- Pause all loops when the section is off-screen (IntersectionObserver) and when the
+  tab is hidden. No layout-thrashing animations — transform/opacity only, will-change.
+- prefers-reduced-motion: show the static image with the soft glow only; no float,
+  tilt, sparkles, or parallax.
+- Meaningful alt text: "Illustration of two Rainbow International School students
+  tying a rakhi on Raksha Bandhan."
+- Zero console errors; verify at 1440px and 390px; keep Lighthouse mobile ≥90.

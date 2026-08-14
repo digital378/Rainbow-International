@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Raksha Bandhan 2026: The Thread That Binds Us">
+  <defs>
+    <radialGradient id="g" cx="78%" cy="30%" r="80%"><stop stop-color="#283684"/><stop offset=".58" stop-color="#10174F"/><stop offset="1" stop-color="#080C30"/></radialGradient>
+    <filter id="s"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="938" cy="308" r="166" fill="none" stroke="#F5B428" stroke-width="24"/>
+  <circle cx="938" cy="308" r="67" fill="#A82542" stroke="#FFF0B2" stroke-width="13"/>
+  <circle cx="938" cy="308" r="34" fill="none" stroke="#F5B428" stroke-width="11"/>
+  <path d="M680 307h502" stroke="#D64043" stroke-width="8"/>
+  <path d="M842 128c90-72 195-89 297-44" fill="none" stroke="#FF8A3D" stroke-width="3" opacity=".7"/>
+  <circle cx="930" cy="103" r="8" fill="#F5B428"/><circle cx="1050" cy="492" r="8" fill="#F5B428"/><circle cx="1105" cy="183" r="5" fill="#FF8A3D"/>
+  <text x="82" y="122" fill="#FFD87B" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="5">RAINBOW INTERNATIONAL SCHOOL · THANE</text>
+  <text x="78" y="278" fill="white" font-family="Georgia, serif" font-size="72" font-weight="700">Raksha Bandhan 2026</text>
+  <text x="82" y="350" fill="#FFF0D0" font-family="Georgia, serif" font-size="40">The Thread That Binds Us</text>
+  <text x="82" y="448" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="25">Date · Speech · Essay · Activities for Students</text>
+  <text x="82" y="506" fill="#F5B428" font-family="Arial, sans-serif" font-size="22" font-weight="700">FRIDAY · 28 AUGUST 2026 · SHRAVANA PURNIMA</text>
+</svg>
