@@ -1,6 +1,22 @@
 import type { Express } from "express";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
 const SLUG = "raksha-bandhan-2026";
+
+/** Short hash of an asset so browsers pick up edits despite long cache lifetimes. */
+function assetVersion(fileName: string): string {
+  for (const base of ["client/public", "dist/public", "public"]) {
+    try {
+      const buf = readFileSync(path.resolve(process.cwd(), base, "blog-assets", SLUG, fileName));
+      return createHash("sha1").update(buf).digest("hex").slice(0, 10);
+    } catch {
+      /* try the next candidate directory */
+    }
+  }
+  return "1";
+}
 const CANONICAL = `https://rainbowinternationalschool.in/blog/${SLUG}`;
 const OG_IMAGE = `${CANONICAL.replace(`/blog/${SLUG}`, "")}/blog-assets/${SLUG}/raksha-bandhan-2026-og.svg`;
 const DESCRIPTION = "Raksha Bandhan 2026 falls on 28 August. Find speeches, an essay, 10 lines, activities for kids, craft ideas and wishes from Rainbow International School.";
@@ -74,11 +90,15 @@ function renderPage(): string {
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&amp;family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/blog-assets/${SLUG}/raksha-bandhan-2026.css" />
+  <link rel="stylesheet" href="/blog-assets/${SLUG}/raksha-bandhan-2026.css?v=${assetVersion("raksha-bandhan-2026.css")}" />
 </head>
 <body>
   <a class="rb-skip" href="#raksha-content">Skip to article content</a>
+  <div class="rb-bg-fallback" aria-hidden="true"></div>
+  <div class="rb-bg" aria-hidden="true"></div>
+  <div class="rb-vignette" aria-hidden="true"></div>
   <div class="rb-progress" aria-hidden="true"><span></span></div>
+  <div class="rb-thread-track" aria-hidden="true"><div class="rb-thread-fill"></div><div class="rb-thread-knot"></div></div>
   <div class="rb-topbar"><span>Rainbow International School, Thane</span><span>CBSE K–12</span><span>Passion for Excellence</span></div>
   <nav class="rb-navbar" aria-label="Primary navigation">
     <a class="rb-brand" href="/">
@@ -88,60 +108,136 @@ function renderPage(): string {
     <ul class="rb-navlinks"><li><a href="/">Home</a></li><li><a href="/about-rainbow-international-school">About</a></li><li><a href="/blogs">Blogs</a></li><li><a href="/contact-us">Contact</a></li></ul>
   </nav>
   <main>
-    <section class="rb-cinematic" aria-labelledby="raksha-title">
-      <div class="rb-scene" aria-hidden="true"></div>
-      <div class="rb-static-rakhi" aria-hidden="true"></div>
-      <div class="rb-hero">
-        <div class="rb-hero-copy">
-          <p class="rb-eyebrow">A festive story from RIS</p>
-          <h1 id="raksha-title">Raksha Bandhan 2026: The Thread That Binds Us</h1>
-          <p class="rb-date-pill">${icon("calendar-days")} Friday · 28 August 2026 · Shravana Purnima</p>
-          <p>A thread can be delicate and still hold a promise. This Raksha Bandhan, explore a celebration of care, trust and the everyday ways we stand beside one another.</p>
-          <a class="rb-scroll-cue" href="#raksha-content"><i aria-hidden="true"></i> Read the story and student resources</a>
+    <div class="rb-cine">
+      <section class="rb-hero" aria-labelledby="raksha-title">
+        <img class="rb-hero-logo" src="/ris-logo.png" alt="" aria-hidden="true" width="140" height="140" />
+        <p class="rb-presents">Rainbow International School presents</p>
+        <h1 id="raksha-title">Raksha Bandhan 2026: The Thread That Binds Us</h1>
+        <p class="rb-sub">A thread can be delicate and still hold a promise. This Raksha Bandhan, explore a celebration of care, trust and the everyday ways we stand beside one another.</p>
+        <p class="rb-date-pill">${icon("calendar-days")} Friday · 28 August 2026 · Shravana Purnima</p>
+        <a class="rb-scrollcue" href="#raksha-content"><span>Scroll to begin</span><span class="rb-cue-line" aria-hidden="true"></span></a>
+      </section>
+
+      <section class="rb-align-l" aria-labelledby="chapter-one">
+        <div class="rb-card">
+          <p class="rb-kicker-light">01 · The Meaning</p>
+          <h2 id="chapter-one">A thread that says, “I am here.”</h2>
+          <p>At its heart, a rakhi is an invitation to notice one another. It carries affection, but also attention: the steady kind that listens, helps and stays present when it matters.</p>
+          <p>Every August, the same small ritual repeats in millions of homes — and every year it means something slightly new, shaped by the year the family has just lived through together.</p>
         </div>
-      </div>
-      <div class="rb-thread" aria-hidden="true"><span></span></div>
-      <section class="rb-chapter" aria-labelledby="chapter-one"><div class="rb-chapter-copy"><p class="rb-chapter-num">01 · THE MEANING</p><h2 id="chapter-one">A thread that says, “I am here.”</h2><p>At its heart, a rakhi is an invitation to notice one another. It carries affection, but also attention: the steady kind that listens, helps and stays present when it matters.</p></div></section>
-      <section class="rb-chapter" aria-labelledby="chapter-two"><div class="rb-chapter-copy"><p class="rb-chapter-num">02 · THE WORDS</p><h2 id="chapter-two">Raksha is care. Bandhan is a bond.</h2><p>Together, these words express a promise. Protection is not about control; it is about respect, responsibility and the courage to choose kindness in the small moments of daily life.</p></div></section>
-      <section class="rb-chapter" aria-labelledby="chapter-three"><div class="rb-chapter-copy"><p class="rb-chapter-num">03 · THE VALUES</p><h2 id="chapter-three">Every classroom can hold the same promise.</h2><p>Friendship, mentorship and care grow through thoughtful actions. A welcoming word, a shared idea or help with a difficult task can make school life feel more connected for everyone.</p></div></section>
+      </section>
+
+      <section class="rb-align-r" aria-labelledby="chapter-two">
+        <div class="rb-card">
+          <p class="rb-kicker-light">02 · The Words</p>
+          <h2 id="chapter-two">Raksha is care. Bandhan is a bond.</h2>
+          <p>Together, these words express a promise. Protection is not about control; it is about respect, responsibility and the courage to choose kindness in the small moments of daily life.</p>
+          <p><em>Raksha</em> asks what we are willing to stand for. <em>Bandhan</em> asks who we are willing to stand with.</p>
+        </div>
+      </section>
+
+      <section class="rb-align-l" aria-labelledby="chapter-three">
+        <div class="rb-card">
+          <p class="rb-kicker-light">03 · The Values</p>
+          <h2 id="chapter-three">Every classroom can hold the same promise.</h2>
+          <p>Friendship, mentorship and care grow through thoughtful actions. A welcoming word, a shared idea or help with a difficult task can make school life feel more connected for everyone.</p>
+          <div class="rb-values"><span>Kindness</span><span>Responsibility</span><span>Trust</span><span>Belonging</span></div>
+        </div>
+      </section>
+
       <section class="rb-celebration" aria-labelledby="celebration-title">
-        <h2 id="celebration-title" class="rb-sr-only">A celebration moment</h2>
+        <p class="rb-kicker-light">From our young artists</p>
+        <h2 id="celebration-title">A celebration drawn by our students</h2>
         <div class="rb-celebration-stage">
           <div class="rb-celebration-glow" aria-hidden="true"></div>
-          <canvas class="rb-celebration-sparkles" aria-hidden="true"></canvas>
-          <p class="rb-celebration-bubble" aria-live="polite"></p>
+          <p class="rb-wish-bubble" aria-live="polite"></p>
           <div class="rb-celebration-tilt">
-            <div class="rb-celebration-float">
-              <picture>
-                <source srcset="/blog-assets/${SLUG}/rakhi-kids.webp" type="image/webp" />
-                <img src="/blog-assets/${SLUG}/rakhi-kids.png" width="900" height="1125" loading="lazy" decoding="async" alt="Illustration of two Rainbow International School students tying a rakhi on Raksha Bandhan." />
-              </picture>
-            </div>
+            <picture>
+              <source srcset="/blog-assets/${SLUG}/rakhi-kids.webp" type="image/webp" />
+              <img src="/blog-assets/${SLUG}/rakhi-kids.png" width="900" height="1125" loading="lazy" decoding="async" alt="Illustration of two Rainbow International School students tying a rakhi on Raksha Bandhan." />
+            </picture>
+            <svg class="rb-celebration-ornament" viewBox="0 0 320 320" role="img" aria-label="Decorative rakhi illustration" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="160" cy="160" r="96" fill="none" stroke="#f5b428" stroke-width="14" />
+              <circle cx="160" cy="160" r="66" fill="none" stroke="#ff8a3d" stroke-width="5" />
+              <circle cx="160" cy="160" r="46" fill="#10174f" />
+              <circle cx="160" cy="160" r="22" fill="#ffd977" />
+              <path d="M64 160 L4 132 M64 160 L4 188 M256 160 L316 132 M256 160 L316 188" stroke="#e0483e" stroke-width="7" stroke-linecap="round" />
+              <g fill="#ffd977">
+                <circle cx="160" cy="46" r="8" /><circle cx="160" cy="274" r="8" />
+                <circle cx="46" cy="160" r="8" /><circle cx="274" cy="160" r="8" />
+                <circle cx="80" cy="80" r="6" /><circle cx="240" cy="240" r="6" />
+                <circle cx="240" cy="80" r="6" /><circle cx="80" cy="240" r="6" />
+              </g>
+            </svg>
           </div>
         </div>
-        <p class="rb-celebration-caption">The joy of tying the knot of protection — Raksha Bandhan at the heart of our Rainbow family.</p>
+        <p class="rb-celebration-caption">The joy of tying the knot of protection — Raksha Bandhan at the heart of our Rainbow family. <strong>Tap the artwork</strong> to send a wish.</p>
       </section>
-      <div class="rb-tie-wrap">
-        <section class="rb-tie-card" aria-labelledby="tie-title">
-          <div class="rb-tie-copy">
-            <p class="rb-eyebrow">An interactive pause</p>
-            <h2 id="tie-title">Tie a rakhi of your own</h2>
-            <p>Choose a colour, turn the rakhi with your pointer, then tie a thread as a small reminder to lead with care.</p>
-            <div class="rb-theme-picker" aria-label="Choose a rakhi colour">
-              <button class="rb-theme" type="button" style="--theme:#a82542" data-theme="#a82542" aria-label="Choose crimson rakhi" aria-pressed="true"></button>
-              <button class="rb-theme" type="button" style="--theme:#1d5d91" data-theme="#1d5d91" aria-label="Choose blue rakhi" aria-pressed="false"></button>
-              <button class="rb-theme" type="button" style="--theme:#5e407e" data-theme="#5e407e" aria-label="Choose violet rakhi" aria-pressed="false"></button>
-              <button class="rb-theme" type="button" style="--theme:#277257" data-theme="#277257" aria-label="Choose green rakhi" aria-pressed="false"></button>
-            </div>
-            <button class="rb-action" type="button">${icon("heart-handshake")} Tie the Thread</button>
-            <p class="rb-wish" aria-live="polite">May every thread remind us to care for one another.</p>
+
+      <section class="rb-interactive" aria-labelledby="tie-title">
+        <div class="rb-intro">
+          <p class="rb-kicker-light">An interactive pause</p>
+          <h2 id="tie-title">Tie a rakhi of your own</h2>
+          <p>Choose a colour, drag to turn the rakhi, then tie the thread as a small reminder to lead with care.</p>
+        </div>
+        <div class="rb-stage" role="img" aria-label="An interactive illustrated rakhi. Drag left or right to rotate it.">
+          <div class="rb-stage-fallback" aria-hidden="true">
+            <svg viewBox="0 0 460 240" xmlns="http://www.w3.org/2000/svg">
+              <path d="M110 120 C70 96 40 96 6 120 M350 120 C390 144 420 144 454 120" fill="none" stroke="#e0483e" stroke-width="6" stroke-linecap="round" />
+              <circle cx="60" cy="107" r="7" fill="#ffd977" /><circle cx="30" cy="112" r="6" fill="#f5b428" />
+              <circle cx="400" cy="133" r="7" fill="#ffd977" /><circle cx="430" cy="128" r="6" fill="#f5b428" />
+              <circle cx="230" cy="120" r="86" fill="none" stroke="#f5b428" stroke-width="15" />
+              <circle cx="230" cy="120" r="60" fill="none" stroke="#ff8a3d" stroke-width="5" />
+              <circle cx="230" cy="120" r="42" fill="#c0392b" />
+              <circle cx="230" cy="120" r="20" fill="#ffd977" />
+              <g fill="#ffd977">
+                <circle cx="230" cy="18" r="6" /><circle cx="230" cy="222" r="6" />
+                <circle cx="128" cy="120" r="6" /><circle cx="332" cy="120" r="6" />
+                <circle cx="158" cy="48" r="5" /><circle cx="302" cy="192" r="5" />
+                <circle cx="302" cy="48" r="5" /><circle cx="158" cy="192" r="5" />
+              </g>
+            </svg>
           </div>
-          <div class="rb-tie-stage" role="img" aria-label="An interactive illustrated rakhi. Drag left or right to rotate it.">
-            <div class="rb-tie-fallback" aria-hidden="true"></div>
+          <div class="rb-wish-pop" aria-live="polite"><span></span></div>
+          <p class="rb-stage-hint">Drag to rotate</p>
+        </div>
+        <div class="rb-swatches" role="group" aria-label="Choose a rakhi colour theme"></div>
+        <button class="rb-tie-btn" type="button">${icon("heart-handshake")} Tie the Thread</button>
+      </section>
+
+      <section class="rb-parallax" aria-labelledby="parallax-title">
+        <div class="rb-px-wrap">
+          <div class="rb-px-layer rb-px-stars" data-depth="0.12" aria-hidden="true"></div>
+          <div class="rb-px-layer rb-px-moon" data-depth="0.2" aria-hidden="true"></div>
+          <div class="rb-px-layer rb-px-clouds" data-depth="0.35" aria-hidden="true"></div>
+          <div class="rb-px-layer rb-px-mandala" data-depth="0.5" aria-hidden="true">
+            <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#f5b428" stroke-width="1">
+                <circle cx="200" cy="200" r="180" opacity=".35" />
+                <circle cx="200" cy="200" r="150" opacity=".45" />
+                <circle cx="200" cy="200" r="110" opacity=".55" />
+                <circle cx="200" cy="200" r="60" opacity=".7" />
+                <g opacity=".6">
+                  <path d="M200 20 L214 90 L200 120 L186 90 Z" /><path d="M200 380 L214 310 L200 280 L186 310 Z" />
+                  <path d="M20 200 L90 186 L120 200 L90 214 Z" /><path d="M380 200 L310 186 L280 200 L310 214 Z" />
+                  <path d="M73 73 L132 113 L146 146 L113 132 Z" /><path d="M327 327 L268 287 L254 254 L287 268 Z" />
+                  <path d="M327 73 L287 132 L254 146 L268 113 Z" /><path d="M73 327 L113 268 L146 254 L132 287 Z" />
+                </g>
+              </g>
+            </svg>
           </div>
-        </section>
-      </div>
-    </section>
+          <div class="rb-px-layer rb-px-garland" data-depth="0.65" aria-hidden="true"></div>
+          <div class="rb-px-caption">
+            <p class="rb-kicker-light">An Evening of Light</p>
+            <h2 id="parallax-title">May every home glow a little brighter</h2>
+            <p>This Raksha Bandhan, we wish every family an evening of warmth — of sweets shared, stories retold, and threads tied with love that lasts far beyond the festival.</p>
+          </div>
+          <div class="rb-px-layer rb-px-diyas" data-depth="0.85" aria-hidden="true">
+            ${Array.from({ length: 5 }).map(() => `<svg class="rb-diya" viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg"><g class="rb-flame"><ellipse cx="32" cy="18" rx="7" ry="13" fill="#ff8a3d"/><ellipse cx="32" cy="21" rx="4" ry="8" fill="#ffd977"/></g><path d="M8 40 Q32 58 56 40 L52 54 Q32 66 12 54 Z" fill="#7a3b1d"/><path d="M8 40 Q32 52 56 40 Q32 48 8 40Z" fill="#a0522d"/></svg>`).join("")}
+          </div>
+        </div>
+      </section>
+    </div>
     <div class="rb-garland" aria-hidden="true"></div>
     <article class="rb-content" id="raksha-content">
       <div class="rb-content-inner">
@@ -209,7 +305,7 @@ For students, Raksha Bandhan is a chance to think about the promises we make eve
   <footer class="rb-footer"><div class="rb-footer-inner"><p class="rb-footer-title">Rainbow International School</p><p>CBSE K–12 · Thane · Passion for Excellence</p><small>All visuals on this page are illustrative artwork created for this festive story; they do not depict real students, staff, or campus facilities.</small></div></footer>
   <script defer src="https://unpkg.com/lucide@0.468.0"></script>
   <script>window.addEventListener("load",function(){if(window.lucide){window.lucide.createIcons();}});</script>
-  <script defer src="/blog-assets/${SLUG}/raksha-bandhan-2026.js"></script>
+  <script defer src="/blog-assets/${SLUG}/raksha-bandhan-2026.js?v=${assetVersion("raksha-bandhan-2026.js")}"></script>
 </body>
 </html>`;
 }
