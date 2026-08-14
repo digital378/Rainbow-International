@@ -581,8 +581,17 @@ export async function registerRoutes(
   app.get("/tag/*",      (_req, res) => res.redirect(301, "/blogs"));
   app.get("/author/*",   (_req, res) => res.redirect(301, "/"));
   app.get("/page/*",     (_req, res) => res.redirect(301, "/blogs"));
-  // WordPress capitalised /Blog/ pagination (e.g. /Blog/uncategorized/page/2/)
-  app.get("/Blog/*",     (_req, res) => res.redirect(301, "/blogs"));
+  // WordPress capitalised /Blog/ pagination (e.g. /Blog/uncategorized/page/2/).
+  // Express routing is case-INSENSITIVE by default, so "/Blog/*" would also match
+  // real "/blog/<slug>" URLs and answer them with a *permanent* redirect to /blogs.
+  // Any visitor who hit a new post's URL before it shipped would then have that 301
+  // cached by their browser forever and could never reach the published page. Match
+  // the capitalised path explicitly so only genuine legacy WordPress URLs redirect.
+  app.get("/Blog/*", (req, res, next) => {
+    const rawPath = req.originalUrl.split("?")[0];
+    if (!rawPath.startsWith("/Blog/")) return next();
+    res.redirect(301, "/blogs");
+  });
   app.get("/wp-login.php", (_req, res) => res.redirect(301, "/"));
   app.get("/wp-admin",   (_req, res) => res.redirect(301, "/"));
   app.get("/wp-admin/*", (_req, res) => res.redirect(301, "/"));
