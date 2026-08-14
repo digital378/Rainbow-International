@@ -1,0 +1,46 @@
+Fix the page at /blog/raksha-bandhan-2026. It currently looks amateurish: broken 3D,
+empty voids, and poor composition. A fully working reference implementation is in
+reference/immersive-reference.html — PORT code from it rather than writing your own
+3D, animation, or layout logic. Keep our site header/nav and all existing SEO content
+text. Work through this list in order, verifying each before moving on:
+
+1. REPLACE THE 3D RAKHI MODEL. The current one renders a flat ring with a giant red
+   wedge through it (broken TubeGeometry). Delete it entirely and port the makeRakhi()
+   function from the reference (torus ring, inner ring, medallion, gem, 12 petals,
+   18 dots, two bead-decorated silk threads) along with its lighting setup.
+
+2. FIX THE HERO. The title currently wraps in a narrow half-width column beside empty
+   space. Make it a centered composition: logo, kicker, H1 (max-width ~18ch, centered,
+   clamp() sizing), subtitle, date pill, scroll cue — with the 3D rakhi floating to the
+   upper right BEHIND the text plane, never overlapping the headline. Port the hero
+   camera keyframe from the reference.
+
+3. FIX THE STORY CHAPTERS. They are oversized bare text on empty navy. Port the
+   reference's glass-card pattern (blurred translucent card, gold border, kicker,
+   left/right alternating alignment) and its scroll-driven camera keyframes so the
+   rakhi travels to the OPPOSITE side of each card as the user scrolls.
+
+4. FILL THE BLANK SECTION. There is a completely empty cream band mid-page (the
+   celebration section fails silently). Ensure rakhi-kids.png resolves at the correct
+   public path, then port the reference's celebration animations: float loop, 24 gold
+   sparkles, pulsing radial glow, pointer tilt with lerp, tap-to-confetti with a
+   "Happy Raksha Bandhan!" bubble (aria-live=polite).
+
+5. FIX THE INTERACTIVE RAKHI SECTION. Port from the reference: drag-to-rotate with
+   inertia, four labelled colour themes (Marigold, Royal Navy, Rose Silk, Peacock)
+   that rebuild the rakhi materials, "Tie the Thread" button triggering a spin +
+   confetti burst + rotating wish text.
+
+6. FIX PERFORMANCE. The page froze the renderer during testing. Cap devicePixelRatio
+   at 2; render the background scene ONLY while its sections are in view; pause all
+   rAF work when the tab is hidden; load three.js deferred and initialize after first
+   paint; animate transforms/opacity only; reduce particle counts under 700px width.
+
+7. ACCESSIBILITY & POLISH. Respect prefers-reduced-motion (static visuals, no tilt/
+   sparkles/parallax); meaningful alt text on all imagery; keyboard-reachable buttons;
+   consistent Playfair Display/Poppins pairing with Georgia/system fallbacks; navy
+   #10174F dominant, gold #F5B428 as accent only.
+
+8. VERIFY before declaring done: zero console errors on load and full scroll at
+   1440px and 390px; no section renders empty; the 3D rakhi is visibly ornate (not a
+   flat ring); Lighthouse mobile performance ≥ 90. Screenshot each fixed section.
