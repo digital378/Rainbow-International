@@ -199,7 +199,153 @@
     }
   }
 
+  function initCelebration() {
+    const section = document.querySelector(".rb-celebration");
+    if (!section) return;
+    const tilt = section.querySelector(".rb-celebration-tilt");
+    const float = section.querySelector(".rb-celebration-float");
+    const image = section.querySelector(".rb-celebration img");
+    const bubble = section.querySelector(".rb-celebration-bubble");
+    const canvas = section.querySelector(".rb-celebration-sparkles");
+    if (!tilt || !float || !image || !bubble || !canvas) return;
+
+    const burst = () => {
+      bubble.textContent = "Happy Raksha Bandhan!";
+      bubble.classList.add("is-visible");
+      if (reducedMotion) return;
+      const colors = ["#10174F", "#F5B428", "#FF8A3D"];
+      for (let index = 0; index < 26; index++) {
+        confetti.push({
+          x: canvas.width / 2 + (Math.random() - .5) * 90,
+          y: canvas.height * .45,
+          vx: (Math.random() - .5) * 7,
+          vy: -Math.random() * 7 - 2.5,
+          size: 3 + Math.random() * 4,
+          color: colors[index % colors.length],
+          life: 1
+        });
+      }
+    };
+    image.addEventListener("click", burst);
+    image.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); burst(); } });
+    image.tabIndex = 0;
+    image.setAttribute("role", "button");
+
+    if (reducedMotion) return;
+
+    const context = canvas.getContext("2d");
+    const confetti = [];
+    const sparkles = [];
+    const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+    let onScreen = false;
+    let tabVisible = !document.hidden;
+    let frame = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    let stageWidth = 0;
+    let stageHeight = 0;
+    const resize = () => {
+      const rect = section.querySelector(".rb-celebration-stage").getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio, 2);
+      stageWidth = rect.width;
+      stageHeight = rect.height;
+      canvas.width = Math.round(stageWidth * ratio);
+      canvas.height = Math.round(stageHeight * ratio);
+      canvas.style.width = `${stageWidth}px`;
+      canvas.style.height = `${stageHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      if (!sparkles.length) {
+        for (let index = 0; index < 24; index++) {
+          sparkles.push({
+            x: Math.random() * stageWidth,
+            y: Math.random() * stageHeight,
+            r: .9 + Math.random() * 2.1,
+            speed: .18 + Math.random() * .42,
+            phase: Math.random() * Math.PI * 2,
+            cream: index % 3 === 0
+          });
+        }
+      }
+    };
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    if (!isTouch) {
+      section.addEventListener("pointermove", (event) => {
+        const rect = tilt.getBoundingClientRect();
+        targetY = ((event.clientX - rect.left) / rect.width - .5) * 12;
+        targetX = (.5 - (event.clientY - rect.top) / rect.height) * 12;
+      });
+      section.addEventListener("pointerleave", () => { targetX = 0; targetY = 0; });
+    }
+
+    let entered = false;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        onScreen = entry.isIntersecting;
+        if (entry.isIntersecting && !entered) {
+          entered = true;
+          float.animate(
+            [
+              { opacity: 0, transform: "translateY(40px) scale(.97)" },
+              { opacity: 1, transform: "translateY(-7px) scale(1.008)", offset: .72 },
+              { opacity: 1, transform: "translateY(0) scale(1)" }
+            ],
+            { duration: 900, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "both" }
+          );
+        }
+      });
+    }, { threshold: .12 });
+    observer.observe(section);
+    document.addEventListener("visibilitychange", () => { tabVisible = !document.hidden; });
+
+    const clamp = Math.max(1, section.offsetHeight + window.innerHeight);
+    const tick = () => {
+      requestAnimationFrame(tick);
+      if (!onScreen || !tabVisible) return;
+      frame += 1;
+      const time = frame / 60;
+      const rect = section.getBoundingClientRect();
+      const parallax = ((window.innerHeight - rect.top) / clamp - .5) * -30;
+      const drift = Math.sin(time * (Math.PI * 2) / 4) * 10;
+      const breathe = 1 + Math.sin(time * (Math.PI * 2) / 4) * .0075;
+      if (entered) float.style.transform = `translateY(${drift + parallax * .15}px) scale(${breathe})`;
+      currentX += (targetX - currentX) * .08;
+      currentY += (targetY - currentY) * .08;
+      tilt.style.transform = `rotateX(${currentX.toFixed(3)}deg) rotateY(${currentY.toFixed(3)}deg)`;
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      sparkles.forEach((sparkle) => {
+        sparkle.y -= sparkle.speed;
+        if (sparkle.y < -6) sparkle.y = canvas.height + 6;
+        const twinkle = .35 + Math.abs(Math.sin(time * 1.5 + sparkle.phase)) * .6;
+        context.globalAlpha = twinkle;
+        context.fillStyle = sparkle.cream ? "#FFF3D2" : "#F5B428";
+        context.beginPath();
+        context.arc(sparkle.x, sparkle.y, sparkle.r, 0, Math.PI * 2);
+        context.fill();
+      });
+      for (let index = confetti.length - 1; index >= 0; index--) {
+        const piece = confetti[index];
+        piece.x += piece.vx;
+        piece.y += piece.vy;
+        piece.vy += .22;
+        piece.life -= .014;
+        if (piece.life <= 0) { confetti.splice(index, 1); continue; }
+        context.globalAlpha = Math.max(0, piece.life);
+        context.fillStyle = piece.color;
+        context.fillRect(piece.x, piece.y, piece.size, piece.size);
+      }
+      context.globalAlpha = 1;
+    };
+    tick();
+  }
+
   setupControls();
+  initCelebration();
   const start = () => initThree();
   if ("requestIdleCallback" in window) window.requestIdleCallback(start, { timeout: 1400 });
   else window.setTimeout(start, 600);

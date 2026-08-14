@@ -104,6 +104,23 @@ function renderPage(): string {
       <section class="rb-chapter" aria-labelledby="chapter-one"><div class="rb-chapter-copy"><p class="rb-chapter-num">01 · THE MEANING</p><h2 id="chapter-one">A thread that says, “I am here.”</h2><p>At its heart, a rakhi is an invitation to notice one another. It carries affection, but also attention: the steady kind that listens, helps and stays present when it matters.</p></div></section>
       <section class="rb-chapter" aria-labelledby="chapter-two"><div class="rb-chapter-copy"><p class="rb-chapter-num">02 · THE WORDS</p><h2 id="chapter-two">Raksha is care. Bandhan is a bond.</h2><p>Together, these words express a promise. Protection is not about control; it is about respect, responsibility and the courage to choose kindness in the small moments of daily life.</p></div></section>
       <section class="rb-chapter" aria-labelledby="chapter-three"><div class="rb-chapter-copy"><p class="rb-chapter-num">03 · THE VALUES</p><h2 id="chapter-three">Every classroom can hold the same promise.</h2><p>Friendship, mentorship and care grow through thoughtful actions. A welcoming word, a shared idea or help with a difficult task can make school life feel more connected for everyone.</p></div></section>
+      <section class="rb-celebration" aria-labelledby="celebration-title">
+        <h2 id="celebration-title" class="rb-sr-only">A celebration moment</h2>
+        <div class="rb-celebration-stage">
+          <div class="rb-celebration-glow" aria-hidden="true"></div>
+          <canvas class="rb-celebration-sparkles" aria-hidden="true"></canvas>
+          <p class="rb-celebration-bubble" aria-live="polite"></p>
+          <div class="rb-celebration-tilt">
+            <div class="rb-celebration-float">
+              <picture>
+                <source srcset="/blog-assets/${SLUG}/rakhi-kids.webp" type="image/webp" />
+                <img src="/blog-assets/${SLUG}/rakhi-kids.png" width="900" height="1125" loading="lazy" decoding="async" alt="Illustration of two Rainbow International School students tying a rakhi on Raksha Bandhan." />
+              </picture>
+            </div>
+          </div>
+        </div>
+        <p class="rb-celebration-caption">The joy of tying the knot of protection — Raksha Bandhan at the heart of our Rainbow family.</p>
+      </section>
       <div class="rb-tie-wrap">
         <section class="rb-tie-card" aria-labelledby="tie-title">
           <div class="rb-tie-copy">
