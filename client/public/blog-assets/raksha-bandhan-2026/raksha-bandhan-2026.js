@@ -26,7 +26,11 @@
   var knotEl = document.querySelector(".rb-thread-knot");
   var bgHost = document.querySelector(".rb-bg");
   var pxSection = document.querySelector(".rb-parallax");
-  var scrollP = 0, scrollPS = 0, storyP = 0, storyPS = 0, storyEnd = 1;
+  var scrollStory = document.querySelector(".rb-scroll-story");
+  var sceneStage = document.querySelector(".rb-scene-stage");
+  var sceneFrames = sceneStage ? Array.prototype.slice.call(sceneStage.querySelectorAll(".rb-scene-frame")) : [];
+  var sceneProgressEl = sceneStage ? sceneStage.querySelector(".rb-scene-progress span") : null;
+  var scrollP = 0, scrollPS = 0, storyP = 0, storyPS = 0, sceneP = 0, scenePS = 0, storyEnd = 1;
 
   function measure() {
     storyEnd = pxSection ? (pxSection.offsetTop + pxSection.offsetHeight - window.innerHeight) : 1;
@@ -36,6 +40,11 @@
     var h = document.documentElement.scrollHeight - window.innerHeight;
     scrollP = h > 0 ? clamp(window.scrollY / h, 0, 1) : 0;
     storyP = clamp(window.scrollY / storyEnd, 0, 1);
+    if (scrollStory) {
+      var storyRect = scrollStory.getBoundingClientRect();
+      var sceneRun = Math.max(scrollStory.offsetHeight - window.innerHeight * 0.7, 1);
+      sceneP = clamp((window.innerHeight * 0.78 - storyRect.top) / sceneRun, 0, 1);
+    }
     if (bgHost) bgHost.classList.toggle("is-off", window.scrollY > storyEnd + window.innerHeight * 0.6);
   }
   window.addEventListener("scroll", readScroll, { passive: true });
@@ -61,6 +70,34 @@
       var tx = mouseX * d * 26;
       L.style.transform = "translate3d(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px,0)";
     });
+  }
+
+  /* ---------------- illustrated scroll story ---------------- */
+  function updateSceneStory() {
+    if (reduced || !sceneStage || !sceneFrames.length) return;
+    var rect = sceneStage.getBoundingClientRect();
+    if (rect.bottom < -80 || rect.top > window.innerHeight + 80) return;
+    var segments = sceneFrames.length - 1;
+    var position = scenePS * segments;
+    var current = Math.min(segments, Math.floor(position));
+    var mix = smooth(position - current);
+
+    sceneFrames.forEach(function (frame, index) {
+      var opacity = 0, shift = 24, scale = 0.965;
+      if (index === current) {
+        opacity = 1 - mix;
+        shift = -mix * 16;
+        scale = 1 + mix * 0.018;
+      } else if (index === current + 1) {
+        opacity = mix;
+        shift = (1 - mix) * 22;
+        scale = 0.978 + mix * 0.022;
+      }
+      frame.style.opacity = opacity.toFixed(3);
+      frame.style.transform = "translate3d(0," + shift.toFixed(1) + "px,0) scale(" + scale.toFixed(4) + ")";
+      frame.style.zIndex = String(index === current + 1 ? 2 : index === current ? 1 : 0);
+    });
+    if (sceneProgressEl) sceneProgressEl.style.width = (scenePS * 100).toFixed(2) + "%";
   }
 
   /* ---------------- celebration moment ---------------- */
@@ -302,7 +339,46 @@
       });
     }
     threadSide(1); threadSide(-1);
+
+    /* A small hanging jhumka gives the rakhi a soft, hand-crafted finish. */
+    var jhumka = new THREE.Group();
+    jhumka.position.set(0, -1.26, 0.06);
+    var chainCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.05, 0),
+      new THREE.Vector3(0.025, -0.16, 0.025),
+      new THREE.Vector3(-0.015, -0.34, 0.01)
+    ]);
+    jhumka.add(new THREE.Mesh(new THREE.TubeGeometry(chainCurve, 18, 0.026, 6), mat(T.thread)));
+    var cap = new THREE.Mesh(new THREE.SphereGeometry(0.16, 18, 12), mat(T.dots, { emissive: T.dots, ei: 0.25 }));
+    cap.scale.set(1, 0.48, 0.72); cap.position.y = -0.38; jhumka.add(cap);
+    var bell = new THREE.Mesh(new THREE.SphereGeometry(0.26, 22, 16, 0, Math.PI * 2, 0, Math.PI * 0.58), mat(T.ring));
+    bell.scale.set(1, 0.82, 0.76); bell.rotation.x = Math.PI; bell.position.y = -0.54; jhumka.add(bell);
+    var bellBand = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.03, 10, 28), mat(T.inner));
+    bellBand.scale.y = 0.55; bellBand.position.y = -0.62; jhumka.add(bellBand);
+    var tasselGem = new THREE.Mesh(new THREE.SphereGeometry(0.08, 14, 10), mat(T.gem, { emissive: T.gem, ei: 0.4 }));
+    tasselGem.position.y = -0.78; jhumka.add(tasselGem);
+    for (i = 0; i < 5; i++) {
+      a = -0.42 + i * 0.21;
+      var tassel = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), mat(i % 2 ? T.inner : T.dots, { emissive: T.dots, ei: 0.16 }));
+      tassel.position.set(Math.sin(a) * 0.25, -0.69 - Math.cos(a) * 0.025, 0.045);
+      jhumka.add(tassel);
+    }
+    jhumka.userData.sway = 0;
+    jhumka.userData.velocity = 0;
+    g.userData.jhumka = jhumka;
+    g.add(jhumka);
     return g;
+  }
+
+  function updateJhumka(rakhi, time) {
+    if (!rakhi || !rakhi.userData || !rakhi.userData.jhumka) return;
+    var tail = rakhi.userData.jhumka;
+    var target = Math.sin(rakhi.rotation.y) * 0.28 + Math.sin(time * 1.15) * 0.038 + rakhi.rotation.x * 0.12;
+    tail.userData.velocity += (target - tail.userData.sway) * 0.085;
+    tail.userData.velocity *= 0.8;
+    tail.userData.sway += tail.userData.velocity;
+    tail.rotation.z = tail.userData.sway;
+    tail.rotation.x = Math.sin(time * 1.6) * 0.035;
   }
 
   function disposeGroup(g) {
@@ -567,6 +643,7 @@
 
     scrollPS += (scrollP - scrollPS) * 0.1;
     storyPS += (storyP - storyPS) * 0.1;
+    scenePS += (sceneP - scenePS) * 0.085;
 
     var pct = (scrollPS * 100).toFixed(2);
     if (barEl) barEl.style.width = pct + "%";
@@ -574,6 +651,7 @@
     if (knotEl) knotEl.style.top = pct + "%";
 
     updateParallax();
+    updateSceneStory();
 
     if (celTilt && !reduced) {
       celRotY += (celTX * 6 - celRotY) * 0.06;
@@ -601,6 +679,7 @@
       bgRakhi.rotation.z = t * 0.12;
       bgRakhi.rotation.y = storyPS * Math.PI * 3 + Math.sin(t * 0.5) * 0.15;
       bgRakhi.rotation.x = Math.sin(t * 0.7) * 0.1;
+       updateJhumka(bgRakhi, t);
 
       cloud1.rotation.y = t * 0.02 + storyPS * 1.2;
       cloud2.rotation.y = -t * 0.014 - storyPS * 0.8;
@@ -630,6 +709,7 @@
         iRakhi.rotation.y = rotY;
         iRakhi.rotation.x = rotX;
         iRakhi.position.y = Math.sin(t * 1.1) * 0.07;
+         updateJhumka(iRakhi, t);
 
         if (confetti) {
           confettiT += dt;

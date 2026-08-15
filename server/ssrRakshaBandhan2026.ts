@@ -4,6 +4,20 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 const SLUG = "raksha-bandhan-2026";
+const SCENE_FILES = [
+  "scene_1.1_1786765935439.webp",
+  "scene_1.2_1786765935439.webp",
+  "scene_1.3_1786765935438.webp",
+  "scene_1.4_1786765935438.webp",
+  "scene_1.5_1786765935438.webp",
+  "scene_2.1_1786765935437.webp",
+  "scene_2.2_1786765935437.webp",
+  "scene_2.3_1786765935436.webp",
+  "scene_2.4_1786765935436.webp",
+  "scene_2.5_1786765935435.webp",
+  "scene_3_1786765935440.webp",
+  "scene_3.1_1786765935432.webp"
+] as const;
 
 /** Short hash of an asset so browsers pick up edits despite long cache lifetimes. */
 function assetVersion(fileName: string): string {
@@ -112,7 +126,7 @@ function renderPage(): string {
       <section class="rb-hero" aria-labelledby="raksha-title">
         <img class="rb-hero-logo" src="/ris-logo.png" alt="" aria-hidden="true" width="140" height="140" />
         <p class="rb-presents">Rainbow International School presents</p>
-        <h1 id="raksha-title">Raksha Bandhan 2026: The Thread That Binds Us</h1>
+        <h1 id="raksha-title" class="rb-gold-display">Raksha Bandhan 2026: The Thread That Binds Us</h1>
         <p class="rb-sub">A thread can be delicate and still hold a promise. This Raksha Bandhan, explore a celebration of care, trust and the everyday ways we stand beside one another.</p>
         <p class="rb-date-pill">${icon("calendar-days")} Friday · 28 August 2026 · Shravana Purnima</p>
         <a class="rb-scrollcue" href="#raksha-content"><span>Scroll to begin</span><span class="rb-cue-line" aria-hidden="true"></span></a>
@@ -145,9 +159,28 @@ function renderPage(): string {
         </div>
       </section>
 
+      <section class="rb-scroll-story" aria-labelledby="scroll-story-title">
+        <div class="rb-scroll-story-sticky">
+          <div class="rb-scroll-story-copy">
+            <p class="rb-kicker-light">A promise in motion</p>
+            <h2 id="scroll-story-title" class="rb-gold-display">Every step leads back to care.</h2>
+            <p>Walk beside this small story as a brother arrives, kneels, and receives a thread made with love.</p>
+          </div>
+          <div class="rb-scene-stage" role="img" aria-labelledby="scroll-story-title scroll-story-description">
+            <span id="scroll-story-description" class="rb-sr-only">An illustrated scroll story of a Rainbow International School student walking forward, kneeling, and sharing a Raksha Bandhan moment with a classmate.</span>
+            <div class="rb-scene-halo" aria-hidden="true"></div>
+            <div class="rb-scene-frames" aria-hidden="true">
+              ${SCENE_FILES.map((file, index) => `<img class="rb-scene-frame${index === 0 ? " is-current" : ""}" src="/blog-assets/${SLUG}/scene/${file}?v=${assetVersion(`scene/${file}`)}" width="1080" height="1350" decoding="async" ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} alt="" />`).join("")}
+            </div>
+            <div class="rb-scene-progress" aria-hidden="true"><span></span></div>
+          </div>
+          <p class="rb-scene-caption" aria-hidden="true"><span>01</span> A thread carries a promise.</p>
+        </div>
+      </section>
+
       <section class="rb-celebration" aria-labelledby="celebration-title">
         <p class="rb-kicker-light">From our young artists</p>
-        <h2 id="celebration-title">A celebration drawn by our students</h2>
+        <h2 id="celebration-title" class="rb-gold-display">A celebration drawn by our students</h2>
         <div class="rb-celebration-stage">
           <div class="rb-celebration-glow" aria-hidden="true"></div>
           <p class="rb-wish-bubble" aria-live="polite"></p>
@@ -177,12 +210,12 @@ function renderPage(): string {
       <section class="rb-interactive" aria-labelledby="tie-title">
         <div class="rb-intro">
           <p class="rb-kicker-light">An interactive pause</p>
-          <h2 id="tie-title">Tie a rakhi of your own</h2>
+          <h2 id="tie-title" class="rb-gold-display">Tie a rakhi of your own</h2>
           <p>Choose a colour, drag to turn the rakhi, then tie the thread as a small reminder to lead with care.</p>
         </div>
         <div class="rb-stage" role="img" aria-label="An interactive illustrated rakhi. Drag left or right to rotate it.">
           <div class="rb-stage-fallback" aria-hidden="true">
-            <svg viewBox="0 0 460 240" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 460 290" xmlns="http://www.w3.org/2000/svg">
               <path d="M110 120 C70 96 40 96 6 120 M350 120 C390 144 420 144 454 120" fill="none" stroke="#e0483e" stroke-width="6" stroke-linecap="round" />
               <circle cx="60" cy="107" r="7" fill="#ffd977" /><circle cx="30" cy="112" r="6" fill="#f5b428" />
               <circle cx="400" cy="133" r="7" fill="#ffd977" /><circle cx="430" cy="128" r="6" fill="#f5b428" />
@@ -196,6 +229,13 @@ function renderPage(): string {
                 <circle cx="158" cy="48" r="5" /><circle cx="302" cy="192" r="5" />
                 <circle cx="302" cy="48" r="5" /><circle cx="158" cy="192" r="5" />
               </g>
+               <g transform="translate(230 206)">
+                 <path d="M0 0 C-3 9 -4 13 -3 18" fill="none" stroke="#e0483e" stroke-width="5" stroke-linecap="round" />
+                 <circle cy="21" r="6" fill="#ffd977" />
+                 <path d="M-18 25 Q0 52 18 25 Q0 16 -18 25Z" fill="#f5b428" stroke="#ff8a3d" stroke-width="3" />
+                 <path d="M-13 30 Q0 43 13 30" fill="none" stroke="#c0392b" stroke-width="3" />
+                 <circle cy="54" r="6" fill="#ffd977" /><circle cx="-12" cy="48" r="4" fill="#ff8a3d" /><circle cx="12" cy="48" r="4" fill="#ff8a3d" />
+               </g>
             </svg>
           </div>
           <div class="rb-wish-pop" aria-live="polite"><span></span></div>
@@ -229,7 +269,7 @@ function renderPage(): string {
           <div class="rb-px-layer rb-px-garland" data-depth="0.65" aria-hidden="true"></div>
           <div class="rb-px-caption">
             <p class="rb-kicker-light">An Evening of Light</p>
-            <h2 id="parallax-title">May every home glow a little brighter</h2>
+            <h2 id="parallax-title" class="rb-gold-display">May every home glow a little brighter</h2>
             <p>This Raksha Bandhan, we wish every family an evening of warmth — of sweets shared, stories retold, and threads tied with love that lasts far beyond the festival.</p>
           </div>
           <div class="rb-px-layer rb-px-diyas" data-depth="0.85" aria-hidden="true">
