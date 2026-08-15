@@ -203,6 +203,10 @@ main { position: relative; z-index: 10; }
 .rb-katha.is-live .rb-katha-bless { display: block; position: absolute; inset: 0; z-index: 1; opacity: 0; background: radial-gradient(90% 70% at 50% 30%, rgba(255, 217, 119, .28), transparent 65%); pointer-events: none; }
 .rb-katha-action { display: none; }
 .rb-katha.is-live .rb-katha-action { position: absolute; inset: -1% 5% 8%; z-index: 4; display: grid; place-items: end center; margin: 0; pointer-events: none; }
+/* Scene Three's caption occupies the right side of the stage. Shift the whole
+   gift composition into the open left area without interfering with the image's
+   inline cinematic float transform. */
+.rb-katha.is-live .rb-katha-gift { transform: translateX(clamp(-128px, -9vw, -72px)); }
 /* height:auto is load-bearing — without it the markup's height attribute keeps the
    box at its natural pixel height, so the frame overruns its reserved band. */
 .rb-katha.is-live .rb-katha-action img { display: block; width: min(104%, 980px); height: auto; max-height: 100%; object-fit: contain; object-position: center bottom; opacity: 0; will-change: transform, opacity; filter: drop-shadow(0 24px 35px rgba(0, 0, 0, .45)); }
@@ -320,6 +324,7 @@ main { position: relative; z-index: 10; }
   /* The caption is bottom-pinned from this width down, so the post-tie frames
      get their own reserved band above it and sit on that band's floor. */
   .rb-katha.is-live .rb-katha-action { inset: 3% 4% 48%; place-items: end center; }
+  .rb-katha.is-live .rb-katha-gift { transform: none; }
   .rb-katha.is-live .rb-katha-action img { width: min(100%, 620px); max-height: 100%; object-position: center bottom; }
 }
 @media (max-width: 760px) {
