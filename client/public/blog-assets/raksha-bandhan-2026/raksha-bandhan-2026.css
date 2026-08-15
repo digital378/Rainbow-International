@@ -121,6 +121,8 @@ main { position: relative; z-index: 10; }
 .rb-cine { position: relative; color: var(--rb-on-dark); }
 .rb-cine h1, .rb-cine h2, .rb-cine h3 { font-family: "Playfair Display", Georgia, "Times New Roman", serif; }
 .rb-cine > section { position: relative; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 12vh 6vw; }
+.rb-cine > .rb-align-l,
+.rb-cine > .rb-align-r { min-height: 78vh; padding-block: 9vh; }
 .rb-kicker-light { margin: 0 0 16px; color: var(--rb-gold); font-size: .72rem; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; }
 .rb-gold-display { color: var(--rb-gold-soft); text-shadow: 0 4px 28px rgba(245, 180, 40, .16); }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
