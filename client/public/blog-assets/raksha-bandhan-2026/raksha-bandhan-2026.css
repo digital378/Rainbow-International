@@ -143,15 +143,19 @@ main { position: relative; z-index: 10; }
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .rb-hero h1 {
-    background: linear-gradient(105deg, #fff6e8 3%, #ffe9a3 27%, #f5b428 53%, #fff0bd 72%, #cf8613 100%);
+    background: linear-gradient(105deg, #cf8613 0%, #f5b428 23%, #fff8dc 43%, #fffdf2 50%, #ffe09a 57%, #f5b428 77%, #cf8613 100%);
+    background-size: 230% 100%;
+    background-position: 0% 50%;
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: transparent;
+    animation: rb-in .4s .1s both, rb-title-reflection 6.8s 1s ease-in-out infinite alternate;
   }
 }
 .rb-hero .rb-sub { max-width: 52ch; margin: 24px 0 0; color: var(--rb-on-dark-dim); font-size: clamp(.95rem, 1.6vw, 1.15rem); font-weight: 300; animation: rb-in .4s .1s both; }
 .rb-date-pill { display: inline-flex; align-items: center; gap: 9px; margin: 18px 0 0; padding: 10px 26px; border: 1px solid rgba(245, 180, 40, .4); border-radius: 100px; color: var(--rb-gold-soft); font-size: .88rem; letter-spacing: .1em; animation: rb-in .4s .14s both; }
 .rb-date-pill svg, .rb-icon svg { width: 18px; height: 18px; }
 @keyframes rb-in { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+@keyframes rb-title-reflection { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 
 /* glass story cards */
 .rb-align-l { justify-content: flex-start; }
@@ -418,6 +422,7 @@ main { position: relative; z-index: 10; }
   .rb-card { opacity: 1 !important; transform: none !important; }
   .rb-bg { display: none; }
   .rb-kcap { transition: none !important; }
+  .rb-hero h1 { animation: none; background-position: 50% 50%; }
   .rb-cursor, .rb-stars { display: none !important; }
   .rb-has-rakhi-cursor, .rb-has-rakhi-cursor * { cursor: auto; }
 }

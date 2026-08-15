@@ -174,6 +174,10 @@
       - Math.sin(time * 4.5) * 3 * wTie;
     kKids.style.transform = "translateX(" + kx.toFixed(1) + "px) translateY(" + kY.toFixed(1) +
       "px) rotate(" + kRot.toFixed(2) + "deg) scale(" + ks.toFixed(3) + ")";
+    /* The original tying artwork is its own layer. Fade it out before the
+       post-tie illustrations come forward, rather than stacking both casts. */
+    var oldArtFade = 1 - smooth(clamp((q - 0.535) / 0.09, 0, 1));
+    kKids.style.opacity = oldArtFade.toFixed(3);
 
     /* scene 1: the walk — sister from the left, brother from the right, real step cycles */
     var approach = smooth(clamp(q / 0.24, 0, 1));
