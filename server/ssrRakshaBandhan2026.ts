@@ -134,33 +134,6 @@ function renderPage(): string {
         <a class="rb-scrollcue" href="#raksha-content"><span>Scroll to begin</span><span class="rb-cue-line" aria-hidden="true"></span></a>
       </section>
 
-      <section class="rb-align-l" aria-labelledby="chapter-one">
-        <div class="rb-card">
-          <p class="rb-kicker-light">01 · The Meaning</p>
-          <h2 id="chapter-one">A thread that says, “I am here.”</h2>
-          <p>At its heart, a rakhi is an invitation to notice one another. It carries affection, but also attention: the steady kind that listens, helps and stays present when it matters.</p>
-          <p>Every August, the same small ritual repeats in millions of homes — and every year it means something slightly new, shaped by the year the family has just lived through together.</p>
-        </div>
-      </section>
-
-      <section class="rb-align-r" aria-labelledby="chapter-two">
-        <div class="rb-card">
-          <p class="rb-kicker-light">02 · The Words</p>
-          <h2 id="chapter-two">Raksha is care. Bandhan is a bond.</h2>
-          <p>Together, these words express a promise. Protection is not about control; it is about respect, responsibility and the courage to choose kindness in the small moments of daily life.</p>
-          <p><em>Raksha</em> asks what we are willing to stand for. <em>Bandhan</em> asks who we are willing to stand with.</p>
-        </div>
-      </section>
-
-      <section class="rb-align-l" aria-labelledby="chapter-three">
-        <div class="rb-card">
-          <p class="rb-kicker-light">03 · The Values</p>
-          <h2 id="chapter-three">Every classroom can hold the same promise.</h2>
-          <p>Friendship, mentorship and care grow through thoughtful actions. A welcoming word, a shared idea or help with a difficult task can make school life feel more connected for everyone.</p>
-          <div class="rb-values"><span>Kindness</span><span>Responsibility</span><span>Trust</span><span>Belonging</span></div>
-        </div>
-      </section>
-
       <section class="rb-katha" aria-labelledby="katha-scene-one">
         <div class="rb-katha-sticky">
           <div class="rb-katha-stage">
@@ -171,12 +144,6 @@ function renderPage(): string {
               <div class="rb-katha-glow" aria-hidden="true"></div>
             </div>
             <div class="rb-katha-bless" aria-hidden="true"></div>
-            <svg class="rb-katha-rakhi" viewBox="0 0 120 120" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="60" cy="60" r="34" fill="none" stroke="#f5b428" stroke-width="7" />
-              <circle cx="60" cy="60" r="22" fill="#10174f" />
-              <circle cx="60" cy="60" r="11" fill="#ffd977" />
-              <path d="M28 60 L4 48 M28 60 L4 72 M92 60 L116 48 M92 60 L116 72" stroke="#e0483e" stroke-width="5" stroke-linecap="round" />
-            </svg>
 
             <div class="rb-kcap rb-kcap-1">
               <p class="rb-kicker-light">The Katha · Scene One</p>
@@ -204,33 +171,31 @@ function renderPage(): string {
         </div>
       </section>
 
-      <section class="rb-celebration" aria-labelledby="celebration-title">
-        <p class="rb-kicker-light">From our young artists</p>
-        <h2 id="celebration-title" class="rb-gold-display">A celebration drawn by our students</h2>
-        <div class="rb-celebration-stage">
-          <div class="rb-celebration-glow" aria-hidden="true"></div>
-          <p class="rb-wish-bubble" aria-live="polite"></p>
-          <div class="rb-celebration-tilt">
-            <picture>
-              <source srcset="/blog-assets/${SLUG}/rakhi-kids.webp" type="image/webp" />
-              <img src="/blog-assets/${SLUG}/rakhi-kids.png" width="900" height="1125" loading="lazy" decoding="async" alt="Illustration of two Rainbow International School students tying a rakhi on Raksha Bandhan." />
-            </picture>
-            <svg class="rb-celebration-ornament" viewBox="0 0 320 320" role="img" aria-label="Decorative rakhi illustration" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="160" cy="160" r="96" fill="none" stroke="#f5b428" stroke-width="14" />
-              <circle cx="160" cy="160" r="66" fill="none" stroke="#ff8a3d" stroke-width="5" />
-              <circle cx="160" cy="160" r="46" fill="#10174f" />
-              <circle cx="160" cy="160" r="22" fill="#ffd977" />
-              <path d="M64 160 L4 132 M64 160 L4 188 M256 160 L316 132 M256 160 L316 188" stroke="#e0483e" stroke-width="7" stroke-linecap="round" />
-              <g fill="#ffd977">
-                <circle cx="160" cy="46" r="8" /><circle cx="160" cy="274" r="8" />
-                <circle cx="46" cy="160" r="8" /><circle cx="274" cy="160" r="8" />
-                <circle cx="80" cy="80" r="6" /><circle cx="240" cy="240" r="6" />
-                <circle cx="240" cy="80" r="6" /><circle cx="80" cy="240" r="6" />
-              </g>
-            </svg>
-          </div>
+      <section class="rb-align-l" aria-labelledby="chapter-one">
+        <div class="rb-card">
+          <p class="rb-kicker-light">01 · The Meaning</p>
+          <h2 id="chapter-one">A thread that says, “I am here.”</h2>
+          <p>At its heart, a rakhi is an invitation to notice one another. It carries affection, but also attention: the steady kind that listens, helps and stays present when it matters.</p>
+          <p>Every August, the same small ritual repeats in millions of homes — and every year it means something slightly new, shaped by the year the family has just lived through together.</p>
         </div>
-        <p class="rb-celebration-caption">The joy of tying the knot of protection — Raksha Bandhan at the heart of our Rainbow family. <strong>Tap the artwork</strong> to send a wish.</p>
+      </section>
+
+      <section class="rb-align-r" aria-labelledby="chapter-two">
+        <div class="rb-card">
+          <p class="rb-kicker-light">02 · The Words</p>
+          <h2 id="chapter-two">Raksha is care. Bandhan is a bond.</h2>
+          <p>Together, these words express a promise. Protection is not about control; it is about respect, responsibility and the courage to choose kindness in the small moments of daily life.</p>
+          <p><em>Raksha</em> asks what we are willing to stand for. <em>Bandhan</em> asks who we are willing to stand with.</p>
+        </div>
+      </section>
+
+      <section class="rb-align-l" aria-labelledby="chapter-three">
+        <div class="rb-card">
+          <p class="rb-kicker-light">03 · The Values</p>
+          <h2 id="chapter-three">Every classroom can hold the same promise.</h2>
+          <p>Friendship, mentorship and care grow through thoughtful actions. A welcoming word, a shared idea or help with a difficult task can make school life feel more connected for everyone.</p>
+          <div class="rb-values"><span>Kindness</span><span>Responsibility</span><span>Trust</span><span>Belonging</span></div>
+        </div>
       </section>
 
       <section class="rb-interactive" aria-labelledby="tie-title">

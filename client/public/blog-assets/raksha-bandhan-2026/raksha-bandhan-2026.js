@@ -77,7 +77,6 @@
   var bKnee = kFrame("b_knee"), bWait = kFrame("b_wait");
   var kGlow = katha ? katha.querySelector(".rb-katha-glow") : null;
   var kBless = katha ? katha.querySelector(".rb-katha-bless") : null;
-  var kOrb = katha ? katha.querySelector(".rb-katha-rakhi") : null;
   var kHint = katha ? katha.querySelector(".rb-katha-hint") : null;
   var kCaps = katha
     ? [
@@ -151,8 +150,6 @@
        below can never force a synchronous layout. */
     var rect = katha.getBoundingClientRect();
     if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
-    var stageRect = kStage.getBoundingClientRect();
-    var kidsRect = kKids.getBoundingClientRect();
     var run = rect.height - window.innerHeight;
     var q = run > 0 ? clamp(-rect.top / run, 0, 1) : 0;
 
@@ -199,21 +196,6 @@
     /* the combined tying illustration fades in as the two meet, and stays for the rest of the story */
     if (kFull) kFull.style.opacity = smooth(clamp((q - 0.335) / 0.06, 0, 1)).toFixed(3);
 
-    /* the rakhi travels the closing gap, then rests at the wrist */
-    if (kOrb) {
-      var orbShow = smooth(clamp(q / 0.08, 0, 1)) * (1 - smooth(clamp((q - 0.60) / 0.10, 0, 1)));
-      var meet = smooth(clamp(q / 0.34, 0, 1));
-      var travelFrom = kidsRect.left - stageRect.left + kidsRect.width * 0.27 - offPx;
-      var travelTo = kidsRect.left - stageRect.left + kidsRect.width * 0.54;
-      var orbX = lerp(travelFrom, travelTo, meet);
-      var orbY = kidsRect.top - stageRect.top + kidsRect.height * (0.30 + 0.23 * meet)
-        - Math.abs(Math.sin(traveled / 90 * Math.PI)) * 6 * walking
-        + Math.sin(time * 1.6) * 5 * (1 - meet);
-      kOrb.style.opacity = orbShow.toFixed(3);
-      kOrb.style.transform = "translate3d(" + orbX.toFixed(1) + "px," + orbY.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" +
-        (time * 34 + meet * 180).toFixed(1) + "deg) scale(" + (0.72 + meet * 0.28).toFixed(3) + ")";
-    }
-
     /* scene 2: the knot — wrist glow */
     if (kGlow) {
       var glowO = smooth(clamp((q - 0.37) / 0.05, 0, 1)) * (1 - smooth(clamp((q - 0.58) / 0.09, 0, 1)));
@@ -224,85 +206,6 @@
 
     for (var c = 0; c < kCaps.length; c++) capSet(kCaps[c], q);
     if (kHint) kHint.style.opacity = q < 0.04 ? "1" : "0";
-  }
-
-  /* ---------------- celebration moment ---------------- */
-  var celSection = document.querySelector(".rb-celebration");
-  var celWrap = document.querySelector(".rb-celebration-stage");
-  var celTilt = document.querySelector(".rb-celebration-tilt");
-  var kidsImg = celTilt ? celTilt.querySelector("img") : null;
-  var wishBubble = document.querySelector(".rb-wish-bubble");
-  var celRotX = 0, celRotY = 0, celTX = 0, celTY = 0;
-
-  if (kidsImg && celSection) {
-    kidsImg.addEventListener("error", function () {
-      /* keep the section — swap to the ornamental fallback instead of hiding content */
-      celSection.classList.add("is-imageless");
-    });
-  }
-
-  if (celWrap && !reduced) {
-    for (var s = 0; s < 24; s++) {
-      var sp = document.createElement("span");
-      sp.className = "rb-sparkle";
-      var sz = 4 + Math.round(Math.random() * 8);
-      sp.style.width = sp.style.height = sz + "px";
-      sp.style.left = (4 + Math.random() * 92) + "%";
-      sp.style.top = (6 + Math.random() * 88) + "%";
-      sp.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
-      sp.style.animationDuration = (3 + Math.random() * 3).toFixed(2) + "s";
-      celWrap.appendChild(sp);
-    }
-    celWrap.addEventListener("pointermove", function (e) {
-      var r = celWrap.getBoundingClientRect();
-      celTX = ((e.clientX - r.left) / r.width - 0.5) * 2;
-      celTY = ((e.clientY - r.top) / r.height - 0.5) * 2;
-    });
-    celWrap.addEventListener("pointerleave", function () { celTX = 0; celTY = 0; });
-  }
-
-  function celebrate() {
-    if (wishBubble) {
-      wishBubble.textContent = "Happy Raksha Bandhan! ✦";
-      wishBubble.classList.add("is-on");
-      clearTimeout(wishBubble._t);
-      wishBubble._t = setTimeout(function () { wishBubble.classList.remove("is-on"); }, 2800);
-    }
-    if (reduced || !celWrap) return;
-    var colors = ["#10174F", "#f5b428", "#ff8a3d", "#ffd977", "#fff6e8"];
-    for (var c = 0; c < 34; c++) {
-      var bit = document.createElement("span");
-      bit.className = "rb-confetti-bit";
-      bit.style.background = colors[c % colors.length];
-      bit.style.left = "50%";
-      bit.style.top = "42%";
-      celWrap.appendChild(bit);
-      (function (el) {
-        var ang = Math.random() * Math.PI * 2, speed = 90 + Math.random() * 160;
-        var vx = Math.cos(ang) * speed, vy = Math.sin(ang) * speed - 120;
-        var x = 0, y = 0, rot = Math.random() * 360, t0 = null, last = null;
-        function fly(ts) {
-          if (!t0) t0 = ts;
-          var dt = Math.min((ts - (last || ts)) / 1000, 0.05);
-          last = ts;
-          var life = (ts - t0) / 1000;
-          x += vx * dt; y += vy * dt; vy += 340 * dt; rot += 240 * dt;
-          el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + rot.toFixed(0) + "deg)";
-          el.style.opacity = String(Math.max(0, 1 - life / 1.6));
-          if (life < 1.7) requestAnimationFrame(fly); else el.remove();
-        }
-        requestAnimationFrame(fly);
-      })(bit);
-    }
-  }
-
-  if (celWrap) celWrap.addEventListener("click", celebrate);
-  if (kidsImg) {
-    kidsImg.tabIndex = 0;
-    kidsImg.setAttribute("role", "button");
-    kidsImg.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); celebrate(); }
-    });
   }
 
   /* ---------------- PDF download ---------------- */
@@ -777,19 +680,6 @@
 
     updateParallax();
     updateKatha((window.performance ? performance.now() : Date.now()) / 1000);
-
-    if (celTilt && !reduced) {
-      celRotY += (celTX * 6 - celRotY) * 0.06;
-      celRotX += (-celTY * 6 - celRotX) * 0.06;
-      var drift = 0;
-      if (celWrap) {
-        var cr = celWrap.getBoundingClientRect();
-        if (cr.bottom > 0 && cr.top < window.innerHeight) {
-          drift = ((cr.top + cr.height / 2) - window.innerHeight / 2) * 0.05;
-        }
-      }
-      celTilt.style.transform = "rotateX(" + celRotX.toFixed(2) + "deg) rotateY(" + celRotY.toFixed(2) + "deg) translateY(" + drift.toFixed(1) + "px)";
-    }
 
     if (!hasWebGL || !THREE) return;
     var t = clock.getElapsedTime();

@@ -128,7 +128,7 @@ main { position: relative; z-index: 10; }
 .rb-katha-stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(20px, 3vw, 32px); width: 100%; }
 .rb-katha-kids { position: relative; width: min(86vw, 100vh); max-width: 900px; aspect-ratio: 1269 / 1000; z-index: 2; }
 .rb-katha-full { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .45)); }
-.rb-katha-sprite, .rb-katha-glow, .rb-katha-bless, .rb-katha-rakhi, .rb-katha-hint { display: none; }
+.rb-katha-sprite, .rb-katha-glow, .rb-katha-bless, .rb-katha-hint { display: none; }
 .rb-kcap { max-width: 560px; padding: 26px 28px; border: 1px solid rgba(245, 180, 40, .22); border-radius: 18px; background: rgba(10, 14, 51, .55); box-shadow: 0 18px 50px rgba(0, 0, 0, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .rb-kcap .rb-kicker-light { margin-bottom: 10px; }
 .rb-kcap h2 { margin: 0 0 10px; color: var(--rb-cream); font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.25; }
@@ -147,7 +147,6 @@ main { position: relative; z-index: 10; }
 .rb-katha.is-live .rb-katha-sprite img { position: absolute; bottom: 0; left: 0; max-width: none; opacity: 0; transform: translateX(-50%); filter: drop-shadow(0 22px 38px rgba(0, 0, 0, .45)); }
 .rb-katha.is-live .rb-katha-glow { display: block; position: absolute; top: 42%; left: 41%; z-index: 3; width: 26%; height: 22%; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(255, 217, 119, .9), rgba(245, 180, 40, .3) 55%, transparent 78%); filter: blur(5px); mix-blend-mode: screen; pointer-events: none; }
 .rb-katha.is-live .rb-katha-bless { display: block; position: absolute; inset: 0; z-index: 1; opacity: 0; background: radial-gradient(90% 70% at 50% 30%, rgba(255, 217, 119, .28), transparent 65%); pointer-events: none; }
-.rb-katha.is-live .rb-katha-rakhi { display: block; position: absolute; top: 0; left: 0; z-index: 4; width: clamp(38px, 5.2vw, 74px); height: auto; opacity: 0; filter: drop-shadow(0 0 16px rgba(245, 180, 40, .85)); pointer-events: none; will-change: transform, opacity; }
 .rb-katha.is-live .rb-kcap { position: absolute; z-index: 6; max-width: 340px; opacity: 0; transform: translateY(26px); pointer-events: none; transition: opacity .55s ease, transform .55s ease; }
 .rb-katha.is-live .rb-kcap.is-on { opacity: 1; transform: translateY(0); }
 .rb-katha.is-live .rb-kcap-1 { top: 9%; left: 5%; }
@@ -156,36 +155,16 @@ main { position: relative; z-index: 10; }
 .rb-katha.is-live .rb-kcap-4 { bottom: 12%; left: 5%; }
 .rb-katha.is-live .rb-katha-hint { display: block; position: absolute; bottom: 22px; left: 50%; z-index: 6; margin: 0; color: var(--rb-on-dark-dim); font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; transform: translateX(-50%); transition: opacity .6s ease; }
 
-/* celebration */
-.rb-celebration { flex-direction: column; gap: 10px; text-align: center; }
-.rb-celebration h2 { max-width: 20ch; margin: 0 0 8px; color: var(--rb-cream); font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
-.rb-celebration-stage { position: relative; margin-top: 8px; overflow: hidden; perspective: 900px; }
-.rb-celebration-glow { position: absolute; inset: -12%; border-radius: 50%; background: radial-gradient(circle, rgba(245, 180, 40, .16) 0%, transparent 62%); pointer-events: none; animation: rb-glow 5s ease-in-out infinite; }
-@keyframes rb-glow { 0%, 100% { opacity: .7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
-.rb-celebration-tilt { transform-style: preserve-3d; will-change: transform; }
-.rb-celebration-tilt img { position: relative; z-index: 2; display: block; width: min(460px, 80vw); height: auto; cursor: pointer; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .45)); animation: rb-floaty 4.2s ease-in-out infinite; }
-@keyframes rb-floaty { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-12px) scale(1.012); } }
-.rb-celebration-ornament { display: none; width: min(340px, 74vw); margin: 0 auto; }
-.rb-celebration.is-imageless .rb-celebration-tilt img { display: none; }
-.rb-celebration.is-imageless .rb-celebration-ornament { display: block; }
-.rb-sparkle { position: absolute; z-index: 3; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #ffd977 0%, rgba(245, 180, 40, .75) 45%, transparent 75%); animation: rb-spark 4s ease-in-out infinite; }
-@keyframes rb-spark { 0%, 100% { opacity: 0; transform: translateY(6px) scale(.5); } 45% { opacity: 1; transform: translateY(-14px) scale(1); } 70% { opacity: .4; } }
-.rb-wish-bubble { position: absolute; top: 4%; left: 50%; z-index: 5; margin: 0; padding: 12px 24px; border-radius: 100px; background: var(--rb-cream); color: var(--rb-navy); font-size: .92rem; font-weight: 500; white-space: nowrap; box-shadow: 0 12px 30px rgba(0, 0, 0, .35); opacity: 0; transform: translate(-50%, -8px); transition: opacity .5s, transform .5s; pointer-events: none; }
-.rb-wish-bubble.is-on { opacity: 1; transform: translate(-50%, -22px); }
-.rb-confetti-bit { position: absolute; z-index: 4; width: 9px; height: 9px; border-radius: 2px; pointer-events: none; }
-.rb-celebration-caption { max-width: 52ch; margin: 26px auto 0; color: var(--rb-on-dark-dim); font-size: .95rem; font-weight: 300; line-height: 1.8; }
-.rb-celebration-caption strong { color: var(--rb-gold-soft); font-weight: 500; }
-
 /* interactive rakhi */
-.rb-interactive { flex-direction: column; gap: 26px; text-align: center; }
-.rb-interactive .rb-intro { max-width: 560px; }
+.rb-interactive { flex-direction: column; gap: 26px; min-height: auto !important; padding-block: clamp(76px, 11vw, 132px) !important; text-align: center; }
+.rb-interactive .rb-intro { max-width: 560px; padding: 0 12px; }
 .rb-interactive .rb-intro h2 { margin: 0 0 14px; color: var(--rb-cream); font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
 .rb-interactive .rb-intro p { margin: 0; color: var(--rb-on-dark-dim); font-weight: 300; }
 .rb-stage {
   position: relative; width: min(560px, 92vw); height: min(430px, 60vh); overflow: hidden;
-  border: 1px solid rgba(245, 180, 40, .22); border-radius: 26px;
-  background: radial-gradient(120% 120% at 50% 20%, rgba(27, 36, 104, .55), rgba(10, 14, 51, .65));
-  box-shadow: 0 30px 80px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 217, 119, .55); border-radius: 26px;
+  background: radial-gradient(90% 85% at 50% 42%, #354aaf 0%, #1a2b78 48%, #10194d 100%);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .42), inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 56px rgba(99, 132, 255, .18);
   cursor: grab; touch-action: none;
 }
 .rb-stage:active { cursor: grabbing; }
@@ -310,7 +289,7 @@ main { position: relative; z-index: 10; }
 @media (max-width: 900px) {
   .rb-align-l, .rb-align-r { justify-content: center; }
   /* lift the pair clear of the bottom-pinned caption card */
-  .rb-cine > .rb-katha.is-live .rb-katha-kids { margin-bottom: 30vh; }
+  .rb-cine > .rb-katha.is-live .rb-katha-kids { width: min(96vw, 680px); margin-bottom: 27vh; }
   .rb-katha.is-live .rb-kcap { top: auto !important; right: auto !important; bottom: 4% !important; left: 50% !important; max-width: 88vw; padding: 18px 20px; transform: translate(-50%, 26px); }
   .rb-katha.is-live .rb-kcap.is-on { transform: translate(-50%, 0); }
   .rb-katha.is-live .rb-kcap h2 { font-size: 1.1rem; }
@@ -320,14 +299,59 @@ main { position: relative; z-index: 10; }
   .rb-topbar { display: none; }
   .rb-navlinks { display: none; }
   .rb-thread-track { left: 10px; }
-  .rb-cine > section { padding: 11vh 7vw; }
-  .rb-cine > .rb-katha.is-live { height: 420vh; }
-  .rb-katha-kids { width: 94vw; }
-  .rb-card { padding: 30px 24px; }
-  .rb-stage { height: min(360px, 56vh); }
-  .rb-swatches { gap: 20px; }
+  .rb-navbar { min-height: 66px; padding: 7px 18px; }
+  .rb-brand img { width: 42px; height: 42px; }
+  .rb-brand span { font-size: 12px; }
+  .rb-brand small { font-size: 8px; }
+  .rb-cine > section { min-height: auto; padding: 72px 7vw; }
+  .rb-hero { min-height: calc(100dvh - 66px) !important; padding-top: 54px !important; padding-bottom: 108px !important; }
+  .rb-hero .rb-hero-logo { width: min(112px, 30vw); margin-bottom: 15px; }
+  .rb-hero .rb-presents { margin-bottom: 13px; font-size: .61rem; letter-spacing: .22em; }
+  .rb-hero h1 { font-size: clamp(2.15rem, 10vw, 3rem); }
+  .rb-hero .rb-sub { margin-top: 18px; font-size: .94rem; line-height: 1.68; }
+  .rb-date-pill { max-width: 100%; margin-top: 16px; padding: 9px 15px; font-size: .73rem; line-height: 1.45; letter-spacing: .035em; text-align: left; }
+  .rb-scrollcue { bottom: 24px; font-size: .61rem; letter-spacing: .18em; }
+  .rb-scrollcue .rb-cue-line { height: 34px; }
+  .rb-cine > .rb-katha { padding: 36px 0 0; }
+  .rb-cine > .rb-katha.is-live { height: 380vh; padding: 0; }
+  .rb-katha-kids { width: 96vw; }
+  .rb-katha:not(.is-live) .rb-kcap { width: min(100%, 620px); padding: 22px 21px; }
+  .rb-katha.is-live .rb-katha-hint { bottom: 15px; max-width: 78vw; font-size: .58rem; letter-spacing: .16em; text-align: center; }
+  .rb-katha.is-live .rb-kcap { bottom: 5% !important; max-width: calc(100vw - 32px); padding: 16px 18px; border-radius: 15px; }
+  .rb-katha.is-live .rb-kcap .rb-kicker-light { margin-bottom: 8px; font-size: .58rem; letter-spacing: .18em; }
+  .rb-katha.is-live .rb-kcap h2 { margin-bottom: 7px; font-size: 1.08rem; line-height: 1.2; }
+  .rb-katha.is-live .rb-kcap p { font-size: .78rem; line-height: 1.55; }
+  .rb-card { width: 100%; padding: 27px 22px; border-radius: 18px; }
+  .rb-card h2 { font-size: 1.7rem; }
+  .rb-card p { font-size: .95rem; line-height: 1.75; }
+  .rb-values { gap: 8px; margin-top: 19px; }
+  .rb-values span { padding: 7px 12px; font-size: .72rem; }
+  .rb-interactive { gap: 22px; padding-block: 70px 78px !important; }
+  .rb-interactive .rb-intro h2 { font-size: 2rem; }
+  .rb-interactive .rb-intro p { font-size: .94rem; line-height: 1.7; }
+  .rb-stage { width: 100%; height: min(340px, 52dvh); border-radius: 20px; }
+  .rb-stage-fallback { padding: 12px; }
+  .rb-stage-fallback svg { width: 100%; }
+  .rb-stage-hint { bottom: 10px; font-size: .62rem; letter-spacing: .14em; }
+  .rb-swatches { gap: 16px 18px; padding: 2px 10px 20px; }
+  .rb-swatch { width: 44px; height: 44px; }
+  .rb-swatch span { font-size: .56rem; letter-spacing: .03em; }
+  .rb-tie-btn { min-height: 48px; margin-top: 20px; padding: 13px 27px; font-size: .8rem; }
+  .rb-parallax { min-height: 82dvh !important; padding: 0 !important; }
+  .rb-px-wrap { min-height: 82dvh; }
+  .rb-px-garland { height: 48px; background-size: 20px 52px; }
+  .rb-px-moon { background: radial-gradient(circle at 74% 22%, rgba(255, 246, 232, .95) 0 34px, rgba(255, 217, 119, .35) 48px, transparent 98px); }
+  .rb-px-caption { max-width: 27rem; padding: 0 12vw; }
+  .rb-px-caption h2 { font-size: 2.05rem; }
+  .rb-px-caption p { font-size: .93rem; line-height: 1.7; }
+  .rb-px-mandala svg { width: 96vw; }
+  .rb-px-diyas { height: 120px; padding-bottom: 16px; }
   .rb-diya:nth-child(4), .rb-diya:nth-child(5) { display: none; }
-  .rb-diya { width: 52px; }
+  .rb-diya { width: 46px; }
+  .rb-content { padding: 56px 18px; }
+  .rb-content h2 { margin-top: 54px; font-size: clamp(2rem, 9vw, 2.55rem); }
+  .rb-content h3 { font-size: 1.55rem; }
+  .rb-content .rb-intro { font-size: 1rem; line-height: 1.72; }
   .rb-legend-grid, .rb-craft-grid { grid-template-columns: 1fr; }
   .rb-wishes { grid-template-columns: 1fr 1fr; }
   .rb-date-card { grid-template-columns: 80px 1fr; gap: 15px; }
@@ -342,8 +366,6 @@ main { position: relative; z-index: 10; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .2s !important; }
   .rb-card { opacity: 1 !important; transform: none !important; }
-  .rb-celebration-tilt img { animation: none; }
-  .rb-sparkle { display: none; }
   .rb-bg { display: none; }
   .rb-kcap { transition: none !important; }
 }
