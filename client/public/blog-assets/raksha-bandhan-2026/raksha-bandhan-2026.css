@@ -203,7 +203,7 @@ main { position: relative; z-index: 10; }
 .rb-katha.is-live .rb-katha-glow { display: block; position: absolute; top: 42%; left: 41%; z-index: 3; width: 26%; height: 22%; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(255, 217, 119, .9), rgba(245, 180, 40, .3) 55%, transparent 78%); filter: blur(5px); mix-blend-mode: screen; pointer-events: none; }
 .rb-katha.is-live .rb-katha-bless { display: block; position: absolute; inset: 0; z-index: 1; opacity: 0; background: radial-gradient(90% 70% at 50% 30%, rgba(255, 217, 119, .28), transparent 65%); pointer-events: none; }
 .rb-katha-action { display: none; }
-.rb-katha.is-live .rb-katha-action { position: absolute; inset: 2% 8% 1%; z-index: 4; display: grid; place-items: end center; margin: 0; pointer-events: none; }
+.rb-katha.is-live .rb-katha-action { position: absolute; inset: -1% 5% 8%; z-index: 4; display: grid; place-items: end center; margin: 0; pointer-events: none; }
 .rb-katha.is-live .rb-katha-action img { display: block; width: min(94%, 880px); max-height: 100%; object-fit: contain; object-position: center bottom; opacity: 0; will-change: transform, opacity; filter: drop-shadow(0 24px 35px rgba(0, 0, 0, .45)); }
 .rb-katha.is-live .rb-kcap { position: absolute; z-index: 6; max-width: 340px; opacity: 0; transform: translateY(26px); pointer-events: none; transition: opacity .55s ease, transform .55s ease; }
 .rb-katha.is-live .rb-kcap.is-on { opacity: 1; transform: translateY(0); }
@@ -371,6 +371,7 @@ main { position: relative; z-index: 10; }
   .rb-katha-kids { width: 96vw; }
   .rb-katha:not(.is-live) .rb-kcap { width: min(100%, 620px); padding: 22px 21px; }
   .rb-katha.is-live .rb-kcap { bottom: 5% !important; max-width: calc(100vw - 32px); padding: 16px 18px; border-radius: 15px; }
+  .rb-katha.is-live .rb-katha-action { inset: 0 0 9%; }
   .rb-katha.is-live .rb-kcap .rb-kicker-light { margin-bottom: 8px; font-size: .58rem; letter-spacing: .18em; }
   .rb-katha.is-live .rb-kcap h2 { margin-bottom: 7px; font-size: 1.08rem; line-height: 1.2; }
   .rb-katha.is-live .rb-kcap p { font-size: .78rem; line-height: 1.55; }

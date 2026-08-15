@@ -227,15 +227,21 @@
       var giftIn = smooth(clamp((q - 0.565) / 0.055, 0, 1));
       var giftOut = smooth(clamp((q - 0.735) / 0.055, 0, 1));
       var giftO = giftIn * (1 - giftOut);
+      var giftFloatY = Math.sin(time * 1.15) * 4.5 * giftO;
+      var giftFloatX = Math.sin(time * 0.72) * 2.2 * giftO;
       kGiftArt.style.opacity = giftO.toFixed(3);
-      kGiftArt.style.transform = "translateY(" + ((1 - giftIn) * 32 - giftOut * 14).toFixed(1) +
-        "px) scale(" + (1.045 - giftIn * 0.045).toFixed(3) + ")";
+      kGiftArt.style.transform = "translate3d(" + (giftFloatX).toFixed(1) + "px," +
+        ((1 - giftIn) * 32 - giftOut * 14 + giftFloatY).toFixed(1) + "px,0) scale(" +
+        (1.045 - giftIn * 0.045).toFixed(3) + ")";
     }
     if (kNamasteArt) {
       var blessIn = smooth(clamp((q - 0.725) / 0.075, 0, 1));
+      var blessFloatY = Math.sin(time * 1.05 + 0.8) * 3.5 * blessIn;
+      var blessFloatX = Math.sin(time * 0.65 + 1.1) * 1.8 * blessIn;
       kNamasteArt.style.opacity = blessIn.toFixed(3);
-      kNamasteArt.style.transform = "translateY(" + ((1 - blessIn) * 28).toFixed(1) +
-        "px) scale(" + (1.055 - blessIn * 0.055).toFixed(3) + ")";
+      kNamasteArt.style.transform = "translate3d(" + (blessFloatX).toFixed(1) + "px," +
+        ((1 - blessIn) * 28 + blessFloatY).toFixed(1) + "px,0) scale(" +
+        (1.055 - blessIn * 0.055).toFixed(3) + ")";
     }
     /* scene 4: blessings wash */
     if (kBless) kBless.style.opacity = (smooth(clamp((q - 0.70) / 0.12, 0, 1)) * 0.9).toFixed(3);
