@@ -111,8 +111,22 @@ function renderPage(): string {
 <body>
   <a class="rb-skip" href="#raksha-content">Skip to article content</a>
   <div class="rb-bg-fallback" aria-hidden="true"></div>
+  <div class="rb-stars" aria-hidden="true"></div>
   <div class="rb-bg" aria-hidden="true"></div>
   <div class="rb-vignette" aria-hidden="true"></div>
+  <div class="rb-cursor" aria-hidden="true">
+    <span class="rb-cursor__aura"></span>
+    <svg class="rb-cursor__rakhi" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 6 34.6 20.4 46 11.6 40.6 25.2 55 22.6 44.2 32 55 41.4 40.6 38.8 46 52.4 34.6 43.6 32 58 29.4 43.6 18 52.4 23.4 38.8 9 41.4 19.8 32 9 22.6 23.4 25.2 18 11.6 29.4 20.4Z" fill="#F5B428" opacity=".55" />
+      <circle cx="32" cy="32" r="16.5" fill="none" stroke="#FFD977" stroke-width="4" />
+      <circle cx="32" cy="32" r="11" fill="#C0392B" />
+      <circle cx="32" cy="32" r="4.6" fill="#FFD977" />
+      <g fill="#FFF6E8">
+        <circle cx="32" cy="12.5" r="1.9" /><circle cx="32" cy="51.5" r="1.9" />
+        <circle cx="12.5" cy="32" r="1.9" /><circle cx="51.5" cy="32" r="1.9" />
+      </g>
+    </svg>
+  </div>
   <div class="rb-progress" aria-hidden="true"><span></span></div>
   <div class="rb-thread-track" aria-hidden="true"><div class="rb-thread-fill"></div><div class="rb-thread-knot"></div></div>
   <div class="rb-topbar"><span>Rainbow International School, Thane</span><span>CBSE K–12</span><span>Passion for Excellence</span></div>
@@ -224,13 +238,6 @@ function renderPage(): string {
                  <circle cy="54" r="6" fill="#ffd977" /><circle cx="-12" cy="48" r="4" fill="#ff8a3d" /><circle cx="12" cy="48" r="4" fill="#ff8a3d" />
                </g>
             </svg>
-          </div>
-          <div class="rb-cursor-guide" aria-hidden="true">
-            <div class="rb-cursor-guide__halo"></div>
-            <svg class="rb-cursor-guide__pointer" viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 3.5 25.7 21 16.5 22.5l5.6 10.7-6.1 3.2-5.7-10.8L4 33.3V3.5Z" fill="#FFF6E8" stroke="#10174F" stroke-width="2.4" stroke-linejoin="round"/>
-            </svg>
-            <span class="rb-cursor-guide__trail"></span>
           </div>
           <div class="rb-wish-pop" aria-live="polite"><span></span></div>
           <p class="rb-stage-hint">Drag to rotate</p>

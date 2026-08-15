@@ -44,6 +44,62 @@ img { max-width: 100%; }
 }
 .rb-vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(5, 8, 26, .55) 100%); }
 
+/* ---------- pointer-reactive star field ---------- */
+/* Fixed to the viewport so the JS glow maths can compare a star's viewport
+   position directly against the pointer, with no scroll offset to track. */
+.rb-stars { position: fixed; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.rb-star {
+  --rb-star-base: .4;
+  --rb-star-lit: 0;
+  position: absolute; border-radius: 50%;
+  background: rgba(255, 246, 232, .95);
+  /* Base twinkle stays subtle; the pointer-driven --rb-star-lit adds the local
+     flare so only the sky near the cursor lights up. */
+  opacity: calc(var(--rb-star-base) + var(--rb-star-lit) * .85);
+  transform: scale(calc(1 + var(--rb-star-lit) * 1.5));
+  box-shadow:
+    0 0 calc(3px + var(--rb-star-lit) * 12px) rgba(255, 231, 176, calc(.35 + var(--rb-star-lit) * .65)),
+    0 0 calc(6px + var(--rb-star-lit) * 26px) rgba(245, 180, 40, calc(var(--rb-star-lit) * .75));
+  animation: rb-star-twinkle 4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+@keyframes rb-star-twinkle { 0%, 100% { filter: brightness(.75); } 50% { filter: brightness(1.25); } }
+
+/* ---------- rakhi cursor ---------- */
+/* Only applied once JS confirms a real mouse; touch and reduced-motion keep the
+   native cursor entirely. */
+.rb-has-rakhi-cursor,
+.rb-has-rakhi-cursor .rb-stage,
+.rb-has-rakhi-cursor .rb-stage:active,
+.rb-has-rakhi-cursor a,
+.rb-has-rakhi-cursor button,
+.rb-has-rakhi-cursor summary,
+.rb-has-rakhi-cursor .rb-swatch { cursor: none; }
+.rb-cursor {
+  --rb-cursor-spin: 0deg;
+  --rb-cursor-tilt: 0deg;
+  --rb-cursor-scale: 1;
+  --rb-cursor-speed: 0;
+  position: fixed; top: 0; left: 0; z-index: 200; width: 0; height: 0;
+  opacity: 0; pointer-events: none; will-change: transform, opacity;
+  transition: opacity .25s ease;
+}
+.rb-cursor.is-on { opacity: 1; }
+.rb-cursor__rakhi {
+  position: absolute; top: 0; left: 0; width: 40px; height: 40px; margin: -20px 0 0 -20px;
+  transform: rotate(var(--rb-cursor-spin)) rotate3d(0, 1, .25, var(--rb-cursor-tilt)) scale(var(--rb-cursor-scale));
+  filter: drop-shadow(0 4px 10px rgba(6, 9, 30, .55)) drop-shadow(0 0 calc(6px + var(--rb-cursor-speed) * 16px) rgba(245, 180, 40, calc(.35 + var(--rb-cursor-speed) * .5)));
+  transition: width .22s ease, height .22s ease, margin .22s ease;
+}
+.rb-cursor__aura {
+  position: absolute; top: 0; left: 0; width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 180, 40, calc(.24 + var(--rb-cursor-speed) * .22)) 0%, rgba(255, 138, 61, .08) 45%, transparent 72%);
+  transform: scale(calc(.85 + var(--rb-cursor-speed) * .5));
+  transition: transform .2s ease;
+}
+.rb-cursor.is-active .rb-cursor__rakhi { width: 52px; height: 52px; margin: -26px 0 0 -26px; }
+.rb-cursor.is-press .rb-cursor__rakhi { width: 32px; height: 32px; margin: -16px 0 0 -16px; }
+
 /* ---------- progress ---------- */
 .rb-progress { position: fixed; top: 0; left: 0; z-index: 100; width: 100%; height: 3px; background: transparent; pointer-events: none; }
 .rb-progress > span { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--rb-saffron), var(--rb-gold)); }
@@ -167,27 +223,6 @@ main { position: relative; z-index: 10; }
 .rb-stage-fallback svg { width: 80%; max-width: 420px; height: auto; }
 .rb-stage.is-live .rb-stage-fallback { display: none; }
 .rb-stage-hint { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; color: var(--rb-on-dark-dim); font-size: .72rem; letter-spacing: .2em; text-align: center; text-transform: uppercase; pointer-events: none; transition: opacity .5s; }
-.rb-cursor-guide {
-  position: absolute; top: 52%; left: 50%; z-index: 5; width: 44px; height: 54px;
-  opacity: 0; pointer-events: none; transform: translate(-50%, -50%); will-change: left, top, transform, opacity;
-}
-.rb-cursor-guide.is-visible { opacity: 1; }
-.rb-cursor-guide.is-demo { animation: rb-cursor-drag 2.5s cubic-bezier(.55, .05, .45, .95) infinite alternate; }
-.rb-cursor-guide.is-following { transition: opacity .28s ease; }
-.rb-cursor-guide.is-dismissed { opacity: 0; transition: opacity .36s ease; }
-.rb-cursor-guide__halo {
-  position: absolute; top: 4px; left: 3px; width: 34px; height: 34px; border: 1px solid rgba(255, 217, 119, .94); border-radius: 50%;
-  background: rgba(245, 180, 40, .15); box-shadow: 0 0 0 8px rgba(245, 180, 40, .07), 0 0 24px rgba(255, 138, 61, .7);
-  animation: rb-cursor-pulse 1.15s ease-in-out infinite;
-}
-.rb-cursor-guide__pointer { position: absolute; top: 0; left: 5px; z-index: 1; width: 30px; height: 40px; filter: drop-shadow(0 3px 5px rgba(10, 14, 51, .55)); }
-.rb-cursor-guide__trail { position: absolute; top: 22px; right: 38px; width: 58px; height: 2px; border-radius: 100%; background: linear-gradient(90deg, transparent, rgba(255, 217, 119, .9)); transform-origin: right center; opacity: .8; }
-@keyframes rb-cursor-drag {
-  0%, 12% { transform: translate(calc(-50% - 78px), -50%) rotate(-8deg); }
-  46%, 62% { transform: translate(calc(-50% + 78px), -50%) rotate(8deg); }
-  100% { transform: translate(calc(-50% - 78px), -50%) rotate(-8deg); }
-}
-@keyframes rb-cursor-pulse { 0%, 100% { transform: scale(.82); opacity: .6; } 50% { transform: scale(1.12); opacity: 1; } }
 .rb-wish-pop { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 34px 30px; text-align: center; opacity: 0; transition: opacity .7s; pointer-events: none; }
 .rb-wish-pop.is-on { opacity: 1; }
 .rb-wish-pop span { max-width: 22ch; color: var(--rb-cream); font-family: "Playfair Display", Georgia, serif; font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.4; text-shadow: 0 2px 30px rgba(10, 14, 51, .9), 0 0 60px rgba(245, 180, 40, .35); }
@@ -344,7 +379,7 @@ main { position: relative; z-index: 10; }
   .rb-stage-fallback { padding: 12px; }
   .rb-stage-fallback svg { width: 100%; }
   .rb-stage-hint { bottom: 10px; font-size: .62rem; letter-spacing: .14em; }
-  .rb-cursor-guide { display: none; }
+  .rb-cursor { display: none; }
   .rb-swatches { gap: 16px 18px; padding: 2px 10px 20px; }
   .rb-swatch { width: 44px; height: 44px; }
   .rb-swatch span { font-size: .56rem; letter-spacing: .03em; }
@@ -380,7 +415,8 @@ main { position: relative; z-index: 10; }
   .rb-card { opacity: 1 !important; transform: none !important; }
   .rb-bg { display: none; }
   .rb-kcap { transition: none !important; }
-  .rb-cursor-guide { display: none !important; }
+  .rb-cursor, .rb-stars { display: none !important; }
+  .rb-has-rakhi-cursor, .rb-has-rakhi-cursor * { cursor: auto; }
 }
 
 /* ---------- print ---------- */

@@ -5,6 +5,13 @@
   var isMobile = window.innerWidth < 700;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
 
+  /* Pointer capability. Touch-only devices must keep their native behaviour, but
+     some desktop browsers (and automation) report no pointer capability at all,
+     so only a device that is coarse *and never* fine counts as touch-only. */
+  var coarseOnly = !!(window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) &&
+    !(window.matchMedia && window.matchMedia("(any-pointer: fine)").matches);
+  var hasFinePointer = !reduced && !isMobile && !coarseOnly;
+
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
   function lerp(a, b, t) { return a + (b - a) * t; }
   function smooth(t) { return t * t * (3 - 2 * t); }
@@ -280,15 +287,6 @@
   var curTheme = 0, clock = null;
   var stage = document.querySelector(".rb-stage");
   var hint = document.querySelector(".rb-stage-hint");
-  var cursorGuide = document.querySelector(".rb-cursor-guide");
-  /* The guide is a mouse affordance, so it stays off for reduced motion and for
-     the narrow layout where CSS hides it. Coarse-pointer detection is only used
-     to skip it on touch devices that report a real touchscreen — some desktop
-     browsers under automation report no pointer capability at all, and those
-     must still get the guide. */
-  var coarseOnly = !!(window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) &&
-    !(window.matchMedia && window.matchMedia("(any-pointer: fine)").matches);
-  var hasFinePointer = !reduced && !isMobile && !coarseOnly;
   var wishPop = document.querySelector(".rb-wish-pop");
   var wishText = wishPop ? wishPop.querySelector("span") : null;
   var swHost = document.querySelector(".rb-swatches");
@@ -502,51 +500,143 @@
   buildSwatches(null);
   if (tieBtn) tieBtn.addEventListener("click", showWish);
 
-  /* ---------------- animated cursor guide ----------------
-     A mouse affordance for the drag interaction: it plays a looping drag
-     gesture until the visitor takes over, follows the real cursor while it is
-     over the stage, then retires for good once a drag begins. It lives outside
-     the WebGL path on purpose — the stage is draggable in the static fallback
-     too, so the guide must not depend on three.js loading. */
-  if (stage && cursorGuide && hasFinePointer) {
-    var guideDismissed = false;
-    var placeGuide = function (e) {
-      var r = stage.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      cursorGuide.style.left = clamp(e.clientX - r.left, 0, r.width).toFixed(1) + "px";
-      cursorGuide.style.top = clamp(e.clientY - r.top, 0, r.height).toFixed(1) + "px";
-    };
-    var isMouse = function (e) { return !e.pointerType || e.pointerType === "mouse"; };
+  /* ---------------- rakhi cursor + reactive stars ----------------
+     The page-wide pointer becomes a small spinning rakhi: it trails the real
+     cursor with easing, tilts into the direction of travel, and squashes on
+     click. A sparse star field sits behind the content and brightens only near
+     the pointer, so movement lights up that part of the sky.
 
-    cursorGuide.classList.add("is-visible", "is-demo");
+     Deliberately outside the WebGL path: three.js may never load, and the
+     cursor must still work. Touch-only devices and reduced-motion keep the
+     native cursor and a still star field. */
+  var cursorEl = document.querySelector(".rb-cursor");
+  var starLayer = document.querySelector(".rb-stars");
+  var stars = [];
+  var STAR_GLOW_RADIUS = 190;
+  /* Pointer position in page coordinates, plus the eased position the rakhi
+     actually renders at, so the cursor visibly lags and settles. */
+  var ptrX = 0, ptrY = 0, curX = 0, curY = 0, ptrSeen = false;
+  var cursorSpin = 0, cursorTilt = 0, cursorSpeed = 0;
+  var starsDirty = true;
 
-    stage.addEventListener("pointerenter", function (e) {
-      if (guideDismissed || !isMouse(e)) return;
-      cursorGuide.classList.remove("is-demo");
-      cursorGuide.classList.add("is-following");
-      placeGuide(e);
+  function buildStars() {
+    if (!starLayer) return;
+    var area = window.innerWidth * window.innerHeight;
+    var count = clamp(Math.round(area / 26000), 26, isMobile ? 40 : 78);
+    var frag = document.createDocumentFragment();
+    stars = [];
+    starLayer.textContent = "";
+    for (var i = 0; i < count; i++) {
+      var s = document.createElement("span");
+      s.className = "rb-star";
+      /* Percentage placement keeps the field correct across resizes without a
+         rebuild, and the size/twinkle jitter stops it reading as a grid. */
+      var xPct = Math.random() * 100;
+      var yPct = Math.random() * 100;
+      var size = 1.2 + Math.random() * 2.2;
+      s.style.left = xPct.toFixed(3) + "%";
+      s.style.top = yPct.toFixed(3) + "%";
+      s.style.width = size.toFixed(2) + "px";
+      s.style.height = size.toFixed(2) + "px";
+      s.style.setProperty("--rb-star-base", (0.28 + Math.random() * 0.34).toFixed(3));
+      s.style.animationDuration = (2.8 + Math.random() * 4.2).toFixed(2) + "s";
+      s.style.animationDelay = (-Math.random() * 6).toFixed(2) + "s";
+      frag.appendChild(s);
+      stars.push({ el: s, xPct: xPct, yPct: yPct, lit: 0 });
+    }
+    starLayer.appendChild(frag);
+    starsDirty = true;
+  }
+
+  /* The layer is fixed to the viewport, so a star's pixel position is just its
+     percentage of the current viewport — no scroll term needed. */
+  function updateStarGlow() {
+    if (!stars.length || !hasFinePointer || !ptrSeen) return;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var vx = ptrX - window.scrollX, vy = ptrY - window.scrollY;
+    for (var i = 0; i < stars.length; i++) {
+      var st = stars[i];
+      var dx = (st.xPct / 100) * vw - vx;
+      var dy = (st.yPct / 100) * vh - vy;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      var target = d > STAR_GLOW_RADIUS ? 0 : 1 - d / STAR_GLOW_RADIUS;
+      target = target * target;
+      /* Ease so the halo swells and fades instead of snapping star to star. */
+      st.lit += (target - st.lit) * 0.16;
+      if (st.lit < 0.004) st.lit = 0;
+      st.el.style.setProperty("--rb-star-lit", st.lit.toFixed(3));
+    }
+  }
+
+  if (starLayer && !reduced) {
+    buildStars();
+    var starResizeT = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(starResizeT);
+      starResizeT = setTimeout(buildStars, 220);
     });
-    stage.addEventListener("pointermove", function (e) {
-      if (guideDismissed || !isMouse(e)) return;
-      if (!cursorGuide.classList.contains("is-following")) {
-        cursorGuide.classList.remove("is-demo");
-        cursorGuide.classList.add("is-following");
+  }
+
+  if (cursorEl && hasFinePointer) {
+    document.documentElement.classList.add("rb-has-rakhi-cursor");
+    window.addEventListener("pointermove", function (e) {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      ptrX = e.clientX + window.scrollX;
+      ptrY = e.clientY + window.scrollY;
+      if (!ptrSeen) {
+        ptrSeen = true;
+        curX = ptrX; curY = ptrY;
+        cursorEl.classList.add("is-on");
       }
-      placeGuide(e);
     }, { passive: true });
-    stage.addEventListener("pointerleave", function (e) {
-      if (guideDismissed || !isMouse(e)) return;
-      cursorGuide.classList.remove("is-following");
-      cursorGuide.classList.add("is-demo");
-      cursorGuide.style.left = "";
-      cursorGuide.style.top = "";
-    });
-    stage.addEventListener("pointerdown", function () {
-      if (guideDismissed) return;
-      guideDismissed = true;
-      cursorGuide.classList.remove("is-demo", "is-following", "is-visible");
-      cursorGuide.classList.add("is-dismissed");
-    });
+
+    /* Leaving the window (or entering an iframe/devtools) should hide the
+       rakhi rather than strand it at the last known point. */
+    document.addEventListener("pointerleave", function () { cursorEl.classList.remove("is-on"); });
+    document.addEventListener("pointerenter", function () { if (ptrSeen) cursorEl.classList.add("is-on"); });
+    window.addEventListener("blur", function () { cursorEl.classList.remove("is-on"); });
+
+    window.addEventListener("pointerdown", function (e) {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      cursorEl.classList.add("is-press");
+    }, { passive: true });
+    window.addEventListener("pointerup", function () { cursorEl.classList.remove("is-press"); }, { passive: true });
+
+    /* Interactive targets get a larger, brighter rakhi so the cursor still
+       communicates affordance now that the native arrow is hidden. */
+    document.addEventListener("pointerover", function (e) {
+      var t = e.target && e.target.closest
+        ? e.target.closest("a, button, summary, .rb-swatch, .rb-stage, input, textarea, select, [role='button']")
+        : null;
+      cursorEl.classList.toggle("is-active", !!t);
+    }, { passive: true });
+  }
+
+  function updateCursor(dt) {
+    if (!cursorEl || !hasFinePointer || !ptrSeen) return;
+    var px = curX, py = curY;
+    /* Framerate-independent easing so the trail feels the same on 60/120Hz. */
+    var k = 1 - Math.pow(0.001, dt);
+    curX += (ptrX - curX) * k;
+    curY += (ptrY - curY) * k;
+
+    var vx = curX - px, vy = curY - py;
+    var speed = Math.sqrt(vx * vx + vy * vy);
+    cursorSpeed += (speed - cursorSpeed) * 0.2;
+
+    /* Spin rate rises with travel speed, and the disc banks toward its motion
+       so fast flicks read as a rakhi being swept across the page. */
+    cursorSpin += (12 + cursorSpeed * 5) * dt;
+    var tiltTarget = clamp(vx * 1.6, -22, 22);
+    cursorTilt += (tiltTarget - cursorTilt) * 0.12;
+
+    var scale = 1 + clamp(cursorSpeed * 0.012, 0, 0.22);
+    cursorEl.style.transform =
+      "translate3d(" + (curX - window.scrollX).toFixed(2) + "px," + (curY - window.scrollY).toFixed(2) + "px,0)";
+    cursorEl.style.setProperty("--rb-cursor-spin", cursorSpin.toFixed(2) + "deg");
+    cursorEl.style.setProperty("--rb-cursor-tilt", cursorTilt.toFixed(2) + "deg");
+    cursorEl.style.setProperty("--rb-cursor-scale", scale.toFixed(3));
+    cursorEl.style.setProperty("--rb-cursor-speed", clamp(cursorSpeed / 26, 0, 1).toFixed(3));
   }
 
   var THREE = null;
@@ -724,7 +814,12 @@
 
   /* ---------------- master loop ---------------- */
   var running = !document.hidden;
-  document.addEventListener("visibilitychange", function () { running = !document.hidden; });
+  var lastFrameMs = window.performance ? performance.now() : Date.now();
+  document.addEventListener("visibilitychange", function () {
+    running = !document.hidden;
+    /* Coming back from a hidden tab must not feed one huge dt into the easing. */
+    lastFrameMs = window.performance ? performance.now() : Date.now();
+  });
 
   function tick() {
     requestAnimationFrame(tick);
@@ -738,8 +833,14 @@
     if (fillEl) fillEl.style.height = pct + "%";
     if (knotEl) knotEl.style.top = pct + "%";
 
+    var nowMs = window.performance ? performance.now() : Date.now();
+    var frameDt = clamp((nowMs - lastFrameMs) / 1000, 0.001, 0.05);
+    lastFrameMs = nowMs;
+
     updateParallax();
-    updateKatha((window.performance ? performance.now() : Date.now()) / 1000);
+    updateKatha(nowMs / 1000);
+    updateCursor(frameDt);
+    updateStarGlow();
 
     if (!hasWebGL || !THREE) return;
     var t = clock.getElapsedTime();
