@@ -339,7 +339,7 @@ main { position: relative; z-index: 10; }
   .rb-katha.is-live .rb-kcap h2 { margin-bottom: 7px; font-size: 1.08rem; line-height: 1.2; }
   .rb-katha.is-live .rb-kcap p { font-size: .78rem; line-height: 1.55; }
   /* Keep the post-tie frames entirely above the caption safe area on phones. */
-  .rb-katha.is-live .rb-katha-action { inset: 8% 3% 32%; place-items: center; }
+  .rb-katha.is-live .rb-katha-action { inset: 4% 3% 44%; place-items: center; }
   .rb-katha.is-live .rb-katha-action img { width: min(108%, 490px); max-height: 100%; object-position: center center; }
   .rb-card { width: 100%; padding: 27px 22px; border-radius: 18px; }
   .rb-card h2 { font-size: 1.7rem; }
