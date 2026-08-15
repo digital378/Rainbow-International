@@ -69,12 +69,9 @@ img { max-width: 100%; }
 /* Only applied once JS confirms a real mouse; touch and reduced-motion keep the
    native cursor entirely. */
 .rb-has-rakhi-cursor,
-.rb-has-rakhi-cursor .rb-stage,
-.rb-has-rakhi-cursor .rb-stage:active,
 .rb-has-rakhi-cursor a,
 .rb-has-rakhi-cursor button,
-.rb-has-rakhi-cursor summary,
-.rb-has-rakhi-cursor .rb-swatch { cursor: none; }
+.rb-has-rakhi-cursor summary { cursor: none; }
 .rb-cursor {
   --rb-cursor-spin: 0deg;
   --rb-cursor-tilt: 0deg;
@@ -212,41 +209,6 @@ main { position: relative; z-index: 10; }
 .rb-katha.is-live .rb-kcap-3 { top: 26%; right: 5%; left: auto; }
 .rb-katha.is-live .rb-kcap-4 { bottom: 12%; left: 5%; }
 
-/* interactive rakhi */
-.rb-interactive { flex-direction: column; gap: 26px; min-height: auto !important; padding-block: clamp(76px, 11vw, 132px) !important; text-align: center; }
-.rb-interactive .rb-intro { max-width: 560px; padding: 0 12px; }
-.rb-interactive .rb-intro h2 { margin: 0 0 14px; color: var(--rb-cream); font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
-.rb-interactive .rb-intro p { margin: 0; color: var(--rb-on-dark-dim); font-weight: 300; }
-.rb-stage {
-  position: relative; width: min(560px, 92vw); height: min(430px, 60vh); overflow: hidden;
-  border: 1px solid rgba(255, 217, 119, .55); border-radius: 26px;
-  background: radial-gradient(90% 85% at 50% 42%, #354aaf 0%, #1a2b78 48%, #10194d 100%);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, .42), inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 56px rgba(99, 132, 255, .18);
-  cursor: grab; touch-action: none;
-}
-.rb-stage:active { cursor: grabbing; }
-.rb-stage canvas { display: block; width: 100%; height: 100%; }
-.rb-stage-fallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 26px; }
-.rb-stage-fallback svg { width: 80%; max-width: 420px; height: auto; }
-.rb-stage.is-live .rb-stage-fallback { display: none; }
-.rb-stage-hint { position: absolute; bottom: 14px; left: 0; right: 0; margin: 0; color: var(--rb-on-dark-dim); font-size: .72rem; letter-spacing: .2em; text-align: center; text-transform: uppercase; pointer-events: none; transition: opacity .5s; }
-.rb-wish-pop { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 34px 30px; text-align: center; opacity: 0; transition: opacity .7s; pointer-events: none; }
-.rb-wish-pop.is-on { opacity: 1; }
-.rb-wish-pop span { max-width: 22ch; color: var(--rb-cream); font-family: "Playfair Display", Georgia, serif; font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.4; text-shadow: 0 2px 30px rgba(10, 14, 51, .9), 0 0 60px rgba(245, 180, 40, .35); }
-.rb-swatches { display: flex; flex-wrap: wrap; justify-content: center; gap: 26px; padding-bottom: 22px; margin: 0; }
-.rb-swatch { position: relative; width: 46px; height: 46px; border: 2px solid rgba(255, 255, 255, .25); border-radius: 50%; cursor: pointer; transition: transform .25s, border-color .25s, box-shadow .25s; }
-.rb-swatch:hover { transform: scale(1.12); }
-.rb-swatch[aria-pressed="true"], .rb-swatch:focus-visible { border-color: var(--rb-cream); box-shadow: 0 0 0 4px rgba(245, 180, 40, .35); transform: scale(1.12); outline: none; }
-.rb-swatch span { position: absolute; top: 110%; left: 50%; color: var(--rb-on-dark-dim); font-size: .62rem; letter-spacing: .08em; white-space: nowrap; transform: translateX(-50%); }
-.rb-tie-btn {
-  display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; padding: 15px 40px; border: none; border-radius: 100px;
-  background: linear-gradient(120deg, var(--rb-gold-soft), var(--rb-gold) 55%, var(--rb-saffron));
-  color: var(--rb-navy); font-weight: 600; font-size: .92rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
-  box-shadow: 0 12px 34px rgba(245, 180, 40, .35); transition: transform .25s, box-shadow .25s;
-}
-.rb-tie-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(245, 180, 40, .5); }
-.rb-tie-btn:active { transform: translateY(1px); }
-
 /* parallax divider */
 .rb-parallax { padding: 0; min-height: 110vh; align-items: stretch; }
 .rb-px-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 110vh; overflow: hidden; }
@@ -380,18 +342,7 @@ main { position: relative; z-index: 10; }
   .rb-card p { font-size: .95rem; line-height: 1.75; }
   .rb-values { gap: 8px; margin-top: 19px; }
   .rb-values span { padding: 7px 12px; font-size: .72rem; }
-  .rb-interactive { gap: 22px; padding-block: 70px 78px !important; }
-  .rb-interactive .rb-intro h2 { font-size: 2rem; }
-  .rb-interactive .rb-intro p { font-size: .94rem; line-height: 1.7; }
-  .rb-stage { width: 100%; height: min(340px, 52dvh); border-radius: 20px; }
-  .rb-stage-fallback { padding: 12px; }
-  .rb-stage-fallback svg { width: 100%; }
-  .rb-stage-hint { bottom: 10px; font-size: .62rem; letter-spacing: .14em; }
   .rb-cursor { display: none; }
-  .rb-swatches { gap: 16px 18px; padding: 2px 10px 20px; }
-  .rb-swatch { width: 44px; height: 44px; }
-  .rb-swatch span { font-size: .56rem; letter-spacing: .03em; }
-  .rb-tie-btn { min-height: 48px; margin-top: 20px; padding: 13px 27px; font-size: .8rem; }
   .rb-parallax { min-height: 82dvh !important; padding: 0 !important; }
   .rb-px-wrap { min-height: 82dvh; }
   .rb-px-garland { height: 48px; background-size: 20px 52px; }

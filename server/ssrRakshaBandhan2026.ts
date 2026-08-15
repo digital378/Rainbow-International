@@ -214,44 +214,6 @@ function renderPage(): string {
         </div>
       </section>
 
-      <section class="rb-interactive" aria-labelledby="tie-title">
-        <div class="rb-intro">
-          <p class="rb-kicker-light">An interactive pause</p>
-          <h2 id="tie-title" class="rb-gold-display">Tie a rakhi of your own</h2>
-          <p>Choose a colour, drag to turn the rakhi, then tie the thread as a small reminder to lead with care.</p>
-        </div>
-        <div class="rb-stage" role="img" aria-label="An interactive illustrated rakhi. Drag left or right to rotate it.">
-          <div class="rb-stage-fallback" aria-hidden="true">
-            <svg viewBox="0 0 460 290" xmlns="http://www.w3.org/2000/svg">
-              <path d="M110 120 C70 96 40 96 6 120 M350 120 C390 144 420 144 454 120" fill="none" stroke="#e0483e" stroke-width="6" stroke-linecap="round" />
-              <circle cx="60" cy="107" r="7" fill="#ffd977" /><circle cx="30" cy="112" r="6" fill="#f5b428" />
-              <circle cx="400" cy="133" r="7" fill="#ffd977" /><circle cx="430" cy="128" r="6" fill="#f5b428" />
-              <circle cx="230" cy="120" r="86" fill="none" stroke="#f5b428" stroke-width="15" />
-              <circle cx="230" cy="120" r="60" fill="none" stroke="#ff8a3d" stroke-width="5" />
-              <circle cx="230" cy="120" r="42" fill="#c0392b" />
-              <circle cx="230" cy="120" r="20" fill="#ffd977" />
-              <g fill="#ffd977">
-                <circle cx="230" cy="18" r="6" /><circle cx="230" cy="222" r="6" />
-                <circle cx="128" cy="120" r="6" /><circle cx="332" cy="120" r="6" />
-                <circle cx="158" cy="48" r="5" /><circle cx="302" cy="192" r="5" />
-                <circle cx="302" cy="48" r="5" /><circle cx="158" cy="192" r="5" />
-              </g>
-               <g transform="translate(230 206)">
-                 <path d="M0 0 C-3 9 -4 13 -3 18" fill="none" stroke="#e0483e" stroke-width="5" stroke-linecap="round" />
-                 <circle cy="21" r="6" fill="#ffd977" />
-                 <path d="M-18 25 Q0 52 18 25 Q0 16 -18 25Z" fill="#f5b428" stroke="#ff8a3d" stroke-width="3" />
-                 <path d="M-13 30 Q0 43 13 30" fill="none" stroke="#c0392b" stroke-width="3" />
-                 <circle cy="54" r="6" fill="#ffd977" /><circle cx="-12" cy="48" r="4" fill="#ff8a3d" /><circle cx="12" cy="48" r="4" fill="#ff8a3d" />
-               </g>
-            </svg>
-          </div>
-          <div class="rb-wish-pop" aria-live="polite"><span></span></div>
-          <p class="rb-stage-hint">Drag to rotate</p>
-        </div>
-        <div class="rb-swatches" role="group" aria-label="Choose a rakhi colour theme"></div>
-        <button class="rb-tie-btn" type="button">${icon("heart-handshake")} Tie the Thread</button>
-      </section>
-
       <section class="rb-parallax" aria-labelledby="parallax-title">
         <div class="rb-px-wrap">
           <div class="rb-px-layer rb-px-stars" data-depth="0.12" aria-hidden="true"></div>

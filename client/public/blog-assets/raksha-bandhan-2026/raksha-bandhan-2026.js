@@ -311,16 +311,7 @@
   /* ---------------- 3D setup ---------------- */
   var hasWebGL = false;
   var bgRenderer, bgScene, bgCam, bgRakhi, cloud1, cloud2, diyaGroup, flames = [];
-  var iRenderer, iScene, iCam, iRakhi, confetti = null, confettiData = null, confettiT = 0;
-  var rotX = 0, rotY = 0, tRotX = 0.15, tRotY = 0, spinBoost = 0;
-  var dragging = false, dragMoved = false, lastX = 0, lastY = 0;
-  var curTheme = 0, clock = null;
-  var stage = document.querySelector(".rb-stage");
-  var hint = document.querySelector(".rb-stage-hint");
-  var wishPop = document.querySelector(".rb-wish-pop");
-  var wishText = wishPop ? wishPop.querySelector("span") : null;
-  var swHost = document.querySelector(".rb-swatches");
-  var tieBtn = document.querySelector(".rb-tie-btn");
+  var clock = null;
 
   var THEMES = [
     { key: "marigold", name: "Marigold", ring: 0xf5b428, inner: 0xff8a3d, center: 0xc0392b, gem: 0xffd977, petalA: 0xf5b428, petalB: 0xff8a3d, thread: 0xe0483e, dots: 0xffd977, bg: ["#f5b428", "#e0483e"] },
@@ -328,15 +319,6 @@
     { key: "rose", name: "Rose Silk", ring: 0xffd977, inner: 0xe85d75, center: 0xe85d75, gem: 0xfff6e8, petalA: 0xe85d75, petalB: 0xfff0f3, thread: 0xd94f68, dots: 0xffd977, bg: ["#ffd977", "#e85d75"] },
     { key: "peacock", name: "Peacock", ring: 0xf5b428, inner: 0x12a58c, center: 0x0e7c6b, gem: 0x7ce3cf, petalA: 0x12a58c, petalB: 0xffd977, thread: 0x0e7c6b, dots: 0xf5b428, bg: ["#12a58c", "#f5b428"] }
   ];
-  var WISHES = [
-    "May your bond grow stronger with every knot tied.",
-    "To the one who always has your back — happy Raksha Bandhan.",
-    "A thread so small, a promise so vast.",
-    "May love protect you, today and always.",
-    "Here's to the family we're born with — and the family we find."
-  ];
-  var wishIdx = 0;
-
   var camKeys = [
     { p: 0.00, cam: [0.0, 0.10, 4.9], look: [0, -0.1, 0], rp: [3.1, 0.55, -2.0], rs: 1.0 },
     { p: 0.14, cam: [0.2, 0.25, 5.4], look: [0.55, 0, 0], rp: [2.15, 0.05, 0], rs: 1.05 },
@@ -451,15 +433,6 @@
     tail.rotation.x = Math.sin(time * 1.6) * 0.035;
   }
 
-  function disposeGroup(g) {
-    g.traverse(function (o) {
-      if (o.geometry) o.geometry.dispose();
-      if (o.material) {
-        if (Array.isArray(o.material)) o.material.forEach(function (m) { m.dispose(); });
-        else o.material.dispose();
-      }
-    });
-  }
   function glowTexture(THREE) {
     var c = document.createElement("canvas");
     c.width = c.height = 64;
@@ -492,43 +465,6 @@
     });
     return new THREE.Points(geo, m);
   }
-
-  /* build the colour swatches immediately so the picker works even without WebGL */
-  function buildSwatches(onPick) {
-    if (!swHost || swHost.childElementCount) return;
-    THEMES.forEach(function (T, i) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "rb-swatch";
-      b.setAttribute("aria-label", "Rakhi colour theme: " + T.name);
-      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
-      b.style.background = "linear-gradient(135deg," + T.bg[0] + " 45%," + T.bg[1] + " 55%)";
-      var lbl = document.createElement("span");
-      lbl.textContent = T.name;
-      b.appendChild(lbl);
-      b.addEventListener("click", function () {
-        curTheme = i;
-        Array.prototype.forEach.call(swHost.children, function (ch) { ch.setAttribute("aria-pressed", "false"); });
-        b.setAttribute("aria-pressed", "true");
-        document.documentElement.style.setProperty("--rakhi-theme", T.bg[0]);
-        if (typeof onPick === "function") onPick(i);
-      });
-      swHost.appendChild(b);
-    });
-  }
-
-  function showWish() {
-    if (!wishPop || !wishText) return;
-    wishText.textContent = WISHES[wishIdx % WISHES.length];
-    wishIdx++;
-    wishPop.classList.add("is-on");
-    clearTimeout(wishPop._t);
-    wishPop._t = setTimeout(function () { wishPop.classList.remove("is-on"); }, 3600);
-  }
-
-  /* fallback behaviour before/without three.js */
-  buildSwatches(null);
-  if (tieBtn) tieBtn.addEventListener("click", showWish);
 
   /* ---------------- rakhi cursor + reactive stars ----------------
      The page-wide pointer becomes a small spinning rakhi: it trails the real
@@ -637,7 +573,7 @@
        communicates affordance now that the native arrow is hidden. */
     document.addEventListener("pointerover", function (e) {
       var t = e.target && e.target.closest
-        ? e.target.closest("a, button, summary, .rb-swatch, .rb-stage, input, textarea, select, [role='button']")
+        ? e.target.closest("a, button, summary, input, textarea, select, [role='button']")
         : null;
       cursorEl.classList.toggle("is-active", !!t);
     }, { passive: true });
@@ -671,13 +607,6 @@
   }
 
   var THREE = null;
-  function buildInteractiveRakhi() {
-    if (!THREE || !iScene) return;
-    if (iRakhi) { iScene.remove(iRakhi); disposeGroup(iRakhi); }
-    iRakhi = makeRakhi(THREE, THEMES[curTheme]);
-    iRakhi.scale.setScalar(0.92);
-    iScene.add(iRakhi);
-  }
 
   function detectWebGL() {
     try {
@@ -689,14 +618,12 @@
   async function init3D() {
     if (reduced) return;
     if (!detectWebGL()) {
-      if (hint) hint.textContent = "Your browser does not support 3D — enjoy the classic view";
       return;
     }
     try {
       THREE = await import("https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js");
     } catch (err) {
       console.warn("Raksha Bandhan 3D enhancement unavailable; static artwork remains visible.", err);
-      if (hint) hint.textContent = "Enjoy the classic view";
       return;
     }
     hasWebGL = true;
@@ -759,88 +686,6 @@
       });
     }
 
-    /* interactive stage */
-    if (stage) {
-      iRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      iRenderer.setPixelRatio(DPR);
-      iScene = new THREE.Scene();
-      iCam = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
-      iCam.position.set(0, 0, 5.4);
-      iScene.add(new THREE.AmbientLight(0x39406e, 1.7));
-      var iw = new THREE.PointLight(0xffd977, 1.8, 30); iw.position.set(3, 4, 5); iScene.add(iw);
-      var ic = new THREE.PointLight(0x5a6cff, 0.8, 30); ic.position.set(-4, -2, 4); iScene.add(ic);
-      buildInteractiveRakhi();
-      stage.insertBefore(iRenderer.domElement, stage.firstChild);
-      stage.classList.add("is-live");
-
-      var sizeStage = function () {
-        var r = stage.getBoundingClientRect();
-        if (!r.width || !r.height) return;
-        iRenderer.setSize(r.width, r.height, false);
-        iRenderer.domElement.style.width = "100%";
-        iRenderer.domElement.style.height = "100%";
-        iCam.aspect = r.width / r.height;
-        iCam.updateProjectionMatrix();
-      };
-      sizeStage();
-      window.addEventListener("resize", sizeStage);
-
-      stage.addEventListener("pointerdown", function (e) {
-        dragging = true; dragMoved = false; lastX = e.clientX; lastY = e.clientY;
-        if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
-      });
-      window.addEventListener("pointermove", function (e) {
-        if (!dragging) return;
-        var dx = e.clientX - lastX, dy = e.clientY - lastY;
-        if (Math.abs(dx) + Math.abs(dy) > 3) dragMoved = true;
-        tRotY += dx * 0.011;
-        tRotX = clamp(tRotX + dy * 0.008, -1.1, 1.1);
-        lastX = e.clientX; lastY = e.clientY;
-        if (dragMoved && hint) hint.style.opacity = "0";
-      });
-      window.addEventListener("pointerup", function () { dragging = false; });
-
-      /* rebuild the 3D rakhi when a swatch is picked */
-      if (swHost) {
-        Array.prototype.forEach.call(swHost.children, function (btn, i) {
-          btn.addEventListener("click", function () { curTheme = i; buildInteractiveRakhi(); });
-        });
-      }
-
-      var burst = function () {
-        if (confetti) { iScene.remove(confetti); confetti.geometry.dispose(); confetti.material.dispose(); }
-        var n = 160;
-        var geo = new THREE.BufferGeometry();
-        var pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
-        var vel = new Float32Array(n * 3);
-        var palette = [[0.96, 0.71, 0.16], [1, 0.85, 0.47], [1, 0.54, 0.24], [0.91, 0.36, 0.46], [1, 0.96, 0.91]];
-        for (var i = 0; i < n; i++) {
-          pos[i * 3] = 0; pos[i * 3 + 1] = 0; pos[i * 3 + 2] = 0.5;
-          var th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1), sp2 = 1.6 + Math.random() * 2.6;
-          vel[i * 3] = Math.sin(ph) * Math.cos(th) * sp2;
-          vel[i * 3 + 1] = Math.cos(ph) * sp2 * 0.9 + 0.8;
-          vel[i * 3 + 2] = Math.sin(ph) * Math.sin(th) * sp2 * 0.6;
-          var c = palette[Math.floor(Math.random() * palette.length)];
-          col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2];
-        }
-        geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-        geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-        confetti = new THREE.Points(geo, new THREE.PointsMaterial({
-          size: 0.09, vertexColors: true, transparent: true, opacity: 1,
-          blending: THREE.AdditiveBlending, depthWrite: false
-        }));
-        confettiData = vel;
-        confettiT = 0;
-        iScene.add(confetti);
-      };
-
-      if (tieBtn) {
-        tieBtn.addEventListener("click", function () {
-          spinBoost += Math.PI * 4;
-          burst();
-        });
-      }
-    }
   }
 
   /* ---------------- master loop ---------------- */
@@ -875,8 +720,6 @@
 
     if (!hasWebGL || !THREE) return;
     var t = clock.getElapsedTime();
-    var dt = 0.016;
-
     if (bgRenderer && window.scrollY < storyEnd + window.innerHeight) {
       var K = interpKeys(storyPS);
       bgCam.position.set(K.cam[0] + mouseX * 0.12, K.cam[1] - mouseY * 0.1, K.cam[2]);
@@ -902,43 +745,6 @@
       bgRenderer.render(bgScene, bgCam);
     }
 
-    if (iRenderer && iRakhi) {
-      var r = stage.getBoundingClientRect();
-      if (r.bottom > 0 && r.top < window.innerHeight) {
-        if (spinBoost > 0.001) {
-          var take = spinBoost * 0.06;
-          tRotY += take;
-          spinBoost -= take;
-        }
-        if (!dragging && Math.abs(spinBoost) < 0.01) tRotY += 0.004;
-        rotY += (tRotY - rotY) * 0.09;
-        rotX += (tRotX - rotX) * 0.09;
-        iRakhi.rotation.y = rotY;
-        iRakhi.rotation.x = rotX;
-        iRakhi.position.y = Math.sin(t * 1.1) * 0.07;
-         updateJhumka(iRakhi, t);
-
-        if (confetti) {
-          confettiT += dt;
-          var parr = confetti.geometry.attributes.position.array;
-          for (var ci = 0; ci < parr.length / 3; ci++) {
-            parr[ci * 3] += confettiData[ci * 3] * dt;
-            parr[ci * 3 + 1] += confettiData[ci * 3 + 1] * dt;
-            parr[ci * 3 + 2] += confettiData[ci * 3 + 2] * dt;
-            confettiData[ci * 3 + 1] -= 2.4 * dt;
-          }
-          confetti.geometry.attributes.position.needsUpdate = true;
-          confetti.material.opacity = Math.max(0, 1 - confettiT / 2.4);
-          if (confettiT > 2.6) {
-            iScene.remove(confetti);
-            confetti.geometry.dispose();
-            confetti.material.dispose();
-            confetti = null;
-          }
-        }
-        iRenderer.render(iScene, iCam);
-      }
-    }
   }
 
   function boot() { init3D(); measure(); readScroll(); }
