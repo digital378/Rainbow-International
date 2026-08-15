@@ -141,7 +141,7 @@ function renderPage(): string {
     <div class="rb-cine">
       <section class="rb-hero" aria-labelledby="raksha-title">
         <p class="rb-presents">Rainbow International School presents</p>
-        <h1 id="raksha-title" class="rb-gold-display">Raksha Bandhan 2026: The Thread That Binds Us</h1>
+        <h1 id="raksha-title" class="rb-gold-display">Raksha Bandhan 2026: The Thread of Bond</h1>
         <p class="rb-sub">A thread can be delicate and still hold a promise. This Raksha Bandhan, explore a celebration of care, trust and the everyday ways we stand beside one another.</p>
         <p class="rb-date-pill">${icon("calendar-days")} Friday · 28 August 2026 · Shravana Purnima</p>
       </section>
