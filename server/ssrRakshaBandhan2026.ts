@@ -4,19 +4,21 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 const SLUG = "raksha-bandhan-2026";
-const SCENE_FILES = [
-  "scene_1.1_1786765935439.webp",
-  "scene_1.2_1786765935439.webp",
-  "scene_1.3_1786765935438.webp",
-  "scene_1.4_1786765935438.webp",
-  "scene_1.5_1786765935438.webp",
-  "scene_2.1_1786765935437.webp",
-  "scene_2.2_1786765935437.webp",
-  "scene_2.3_1786765935436.webp",
-  "scene_2.4_1786765935436.webp",
-  "scene_2.5_1786765935435.webp",
-  "scene_3_1786765935440.webp",
-  "scene_3.1_1786765935432.webp"
+
+/** Sprite frames for the scroll-driven katha scene: [element id, height as % of stage]. */
+const KATHA_SIS_FRAMES = [
+  ["s_w1", "76.0%"],
+  ["s_w2", "77.6%"],
+  ["s_w3", "76.42%"],
+  ["s_lean", "70.0%"],
+  ["s_rakhi", "76.51%"]
+] as const;
+const KATHA_BOY_FRAMES = [
+  ["b_w1", "76.0%"],
+  ["b_w2", "77.18%"],
+  ["b_w3", "73.21%"],
+  ["b_knee", "73.97%"],
+  ["b_wait", "75.16%"]
 ] as const;
 
 /** Short hash of an asset so browsers pick up edits despite long cache lifetimes. */
@@ -159,22 +161,46 @@ function renderPage(): string {
         </div>
       </section>
 
-      <section class="rb-scroll-story" aria-labelledby="scroll-story-title">
-        <div class="rb-scroll-story-sticky">
-          <div class="rb-scroll-story-copy">
-            <p class="rb-kicker-light">A promise in motion</p>
-            <h2 id="scroll-story-title" class="rb-gold-display">Every step leads back to care.</h2>
-            <p>Walk beside this small story as a brother arrives, kneels, and receives a thread made with love.</p>
-          </div>
-          <div class="rb-scene-stage" role="img" aria-labelledby="scroll-story-title scroll-story-description">
-            <span id="scroll-story-description" class="rb-sr-only">An illustrated scroll story of a Rainbow International School student walking forward, kneeling, and sharing a Raksha Bandhan moment with a classmate.</span>
-            <div class="rb-scene-halo" aria-hidden="true"></div>
-            <div class="rb-scene-frames" aria-hidden="true">
-              ${SCENE_FILES.map((file, index) => `<img class="rb-scene-frame${index === 0 ? " is-current" : ""}" src="/blog-assets/${SLUG}/scene/${file}?v=${assetVersion(`scene/${file}`)}" width="1080" height="1350" decoding="async" ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} alt="" />`).join("")}
+      <section class="rb-katha" aria-labelledby="katha-scene-one">
+        <div class="rb-katha-sticky">
+          <div class="rb-katha-stage">
+            <div class="rb-katha-kids">
+              <img class="rb-katha-full" src="/blog-assets/${SLUG}/katha/k-full.webp?v=${assetVersion("katha/k-full.webp")}" width="1269" height="1000" loading="lazy" decoding="async" alt="Illustration of a sister tying a rakhi on her brother's wrist — two Rainbow International School students celebrating Raksha Bandhan." />
+              <div class="rb-katha-sprite" data-katha-side="sis" aria-hidden="true">${KATHA_SIS_FRAMES.map(([id, height]) => `<img data-katha-frame="${id}" src="/blog-assets/${SLUG}/katha/${id}.webp?v=${assetVersion(`katha/${id}.webp`)}" style="height:${height}" decoding="async" alt="" />`).join("")}</div>
+              <div class="rb-katha-sprite" data-katha-side="boy" aria-hidden="true">${KATHA_BOY_FRAMES.map(([id, height]) => `<img data-katha-frame="${id}" src="/blog-assets/${SLUG}/katha/${id}.webp?v=${assetVersion(`katha/${id}.webp`)}" style="height:${height}" decoding="async" alt="" />`).join("")}</div>
+              <div class="rb-katha-glow" aria-hidden="true"></div>
             </div>
-            <div class="rb-scene-progress" aria-hidden="true"><span></span></div>
+            <div class="rb-katha-bless" aria-hidden="true"></div>
+            <svg class="rb-katha-rakhi" viewBox="0 0 120 120" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="60" r="34" fill="none" stroke="#f5b428" stroke-width="7" />
+              <circle cx="60" cy="60" r="22" fill="#10174f" />
+              <circle cx="60" cy="60" r="11" fill="#ffd977" />
+              <path d="M28 60 L4 48 M28 60 L4 72 M92 60 L116 48 M92 60 L116 72" stroke="#e0483e" stroke-width="5" stroke-linecap="round" />
+            </svg>
+
+            <div class="rb-kcap rb-kcap-1">
+              <p class="rb-kicker-light">The Katha · Scene One</p>
+              <h2 id="katha-scene-one">She arrives with a thread and a prayer</h2>
+              <p>On Shravana Purnima, a sister crosses the courtyard carrying a few strands of silk — and one of the oldest promises we know. <em>I am with you.</em></p>
+            </div>
+            <div class="rb-kcap rb-kcap-2">
+              <p class="rb-kicker-light">Scene Two</p>
+              <h2>The knot of protection</h2>
+              <p><em>Raksha</em> means protection. <em>Bandhan</em> means bond. As she ties the rakhi, the promise is renewed — not in words, but in a knot.</p>
+            </div>
+            <div class="rb-kcap rb-kcap-3">
+              <p class="rb-kicker-light">Scene Three</p>
+              <h2>A promise, returned</h2>
+              <p>In return comes a gift — sweets, a token, and a brother's vow to stand beside her through every season that follows.</p>
+            </div>
+            <div class="rb-kcap rb-kcap-4">
+              <p class="rb-kicker-light">Scene Four</p>
+              <h2>Blessings that last all year</h2>
+              <p>At Rainbow International School, we see these threads everywhere — in friendships, in mentors, in classrooms where every child is cared for, protected and inspired to grow.</p>
+            </div>
+
+            <p class="rb-katha-hint" aria-hidden="true">Keep scrolling — the story unfolds</p>
           </div>
-          <p class="rb-scene-caption" aria-hidden="true"><span>01</span> A thread carries a promise.</p>
         </div>
       </section>
 

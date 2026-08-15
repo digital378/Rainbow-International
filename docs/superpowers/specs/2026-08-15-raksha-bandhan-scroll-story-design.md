@@ -1,103 +1,78 @@
-# Raksha Bandhan 2026 Scroll Story and Rakhi Motion
+# Raksha Bandhan 2026 — "The Katha" scroll story
 
-## Goal
+## What it is
 
-Upgrade `/blog/raksha-bandhan-2026` with the uploaded local scene artwork so the
-scroll sequence visibly changes the brother's leg and body pose, while making the
-rakhi animation feel softer, more recognisably handcrafted, and more festive.
-Preserve the existing SSR article, navigation, SEO metadata, JSON-LD, accessibility
-behavior, reduced-motion support, WebGL safeguards, and cache-busted static assets.
+A full-viewport, scroll-driven scene on the SSR blog page `/blog/raksha-bandhan-2026`.
+The sister walks in from the left edge and the brother from the right edge as the
+reader scrolls. They meet in the middle, kneel, the rakhi is tied, and the scene
+settles into a combined illustration that carries the remaining three story beats.
 
-## Scope
+This replaces the earlier single-panel crossfade design (`.rb-scroll-story` /
+`.rb-scene-*`), which has been removed along with its generated `scene/*.webp`
+derivatives.
 
-### Scroll-led scene
+## Structure
 
-- Add a dedicated visual story stage to the existing cinematic section.
-- Use the local uploaded scene PNGs as the source artwork:
-  - `scene_1.1` through `scene_1.5` for the approach/walking progression.
-  - `scene_2.1` through `scene_2.5` for changing leg and kneeling poses.
-  - `scene_3.1` and `scene_3` for the tying/celebration state.
-- Create optimized page-local derivatives rather than serving the original
-  3375×4219 uploads directly.
-- Crossfade neighboring frames based on normalized story scroll progress. Add
-  small eased translation and scale changes to prevent hard cuts and preserve
-  the cinematic depth of the current page.
-- Keep a deterministic initial frame and a final settled frame. Do not require
-  JavaScript for the article copy or basic page access.
-- On reduced-motion preferences or a non-visual fallback, show one stable,
-  representative scene without continuous animation.
+```
+section.rb-katha            480vh tall (420vh under 760px) when live
+  .rb-katha-sticky          position:sticky; top:0; height:100vh; overflow:hidden
+    .rb-katha-stage
+      .rb-katha-kids        width:min(86vw,100vh); aspect-ratio 1269/1000
+        img.rb-katha-full   the combined tying illustration
+        [data-katha-side="sis"]   left:27%  -> s_w1 s_w2 s_w3 s_lean s_rakhi
+        [data-katha-side="boy"]   left:75%  -> b_w1 b_w2 b_w3 b_knee b_wait
+      .rb-katha-glow        wrist glow
+      .rb-katha-bless       blessings wash
+      svg.rb-katha-rakhi    the travelling rakhi orb
+      .rb-kcap-1 … -4       glass caption cards
+      .rb-katha-hint        "Keep scrolling — the story unfolds"
+```
 
-### Rakhi motion
+Sprites live in `client/public/blog-assets/raksha-bandhan-2026/katha/` and are
+served through the existing `assetVersion()` cache-busting helper.
 
-- Refine the existing Three.js rakhi builder with:
-  - layered medallion/ring geometry;
-  - braided thread sides and bead details;
-  - a central jhumka-like hanging tail with a bell-shaped body, cap, bead,
-    and short thread connection.
-- Update the tail each animation frame using a damped target-following motion,
-  so it lags gently during rotation and floating rather than snapping.
-- Add a matching static SVG fallback with a visible hanging jhumka tail.
-- Keep theme swatches functional by rebuilding all theme-dependent geometry,
-  including the tail colors.
+## Progressive enhancement
 
-### Visual polish
+The section renders by default as a **static, readable stacked column**: the
+combined illustration plus the four caption cards in normal flow, sprites hidden.
+JS adds `.is-live` only when `prefers-reduced-motion` is not set *and* every
+sprite element resolved. So the no-JS and reduced-motion readers both get the
+static layout for free — there is no separate reduced-motion branch to maintain.
 
-- Apply a premium multi-stop gold gradient to primary cinematic headings and
-  supporting display headings where contrast remains accessible.
-- Normalize motion timing around eased transitions for card reveals, scene
-  crossfades, rakhi tilt, wish bubbles, and stage feedback.
-- Respect the current dark navy/gold direction and avoid changing article copy,
-  layout semantics, or the Rainbow International School navigation.
+## Scroll choreography
 
-## Technical approach
+`q` is progress through the section: `clamp(-rect.top / (rect.height - innerHeight), 0, 1)`.
 
-1. Extend the SSR template with a semantic scene-stage section and a layered
-   frame stack. The stage will include an accessible label and a concise
-   visually-hidden description; decorative duplicate frames will be hidden from
-   assistive technology.
-2. Copy/convert uploaded local artwork into
-   `client/public/blog-assets/raksha-bandhan-2026/scene/` at a practical display
-   size and use responsive image sources where supported.
-3. Add a small scene-controller module inside the existing page script. It will:
-   - calculate progress from the existing story range;
-   - select the current frame pair;
-   - ease the crossfade, opacity, transform, and stage depth values inside the
-     existing animation loop;
-   - pause work when the stage is outside the viewport;
-   - stop continuous effects under reduced motion.
-4. Extend `makeRakhi` with a grouped jhumka tail and attach metadata for the
-   animation loop. The tail will receive the current rakhi orientation and a
-   damped follow offset.
-5. Update CSS for the scene stage, gold display gradients, fallback rakhi tail,
-   and responsive/reduced-motion behavior.
-6. Preserve the existing `assetVersion(...)` query parameters in the SSR output
-   and add the new static scene asset URLs to the same cache-busting strategy if
-   their serving path is long-lived.
+| q | beat |
+|---|---|
+| 0.00–0.24 | the walk. `approach = smooth(q/0.24)`; each figure is offset by `(1-approach) * innerWidth * 0.6`. Step frame = `floor(traveled/90) % 3`, with a `-abs(sin(...)) * 8px` bob so the legs and body actually move. |
+| 0.235–0.27 | `walking` decays to 0, freezing the step cycle. |
+| 0.245–0.30 | `s_lean` / `b_knee` — they crouch. |
+| 0.295+ | `s_rakhi` / `b_wait` settle in. |
+| 0.335–0.395 | sprites fade out, `.rb-katha-full` fades in and stays for the rest of the section. |
+| 0.37–0.58 | wrist glow pulses. |
+| 0.44–1.01 | `wTie` / `wGift` / `wBless` acting weights drive a gentle rotate + bob on the whole pair, and `travelX` / `travelS` drift the group centre → right → left → centre. |
+| 0.70+ | blessings wash. |
 
-## Failure and accessibility behavior
+Captions reveal on windows 0.02–0.30, 0.37–0.57, 0.59–0.75, 0.78–0.98 via an
+`.is-on` class, so only one is ever on screen.
 
-- Missing scene assets must not remove article content. The stage will fall back
-  to its first available local frame, then to a styled placeholder only if no
-  frame can load.
-- A failed Three.js import continues to use the static rakhi fallback.
-- WebGL detection remains guarded and mobile pixel ratio remains capped.
-- Decorative frame layers use `aria-hidden="true"`; the story stage exposes a
-  meaningful text alternative.
-- Reduced-motion users receive no continuous scene cycling, parallax, confetti,
-  or spring tail animation.
-- Gold gradient text must retain a solid-color fallback for browsers without
-  background-clip support.
+The rakhi orb is a DOM `<svg>`, not a second WebGL context — the page already
+runs three.js for the background, and the orb has to work when WebGL is absent.
+It rides the closing gap between the two children and fades out by q ≈ 0.65.
 
-## Verification
+## Two traps worth remembering
 
-- Run TypeScript checking after the SSR/template changes.
-- Restart the configured application workflow after code and asset changes.
-- Load the page with a cache-busting query parameter and assert HTTP 200.
-- Verify in a browser at desktop and mobile widths:
-  - scene frames change as the story scrolls;
-  - brother leg positions visibly change;
-  - the rakhi and jhumka tail move smoothly;
-  - static fallback and reduced-motion behavior remain usable;
-  - headings remain readable and no horizontal overflow is introduced.
-- Confirm existing article sections, FAQ, navigation, metadata, and JSON-LD remain
-  present.
+**Specificity.** `.rb-cine > section` sets `display:flex; align-items:center`.
+A plain `.rb-katha` rule loses to it, which turns the section into a centring
+flex container: the sticky stage then sits half a section down and the entire
+walk plays below the fold while the opacity values still look perfect in the
+DOM. The katha layout rules must be written as `.rb-cine > .rb-katha`.
+
+**Sprite box height.** `.rb-katha-sprite` is `width:0` — a pure positioning
+anchor — but it still needs `height:100%`, because the frames inside are sized
+as a percentage of it. Drop the height and the frames collapse to zero and the
+walk renders blank, again with correct-looking opacity values.
+
+Both failures are invisible to opacity/transform assertions. Verify this section
+with screenshots, not computed styles.

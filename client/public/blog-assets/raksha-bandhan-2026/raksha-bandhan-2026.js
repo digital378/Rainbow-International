@@ -26,11 +26,7 @@
   var knotEl = document.querySelector(".rb-thread-knot");
   var bgHost = document.querySelector(".rb-bg");
   var pxSection = document.querySelector(".rb-parallax");
-  var scrollStory = document.querySelector(".rb-scroll-story");
-  var sceneStage = document.querySelector(".rb-scene-stage");
-  var sceneFrames = sceneStage ? Array.prototype.slice.call(sceneStage.querySelectorAll(".rb-scene-frame")) : [];
-  var sceneProgressEl = sceneStage ? sceneStage.querySelector(".rb-scene-progress span") : null;
-  var scrollP = 0, scrollPS = 0, storyP = 0, storyPS = 0, sceneP = 0, scenePS = 0, storyEnd = 1;
+  var scrollP = 0, scrollPS = 0, storyP = 0, storyPS = 0, storyEnd = 1;
 
   function measure() {
     storyEnd = pxSection ? (pxSection.offsetTop + pxSection.offsetHeight - window.innerHeight) : 1;
@@ -40,11 +36,6 @@
     var h = document.documentElement.scrollHeight - window.innerHeight;
     scrollP = h > 0 ? clamp(window.scrollY / h, 0, 1) : 0;
     storyP = clamp(window.scrollY / storyEnd, 0, 1);
-    if (scrollStory) {
-      var storyRect = scrollStory.getBoundingClientRect();
-      var sceneRun = Math.max(scrollStory.offsetHeight - window.innerHeight * 0.7, 1);
-      sceneP = clamp((window.innerHeight * 0.78 - storyRect.top) / sceneRun, 0, 1);
-    }
     if (bgHost) bgHost.classList.toggle("is-off", window.scrollY > storyEnd + window.innerHeight * 0.6);
   }
   window.addEventListener("scroll", readScroll, { passive: true });
@@ -72,32 +63,167 @@
     });
   }
 
-  /* ---------------- illustrated scroll story ---------------- */
-  function updateSceneStory() {
-    if (reduced || !sceneStage || !sceneFrames.length) return;
-    var rect = sceneStage.getBoundingClientRect();
-    if (rect.bottom < -80 || rect.top > window.innerHeight + 80) return;
-    var segments = sceneFrames.length - 1;
-    var position = scenePS * segments;
-    var current = Math.min(segments, Math.floor(position));
-    var mix = smooth(position - current);
+  /* ---------------- katha: scroll-driven kids story ---------------- */
+  var katha = document.querySelector(".rb-katha");
+  var kStage = katha ? katha.querySelector(".rb-katha-stage") : null;
+  var kKids = katha ? katha.querySelector(".rb-katha-kids") : null;
+  var kFull = katha ? katha.querySelector(".rb-katha-full") : null;
+  var kSis = katha ? katha.querySelector('[data-katha-side="sis"]') : null;
+  var kBoy = katha ? katha.querySelector('[data-katha-side="boy"]') : null;
+  function kFrame(id) { return katha ? katha.querySelector('[data-katha-frame="' + id + '"]') : null; }
+  var sWalk = [kFrame("s_w1"), kFrame("s_w2"), kFrame("s_w3")];
+  var bWalk = [kFrame("b_w1"), kFrame("b_w2"), kFrame("b_w3")];
+  var sLean = kFrame("s_lean"), sRakhi = kFrame("s_rakhi");
+  var bKnee = kFrame("b_knee"), bWait = kFrame("b_wait");
+  var kGlow = katha ? katha.querySelector(".rb-katha-glow") : null;
+  var kBless = katha ? katha.querySelector(".rb-katha-bless") : null;
+  var kOrb = katha ? katha.querySelector(".rb-katha-rakhi") : null;
+  var kHint = katha ? katha.querySelector(".rb-katha-hint") : null;
+  var kCaps = katha
+    ? [
+        { el: katha.querySelector(".rb-kcap-1"), a: 0.02, b: 0.30 },
+        { el: katha.querySelector(".rb-kcap-2"), a: 0.37, b: 0.57 },
+        { el: katha.querySelector(".rb-kcap-3"), a: 0.59, b: 0.75 },
+        { el: katha.querySelector(".rb-kcap-4"), a: 0.78, b: 0.98 }
+      ].filter(function (c) { return !!c.el; })
+    : [];
+  var kSprites = [sWalk[0], sWalk[1], sWalk[2], bWalk[0], bWalk[1], bWalk[2], sLean, sRakhi, bKnee, bWait];
+  var kathaReady = !!(katha && kStage && kKids && kSis && kBoy && !reduced &&
+    kSprites.every(function (el) { return !!el; }));
+  var kathaLive = false;
+  var kathaVisible = true;
 
-    sceneFrames.forEach(function (frame, index) {
-      var opacity = 0, shift = 24, scale = 0.965;
-      if (index === current) {
-        opacity = 1 - mix;
-        shift = -mix * 16;
-        scale = 1 + mix * 0.018;
-      } else if (index === current + 1) {
-        opacity = mix;
-        shift = (1 - mix) * 22;
-        scale = 0.978 + mix * 0.022;
-      }
-      frame.style.opacity = opacity.toFixed(3);
-      frame.style.transform = "translate3d(0," + shift.toFixed(1) + "px,0) scale(" + scale.toFixed(4) + ")";
-      frame.style.zIndex = String(index === current + 1 ? 2 : index === current ? 1 : 0);
+  /* Only go live once every sprite has actually decoded. A blocked or broken
+     sprite must leave the static illustration in place rather than hide it
+     behind an incomplete animation. */
+  if (kathaReady) {
+    var pending = kSprites.length;
+    var kathaFailed = false;
+    var settle = function (ok) {
+      if (kathaFailed) return;
+      if (!ok) { kathaFailed = true; return; }
+      if (--pending > 0) return;
+      kathaLive = true;
+      katha.classList.add("is-live");
+      observeKatha();
+    };
+    kSprites.forEach(function (img) {
+      if (img.complete) { settle(img.naturalWidth > 0); return; }
+      img.addEventListener("load", function () { settle(img.naturalWidth > 0); }, { once: true });
+      img.addEventListener("error", function () { settle(false); }, { once: true });
     });
-    if (sceneProgressEl) sceneProgressEl.style.width = (scenePS * 100).toFixed(2) + "%";
+  }
+
+  /* Skip the per-frame geometry read entirely while the section is far away. */
+  function observeKatha() {
+    if (!("IntersectionObserver" in window)) return;
+    new IntersectionObserver(function (entries) {
+      kathaVisible = entries[0].isIntersecting;
+    }, { rootMargin: "20% 0px" }).observe(katha);
+  }
+
+  function capSet(c, q) {
+    var on = q > c.a && q < c.b;
+    if (on !== c._on) { c._on = on; c.el.classList.toggle("is-on", on); }
+  }
+  /* Travel across the stage: centre → right (tie) → left (gift) → centre. */
+  function travelX(q) {
+    if (q < 0.42) return 0;
+    if (q < 0.50) return smooth((q - 0.42) / 0.08);
+    if (q < 0.58) return 1;
+    if (q < 0.68) return 1 - smooth((q - 0.58) / 0.10) * 2;
+    if (q < 0.76) return -1;
+    if (q < 0.86) return -1 + smooth((q - 0.76) / 0.10);
+    return 0;
+  }
+  function travelS(q) {
+    if (q < 0.44) return 1;
+    if (q < 0.52) return 1 + smooth((q - 0.44) / 0.08) * 0.16;
+    if (q < 0.56) return 1.16;
+    if (q < 0.66) return 1.16 - smooth((q - 0.56) / 0.10) * 0.16;
+    if (q < 0.84) return 1;
+    return 1 - smooth(clamp((q - 0.84) / 0.12, 0, 1)) * 0.05;
+  }
+
+  function updateKatha(time) {
+    if (!kathaLive || !kathaVisible) return;
+    /* All geometry is read up front, before any style write, so the writes
+       below can never force a synchronous layout. */
+    var rect = katha.getBoundingClientRect();
+    if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
+    var stageRect = kStage.getBoundingClientRect();
+    var kidsRect = kKids.getBoundingClientRect();
+    var run = rect.height - window.innerHeight;
+    var q = run > 0 ? clamp(-rect.top / run, 0, 1) : 0;
+
+    /* the pair drifts and breathes once they have met */
+    var kx = travelX(q) * window.innerWidth * (window.innerWidth < 900 ? 0.07 : 0.14);
+    var ks = travelS(q);
+    function actWin(a, b) {
+      return smooth(clamp((q - a) / 0.04, 0, 1)) * (1 - smooth(clamp((q - b) / 0.04, 0, 1)));
+    }
+    var wTie = actWin(0.44, 0.58), wGift = actWin(0.58, 0.75), wBless = actWin(0.77, 1.01);
+    var kRot = -2.4 * wTie + 1.8 * wGift + Math.sin(time * 1.3) * 2.0 * wBless;
+    var kY = -Math.abs(Math.sin(time * 3.2)) * 13 * wGift
+      + Math.sin(time * 1.1) * 5 * wBless
+      - Math.sin(time * 4.5) * 3 * wTie;
+    kKids.style.transform = "translateX(" + kx.toFixed(1) + "px) translateY(" + kY.toFixed(1) +
+      "px) rotate(" + kRot.toFixed(2) + "deg) scale(" + ks.toFixed(3) + ")";
+
+    /* scene 1: the walk — sister from the left, brother from the right, real step cycles */
+    var approach = smooth(clamp(q / 0.24, 0, 1));
+    var offPx = (1 - approach) * window.innerWidth * 0.6;
+    var traveled = approach * window.innerWidth * 0.6;
+    var stepIdx = Math.floor(traveled / 90) % 3;
+    var walking = 1 - smooth(clamp((q - 0.235) / 0.035, 0, 1));
+    var stepBob = -Math.abs(Math.sin(traveled / 90 * Math.PI)) * 8 * walking;
+    var pairOpacity = 1 - smooth(clamp((q - 0.335) / 0.055, 0, 1));
+
+    kSis.style.transform = "translate3d(" + (-offPx).toFixed(1) + "px," + stepBob.toFixed(1) + "px,0)";
+    kBoy.style.transform = "translate3d(" + offPx.toFixed(1) + "px," + stepBob.toFixed(1) + "px,0)";
+    kSis.style.opacity = pairOpacity.toFixed(3);
+    kBoy.style.opacity = pairOpacity.toFixed(3);
+
+    for (var i = 0; i < 3; i++) {
+      var on = i === stepIdx ? walking : 0;
+      sWalk[i].style.opacity = on;
+      bWalk[i].style.opacity = on;
+    }
+    /* kneel transitions: lean / one knee, then rakhi-out and settled */
+    function win2(a, b) { return smooth(clamp((q - a) / 0.03, 0, 1)) * (1 - smooth(clamp((q - b) / 0.03, 0, 1))); }
+    sLean.style.opacity = win2(0.245, 0.30).toFixed(3);
+    bKnee.style.opacity = win2(0.245, 0.305).toFixed(3);
+    sRakhi.style.opacity = smooth(clamp((q - 0.295) / 0.035, 0, 1)).toFixed(3);
+    bWait.style.opacity = smooth(clamp((q - 0.30) / 0.035, 0, 1)).toFixed(3);
+
+    /* the combined tying illustration fades in as the two meet, and stays for the rest of the story */
+    if (kFull) kFull.style.opacity = smooth(clamp((q - 0.335) / 0.06, 0, 1)).toFixed(3);
+
+    /* the rakhi travels the closing gap, then rests at the wrist */
+    if (kOrb) {
+      var orbShow = smooth(clamp(q / 0.08, 0, 1)) * (1 - smooth(clamp((q - 0.60) / 0.10, 0, 1)));
+      var meet = smooth(clamp(q / 0.34, 0, 1));
+      var travelFrom = kidsRect.left - stageRect.left + kidsRect.width * 0.27 - offPx;
+      var travelTo = kidsRect.left - stageRect.left + kidsRect.width * 0.54;
+      var orbX = lerp(travelFrom, travelTo, meet);
+      var orbY = kidsRect.top - stageRect.top + kidsRect.height * (0.30 + 0.23 * meet)
+        - Math.abs(Math.sin(traveled / 90 * Math.PI)) * 6 * walking
+        + Math.sin(time * 1.6) * 5 * (1 - meet);
+      kOrb.style.opacity = orbShow.toFixed(3);
+      kOrb.style.transform = "translate3d(" + orbX.toFixed(1) + "px," + orbY.toFixed(1) + "px,0) translate(-50%,-50%) rotate(" +
+        (time * 34 + meet * 180).toFixed(1) + "deg) scale(" + (0.72 + meet * 0.28).toFixed(3) + ")";
+    }
+
+    /* scene 2: the knot — wrist glow */
+    if (kGlow) {
+      var glowO = smooth(clamp((q - 0.37) / 0.05, 0, 1)) * (1 - smooth(clamp((q - 0.58) / 0.09, 0, 1)));
+      kGlow.style.opacity = (glowO * (0.75 + Math.sin(time * 5) * 0.25)).toFixed(3);
+    }
+    /* scene 4: blessings wash */
+    if (kBless) kBless.style.opacity = (smooth(clamp((q - 0.70) / 0.12, 0, 1)) * 0.9).toFixed(3);
+
+    for (var c = 0; c < kCaps.length; c++) capSet(kCaps[c], q);
+    if (kHint) kHint.style.opacity = q < 0.04 ? "1" : "0";
   }
 
   /* ---------------- celebration moment ---------------- */
@@ -643,7 +769,6 @@
 
     scrollPS += (scrollP - scrollPS) * 0.1;
     storyPS += (storyP - storyPS) * 0.1;
-    scenePS += (sceneP - scenePS) * 0.085;
 
     var pct = (scrollPS * 100).toFixed(2);
     if (barEl) barEl.style.width = pct + "%";
@@ -651,7 +776,7 @@
     if (knotEl) knotEl.style.top = pct + "%";
 
     updateParallax();
-    updateSceneStory();
+    updateKatha((window.performance ? performance.now() : Date.now()) / 1000);
 
     if (celTilt && !reduced) {
       celRotY += (celTX * 6 - celRotY) * 0.06;

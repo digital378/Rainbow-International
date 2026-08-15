@@ -119,23 +119,42 @@ main { position: relative; z-index: 10; }
 .rb-values { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
 .rb-values span { padding: 8px 18px; border: 1px solid rgba(245, 180, 40, .35); border-radius: 100px; background: rgba(245, 180, 40, .07); color: var(--rb-gold-soft); font-size: .8rem; letter-spacing: .06em; }
 
-/* ---------- scroll-led illustration story ---------- */
-.rb-scroll-story { min-height: 310vh !important; padding: 0 !important; }
-.rb-scroll-story-sticky { position: sticky; top: 0; display: grid; grid-template-columns: minmax(240px, .78fr) minmax(340px, 1.22fr); grid-template-rows: 1fr auto; align-items: center; gap: clamp(20px, 5vw, 80px); width: min(1260px, 100%); min-height: 100vh; padding: 10vh 6vw 7vh; }
-.rb-scroll-story-copy { position: relative; z-index: 3; max-width: 425px; }
-.rb-scroll-story-copy h2 { max-width: 10ch; margin: 0 0 17px; font-size: clamp(2.05rem, 4.6vw, 4rem); line-height: 1.04; }
-.rb-scroll-story-copy > p:last-child { margin: 0; color: var(--rb-on-dark-dim); font-size: clamp(.95rem, 1.35vw, 1.08rem); font-weight: 300; line-height: 1.8; }
-.rb-scene-stage { position: relative; width: min(610px, 48vw); aspect-ratio: 4 / 5; justify-self: center; overflow: hidden; border: 1px solid rgba(245, 180, 40, .21); border-radius: 38% 38% 15% 15% / 22% 22% 11% 11%; background: radial-gradient(circle at 50% 42%, rgba(245, 180, 40, .15), rgba(10, 14, 51, .24) 58%, rgba(10, 14, 51, .62)); box-shadow: 0 35px 100px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .1); isolation: isolate; }
-.rb-scene-stage::after { position: absolute; inset: 0; z-index: 4; content: ""; border: 1px solid rgba(255, 232, 163, .11); border-radius: inherit; pointer-events: none; }
-.rb-scene-halo { position: absolute; inset: 7% 5% auto; z-index: 0; height: 55%; border-radius: 50%; background: radial-gradient(ellipse, rgba(255, 222, 134, .3), rgba(245, 180, 40, .08) 45%, transparent 70%); filter: blur(10px); animation: rb-scene-breathe 5s ease-in-out infinite; }
-@keyframes rb-scene-breathe { 50% { transform: scale(1.08); opacity: .84; } }
-.rb-scene-frames { position: absolute; inset: 0; z-index: 1; }
-.rb-scene-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; opacity: 0; transform: translate3d(0, 28px, 0) scale(.96); filter: drop-shadow(0 24px 28px rgba(0, 0, 0, .35)); will-change: opacity, transform; }
-.rb-scene-frame.is-current { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-.rb-scene-progress { position: absolute; right: 13%; bottom: 7%; left: 13%; z-index: 5; height: 2px; overflow: hidden; border-radius: 2px; background: rgba(255, 246, 232, .22); }
-.rb-scene-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ffe9a3, var(--rb-gold), var(--rb-saffron)); box-shadow: 0 0 10px rgba(245, 180, 40, .8); }
-.rb-scene-caption { grid-column: 1 / -1; justify-self: center; margin: -3vh 0 0; color: var(--rb-on-dark-dim); font-size: .72rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
-.rb-scene-caption span { margin-right: 9px; color: var(--rb-gold-soft); }
+/* ---------- katha: scroll-driven kids story ---------- */
+/* Static, readable fallback first — JS adds .is-live to switch on the scroll scene. */
+/* Beats `.rb-cine > section`'s flex centring — as a flex item the sticky stage
+   would sit half a section down and the whole walk would play below the fold. */
+.rb-cine > .rb-katha { position: relative; display: block; min-height: 0; padding: clamp(56px, 9vw, 110px) 6vw; }
+.rb-katha-sticky { width: min(1160px, 100%); margin: 0 auto; }
+.rb-katha-stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(20px, 3vw, 32px); width: 100%; }
+.rb-katha-kids { position: relative; width: min(86vw, 100vh); max-width: 900px; aspect-ratio: 1269 / 1000; z-index: 2; }
+.rb-katha-full { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .45)); }
+.rb-katha-sprite, .rb-katha-glow, .rb-katha-bless, .rb-katha-rakhi, .rb-katha-hint { display: none; }
+.rb-kcap { max-width: 560px; padding: 26px 28px; border: 1px solid rgba(245, 180, 40, .22); border-radius: 18px; background: rgba(10, 14, 51, .55); box-shadow: 0 18px 50px rgba(0, 0, 0, .35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.rb-kcap .rb-kicker-light { margin-bottom: 10px; }
+.rb-kcap h2 { margin: 0 0 10px; color: var(--rb-cream); font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.25; }
+.rb-kcap p { margin: 0; color: var(--rb-on-dark); font-size: .92rem; font-weight: 300; line-height: 1.75; }
+.rb-kcap em { color: var(--rb-gold-soft); font-style: italic; }
+
+/* Live scroll scene */
+.rb-cine > .rb-katha.is-live { height: 480vh; padding: 0; }
+.rb-katha.is-live .rb-katha-sticky { position: sticky; top: 0; width: 100%; height: 100vh; overflow: hidden; }
+.rb-katha.is-live .rb-katha-stage { height: 100%; gap: 0; }
+.rb-katha.is-live .rb-katha-full { opacity: 0; will-change: opacity, transform; }
+/* height:100% is load-bearing — the frames inside are sized in % of this box. */
+.rb-katha.is-live .rb-katha-sprite { display: block; position: absolute; top: auto; bottom: 1%; z-index: 2; width: 0; height: 100%; will-change: transform, opacity; }
+.rb-katha.is-live .rb-katha-sprite[data-katha-side="sis"] { left: 27%; }
+.rb-katha.is-live .rb-katha-sprite[data-katha-side="boy"] { left: 75%; }
+.rb-katha.is-live .rb-katha-sprite img { position: absolute; bottom: 0; left: 0; max-width: none; opacity: 0; transform: translateX(-50%); filter: drop-shadow(0 22px 38px rgba(0, 0, 0, .45)); }
+.rb-katha.is-live .rb-katha-glow { display: block; position: absolute; top: 42%; left: 41%; z-index: 3; width: 26%; height: 22%; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(255, 217, 119, .9), rgba(245, 180, 40, .3) 55%, transparent 78%); filter: blur(5px); mix-blend-mode: screen; pointer-events: none; }
+.rb-katha.is-live .rb-katha-bless { display: block; position: absolute; inset: 0; z-index: 1; opacity: 0; background: radial-gradient(90% 70% at 50% 30%, rgba(255, 217, 119, .28), transparent 65%); pointer-events: none; }
+.rb-katha.is-live .rb-katha-rakhi { display: block; position: absolute; top: 0; left: 0; z-index: 4; width: clamp(38px, 5.2vw, 74px); height: auto; opacity: 0; filter: drop-shadow(0 0 16px rgba(245, 180, 40, .85)); pointer-events: none; will-change: transform, opacity; }
+.rb-katha.is-live .rb-kcap { position: absolute; z-index: 6; max-width: 340px; opacity: 0; transform: translateY(26px); pointer-events: none; transition: opacity .55s ease, transform .55s ease; }
+.rb-katha.is-live .rb-kcap.is-on { opacity: 1; transform: translateY(0); }
+.rb-katha.is-live .rb-kcap-1 { top: 9%; left: 5%; }
+.rb-katha.is-live .rb-kcap-2 { top: 24%; left: 5%; }
+.rb-katha.is-live .rb-kcap-3 { top: 26%; right: 5%; left: auto; }
+.rb-katha.is-live .rb-kcap-4 { bottom: 12%; left: 5%; }
+.rb-katha.is-live .rb-katha-hint { display: block; position: absolute; bottom: 22px; left: 50%; z-index: 6; margin: 0; color: var(--rb-on-dark-dim); font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; transform: translateX(-50%); transition: opacity .6s ease; }
 
 /* celebration */
 .rb-celebration { flex-direction: column; gap: 10px; text-align: center; }
@@ -290,23 +309,20 @@ main { position: relative; z-index: 10; }
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .rb-align-l, .rb-align-r { justify-content: center; }
-  .rb-scroll-story-sticky { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; gap: 13px; padding-inline: 8vw; }
-  .rb-scroll-story-copy { max-width: 580px; text-align: center; justify-self: center; }
-  .rb-scroll-story-copy h2 { max-width: none; }
-  .rb-scene-stage { width: min(560px, 84vw); }
+  /* lift the pair clear of the bottom-pinned caption card */
+  .rb-cine > .rb-katha.is-live .rb-katha-kids { margin-bottom: 30vh; }
+  .rb-katha.is-live .rb-kcap { top: auto !important; right: auto !important; bottom: 4% !important; left: 50% !important; max-width: 88vw; padding: 18px 20px; transform: translate(-50%, 26px); }
+  .rb-katha.is-live .rb-kcap.is-on { transform: translate(-50%, 0); }
+  .rb-katha.is-live .rb-kcap h2 { font-size: 1.1rem; }
+  .rb-katha.is-live .rb-kcap p { font-size: .82rem; line-height: 1.6; }
 }
 @media (max-width: 760px) {
   .rb-topbar { display: none; }
   .rb-navlinks { display: none; }
   .rb-thread-track { left: 10px; }
   .rb-cine > section { padding: 11vh 7vw; }
-  .rb-scroll-story { min-height: 260vh !important; }
-  .rb-scroll-story-sticky { padding-top: 8vh; padding-bottom: 5vh; }
-  .rb-scroll-story-copy .rb-kicker-light { margin-bottom: 8px; }
-  .rb-scroll-story-copy h2 { margin-bottom: 8px; font-size: clamp(1.85rem, 9vw, 2.7rem); }
-  .rb-scroll-story-copy > p:last-child { font-size: .9rem; }
-  .rb-scene-stage { width: min(430px, 86vw); border-radius: 34% 34% 13% 13% / 20% 20% 10% 10%; }
-  .rb-scene-caption { margin-top: 0; }
+  .rb-cine > .rb-katha.is-live { height: 420vh; }
+  .rb-katha-kids { width: 94vw; }
   .rb-card { padding: 30px 24px; }
   .rb-stage { height: min(360px, 56vh); }
   .rb-swatches { gap: 20px; }
@@ -329,8 +345,7 @@ main { position: relative; z-index: 10; }
   .rb-celebration-tilt img { animation: none; }
   .rb-sparkle { display: none; }
   .rb-bg { display: none; }
-  .rb-scene-halo { animation: none; }
-  .rb-scene-frame { transition: none !important; }
+  .rb-kcap { transition: none !important; }
 }
 
 /* ---------- print ---------- */
