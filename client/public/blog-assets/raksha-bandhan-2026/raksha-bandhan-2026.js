@@ -553,7 +553,7 @@
   function buildStars() {
     if (!starLayer) return;
     var area = window.innerWidth * window.innerHeight;
-    var count = clamp(Math.round(area / 17500), 36, isMobile ? 52 : 96);
+    var count = clamp(Math.round(area / 11500), 48, isMobile ? 68 : 128);
     var frag = document.createDocumentFragment();
     stars = [];
     starLayer.textContent = "";
