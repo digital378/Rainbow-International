@@ -387,6 +387,57 @@ main { position: relative; z-index: 10; }
   .rb-closing { padding: 32px 20px; }
 }
 
+/* Short landscape screens need the post-tie artwork to be height-led rather
+   than width-led. Otherwise the 1.05x entrance scale can lift the characters
+   above the viewport before the bottom-pinned scene card is reached.
+   The cap must be expressed in viewport units only: a percentage operand
+   resolves against the indefinite grid area, so the image silently falls back
+   to its intrinsic width-driven height and overruns the stage. */
+@media (orientation: landscape) {
+  .rb-katha.is-live .rb-katha-action img {
+    width: auto;
+    height: 76vh;
+    max-width: 92%;
+    max-height: 76vh;
+  }
+}
+
+/* Landscape phones and small tablets are height-starved: the stacked layout
+   (art above a full-width card) leaves too little room, and the sticky navbar
+   crops the characters' heads. Switch to the side-by-side composition instead —
+   art on one side, caption on the other — mirroring the desktop scenes.
+   Heights stay in viewport units: a percentage operand would be indefinite here
+   and the art would fall back to its intrinsic width-driven height. */
+@media (max-width: 900px) and (orientation: landscape) {
+  /* Clear the sticky navbar (70px) at the top of every band. */
+  .rb-cine > .rb-katha.is-live .rb-katha-kids {
+    width: auto;
+    height: 58vh;
+    max-width: 54%;
+    margin-bottom: 0;
+    transform: translateX(30%);
+  }
+  .rb-katha.is-live .rb-kcap {
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: 4% !important;
+    max-width: min(44%, 330px);
+    padding: 12px 15px;
+    transform: translate(0, calc(-50% + 20px));
+  }
+  .rb-katha.is-live .rb-kcap.is-on { transform: translate(0, -50%); }
+  .rb-katha.is-live .rb-kcap-3 { right: 4% !important; left: auto !important; }
+  .rb-katha.is-live .rb-katha-gift { inset: 76px 48% 6% 3%; }
+  .rb-katha.is-live .rb-katha-namaste { inset: 76px 3% 6% 48%; }
+  .rb-katha.is-live .rb-katha-action img {
+    width: auto;
+    height: 54vh;
+    max-width: 100%;
+    max-height: 54vh;
+  }
+}
+
 /* ---------- reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
