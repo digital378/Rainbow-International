@@ -207,6 +207,9 @@ main { position: relative; z-index: 10; }
    gift composition into the open left area without interfering with the image's
    inline cinematic float transform. */
 .rb-katha.is-live .rb-katha-gift { transform: translateX(clamp(-128px, -9vw, -72px)); }
+/* Scene Four's caption occupies the left side, so mirror the composition shift
+   into the open right area. */
+.rb-katha.is-live .rb-katha-namaste { transform: translateX(clamp(72px, 9vw, 128px)); }
 /* height:auto is load-bearing — without it the markup's height attribute keeps the
    box at its natural pixel height, so the frame overruns its reserved band. */
 .rb-katha.is-live .rb-katha-action img { display: block; width: min(104%, 980px); height: auto; max-height: 100%; object-fit: contain; object-position: center bottom; opacity: 0; will-change: transform, opacity; filter: drop-shadow(0 24px 35px rgba(0, 0, 0, .45)); }
@@ -325,6 +328,7 @@ main { position: relative; z-index: 10; }
      get their own reserved band above it and sit on that band's floor. */
   .rb-katha.is-live .rb-katha-action { inset: 3% 4% 48%; place-items: end center; }
   .rb-katha.is-live .rb-katha-gift { transform: none; }
+  .rb-katha.is-live .rb-katha-namaste { transform: none; }
   .rb-katha.is-live .rb-katha-action img { width: min(100%, 620px); max-height: 100%; object-position: center bottom; }
 }
 @media (max-width: 760px) {
