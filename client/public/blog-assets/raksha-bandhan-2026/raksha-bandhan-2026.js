@@ -490,7 +490,11 @@
   function buildStars() {
     if (!starLayer) return;
     var area = window.innerWidth * window.innerHeight;
-    var count = clamp(Math.round(area / 11500), 48, isMobile ? 68 : 128);
+    /* Keep the compact mobile field unchanged, while giving desktop the richer
+       star density requested for the wide cinematic layout. */
+    var count = isMobile
+      ? clamp(Math.round(area / 11500), 48, 68)
+      : clamp(Math.round(area / 8500), 48, 180);
     var frag = document.createDocumentFragment();
     stars = [];
     starLayer.textContent = "";
