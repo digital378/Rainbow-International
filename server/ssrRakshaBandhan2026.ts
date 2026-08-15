@@ -155,6 +155,12 @@ function renderPage(): string {
               <div class="rb-katha-sprite" data-katha-side="boy" aria-hidden="true">${KATHA_BOY_FRAMES.map(([id, height]) => `<img data-katha-frame="${id}" src="/blog-assets/${SLUG}/katha/${id}.webp?v=${assetVersion(`katha/${id}.webp`)}" style="height:${height}" decoding="async" alt="" />`).join("")}</div>
               <div class="rb-katha-glow" aria-hidden="true"></div>
             </div>
+             <figure class="rb-katha-action rb-katha-gift" aria-hidden="true">
+               <img src="/blog-assets/${SLUG}/katha/k-gift.webp?v=${assetVersion("katha/k-gift.webp")}" width="1200" height="809" loading="eager" decoding="async" alt="" />
+             </figure>
+             <figure class="rb-katha-action rb-katha-namaste" aria-hidden="true">
+               <img src="/blog-assets/${SLUG}/katha/k-bless.webp?v=${assetVersion("katha/k-bless.webp")}" width="1200" height="779" loading="eager" decoding="async" alt="" />
+             </figure>
             <div class="rb-katha-bless" aria-hidden="true"></div>
 
             <div class="rb-kcap rb-kcap-1">

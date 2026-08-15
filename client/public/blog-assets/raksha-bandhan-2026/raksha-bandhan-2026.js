@@ -84,6 +84,8 @@
   var bKnee = kFrame("b_knee"), bWait = kFrame("b_wait");
   var kGlow = katha ? katha.querySelector(".rb-katha-glow") : null;
   var kBless = katha ? katha.querySelector(".rb-katha-bless") : null;
+  var kGiftArt = katha ? katha.querySelector(".rb-katha-gift img") : null;
+  var kNamasteArt = katha ? katha.querySelector(".rb-katha-namaste img") : null;
   var kCaps = katha
     ? [
         { el: katha.querySelector(".rb-kcap-1"), a: 0.02, b: 0.30 },
@@ -92,7 +94,7 @@
         { el: katha.querySelector(".rb-kcap-4"), a: 0.78, b: 0.98 }
       ].filter(function (c) { return !!c.el; })
     : [];
-  var kSprites = [sWalk[0], sWalk[1], sWalk[2], bWalk[0], bWalk[1], bWalk[2], sLean, sRakhi, bKnee, bWait];
+  var kSprites = [sWalk[0], sWalk[1], sWalk[2], bWalk[0], bWalk[1], bWalk[2], sLean, sRakhi, bKnee, bWait, kGiftArt, kNamasteArt];
   var kathaReady = !!(katha && kStage && kKids && kSis && kBoy && !reduced &&
     kSprites.every(function (el) { return !!el; }));
   var kathaLive = false;
@@ -212,6 +214,24 @@
     if (kGlow) {
       var glowO = smooth(clamp((q - 0.37) / 0.05, 0, 1)) * (1 - smooth(clamp((q - 0.58) / 0.09, 0, 1)));
       kGlow.style.opacity = (glowO * (0.75 + Math.sin(time * 5) * 0.25)).toFixed(3);
+    }
+
+    /* Scenes three and four use complete illustrations rather than the knot
+       sprites. They crossfade through a shared gold bloom, giving the
+       post-tie gift and namaste moments a deliberate cinematic handoff. */
+    if (kGiftArt) {
+      var giftIn = smooth(clamp((q - 0.565) / 0.055, 0, 1));
+      var giftOut = smooth(clamp((q - 0.735) / 0.055, 0, 1));
+      var giftO = giftIn * (1 - giftOut);
+      kGiftArt.style.opacity = giftO.toFixed(3);
+      kGiftArt.style.transform = "translateY(" + ((1 - giftIn) * 32 - giftOut * 14).toFixed(1) +
+        "px) scale(" + (1.045 - giftIn * 0.045).toFixed(3) + ")";
+    }
+    if (kNamasteArt) {
+      var blessIn = smooth(clamp((q - 0.725) / 0.075, 0, 1));
+      kNamasteArt.style.opacity = blessIn.toFixed(3);
+      kNamasteArt.style.transform = "translateY(" + ((1 - blessIn) * 28).toFixed(1) +
+        "px) scale(" + (1.055 - blessIn * 0.055).toFixed(3) + ")";
     }
     /* scene 4: blessings wash */
     if (kBless) kBless.style.opacity = (smooth(clamp((q - 0.70) / 0.12, 0, 1)) * 0.9).toFixed(3);
@@ -513,8 +533,9 @@
   var starLayer = document.querySelector(".rb-stars");
   var stars = [];
   var STAR_GLOW_RADIUS = 190;
-  /* Pointer position in page coordinates, plus the eased position the rakhi
-     actually renders at, so the cursor visibly lags and settles. */
+   /* Pointer position in viewport coordinates, plus the eased position the
+      rakhi actually renders at. The cursor is fixed, so scroll never changes
+      either value — it moves only when the mouse does. */
   var ptrX = 0, ptrY = 0, curX = 0, curY = 0, ptrSeen = false;
   var cursorSpin = 0, cursorTilt = 0, cursorSpeed = 0;
   var starsDirty = true;
@@ -522,7 +543,7 @@
   function buildStars() {
     if (!starLayer) return;
     var area = window.innerWidth * window.innerHeight;
-    var count = clamp(Math.round(area / 26000), 26, isMobile ? 40 : 78);
+    var count = clamp(Math.round(area / 17500), 36, isMobile ? 52 : 96);
     var frag = document.createDocumentFragment();
     stars = [];
     starLayer.textContent = "";
@@ -553,7 +574,7 @@
   function updateStarGlow() {
     if (!stars.length || !hasFinePointer || !ptrSeen) return;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var vx = ptrX - window.scrollX, vy = ptrY - window.scrollY;
+    var vx = ptrX, vy = ptrY;
     for (var i = 0; i < stars.length; i++) {
       var st = stars[i];
       var dx = (st.xPct / 100) * vw - vx;
@@ -581,8 +602,8 @@
     document.documentElement.classList.add("rb-has-rakhi-cursor");
     window.addEventListener("pointermove", function (e) {
       if (e.pointerType && e.pointerType !== "mouse") return;
-      ptrX = e.clientX + window.scrollX;
-      ptrY = e.clientY + window.scrollY;
+      ptrX = e.clientX;
+      ptrY = e.clientY;
       if (!ptrSeen) {
         ptrSeen = true;
         curX = ptrX; curY = ptrY;
@@ -632,7 +653,7 @@
 
     var scale = 1 + clamp(cursorSpeed * 0.012, 0, 0.22);
     cursorEl.style.transform =
-      "translate3d(" + (curX - window.scrollX).toFixed(2) + "px," + (curY - window.scrollY).toFixed(2) + "px,0)";
+      "translate3d(" + curX.toFixed(2) + "px," + curY.toFixed(2) + "px,0)";
     cursorEl.style.setProperty("--rb-cursor-spin", cursorSpin.toFixed(2) + "deg");
     cursorEl.style.setProperty("--rb-cursor-tilt", cursorTilt.toFixed(2) + "deg");
     cursorEl.style.setProperty("--rb-cursor-scale", scale.toFixed(3));
