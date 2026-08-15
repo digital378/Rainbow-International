@@ -77,7 +77,6 @@
   var bKnee = kFrame("b_knee"), bWait = kFrame("b_wait");
   var kGlow = katha ? katha.querySelector(".rb-katha-glow") : null;
   var kBless = katha ? katha.querySelector(".rb-katha-bless") : null;
-  var kHint = katha ? katha.querySelector(".rb-katha-hint") : null;
   var kCaps = katha
     ? [
         { el: katha.querySelector(".rb-kcap-1"), a: 0.02, b: 0.30 },
@@ -193,8 +192,14 @@
     sRakhi.style.opacity = smooth(clamp((q - 0.295) / 0.035, 0, 1)).toFixed(3);
     bWait.style.opacity = smooth(clamp((q - 0.30) / 0.035, 0, 1)).toFixed(3);
 
-    /* the combined tying illustration fades in as the two meet, and stays for the rest of the story */
-    if (kFull) kFull.style.opacity = smooth(clamp((q - 0.335) / 0.06, 0, 1)).toFixed(3);
+    /* Begin with a complete, readable illustration so the scroll scene never opens
+       on an empty frame. It gives way to the walking sprites, then returns once
+       the two characters meet. */
+    if (kFull) {
+      var openingArt = 1 - smooth(clamp(q / 0.08, 0, 1));
+      var resolvedArt = smooth(clamp((q - 0.335) / 0.06, 0, 1));
+      kFull.style.opacity = Math.max(openingArt, resolvedArt).toFixed(3);
+    }
 
     /* scene 2: the knot — wrist glow */
     if (kGlow) {
@@ -205,7 +210,6 @@
     if (kBless) kBless.style.opacity = (smooth(clamp((q - 0.70) / 0.12, 0, 1)) * 0.9).toFixed(3);
 
     for (var c = 0; c < kCaps.length; c++) capSet(kCaps[c], q);
-    if (kHint) kHint.style.opacity = q < 0.04 ? "1" : "0";
   }
 
   /* ---------------- PDF download ---------------- */

@@ -126,12 +126,10 @@ function renderPage(): string {
   <main>
     <div class="rb-cine">
       <section class="rb-hero" aria-labelledby="raksha-title">
-        <img class="rb-hero-logo" src="/ris-logo.png" alt="" aria-hidden="true" width="140" height="140" />
         <p class="rb-presents">Rainbow International School presents</p>
         <h1 id="raksha-title" class="rb-gold-display">Raksha Bandhan 2026: The Thread That Binds Us</h1>
         <p class="rb-sub">A thread can be delicate and still hold a promise. This Raksha Bandhan, explore a celebration of care, trust and the everyday ways we stand beside one another.</p>
         <p class="rb-date-pill">${icon("calendar-days")} Friday · 28 August 2026 · Shravana Purnima</p>
-        <a class="rb-scrollcue" href="#raksha-content"><span>Scroll to begin</span><span class="rb-cue-line" aria-hidden="true"></span></a>
       </section>
 
       <section class="rb-katha" aria-labelledby="katha-scene-one">
@@ -165,8 +163,6 @@ function renderPage(): string {
               <h2>Blessings that last all year</h2>
               <p>At Rainbow International School, we see these threads everywhere — in friendships, in mentors, in classrooms where every child is cared for, protected and inspired to grow.</p>
             </div>
-
-            <p class="rb-katha-hint" aria-hidden="true">Keep scrolling — the story unfolds</p>
           </div>
         </div>
       </section>
