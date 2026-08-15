@@ -15,9 +15,8 @@ const KATHA_SIS_FRAMES = [
 ] as const;
 const KATHA_BOY_FRAMES = [
   ["b_w1", "76.0%"],
-  ["b_w2", "76.0%"],
-  ["b_w3", "76.0%"],
-  ["b_w4", "76.0%"],
+  ["b_w2", "77.18%"],
+  ["b_w3", "73.21%"],
   ["b_knee", "73.97%"],
   ["b_wait", "75.16%"]
 ] as const;

@@ -79,8 +79,7 @@
   var kBoy = katha ? katha.querySelector('[data-katha-side="boy"]') : null;
   function kFrame(id) { return katha ? katha.querySelector('[data-katha-frame="' + id + '"]') : null; }
   var sWalk = [kFrame("s_w1"), kFrame("s_w2"), kFrame("s_w3")];
-  /* Boy walk alternates planted right / passing / planted left / passing. */
-  var bWalk = [kFrame("b_w1"), kFrame("b_w2"), kFrame("b_w3"), kFrame("b_w4")];
+  var bWalk = [kFrame("b_w1"), kFrame("b_w2"), kFrame("b_w3")];
   var sLean = kFrame("s_lean"), sRakhi = kFrame("s_rakhi");
   var bKnee = kFrame("b_knee"), bWait = kFrame("b_wait");
   var kGlow = katha ? katha.querySelector(".rb-katha-glow") : null;
@@ -95,7 +94,7 @@
         { el: katha.querySelector(".rb-kcap-4"), a: 0.78, b: 0.98 }
       ].filter(function (c) { return !!c.el; })
     : [];
-  var kSprites = [sWalk[0], sWalk[1], sWalk[2], bWalk[0], bWalk[1], bWalk[2], bWalk[3], sLean, sRakhi, bKnee, bWait, kGiftArt, kNamasteArt];
+  var kSprites = [sWalk[0], sWalk[1], sWalk[2], bWalk[0], bWalk[1], bWalk[2], sLean, sRakhi, bKnee, bWait, kGiftArt, kNamasteArt];
   var kathaReady = !!(katha && kStage && kKids && kSis && kBoy && !reduced &&
     kSprites.every(function (el) { return !!el; }));
   var kathaLive = false;
@@ -184,9 +183,9 @@
     var approach = smooth(clamp(q / 0.24, 0, 1));
     var offPx = (1 - approach) * window.innerWidth * 0.6;
     var traveled = approach * window.innerWidth * 0.6;
-    var stepPhase = traveled / 118;
+    var stepIdx = Math.floor(traveled / 90) % 3;
     var walking = 1 - smooth(clamp((q - 0.235) / 0.035, 0, 1));
-    var stepBob = -Math.abs(Math.sin(stepPhase * Math.PI)) * 8 * walking;
+    var stepBob = -Math.abs(Math.sin(traveled / 90 * Math.PI)) * 8 * walking;
     var pairOpacity = 1 - smooth(clamp((q - 0.335) / 0.055, 0, 1));
 
     kSis.style.transform = "translate3d(" + (-offPx).toFixed(1) + "px," + stepBob.toFixed(1) + "px,0)";
@@ -194,19 +193,12 @@
     kSis.style.opacity = pairOpacity.toFixed(3);
     kBoy.style.opacity = pairOpacity.toFixed(3);
 
-    /* Crossfade contiguous poses as scroll advances. The sister keeps her
-       existing three frames; the boy uses a four-pose alternating-leg cycle. */
-    function setWalkCycle(frames, phase) {
-      var from = Math.floor(phase) % frames.length;
-      var to = (from + 1) % frames.length;
-      var mix = smooth(phase - Math.floor(phase));
-      for (var i = 0; i < frames.length; i++) {
-        var opacity = i === from ? 1 - mix : (i === to ? mix : 0);
-        frames[i].style.opacity = (opacity * walking).toFixed(3);
-      }
+    /* Restore the original matching three-pose walk cycle for both siblings. */
+    for (var i = 0; i < 3; i++) {
+      var on = i === stepIdx ? walking : 0;
+      sWalk[i].style.opacity = on;
+      bWalk[i].style.opacity = on;
     }
-    setWalkCycle(sWalk, stepPhase);
-    setWalkCycle(bWalk, stepPhase);
     /* kneel transitions: lean / one knee, then rakhi-out and settled */
     function win2(a, b) { return smooth(clamp((q - a) / 0.03, 0, 1)) * (1 - smooth(clamp((q - b) / 0.03, 0, 1))); }
     sLean.style.opacity = win2(0.245, 0.30).toFixed(3);
