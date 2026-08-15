@@ -280,6 +280,15 @@
   var curTheme = 0, clock = null;
   var stage = document.querySelector(".rb-stage");
   var hint = document.querySelector(".rb-stage-hint");
+  var cursorGuide = document.querySelector(".rb-cursor-guide");
+  /* The guide is a mouse affordance, so it stays off for reduced motion and for
+     the narrow layout where CSS hides it. Coarse-pointer detection is only used
+     to skip it on touch devices that report a real touchscreen — some desktop
+     browsers under automation report no pointer capability at all, and those
+     must still get the guide. */
+  var coarseOnly = !!(window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches) &&
+    !(window.matchMedia && window.matchMedia("(any-pointer: fine)").matches);
+  var hasFinePointer = !reduced && !isMobile && !coarseOnly;
   var wishPop = document.querySelector(".rb-wish-pop");
   var wishText = wishPop ? wishPop.querySelector("span") : null;
   var swHost = document.querySelector(".rb-swatches");
@@ -492,6 +501,53 @@
   /* fallback behaviour before/without three.js */
   buildSwatches(null);
   if (tieBtn) tieBtn.addEventListener("click", showWish);
+
+  /* ---------------- animated cursor guide ----------------
+     A mouse affordance for the drag interaction: it plays a looping drag
+     gesture until the visitor takes over, follows the real cursor while it is
+     over the stage, then retires for good once a drag begins. It lives outside
+     the WebGL path on purpose — the stage is draggable in the static fallback
+     too, so the guide must not depend on three.js loading. */
+  if (stage && cursorGuide && hasFinePointer) {
+    var guideDismissed = false;
+    var placeGuide = function (e) {
+      var r = stage.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      cursorGuide.style.left = clamp(e.clientX - r.left, 0, r.width).toFixed(1) + "px";
+      cursorGuide.style.top = clamp(e.clientY - r.top, 0, r.height).toFixed(1) + "px";
+    };
+    var isMouse = function (e) { return !e.pointerType || e.pointerType === "mouse"; };
+
+    cursorGuide.classList.add("is-visible", "is-demo");
+
+    stage.addEventListener("pointerenter", function (e) {
+      if (guideDismissed || !isMouse(e)) return;
+      cursorGuide.classList.remove("is-demo");
+      cursorGuide.classList.add("is-following");
+      placeGuide(e);
+    });
+    stage.addEventListener("pointermove", function (e) {
+      if (guideDismissed || !isMouse(e)) return;
+      if (!cursorGuide.classList.contains("is-following")) {
+        cursorGuide.classList.remove("is-demo");
+        cursorGuide.classList.add("is-following");
+      }
+      placeGuide(e);
+    }, { passive: true });
+    stage.addEventListener("pointerleave", function (e) {
+      if (guideDismissed || !isMouse(e)) return;
+      cursorGuide.classList.remove("is-following");
+      cursorGuide.classList.add("is-demo");
+      cursorGuide.style.left = "";
+      cursorGuide.style.top = "";
+    });
+    stage.addEventListener("pointerdown", function () {
+      if (guideDismissed) return;
+      guideDismissed = true;
+      cursorGuide.classList.remove("is-demo", "is-following", "is-visible");
+      cursorGuide.classList.add("is-dismissed");
+    });
+  }
 
   var THREE = null;
   function buildInteractiveRakhi() {

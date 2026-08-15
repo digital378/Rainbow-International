@@ -225,6 +225,13 @@ function renderPage(): string {
                </g>
             </svg>
           </div>
+          <div class="rb-cursor-guide" aria-hidden="true">
+            <div class="rb-cursor-guide__halo"></div>
+            <svg class="rb-cursor-guide__pointer" viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 3.5 25.7 21 16.5 22.5l5.6 10.7-6.1 3.2-5.7-10.8L4 33.3V3.5Z" fill="#FFF6E8" stroke="#10174F" stroke-width="2.4" stroke-linejoin="round"/>
+            </svg>
+            <span class="rb-cursor-guide__trail"></span>
+          </div>
           <div class="rb-wish-pop" aria-live="polite"><span></span></div>
           <p class="rb-stage-hint">Drag to rotate</p>
         </div>
