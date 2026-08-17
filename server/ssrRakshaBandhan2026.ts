@@ -85,7 +85,7 @@ function renderPage(): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Raksha Bandhan 2026: Date, Speech, Essay &amp; Activities for Students | Rainbow International School</title>
+  <title>Raksha Bandhan 2026: Date, Speeches &amp; More for Students</title>
   <meta name="description" content="${DESCRIPTION}" />
   <meta name="keywords" content="raksha bandhan 2026, raksha bandhan 2026 date, raksha bandhan speech in english for students, raksha bandhan essay in english, 10 lines on raksha bandhan, raksha bandhan activities for school students, rakhi making ideas for kids" />
   <meta name="robots" content="index, follow" />
