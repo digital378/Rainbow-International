@@ -1,0 +1,148 @@
+Build a single-file index.html blog page. This is a redesign of https://www.rainbowpreschools.com/blog/raksha-bandhan-2026-for-kids — scrape ALL content from that live URL directly (every section, heading, paragraph, multilingual tabs, quiz questions, FAQ answers, wishes, captions, slogans — everything word for word) and use it as the content source. Do not invent or summarize content.
+
+Image Files
+
+All character images are uploaded to the project root. Use these exact filenames in the code:
+
+pair-rakhi.png — Girl tying rakhi on boy's wrist, both kneeling
+pair-gift.png — Girl praying (namaste) + Boy holding gift box
+pair-prayer.png — Both praying together (girl kneeling, boy cross-legged with rakhi on wrist)
+boy-front.png — Boy standing upright, front-facing, smiling
+boy-walk-1.png, boy-walk-2.png, boy-walk-3.png — Boy walking animation frames
+girl-walk-1.png, girl-walk-2.png, girl-walk-3.png — Girl walking animation frames
+girl-kneeling-1.png, girl-kneeling-2.png — Girl kneeling poses
+
+All images have solid black backgrounds. All sections where characters appear must use dark backgrounds (deep red 
+#2D0000, dark maroon 
+#1A0000, or dark red-to-black gradient) so the black merges invisibly. Also apply mix-blend-mode: screen on all character <img> elements as a CSS fallback.
+
+Brand & Identity
+School: Rainbow Preschool International
+Primary color: 
+#EC210F (red)
+Tagline: "The Future Begins Here"
+RPS website: https://www.rainbowpreschools.com
+Partner school: Rainbow International School → https://rainbowinternationalschool.in
+Canonical URL (self): https://www.rainbowpreschools.com/blog/raksha-bandhan-2026-for-kids
+Do NOT add any canonical tag pointing to the RIS blog
+Scroll-Storytelling Animation System
+
+This is the heart of the page. Implement a scroll-driven character animation system using requestAnimationFrame + a scroll event listener.
+
+Walking animation: Each character has 3 walking frames. Use JavaScript to swap the src of a single <img> element at 8fps to create the walk cycle. Keep a setInterval running at 125ms that cycles through frames 1→2→3→1 only while the character is actively "walking" (i.e. visible and scroll is moving).
+
+Scroll-driven horizontal movement: As the user scrolls past each section, characters move horizontally using transform: translateX() tied to scroll progress. Boy enters from the left, girl from the right. When they "meet," swap to the appropriate pair image.
+
+Scene plan:
+
+Scene	Scroll depth	Character shown
+Hero entrance	0–10%	Boy walks in from left (boy-walk-1/2/3)
+History & Origin	10–25%	Girl walks in from right (girl-walk-1/2/3)
+Significance	25–35%	Both meet — show pair-rakhi.png
+Celebration & Activities	35–50%	Girl kneeling beside text (girl-kneeling-1.png)
+Essay & Story sections	50–65%	Boy standing beside text (boy-front.png, gentle float bob)
+Quiz section	65–75%	Both praying — pair-prayer.png
+Wishes & Captions	75–85%	Girl kneeling — girl-kneeling-2.png
+Conclusion & Footer	85–100%	Pair with gift — pair-gift.png
+
+Parallax depth layers: Each section has 3 depth layers — background moves at 0.1× scroll speed, character images at 0.4×, text at 1.0× normal. Update via JS: character.style.transform = \translateY(${scrollY * 0.4}px)`` inside the scroll listener.
+
+Characters are position: absolute, pointer-events: none, user-select: none, z-index: 2.
+
+Page Layout & Visual Design
+
+Fonts: Google Fonts — Baloo 2 (headings) + Nunito (body). Preconnect to fonts.googleapis.com.
+
+Color palette:
+
+Primary red: 
+#EC210F
+Dark: 
+#1A0000
+Cream: 
+#FFF8F0
+Gold accent: 
+#C9963A
+White: 
+#FFFFFF
+
+Section alternation: Dark sections (
+#1A0000 background, white text) with character on right. Light sections (
+#FFF8F0 background, dark text) with character on left. Cinematic gradient fade between sections.
+
+Sticky nav: White background, red bottom border. Left: school name in 
+#EC210F bold. Right: "Book a School Tour" button. Shrinks from 72px to 52px height on scroll.
+
+Reading progress bar: 3px red bar at very top of viewport, fills left-to-right with scroll.
+
+Hero section: Full-viewport height. Radial gradient from 
+#EC210F center to 
+#1A0000 edges. Large H1 title, subtitle, date and read-time meta. Floating golden petal particles using CSS-only @keyframes (tiny ◆ shapes in red/gold, no library). "Rainbow Preschool International, Thane" as a clickable <a href="https://www.rainbowpreschools.com"> pill badge with Lucide map-pin icon.
+
+Cards: 3D tilt on hover using perspective(800px) rotateX() rotateY() driven by mousemove event on each card.
+
+Back-to-top button: Appears after 400px scroll, bottom-right, red circle with Lucide arrow-up icon.
+
+Lucide Icons
+
+Load via CDN: <script src="https://unpkg.com/lucide@latest"></script>. Call lucide.createIcons() at end of body script. Use <i data-lucide="icon-name"></i> syntax throughout. No emojis anywhere on the page.
+
+Icons to use: map-pin (location), calendar (date), clock (read time), book-open (essay), mic (speech), pen-tool (poem), star (slogans), palette (drawing), scissors (craft), heart (wishes), instagram (captions), help-circle (FAQ), arrow-up (back to top), external-link (related posts), copy (copy buttons).
+
+All 22 Content Sections
+
+Scrape every word from https://www.rainbowpreschools.com/blog/raksha-bandhan-2026-for-kids. Include:
+
+Table of Contents with anchor links to all sections
+History & Origin of Raksha Bandhan
+Significance & Meaning
+How to Celebrate
+Activity Ideas for Kids (card grid)
+Short Essay — English / हिंदी / मराठी language tabs
+10 Lines — English / हिंदी / मराठी tabs
+Story for Kids — English / हिंदी / मराठी tabs
+Speech for Kids — English / हिंदी / मराठी tabs
+Poem / Kavita — English / हिंदी / मराठी tabs
+Slogans (card grid)
+Drawing Ideas (card grid)
+Rakhi Making Craft (step-by-step)
+Fancy Dress Ideas
+Wishes & Messages — copyable cards with copy button using navigator.clipboard.writeText(), show "Copied!" for 1.5s
+WhatsApp DP Ideas
+Instagram Captions (card grid with copy buttons)
+Interactive Quiz — 5 questions, JS state machine, score shown at end, no localStorage
+FAQ — accordion expand/collapse
+Conclusion
+Related Posts — 2 cards: one linking to https://rainbowinternationalschool.in (Rainbow International School), one to https://www.rainbowpreschools.com
+Footer — school name, tagline, copyright 2026, links to both schools
+
+Language tabs (sections 6–10): Three tabs per section: English / हिंदी / मराठी. Clicking a tab shows that panel, hides others. Default active tab is English.
+
+SEO / AEO / GEO
+
+In <head>:
+
+html
+<link rel="canonical" href="https://www.rainbowpreschools.com/blog/raksha-bandhan-2026-for-kids" />
+
+Full meta tags: title, description, keywords, og:title, og:description, og:type: article, og:url, og:image, twitter:card, twitter:title, twitter:description.
+
+JSON-LD @graph containing:
+
+Article — headline, datePublished: 2026-08-12, dateModified: 2026-08-12, author, publisher
+FAQPage — all FAQ Q&A pairs from the scraped content
+BreadcrumbList — Home → Blog → Raksha Bandhan 2026
+
+Semantic HTML throughout: <article>, <section>, <nav>, <footer>, H1→H2→H3 hierarchy, descriptive alt text on all images.
+
+Rules & Constraints
+All CSS and JS inline in the single index.html file
+No external CSS frameworks (no Bootstrap, Tailwind, etc.)
+Lucide CDN script is the only external JS dependency
+Reference character images by filename only (e.g. boy-walk-1.png) — do not base64 encode them
+All sections must be visible by default (opacity: 1) — scroll animation is an enhancement, never hides content
+Do not use localStorage or sessionStorage
+Do not use emojis
+Do not say "No. 1", "Best", "100% guaranteed", or any fabricated claims
+Do not add any canonical or meta tag referencing the RIS blog URL
+After generating, open Live Preview and confirm all 22 sections are visible and characters animate on scroll
