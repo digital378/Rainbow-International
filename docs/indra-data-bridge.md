@@ -25,9 +25,9 @@ dataset, timestamp, and pagination details where applicable.
 | --- | --- | --- |
 | `GET /api/indra/v1` or `GET /api/indra/v1/catalog` | Available datasets and exclusions | — |
 | `GET /api/indra/v1/health` | Credential and outbound-delivery status | — |
-| `GET /api/indra/v1/crm/leads` | Walk-in CRM leads for an academic year | `brand`, `branchId`, `academicYear`, `updatedSince`, `includeArchived` |
+| `GET /api/indra/v1/crm/leads` | Walk-in CRM leads; defaults to 2026–27 when no year is supplied | `brand`, `branchId`, `academicYear`, `updatedSince`, `includeArchived` |
 | `GET /api/indra/v1/crm/reference` | Branches, staff, programs, sources, statuses, close reasons | `brand`, `includeInactive` |
-| `GET /api/indra/v1/crm/summary` | Lead counts by brand, status, and source | `brand`, `academicYear` |
+| `GET /api/indra/v1/crm/summary` | Lead counts by brand, status, and source; defaults to 2026–27 | `brand`, `academicYear` |
 | `GET /api/indra/v1/crm/admissions` | Verified academic-year admissions KPIs without contact records | `brand=RIS|RPS|BOTH`, `academicYear`, `branchId` |
 | `GET /api/indra/v1/crm/admissions-performance` | Live conversion-focused admissions KPIs by brand without contact records | `academicYear` (required), `brand`, `branchId` |
 | `GET /api/indra/v1/dashboard/overview` | One live overview across CRM, website demand, Friendship Schools, content, and public site pages | `academicYear` (required), `brand`, `branchId` |

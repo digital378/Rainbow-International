@@ -30,6 +30,7 @@ export const INDRA_ALLOWED_ORIGIN = "https://indra-intelligence-assistant.replit
 const API_VERSION = "v1";
 const INTEGRATION_KEY = "indra-intelligence";
 const MAX_PAGE_SIZE = 200;
+const DEFAULT_ACADEMIC_YEAR = "2026-27";
 const PUSH_TARGET_HOST = new URL(INDRA_ALLOWED_ORIGIN).hostname;
 const DEFAULT_PUSH_URL = `${INDRA_ALLOWED_ORIGIN}/api/integrations/rainbow/v1/deliveries`;
 const DELIVERY_LEASE_MS = 10 * 60_000;
@@ -84,7 +85,7 @@ function parseRequiredAcademicYear(value: unknown): string {
 }
 
 function parseAcademicYear(value: unknown): string {
-  const academicYear = String(value || "2027-28");
+  const academicYear = String(value || DEFAULT_ACADEMIC_YEAR);
   if (!/^\d{4}-\d{2}$/.test(academicYear)) {
     throw new Error("academicYear must use YYYY-YY format");
   }
@@ -92,7 +93,6 @@ function parseAcademicYear(value: unknown): string {
 }
 
 function parseOptionalAcademicYear(value: unknown): string | null {
-  if (value === undefined || value === "") return null;
   return parseAcademicYear(value);
 }
 
@@ -146,7 +146,7 @@ type IndraResource = {
 const INDRA_RESOURCES: IndraResource[] = [
   {
     id: "crm.leads", path: "/api/indra/v1/crm/leads", category: "crm", access: "service-token",
-    purpose: "Read operational CRM lead records.", filters: ["brand", "branchId", "academicYear", "updatedSince", "includeArchived"],
+    purpose: "Read operational CRM lead records. Defaults to the current 2026-27 academic year when academicYear is omitted.", filters: ["brand", "branchId", "academicYear", "updatedSince", "includeArchived"],
     freshness: "Live database query", sourceOfTruth: "walkin_leads", containsPersonalData: true,
   },
   {
@@ -156,7 +156,7 @@ const INDRA_RESOURCES: IndraResource[] = [
   },
   {
     id: "crm.summary", path: "/api/indra/v1/crm/summary", category: "crm", access: "service-token",
-    purpose: "Read lead totals by brand, status, and source.", filters: ["brand", "academicYear"],
+    purpose: "Read lead totals by brand, status, and source. Defaults to the current 2026-27 academic year when academicYear is omitted.", filters: ["brand", "academicYear"],
     freshness: "Live database query", sourceOfTruth: "walkin_leads", containsPersonalData: false,
   },
   {

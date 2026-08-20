@@ -20,6 +20,8 @@ info:
     Read /api/indra/v1/catalog before answering a new class of question.
     For admissions and dashboard totals, use the aggregate endpoints rather
     than counting a paginated /crm/leads response.
+    CRM lead and summary requests without academicYear default to the current
+    2026-27 academic year. Use an explicit academicYear for another year.
 servers:
   - url: https://rainbowinternationalschool.in
     description: Production Rainbow International School API
@@ -52,19 +54,20 @@ components:
       name: academicYear
       in: query
       required: true
-      description: Academic year in YYYY-YY form, for example 2027-28.
+      description: Academic year in YYYY-YY form, for example 2026-27.
       schema:
         type: string
         pattern: '^\\\\d{4}-\\\\d{2}$'
-        example: 2027-28
+        example: 2026-27
     OptionalAcademicYear:
       name: academicYear
       in: query
       required: false
-      description: Academic year in YYYY-YY form.
+      description: Academic year in YYYY-YY form. Defaults to 2026-27 when omitted.
       schema:
         type: string
         pattern: '^\\\\d{4}-\\\\d{2}$'
+        default: 2026-27
     HistoricalAcademicYear:
       name: academicYear
       in: query

@@ -245,6 +245,59 @@ describe("GET /api/indra/v1/crm/admissions-performance", () => {
 });
 
 describe("Indra catalog and admissions aggregate routing", () => {
+  it("defaults optional CRM year filters to the current 2026-27 trackers while preserving explicit years", async () => {
+    const headers = { Authorization: "Bearer indra-regression-token" };
+    mockDbSelect.mockImplementation((selection?: Record<string, unknown>) => ({
+      from: () => ({
+        where: (conditions: Array<{ column: keyof FakeLead; value: unknown }>) => {
+          let rows = filterRows(conditions);
+          const selectedField = Object.keys(selection || {}).find((field) => field !== "total");
+          const result = () => {
+            if (selectedField) {
+              return [...new Map(rows.map((row) => [row[selectedField as keyof FakeLead], row]))
+                .entries()]
+                .map(([value]) => ({ [selectedField]: value, total: rows.filter((row) => row[selectedField as keyof FakeLead] === value).length }));
+            }
+            return selection ? [{ total: rows.length }] : rows;
+          };
+          const query: any = {
+            orderBy: () => query,
+            limit: (count: number) => {
+              rows = rows.slice(0, count);
+              return query;
+            },
+            offset: (start: number) => {
+              rows = rows.slice(start);
+              return query;
+            },
+            groupBy: () => Promise.resolve(result()),
+            then: (resolve: (value: unknown) => unknown, reject: (reason: unknown) => unknown) =>
+              Promise.resolve(result()).then(resolve, reject),
+          };
+          return query;
+        },
+      }),
+    }));
+
+    const defaultLeads = await fetch(`${serverUrl}/api/indra/v1/crm/leads`, { headers });
+    const defaultLeadsBody = await defaultLeads.json();
+    const defaultSummary = await fetch(`${serverUrl}/api/indra/v1/crm/summary`, { headers });
+    const defaultSummaryBody = await defaultSummary.json();
+    const futureLeads = await fetch(`${serverUrl}/api/indra/v1/crm/leads?academicYear=2027-28`, { headers });
+    const futureLeadsBody = await futureLeads.json();
+
+    expect(defaultLeads.status).toBe(200);
+    expect(defaultLeadsBody.total).toBe(1);
+    expect(defaultLeadsBody.data).toHaveLength(1);
+    expect(defaultLeadsBody.data.every((lead: { academicYear: string }) => lead.academicYear === "2026-27")).toBe(true);
+    expect(defaultSummary.status).toBe(200);
+    expect(defaultSummaryBody.data.academicYear).toBe("2026-27");
+
+    expect(futureLeads.status).toBe(200);
+    expect(futureLeadsBody.total).toBeGreaterThan(0);
+    expect(futureLeadsBody.data.every((lead: { academicYear: string }) => lead.academicYear === "2027-28")).toBe(true);
+  });
+
   it("publishes aggregate-first routing guidance and valid filters", async () => {
     const response = await fetch(`${serverUrl}/api/indra/v1/catalog`, {
       headers: { "X-Indra-Api-Key": "indra-regression-token" },
