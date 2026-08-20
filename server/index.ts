@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import compression from "compression";
 import { registerRoutes } from "./routes";
+import { INDRA_ALLOWED_ORIGIN } from "./indraIntegration";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
@@ -16,6 +17,25 @@ app.use(compression());
 // /api/* endpoints cross-origin. Sensitive endpoints are still protected by
 // ADMIN_TOKEN; this only removes the browser-level CORS block.
 app.use("/api", (req, res, next) => {
+  if (req.path.startsWith("/indra/")) {
+    const origin = req.headers.origin;
+    if (origin === INDRA_ALLOWED_ORIGIN) {
+      res.setHeader("Access-Control-Allow-Origin", INDRA_ALLOWED_ORIGIN);
+      res.setHeader("Vary", "Origin");
+    }
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, X-Indra-Api-Key");
+    if (req.method === "OPTIONS") {
+      if (origin !== INDRA_ALLOWED_ORIGIN) {
+        res.sendStatus(403);
+        return;
+      }
+      res.sendStatus(204);
+      return;
+    }
+    next();
+    return;
+  }
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Api-Key");
@@ -120,7 +140,7 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      if (capturedJsonResponse && !path.startsWith("/api/indra/")) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 

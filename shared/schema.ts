@@ -392,6 +392,20 @@ export const walkinLeadAuditLog = pgTable("walkin_lead_audit_log", {
   changedAt: timestamp("changed_at").defaultNow().notNull(),
 });
 
+// ── Indra Intelligence integration delivery state ───────────────
+// Stores only operational delivery metadata. Payloads, credentials, and
+// customer records are intentionally never persisted here.
+export const indraSyncStates = pgTable("indra_sync_states", {
+  integration: text("integration").primaryKey(),
+  lastAttemptedAt: timestamp("last_attempted_at"),
+  lastSuccessfulAt: timestamp("last_successful_at"),
+  lastDeliveryId: text("last_delivery_id"),
+  lastError: text("last_error"),
+  leaseId: text("lease_id"),
+  leaseUntil: timestamp("lease_until"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ── Types ─────────────────────────────────────────────────────
 export type WalkinBranch = typeof walkinBranches.$inferSelect;
 export type InsertWalkinBranch = typeof walkinBranches.$inferInsert;
