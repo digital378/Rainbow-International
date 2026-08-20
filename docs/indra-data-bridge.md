@@ -20,7 +20,7 @@ dataset, timestamp, and pagination details where applicable.
 
 | Endpoint | Purpose | Filters |
 | --- | --- | --- |
-| `GET /api/indra/v1/catalog` | Available datasets and exclusions | — |
+| `GET /api/indra/v1` or `GET /api/indra/v1/catalog` | Available datasets and exclusions | — |
 | `GET /api/indra/v1/health` | Credential and outbound-delivery status | — |
 | `GET /api/indra/v1/crm/leads` | Walk-in CRM leads | `brand`, `branchId`, `updatedSince`, `includeArchived` |
 | `GET /api/indra/v1/crm/reference` | Branches, staff, programs, sources, statuses, close reasons | `brand`, `includeInactive` |

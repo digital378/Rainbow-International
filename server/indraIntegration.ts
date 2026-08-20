@@ -544,7 +544,7 @@ export function startIndraPushScheduler() {
 export function registerIndraIntegrationRoutes(app: Express) {
   app.use("/api/indra/v1", rateLimitIndra, requireIndraToken);
 
-  app.get("/api/indra/v1/catalog", (_req, res) => {
+  const sendCatalog = (_req: Request, res: Response) => {
     res.json(envelope("catalog", {
       crm: ["leads", "reference", "summary"],
       website: ["inquiries", "callback-requests", "brochure-requests", "career-applications"],
@@ -558,7 +558,12 @@ export function registerIndraIntegrationRoutes(app: Express) {
         "unstructured internal remarks and messages",
       ],
     }));
-  });
+  };
+
+  // Make the documented base URL useful for clients that probe it before
+  // selecting a dataset. `/catalog` remains the explicit discovery route.
+  app.get("/api/indra/v1", sendCatalog);
+  app.get("/api/indra/v1/catalog", sendCatalog);
 
   app.get("/api/indra/v1/health", async (_req, res) => {
     const status = await getPushState();
