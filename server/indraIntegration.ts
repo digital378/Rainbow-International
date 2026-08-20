@@ -69,6 +69,13 @@ function parseOptionalBrand(value: unknown): "RIS" | "RPS" | null {
   throw new Error("brand must be RIS or RPS");
 }
 
+function parseRequiredAcademicYear(value: unknown): string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}$/.test(value)) {
+    throw new Error("academicYear is required and must use the YYYY-YY format");
+  }
+  return value;
+}
+
 function parseAcademicYear(value: unknown): string {
   const academicYear = String(value || "2027-28");
   if (!/^\d{4}-\d{2}$/.test(academicYear)) {
@@ -89,6 +96,11 @@ function parseOptionalPositiveInteger(value: unknown, name: string): number | nu
   const parsed = Number(raw);
   if (!Number.isSafeInteger(parsed)) throw new Error(`${name} must be a positive integer`);
   return parsed;
+}
+
+function percentage(numerator: number, denominator: number): number | null {
+  if (denominator === 0) return null;
+  return Number(((numerator / denominator) * 100).toFixed(2));
 }
 
 function parseBoolean(value: unknown): boolean {
@@ -630,7 +642,7 @@ export function registerIndraIntegrationRoutes(app: Express) {
 
   const sendCatalog = (_req: Request, res: Response) => {
     res.json(envelope("catalog", {
-      crm: ["leads", "reference", "summary", "admissions"],
+      crm: ["leads", "reference", "summary", "admissions", "admissions-performance"],
       website: ["inquiries", "callback-requests", "brochure-requests", "career-applications"],
       friendship: ["schools", "leads"],
       content: ["blogs"],
@@ -780,6 +792,85 @@ export function registerIndraIntegrationRoutes(app: Express) {
         },
         brands,
         combined,
+      }));
+    } catch (error) {
+      res.status(400).json({ message: safeErrorMessage(error) });
+    }
+  });
+
+  app.get("/api/indra/v1/crm/admissions-performance", async (req, res) => {
+    try {
+      const academicYear = parseRequiredAcademicYear(req.query.academicYear);
+      const brand = parseOptionalBrand(req.query.brand);
+      const branchId = parseOptionalPositiveInteger(req.query.branchId, "branchId");
+      const conditions = [
+        eq(walkinLeads.academicYear, academicYear),
+        eq(walkinLeads.isArchived, false),
+        brand ? eq(walkinLeads.brand, brand) : undefined,
+        branchId ? eq(walkinLeads.branchId, branchId) : undefined,
+      ].filter(Boolean);
+      const rows = await db
+        .select({
+          brand: walkinLeads.brand,
+          status: walkinLeads.status,
+        })
+        .from(walkinLeads)
+        .where(and(...conditions));
+
+      const selectedBrands: Array<"RIS" | "RPS"> = brand ? [brand] : ["RIS", "RPS"];
+      const metrics = new Map(selectedBrands.map((selectedBrand) => [
+        selectedBrand,
+        { leads: 0, walkIns: 0, admissions: 0 },
+      ]));
+
+      for (const row of rows) {
+        if (row.brand !== "RIS" && row.brand !== "RPS") continue;
+        const metric = metrics.get(row.brand);
+        if (!metric) continue;
+
+        const status = (row.status ?? "").trim().toUpperCase();
+        metric.leads += 1;
+        if (status === "WALK-IN COMPLETED" || status === "ADMISSION DONE") metric.walkIns += 1;
+        if (status === "ADMISSION DONE") metric.admissions += 1;
+      }
+
+      const dataReadAt = new Date().toISOString();
+      res.json(envelope("crm.admissions-performance", {
+        source: {
+          system: "Rainbow International School CRM",
+          table: "walkin_leads",
+          description: "Live, non-archived CRM lead records from the database source of truth.",
+        },
+        freshness: {
+          dataReadAt,
+          cached: false,
+        },
+        filters: {
+          academicYear,
+          brand,
+          branchId,
+        },
+        definitions: {
+          admission: 'A lead is counted as an admission only when its CRM status, after trimming and uppercasing, is exactly "ADMISSION DONE".',
+          walkIn: 'A lead is counted as a walk-in when its CRM status, after trimming and uppercasing, is "WALK-IN COMPLETED" or "ADMISSION DONE".',
+          conversions: {
+            leadToAdmissionRate: "admissions ÷ leads × 100; null when there are no leads",
+            walkInToAdmissionRate: "admissions ÷ walk-ins × 100; null when there are no walk-ins",
+          },
+        },
+        byBrand: selectedBrands.map((selectedBrand) => {
+          const metric = metrics.get(selectedBrand)!;
+          return {
+            brand: selectedBrand,
+            leads: metric.leads,
+            walkIns: metric.walkIns,
+            admissions: metric.admissions,
+            conversions: {
+              leadToAdmissionRate: percentage(metric.admissions, metric.leads),
+              walkInToAdmissionRate: percentage(metric.admissions, metric.walkIns),
+            },
+          };
+        }),
       }));
     } catch (error) {
       res.status(400).json({ message: safeErrorMessage(error) });

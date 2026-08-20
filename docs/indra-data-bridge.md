@@ -26,6 +26,7 @@ dataset, timestamp, and pagination details where applicable.
 | `GET /api/indra/v1/crm/reference` | Branches, staff, programs, sources, statuses, close reasons | `brand`, `includeInactive` |
 | `GET /api/indra/v1/crm/summary` | Lead counts by brand, status, and source | `brand`, `academicYear` |
 | `GET /api/indra/v1/crm/admissions` | Verified academic-year admissions KPIs without contact records | `brand=RIS|RPS|BOTH`, `academicYear`, `branchId` |
+| `GET /api/indra/v1/crm/admissions-performance` | Live conversion-focused admissions KPIs by brand without contact records | `academicYear` (required), `brand`, `branchId` |
 | `GET /api/indra/v1/website/inquiries` | Website enquiries | `createdSince` |
 | `GET /api/indra/v1/website/callback-requests` | Callback requests | `createdSince` |
 | `GET /api/indra/v1/website/brochure-requests` | Brochure requests | `createdSince` |
@@ -61,6 +62,14 @@ endpoint excludes archived leads and counts a lead as an admission only when
 its current status is exactly `ADMISSION DONE`. It also reports the academic
 year, total leads, walk-ins, bookings, status breakdown, and aggregate
 breakdowns by branch and source.
+
+`GET /api/indra/v1/crm/admissions-performance` is the conversion-focused
+resource. It requires `academicYear` in `YYYY-YY` form and returns only
+per-brand lead, walk-in, admission, lead-to-admission, and
+walk-in-to-admission counters. Every response includes the database source,
+the non-cached read timestamp, applied filters, and the exact normalized-status
+definition. Conversion rates are percentages and are `null` when the relevant
+denominator is zero; no lead rows or contact data are returned.
 
 ## Scheduled outbound delivery
 
