@@ -69,10 +69,25 @@ function parseOptionalBrand(value: unknown): "RIS" | "RPS" | null {
   throw new Error("brand must be RIS or RPS");
 }
 
+function parseAcademicYear(value: unknown): string {
+  const academicYear = String(value || "2027-28");
+  if (!/^\d{4}-\d{2}$/.test(academicYear)) {
+    throw new Error("academicYear must use YYYY-YY format");
+  }
+  return academicYear;
+}
+
+function parseOptionalAcademicYear(value: unknown): string | null {
+  if (value === undefined || value === "") return null;
+  return parseAcademicYear(value);
+}
+
 function parseOptionalPositiveInteger(value: unknown, name: string): number | null {
   if (value === undefined || value === "") return null;
-  const parsed = Number.parseInt(String(value), 10);
-  if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a positive integer`);
+  const raw = String(value);
+  if (!/^[1-9]\d*$/.test(raw)) throw new Error(`${name} must be a positive integer`);
+  const parsed = Number(raw);
+  if (!Number.isSafeInteger(parsed)) throw new Error(`${name} must be a positive integer`);
   return parsed;
 }
 
@@ -95,6 +110,75 @@ function envelope(dataset: string, data: unknown, page?: Page & { total: number 
     } : {}),
     data,
   };
+}
+
+type AdmissionsRow = {
+  brand: string;
+  status: string | null;
+  monthLabel: string;
+  branchId: number | null;
+  source: string | null;
+};
+
+function emptyAdmissionsSummary(brand: string, academicYear: string) {
+  return {
+    brand,
+    academicYear,
+    kpis: { totalLeads: 0, bookings: 0, walkins: 0, admissions: 0 },
+    statusBreakdown: [] as Array<{ status: string; count: number }>,
+    monthly: [] as Array<{ month: string; leads: number; walkins: number; admissions: number }>,
+    byBranch: [] as Array<{ branchId: number | null; leads: number; admissions: number }>,
+    bySource: [] as Array<{ source: string; leads: number; admissions: number }>,
+  };
+}
+
+function aggregateAdmissionsRows(rows: AdmissionsRow[], brand: string, academicYear: string) {
+  const result = emptyAdmissionsSummary(brand, academicYear);
+  const statusMap = new Map<string, number>();
+  const monthMap = new Map<string, { leads: number; walkins: number; admissions: number }>();
+  const branchMap = new Map<number | null, { leads: number; admissions: number }>();
+  const sourceMap = new Map<string, { leads: number; admissions: number }>();
+
+  for (const row of rows) {
+    const status = (row.status || "").trim().toUpperCase() || "UNKNOWN";
+    const month = row.monthLabel?.trim() || "Unknown";
+    const source = row.source?.trim() || "Unknown";
+    const isAdmission = status === "ADMISSION DONE";
+    const isWalkin = status === "WALK-IN COMPLETED" || isAdmission;
+    const isBooking = status === "WALK-IN BOOKED";
+
+    result.kpis.totalLeads++;
+    if (isBooking) result.kpis.bookings++;
+    if (isWalkin) result.kpis.walkins++;
+    if (isAdmission) result.kpis.admissions++;
+
+    statusMap.set(status, (statusMap.get(status) || 0) + 1);
+
+    const monthStats = monthMap.get(month) || { leads: 0, walkins: 0, admissions: 0 };
+    monthStats.leads++;
+    if (isWalkin) monthStats.walkins++;
+    if (isAdmission) monthStats.admissions++;
+    monthMap.set(month, monthStats);
+
+    const branchStats = branchMap.get(row.branchId) || { leads: 0, admissions: 0 };
+    branchStats.leads++;
+    if (isAdmission) branchStats.admissions++;
+    branchMap.set(row.branchId, branchStats);
+
+    const sourceStats = sourceMap.get(source) || { leads: 0, admissions: 0 };
+    sourceStats.leads++;
+    if (isAdmission) sourceStats.admissions++;
+    sourceMap.set(source, sourceStats);
+  }
+
+  result.statusBreakdown = Array.from(statusMap, ([status, count]) => ({ status, count }))
+    .sort((a, b) => b.count - a.count || a.status.localeCompare(b.status));
+  result.monthly = Array.from(monthMap, ([month, stats]) => ({ month, ...stats }));
+  result.byBranch = Array.from(branchMap, ([branchId, stats]) => ({ branchId, ...stats }))
+    .sort((a, b) => b.admissions - a.admissions || b.leads - a.leads);
+  result.bySource = Array.from(sourceMap, ([source, stats]) => ({ source, ...stats }))
+    .sort((a, b) => b.admissions - a.admissions || b.leads - a.leads);
+  return result;
 }
 
 function sanitizeLead(lead: typeof walkinLeads.$inferSelect) {
@@ -546,7 +630,7 @@ export function registerIndraIntegrationRoutes(app: Express) {
 
   const sendCatalog = (_req: Request, res: Response) => {
     res.json(envelope("catalog", {
-      crm: ["leads", "reference", "summary"],
+      crm: ["leads", "reference", "summary", "admissions"],
       website: ["inquiries", "callback-requests", "brochure-requests", "career-applications"],
       friendship: ["schools", "leads"],
       content: ["blogs"],
@@ -576,11 +660,13 @@ export function registerIndraIntegrationRoutes(app: Express) {
       const brand = parseOptionalBrand(req.query.brand);
       const branchId = parseOptionalPositiveInteger(req.query.branchId, "branchId");
       const updatedSince = parseDate(req.query.updatedSince, "updatedSince");
+      const academicYear = parseOptionalAcademicYear(req.query.academicYear);
       const includeArchived = parseBoolean(req.query.includeArchived);
       const conditions: any[] = [];
       if (brand) conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, branchId));
       if (updatedSince) conditions.push(gte(walkinLeads.updatedAt, updatedSince));
+      if (academicYear) conditions.push(eq(walkinLeads.academicYear, academicYear));
       if (!includeArchived) conditions.push(eq(walkinLeads.isArchived, false));
       const where = conditions.length ? and(...conditions) : undefined;
       const [rows, [{ total }]] = await Promise.all([
@@ -628,8 +714,10 @@ export function registerIndraIntegrationRoutes(app: Express) {
   app.get("/api/indra/v1/crm/summary", async (req, res) => {
     try {
       const brand = parseOptionalBrand(req.query.brand);
+      const academicYear = parseOptionalAcademicYear(req.query.academicYear);
       const where = and(
         eq(walkinLeads.isArchived, false),
+        academicYear ? eq(walkinLeads.academicYear, academicYear) : undefined,
         brand ? eq(walkinLeads.brand, brand) : undefined,
       );
       const [byBrand, byStatus, bySource] = await Promise.all([
@@ -640,7 +728,59 @@ export function registerIndraIntegrationRoutes(app: Express) {
         db.select({ source: walkinLeads.source, total: sql<number>`cast(count(*) as int)` })
           .from(walkinLeads).where(where).groupBy(walkinLeads.source),
       ]);
-      res.json(envelope("crm.summary", { byBrand, byStatus, bySource }));
+      res.json(envelope("crm.summary", { academicYear, byBrand, byStatus, bySource }));
+    } catch (error) {
+      res.status(400).json({ message: safeErrorMessage(error) });
+    }
+  });
+
+  app.get("/api/indra/v1/crm/admissions", async (req, res) => {
+    try {
+      const academicYear = parseAcademicYear(req.query.academicYear);
+      const requestedBrand = String(req.query.brand || "BOTH").toUpperCase();
+      if (requestedBrand !== "RIS" && requestedBrand !== "RPS" && requestedBrand !== "BOTH") {
+        throw new Error("brand must be RIS, RPS, or BOTH");
+      }
+      const branchId = parseOptionalPositiveInteger(req.query.branchId, "branchId");
+      const brandFilter = requestedBrand === "BOTH" ? null : requestedBrand as "RIS" | "RPS";
+      const conditions: any[] = [
+        eq(walkinLeads.academicYear, academicYear),
+        eq(walkinLeads.isArchived, false),
+      ];
+      if (brandFilter) conditions.push(eq(walkinLeads.brand, brandFilter));
+      else conditions.push(or(eq(walkinLeads.brand, "RIS"), eq(walkinLeads.brand, "RPS")));
+      if (branchId) conditions.push(eq(walkinLeads.branchId, branchId));
+
+      const rows = await db
+        .select({
+          brand: walkinLeads.brand,
+          status: walkinLeads.status,
+          monthLabel: walkinLeads.monthLabel,
+          branchId: walkinLeads.branchId,
+          source: walkinLeads.source,
+        })
+        .from(walkinLeads)
+        .where(and(...conditions));
+
+      const brands = brandFilter
+        ? [aggregateAdmissionsRows(rows, brandFilter, academicYear)]
+        : (["RIS", "RPS"] as const).map((brand) =>
+            aggregateAdmissionsRows(rows.filter((row) => row.brand === brand), brand, academicYear),
+          );
+      const combined = aggregateAdmissionsRows(rows, "RIS+RPS", academicYear);
+
+      res.json(envelope("crm.admissions", {
+        academicYear,
+        requestedBrand,
+        admissionDefinition: {
+          status: "ADMISSION DONE",
+          countedAsAdmission: "A non-archived walk-in lead whose current status is exactly ADMISSION DONE.",
+          countedAsWalkIn: ["WALK-IN COMPLETED", "ADMISSION DONE"],
+          sourceTable: "walkin_leads",
+        },
+        brands,
+        combined,
+      }));
     } catch (error) {
       res.status(400).json({ message: safeErrorMessage(error) });
     }

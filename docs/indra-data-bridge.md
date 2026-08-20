@@ -22,9 +22,10 @@ dataset, timestamp, and pagination details where applicable.
 | --- | --- | --- |
 | `GET /api/indra/v1` or `GET /api/indra/v1/catalog` | Available datasets and exclusions | — |
 | `GET /api/indra/v1/health` | Credential and outbound-delivery status | — |
-| `GET /api/indra/v1/crm/leads` | Walk-in CRM leads | `brand`, `branchId`, `updatedSince`, `includeArchived` |
+| `GET /api/indra/v1/crm/leads` | Walk-in CRM leads for an academic year | `brand`, `branchId`, `academicYear`, `updatedSince`, `includeArchived` |
 | `GET /api/indra/v1/crm/reference` | Branches, staff, programs, sources, statuses, close reasons | `brand`, `includeInactive` |
-| `GET /api/indra/v1/crm/summary` | Current lead counts by brand, status, and source | `brand` |
+| `GET /api/indra/v1/crm/summary` | Lead counts by brand, status, and source | `brand`, `academicYear` |
+| `GET /api/indra/v1/crm/admissions` | Verified academic-year admissions KPIs without contact records | `brand=RIS|RPS|BOTH`, `academicYear`, `branchId` |
 | `GET /api/indra/v1/website/inquiries` | Website enquiries | `createdSince` |
 | `GET /api/indra/v1/website/callback-requests` | Callback requests | `createdSince` |
 | `GET /api/indra/v1/website/brochure-requests` | Brochure requests | `createdSince` |
@@ -51,6 +52,15 @@ The bridge has explicit output allowlists. It does **not** send:
 The operational records that remain may contain contact information. Indra
 must keep this data private, use it only for approved school operations, and
 avoid re-exposing it in public responses.
+
+### Admissions KPI definition
+
+Use `/api/indra/v1/crm/admissions` for questions about admissions performance;
+do not infer admissions by counting a page of `/crm/leads` results. The
+endpoint excludes archived leads and counts a lead as an admission only when
+its current status is exactly `ADMISSION DONE`. It also reports the academic
+year, total leads, walk-ins, bookings, status breakdown, and aggregate
+breakdowns by branch and source.
 
 ## Scheduled outbound delivery
 
