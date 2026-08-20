@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { storage } from "./storage";
 import { OPENAPI_YAML } from "./openapiSpec";
+import { INDRA_OPENAPI_YAML } from "./indraOpenapiSpec";
 import { z } from "zod";
 import { insertInquirySchema, insertEventSchema, insertCallbackRequestSchema, insertCareerApplicationSchema, insertBrochureRequestSchema, insertRaSchema, insertFriendshipSchoolSchema, insertFriendshipLeadSchema, type InsertFriendshipLead, walkinLeads, callbackRequests } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
@@ -3872,6 +3873,17 @@ paths:
     res.setHeader("Content-Type", "text/yaml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
     res.send(OPENAPI_YAML);
+  });
+
+  // ── Indra OpenAPI schema ───────────────────────────────────────────────
+  // Keep this route separate from /openapi.yaml: the older public marketing
+  // schema is still used by the existing GPT integration, while this schema
+  // describes only the read-only, token-protected Indra bridge.
+  app.get("/openapi-indra.yaml", (_req, res) => {
+    res.setHeader("Content-Type", "text/yaml; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
+    res.setHeader("X-Robots-Tag", "noindex, nofollow");
+    res.send(INDRA_OPENAPI_YAML);
   });
 
   // ── RA Walk-in QR Check-in System ──────────────────────────────────────

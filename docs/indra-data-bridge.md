@@ -45,6 +45,24 @@ The browser CORS policy is limited to
 `https://indra-intelligence-assistant.replit.app`. Server-to-server calls are
 still recommended.
 
+## OpenAPI schema import
+
+For an importable, GPT-style connection schema, use:
+
+```text
+https://rainbowinternationalschool.in/openapi-indra.yaml
+```
+
+This public schema link contains endpoint descriptions and authentication
+requirements only; it never contains an API token or live data. Configure the
+dedicated `INDRA_API_TOKEN` in Indra's secure credential field as a Bearer
+token, then import the schema. After import, read
+`/api/indra/v1/catalog` to refresh current resource and routing guidance.
+
+Do not use the older `/openapi.yaml` for Indra. It belongs to the legacy
+Rainbow Group Marketing/GPT integration and describes a different, older API
+contract.
+
 ## Broad read-only source registry
 
 Start each new Indra connection by reading `/api/indra/v1/catalog`. In
