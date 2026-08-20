@@ -4218,6 +4218,12 @@ paths:
   app.get("/api/rps-sales/live", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
     try {
+      const requestedAcademicYear = typeof req.query.academicYear === "string"
+        ? req.query.academicYear.trim()
+        : "";
+      if (requestedAcademicYear && !/^\d{4}-\d{2}$/.test(requestedAcademicYear)) {
+        return res.status(400).json({ message: "academicYear must use YYYY-YY format" });
+      }
       const RPS_SID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
       const [walkinRows, indConvRows, dmRows, misRows, dCohortRows, branchClosedRows, branchAsmRows, branchOpenRows, branchWalkinRows] = await Promise.all([
         fetchSheetRange(RPS_SID, "'Walkin Data'!A2:U5000"),
@@ -4290,6 +4296,7 @@ paths:
 
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
+        if (requestedAcademicYear && norm(r[6]) !== requestedAcademicYear) continue;
         const name = norm(r[4]); if (!name) continue;
         const d       = parseDate(r[1]);
         const branch  = norm(r[3]) || "Unknown";
@@ -4401,6 +4408,7 @@ paths:
       // where the counsellor column is filled. This separate pass matches the pivot's count.
       for (const r of walkinRows) {
         if (isEmptyRow(r)) continue;
+        if (requestedAcademicYear && norm(r[6]) !== requestedAcademicYear) continue;
         const coun = norm(r[10]); if (!coun || coun.toLowerCase() === "unassigned") continue;
         const lbKey = coun.toLowerCase();
         const lb = counselorLBMap.get(lbKey) || { display: toTitleCase(coun), admDone:0, admRIS:0, closed:0, open:0, inProcess:0, futureProspect:0, total:0 };

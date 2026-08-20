@@ -31,6 +31,8 @@ dataset, timestamp, and pagination details where applicable.
 | `GET /api/indra/v1/crm/admissions` | Verified academic-year admissions KPIs without contact records | `brand=RIS|RPS|BOTH`, `academicYear`, `branchId` |
 | `GET /api/indra/v1/crm/admissions-performance` | Live conversion-focused admissions KPIs by brand without contact records | `academicYear` (required), `brand`, `branchId` |
 | `GET /api/indra/v1/dashboard/overview` | One live overview across CRM, website demand, Friendship Schools, content, and public site pages | `academicYear` (required), `brand`, `branchId` |
+| `GET /api/indra/v1/dashboard/academic-years` | Discover historical dashboard provider coverage, availability, and limitations | — |
+| `GET /api/indra/v1/dashboard/reports` | Aggregate-only historical Marketing, RIS Sales, RPS Sales, and current CRM reports | `academicYear` (`YYYY-YY` or `all`) |
 | `GET /api/indra/v1/website/inquiries` | Website enquiries | `createdSince` |
 | `GET /api/indra/v1/website/callback-requests` | Callback requests | `createdSince` |
 | `GET /api/indra/v1/website/brochure-requests` | Brochure requests | `createdSince` |
@@ -90,6 +92,25 @@ explicitly labelled as all-time, organisation-wide values because those
 sources do not consistently contain the same CRM filter attributes. A
 `no_matching_records` freshness status means the requested CRM filter was
 valid but did not match current records.
+
+## Historical dashboard reporting
+
+Use `GET /api/indra/v1/dashboard/academic-years` before asking a historical
+dashboard question. It lists the approved provider coverage for every
+academic year currently represented in the bridge. Then call
+`GET /api/indra/v1/dashboard/reports?academicYear=2026-27` for the legacy
+Marketing, RIS Sales, and RPS Sales dashboard aggregates, or
+`academicYear=all` to read every known provider.
+
+The response is deliberately provider-labelled. The legacy dashboard sheets
+use different date fields, status definitions, and reporting periods, so Indra
+must not merge their figures into one total unless the requested comparison
+explicitly supports it. Each provider reports its source, coverage, freshness,
+and availability. `provider_unavailable` means the source could not be read;
+it never means zero. The resource exposes only allowed aggregate series:
+monthly KPIs, funnel/status/source/grade/branch counts, and marketing spend.
+It never includes raw spreadsheet rows, people’s names, contacts, remarks,
+free-text closure reasons, sheet IDs, credentials, or uploaded files.
 
 `/site/pages` inventories canonical public website pages from the deployed
 route metadata. Blogs remain discoverable from `/content/blogs`, including

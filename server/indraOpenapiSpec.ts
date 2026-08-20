@@ -65,6 +65,14 @@ components:
       schema:
         type: string
         pattern: '^\\\\d{4}-\\\\d{2}$'
+    HistoricalAcademicYear:
+      name: academicYear
+      in: query
+      required: true
+      description: Academic year in YYYY-YY form, or all to return each known academic-year provider.
+      schema:
+        type: string
+        pattern: '^(\\\\d{4}-\\\\d{2}|all)$'
     Brand:
       name: brand
       in: query
@@ -263,7 +271,7 @@ paths:
         Uses non-archived CRM records. An admission is a lead whose normalized
         status is exactly ADMISSION DONE.
       parameters:
-        - $ref: '#/components/parameters/OptionalAcademicYear'
+        - $ref: '#/components/parameters/AcademicYear'
         - $ref: '#/components/parameters/AdmissionsBrand'
         - $ref: '#/components/parameters/BranchId'
       responses:
@@ -297,6 +305,30 @@ paths:
         - $ref: '#/components/parameters/AcademicYear'
         - $ref: '#/components/parameters/Brand'
         - $ref: '#/components/parameters/BranchId'
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/indra/v1/dashboard/academic-years:
+    get:
+      tags: [Dashboard]
+      operationId: listHistoricalAcademicYears
+      summary: Discover academic-year dashboard providers and coverage
+      description: Returns provider availability and limitations before reading historical aggregate reports.
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/indra/v1/dashboard/reports:
+    get:
+      tags: [Dashboard]
+      operationId: getHistoricalDashboardReports
+      summary: Read aggregate-only historical dashboard reports
+      description: |
+        Use academicYear=2026-27 for the legacy Marketing, RIS Sales, and RPS
+        Sales providers. Use all to return every provider with its provenance and
+        limitation. Do not combine provider totals unless their definitions match.
+      parameters:
+        - $ref: '#/components/parameters/HistoricalAcademicYear'
       responses:
         '200': { $ref: '#/components/responses/Success' }
         '400': { $ref: '#/components/responses/InvalidRequest' }

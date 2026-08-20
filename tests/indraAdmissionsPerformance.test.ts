@@ -87,9 +87,11 @@ function filterRows(conditions: Array<{ column: keyof FakeLead; value: unknown }
 let httpServer: ReturnType<typeof createServer>;
 let serverUrl = "";
 let originalToken: string | undefined;
+let originalPort: string | undefined;
 
 beforeEach(async () => {
   originalToken = process.env.INDRA_API_TOKEN;
+  originalPort = process.env.PORT;
   process.env.INDRA_API_TOKEN = "indra-regression-token";
 
   mockEq.mockImplementation((column: keyof FakeLead, value: unknown) => ({ column, value }));
@@ -109,11 +111,14 @@ beforeEach(async () => {
   await new Promise<void>((resolve) => httpServer.listen(0, "127.0.0.1", resolve));
   const address = httpServer.address() as { port: number };
   serverUrl = `http://127.0.0.1:${address.port}`;
+  process.env.PORT = String(address.port);
 });
 
 afterEach(async () => {
   if (originalToken === undefined) delete process.env.INDRA_API_TOKEN;
   else process.env.INDRA_API_TOKEN = originalToken;
+  if (originalPort === undefined) delete process.env.PORT;
+  else process.env.PORT = originalPort;
   await new Promise<void>((resolve, reject) =>
     httpServer.close((error) => (error ? reject(error) : resolve())),
   );
@@ -367,5 +372,53 @@ describe("Indra catalog and admissions aggregate routing", () => {
       },
     });
     expect(Number.isNaN(Date.parse(body.data.freshness.dataReadAt))).toBe(false);
+  });
+});
+
+describe("Indra historical dashboard aggregates", () => {
+  it("protects academic-year discovery with the dedicated token", async () => {
+    const response = await fetch(`${serverUrl}/api/indra/v1/dashboard/academic-years`);
+
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ message: "Unauthorized" });
+  });
+
+  it("publishes provider coverage and keeps static history aggregate-only", async () => {
+    const response = await fetch(`${serverUrl}/api/indra/v1/dashboard/reports?academicYear=2024-25`, {
+      headers: { "X-Indra-Api-Key": "indra-regression-token" },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data).toMatchObject({
+      requestedAcademicYear: "2024-25",
+      aggregateOnly: true,
+      reports: [{
+        academicYear: "2024-25",
+        availability: "partial",
+        providers: [expect.objectContaining({
+          id: "marketing.comparison-history",
+          status: "available",
+        })],
+      }],
+    });
+    expect(JSON.stringify(body)).not.toMatch(/parentName|childName|phone|email|remark|spreadsheet/i);
+  });
+
+  it("distinguishes an unavailable legacy provider from a zero-value report", async () => {
+    const response = await fetch(`${serverUrl}/api/indra/v1/dashboard/reports?academicYear=2026-27`, {
+      headers: { Authorization: "Bearer indra-regression-token" },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.reports[0].providers).toHaveLength(3);
+    expect(body.data.reports[0].providers).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        status: "unavailable",
+        error: expect.objectContaining({ code: "provider_unavailable" }),
+      }),
+    ]));
+    expect(JSON.stringify(body)).not.toMatch(/parentName|childName|phone|email|remark/i);
   });
 });

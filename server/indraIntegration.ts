@@ -21,6 +21,10 @@ import {
 } from "@shared/schema";
 import { CODE_OWNED_BLOGS } from "@shared/codeOwnedBlogs";
 import { ROUTE_SEO, routeCanonical } from "@shared/routeSeo";
+import {
+  HISTORICAL_REPORT_YEARS,
+  readHistoricalDashboardProviders,
+} from "./indraHistoricalReports";
 
 export const INDRA_ALLOWED_ORIGIN = "https://indra-intelligence-assistant.replit.app";
 const API_VERSION = "v1";
@@ -171,6 +175,16 @@ const INDRA_RESOURCES: IndraResource[] = [
     freshness: "Live non-cached database query", sourceOfTruth: "Rainbow operational databases", containsPersonalData: false,
   },
   {
+    id: "dashboard.academic-years", path: "/api/indra/v1/dashboard/academic-years", category: "dashboard", access: "service-token",
+    purpose: "Discover each academic year's approved aggregate providers, availability, and source limitations.", filters: [],
+    freshness: "Provider registry with live database availability described separately", sourceOfTruth: "Rainbow historical reporting registry", containsPersonalData: false,
+  },
+  {
+    id: "dashboard.reports", path: "/api/indra/v1/dashboard/reports", category: "dashboard", access: "service-token",
+    purpose: "Read provider-labelled historical dashboard aggregates for one academic year or all known years.", filters: ["academicYear (YYYY-YY or all)"],
+    freshness: "Live provider reads for 2026-27; application historical data for prior marketing series; live CRM query for 2027-28", sourceOfTruth: "Named provider in each response", containsPersonalData: false,
+  },
+  {
     id: "website.records", path: "/api/indra/v1/website/:dataset", category: "website", access: "service-token",
     purpose: "Read website enquiry, callback, brochure-request, and career-application metadata.", filters: ["createdSince", "page", "pageSize"],
     freshness: "Live database query", sourceOfTruth: "Rainbow website request tables", containsPersonalData: true,
@@ -221,6 +235,14 @@ const INDRA_QUERY_ROUTING = [
     requiredFilters: ["academicYear"],
     optionalFilters: ["brand", "branchId"],
     guidance: "Use this live overview when the question spans admissions and organization-wide website, Friendship Schools, content, or public-site metrics. CRM filters apply only to the nested admissions section.",
+  },
+  {
+    intent: "historic-dashboard-report",
+    resourceId: "dashboard.reports",
+    path: "/api/indra/v1/dashboard/reports",
+    requiredFilters: ["academicYear"],
+    optionalFilters: [],
+    guidance: "Use this aggregate-only resource for historical dashboard questions. Check dashboard.academic-years first; preserve each provider's source and limitation instead of combining unlike sources.",
   },
   {
     intent: "lead-records",
@@ -868,7 +890,7 @@ export function registerIndraIntegrationRoutes(app: Express) {
       website: ["inquiries", "callback-requests", "brochure-requests", "career-applications"],
       friendship: ["schools", "leads"],
       content: ["blogs"],
-      dashboard: ["overview"],
+      dashboard: ["overview", "academic-years", "reports"],
       site: ["pages"],
       repository: ["context"],
       ...resourceCatalog(),
@@ -883,6 +905,56 @@ export function registerIndraIntegrationRoutes(app: Express) {
   app.get("/api/indra/v1/health", async (_req, res) => {
     const status = await getPushState();
     res.json(envelope("health", status));
+  });
+
+  app.get("/api/indra/v1/dashboard/academic-years", (_req, res) => {
+    res.json(envelope("dashboard.academic-years", {
+      years: HISTORICAL_REPORT_YEARS,
+      guidance: "Availability is provider-specific. An unavailable provider is not a zero value; retain its source and limitation when answering.",
+    }));
+  });
+
+  app.get("/api/indra/v1/dashboard/reports", async (req, res) => {
+    try {
+      const requestedYear = String(req.query.academicYear || "");
+      if (requestedYear !== "all" && !/^\d{4}-\d{2}$/.test(requestedYear)) {
+        throw new Error("academicYear is required and must use YYYY-YY format or all");
+      }
+      const years = requestedYear === "all"
+        ? HISTORICAL_REPORT_YEARS.map((year) => year.academicYear)
+        : [requestedYear];
+      const reports = await Promise.all(years.map(async (academicYear) => {
+        if (academicYear === "2027-28") {
+          const databaseAggregate = await readAdmissionsPerformance(academicYear, null, null);
+          return {
+            academicYear,
+            availability: databaseAggregate.freshness.status === "available" ? "available" : "no_matching_records",
+            providers: [{
+              id: "crm.database",
+              status: databaseAggregate.freshness.status,
+              source: databaseAggregate.source,
+              freshness: databaseAggregate.freshness,
+              data: { admissionsPerformance: databaseAggregate.byBrand, definitions: databaseAggregate.definitions },
+            }],
+          };
+        }
+        const definition = HISTORICAL_REPORT_YEARS.find((year) => year.academicYear === academicYear);
+        return {
+          academicYear,
+          availability: definition?.availability ?? "not_configured",
+          providers: await readHistoricalDashboardProviders(academicYear),
+          ...(definition?.limitation ? { limitation: definition.limitation } : {}),
+        };
+      }));
+      res.json(envelope("dashboard.reports", {
+        requestedAcademicYear: requestedYear,
+        aggregateOnly: true,
+        reports,
+        guidance: "Do not combine provider totals unless their definitions and reporting periods are explicitly compatible. Provider-unavailable means retry later, not zero.",
+      }));
+    } catch (error) {
+      res.status(400).json({ message: safeErrorMessage(error) });
+    }
   });
 
   app.get("/api/indra/v1/crm/leads", async (req, res) => {
