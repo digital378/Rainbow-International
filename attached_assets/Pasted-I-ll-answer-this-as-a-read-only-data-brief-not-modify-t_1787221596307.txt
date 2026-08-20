@@ -1,0 +1,203 @@
+I’ll answer this as a read-only data brief, not modify the app. I’m first checking the project’s approved Rainbow/RPS source contracts and connector guidance, then I’ll fetch each requested endpoint with its filters and freshness fields and inspect the public GitHub repository without writing to it.
+
+
+
+6 actions
+I’ll follow the source order you specified. First I’m reading the Rainbow catalog only, with the existing server-side read credential and no writes; I’ll use the advertised contract to resolve the aggregate RIS/RPS, overview, and site-page requests rather than guessing paths or falling back to paginated leads.
+
+
+
+Ran $status
+The catalog confirms that the new aggregate admissions and admissions-performance datasets are approved, while credentials, remarks, and other sensitive material remain explicitly excluded. I’m now reading the two branded aggregate admissions feeds plus the requested overview and canonical-pages feeds, all with the stated academic-year filter where applicable, and separately resolving read-only access to the named GitHub repository.
+
+
+
+2 actions
+The two aggregate admissions feeds are available and returned valid, fresh JSON. The overview and public-pages paths returned 404 from the current /api/indra/v1 base, so I will not fabricate those results or substitute unrelated counts.
+
+I also found that GitHub is authorized at the account level but not attached to this project, so I need to attach that existing read-only connection before I can truthfully summarize it as a connected source. I’m checking the connection flow now, then I’ll continue resolving the two unavailable endpoints from the verified Rainbow contract.
+
+
+
+2 actions
+The GitHub authorization is available but not yet attached to this workspace; I’ll attach that existing connection so the repository summary is genuinely from the connected source, without changing anything in GitHub.
+
+For the two 404s, I’m using the other already-connected Rainbow service’s documented /api/indra base with the exact relative paths you gave—still read-only—rather than broad endpoint discovery.
+
+
+
+3 actions
+GitHub is now attached to this workspace with its existing connection, and I’ll use only authenticated GET requests. The RPS service redirected the first two requests, so I’m following that service’s documented HTTPS redirect while preserving the same read-only request and filter; I’ll report the endpoint as unavailable if it still does not return JSON.
+
+
+
+2 actions
+The GitHub summary is complete and confirms a private TypeScript repository with an active Indra data-bridge update on main. The overview and page endpoints are not exposed at either currently configured read-only API base, so I’m using the connected repository’s own route and bridge documentation to locate their declared base paths before I mark them unavailable.
+
+
+Determining report endpoints
+
+Determining report endpoints
+The repository’s own route map identifies the authoritative references: docs/indra-data-bridge.md, server/indraIntegration.ts, and its admissions-performance test. I’m reading those exact files through the attached GitHub connection to resolve the overview/pages base and any endpoint freshness rules before finalizing the report.
+
+
+The repository documentation resolved the mismatch: the new overview, site inventory, and conversion-performance routes require the dedicated Indra data-bridge credential, not the legacy RIS integration token. I’m now querying the documented live endpoints with that dedicated server-side credential:
+
+/crm/admissions-performance?academicYear=2027-28
+/dashboard/overview?academicYear=2027-28
+/site/pages
+This stays strictly read-only and will provide the requested freshness and filter metadata.
+
+
+
+2 actions
+All five requested sources are now accessible read-only with the proper credentials. I’m extracting the precise overview section totals and the complete canonical-page inventory from the fresh responses, so the final brief can cleanly distinguish the filtered 2027–28 CRM admissions figures from all-time organisation-wide values.
+
+
+
+Ran a Python script
+I have the complete 48-page canonical inventory and the live overview totals. I’m extracting the page response’s own freshness metadata for exact citation; then I’ll return the requested five-part read-only brief with no source substitutions or inferred metrics.
+
+
+
+2 actions
+1) Available Rainbow resources
+Rainbow’s data bridge currently exposes these approved, read-only resource groups:
+
+CRM: leads, reference data, summary, admissions, admissions performance
+Website demand: enquiries, callback requests, brochure requests, career applications
+Friendship Schools: schools and leads
+Content: blogs
+Public site: canonical page inventory
+Repository context: read-only GitHub repository boundary
+It explicitly excludes resume contents, PINs, tokens, API keys, sessions, credentials, database connection values, and unstructured internal remarks.
+
+Source: GET /api/indra/v1/catalog
+Filters: none
+Freshness: generated 2026-08-20T10:21:21.938Z; API v1; dataset catalog.
+
+2) RIS and RPS admissions and conversion metrics — academic year 2027–28
+Brand	Leads	Walk-ins	Admissions	Lead → admission	Walk-in → admission
+RIS	1	0	0	0%	Not available — no walk-ins
+RPS	0	0	0	Not available — no leads	Not available — no walk-ins
+An admission is counted only when a non-archived CRM record has the exact current status ADMISSION DONE. These are aggregate CRM metrics, not a paginated lead count.
+
+Source: GET /api/indra/v1/crm/admissions-performance?academicYear=2027-28
+Filters: academicYear=2027-28, brand=null (both brands), branchId=null
+Freshness: live read from walkin_leads; dataReadAt=2026-08-20T10:23:03.441Z; cached=false; generated 2026-08-20T10:23:03.442Z.
+
+3) Current combined operational overview
+Filtered admissions metrics — academic year 2027–28 only
+These figures are filtered specifically to the requested academic year; no brand or branch filter was applied.
+
+Brand	Leads	Walk-ins	Admissions	Lead → admission
+RIS	1	0	0	0%
+RPS	0	0	0	Not available
+All-time, organisation-wide totals
+These sections are not filtered by academic year, brand, or branch because their underlying sources do not carry those CRM attributes consistently.
+
+Area	Current total
+Website enquiries	277
+Callback requests	6
+Brochure requests	30
+Career applications	584
+Friendship Schools	30
+Active Friendship Schools	30
+Friendship leads	0
+Friendship sync failures	0
+Database blogs	96
+Code-owned blogs	2
+Indexed public-site pages	48
+Source: GET /api/indra/v1/dashboard/overview?academicYear=2027-28
+Admissions filters: academicYear=2027-28, brand=null, branchId=null
+All-time scope: website demand, Friendship Schools, content, and public-site totals
+Freshness: live, uncached; overview dataReadAt=2026-08-20T10:23:04.245Z; admissions section read at 2026-08-20T10:23:03.940Z; generated 2026-08-20T10:23:04.256Z.
+
+4) Canonical public Rainbow site pages
+There are 48 canonical public pages:
+
+/
+/about-rainbow-international-school
+/academic-calendar
+/academic-team
+/admissions
+/amenities
+/application-form
+/awards-achievements
+/beyond-the-classroom
+/blogs
+/book-list
+/brand-partners
+/career
+/cbse-mandatory-public-disclosures
+/chairpersons-note
+/contact-us
+/curriculum
+/declaration
+/extracurriculars
+/faqs
+/fee-structure
+/google-school-2025-26
+/meta-school-2025-26
+/middle-school-section
+/our-philosophy
+/photo-gallery
+/pre-primary-school-thane
+/primary-section
+/privacy-policy-and-cookie-policy
+/rainbow-preschool-international
+/ris-vision-mission
+/safety-security
+/schedule-appointment
+/school-managing-committee
+/school-near-brahmand-thane
+/school-near-ghodbunder-road-thane
+/school-near-manpada-thane
+/school-readiness-quiz
+/secondary-section
+/senior-secondary-section
+/student-achievements
+/students-leaving-certificate
+/term-of-use
+/testimonials
+/thank-you
+/top-schools-in-thane
+/virtual-learning
+/welcome-to-ris
+
+All are under https://rainbowinternationalschool.in.
+
+Source: GET /api/indra/v1/site/pages
+Filters: none
+Freshness: deployed-route metadata read at 2026-08-20T10:23:04.703Z; generated 2026-08-20T10:23:04.703Z; dataset site.pages.
+
+5) Connected GitHub repository summary
+digital378/Rainbow-International is a private TypeScript repository on the main branch. It contains approximately 1,903 tracked files, with the main application areas under:
+
+client/ — frontend
+server/ — backend and the Indra integration
+shared/ — shared code
+docs/ — including the Indra data-bridge contract
+tests/ — automated coverage
+migrations/ — database migrations
+The repository currently has:
+
+0 open pull requests
+0 open issues
+0 forks
+0 stars
+The latest commit is “Update Indra data bridge documentation and integration logic”, committed at 2026-08-20T10:16:42Z. Earlier recent work includes the authenticated admissions-performance resource.
+
+No GitHub content was changed.
+
+Sources:
+
+GET /repos/digital378/Rainbow-International
+GET /repos/digital378/Rainbow-International/git/trees/main?recursive=1
+GET /repos/digital378/Rainbow-International/commits?sha=main&per_page=5
+GET /repos/digital378/Rainbow-International/pulls?state=open&per_page=100
+GET /repos/digital378/Rainbow-International/issues?state=open&per_page=100
+Filters: branch main; pull requests and issues filtered to state=open; page size 100 where applicable.
+Freshness: repository pushed at 2026-08-20T10:18:21Z; GitHub metadata updated at 2026-08-20T10:18:51Z.
+
+All source access in this check was read-only.
