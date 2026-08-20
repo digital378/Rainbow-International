@@ -65,6 +65,56 @@ Do not use the older `/openapi.yaml` for Indra. It belongs to the legacy
 Rainbow Group Marketing/GPT integration and describes a different, older API
 contract.
 
+## Direct Google Sheets source mode
+
+If Indra is configured to read the source workbooks directly instead of using
+the Rainbow API, URLs alone do not grant access. Connect a Google Sheets
+read-only integration in the Indra workspace, then share each workbook with
+the Google identity used by that connection. Do not provide Google passwords,
+refresh tokens, API keys, or browser cookies in chat or in the source
+instructions.
+
+Use these workbooks as the direct source registry:
+
+| Dashboard source | Workbook | Tabs to read |
+| --- | --- | --- |
+| Marketing / combined dashboard | `https://docs.google.com/spreadsheets/d/1FjLbJbThU2wZCu7m0Y-GAzv6vTs8WdkVxBRBZh8QZqc/edit` | `DM Overall` and the current RIS/RPS monthly tabs |
+| Marketing task tracker | `https://docs.google.com/spreadsheets/d/1gzMAO-RyVFfz5hqANr8JApu-M6LwAftMyXnZD8_kjMw/edit` | `Key Task` |
+| RPS CRM / marketing | `https://docs.google.com/spreadsheets/d/1t1_2SPI6--W-nCWc-lHHE-D4ee38WGFxiBsB5txI-CM/edit` | `DM 2026-27`, `Target Sheet` |
+| RIS CRM / marketing | `https://docs.google.com/spreadsheets/d/1zLIWutvJxwLyVBAK-vDlpEzNPV7c2RwutYC9Gn3yd2s/edit` | `Nur to Class 12`, `Target sheet` |
+| RIS Sales | `https://docs.google.com/spreadsheets/d/1R5evjW6gVYIB6nyR1dmIdiWp1qMTui4J9wQovmUkakw/edit` | `Walkin Sheet 26-27`, `New Admission List`, `Provisional Admission LIST`, `CONVERSION RATIO` |
+| RPS Sales | `https://docs.google.com/spreadsheets/d/1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q/edit` | `Walkin Data`, `Individual Conversion`, `DM Tracker`, `MIS DASHBOARD`, `D-Cohort`, `Branch Closed`, `Branch Admissions`, `Branch Open`, `Branch Walkin` |
+| Alliances / Friendship Schools | `https://docs.google.com/spreadsheets/d/1eTo457sA4SXnlQoEthHclcnr2WO_YG6cosUfhcrRmxA/edit` | Friendship Schools and Alliances tabs only |
+
+Give Indra the following routing rules when direct Sheet mode is enabled:
+
+```text
+Use the connected Google Sheets read-only source directly for dashboard
+questions. Do not use the Rainbow CRM database as a substitute for the
+spreadsheet dashboards.
+
+For questions about tracker performance, monthly leads, walk-ins, or
+admissions:
+1. Use the Marketing / combined dashboard workbook for Marketing totals.
+2. Use the RIS Sales workbook for RIS Sales totals.
+3. Use the RPS Sales workbook for RPS Sales totals.
+4. Keep the three sources separate; never add their totals together.
+5. “Last month” means the previous completed calendar month in Asia/Kolkata.
+6. Read only the tab needed for the requested metric and reporting month.
+7. If a workbook, tab, or month cannot be read, report “source unavailable.”
+   Never convert a permission error, missing tab, empty read, or parse error
+   into zero.
+8. Do not expose names, phone numbers, email addresses, child details,
+   remarks, or other personal data in the answer.
+
+Use the Alliances workbook only for Friendship Schools or partnership
+questions. Do not use it for Marketing, RIS Sales, or RPS Sales totals.
+```
+
+Direct Sheet mode is intentionally separate from the API bridge. The API
+remains the safer aggregate-only option because it filters fields and prevents
+raw spreadsheet rows from leaving the school system.
+
 ## Broad read-only source registry
 
 Start each new Indra connection by reading `/api/indra/v1/catalog`. In
