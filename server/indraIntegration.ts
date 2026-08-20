@@ -197,6 +197,41 @@ const INDRA_RESOURCES: IndraResource[] = [
   },
 ];
 
+const INDRA_QUERY_ROUTING = [
+  {
+    intent: "admissions",
+    resourceId: "crm.admissions",
+    path: "/api/indra/v1/crm/admissions",
+    requiredFilters: ["academicYear"],
+    optionalFilters: ["brand", "branchId"],
+    guidance: "Use this aggregate for admissions, lead, walk-in, booking, branch, source, or monthly KPI questions. Never count a paginated crm.leads response as a total.",
+  },
+  {
+    intent: "admissions-performance",
+    resourceId: "crm.admissions-performance",
+    path: "/api/indra/v1/crm/admissions-performance",
+    requiredFilters: ["academicYear"],
+    optionalFilters: ["brand", "branchId"],
+    guidance: "Use this aggregate for conversion rates and per-brand admissions performance. Never count a paginated crm.leads response as a total.",
+  },
+  {
+    intent: "dashboard-overview",
+    resourceId: "dashboard.overview",
+    path: "/api/indra/v1/dashboard/overview",
+    requiredFilters: ["academicYear"],
+    optionalFilters: ["brand", "branchId"],
+    guidance: "Use this live overview when the question spans admissions and organization-wide website, Friendship Schools, content, or public-site metrics. CRM filters apply only to the nested admissions section.",
+  },
+  {
+    intent: "lead-records",
+    resourceId: "crm.leads",
+    path: "/api/indra/v1/crm/leads",
+    requiredFilters: [],
+    optionalFilters: ["brand", "branchId", "academicYear", "updatedSince", "includeArchived"],
+    guidance: "Use this paginated resource only for individual lead records or operational record inspection, not aggregate totals or performance metrics.",
+  },
+] as const;
+
 function publicSitePages() {
   return Object.entries(ROUTE_SEO)
     .map(([path, seo]) => ({
@@ -220,6 +255,7 @@ function resourceCatalog() {
       repositoryAccess: "Read-only GitHub connector; repository files are not proxied through this API.",
     },
     resources: INDRA_RESOURCES,
+    queryRouting: INDRA_QUERY_ROUTING,
     exclusions: [
       "resume files and contents",
       "branch PINs",
@@ -931,7 +967,7 @@ export function registerIndraIntegrationRoutes(app: Express) {
 
   app.get("/api/indra/v1/crm/admissions", async (req, res) => {
     try {
-      const academicYear = parseAcademicYear(req.query.academicYear);
+      const academicYear = parseRequiredAcademicYear(req.query.academicYear);
       const requestedBrand = String(req.query.brand || "BOTH").toUpperCase();
       if (requestedBrand !== "RIS" && requestedBrand !== "RPS" && requestedBrand !== "BOTH") {
         throw new Error("brand must be RIS, RPS, or BOTH");
@@ -967,6 +1003,16 @@ export function registerIndraIntegrationRoutes(app: Express) {
       res.json(envelope("crm.admissions", {
         academicYear,
         requestedBrand,
+        freshness: {
+          dataReadAt: new Date().toISOString(),
+          cached: false,
+          status: rows.length ? "available" : "no_matching_records",
+        },
+        filters: {
+          academicYear,
+          brand: requestedBrand,
+          branchId,
+        },
         admissionDefinition: {
           status: "ADMISSION DONE",
           countedAsAdmission: "A non-archived walk-in lead whose current status is exactly ADMISSION DONE.",
@@ -1030,6 +1076,7 @@ export function registerIndraIntegrationRoutes(app: Express) {
         freshness: {
           dataReadAt: new Date().toISOString(),
           cached: false,
+          status: admissions.freshness.status,
         },
         filters: {
           admissions: {

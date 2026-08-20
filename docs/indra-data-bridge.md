@@ -60,8 +60,10 @@ addition to the endpoint groups above, it returns a machine-readable
 
 For performance questions, use aggregate resources such as
 `/crm/admissions`, `/crm/admissions-performance`, or
-`/dashboard/overview`. Do not infer a school-level metric by counting one
-page of `/crm/leads`.
+`/dashboard/overview`, always supplying an explicit `academicYear` in
+`YYYY-YY` form. Do not infer a school-level metric by counting one page of
+`/crm/leads`. The catalog's `queryRouting` entries make this distinction
+machine-readable for Indra source setup and refresh.
 
 `/dashboard/overview` is a non-cached live read. Its `academicYear`, `brand`,
 and `branchId` filters apply **only to its nested CRM admissions section**.
@@ -112,12 +114,14 @@ avoid re-exposing it in public responses.
 
 ### Admissions KPI definition
 
-Use `/api/indra/v1/crm/admissions` for questions about admissions performance;
-do not infer admissions by counting a page of `/crm/leads` results. The
-endpoint excludes archived leads and counts a lead as an admission only when
-its current status is exactly `ADMISSION DONE`. It also reports the academic
-year, total leads, walk-ins, bookings, status breakdown, and aggregate
-breakdowns by branch and source.
+Use `/api/indra/v1/crm/admissions` for questions about admissions performance,
+with an explicit `academicYear`; do not infer admissions by counting a page of
+`/crm/leads` results. The endpoint excludes archived leads and counts a lead as
+an admission only when its current status is exactly `ADMISSION DONE`. It also
+reports the academic year, applied filters, live-read freshness, total leads,
+walk-ins, bookings, status breakdown, and aggregate breakdowns by branch and
+source. A valid filter with no current matches returns
+`freshness.status: "no_matching_records"` and zeroed aggregates.
 
 `GET /api/indra/v1/crm/admissions-performance` is the conversion-focused
 resource. It requires `academicYear` in `YYYY-YY` form and returns only
@@ -125,7 +129,9 @@ per-brand lead, walk-in, admission, lead-to-admission, and
 walk-in-to-admission counters. Every response includes the database source,
 the non-cached read timestamp, applied filters, and the exact normalized-status
 definition. Conversion rates are percentages and are `null` when the relevant
-denominator is zero; no lead rows or contact data are returned.
+denominator is zero; no lead rows or contact data are returned. A valid filter
+with no current matches likewise reports
+`freshness.status: "no_matching_records"`.
 
 ## Scheduled outbound delivery
 

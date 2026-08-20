@@ -94,8 +94,13 @@ beforeEach(async () => {
 
   mockEq.mockImplementation((column: keyof FakeLead, value: unknown) => ({ column, value }));
   mockAnd.mockImplementation((...conditions) => conditions.filter(Boolean));
-  mockDbWhere.mockImplementation((conditions) => Promise.resolve(filterRows(conditions)));
-  mockDbFrom.mockImplementation(() => ({ where: mockDbWhere }));
+  mockDbWhere.mockImplementation((conditions) => Promise.resolve(
+    Array.isArray(conditions) ? filterRows(conditions) : [],
+  ));
+  mockDbFrom.mockImplementation(() => ({
+    where: mockDbWhere,
+    then: (resolve, reject) => Promise.resolve([{ total: 0 }]).then(resolve, reject),
+  }));
   mockDbSelect.mockImplementation(() => ({ from: mockDbFrom }));
 
   const app = express();
@@ -199,5 +204,168 @@ describe("GET /api/indra/v1/crm/admissions-performance", () => {
       admissions: 1,
       conversions: { leadToAdmissionRate: 33.33, walkInToAdmissionRate: 50 },
     }]);
+  });
+
+  it("reports a valid no-match filter as fresh, empty aggregate data", async () => {
+    const response = await fetch(
+      `${serverUrl}/api/indra/v1/crm/admissions-performance?academicYear=2030-31&brand=RIS&branchId=1`,
+      { headers: { Authorization: "Bearer indra-regression-token" } },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data).toMatchObject({
+      freshness: {
+        cached: false,
+        status: "no_matching_records",
+      },
+      filters: {
+        academicYear: "2030-31",
+        brand: "RIS",
+        branchId: 1,
+      },
+      byBrand: [{
+        brand: "RIS",
+        leads: 0,
+        walkIns: 0,
+        admissions: 0,
+        conversions: {
+          leadToAdmissionRate: null,
+          walkInToAdmissionRate: null,
+        },
+      }],
+    });
+    expect(Number.isNaN(Date.parse(body.data.freshness.dataReadAt))).toBe(false);
+  });
+});
+
+describe("Indra catalog and admissions aggregate routing", () => {
+  it("publishes aggregate-first routing guidance and valid filters", async () => {
+    const response = await fetch(`${serverUrl}/api/indra/v1/catalog`, {
+      headers: { "X-Indra-Api-Key": "indra-regression-token" },
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.queryRouting).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        intent: "admissions",
+        path: "/api/indra/v1/crm/admissions",
+        requiredFilters: ["academicYear"],
+      }),
+      expect.objectContaining({
+        intent: "admissions-performance",
+        path: "/api/indra/v1/crm/admissions-performance",
+        requiredFilters: ["academicYear"],
+      }),
+      expect.objectContaining({
+        intent: "dashboard-overview",
+        path: "/api/indra/v1/dashboard/overview",
+        requiredFilters: ["academicYear"],
+      }),
+      expect.objectContaining({
+        intent: "lead-records",
+        path: "/api/indra/v1/crm/leads",
+        requiredFilters: [],
+      }),
+    ]));
+    expect(body.data.resources).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: "crm.admissions",
+        filters: ["brand", "academicYear", "branchId"],
+      }),
+      expect.objectContaining({
+        id: "crm.admissions-performance",
+        filters: ["academicYear", "brand", "branchId"],
+      }),
+    ]));
+  });
+
+  it("requires an explicit academic year for admissions aggregates", async () => {
+    const response = await fetch(`${serverUrl}/api/indra/v1/crm/admissions`, {
+      headers: { Authorization: "Bearer indra-regression-token" },
+    });
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      message: "academicYear is required and must use the YYYY-YY format",
+    });
+  });
+
+  it("returns applied filters and no-matching-records freshness without treating leads as totals", async () => {
+    const response = await fetch(
+      `${serverUrl}/api/indra/v1/crm/admissions?academicYear=2030-31&brand=RIS&branchId=1`,
+      { headers: { "X-Indra-Api-Key": "indra-regression-token" } },
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data).toMatchObject({
+      academicYear: "2030-31",
+      requestedBrand: "RIS",
+      freshness: {
+        cached: false,
+        status: "no_matching_records",
+      },
+      filters: {
+        academicYear: "2030-31",
+        brand: "RIS",
+        branchId: 1,
+      },
+      combined: {
+        kpis: {
+          totalLeads: 0,
+          bookings: 0,
+          walkins: 0,
+          admissions: 0,
+        },
+      },
+    });
+    expect(Number.isNaN(Date.parse(body.data.freshness.dataReadAt))).toBe(false);
+  });
+
+  it("keeps dashboard-wide metrics scoped while surfacing an empty valid admissions filter", async () => {
+    const missingYear = await fetch(`${serverUrl}/api/indra/v1/dashboard/overview`, {
+      headers: { Authorization: "Bearer indra-regression-token" },
+    });
+    expect(missingYear.status).toBe(400);
+    expect(await missingYear.json()).toEqual({
+      message: "academicYear is required and must use the YYYY-YY format",
+    });
+
+    const response = await fetch(
+      `${serverUrl}/api/indra/v1/dashboard/overview?academicYear=2030-31&brand=RIS&branchId=1`,
+      { headers: { Authorization: "Bearer indra-regression-token" } },
+    );
+    const body = await response.json();
+
+    expect(response.status, JSON.stringify(body)).toBe(200);
+    expect(body.data).toMatchObject({
+      freshness: {
+        cached: false,
+        status: "no_matching_records",
+      },
+      filters: {
+        admissions: {
+          academicYear: "2030-31",
+          brand: "RIS",
+          branchId: 1,
+        },
+        organizationWideSections: {
+          scope: "all-time, organization-wide",
+        },
+      },
+      admissions: {
+        freshness: {
+          status: "no_matching_records",
+        },
+        filters: {
+          academicYear: "2030-31",
+          brand: "RIS",
+          branchId: 1,
+        },
+      },
+    });
+    expect(Number.isNaN(Date.parse(body.data.freshness.dataReadAt))).toBe(false);
   });
 });
