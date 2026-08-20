@@ -1,0 +1,52 @@
+I found the exact RIS-side failure. Indra reaches the configured Rainbow International endpoints successfully, but both return:
+
+503 {"message":"Indra integration is not configured"}
+
+So this is not a bad Indra token and not a DNS/URL failure. The RIS project itself has the integration route but has not been configured to serve the approved catalog and CRM-leads data. I’ll now fix the “Ras and RPS” voice path in Indra; separately, the RIS project owner must enable/configure its Indra integration upstream.
+
+
+
+6 actions
+The fix is now in both places that matter: the browser uses Indian English recognition and safely corrects only the exact “Ras and RPS” product phrase before sending it; the backend independently normalizes and routes that question to both RIS and RPS. I’m running API and web validation now.
+
+
+
+4 actions
+The updated source-routing test passes, along with API and web typechecks. Indra will now turn the exact voice transcript “Ras and RPS” into “RIS and RPS,” then query both source paths; it will not alter an unrelated person named Ras. I’m restarting the web and API services and recording the confirmed RIS upstream status so future work targets the correct system.
+
+
+
+4 actions
+Both services restarted cleanly. The prior RIS note was stale: the host now returns a structured 503 saying the integration is not configured, which pinpoints the repair on the Rainbow International service. I’m updating that record and doing a browser smoke test of the live chat page.
+
+
+
+Updated memory: ris-read-api-status
+The RIS diagnosis is now durable and accurately points to the upstream service configuration. I’m running a browser smoke test against the restarted Indra interface; microphone capture itself requires the leader’s browser permission, but the test can verify the page and voice controls load without client errors.
+
+
+
+2 actions
+The browser smoke test passed: the access portal loads with no console errors. The authenticated voice UI cannot be exercised without a leadership identity, which is an expected access-control boundary. The RIS/RPS correction is validated in the API test suite; I’m doing the final workspace check and task wrap-up now.
+
+
+
+3 actions
+The final check is clean: both services are running, the source-routing regression test passes, and the authenticated smoke test found no client errors. The remaining RIS problem is definitively upstream configuration on the Rainbow International service, so I’m closing this implementation step with that dependency clearly identified.
+
+
+Fixed the voice-routing issue:
+
+Browser recognition now uses Indian English.
+The exact phrase “Ras and RPS” is safely corrected to “RIS and RPS” before it is sent.
+That combined request now routes to both Rainbow International and Rainbow Preschool sources.
+It does not replace an unrelated person named “Ras.”
+The Rainbow International data issue is upstream. Indra reached both approved RIS endpoints, but they respond with:
+
+503 — Indra integration is not configured
+
+So the problem is in the Rainbow International project’s API configuration, not the Indra chat app or its credentials. The RIS project needs to enable/configure its Indra integration so these return live JSON successfully:
+
+/api/indra/v1/catalog
+/api/indra/v1/crm/leads?page=1&pageSize=100
+Once that project returns HTTP 200 data, Indra will be able to answer live RIS lead questions.
