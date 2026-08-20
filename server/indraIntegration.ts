@@ -20,6 +20,7 @@ import {
   walkinStatuses,
 } from "@shared/schema";
 import { CODE_OWNED_BLOGS } from "@shared/codeOwnedBlogs";
+import { ROUTE_SEO, routeCanonical } from "@shared/routeSeo";
 
 export const INDRA_ALLOWED_ORIGIN = "https://indra-intelligence-assistant.replit.app";
 const API_VERSION = "v1";
@@ -28,8 +29,10 @@ const MAX_PAGE_SIZE = 200;
 const PUSH_TARGET_HOST = new URL(INDRA_ALLOWED_ORIGIN).hostname;
 const DEFAULT_PUSH_URL = `${INDRA_ALLOWED_ORIGIN}/api/integrations/rainbow/v1/deliveries`;
 const DELIVERY_LEASE_MS = 10 * 60_000;
+const RAINBOW_REPOSITORY_URL = "https://github.com/digital378/Rainbow-International";
 
 type Page = { page: number; pageSize: number; offset: number };
+type Brand = "RIS" | "RPS";
 type PushState = {
   enabled: boolean;
   intervalMinutes: number;
@@ -124,6 +127,110 @@ function envelope(dataset: string, data: unknown, page?: Page & { total: number 
   };
 }
 
+type IndraResource = {
+  id: string;
+  path: string;
+  category: "crm" | "dashboard" | "website" | "friendship" | "content" | "site" | "repository";
+  access: "service-token";
+  purpose: string;
+  filters?: string[];
+  freshness: string;
+  sourceOfTruth: string;
+  containsPersonalData: boolean;
+};
+
+const INDRA_RESOURCES: IndraResource[] = [
+  {
+    id: "crm.leads", path: "/api/indra/v1/crm/leads", category: "crm", access: "service-token",
+    purpose: "Read operational CRM lead records.", filters: ["brand", "branchId", "academicYear", "updatedSince", "includeArchived"],
+    freshness: "Live database query", sourceOfTruth: "walkin_leads", containsPersonalData: true,
+  },
+  {
+    id: "crm.reference", path: "/api/indra/v1/crm/reference", category: "crm", access: "service-token",
+    purpose: "Read CRM branches, staff, and active lookup values.", filters: ["brand", "includeInactive"],
+    freshness: "Live database query", sourceOfTruth: "walkin_branches and CRM lookup tables", containsPersonalData: true,
+  },
+  {
+    id: "crm.summary", path: "/api/indra/v1/crm/summary", category: "crm", access: "service-token",
+    purpose: "Read lead totals by brand, status, and source.", filters: ["brand", "academicYear"],
+    freshness: "Live database query", sourceOfTruth: "walkin_leads", containsPersonalData: false,
+  },
+  {
+    id: "crm.admissions", path: "/api/indra/v1/crm/admissions", category: "crm", access: "service-token",
+    purpose: "Read admissions, walk-in, booking, branch, source, and monthly KPI breakdowns.", filters: ["brand", "academicYear", "branchId"],
+    freshness: "Live database query", sourceOfTruth: "walkin_leads", containsPersonalData: false,
+  },
+  {
+    id: "crm.admissions-performance", path: "/api/indra/v1/crm/admissions-performance", category: "dashboard", access: "service-token",
+    purpose: "Read conversion-focused admissions performance with definitions and freshness metadata.", filters: ["academicYear", "brand", "branchId"],
+    freshness: "Live non-cached database query", sourceOfTruth: "walkin_leads", containsPersonalData: false,
+  },
+  {
+    id: "dashboard.overview", path: "/api/indra/v1/dashboard/overview", category: "dashboard", access: "service-token",
+    purpose: "Read one live operational overview across admissions, website demand, Friendship Schools, content, and public pages.", filters: ["academicYear (admissions only)", "brand (admissions only)", "branchId (admissions only)"],
+    freshness: "Live non-cached database query", sourceOfTruth: "Rainbow operational databases", containsPersonalData: false,
+  },
+  {
+    id: "website.records", path: "/api/indra/v1/website/:dataset", category: "website", access: "service-token",
+    purpose: "Read website enquiry, callback, brochure-request, and career-application metadata.", filters: ["createdSince", "page", "pageSize"],
+    freshness: "Live database query", sourceOfTruth: "Rainbow website request tables", containsPersonalData: true,
+  },
+  {
+    id: "friendship.records", path: "/api/indra/v1/friendship/:dataset", category: "friendship", access: "service-token",
+    purpose: "Read Friendship School profiles and lead records.", filters: ["createdSince", "page", "pageSize"],
+    freshness: "Live database query", sourceOfTruth: "Friendship School tables", containsPersonalData: true,
+  },
+  {
+    id: "content.blogs", path: "/api/indra/v1/content/blogs", category: "content", access: "service-token",
+    purpose: "Read database-backed and code-owned blog content.", filters: ["publishedSince", "page", "pageSize"],
+    freshness: "Live database query plus deployed code registry", sourceOfTruth: "blog_posts and code-owned blogs", containsPersonalData: false,
+  },
+  {
+    id: "site.pages", path: "/api/indra/v1/site/pages", category: "site", access: "service-token",
+    purpose: "Discover canonical public Rainbow pages and their metadata.", filters: [],
+    freshness: "Deployed route metadata", sourceOfTruth: "shared route SEO registry", containsPersonalData: false,
+  },
+  {
+    id: "repository.context", path: "/api/indra/v1/repository/context", category: "repository", access: "service-token",
+    purpose: "Discover the official Rainbow repository and the required read-only GitHub connector context.", filters: [],
+    freshness: "Repository connection metadata", sourceOfTruth: "Rainbow GitHub repository", containsPersonalData: false,
+  },
+];
+
+function publicSitePages() {
+  return Object.entries(ROUTE_SEO)
+    .map(([path, seo]) => ({
+      path,
+      url: routeCanonical(path),
+      title: seo.crumb,
+      description: seo.description,
+      visibility: "public" as const,
+      source: "route-seo",
+    }))
+    .sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function resourceCatalog() {
+  return {
+    accessModel: {
+      mode: "broad-read-only",
+      authentication: "Dedicated Indra service token",
+      writesAllowed: false,
+      browserSessionRequired: false,
+      repositoryAccess: "Read-only GitHub connector; repository files are not proxied through this API.",
+    },
+    resources: INDRA_RESOURCES,
+    exclusions: [
+      "resume files and contents",
+      "branch PINs",
+      "friendship school tokens",
+      "all API keys, session data, credentials, and database connection values",
+      "unstructured internal remarks and messages",
+      "user-provided file uploads",
+    ],
+  };
+}
+
 type AdmissionsRow = {
   brand: string;
   status: string | null;
@@ -191,6 +298,85 @@ function aggregateAdmissionsRows(rows: AdmissionsRow[], brand: string, academicY
   result.bySource = Array.from(sourceMap, ([source, stats]) => ({ source, ...stats }))
     .sort((a, b) => b.admissions - a.admissions || b.leads - a.leads);
   return result;
+}
+
+async function readAdmissionsPerformance(
+  academicYear: string,
+  brand: Brand | null,
+  branchId: number | null,
+) {
+  const conditions = [
+    eq(walkinLeads.academicYear, academicYear),
+    eq(walkinLeads.isArchived, false),
+    brand ? eq(walkinLeads.brand, brand) : undefined,
+    branchId ? eq(walkinLeads.branchId, branchId) : undefined,
+  ].filter(Boolean);
+  const rows = await db
+    .select({
+      brand: walkinLeads.brand,
+      status: walkinLeads.status,
+    })
+    .from(walkinLeads)
+    .where(and(...conditions));
+
+  const selectedBrands: Brand[] = brand ? [brand] : ["RIS", "RPS"];
+  const metrics = new Map(selectedBrands.map((selectedBrand) => [
+    selectedBrand,
+    { leads: 0, walkIns: 0, admissions: 0 },
+  ]));
+
+  for (const row of rows) {
+    if (row.brand !== "RIS" && row.brand !== "RPS") continue;
+    const metric = metrics.get(row.brand);
+    if (!metric) continue;
+
+    const status = (row.status ?? "").trim().toUpperCase();
+    metric.leads += 1;
+    if (status === "WALK-IN COMPLETED" || status === "ADMISSION DONE") metric.walkIns += 1;
+    if (status === "ADMISSION DONE") metric.admissions += 1;
+  }
+
+  const dataReadAt = new Date().toISOString();
+  const byBrand = selectedBrands.map((selectedBrand) => {
+    const metric = metrics.get(selectedBrand)!;
+    return {
+      brand: selectedBrand,
+      leads: metric.leads,
+      walkIns: metric.walkIns,
+      admissions: metric.admissions,
+      conversions: {
+        leadToAdmissionRate: percentage(metric.admissions, metric.leads),
+        walkInToAdmissionRate: percentage(metric.admissions, metric.walkIns),
+      },
+    };
+  });
+
+  return {
+    source: {
+      system: "Rainbow International School CRM",
+      table: "walkin_leads",
+      description: "Live, non-archived CRM lead records from the database source of truth.",
+    },
+    freshness: {
+      dataReadAt,
+      cached: false,
+      status: rows.length ? "available" : "no_matching_records",
+    },
+    filters: {
+      academicYear,
+      brand,
+      branchId,
+    },
+    definitions: {
+      admission: 'A lead is counted as an admission only when its CRM status, after trimming and uppercasing, is exactly "ADMISSION DONE".',
+      walkIn: 'A lead is counted as a walk-in when its CRM status, after trimming and uppercasing, is "WALK-IN COMPLETED" or "ADMISSION DONE".',
+      conversions: {
+        leadToAdmissionRate: "admissions ÷ leads × 100; null when there are no leads",
+        walkInToAdmissionRate: "admissions ÷ walk-ins × 100; null when there are no walk-ins",
+      },
+    },
+    byBrand,
+  };
 }
 
 function sanitizeLead(lead: typeof walkinLeads.$inferSelect) {
@@ -646,13 +832,10 @@ export function registerIndraIntegrationRoutes(app: Express) {
       website: ["inquiries", "callback-requests", "brochure-requests", "career-applications"],
       friendship: ["schools", "leads"],
       content: ["blogs"],
-      excluded: [
-        "resume files and contents",
-        "branch PINs",
-        "friendship school tokens",
-        "all API keys, session data, credentials, and database connection values",
-        "unstructured internal remarks and messages",
-      ],
+      dashboard: ["overview"],
+      site: ["pages"],
+      repository: ["context"],
+      ...resourceCatalog(),
     }));
   };
 
@@ -803,78 +986,117 @@ export function registerIndraIntegrationRoutes(app: Express) {
       const academicYear = parseRequiredAcademicYear(req.query.academicYear);
       const brand = parseOptionalBrand(req.query.brand);
       const branchId = parseOptionalPositiveInteger(req.query.branchId, "branchId");
-      const conditions = [
-        eq(walkinLeads.academicYear, academicYear),
-        eq(walkinLeads.isArchived, false),
-        brand ? eq(walkinLeads.brand, brand) : undefined,
-        branchId ? eq(walkinLeads.branchId, branchId) : undefined,
-      ].filter(Boolean);
-      const rows = await db
-        .select({
-          brand: walkinLeads.brand,
-          status: walkinLeads.status,
-        })
-        .from(walkinLeads)
-        .where(and(...conditions));
+      const data = await readAdmissionsPerformance(academicYear, brand, branchId);
+      res.json(envelope("crm.admissions-performance", data));
+    } catch (error) {
+      res.status(400).json({ message: safeErrorMessage(error) });
+    }
+  });
 
-      const selectedBrands: Array<"RIS" | "RPS"> = brand ? [brand] : ["RIS", "RPS"];
-      const metrics = new Map(selectedBrands.map((selectedBrand) => [
-        selectedBrand,
-        { leads: 0, walkIns: 0, admissions: 0 },
-      ]));
+  app.get("/api/indra/v1/dashboard/overview", async (req, res) => {
+    try {
+      const academicYear = parseRequiredAcademicYear(req.query.academicYear);
+      const brand = parseOptionalBrand(req.query.brand);
+      const branchId = parseOptionalPositiveInteger(req.query.branchId, "branchId");
+      const [
+        admissions,
+        inquiryCount,
+        callbackCount,
+        brochureCount,
+        careerCount,
+        friendshipSchoolCount,
+        activeFriendshipSchoolCount,
+        friendshipLeadCount,
+        friendshipSyncFailureCount,
+        databaseBlogCount,
+      ] = await Promise.all([
+        readAdmissionsPerformance(academicYear, brand, branchId),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(inquiries),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(callbackRequests),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(brochureRequests),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(careerApplications),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(friendshipSchools),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(friendshipSchools).where(eq(friendshipSchools.isActive, true)),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(friendshipSchoolLeads),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(friendshipSchoolLeads).where(eq(friendshipSchoolLeads.syncFailed, true)),
+        db.select({ total: sql<number>`cast(count(*) as int)` }).from(blogPostsTable),
+      ]);
 
-      for (const row of rows) {
-        if (row.brand !== "RIS" && row.brand !== "RPS") continue;
-        const metric = metrics.get(row.brand);
-        if (!metric) continue;
-
-        const status = (row.status ?? "").trim().toUpperCase();
-        metric.leads += 1;
-        if (status === "WALK-IN COMPLETED" || status === "ADMISSION DONE") metric.walkIns += 1;
-        if (status === "ADMISSION DONE") metric.admissions += 1;
-      }
-
-      const dataReadAt = new Date().toISOString();
-      res.json(envelope("crm.admissions-performance", {
+      res.json(envelope("dashboard.overview", {
         source: {
-          system: "Rainbow International School CRM",
-          table: "walkin_leads",
-          description: "Live, non-archived CRM lead records from the database source of truth.",
+          system: "Rainbow International School",
+          description: "Live operational overview composed from the CRM, website, Friendship School, content, and public-site sources.",
         },
         freshness: {
-          dataReadAt,
+          dataReadAt: new Date().toISOString(),
           cached: false,
         },
         filters: {
-          academicYear,
-          brand,
-          branchId,
-        },
-        definitions: {
-          admission: 'A lead is counted as an admission only when its CRM status, after trimming and uppercasing, is exactly "ADMISSION DONE".',
-          walkIn: 'A lead is counted as a walk-in when its CRM status, after trimming and uppercasing, is "WALK-IN COMPLETED" or "ADMISSION DONE".',
-          conversions: {
-            leadToAdmissionRate: "admissions ÷ leads × 100; null when there are no leads",
-            walkInToAdmissionRate: "admissions ÷ walk-ins × 100; null when there are no walk-ins",
+          admissions: {
+            academicYear,
+            brand,
+            branchId,
+          },
+          organizationWideSections: {
+            scope: "all-time, organization-wide",
+            appliesTo: ["websiteDemand", "friendship", "content", "publicSite"],
+            reason: "These sources do not consistently carry CRM academic-year, brand, or branch attributes.",
           },
         },
-        byBrand: selectedBrands.map((selectedBrand) => {
-          const metric = metrics.get(selectedBrand)!;
-          return {
-            brand: selectedBrand,
-            leads: metric.leads,
-            walkIns: metric.walkIns,
-            admissions: metric.admissions,
-            conversions: {
-              leadToAdmissionRate: percentage(metric.admissions, metric.leads),
-              walkInToAdmissionRate: percentage(metric.admissions, metric.walkIns),
-            },
-          };
-        }),
+        admissions,
+        websiteDemand: {
+          inquiries: Number(inquiryCount[0]?.total ?? 0),
+          callbackRequests: Number(callbackCount[0]?.total ?? 0),
+          brochureRequests: Number(brochureCount[0]?.total ?? 0),
+          careerApplications: Number(careerCount[0]?.total ?? 0),
+        },
+        friendship: {
+          schools: Number(friendshipSchoolCount[0]?.total ?? 0),
+          activeSchools: Number(activeFriendshipSchoolCount[0]?.total ?? 0),
+          leads: Number(friendshipLeadCount[0]?.total ?? 0),
+          syncFailures: Number(friendshipSyncFailureCount[0]?.total ?? 0),
+        },
+        content: {
+          databaseBlogs: Number(databaseBlogCount[0]?.total ?? 0),
+          codeOwnedBlogs: CODE_OWNED_BLOGS.length,
+        },
+        publicSite: {
+          indexedPages: publicSitePages().length,
+          pagesResource: "/api/indra/v1/site/pages",
+        },
       }));
     } catch (error) {
       res.status(400).json({ message: safeErrorMessage(error) });
     }
+  });
+
+  app.get("/api/indra/v1/site/pages", (_req, res) => {
+    const pages = publicSitePages();
+    res.json(envelope("site.pages", {
+      origin: routeCanonical("/").replace(/\/$/, ""),
+      freshness: {
+        source: "deployed route metadata",
+        dataReadAt: new Date().toISOString(),
+      },
+      pages,
+      blogsResource: "/api/indra/v1/content/blogs",
+    }));
+  });
+
+  app.get("/api/indra/v1/repository/context", (_req, res) => {
+    res.json(envelope("repository.context", {
+      repository: {
+        provider: "github",
+        url: RAINBOW_REPOSITORY_URL,
+        fullName: "digital378/Rainbow-International",
+        access: "Read-only repository context is available through the configured GitHub connector.",
+        operations: ["repository metadata", "source files", "issues", "pull requests", "commits"],
+      },
+      liveSystemBoundary: {
+        liveOperationalData: "Use the authenticated /api/indra/v1 resources in this catalog.",
+        repositoryFiles: "Use the GitHub connector; repository contents are not mirrored or proxied through the Rainbow API.",
+      },
+    }));
   });
 
   app.get("/api/indra/v1/website/:dataset", async (req, res) => {

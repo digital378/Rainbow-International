@@ -1,8 +1,11 @@
 # Indra Intelligence data bridge
 
-This project provides a **read-only, versioned** API for Indra Intelligence at
-`/api/indra/v1`. It deliberately uses a dedicated credential and does not
-accept this project's existing admin, RIS, or RPS tokens.
+This project provides a **broad read-only, versioned** API for Indra
+Intelligence at `/api/indra/v1`. It gives Indra a named, live source for
+Rainbow’s public site, operational records, and dashboard-equivalent metrics
+without giving it a staff browser session, an admin login, or write access. It
+deliberately uses a dedicated credential and does not accept this project's
+existing admin, RIS, or RPS tokens.
 
 ## Source API
 
@@ -27,6 +30,7 @@ dataset, timestamp, and pagination details where applicable.
 | `GET /api/indra/v1/crm/summary` | Lead counts by brand, status, and source | `brand`, `academicYear` |
 | `GET /api/indra/v1/crm/admissions` | Verified academic-year admissions KPIs without contact records | `brand=RIS|RPS|BOTH`, `academicYear`, `branchId` |
 | `GET /api/indra/v1/crm/admissions-performance` | Live conversion-focused admissions KPIs by brand without contact records | `academicYear` (required), `brand`, `branchId` |
+| `GET /api/indra/v1/dashboard/overview` | One live overview across CRM, website demand, Friendship Schools, content, and public site pages | `academicYear` (required), `brand`, `branchId` |
 | `GET /api/indra/v1/website/inquiries` | Website enquiries | `createdSince` |
 | `GET /api/indra/v1/website/callback-requests` | Callback requests | `createdSince` |
 | `GET /api/indra/v1/website/brochure-requests` | Brochure requests | `createdSince` |
@@ -34,10 +38,62 @@ dataset, timestamp, and pagination details where applicable.
 | `GET /api/indra/v1/friendship/schools` | Friendship school profiles | — |
 | `GET /api/indra/v1/friendship/leads` | Friendship-school leads | `createdSince` |
 | `GET /api/indra/v1/content/blogs` | Database and code-owned blog metadata | `publishedSince` |
+| `GET /api/indra/v1/site/pages` | Canonical public site-page inventory and page metadata | — |
+| `GET /api/indra/v1/repository/context` | Official GitHub repository and repository-access boundary | — |
 
 The browser CORS policy is limited to
 `https://indra-intelligence-assistant.replit.app`. Server-to-server calls are
 still recommended.
+
+## Broad read-only source registry
+
+Start each new Indra connection by reading `/api/indra/v1/catalog`. In
+addition to the endpoint groups above, it returns a machine-readable
+`resources` list. Each resource states:
+
+- its stable path and business purpose;
+- valid filters;
+- source of truth and freshness behaviour;
+- whether it may contain personal data;
+- whether it is a CRM, dashboard, website, Friendship, content, site, or
+  repository resource.
+
+For performance questions, use aggregate resources such as
+`/crm/admissions`, `/crm/admissions-performance`, or
+`/dashboard/overview`. Do not infer a school-level metric by counting one
+page of `/crm/leads`.
+
+`/dashboard/overview` is a non-cached live read. Its `academicYear`, `brand`,
+and `branchId` filters apply **only to its nested CRM admissions section**.
+The website-demand, Friendship School, content, and public-site sections are
+explicitly labelled as all-time, organisation-wide values because those
+sources do not consistently contain the same CRM filter attributes. A
+`no_matching_records` freshness status means the requested CRM filter was
+valid but did not match current records.
+
+`/site/pages` inventories canonical public website pages from the deployed
+route metadata. Blogs remain discoverable from `/content/blogs`, including
+code-owned posts. Private browser routes are intentionally not proxied as
+HTML; Indra should use the named API resource that supplies their underlying
+data instead.
+
+## Repository context
+
+`/repository/context` identifies the official Rainbow repository:
+
+```text
+https://github.com/digital378/Rainbow-International
+```
+
+Repository contents are not copied into or proxied through the Rainbow API.
+Use the attached read-only GitHub connector to read repository metadata,
+source files, commits, issues, and pull requests. The connector is separate
+from live operational-data authorization: GitHub access does not grant
+dashboard data, and the Indra API token does not grant GitHub access.
+
+If the Indra application runs in a different workspace, attach a read-only
+GitHub connection there as well; do not copy a GitHub token into source code,
+chat, or an environment variable.
 
 ## Data exclusions
 
