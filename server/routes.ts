@@ -44,6 +44,11 @@ import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
 import { registerMcpGateway } from "./mcpGateway";
 import { db } from "./db";
+import {
+  buildCounselorPerformance,
+  parseCounselorPerformanceFilters,
+  type CounselorPerformanceRecord,
+} from "./counselorPerformance";
 
 /** Derive "Mon-YY" month label from a YYYY-MM-DD date string (e.g. "2027-06-15" → "Jun-27"). */
 function crmMonthLabel(dateStr: string): string {
@@ -3106,6 +3111,11 @@ export async function registerRoutes(
   // Auto-updates: response is no-store; frontend polls every 5 minutes.
   app.get("/api/sales/live", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
+    const performanceFilterResult = parseCounselorPerformanceFilters(req.query as Record<string, unknown>);
+    if ("error" in performanceFilterResult) {
+      return res.status(400).json({ message: performanceFilterResult.error });
+    }
+    const performanceFilters = performanceFilterResult.filters;
     try {
       const SID = SHEET_IDS.sales;
       const [walkinRows, admRows, provAdmRows, convRows, targetAchRows, targetMonthRow, misDashRows, risDmRows, rpsAdmRows] = await Promise.all([
@@ -3485,6 +3495,38 @@ export async function registerRoutes(
       })).sort((a,b) => b.admissions - a.admissions).filter(c => c.walkins > 0 && c.counselor !== "Unassigned");
 
       const overallConversion = walkinsTotal ? Math.round((admTotal / walkinsTotal) * 10000) / 100 : 0;
+      const generatedAt = new Date().toISOString();
+      const counselorPerformanceRecords: CounselorPerformanceRecord[] = [];
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const counselorRaw = norm(r[7]);
+        const isStatusAsCounselor = /ADMIS|CLOSED|FOLLOW[ -]?UP|NOT COUNTED|SEAT NOT|PROVISIONAL|WALKIN/i.test(counselorRaw);
+        const counselor = (!isStatusAsCounselor && counselorRaw) ? counselorRaw : "Unassigned";
+        const status = upper(r[9]) || "OPEN";
+        const admission = status.includes("ADMIS") && !status.includes("PROV");
+        const provisional = status.includes("PROV");
+        const closed = status.includes("CLOSED") || status.includes("SEAT NOT") || status.includes("NOT COUNT");
+        const followUp = status.includes("FOLLOW");
+        counselorPerformanceRecords.push({
+          counselor,
+          branch: "Main",
+          source: norm(r[8]) || "Unknown",
+          date: parseDate(r[1]),
+          status: {
+            admission,
+            provisional,
+            closed,
+            followUp,
+            open: !admission && !provisional && !closed && !followUp,
+          },
+        });
+      }
+      const counselorPerformance = buildCounselorPerformance(
+        "ris",
+        generatedAt,
+        performanceFilters,
+        counselorPerformanceRecords,
+      );
 
       // ── Per-month breakdown for client-side filtering ──────────
       const monthBreakdown = Array.from(monthWalkinMap.entries())
@@ -3637,7 +3679,9 @@ export async function registerRoutes(
           };
         } catch {}
         return res.json({
-          generatedAt: new Date().toISOString(),
+          account: "ris",
+          generatedAt,
+          counselorPerformance: counselorPerformance.counselorPerformance,
           kpis: risKpis,
           leadTemperature,
           walkinsByMonth: sortedMonths(walkinByMonth).map(([k, v]) => ({ monthKey: k, month: v.label, count: v.count })),
@@ -3651,7 +3695,9 @@ export async function registerRoutes(
       }
 
       res.json({
-        generatedAt: new Date().toISOString(),
+        account: "ris",
+        generatedAt,
+        counselorPerformance: counselorPerformance.counselorPerformance,
         kpis: risKpis,
         monthlyTargets,
         walkins: {
@@ -4219,13 +4265,13 @@ paths:
   // ── RPS Sales Dashboard ─────────────────────────────────────────────────────
   app.get("/api/rps-sales/live", async (req, res) => {
     res.set("Cache-Control", "no-store, private, max-age=0");
+    const performanceFilterResult = parseCounselorPerformanceFilters(req.query as Record<string, unknown>);
+    if ("error" in performanceFilterResult) {
+      return res.status(400).json({ message: performanceFilterResult.error });
+    }
+    const performanceFilters = performanceFilterResult.filters;
     try {
-      const requestedAcademicYear = typeof req.query.academicYear === "string"
-        ? req.query.academicYear.trim()
-        : "";
-      if (requestedAcademicYear && !/^\d{4}-\d{2}$/.test(requestedAcademicYear)) {
-        return res.status(400).json({ message: "academicYear must use YYYY-YY format" });
-      }
+      const requestedAcademicYear = performanceFilters.academicYear || "";
       const RPS_SID = "1ShXsyfbtViGccYcgPGMIEcT8C4m_Cs3b6yio6N54D1Q";
       const [walkinRows, indConvRows, dmRows, misRows, dCohortRows, branchClosedRows, branchAsmRows, branchOpenRows, branchWalkinRows] = await Promise.all([
         fetchSheetRange(RPS_SID, "'Walkin Data'!A2:U5000"),
@@ -4661,6 +4707,32 @@ paths:
       const byGrade  = Array.from(byGradeMap,  ([grade, count]) => ({ grade, count })).sort((a,b) => b.count - a.count);
       const closedReasons = Array.from(closedReasonMap, ([reason, count]) => ({ reason, count })).sort((a,b) => b.count - a.count).slice(0,12);
       const overallConversion = totalEnq ? Math.round(((totalAdm + totalAdmRIS)/totalEnq)*1000)/10 : 0;
+      const generatedAt = new Date().toISOString();
+      const counselorPerformanceRecords: CounselorPerformanceRecord[] = [];
+      for (const r of walkinRows) {
+        if (isEmptyRow(r)) continue;
+        const status = upper(r[14]);
+        counselorPerformanceRecords.push({
+          counselor: norm(r[10]) || "Unassigned",
+          branch: norm(r[3]) || "Unknown",
+          source: norm(r[13]) || "Unknown",
+          date: parseDate(r[1]),
+          academicYear: norm(r[6]) || null,
+          status: {
+            admission: status === "ADM DONE" || status === "ADM DONE IN RIS",
+            closed: status.startsWith("CLOSED"),
+            open: status === "OPEN",
+            inProcess: status === "IN PROCESS ADM",
+            futureProspect: status.startsWith("FUTURE"),
+          },
+        });
+      }
+      const counselorPerformance = buildCounselorPerformance(
+        "rps",
+        generatedAt,
+        performanceFilters,
+        counselorPerformanceRecords,
+      );
 
       const monthlyDetail = Array.from(monthDetailMap.values()).map(det => ({
         monthKey: det.monthKey, label: det.label, enquiries: det.enquiries, admissions: det.admissions,
@@ -4683,7 +4755,9 @@ paths:
           };
         } catch {}
         return res.json({
-          generatedAt: new Date().toISOString(),
+          account: "rps",
+          generatedAt,
+          counselorPerformance: counselorPerformance.counselorPerformance,
           kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
           byMonth,
           byBranch,
@@ -4698,7 +4772,9 @@ paths:
       }
 
       res.json({
-        generatedAt: new Date().toISOString(),
+        account: "rps",
+        generatedAt,
+        counselorPerformance: counselorPerformance.counselorPerformance,
         kpis: { totalEnquiries: totalEnq, totalAdmissions: totalAdm, totalAdmRIS, openEnquiries: openEnq, closedTotal, inProcess, futureProspect, overallConversion, thisMonthEnquiries: thisMonthEnq, thisMonthAdm },
         byMonth, byBranch, bySource, byGrade, counselorLeaderboard, closedReasons,
         monthlyDetail,
