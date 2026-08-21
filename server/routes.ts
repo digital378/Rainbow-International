@@ -42,6 +42,7 @@ import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
+import { registerMcpGateway } from "./mcpGateway";
 import { db } from "./db";
 
 /** Derive "Mon-YY" month label from a YYYY-MM-DD date string (e.g. "2027-06-15" → "Jun-27"). */
@@ -3957,6 +3958,7 @@ paths:
   // /api/walkin/leads and /api/walkin/branches are not swallowed by the RA slug route.
   registerWalkinRoutes(app);
   registerIndraIntegrationRoutes(app);
+  registerMcpGateway(app);
   startIndraPushScheduler();
 
   // Public: get RA info by slug (used by walkin form to display RA name)

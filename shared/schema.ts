@@ -392,6 +392,20 @@ export const walkinLeadAuditLog = pgTable("walkin_lead_audit_log", {
   changedAt: timestamp("changed_at").defaultNow().notNull(),
 });
 
+// MCP records deliberately retain only redacted arguments, never bearer tokens
+// or the personal-data fields passed through administrative tools.
+export const mcpAuditLogs = pgTable("mcp_audit_logs", {
+  id: serial("id").primaryKey(),
+  tool: text("tool").notNull(),
+  outcome: text("outcome").notNull(),
+  argumentsRedacted: jsonb("arguments_redacted").notNull(),
+  detail: text("detail"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_audit_logs_created_at_idx").on(table.createdAt),
+  index("mcp_audit_logs_tool_idx").on(table.tool),
+]);
+
 // ── Indra Intelligence integration delivery state ───────────────
 // Stores only operational delivery metadata. Payloads, credentials, and
 // customer records are intentionally never persisted here.
