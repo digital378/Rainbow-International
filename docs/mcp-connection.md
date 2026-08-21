@@ -10,7 +10,8 @@ https://rainbowinternationalschool.in/mcp
 
 ## Required configuration
 
-The MCP gateway is intentionally disabled unless:
+The MCP gateway, including OAuth discovery and registration, is intentionally
+unavailable unless:
 
 - `MCP_ENABLED=true`
 - either the legacy `MCP_ADMIN_TOKEN` is configured for header-based clients,
@@ -74,6 +75,8 @@ requests.
   every use. The database retains only token/code hashes.
 - OAuth-issued sessions are bound to the authenticating Workspace principal;
   one client cannot reuse another principal’s MCP session.
+- Expired authorization requests, codes, access tokens, and refresh tokens are
+  cleared automatically in the background.
 
 ## Available capability groups
 

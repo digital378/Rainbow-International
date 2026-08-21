@@ -214,6 +214,9 @@ application source code.
 Automated and integration checks must cover:
 
 - missing, invalid, and valid MCP credentials;
+- OAuth discovery, public-client registration, PKCE enforcement,
+  authorization-code replay rejection, refresh rotation, disabled-gateway
+  behavior, and expiry cleanup;
 - Streamable HTTP initialization and session lifecycle;
 - tool discovery contains only the explicit allowlist;
 - dashboard reads return current structured data;
@@ -229,8 +232,8 @@ Automated and integration checks must cover:
 
 ## Success criteria
 
-- Claude and compatible ChatGPT clients can connect to the same production MCP
-  URL using the dedicated token.
+- Claude can connect to the production MCP URL through Google Workspace OAuth;
+  compatible header-based clients may continue using the dedicated token.
 - The client can discover and use all approved dashboard and administrative
   tools without a second data bridge.
 - Every mutation is validated by the existing application rules and audited.

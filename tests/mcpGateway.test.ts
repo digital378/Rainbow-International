@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { __mcpGatewayTestUtils, registerMcpGateway } from "../server/mcpGateway";
 import { db } from "../server/db";
 import { mcpOauthAuthorizationCodes, mcpOauthClients } from "@shared/schema";
+import { __mcpOauthTestUtils } from "../server/mcpOAuth";
+import { eq } from "drizzle-orm";
 
 let server: Server | undefined;
 let baseUrl = "";
@@ -302,5 +304,42 @@ describe("MCP OAuth connector support", () => {
     })}`);
     expect(invalidScope.status).toBe(400);
     expect((await invalidScope.json()).error).toBe("invalid_scope");
+  });
+
+  it("hides all OAuth routes when the MCP feature is disabled", async () => {
+    process.env.MCP_ENABLED = "false";
+    try {
+      for (const path of [
+        "/.well-known/oauth-protected-resource/mcp",
+        "/.well-known/oauth-authorization-server",
+        "/oauth/register",
+        "/oauth/authorize",
+        "/oauth/token",
+      ]) {
+        const response = await fetch(`${baseUrl}${path}`, {
+          method: path === "/oauth/register" || path === "/oauth/token" ? "POST" : "GET",
+        });
+        expect(response.status).toBe(404);
+      }
+    } finally {
+      process.env.MCP_ENABLED = "true";
+    }
+  });
+
+  it("removes expired authorization records during background cleanup", async () => {
+    const codeHash = createHash("sha256").update(randomBytes(32)).digest("hex");
+    await db.insert(mcpOauthAuthorizationCodes).values({
+      codeHash,
+      clientId: randomUUID(),
+      redirectUri: "https://claude.example.test/oauth/expired-callback",
+      codeChallenge: randomBytes(32).toString("base64url"),
+      principal: "admin@rainbowinternationalschool.in",
+      scope: "mcp",
+      expiresAt: new Date(Date.now() - 60_000),
+    });
+    await __mcpOauthTestUtils.cleanupExpiredOAuthRecords();
+    const [remaining] = await db.select().from(mcpOauthAuthorizationCodes)
+      .where(eq(mcpOauthAuthorizationCodes.codeHash, codeHash)).limit(1);
+    expect(remaining).toBeUndefined();
   });
 });

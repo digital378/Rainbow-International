@@ -20,6 +20,7 @@ const MAX_REGISTRATIONS_PER_HOUR = 20;
 const registrationWindows = new Map<string, { startedAt: number; count: number }>();
 const PKCE_VERIFIER_PATTERN = /^[A-Za-z0-9\-._~]{43,128}$/;
 const PKCE_S256_CHALLENGE_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+let cleanupTimerStarted = false;
 
 export type McpAuthPrincipal = {
   auditPrincipal: string;
@@ -124,6 +125,21 @@ function cleanupExpiredOAuthRecords() {
   ]).catch((error) => console.error("[mcp-oauth] expired record cleanup failed", error));
 }
 
+function startOAuthCleanup() {
+  if (cleanupTimerStarted) return;
+  cleanupTimerStarted = true;
+  void cleanupExpiredOAuthRecords();
+  setInterval(() => void cleanupExpiredOAuthRecords(), 60 * 60_000).unref();
+}
+
+function requireMcpOAuthEnabled(_req: Request, res: Response, next: () => void) {
+  if (process.env.MCP_ENABLED === "true") {
+    next();
+    return;
+  }
+  res.status(404).json({ error: "Not found" });
+}
+
 function redirectWithOAuthResult(
   redirectUri: string,
   values: { code?: string; state?: string | null; error?: string },
@@ -193,6 +209,14 @@ export async function authenticateMcpBearer(provided: string): Promise<McpAuthPr
 }
 
 export function registerMcpOAuthRoutes(app: Express) {
+  startOAuthCleanup();
+  app.use("/.well-known/oauth-protected-resource/mcp", requireMcpOAuthEnabled);
+  app.use("/.well-known/oauth-authorization-server", requireMcpOAuthEnabled);
+  app.use("/oauth/register", requireMcpOAuthEnabled);
+  app.use("/oauth/authorize", requireMcpOAuthEnabled);
+  app.use("/oauth/google/callback", requireMcpOAuthEnabled);
+  app.use("/oauth/token", requireMcpOAuthEnabled);
+
   app.get("/.well-known/oauth-protected-resource/mcp", (req, res) => {
     const origin = publicOrigin(req);
     res.set("Cache-Control", "no-store");
@@ -452,3 +476,7 @@ export function registerMcpOAuthRoutes(app: Express) {
     return oauthError(res, "unsupported_grant_type");
   });
 }
+
+export const __mcpOauthTestUtils = {
+  cleanupExpiredOAuthRecords,
+};
