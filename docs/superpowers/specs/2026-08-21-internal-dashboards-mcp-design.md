@@ -2,7 +2,8 @@
 
 ## Status
 
-Design approved in conversation. Implementation has not started.
+Bearer-token MCP implementation exists. Google Workspace OAuth support is
+implemented pending production OAuth-client configuration.
 
 ## Goal
 
@@ -31,16 +32,20 @@ The production MCP endpoint will be:
 https://rainbowinternationalschool.in/mcp
 ```
 
-It will use MCP Streamable HTTP transport and a bearer credential:
+It uses MCP Streamable HTTP transport. Compatible clients may continue using a
+dedicated bearer credential:
 
 ```text
 Authorization: Bearer <MCP_ADMIN_TOKEN>
 ```
 
-`MCP_ADMIN_TOKEN` is a new dedicated secret. It must not reuse
-`ADMIN_TOKEN`, `INDRA_API_TOKEN`, Google credentials, or a browser session.
-The endpoint is not considered ready to share until the feature flag,
-credential, health check, and production deployment are all verified.
+`MCP_ADMIN_TOKEN` is a dedicated secret. It must not reuse `ADMIN_TOKEN`,
+`INDRA_API_TOKEN`, Google credentials, or a browser session.
+
+OAuth clients use discovery, dynamic client registration, Authorization Code
+with PKCE S256, and a separate Google Workspace OAuth client. The endpoint is
+not considered ready to share until its feature flag, OAuth client,
+health/discovery checks, and production deployment are all verified.
 
 ## Architecture
 
@@ -48,8 +53,11 @@ The server adds a typed MCP gateway to the existing application:
 
 ```text
 MCP client
+  -> OAuth protected-resource metadata and authorization-server discovery
+  -> Dynamic public-client registration and Google Workspace authorization
+  -> PKCE-protected MCP access token
   -> Streamable HTTP /mcp endpoint
-  -> MCP token authentication and rate limit
+  -> MCP authentication and rate limit
   -> explicit tool allowlist and input schemas
   -> confirmation/idempotency checks for high-impact writes
   -> existing application services and route logic
@@ -116,13 +124,24 @@ operation.
 
 ## Authentication and authorization
 
-Every MCP request requires the dedicated token. Missing, invalid, or
-misconfigured credentials return a generic unauthorized response without
-revealing whether a resource exists.
+Every MCP request requires either the dedicated bearer token or an unexpired
+OAuth-issued MCP access token. OAuth clients are authorized through a separate
+Google Workspace OAuth client. The server accepts only verified emails in the
+`rainbowinternationalschool.in` Workspace domain.
 
-The token is an application-level administrator credential, not a Google
-credential. The implementation must use constant-time comparison or the
-project's established secure token helper and must never log the token.
+OAuth discovery exposes protected-resource metadata, authorization-server
+metadata, and dynamic public-client registration. The authorization flow
+requires PKCE S256 and exact registered redirect-URI matching. Authorization
+codes are short-lived and single-use. Access and refresh tokens are opaque,
+stored only as hashes, and refresh tokens rotate on use.
+
+Missing, invalid, expired, revoked, or misconfigured credentials return a
+generic unauthorized response without revealing whether a resource exists.
+
+The bearer token is an application-level administrator credential, not a
+Google credential. The implementation uses constant-time comparison for it and
+never logs any bearer token, OAuth token, authorization code, Google profile,
+or client secret. The existing Google Sheets OAuth client is never reused.
 
 The tool registry is the authorization boundary. New application routes are
 not automatically exposed through MCP; they require an explicit tool
@@ -167,8 +186,9 @@ successful zero-valued dashboard result.
 ## Compatibility
 
 The MCP endpoint uses Streamable HTTP so Claude and compatible ChatGPT clients
-can use the same endpoint. Client setup requires the endpoint URL and the
-dedicated bearer token in the client's secure credential configuration.
+can use the same endpoint. Claude custom connectors discover and complete the
+OAuth flow automatically; header-based compatible clients may use the dedicated
+bearer token.
 
 No token is embedded in this document, the OpenAPI schema, a prompt, a URL, or
 application source code.
@@ -176,15 +196,18 @@ application source code.
 ## Rollout
 
 1. Add the MCP SDK and a focused gateway module.
-2. Add `MCP_ENABLED` and `MCP_ADMIN_TOKEN` secret handling.
-3. Implement discovery and read-only tools first.
-4. Add CRM, operations, synchronization, and content write tools behind
-   confirmation checks.
-5. Register audit storage and redaction.
-6. Verify the local MCP lifecycle and tool calls.
-7. Restart the application workflow and inspect logs.
-8. Deploy and verify the production `/mcp` health/tool-discovery flow.
-9. Share the URL only after production verification passes.
+2. Add `MCP_ENABLED`, bearer compatibility, and separate MCP Google OAuth
+   secret handling.
+3. Implement OAuth discovery, public-client registration, Google Workspace
+   authorization, callback, PKCE exchange, refresh-token rotation, and domain
+   enforcement.
+4. Register audit, idempotency, OAuth-client, authorization-code, and token
+   storage.
+5. Verify the local MCP lifecycle, OAuth discovery, registration, PKCE
+   exchange, refresh rotation, and tool calls.
+6. Restart the application workflow and inspect logs.
+7. Publish and apply the managed schema diff, then verify production OAuth
+   discovery and the `/mcp` flow.
 
 ## Verification
 

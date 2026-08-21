@@ -74,6 +74,10 @@ RPS_WALKIN_SHEET_ID_2728 = "1cai6w40yIbCcAn6KvjrQomgu4BpBVh_yB00UqKaHEXA"
 MASTER_WALKIN_SHEET_ID_2728 = "13VRF-mm9xMenrCp2OeWj4knzDB_l78NpvhD8p_jbmGQ"
 MCP_ENABLED = "true"
 
+[userenv.production]
+MCP_GOOGLE_WORKSPACE_DOMAIN = "rainbowinternationalschool.in"
+MCP_PUBLIC_URL = "https://rainbowinternationalschool.in"
+
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 180000

@@ -10,22 +10,57 @@ https://rainbowinternationalschool.in/mcp
 
 ## Required configuration
 
-The gateway is intentionally disabled unless both settings are present:
+The MCP gateway is intentionally disabled unless:
 
 - `MCP_ENABLED=true`
-- `MCP_ADMIN_TOKEN` — a new, high-entropy secret dedicated only to MCP clients
+- either the legacy `MCP_ADMIN_TOKEN` is configured for header-based clients,
+  or the MCP-specific Google OAuth client is configured for OAuth clients.
 
-Never use browser sessions, the general admin token, Indra token, or Google credentials to connect an MCP client.
+OAuth clients require a **separate** Google Cloud OAuth web client:
+
+- `MCP_GOOGLE_CLIENT_ID` — the MCP Google OAuth client ID;
+- `MCP_GOOGLE_CLIENT_SECRET` — the MCP Google OAuth client secret;
+- `MCP_GOOGLE_WORKSPACE_DOMAIN` — allowed Workspace domain; defaults to
+  `rainbowinternationalschool.in`;
+- `MCP_PUBLIC_URL` — production public origin, set to
+  `https://rainbowinternationalschool.in` if the server may not infer it from
+  the request host.
+
+In Google Cloud, register this exact authorized redirect URI:
+
+```text
+https://rainbowinternationalschool.in/oauth/google/callback
+```
+
+Never reuse the Google Sheets client, browser sessions, the general admin
+token, or Indra token for the MCP OAuth client.
 
 ## Client configuration
 
-Configure an MCP client with:
+### Claude custom connector
 
-- **Transport:** Streamable HTTP
-- **URL:** `https://rainbowinternationalschool.in/mcp`
-- **Header:** `Authorization: Bearer <MCP_ADMIN_TOKEN>`
+Use the Streamable HTTP endpoint:
 
-The gateway creates an MCP session after the client sends `initialize`; clients must retain the returned `Mcp-Session-Id` header for follow-up requests.
+```text
+https://rainbowinternationalschool.in/mcp
+```
+
+Claude discovers the MCP OAuth authorization server automatically. It
+registers a public client, completes Google Workspace sign-in, and uses
+PKCE-protected, short-lived MCP access tokens. Only verified accounts in the
+approved Workspace domain can complete the flow.
+
+### Compatible header-based clients
+
+Clients that support a static authorization header can continue using:
+
+```text
+Authorization: Bearer <MCP_ADMIN_TOKEN>
+```
+
+The gateway creates an MCP session after the client sends `initialize`;
+clients must retain the returned `Mcp-Session-Id` header for follow-up
+requests.
 
 ## Safety model
 
@@ -34,7 +69,11 @@ The gateway creates an MCP session after the client sends `initialize`; clients 
 - Lead archiving, branch deletion, sheet pulls/resyncs, SEO checks, and blog deletion require `confirm: true`.
 - Consequential calls require an idempotency key. Retries are reserved durably and ambiguous outcomes are held for reconciliation rather than repeated.
 - Requests are rate-limited, sessions expire after inactivity, and calls are audited with redacted arguments.
-- OAuth provisioning is not part of this release; clients authenticate with the dedicated bearer token.
+- OAuth requires Authorization Code flow with PKCE S256. Authorization codes
+  are single-use, access tokens are short-lived, and refresh tokens rotate on
+  every use. The database retains only token/code hashes.
+- OAuth-issued sessions are bound to the authenticating Workspace principal;
+  one client cannot reuse another principal’s MCP session.
 
 ## Available capability groups
 
@@ -46,6 +85,11 @@ The gateway creates an MCP session after the client sends `initialize`; clients 
 
 ## Publishing prerequisite
 
-The MCP audit and retry-protection tables are part of the managed application schema. Before enabling the published endpoint, use the Publish flow to review and apply the schema diff, then verify `/mcp` with an authenticated client. Do not add database DDL to the application startup or deployment build: managed schema changes are applied by the Publish flow.
+The MCP audit, retry-protection, OAuth-client, authorization-code, and token
+tables are part of the managed application schema. Before enabling the
+published endpoint, use the Publish flow to review and apply the schema diff,
+then verify OAuth discovery and `/mcp` with an authenticated client. Do not add
+database DDL to the application startup or deployment build: managed schema
+changes are applied by the Publish flow.
 
 After publishing, verify the production endpoint with an MCP client before relying on it operationally.

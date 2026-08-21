@@ -431,6 +431,66 @@ export const mcpIdempotencyKeys = pgTable("mcp_idempotency_keys", {
   index("mcp_idempotency_keys_expires_at_idx").on(table.expiresAt),
 ]);
 
+export const mcpOauthClients = pgTable("mcp_oauth_clients", {
+  clientId: text("client_id").primaryKey(),
+  clientName: text("client_name"),
+  redirectUris: jsonb("redirect_uris").$type<string[]>().notNull(),
+  tokenEndpointAuthMethod: text("token_endpoint_auth_method").notNull().default("none"),
+  scope: text("scope").notNull().default("mcp"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const mcpOauthAuthorizationRequests = pgTable("mcp_oauth_authorization_requests", {
+  id: text("id").primaryKey(),
+  clientId: text("client_id").notNull(),
+  redirectUri: text("redirect_uri").notNull(),
+  clientState: text("client_state"),
+  codeChallenge: text("code_challenge").notNull(),
+  scope: text("scope").notNull().default("mcp"),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_oauth_authorization_requests_expires_at_idx").on(table.expiresAt),
+]);
+
+export const mcpOauthAuthorizationCodes = pgTable("mcp_oauth_authorization_codes", {
+  codeHash: varchar("code_hash", { length: 64 }).primaryKey(),
+  clientId: text("client_id").notNull(),
+  redirectUri: text("redirect_uri").notNull(),
+  codeChallenge: text("code_challenge").notNull(),
+  principal: text("principal").notNull(),
+  scope: text("scope").notNull().default("mcp"),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_oauth_authorization_codes_expires_at_idx").on(table.expiresAt),
+]);
+
+export const mcpOauthAccessTokens = pgTable("mcp_oauth_access_tokens", {
+  tokenHash: varchar("token_hash", { length: 64 }).primaryKey(),
+  clientId: text("client_id").notNull(),
+  principal: text("principal").notNull(),
+  scope: text("scope").notNull().default("mcp"),
+  expiresAt: timestamp("expires_at").notNull(),
+  revokedAt: timestamp("revoked_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_oauth_access_tokens_expires_at_idx").on(table.expiresAt),
+]);
+
+export const mcpOauthRefreshTokens = pgTable("mcp_oauth_refresh_tokens", {
+  tokenHash: varchar("token_hash", { length: 64 }).primaryKey(),
+  clientId: text("client_id").notNull(),
+  principal: text("principal").notNull(),
+  scope: text("scope").notNull().default("mcp"),
+  expiresAt: timestamp("expires_at").notNull(),
+  revokedAt: timestamp("revoked_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_oauth_refresh_tokens_expires_at_idx").on(table.expiresAt),
+]);
+
 // ── Indra Intelligence integration delivery state ───────────────
 // Stores only operational delivery metadata. Payloads, credentials, and
 // customer records are intentionally never persisted here.

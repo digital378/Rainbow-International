@@ -1,5 +1,6 @@
 import type { Express, NextFunction, Request, Response } from "express";
-import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { createHash, randomUUID } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
@@ -7,6 +8,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { mcpAuditLogs, mcpIdempotencyKeys } from "@shared/schema";
+import { authenticateMcpBearer, registerMcpOAuthRoutes, type McpAuthPrincipal } from "./mcpOAuth";
 
 const MAX_REQUESTS_PER_MINUTE = 120;
 const SESSION_TTL_MS = 30 * 60_000;
@@ -14,11 +16,21 @@ const SESSION_TTL_MS = 30 * 60_000;
 type McpSession = {
   transport: StreamableHTTPServerTransport;
   server: McpServer;
+  principal: string;
   lastUsedAt: number;
 };
 
 const sessions = new Map<string, McpSession>();
 const requestWindows = new Map<string, { startedAt: number; count: number }>();
+const authenticatedRequests = new WeakMap<Request, McpAuthPrincipal>();
+const mcpRequestContext = new AsyncLocalStorage<McpAuthPrincipal>();
+
+function currentPrincipal() {
+  return mcpRequestContext.getStore() ?? {
+    auditPrincipal: "mcp-bearer",
+    idempotencyPrincipal: "mcp-bearer",
+  };
+}
 
 function jsonResult(data: unknown, isError = false) {
   return {
@@ -72,7 +84,7 @@ async function writeAudit(input: {
 }) {
   const event = {
     at: new Date().toISOString(),
-    principal: "mcp-bearer",
+    principal: currentPrincipal().auditPrincipal,
     requestId: input.requestId,
     tool: input.tool,
     outcome: input.outcome,
@@ -94,26 +106,23 @@ async function writeAudit(input: {
   });
 }
 
-function requireMcpToken(req: Request, res: Response, next: NextFunction) {
+async function requireMcpToken(req: Request, res: Response, next: NextFunction) {
   if (process.env.MCP_ENABLED !== "true") {
     res.status(404).json({ error: "MCP gateway is disabled" });
     return;
   }
 
-  const expected = process.env.MCP_ADMIN_TOKEN;
   const authorization = req.header("authorization") || "";
   const provided = authorization.replace(/^Bearer\s+/i, "");
-  if (!expected) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-  if (!provided || provided.length !== expected.length) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
+  let principal: McpAuthPrincipal | null = null;
   try {
-    if (!timingSafeEqual(Buffer.from(provided), Buffer.from(expected))) throw new Error("token mismatch");
-  } catch {
+    principal = await authenticateMcpBearer(provided);
+  } catch (error) {
+    console.error("[mcp-auth] token lookup failed", error);
+    res.status(503).json({ error: "MCP authentication is temporarily unavailable" });
+    return;
+  }
+  if (!principal) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -130,6 +139,7 @@ function requireMcpToken(req: Request, res: Response, next: NextFunction) {
   } else {
     window.count += 1;
   }
+  authenticatedRequests.set(req, principal);
   next();
 }
 
@@ -145,7 +155,7 @@ async function withIdempotency(
   payload: unknown,
   operation: () => Promise<unknown>,
 ) {
-  const principal = "mcp-bearer";
+  const principal = currentPrincipal().idempotencyPrincipal;
   const recordId = `${principal}:${tool}:${idempotencyKey}`;
   const fingerprint = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
   const expiresAt = new Date(Date.now() + 24 * 60 * 60_000);
@@ -640,42 +650,56 @@ function mcpError(res: Response, status: number, message: string) {
 }
 
 export function registerMcpGateway(app: Express) {
+  registerMcpOAuthRoutes(app);
+
   const handler = async (req: Request, res: Response) => {
-    cleanupExpiredSessions();
-    const sessionId = sessionIdFrom(req);
-    let session = sessionId ? sessions.get(sessionId) : undefined;
+    const principal = authenticatedRequests.get(req) ?? currentPrincipal();
+    return mcpRequestContext.run(principal, async () => {
+      cleanupExpiredSessions();
+      const sessionId = sessionIdFrom(req);
+      let session = sessionId ? sessions.get(sessionId) : undefined;
 
-    try {
-      if (!session && req.method === "POST" && !sessionId && isInitializeRequest(req.body)) {
-        const transport = new StreamableHTTPServerTransport({
-          sessionIdGenerator: () => randomUUID(),
-          onsessioninitialized: (id) => {
-            const created = sessions.get(id);
-            if (created) created.lastUsedAt = Date.now();
-          },
-        });
-        const server = createMcpServer();
-        session = { transport, server, lastUsedAt: Date.now() };
-        transport.onclose = () => {
-          const activeId = transport.sessionId;
-          if (activeId) sessions.delete(activeId);
-        };
-        await server.connect(transport);
-        await transport.handleRequest(req, res, req.body);
-        if (transport.sessionId) sessions.set(transport.sessionId, session);
-        return;
-      }
+      try {
+        if (!session && req.method === "POST" && !sessionId && isInitializeRequest(req.body)) {
+          const transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: () => randomUUID(),
+            onsessioninitialized: (id) => {
+              const created = sessions.get(id);
+              if (created) created.lastUsedAt = Date.now();
+            },
+          });
+          const server = createMcpServer();
+          session = {
+            transport,
+            server,
+            principal: principal.idempotencyPrincipal,
+            lastUsedAt: Date.now(),
+          };
+          transport.onclose = () => {
+            const activeId = transport.sessionId;
+            if (activeId) sessions.delete(activeId);
+          };
+          await server.connect(transport);
+          await transport.handleRequest(req, res, req.body);
+          if (transport.sessionId) sessions.set(transport.sessionId, session);
+          return;
+        }
 
-      if (!session) {
-        mcpError(res, sessionId ? 404 : 400, sessionId ? "Unknown MCP session" : "Initialize a session before sending this request");
-        return;
+        if (!session) {
+          mcpError(res, sessionId ? 404 : 400, sessionId ? "Unknown MCP session" : "Initialize a session before sending this request");
+          return;
+        }
+        if (session.principal !== principal.idempotencyPrincipal) {
+          mcpError(res, 401, "Unauthorized");
+          return;
+        }
+        session.lastUsedAt = Date.now();
+        await session.transport.handleRequest(req, res, req.method === "POST" ? req.body : undefined);
+      } catch (error) {
+        console.error("[mcp] request failed:", error instanceof Error ? error.message : "unknown error");
+        if (!res.headersSent) mcpError(res, 500, "MCP request failed");
       }
-      session.lastUsedAt = Date.now();
-      await session.transport.handleRequest(req, res, req.method === "POST" ? req.body : undefined);
-    } catch (error) {
-      console.error("[mcp] request failed:", error instanceof Error ? error.message : "unknown error");
-      if (!res.headersSent) mcpError(res, 500, "MCP request failed");
-    }
+    });
   };
 
   app.post("/mcp", requireMcpToken, handler);
