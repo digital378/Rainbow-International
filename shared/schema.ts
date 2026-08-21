@@ -396,14 +396,39 @@ export const walkinLeadAuditLog = pgTable("walkin_lead_audit_log", {
 // or the personal-data fields passed through administrative tools.
 export const mcpAuditLogs = pgTable("mcp_audit_logs", {
   id: serial("id").primaryKey(),
+  principal: text("principal").notNull().default("legacy"),
+  requestId: varchar("request_id").notNull().default(sql`gen_random_uuid()`),
   tool: text("tool").notNull(),
   outcome: text("outcome").notNull(),
+  failureCategory: text("failure_category"),
+  resourceId: text("resource_id"),
+  durationMs: integer("duration_ms").notNull().default(0),
   argumentsRedacted: jsonb("arguments_redacted").notNull(),
+  // Retained for a non-destructive schema transition. MCP audit writes do not
+  // populate this legacy free-text field.
   detail: text("detail"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
   index("mcp_audit_logs_created_at_idx").on(table.createdAt),
   index("mcp_audit_logs_tool_idx").on(table.tool),
+  index("mcp_audit_logs_request_id_idx").on(table.requestId),
+]);
+
+// Durable retry protection for MCP operations that archive, delete, pull, or
+// replace synchronized data. The request fingerprint prevents key reuse for a
+// different operation without storing the request body itself.
+export const mcpIdempotencyKeys = pgTable("mcp_idempotency_keys", {
+  id: text("id").primaryKey(),
+  principal: text("principal").notNull(),
+  tool: text("tool").notNull(),
+  fingerprint: varchar("fingerprint", { length: 64 }).notNull(),
+  state: text("state").notNull().default("processing"),
+  result: jsonb("result"),
+  completedAt: timestamp("completed_at"),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("mcp_idempotency_keys_expires_at_idx").on(table.expiresAt),
 ]);
 
 // ── Indra Intelligence integration delivery state ───────────────

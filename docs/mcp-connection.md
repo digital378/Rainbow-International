@@ -31,16 +31,21 @@ The gateway creates an MCP session after the client sends `initialize`; clients 
 
 - Only named operations are available. There is no generic HTTP proxy, arbitrary SQL tool, debug route, upload capability, or credential access.
 - The gateway uses the application’s existing validation for each approved operation.
-- Lead archiving, branch deletion, sheet pulls/resyncs, and blog deletion require `confirm: true`.
+- Lead archiving, branch deletion, sheet pulls/resyncs, SEO checks, and blog deletion require `confirm: true`.
+- Consequential calls require an idempotency key. Retries are reserved durably and ambiguous outcomes are held for reconciliation rather than repeated.
 - Requests are rate-limited, sessions expire after inactivity, and calls are audited with redacted arguments.
 - OAuth provisioning is not part of this release; clients authenticate with the dedicated bearer token.
 
 ## Available capability groups
 
-- Live dashboard and admissions reports
-- CRM lead lookup, update, and archive
+- Live dashboard, admissions, marketing, RIS/RPS sales, and SEO reports
+- CRM summary, lead creation, lookup, history, update, and archive
 - CRM branch, staff, and lookup-list administration
-- CRM sheet status, pull, and resynchronization operations
-- Editorial post listing and deletion
+- CRM sheet status, pull logs, pull, and resynchronization operations
+- Editorial post listing, creation, update, and deletion
+
+## Publishing prerequisite
+
+The MCP audit and retry-protection tables are part of the managed application schema. Before enabling the published endpoint, use the Publish flow to review and apply the schema diff, then verify `/mcp` with an authenticated client. Do not add database DDL to the application startup or deployment build: managed schema changes are applied by the Publish flow.
 
 After publishing, verify the production endpoint with an MCP client before relying on it operationally.
