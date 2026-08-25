@@ -105,14 +105,14 @@ const FAKE_LEAD = {
 };
 
 /**
- * Build an 18-column sheet row (A–R).
- * Only col L (index 11, Status) and col R (index 17, Lead ID) are populated;
+ * Build a 20-column RIS sheet row (A–T).
+ * Only col N (index 13, Status) and col T (index 19, Lead ID) are populated;
  * all other columns are empty strings.
  */
 function makeSheetRow(status: string, leadId: string): string[] {
-  const row: string[] = Array(18).fill("");
-  row[11] = status;   // L — Status
-  row[17] = leadId;   // R — Lead ID (upsert key)
+  const row: string[] = Array(20).fill("");
+  row[13] = status;   // N — Status
+  row[19] = leadId;   // T — Lead ID (upsert key)
   return row;
 }
 
@@ -121,7 +121,7 @@ function makeSheetRow(status: string, leadId: string): string[] {
  * A dummy header row is prepended (pullChangesFromSheet slices it off).
  */
 function primeSheetRows(rows: string[][]): void {
-  const header: string[] = Array(18).fill("header");
+  const header: string[] = Array(20).fill("header");
   mockSheetsGet.mockResolvedValue({ data: { values: [header, ...rows] } });
 }
 

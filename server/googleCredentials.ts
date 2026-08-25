@@ -14,6 +14,7 @@ const KEY_CONTEXT = "rainbow-google-oauth-refresh-token:v1";
 
 let initialized = false;
 let activeRefreshToken: string | null = null;
+let credentialSource: "encrypted" | "legacy" | "unavailable" = "unavailable";
 
 function encryptionKey(): Buffer {
   const sessionSecret = process.env.SESSION_SECRET;
@@ -76,8 +77,10 @@ export async function initializeGoogleCredentials(): Promise<void> {
 
   if (storedCredential) {
     activeRefreshToken = decryptGoogleRefreshToken(storedCredential);
+    credentialSource = "encrypted";
   } else {
     activeRefreshToken = process.env.GOOGLE_REFRESH_TOKEN || null;
+    credentialSource = activeRefreshToken ? "legacy" : "unavailable";
   }
 
   initialized = true;
@@ -93,6 +96,13 @@ export function getGoogleRefreshToken(): string | null {
     return process.env.GOOGLE_REFRESH_TOKEN || null;
   }
   return activeRefreshToken;
+}
+
+/** Safe for an authorized admin status page; never reveals credential content. */
+export function getGoogleCredentialSource(): "encrypted" | "legacy" | "unavailable" {
+  return initialized
+    ? credentialSource
+    : (process.env.GOOGLE_REFRESH_TOKEN ? "legacy" : "unavailable");
 }
 
 export async function storeGoogleRefreshToken(refreshToken: string): Promise<void> {
@@ -115,6 +125,7 @@ export async function storeGoogleRefreshToken(refreshToken: string): Promise<voi
     });
 
   activeRefreshToken = refreshToken;
+  credentialSource = "encrypted";
   initialized = true;
 }
 

@@ -6,7 +6,8 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
 import { startSeoMonitor } from "./seoMonitor";
-import { bootstrapWalkinSequences, bootstrapWalkinLookups } from "./walkinSheets";
+import { bootstrapWalkinSequences, bootstrapWalkinLookups, stopAutoPullForShutdown } from "./walkinSheets";
+import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { initializeGoogleCredentials } from "./googleCredentials";
 
 const app = express();
@@ -157,8 +158,10 @@ app.use((req, res, next) => {
   // worker can use Google services. A corrupt encrypted record must stop boot.
   await initializeGoogleCredentials();
   await autoSeedBlogsIfEmpty();
-  await bootstrapWalkinSequences();
-  await bootstrapWalkinLookups();
+  await runWalkinSheetOperation("startup bootstrap", async () => {
+    await bootstrapWalkinSequences();
+    await bootstrapWalkinLookups();
+  });
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -196,4 +199,17 @@ app.use((req, res, next) => {
       log(`serving on port ${port}`);
     },
   );
+
+  let shutdownStarted = false;
+  const shutdown = async (signal: string) => {
+    if (shutdownStarted) return;
+    shutdownStarted = true;
+    log(`${signal} received; draining walk-in synchronization`, "shutdown");
+    await stopAutoPullForShutdown();
+    httpServer.close(() => process.exit(0));
+    // Avoid an indefinitely hung process if a client connection never closes.
+    setTimeout(() => process.exit(0), 30_000).unref();
+  };
+  process.once("SIGTERM", () => { void shutdown("SIGTERM"); });
+  process.once("SIGINT", () => { void shutdown("SIGINT"); });
 })();

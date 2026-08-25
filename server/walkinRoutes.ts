@@ -30,7 +30,9 @@ import {
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
 import * as XLSX from "xlsx";
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
+import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
+import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
+import { getGoogleCredentialSource } from "./googleCredentials";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -654,14 +656,9 @@ export function registerWalkinRoutes(app: Express) {
       // Use a full brand resync so the archived row is physically removed from the sheet
       // (consistent with how syncDeletionsFromMaster handles deletions from the Master MIS).
       const archiveBrand = existing.brand as "RIS" | "RPS";
-      resyncBrandToSheet(archiveBrand).catch((err) => {
-        console.error(`[walkin/leads/archive] Brand sheet resync failed (${archiveBrand}):`, err?.message);
-      });
-      // Use a full master resync so the archived row is physically removed
-      // (same approach as the brand sheet resync above — no ghost ARCHIVED rows).
-      resyncMasterSheet().catch((err) => {
-        console.error("[walkin/leads/archive] Master sheet resync failed:", err?.message);
-      });
+      resyncArchivedLead(archiveBrand).catch((err) =>
+        console.error("[walkin/leads/archive] Sheet propagation failed:", err?.message)
+      );
 
       res.json(updated);
     } catch (err: any) {
@@ -813,11 +810,11 @@ export function registerWalkinRoutes(app: Express) {
     // Respond immediately so Apps Script doesn't hit its 30-s timeout
     res.json({ ok: true, message: "Pull triggered" });
     if (brand === "MASTER") {
-      pullChangesFromMasterSheet().catch((e: any) =>
+      runWalkinSheetOperation("pull webhook", pullChangesFromMasterSheet).catch((e: any) =>
         console.error("[walkin/pull-hook]", e?.message)
       );
     } else {
-      pullChangesFromSheet(brand as "RIS" | "RPS").catch((e: any) =>
+      runWalkinSheetOperation("pull webhook", () => pullChangesFromSheet(brand as "RIS" | "RPS")).catch((e: any) =>
         console.error("[walkin/pull-hook]", e?.message)
       );
     }
@@ -841,21 +838,21 @@ export function registerWalkinRoutes(app: Express) {
       let masterResult: ReturnType<typeof pullChangesFromMasterSheet> | null = null;
 
       if (brandParam === "RIS") {
-        brandResults.push(pullChangesFromSheet("RIS"));
+        brandResults.push(runWalkinSheetOperation("manual RIS pull", () => pullChangesFromSheet("RIS")));
       } else if (brandParam === "RPS") {
-        brandResults.push(pullChangesFromSheet("RPS"));
+        brandResults.push(runWalkinSheetOperation("manual RPS pull", () => pullChangesFromSheet("RPS")));
       } else if (brandParam === "MASTER") {
-        masterResult = pullChangesFromMasterSheet();
+        masterResult = runWalkinSheetOperation("manual Master pull", pullChangesFromMasterSheet);
       } else {
         // ALL — MASTER must run first so its DB writes land before the brand pulls
         // compare brand-sheet values against the DB.  Running them in parallel risks
         // a race where a brand pull reads the brand sheet (old value), sees it differs
         // from the DB (already updated by MASTER), and reverts the master change.
-        masterResult = pullChangesFromMasterSheet();
-        const masterEntry0 = await masterResult;
-        brandResults.push(pullChangesFromSheet("RIS"), pullChangesFromSheet("RPS"));
-        const brandEntries0 = await Promise.all(brandResults);
-        const allEntries0 = [masterEntry0, ...brandEntries0];
+        const allEntries0 = await runWalkinSheetOperation("manual full pull", async () => {
+          const masterEntry0 = await pullChangesFromMasterSheet();
+          const brandEntries0 = await Promise.all([pullChangesFromSheet("RIS"), pullChangesFromSheet("RPS")]);
+          return [masterEntry0, ...brandEntries0];
+        });
         return res.json({
           results: allEntries0,
           summary: allEntries0.map((r) => ({
@@ -1179,7 +1176,10 @@ export function registerWalkinRoutes(app: Express) {
         return res.status(400).json({ message: "brand query param must be RIS or RPS" });
       }
 
-      const { dbCount, sheetCount } = await resyncBrandToSheet(brand as "RIS" | "RPS");
+      const { dbCount, sheetCount } = await runWalkinSheetOperation(
+        `${brand} manual resync`,
+        () => resyncBrandToSheet(brand as "RIS" | "RPS"),
+      );
 
       res.json({
         brand,
@@ -1198,7 +1198,7 @@ export function registerWalkinRoutes(app: Express) {
   // Rewrites the entire master (combined RIS + RPS) sheet from DB.
   app.post("/api/walkin/sheets/resync-master", requireAdmin, async (req, res) => {
     try {
-      const { dbCount, sheetCount } = await resyncMasterSheet();
+      const { dbCount, sheetCount } = await runWalkinSheetOperation("Master manual resync", resyncMasterSheet);
       res.json({ message: `Resynced ${dbCount} leads (RIS + RPS) to master sheet`, dbCount, sheetCount });
     } catch (err: any) {
       console.error("[walkin/sheets/resync-master]", err?.message);
@@ -1212,7 +1212,7 @@ export function registerWalkinRoutes(app: Express) {
   // Explicit admin action — intentionally NOT part of auto-pull.
   app.post("/api/walkin/sheets/sync-master-deletions", requireAdmin, async (req, res) => {
     try {
-      const result = await syncDeletionsFromMaster();
+      const result = await runWalkinSheetOperation("manual deletion sync", syncDeletionsFromMaster);
       const message = result.archived > 0
         ? `Archived ${result.archived} lead(s) that were removed from Master MIS`
         : "No missing leads found — all DB leads are present in Master MIS";
@@ -1242,10 +1242,12 @@ export function registerWalkinRoutes(app: Express) {
       const risSheetConfigured = !!process.env.RIS_WALKIN_SHEET_ID_2728;
       const rpsSheetConfigured = !!process.env.RPS_WALKIN_SHEET_ID_2728;
       const masterSheetConfigured = !!process.env.MASTER_WALKIN_SHEET_ID_2728;
-      const googleConfigured = !!(process.env.GOOGLE_REFRESH_TOKEN && process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+      const credentialSource = getGoogleCredentialSource();
+      const googleConfigured = credentialSource !== "unavailable" && !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
       res.json({
         googleConfigured,
+        credentialSource,
         RIS: {
           sheetConfigured: risSheetConfigured,
           sheetId: risSheetConfigured ? process.env.RIS_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,

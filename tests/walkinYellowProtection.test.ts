@@ -3,11 +3,11 @@
  *
  * These tests verify that buildYellowProtectionRequests() produces the correct
  * batchUpdate request list in every scenario a live resync can encounter:
- *   1. First-ever resync  — no existing protections → only 6 addProtectedRange
- *   2. Repeated resync    — our 6 protections exist → 6 delete + 6 add (no net duplicate)
+ *   1. First-ever resync  — no existing protections → seven addProtectedRange
+ *   2. Repeated resync    — our seven protections exist → seven delete + seven add (no net duplicate)
  *   3. Alien protections  — other owners' protections exist → they are untouched
  *   4. Mixed              — both ours and alien protections → only ours are deleted
- *   5. Correct columns    — the 6 add requests cover exactly A,D,E,F,J,K (0,3,4,5,9,10)
+ *   5. Correct columns    — the seven add requests cover A,D,E,F,G,L,M
  *   6. warningOnly flag   — every add request sets warningOnly: true
  */
 
@@ -40,14 +40,14 @@ function deleteRequests(reqs: object[]) {
 const TAB_SHEET_ID = 42;
 
 describe("buildYellowProtectionRequests", () => {
-  it("produces exactly 6 add requests and 0 delete requests on the first resync (no existing protections)", () => {
+  it("produces exactly 7 add requests and 0 delete requests on the first resync (no existing protections)", () => {
     const reqs = buildYellowProtectionRequests(TAB_SHEET_ID, []);
 
-    expect(addRequests(reqs)).toHaveLength(6);
+    expect(addRequests(reqs)).toHaveLength(7);
     expect(deleteRequests(reqs)).toHaveLength(0);
   });
 
-  it("produces 6 delete + 6 add when our own protections already exist (prevents duplicates)", () => {
+  it("produces 7 delete + 7 add when our own protections already exist (prevents duplicates)", () => {
     // Simulate the state left behind by a previous resync
     const existing = YELLOW_COL_INDICES.map((_, i) =>
       makeExisting(100 + i, YELLOW_PROTECTION_DESCRIPTION),
@@ -55,14 +55,14 @@ describe("buildYellowProtectionRequests", () => {
 
     const reqs = buildYellowProtectionRequests(TAB_SHEET_ID, existing);
 
-    expect(deleteRequests(reqs)).toHaveLength(6);
-    expect(addRequests(reqs)).toHaveLength(6);
+    expect(deleteRequests(reqs)).toHaveLength(7);
+    expect(addRequests(reqs)).toHaveLength(7);
 
     // Each delete targets one of the pre-existing IDs
     const deletedIds = deleteRequests(reqs).map(
       (r: any) => r.deleteProtectedRange.protectedRangeId,
     );
-    expect(deletedIds.sort()).toEqual([100, 101, 102, 103, 104, 105]);
+    expect(deletedIds.sort()).toEqual([100, 101, 102, 103, 104, 105, 106]);
   });
 
   it("does NOT delete alien protections (different description)", () => {
@@ -75,7 +75,7 @@ describe("buildYellowProtectionRequests", () => {
 
     // No deletes — the alien protections must survive intact
     expect(deleteRequests(reqs)).toHaveLength(0);
-    expect(addRequests(reqs)).toHaveLength(6);
+    expect(addRequests(reqs)).toHaveLength(7);
   });
 
   it("only deletes OUR protections when both ours and alien protections exist", () => {
@@ -95,10 +95,10 @@ describe("buildYellowProtectionRequests", () => {
     expect(deletedIds).toContain(201);
     expect(deletedIds).not.toContain(777);
 
-    expect(addRequests(reqs)).toHaveLength(6);
+    expect(addRequests(reqs)).toHaveLength(7);
   });
 
-  it("adds protections for exactly columns A,D,E,F,J,K (0-based: 0,3,4,5,9,10)", () => {
+  it("adds protections for exactly columns A,D,E,F,G,L,M (0-based: 0,3,4,5,6,11,12)", () => {
     const reqs = buildYellowProtectionRequests(TAB_SHEET_ID, []);
     const adds = addRequests(reqs) as any[];
 

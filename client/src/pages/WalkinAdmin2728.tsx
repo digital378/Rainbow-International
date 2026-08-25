@@ -59,6 +59,7 @@ interface SheetBrandStatus {
 }
 interface SyncStatus {
   googleConfigured: boolean;
+  credentialSource: "encrypted" | "legacy" | "unavailable";
   RIS: SheetBrandStatus; RPS: SheetBrandStatus; MASTER: SheetBrandStatus;
 }
 
@@ -1486,6 +1487,20 @@ function SheetsSyncTab({ token }: { token: string }) {
           Google OAuth not configured. <span className="font-mono">GOOGLE_REFRESH_TOKEN</span> is missing.
         </div>
       )}
+      <div className={`text-xs rounded-xl border px-4 py-3 ${
+        status.credentialSource === "encrypted"
+          ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+          : status.credentialSource === "legacy"
+            ? "border-amber-200 bg-amber-50 text-amber-800"
+            : "border-slate-200 bg-slate-50 text-slate-600"
+      }`}>
+        <span className="font-semibold">Google credential:</span>{" "}
+        {status.credentialSource === "encrypted"
+          ? "Encrypted server credential active"
+          : status.credentialSource === "legacy"
+            ? "Legacy secret active — keep it until encrypted storage has been verified"
+            : "Not configured"}
+      </div>
 
       {/* Per-brand sheets */}
       <div>

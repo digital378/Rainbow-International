@@ -41,9 +41,15 @@
 import { google } from "googleapis";
 import { getGoogleRefreshToken } from "./googleCredentials";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
+import {
+  beginWalkinSyncShutdown,
+  isWalkinSyncDraining,
+  runWalkinSheetOperation,
+  waitForWalkinSyncDrain,
+} from "./walkinSyncCoordinator";
 
 // ── Startup bootstrap ─────────────────────────────────────────────
 // Creates per-brand sequences and backfills brand_seq_num for any
@@ -264,23 +270,79 @@ export const SHEET_HEADERS = [
   "Lead ID",               // T(19) ← hidden; upsert key
 ] as const;
 
-// Index of the Lead ID column (0-based) — used for row matching
-const LEAD_ID_COL_INDEX = SHEET_HEADERS.length - 1; // 19 → column T
+// RPS has a branch field between grade and academic year.  Keep the established
+// workbook shape rather than shifting staff-owned columns during a resync.
+export const RPS_SHEET_HEADERS = [
+  ...SHEET_HEADERS.slice(0, 7),
+  "Branch",
+  ...SHEET_HEADERS.slice(7),
+] as const;
 
 // Sheet tab name (must match the tab in the actual Google Sheet)
 const LEADS_TAB = "WALKINs";
 
 // ── Master (combined RIS + RPS) sheet ────────────────────────────
-// Same column layout as brand sheets but with "Brand" prepended as column A.
+// Master contains Brand and Branch.  Source intentionally precedes Counsellor
+// because that is the existing staff-facing workbook order.
 export const MASTER_SHEET_HEADERS = [
   "Brand",
-  ...SHEET_HEADERS,
+  "Unique ID",
+  "Date",
+  "Time",
+  "Student Name",
+  "Father Name",
+  "Mother Name",
+  "GRADE",
+  "Branch",
+  "Academic Year",
+  "Father Contact",
+  "Mother Contact",
+  "Email",
+  "Source",
+  "Counsellor Name",
+  "Status",
+  "Admission Date",
+  "Follow up Remarks",
+  "Reason for Closed",
+  "Revisit 1 Date",
+  "Revisit 2 Date",
+  "Lead ID",
 ] as const;
 
-// Lead ID column index in the master sheet (0-based; "S" = index 18)
-const MASTER_LEAD_ID_COL_INDEX = MASTER_SHEET_HEADERS.length - 1; // 18
-
 const MASTER_LEADS_TAB = "WALKINs";
+
+function headersForBrand(brand: "RIS" | "RPS") {
+  return brand === "RPS" ? RPS_SHEET_HEADERS : SHEET_HEADERS;
+}
+
+function columnLetter(index: number): string {
+  let number = index + 1;
+  let letter = "";
+  while (number > 0) {
+    const remainder = (number - 1) % 26;
+    letter = String.fromCharCode(65 + remainder) + letter;
+    number = Math.floor((number - 1) / 26);
+  }
+  return letter;
+}
+
+function headerIndex(header: string[], name: string, fallback: number): number {
+  const index = header.findIndex((cell) => cell.trim().toLowerCase() === name.toLowerCase());
+  return index >= 0 ? index : fallback;
+}
+
+function cellAt(row: string[], index: number): string {
+  return row[index]?.trim() ?? "";
+}
+
+function leadIdFromRow(row: string[], index: number): string {
+  const direct = cellAt(row, index);
+  if (direct) return direct;
+  // Rows written before the Branch-column correction can carry the UUID one
+  // cell left of its header. This transition fallback is read-only and ends
+  // once a normal resync rewrites the row in the canonical layout.
+  return row.find((value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value?.trim() ?? ""))?.trim() ?? "";
+}
 
 // ── In-memory sync status ────────────────────────────────────────
 interface SyncStatus {
@@ -298,6 +360,35 @@ const syncStatus: Record<"RIS" | "RPS" | "MASTER", SyncStatus> = {
 
 export function getSyncStatus() {
   return { ...syncStatus };
+}
+
+type ReconciliationScope = "RIS" | "RPS" | "MASTER";
+
+async function markReconciliation(...scopes: ReconciliationScope[]): Promise<void> {
+  for (const scope of new Set(scopes)) {
+    await db.insert(walkinSyncReconciliations).values({ scope, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: walkinSyncReconciliations.scope,
+        set: { updatedAt: new Date() },
+      });
+  }
+}
+
+async function clearReconciliation(scope: ReconciliationScope): Promise<void> {
+  await db.delete(walkinSyncReconciliations).where(eq(walkinSyncReconciliations.scope, scope));
+}
+
+async function recoverPendingReconciliations(): Promise<void> {
+  const pending = await db.select().from(walkinSyncReconciliations);
+  for (const { scope } of pending) {
+    if (scope === "RIS" || scope === "RPS") {
+      await resyncBrandToSheet(scope);
+      await clearReconciliation(scope);
+    } else if (scope === "MASTER") {
+      await resyncMasterSheet();
+      await clearReconciliation(scope);
+    }
+  }
 }
 
 // ── Auth client ───────────────────────────────────────────────────
@@ -389,32 +480,43 @@ function formatTime12h(ts: Date): string {
 }
 
 // ── Row serialiser ────────────────────────────────────────────────
-// Maps a WalkinLead DB row to a flat array matching SHEET_HEADERS column order.
-export async function leadToRow(lead: WalkinLead): Promise<string[]> {
+// Maps a WalkinLead DB row to a flat array matching the target sheet's layout.
+export async function leadToRow(lead: WalkinLead, brand = lead.brand as "RIS" | "RPS"): Promise<string[]> {
   const seqPart = lead.brandSeqNum != null ? lead.brandSeqNum : (lead as any).seqNum ?? lead.id;
   const uniqueId = `LD-${formatDateDotted(lead.enquiryDate)}-${lead.brand}-${seqPart}`;
-  return [
-    uniqueId,                                            // A(0)  Unique ID
-    formatDateDDMMYYYY(lead.enquiryDate),                // B(1)  Date
-    formatTime12h(lead.createdAt),                       // C(2)  Time
-    lead.childName,                                      // D(3)  Student Name
-    lead.parentName,                                     // E(4)  Father Name
-    (lead as any).motherName ?? "",                      // F(5)  Mother Name
-    lead.program,                                        // G(6)  GRADE
-    lead.academicYear,                                   // H(7)  Academic Year
-    lead.phone,                                          // I(8)  Father Contact
-    lead.altPhone ?? "",                                 // J(9)  Mother Contact
-    lead.email ?? "",                                    // K(10) Email
-    lead.leadOwner ?? "",                                // L(11) Counsellor Name
-    lead.source,                                         // M(12) Source
-    lead.status,                                         // N(13) Status
-    lead.walkInDate ? formatDateDDMMYYYY(lead.walkInDate) : "", // O(14) Admission Date
-    lead.remark ?? "",                                   // P(15) Follow up Remarks
-    lead.closeReason ?? "",                              // Q(16) Reason for Closed
-    lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "", // R(17) Revisit 1 Date
-    (lead as any).revisitDate2 ? formatDateDDMMYYYY((lead as any).revisitDate2) : "", // S(18) Revisit 2 Date
-    String(lead.id),                                     // T(19) Lead ID (hidden, upsert key)
-  ];
+  const values: Record<string, string> = {
+    "Unique ID": uniqueId,
+    "Date": formatDateDDMMYYYY(lead.enquiryDate),
+    "Time": formatTime12h(lead.createdAt),
+    "Student Name": lead.childName,
+    "Father Name": lead.parentName,
+    "Mother Name": (lead as any).motherName ?? "",
+    "GRADE": lead.program,
+    "Branch": await resolveBranchName(lead.branchId),
+    "Academic Year": lead.academicYear,
+    "Father Contact": lead.phone,
+    "Mother Contact": lead.altPhone ?? "",
+    "Email": lead.email ?? "",
+    "Counsellor Name": lead.leadOwner ?? "",
+    "Source": lead.source,
+    "Status": lead.status,
+    "Admission Date": lead.walkInDate ? formatDateDDMMYYYY(lead.walkInDate) : "",
+    "Follow up Remarks": lead.remark ?? "",
+    "Reason for Closed": lead.closeReason ?? "",
+    "Revisit 1 Date": lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "",
+    "Revisit 2 Date": (lead as any).revisitDate2 ? formatDateDDMMYYYY((lead as any).revisitDate2) : "",
+    "Lead ID": String(lead.id),
+  };
+  return headersForBrand(brand).map((header) => values[header] ?? "");
+}
+
+async function leadToMasterRow(lead: WalkinLead): Promise<string[]> {
+  const brandRow = await leadToRow(lead, "RPS");
+  const byHeader = new Map<string, string>(
+    RPS_SHEET_HEADERS.map((header, index) => [header, brandRow[index]]),
+  );
+  byHeader.set("Brand", lead.brand);
+  return MASTER_SHEET_HEADERS.map((header) => byHeader.get(header) ?? "");
 }
 
 // ── Upsert a single lead into the correct brand sheet ────────────
@@ -426,28 +528,26 @@ export async function upsertLeadToSheet(
 ): Promise<void> {
   const auth = getAuthClient();
   if (!auth) {
-    console.warn("[walkin/sheets] Google auth not configured — skipping sheet upsert");
-    return;
+    throw new Error("Google auth not configured for sheet upsert");
   }
   const sheetId = getSheetId(brand);
   if (!sheetId) {
-    console.warn(`[walkin/sheets] ${brand}_WALKIN_SHEET_ID_2728 not set — skipping upsert`);
-    return;
+    throw new Error(`${brand}_WALKIN_SHEET_ID_2728 not set for sheet upsert`);
   }
 
   // Brand guard — never write a RIS lead into the RPS sheet or vice-versa
   if (lead.brand !== brand) {
     console.error(`[walkin/sheets] Brand mismatch: lead.brand=${lead.brand} but target sheet is ${brand} — aborting`);
-    return;
+    throw new Error(`Brand mismatch for lead ${lead.id}`);
   }
 
   const sheets = google.sheets({ version: "v4", auth });
-  const row = await leadToRow(lead);
-  // Lead ID column is T = index 19
-  const leadIdColLetter = "T";
+  const headers = headersForBrand(brand);
+  const row = await leadToRow(lead, brand);
+  const leadIdColLetter = columnLetter(headers.indexOf("Lead ID"));
 
   // Ensure the WALKINs tab exists (creates it with header row on first use)
-  await ensureLeadsTab(sheets, sheetId, LEADS_TAB, SHEET_HEADERS);
+  await ensureLeadsTab(sheets, sheetId, LEADS_TAB, headers);
 
   async function doUpsert(retried = false): Promise<void> {
     try {
@@ -500,6 +600,7 @@ export async function upsertLeadToSheet(
       }
       syncStatus[brand].lastError = err?.message ?? "Unknown error";
       console.error(`[walkin/sheets] Upsert failed for lead ${lead.id} (${brand}):`, err?.message);
+      throw err;
     }
   }
 
@@ -509,28 +610,27 @@ export async function upsertLeadToSheet(
 // ── Fire-and-forget wrapper (used in API route handlers) ─────────
 // Never throws — sheet failure must not block the API response.
 export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
-  upsertLeadToSheet(brand, lead).catch((err) => {
-    console.error("[walkin/sheets] Unexpected queue error:", err?.message);
-  });
-  upsertLeadToMasterSheet(lead).catch((err) => {
-    console.error("[walkin/sheets] Master upsert queue error:", err?.message);
-  });
+  runWalkinSheetOperation("queued lead upsert", async () => {
+    await markReconciliation(brand, "MASTER");
+    await upsertLeadToSheet(brand, lead);
+    await upsertLeadToMasterSheet(lead);
+    await clearReconciliation(brand);
+    await clearReconciliation("MASTER");
+  }).catch((err) => console.error("[walkin/sheets] Unexpected queue error:", err?.message));
 }
 
 // ── Upsert a single lead into the master (combined) sheet ────────
 export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
   const auth = getAuthClient();
-  if (!auth) return;
+  if (!auth) throw new Error("Google auth not configured for Master upsert");
   const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
   if (!sheetId) {
-    console.warn("[walkin/sheets] MASTER_WALKIN_SHEET_ID_2728 not set — skipping master upsert");
-    return;
+    throw new Error("MASTER_WALKIN_SHEET_ID_2728 not set for Master upsert");
   }
 
   const sheets = google.sheets({ version: "v4", auth });
-  const brandRow = await leadToRow(lead);
-  const row = [lead.brand, ...brandRow];             // Brand in col A, rest follow
-  const leadIdColLetter = "U";                        // Column U = index 20
+  const row = await leadToMasterRow(lead);
+  const leadIdColLetter = columnLetter(MASTER_SHEET_HEADERS.indexOf("Lead ID"));
 
   // Ensure the WALKINs tab exists in the master sheet
   await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
@@ -570,6 +670,7 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
       }
       syncStatus.MASTER.lastError = err?.message ?? "Unknown error";
       console.error(`[walkin/sheets] Master upsert failed for lead ${lead.id}:`, err?.message);
+      throw err;
     }
   }
 
@@ -592,8 +693,8 @@ export const YELLOW_COL_INDICES = [0, 3, 4, 5, 6, 11, 12] as const;
 
 /**
  * Description stamped on every Master-sheet read-only protection we own.
- * Master cols A–N (0-based 0–13) are auto-populated by the sync system and
- * must not be overwritten by sheet editors.  Green cols O–T (14–19) remain
+ * Master cols A–O (0-based 0–14) are auto-populated by the sync system and
+ * must not be overwritten by sheet editors. Green cols P–U (15–20) remain
  * editable so MIS staff can update Status, Dates, and Remarks.
  */
 export const MASTER_YELLOW_PROTECTION_DESCRIPTION =
@@ -604,7 +705,7 @@ export const MASTER_YELLOW_PROTECTION_DESCRIPTION =
  * (Brand, Unique ID, Date, Time, Student Name, Father Name, Mother Name, GRADE,
  * Academic Year, Father Contact, Mother Contact, Email, Counsellor Name, Source).
  */
-export const MASTER_YELLOW_COL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const;
+export const MASTER_YELLOW_COL_INDICES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] as const;
 
 /**
  * Canonical allowed Status values — used both for sheet dropdowns and pull
@@ -886,7 +987,7 @@ export function buildYellowProtectionRequests(
   );
 }
 
-/** Build warningOnly protection requests for Master cols A–L (indices 0–11). */
+/** Build warningOnly protection requests for Master cols A–O (indices 0–14). */
 export function buildMasterYellowProtectionRequests(
   tabSheetId: number,
   existingProtections: Array<{ protectedRangeId: number; description?: string }>,
@@ -951,8 +1052,8 @@ async function applyYellowColumnProtection(
 }
 
 /**
- * Apply warningOnly protections on Master cols A–L (indices 0–11).
- * Green cols M–R (12–17) are intentionally left unprotected so MIS staff can
+ * Apply warningOnly protections on Master cols A–O (indices 0–14).
+ * Green cols P–U (15–20) are intentionally left unprotected so MIS staff can
  * continue editing Status, Dates, and Remarks directly in the sheet.
  * Non-fatal — a failure here does not abort the resync.
  */
@@ -975,15 +1076,15 @@ async function applyMasterYellowColumnProtection(
   const requests = [
     ...buildMasterYellowProtectionRequests(tabSheetId, existingProtections),
     buildDropdownRequest(tabSheetId, 7, allowedGrades),                            // col H = GRADE (dropdown)
-    buildStatusDropdownRequest(tabSheetId, 14),                                    // col O = Status (dropdown)
-    buildSourceDropdownRequest(tabSheetId, 13),                                    // col N = Source (dropdown)
-    buildCloseReasonDropdownRequest(tabSheetId, 17),                               // col R = Reason for Closed (dropdown)
+    buildStatusDropdownRequest(tabSheetId, 15),                                    // col P = Status (dropdown)
+    buildSourceDropdownRequest(tabSheetId, 14),                                    // col O = Source (dropdown)
+    buildCloseReasonDropdownRequest(tabSheetId, 18),                               // col S = Reason for Closed (dropdown)
     // Clear stale validation from columns that should be free-text / date pickers
     buildClearValidationRequest(tabSheetId, 11),   // col L = Email
-    buildClearValidationRequest(tabSheetId, 15),   // col P = Admission Date
-    buildClearValidationRequest(tabSheetId, 16),   // col Q = Follow up Remarks
-    buildClearValidationRequest(tabSheetId, 18),   // col S = Revisit 1 Date
-    buildClearValidationRequest(tabSheetId, 19),   // col T = Revisit 2 Date
+    buildClearValidationRequest(tabSheetId, 16),   // col Q = Admission Date
+    buildClearValidationRequest(tabSheetId, 17),   // col R = Follow up Remarks
+    buildClearValidationRequest(tabSheetId, 19),   // col T = Revisit 1 Date
+    buildClearValidationRequest(tabSheetId, 20),   // col U = Revisit 2 Date
     // Note: Status column background colour is managed manually in the sheet.
   ];
 
@@ -993,7 +1094,7 @@ async function applyMasterYellowColumnProtection(
   });
 
   console.log(
-    `[walkin/sheets] Master A–L protections + Status/Source dropdowns applied on tab "${MASTER_LEADS_TAB}"`,
+    `[walkin/sheets] Master A–O protections + Status/Source dropdowns applied on tab "${MASTER_LEADS_TAB}"`,
   );
 }
 
@@ -1011,6 +1112,7 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   if (!sheetId) throw new Error(`${brand}_WALKIN_SHEET_ID_2728 env var not set`);
 
   const sheets = google.sheets({ version: "v4", auth });
+  const headers = headersForBrand(brand);
 
   // 1. Fetch all non-archived leads for this brand from DB
   const leads = await db
@@ -1020,11 +1122,11 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
     .orderBy(walkinLeads.enquiryDate);
 
   // 2. Serialise all rows
-  const dataRows = await Promise.all(leads.map(leadToRow));
+  const dataRows = await Promise.all(leads.map((lead) => leadToRow(lead, brand)));
 
   // 3. Ensure the WALKINs tab exists (creates it with header on first run).
   //    If it was just created, skip the clear — there is nothing to clear.
-  const tabWasCreated = await ensureLeadsTab(sheets, sheetId, LEADS_TAB, SHEET_HEADERS);
+  const tabWasCreated = await ensureLeadsTab(sheets, sheetId, LEADS_TAB, headers);
 
   if (!tabWasCreated) {
     // 3a. Clear existing data rows (A2:end), preserving the header row
@@ -1034,7 +1136,7 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
         range: `${LEADS_TAB}!A2:Z`,
       });
     } catch (err: any) {
-      console.warn(`[walkin/sheets] Clear failed for ${brand}:`, err?.message);
+      throw new Error(`${brand} sheet clear failed: ${err?.message ?? "Unknown error"}`);
     }
 
     // 3b. Re-write header row (ensures it's always up to date)
@@ -1042,7 +1144,7 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
       spreadsheetId: sheetId,
       range: `${LEADS_TAB}!A1`,
       valueInputOption: "USER_ENTERED",
-      requestBody: { values: [SHEET_HEADERS as unknown as string[]] },
+        requestBody: { values: [headers as unknown as string[]] },
     });
   }
 
@@ -1098,7 +1200,7 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
 
   // 2. Serialise — prepend Brand column to each row
   const dataRows = await Promise.all(
-    leads.map(async (l) => [l.brand, ...(await leadToRow(l))])
+    leads.map((lead) => leadToMasterRow(lead))
   );
 
   // 3. Ensure the WALKINs tab exists in the master sheet.
@@ -1112,7 +1214,7 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
         spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2:Z`,
       });
     } catch (err: any) {
-      console.warn("[walkin/sheets] Master clear failed:", err?.message);
+      throw new Error(`Master sheet clear failed: ${err?.message ?? "Unknown error"}`);
     }
 
     // Re-write header row (ensures it stays current)
@@ -1216,13 +1318,15 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read all data columns A:R from the sheet
+    // Include the hidden Lead ID column. The header is resolved below so RIS
+    // and RPS can safely retain their different Branch-column layouts.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!A:R`,
+      range: `${LEADS_TAB}!A:U`,
     });
 
     const rows = resp.data.values ?? [];
+    const header = rows[0] ?? [];
     // Row 0 = header, data starts at 1
     const dataRows = rows.slice(1);
     entry.rowsScanned = dataRows.length;
@@ -1260,16 +1364,17 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
 
     for (const row of dataRows) {
-      const leadId = row[19]?.trim(); // column T (index 19) = Lead ID
+      const hasBranch = header.some((cell) => cell.trim().toLowerCase() === "branch");
+      const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", hasBranch ? 20 : 19));
       if (!leadId) continue;
 
       // Green column values from sheet
-      const sheetStatus        = row[13]?.trim() ?? "";              // N = Status
-      const sheetWalkInDate    = parseDateFromSheet(row[14] ?? "");  // O = Admission Date
-      const sheetRemark        = row[15]?.trim() ?? "";              // P = Follow up Remarks
-      const sheetCloseReason   = row[16]?.trim() ?? "";              // Q = Reason for Closed
-      const sheetRevisitDate   = parseDateFromSheet(row[17] ?? "");  // R = Revisit 1 Date
-      const sheetRevisitDate2  = parseDateFromSheet(row[18] ?? "");  // S = Revisit 2 Date
+      const sheetStatus        = cellAt(row, headerIndex(header, "Status", hasBranch ? 14 : 13));
+      const sheetWalkInDate    = parseDateFromSheet(cellAt(row, headerIndex(header, "Admission Date", hasBranch ? 15 : 14)));
+      const sheetRemark        = cellAt(row, headerIndex(header, "Follow up Remarks", hasBranch ? 16 : 15));
+      const sheetCloseReason   = cellAt(row, headerIndex(header, "Reason for Closed", hasBranch ? 17 : 16));
+      const sheetRevisitDate   = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 1 Date", hasBranch ? 18 : 17)));
+      const sheetRevisitDate2  = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 2 Date", hasBranch ? 19 : 18)));
 
       // Fetch current DB record
       let existing: any;
@@ -1358,12 +1463,12 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         pendingMasterUpdates.push({
           leadId,
           greenValues: [
-            row[13] ?? "",  // N Status           → Master col O
-            row[14] ?? "",  // O Admission Date   → Master col P
-            row[15] ?? "",  // P Follow up Remarks → Master col Q
-            row[16] ?? "",  // Q Reason for Closed → Master col R
-            row[17] ?? "",  // R Revisit 1 Date   → Master col S
-            row[18] ?? "",  // S Revisit 2 Date   → Master col T
+            sheetStatus,
+            cellAt(row, headerIndex(header, "Admission Date", hasBranch ? 15 : 14)),
+            sheetRemark,
+            sheetCloseReason,
+            cellAt(row, headerIndex(header, "Revisit 1 Date", hasBranch ? 18 : 17)),
+            cellAt(row, headerIndex(header, "Revisit 2 Date", hasBranch ? 19 : 18)),
           ],
         });
       } catch (e: any) {
@@ -1376,22 +1481,25 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
       if (masterSheetId) {
         try {
-          // Read Lead ID column from Master (column U = index 20)
+          // Read the full Master row so its header determines the Lead ID
+          // location. This safely handles the pre-fix legacy row shape too.
           const masterIdResp = await sheets.spreadsheets.values.get({
             spreadsheetId: masterSheetId,
-            range: `${MASTER_LEADS_TAB}!U:U`,
+            range: `${MASTER_LEADS_TAB}!A:V`,
           });
           const masterIds = masterIdResp.data.values ?? [];
+          const masterHeader = masterIds[0] ?? [];
+          const masterLeadIdIndex = headerIndex(masterHeader, "Lead ID", 21);
           const leadIdToMasterRow = new Map<string, number>();
           masterIds.forEach((r, idx) => {
-            const id = r[0]?.trim();
+            const id = leadIdFromRow(r, masterLeadIdIndex);
             if (id && idx > 0) leadIdToMasterRow.set(id, idx + 1); // 1-based row number
           });
 
           const batchData = pendingMasterUpdates
             .filter(u => leadIdToMasterRow.has(u.leadId))
             .map(u => ({
-              range: `${MASTER_LEADS_TAB}!O${leadIdToMasterRow.get(u.leadId)}:T${leadIdToMasterRow.get(u.leadId)}`,
+              range: `${MASTER_LEADS_TAB}!P${leadIdToMasterRow.get(u.leadId)}:U${leadIdToMasterRow.get(u.leadId)}`,
               values: [u.greenValues],
             }));
 
@@ -1455,13 +1563,15 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read A:S — Brand(A=0) … Status(M=12) … MIS Calling(R=17) … Lead ID(S=18)
+    // Read through Lead ID. Header names are resolved below because Master has
+    // Branch and its staff-facing Source/Counsellor order differs from a brand.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheetId,
-      range: `${MASTER_LEADS_TAB}!A:S`,
+      range: `${MASTER_LEADS_TAB}!A:V`,
     });
 
     const rows = resp.data.values ?? [];
+    const header = rows[0] ?? [];
     const dataRows = rows.slice(1); // skip header
     entry.rowsScanned = dataRows.length;
 
@@ -1493,16 +1603,16 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       const brand = (row[0]?.trim() ?? "") as "RIS" | "RPS";
       if (brand !== "RIS" && brand !== "RPS") continue;
 
-      const leadId = row[20]?.trim(); // col U (index 20) = Lead ID
+      const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", 21));
       if (!leadId) continue;
 
-      // Green columns from Master (O–T = indices 14–19)
-      const sheetStatus       = row[14]?.trim() ?? "";             // O = Status
-      const sheetWalkInDate   = parseDateFromSheet(row[15] ?? ""); // P = Admission Date
-      const sheetRemark       = row[16]?.trim() ?? "";             // Q = Follow-up Remarks
-      const sheetCloseReason  = row[17]?.trim() ?? "";             // R = Reason for Closed
-      const sheetRevisitDate  = parseDateFromSheet(row[18] ?? ""); // S = Revisit 1 Date
-      const sheetRevisitDate2 = parseDateFromSheet(row[19] ?? ""); // T = Revisit 2 Date
+      // Green columns from Master (P–U in the canonical 22-column layout).
+      const sheetStatus       = cellAt(row, headerIndex(header, "Status", 15));
+      const sheetWalkInDate   = parseDateFromSheet(cellAt(row, headerIndex(header, "Admission Date", 16)));
+      const sheetRemark       = cellAt(row, headerIndex(header, "Follow up Remarks", 17));
+      const sheetCloseReason  = cellAt(row, headerIndex(header, "Reason for Closed", 18));
+      const sheetRevisitDate  = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 1 Date", 19)));
+      const sheetRevisitDate2 = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 2 Date", 20)));
 
       let existing: any;
       try {
@@ -1573,12 +1683,12 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
         pendingBrandUpdates[brand].push({
           leadId,
           greenValues: [
-            row[14] ?? "",  // O Status           → brand col N
-            row[15] ?? "",  // P Admission Date   → brand col O
-            row[16] ?? "",  // Q Follow-up Remarks → brand col P
-            row[17] ?? "",  // R Reason for Closed → brand col Q
-            row[18] ?? "",  // S Revisit 1 Date   → brand col R
-            row[19] ?? "",  // T Revisit 2 Date   → brand col S
+            sheetStatus,
+            cellAt(row, headerIndex(header, "Admission Date", 16)),
+            sheetRemark,
+            sheetCloseReason,
+            cellAt(row, headerIndex(header, "Revisit 1 Date", 19)),
+            cellAt(row, headerIndex(header, "Revisit 2 Date", 20)),
           ],
         });
       } catch (e: any) {
@@ -1595,10 +1705,14 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       if (!brandSheetId) continue;
 
       try {
-        // Look up row numbers by Lead ID in brand sheet col T (index 19)
+        const brandHeaders = headersForBrand(brand);
+        const brandLeadIdColumn = columnLetter(brandHeaders.indexOf("Lead ID"));
+        const brandStatusColumn = columnLetter(brandHeaders.indexOf("Status"));
+        const brandRevisit2Column = columnLetter(brandHeaders.indexOf("Revisit 2 Date"));
+        // Look up row numbers by the brand's hidden Lead ID column.
         const idResp = await sheets.spreadsheets.values.get({
           spreadsheetId: brandSheetId,
-          range: `${LEADS_TAB}!T:T`,
+          range: `${LEADS_TAB}!${brandLeadIdColumn}:${brandLeadIdColumn}`,
         });
         const idRows = idResp.data.values ?? [];
         const leadIdToRow = new Map<string, number>();
@@ -1610,7 +1724,7 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
         const batchData = updates
           .filter((u) => leadIdToRow.has(u.leadId))
           .map((u) => ({
-            range: `${LEADS_TAB}!N${leadIdToRow.get(u.leadId)}:S${leadIdToRow.get(u.leadId)}`,
+            range: `${LEADS_TAB}!${brandStatusColumn}${leadIdToRow.get(u.leadId)}:${brandRevisit2Column}${leadIdToRow.get(u.leadId)}`,
             values: [u.greenValues],
           }));
 
@@ -1666,27 +1780,29 @@ export async function syncDeletionsFromMaster(): Promise<{
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read just the Lead ID column from Master (col U = index 20)
+    // Read the header and rows through Lead ID. A full read avoids treating the
+    // legacy one-cell-left IDs as absent during the layout transition.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheetId,
-      range: `${MASTER_LEADS_TAB}!U:U`,
+      range: `${MASTER_LEADS_TAB}!A:V`,
     });
 
     const rows = resp.data.values ?? [];
 
-    // Safety guard: the first cell must be the "Lead ID" header.
-    // If it's missing the API likely returned a truncated/empty response
-    // (transient failure) — bail out rather than mass-archiving everything.
-    if (rows[0]?.[0]?.trim() !== "Lead ID") {
+    const header = rows[0] ?? [];
+    const leadIdIndex = header.findIndex((cell) => cell.trim() === "Lead ID");
+    // If the header is missing, the API likely returned a truncated/empty
+    // response — bail out rather than mass-archiving everything.
+    if (leadIdIndex < 0) {
       result.errors.push(
-        "Master sheet header sanity check failed (expected 'Lead ID' in col U row 1) — skipping deletion sync to avoid accidental mass-archival"
+        "Master sheet header sanity check failed (missing 'Lead ID') — skipping deletion sync to avoid accidental mass-archival"
       );
       return result;
     }
 
     const masterLeadIds = new Set(
       rows.slice(1) // skip header row
-        .map((r) => r[0]?.trim())
+        .map((r) => leadIdFromRow(r, leadIdIndex))
         .filter(Boolean) as string[]
     );
 
@@ -1729,6 +1845,7 @@ export async function syncDeletionsFromMaster(): Promise<{
 
         if (lead.brand === "RIS" || lead.brand === "RPS") {
           brandsToResync.add(lead.brand);
+          await markReconciliation(lead.brand);
         }
 
         console.log(`[walkin/sheets] syncDeletionsFromMaster: archived ${lead.id} (${lead.brand})`);
@@ -1740,9 +1857,13 @@ export async function syncDeletionsFromMaster(): Promise<{
     // Full resync so archived rows are physically removed from brand sheets
     // (cheaper than row-by-row deletion and leaves the sheet clean)
     for (const brand of brandsToResync) {
-      await resyncBrandToSheet(brand).catch((e: any) => {
+      let resynced = false;
+      await resyncBrandToSheet(brand).then(() => {
+        resynced = true;
+      }).catch((e: any) => {
         result.errors.push(`${brand} sheet resync after archiving failed — ${e?.message}`);
       });
+      if (resynced) await clearReconciliation(brand);
     }
   } catch (e: any) {
     result.errors.push(`Master sheet read failed: ${e?.message}`);
@@ -1764,13 +1885,11 @@ export async function removeLeadFromSheet(
 ): Promise<void> {
   const auth = getAuthClient();
   if (!auth) {
-    console.warn("[walkin/sheets] Google auth not configured — skipping sheet removal");
-    return;
+    throw new Error("Google auth not configured for sheet removal");
   }
   const sheetId = getSheetId(brand);
   if (!sheetId) {
-    console.warn(`[walkin/sheets] ${brand}_WALKIN_SHEET_ID_2728 not set — skipping removal`);
-    return;
+    throw new Error(`${brand}_WALKIN_SHEET_ID_2728 not set for sheet removal`);
   }
 
   try {
@@ -1810,27 +1929,27 @@ export async function removeLeadFromSheet(
   } catch (err: any) {
     syncStatus[brand].lastError = err?.message ?? "Unknown error";
     console.error(`[walkin/sheets] removeLeadFromSheet failed for lead ${leadId} (${brand}):`, err?.message);
+    throw err;
   }
 }
 
 // ── Remove (archive) a lead from the Master MIS sheet ────────────
-// Same approach: find by Lead ID (col S) and overwrite Status (col M).
+// Same approach: find by Lead ID (col V) and overwrite Status (col P).
 export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
   const auth = getAuthClient();
-  if (!auth) return;
+  if (!auth) throw new Error("Google auth not configured for Master removal");
   const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
   if (!sheetId) {
-    console.warn("[walkin/sheets] MASTER_WALKIN_SHEET_ID_2728 not set — skipping master removal");
-    return;
+    throw new Error("MASTER_WALKIN_SHEET_ID_2728 not set for Master removal");
   }
 
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read Lead ID column (U = index 20) to locate the row
+    // Read Lead ID column (V = index 21) to locate the row
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!U:U`,
+      range: `${MASTER_LEADS_TAB}!V:V`,
     });
     const cellValues = readResp.data.values ?? [];
 
@@ -1847,10 +1966,10 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
       return;
     }
 
-    // Overwrite Status cell (column O = index 14) with "ARCHIVED"
+    // Overwrite Status cell (column P = index 15) with "ARCHIVED"
     await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!O${sheetsRow}`,
+      range: `${MASTER_LEADS_TAB}!P${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
     });
@@ -1861,17 +1980,30 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
   } catch (err: any) {
     syncStatus.MASTER.lastError = err?.message ?? "Unknown error";
     console.error(`[walkin/sheets] removeLeadFromMasterSheet failed for lead ${leadId}:`, err?.message);
+    throw err;
   }
 }
 
 // ── Fire-and-forget wrapper for archival sheet updates ────────────
 // Never throws — sheet failure must not block the API response.
 export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
-  removeLeadFromSheet(brand, leadId).catch((err) => {
-    console.error("[walkin/sheets] Unexpected remove error:", err?.message);
-  });
-  removeLeadFromMasterSheet(leadId).catch((err) => {
-    console.error("[walkin/sheets] Master remove error:", err?.message);
+  runWalkinSheetOperation("queued lead removal", async () => {
+    await markReconciliation(brand, "MASTER");
+    await removeLeadFromSheet(brand, leadId);
+    await removeLeadFromMasterSheet(leadId);
+    await clearReconciliation(brand);
+    await clearReconciliation("MASTER");
+  }).catch((err) => console.error("[walkin/sheets] Unexpected remove error:", err?.message));
+}
+
+/** Keep the brand and combined workbook changes together for a lead archive. */
+export async function resyncArchivedLead(brand: "RIS" | "RPS"): Promise<void> {
+  await runWalkinSheetOperation("archive propagation", async () => {
+    await markReconciliation(brand, "MASTER");
+    await resyncBrandToSheet(brand);
+    await clearReconciliation(brand);
+    await resyncMasterSheet();
+    await clearReconciliation("MASTER");
   });
 }
 
@@ -2289,15 +2421,15 @@ export async function readCrmLeadsTrackerStats(
   return fetchPromise;
 }
 
-// ── Auto-pull timer (every 5 minutes) ───────────────────────────
-export function startAutoPull(): void {
-  const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
+// ── Auto-pull timer (every minute, with a shared durable lease) ──
+let autoPullInitialTimer: NodeJS.Timeout | null = null;
+let autoPullInterval: NodeJS.Timeout | null = null;
+let autoPullRun: Promise<void> | null = null;
 
-  const run = async () => {
+async function runAutoPullCycle(): Promise<void> {
+  await runWalkinSheetOperation("automatic pull", async () => {
     // MASTER must run first so its DB writes land before the brand pulls compare
-    // brand-sheet values against the DB.  Running MASTER last (or in parallel)
-    // risks a brand pull seeing brand-sheet (old) ≠ DB (updated by MASTER) and
-    // reverting the master-originated change in the same or next cycle.
+    // brand-sheet values against the DB.
     try { await pullChangesFromMasterSheet(); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull MASTER failed:", e?.message);
     }
@@ -2307,21 +2439,45 @@ export function startAutoPull(): void {
     try { await pullChangesFromSheet("RPS"); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
     }
-    // Deletion sync: archive DB leads whose rows were deleted from the Master
-    // sheet and rewrite affected brand sheets so the rows disappear.
-    // Runs last (after status pulls) so any in-flight status updates from
-    // this cycle are already written to DB before we check what's missing.
-    // Protected by a header sanity check inside syncDeletionsFromMaster.
+    // Recover an interrupted rewrite only after current staff edits have been
+    // pulled into the authoritative database.
+    await recoverPendingReconciliations();
     try { await syncDeletionsFromMaster(); } catch (e: any) {
       console.error("[walkin/sheets] Auto-pull deletion-sync failed:", e?.message);
     }
+  });
+}
+
+export function startAutoPull(): void {
+  const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
+
+  const run = async () => {
+    if (isWalkinSyncDraining() || autoPullRun) return;
+    autoPullRun = runAutoPullCycle()
+      .catch((e: any) => console.error("[walkin/sheets] Auto-pull skipped or failed:", e?.message))
+      .finally(() => { autoPullRun = null; });
+    await autoPullRun;
   };
 
   // First run after 30 seconds so startup isn't slowed
-  setTimeout(() => {
+  autoPullInitialTimer = setTimeout(() => {
     run();
-    setInterval(run, INTERVAL_MS);
+    autoPullInterval = setInterval(run, INTERVAL_MS);
   }, 30_000);
 
-  console.log("[walkin/sheets] Auto-pull scheduled every 5 minutes");
+  console.log("[walkin/sheets] Auto-pull scheduled every minute");
+}
+
+export async function stopAutoPullForShutdown(timeoutMs = 25_000): Promise<boolean> {
+  beginWalkinSyncShutdown();
+  if (autoPullInitialTimer) clearTimeout(autoPullInitialTimer);
+  if (autoPullInterval) clearInterval(autoPullInterval);
+  autoPullInitialTimer = null;
+  autoPullInterval = null;
+
+  const drained = await waitForWalkinSyncDrain(timeoutMs);
+  if (!drained) {
+    console.warn("[walkin/sheets] Shutdown drain timed out; an expired lease will allow recovery.");
+  }
+  return drained;
 }

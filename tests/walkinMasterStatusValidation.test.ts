@@ -3,8 +3,8 @@
  * pullChangesFromMasterSheet().
  *
  * The Master MIS sheet uses a separate pull path (`pullChangesFromMasterSheet`)
- * that reads a 19-column layout (Brand prepended as col A, Lead ID in col S).
- * Status lives in col M (index 12) and Reason for Closed in col P (index 15),
+ * that reads a 22-column layout (Brand and Branch, Lead ID in col V).
+ * Status lives in col P (index 15) and Reason for Closed in col S (index 18),
  * instead of the brand-sheet positions.
  *
  * When the Status or Reason for Closed column contains an unrecognised value
@@ -107,10 +107,10 @@ const FAKE_LEAD = {
 };
 
 /**
- * Build a 19-column Master sheet row (A–S).
+ * Build a 22-column Master sheet row (A–V).
  *   A  (index  0) = Brand
- *   M  (index 12) = Status
- *   S  (index 18) = Lead ID (upsert key)
+ *   P  (index 15) = Status
+ *   V  (index 21) = Lead ID (upsert key)
  * All other columns are empty strings.
  */
 function makeMasterSheetRow(
@@ -118,19 +118,19 @@ function makeMasterSheetRow(
   status: string,
   leadId: string,
 ): string[] {
-  const row: string[] = Array(19).fill("");
+  const row: string[] = Array(22).fill("");
   row[0]  = brand;   // A — Brand
-  row[12] = status;  // M — Status
-  row[18] = leadId;  // S — Lead ID
+  row[15] = status;  // P — Status
+  row[21] = leadId;  // V — Lead ID
   return row;
 }
 
 /**
- * Build a 19-column Master sheet row (A–S) that carries only a close reason.
+ * Build a 22-column Master sheet row (A–V) that carries only a close reason.
  *   A  (index  0) = Brand
- *   P  (index 15) = Reason for Closed
- *   S  (index 18) = Lead ID (upsert key)
- * Status (index 12) and all other columns are left as empty strings so only
+ *   S  (index 18) = Reason for Closed
+ *   V  (index 21) = Lead ID (upsert key)
+ * Status (index 15) and all other columns are left as empty strings so only
  * the close-reason validation path is exercised.
  */
 function makeMasterSheetRowWithCloseReason(
@@ -138,19 +138,19 @@ function makeMasterSheetRowWithCloseReason(
   closeReason: string,
   leadId: string,
 ): string[] {
-  const row: string[] = Array(19).fill("");
+  const row: string[] = Array(22).fill("");
   row[0]  = brand;        // A — Brand
-  row[15] = closeReason;  // P — Reason for Closed
-  row[18] = leadId;       // S — Lead ID
+  row[18] = closeReason;  // S — Reason for Closed
+  row[21] = leadId;       // V — Lead ID
   return row;
 }
 
 /**
  * Prime the sheets values.get mock to return the given data rows.
- * A dummy 19-column header row is prepended (pullChangesFromMasterSheet slices it off).
+ * A dummy 22-column header row is prepended (pullChangesFromMasterSheet slices it off).
  */
 function primeMasterSheetRows(rows: string[][]): void {
-  const header: string[] = Array(19).fill("header");
+  const header: string[] = Array(22).fill("header");
   mockSheetsGet.mockResolvedValue({ data: { values: [header, ...rows] } });
 }
 
@@ -401,7 +401,7 @@ describe("pullChangesFromMasterSheet — back-propagation suppressed on invalid 
     // Seed the Lead ID column read for the brand sheet so the batch data
     // is non-empty (lead ID 42 found at row 2).
     mockSheetsGet
-      .mockResolvedValueOnce({ data: { values: [Array(19).fill("header"), makeMasterSheetRow("RIS", "CLOSED", "42")] } }) // master sheet read
+      .mockResolvedValueOnce({ data: { values: [Array(22).fill("header"), makeMasterSheetRow("RIS", "CLOSED", "42")] } }) // master sheet read
       .mockResolvedValueOnce({ data: { values: [["Lead ID"], ["42"]] } }); // brand sheet R:R column read
 
     await pullChangesFromMasterSheet();

@@ -503,6 +503,24 @@ export const googleOauthCredentials = pgTable("google_oauth_credentials", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// One durable lease shared by all Autoscale instances that can write the
+// walk-in workbooks. Expiry makes a crashed instance recoverable.
+export const walkinSyncLeases = pgTable("walkin_sync_leases", {
+  leaseName: text("lease_name").primaryKey(),
+  ownerId: text("owner_id").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("walkin_sync_leases_expires_at_idx").on(table.expiresAt),
+]);
+
+// Durable, idempotent resync requests. A replacement instance drains scopes
+// left behind if its predecessor stops between multi-workbook writes.
+export const walkinSyncReconciliations = pgTable("walkin_sync_reconciliations", {
+  scope: text("scope").primaryKey(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ── Indra Intelligence integration delivery state ───────────────
 // Stores only operational delivery metadata. Payloads, credentials, and
 // customer records are intentionally never persisted here.
