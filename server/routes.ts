@@ -45,6 +45,11 @@ import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indra
 import { registerMcpGateway } from "./mcpGateway";
 import { db } from "./db";
 import {
+  getGoogleRefreshToken,
+  googleOAuthSuccessPage,
+  storeGoogleRefreshToken,
+} from "./googleCredentials";
+import {
   buildCounselorPerformance,
   parseCounselorPerformanceFilters,
   type CounselorPerformanceRecord,
@@ -1047,7 +1052,7 @@ export async function registerRoutes(
   }
 
   function getAuthenticatedClient() {
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    const refreshToken = getGoogleRefreshToken();
     if (!refreshToken) return null;
     const oauth2Client = getOAuthClient();
     oauth2Client.setCredentials({ refresh_token: refreshToken });
@@ -1101,13 +1106,8 @@ export async function registerRoutes(
           <a href="/auth/google" style="color:#60a5fa">/auth/google</a> again.</p>
           </body></html>`);
       }
-      return res.send(`
-        <html><body style="font-family:monospace;padding:2rem;background:#0f172a;color:#f8fafc">
-        <h2 style="color:#22c55e">Google connected successfully</h2>
-        <p>Copy the refresh token below and save it as a Replit secret named <strong style="color:#f59e0b">GOOGLE_REFRESH_TOKEN</strong></p>
-        <div style="background:#1e293b;padding:1rem;border-radius:8px;margin:1rem 0;word-break:break-all;color:#86efac;font-size:0.9rem">${refreshToken}</div>
-        <p style="color:#94a3b8;font-size:0.85rem">Once saved as a secret, the /api/gsc/* and /api/pagespeed endpoints will be live.</p>
-        </body></html>`);
+      await storeGoogleRefreshToken(refreshToken);
+      return res.type("html").send(googleOAuthSuccessPage());
     } catch (err: any) {
       res.status(500).json({ message: "OAuth exchange failed", error: err.message });
     }
@@ -1505,7 +1505,7 @@ export async function registerRoutes(
 
   async function getGoogleAdsClient() {
     const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
-    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    const refreshToken = getGoogleRefreshToken();
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     if (!devToken || !refreshToken || !clientId || !clientSecret) return null;
@@ -1542,7 +1542,7 @@ export async function registerRoutes(
     return client.Customer({
       customer_id: customerId,
       login_customer_id: mccId,
-      refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
+      refresh_token: getGoogleRefreshToken() || "",
     });
   }
 
@@ -1565,7 +1565,7 @@ export async function registerRoutes(
       const customer = client.Customer({
         customer_id: customerId,
         login_customer_id: mccId,
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
+        refresh_token: getGoogleRefreshToken() || "",
       });
 
       const range = gaMonthRange();
@@ -1643,7 +1643,7 @@ export async function registerRoutes(
       const customer = client.Customer({
         customer_id: customerId,
         login_customer_id: mccId,
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN || "",
+        refresh_token: getGoogleRefreshToken() || "",
       });
 
       const range = gaMonthRange();

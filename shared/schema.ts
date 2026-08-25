@@ -491,6 +491,18 @@ export const mcpOauthRefreshTokens = pgTable("mcp_oauth_refresh_tokens", {
   index("mcp_oauth_refresh_tokens_expires_at_idx").on(table.expiresAt),
 ]);
 
+// ── Server-managed Google OAuth credential ───────────────────────
+// The refresh token is encrypted before it reaches this table. Its encryption
+// key stays in SESSION_SECRET and is never persisted alongside the ciphertext.
+export const googleOauthCredentials = pgTable("google_oauth_credentials", {
+  provider: text("provider").primaryKey(),
+  encryptedRefreshToken: text("encrypted_refresh_token").notNull(),
+  iv: text("iv").notNull(),
+  authTag: text("auth_tag").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ── Indra Intelligence integration delivery state ───────────────
 // Stores only operational delivery metadata. Payloads, credentials, and
 // customer records are intentionally never persisted here.

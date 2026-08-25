@@ -25,6 +25,8 @@ import { createServer } from "node:http";
 // ── Hoist spies so they are available inside vi.mock() factories ──────────────
 const mockSheetsAppend = vi.hoisted(() => vi.fn());
 const mockSheetsGet    = vi.hoisted(() => vi.fn());
+const mockGoogleGetToken = vi.hoisted(() => vi.fn().mockResolvedValue({ tokens: {} }));
+const mockStoreGoogleRefreshToken = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
 
 // DB select chain (used by readCrmLeadsTrackerStats)
 const mockDbWhere  = vi.hoisted(() => vi.fn());
@@ -73,7 +75,7 @@ const mockOAuth2Constructor = vi.hoisted(() =>
   vi.fn(function (this: Record<string, unknown>) {
     this.setCredentials  = vi.fn();
     this.generateAuthUrl = vi.fn().mockReturnValue("https://accounts.google.com/o/oauth2/auth");
-    this.getToken        = vi.fn().mockResolvedValue({ tokens: {} });
+    this.getToken        = mockGoogleGetToken;
     this.credentials     = {};
     this.on              = vi.fn();
     this.request         = vi.fn().mockResolvedValue({ data: {} });
@@ -98,6 +100,12 @@ vi.mock("../server/db", () => ({
     insert:      mockDbInsert,
     transaction: mockDbTransaction,
   },
+}));
+
+vi.mock("../server/googleCredentials", () => ({
+  getGoogleRefreshToken: () => process.env.GOOGLE_REFRESH_TOKEN || null,
+  storeGoogleRefreshToken: mockStoreGoogleRefreshToken,
+  googleOAuthSuccessPage: () => "<html><body>Google connected safely</body></html>",
 }));
 
 vi.mock("../shared/schema", () => ({
@@ -175,6 +183,7 @@ vi.mock("../server/ssrSpainArgentina", () => ({ registerSpainArgentinaSSR: vi.fn
 vi.mock("../server/seoMonitor",        () => ({ runAndAlert:               vi.fn() }));
 vi.mock("../server/walkinRoutes",      () => ({ registerWalkinRoutes:      vi.fn() }));
 vi.mock("../server/openapiSpec",       () => ({ OPENAPI_YAML:              "" }));
+vi.mock("../server/mcpGateway",        () => ({ registerMcpGateway:        vi.fn() }));
 
 // ── Import after all mocks are in place ──────────────────────────────────────
 import { readCrmLeadsTrackerStats, bustCrmStatsCache } from "../server/walkinSheets";
@@ -206,6 +215,10 @@ beforeEach(async () => {
   mockSheetsAppend.mockReset();
   mockSheetsGet.mockReset();
   mockSheetsAppend.mockResolvedValue({});
+  mockGoogleGetToken.mockReset();
+  mockGoogleGetToken.mockResolvedValue({ tokens: {} });
+  mockStoreGoogleRefreshToken.mockReset();
+  mockStoreGoogleRefreshToken.mockResolvedValue(undefined);
 
   mockDbWhere.mockReset();
   mockDbSelect.mockImplementation(() => ({ from: mockDbFrom }));
@@ -331,5 +344,24 @@ describe("/api/callback-requests: atomic transaction then CRM stats cache bust",
     const after = await readCrmLeadsTrackerStats("RIS");
     expect(mockDbWhere).toHaveBeenCalledTimes(1); // still 1
     expect(after.kpis.totalLeads).toBe(5);        // cached total unchanged
+  });
+});
+
+describe("/auth/google/callback: refresh-token redaction", () => {
+  it("stores a new refresh token server-side without returning it in HTML", async () => {
+    const refreshToken = "refresh-token-that-must-never-reach-the-browser";
+    const state = "valid-oauth-state";
+    mockGoogleGetToken.mockResolvedValueOnce({ tokens: { refresh_token: refreshToken } });
+
+    const res = await fetch(`${serverUrl}/auth/google/callback?code=valid-code&state=${state}`, {
+      headers: { Cookie: `oauth_state=${state}` },
+    });
+    const html = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(mockStoreGoogleRefreshToken).toHaveBeenCalledWith(refreshToken);
+    expect(html).not.toContain(refreshToken);
+    expect(html).not.toContain("Copy the refresh token");
+    expect(html).toContain("Google connected safely");
   });
 });

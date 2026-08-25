@@ -7,6 +7,7 @@ import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
 import { startSeoMonitor } from "./seoMonitor";
 import { bootstrapWalkinSequences, bootstrapWalkinLookups } from "./walkinSheets";
+import { initializeGoogleCredentials } from "./googleCredentials";
 
 const app = express();
 const httpServer = createServer(app);
@@ -152,6 +153,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Validate encrypted Google OAuth storage before any route or background
+  // worker can use Google services. A corrupt encrypted record must stop boot.
+  await initializeGoogleCredentials();
   await autoSeedBlogsIfEmpty();
   await bootstrapWalkinSequences();
   await bootstrapWalkinLookups();

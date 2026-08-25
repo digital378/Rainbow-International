@@ -39,6 +39,7 @@
  */
 
 import { google } from "googleapis";
+import { getGoogleRefreshToken } from "./googleCredentials";
 import { db } from "./db";
 import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
@@ -301,7 +302,7 @@ export function getSyncStatus() {
 
 // ── Auth client ───────────────────────────────────────────────────
 function getAuthClient() {
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+  const refreshToken = getGoogleRefreshToken();
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   if (!refreshToken || !clientId || !clientSecret) return null;
