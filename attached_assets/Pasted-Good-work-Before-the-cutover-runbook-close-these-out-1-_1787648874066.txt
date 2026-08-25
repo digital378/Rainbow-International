@@ -1,0 +1,35 @@
+Good work. Before the cutover runbook, close these out:
+
+1. The 5 remaining CRM-tracker failures are admissions KPI, walk-ins KPI,
+   bookings KPI, monthly admissions detail, and mixed date-format handling.
+   Those are the numbers my dashboards report to leadership. Tell me plainly:
+   are those tests stale, or are the KPI figures on /marketing, /sales,
+   /rps-sales and /overview-27-28 currently wrong? If the numbers are wrong,
+   show me which metric is wrong and by how much.
+
+2. The 4 Friendship-admin Playwright tests time out on delete cleanup. Is that a
+   test-harness issue, or can the delete operation actually hang in production?
+
+3. You corrected Master, RPS and RIS column layouts and Lead ID positions. The
+   live workbooks already contain rows written under the OLD layout. Confirm what
+   happens to those existing rows on the first sync after deploy: are they read
+   correctly by the legacy fallback, silently rewritten, or corrupted? If any
+   existing row will be rewritten, tell me exactly which and how many.
+
+4. Confirm the new database lease behaves correctly in the failure cases: an
+   instance killed without SIGTERM, a lease TTL expiring mid-cycle while the
+   holder is still alive, and two instances starting simultaneously after a
+   deploy. Show me the test that covers each.
+
+5. Both this fix and the OAuth fix require new database tables. Confirm the
+   schema changes apply cleanly to the production database, and what happens if
+   a table creation fails partway through deploy.
+
+Then give me the complete cutover runbook, click-by-click, for someone with no
+terminal and no coding background. Cover in order: pre-flight items to record,
+publishing this release, the revoke and re-authorize sequence, verification of
+each Google integration, when it is safe to delete GOOGLE_REFRESH_TOKEN, and the
+rollback procedure if any step fails. For every step state where to click, what
+confirms success, and what to do if it fails.
+
+Do not deploy.
