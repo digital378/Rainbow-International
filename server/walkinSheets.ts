@@ -611,13 +611,17 @@ export async function upsertLeadToSheet(
 // ── Fire-and-forget wrapper (used in API route handlers) ─────────
 // Never throws — sheet failure must not block the API response.
 export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
-  runWalkinSheetOperation("queued lead upsert", async () => {
-    await markReconciliation(brand, "MASTER");
-    await upsertLeadToSheet(brand, lead);
-    await upsertLeadToMasterSheet(lead);
-    await clearReconciliation(brand);
-    await clearReconciliation("MASTER");
-  }).catch((err) => console.error("[walkin/sheets] Unexpected queue error:", err?.message));
+  // Mark before trying to claim the lease. If another Autoscale instance owns
+  // it, the DB lead still leaves a durable workbook-reconciliation request
+  // instead of losing the fire-and-forget Sheet mirror attempt.
+  void markReconciliation(brand, "MASTER")
+    .then(() => runWalkinSheetOperation("queued lead upsert", async () => {
+      await upsertLeadToSheet(brand, lead);
+      await upsertLeadToMasterSheet(lead);
+      await clearReconciliation(brand);
+      await clearReconciliation("MASTER");
+    }))
+    .catch((err) => console.error("[walkin/sheets] Unexpected queue error:", err?.message));
 }
 
 // ── Upsert a single lead into the master (combined) sheet ────────
@@ -1988,13 +1992,16 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
 // ── Fire-and-forget wrapper for archival sheet updates ────────────
 // Never throws — sheet failure must not block the API response.
 export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
-  runWalkinSheetOperation("queued lead removal", async () => {
-    await markReconciliation(brand, "MASTER");
-    await removeLeadFromSheet(brand, leadId);
-    await removeLeadFromMasterSheet(leadId);
-    await clearReconciliation(brand);
-    await clearReconciliation("MASTER");
-  }).catch((err) => console.error("[walkin/sheets] Unexpected remove error:", err?.message));
+  // Persist the recovery intent before lease acquisition for the same reason
+  // as queueUpsert: temporary cross-instance contention must not erase it.
+  void markReconciliation(brand, "MASTER")
+    .then(() => runWalkinSheetOperation("queued lead removal", async () => {
+      await removeLeadFromSheet(brand, leadId);
+      await removeLeadFromMasterSheet(leadId);
+      await clearReconciliation(brand);
+      await clearReconciliation("MASTER");
+    }))
+    .catch((err) => console.error("[walkin/sheets] Unexpected remove error:", err?.message));
 }
 
 /** Keep the brand and combined workbook changes together for a lead archive. */

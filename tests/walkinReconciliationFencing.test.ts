@@ -5,6 +5,7 @@ const {
   mockGoogleRefreshToken,
   mockInsert,
   mockDelete,
+  mockRunOperation,
   mockSheetsAppend,
   mockSheetsGet,
   mockSpreadsheetsGet,
@@ -13,6 +14,7 @@ const {
   mockGoogleRefreshToken: vi.fn(),
   mockInsert: vi.fn(),
   mockDelete: vi.fn(),
+  mockRunOperation: vi.fn(),
   mockSheetsAppend: vi.fn(),
   mockSheetsGet: vi.fn(),
   mockSpreadsheetsGet: vi.fn(),
@@ -54,7 +56,7 @@ vi.mock("../server/walkinSyncCoordinator", () => ({
   beginWalkinSyncShutdown: vi.fn(),
   fencedWalkinSheetWrite: mockFencedWrite,
   isWalkinSyncDraining: () => false,
-  runWalkinSheetOperation: (_name: string, operation: () => Promise<unknown>) => operation(),
+  runWalkinSheetOperation: mockRunOperation,
   waitForWalkinSyncDrain: async () => true,
 }));
 
@@ -100,6 +102,7 @@ describe("queueUpsert reconciliation fencing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGoogleRefreshToken.mockReturnValue("test-refresh-token");
+    mockRunOperation.mockImplementation((_name: string, operation: () => Promise<unknown>) => operation());
     mockInsert.mockImplementation(reconciliationInsert);
     mockDelete.mockImplementation(reconciliationDelete);
     mockSpreadsheetsGet.mockResolvedValue({
@@ -131,6 +134,19 @@ describe("queueUpsert reconciliation fencing", () => {
 
   it("keeps markers pending when authentication fails before any Sheet request", async () => {
     mockGoogleRefreshToken.mockReturnValue(null);
+
+    queueUpsert("RIS", lead);
+    await settleQueue();
+
+    expect(mockInsert).toHaveBeenCalledTimes(2);
+    expect(mockSheetsAppend).not.toHaveBeenCalled();
+    expect(mockDelete).not.toHaveBeenCalled();
+  });
+
+  it("keeps markers pending when another instance owns the lease", async () => {
+    mockRunOperation.mockRejectedValueOnce(
+      new Error("Another application instance is already synchronizing walk-in sheets"),
+    );
 
     queueUpsert("RIS", lead);
     await settleQueue();
