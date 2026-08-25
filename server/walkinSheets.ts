@@ -46,6 +46,7 @@ import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import type { WalkinLead } from "@shared/schema";
 import {
   beginWalkinSyncShutdown,
+  fencedWalkinSheetWrite,
   isWalkinSyncDraining,
   runWalkinSheetOperation,
   waitForWalkinSyncDrain,
@@ -426,20 +427,20 @@ async function ensureLeadsTab(
   if (exists) return false;
 
   // Create the tab
-  await sheets.spreadsheets.batchUpdate({
+  await fencedWalkinSheetWrite(`create ${tabName} tab`, () => sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: {
       requests: [{ addSheet: { properties: { title: tabName } } }],
     },
-  });
+  }));
 
   // Write the header row immediately so the tab is never empty
-  await sheets.spreadsheets.values.update({
+  await fencedWalkinSheetWrite(`write ${tabName} header`, () => sheets.spreadsheets.values.update({
     spreadsheetId,
     range: `${tabName}!A1`,
     valueInputOption: "USER_ENTERED",
     requestBody: { values: [headers as unknown as string[]] },
-  });
+  }));
 
   console.log(`[walkin/sheets] Created tab "${tabName}" and wrote header row`);
   return true; // caller should skip the data-clear step
@@ -570,22 +571,22 @@ export async function upsertLeadToSheet(
       if (existingRowIndex >= 0) {
         // Update existing row (Sheets row = existingRowIndex + 1, 1-based)
         const sheetsRow = existingRowIndex + 1;
-        await sheets.spreadsheets.values.update({
+        await fencedWalkinSheetWrite(`upsert ${brand} lead ${lead.id}`, () => sheets.spreadsheets.values.update({
           spreadsheetId: sheetId!,
           range: `${LEADS_TAB}!A${sheetsRow}`,
           valueInputOption: "USER_ENTERED",
           requestBody: { values: [row] },
-        });
+        }));
         console.log(`[walkin/sheets] Updated row ${sheetsRow} for lead ${lead.id} in ${brand} sheet`);
       } else {
         // Append a new row after the last row
-        await sheets.spreadsheets.values.append({
+        await fencedWalkinSheetWrite(`append ${brand} lead ${lead.id}`, () => sheets.spreadsheets.values.append({
           spreadsheetId: sheetId!,
           range: `${LEADS_TAB}!A1`,
           valueInputOption: "USER_ENTERED",
           insertDataOption: "INSERT_ROWS",
           requestBody: { values: [row] },
-        });
+        }));
         console.log(`[walkin/sheets] Appended new lead ${lead.id} to ${brand} sheet`);
       }
 
@@ -649,16 +650,16 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
 
       if (existingRowIndex >= 0) {
         const sheetsRow = existingRowIndex + 1;
-        await sheets.spreadsheets.values.update({
+        await fencedWalkinSheetWrite(`upsert Master lead ${lead.id}`, () => sheets.spreadsheets.values.update({
           spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A${sheetsRow}`,
           valueInputOption: "USER_ENTERED", requestBody: { values: [row] },
-        });
+        }));
       } else {
-        await sheets.spreadsheets.values.append({
+        await fencedWalkinSheetWrite(`append Master lead ${lead.id}`, () => sheets.spreadsheets.values.append({
           spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A1`,
           valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
           requestBody: { values: [row] },
-        });
+        }));
       }
 
       syncStatus.MASTER.lastSyncAt = new Date();
@@ -1041,10 +1042,10 @@ async function applyYellowColumnProtection(
     // We intentionally do NOT apply a colour here so staff corrections persist.
   ];
 
-  await sheets.spreadsheets.batchUpdate({
+  await fencedWalkinSheetWrite(`apply ${brand} sheet protections`, () => sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: { requests },
-  });
+  }));
 
   console.log(
     `[walkin/sheets] Yellow-column protections + dropdowns applied on tab "${LEADS_TAB}" (${brand})`,
@@ -1088,10 +1089,10 @@ async function applyMasterYellowColumnProtection(
     // Note: Status column background colour is managed manually in the sheet.
   ];
 
-  await sheets.spreadsheets.batchUpdate({
+  await fencedWalkinSheetWrite("apply Master sheet protections", () => sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: { requests },
-  });
+  }));
 
   console.log(
     `[walkin/sheets] Master A–O protections + Status/Source dropdowns applied on tab "${MASTER_LEADS_TAB}"`,
@@ -1131,31 +1132,31 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   if (!tabWasCreated) {
     // 3a. Clear existing data rows (A2:end), preserving the header row
     try {
-      await sheets.spreadsheets.values.clear({
+      await fencedWalkinSheetWrite(`clear ${brand} sheet for resync`, () => sheets.spreadsheets.values.clear({
         spreadsheetId: sheetId,
         range: `${LEADS_TAB}!A2:Z`,
-      });
+      }));
     } catch (err: any) {
       throw new Error(`${brand} sheet clear failed: ${err?.message ?? "Unknown error"}`);
     }
 
     // 3b. Re-write header row (ensures it's always up to date)
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite(`rewrite ${brand} sheet header`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: `${LEADS_TAB}!A1`,
       valueInputOption: "USER_ENTERED",
         requestBody: { values: [headers as unknown as string[]] },
-    });
+    }));
   }
 
   // 5. Write data rows (OVERWRITE uses existing empty cells; avoids row-shift that loses validation)
   if (dataRows.length > 0) {
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite(`write ${brand} resync rows`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: `${LEADS_TAB}!A2`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: dataRows },
-    });
+    }));
   }
 
   // 6. Protect yellow columns + Status/Source dropdowns — non-fatal; resync still succeeds if this fails
@@ -1210,28 +1211,28 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
   if (!masterTabWasCreated) {
     // Clear data rows
     try {
-      await sheets.spreadsheets.values.clear({
+      await fencedWalkinSheetWrite("clear Master sheet for resync", () => sheets.spreadsheets.values.clear({
         spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2:Z`,
-      });
+      }));
     } catch (err: any) {
       throw new Error(`Master sheet clear failed: ${err?.message ?? "Unknown error"}`);
     }
 
     // Re-write header row (ensures it stays current)
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite("rewrite Master sheet header", () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A1`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [MASTER_SHEET_HEADERS as unknown as string[]] },
-    });
+    }));
   }
 
   // 5. Write data rows (OVERWRITE — avoids row-shift that strips data validation)
   if (dataRows.length > 0) {
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite("write Master resync rows", () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A2`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: dataRows },
-    });
+    }));
   }
 
   // 6. Protect Master cols A–L (read-only) + Status/Source dropdowns — non-fatal
@@ -1504,10 +1505,10 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
             }));
 
           if (batchData.length > 0) {
-            await sheets.spreadsheets.values.batchUpdate({
+            await fencedWalkinSheetWrite(`propagate ${brand} changes to Master`, () => sheets.spreadsheets.values.batchUpdate({
               spreadsheetId: masterSheetId,
               requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
-            });
+            }));
             console.log(`[walkin/sheets] Master propagated ${batchData.length} row(s) from ${brand}`);
           }
         } catch (e: any) {
@@ -1729,10 +1730,10 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
           }));
 
         if (batchData.length > 0) {
-          await sheets.spreadsheets.values.batchUpdate({
+          await fencedWalkinSheetWrite(`propagate Master changes to ${brand}`, () => sheets.spreadsheets.values.batchUpdate({
             spreadsheetId: brandSheetId,
             requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
-          });
+          }));
           console.log(`[walkin/sheets] ${brand} sheet back-propagated ${batchData.length} row(s) from Master`);
         }
       } catch (e: any) {
@@ -1916,12 +1917,12 @@ export async function removeLeadFromSheet(
     }
 
     // Overwrite Status cell (column N = index 13) with "ARCHIVED"
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite(`archive ${brand} lead ${leadId}`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: `${LEADS_TAB}!N${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
-    });
+    }));
 
     console.log(`[walkin/sheets] Marked lead ${leadId} as ARCHIVED in ${brand} sheet (row ${sheetsRow})`);
     syncStatus[brand].lastSyncAt = new Date();
@@ -1967,12 +1968,12 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
     }
 
     // Overwrite Status cell (column P = index 15) with "ARCHIVED"
-    await sheets.spreadsheets.values.update({
+    await fencedWalkinSheetWrite(`archive Master lead ${leadId}`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: `${MASTER_LEADS_TAB}!P${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
-    });
+    }));
 
     console.log(`[walkin/sheets] Marked lead ${leadId} as ARCHIVED in Master sheet (row ${sheetsRow})`);
     syncStatus.MASTER.lastSyncAt = new Date();

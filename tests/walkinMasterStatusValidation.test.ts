@@ -74,6 +74,17 @@ vi.mock("../server/db", () => ({
   },
 }));
 
+// This suite calls the pull function directly to isolate validation. Production
+// routes wrap it in runWalkinSheetOperation; the pass-through fence here keeps
+// this unit test focused on the separately tested validation/back-propagation.
+vi.mock("../server/walkinSyncCoordinator", () => ({
+  beginWalkinSyncShutdown: vi.fn(),
+  fencedWalkinSheetWrite: (_name: string, write: () => Promise<unknown>) => write(),
+  isWalkinSyncDraining: () => false,
+  runWalkinSheetOperation: (_name: string, operation: () => Promise<unknown>) => operation(),
+  waitForWalkinSyncDrain: async () => true,
+}));
+
 // ── Import subjects under test (mocks are already in place) ──────────────────
 import { pullChangesFromMasterSheet } from "../server/walkinSheets";
 import { db } from "../server/db";

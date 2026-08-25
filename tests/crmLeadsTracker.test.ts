@@ -12,8 +12,8 @@
  *
  * Column layout verified against the live sheet (0-based):
  *   [0] Date  [1] Time  [2] Parent's Name  [3] Child's Name
- *   [4] Phone  [5] Program  [6] Status  [7] Remark
- *   [8] Lead Owner  [9] Source  [10] Walk-In Date  [11] Revisit Date  [12] Email ID
+ *   [4] Phone  [5] Program  [6] Centre  [7] Status  [8] Remark
+ *   [9] Lead Owner  [10] Source  [11] Walk-In Date  [12] Revisit Date  [13] Email ID
  */
 
 import { describe, it, expect } from "vitest";
@@ -34,10 +34,14 @@ import { aggregateCrmRows } from "../server/walkinSheets";
 
 // ── Synthetic sheet data ──────────────────────────────────────────
 // 20 rows modelled on a real CRM Leads Tracker tab.
-// Columns: Date · Time · Parent · Child · Phone · Program · Status ·
+// Columns: Date · Time · Parent · Child · Phone · Program · Centre · Status ·
 //          Remark · LeadOwner · Source · WalkInDate · RevisitDate · Email
 //
 // Date format is DD/MM/YYYY (the canonical format written by the sync system).
+
+function withCentre(row: string[]): string[] {
+  return [...row.slice(0, 6), "Brahmand", ...row.slice(6)];
+}
 
 const SYNTHETIC_ROWS: string[][] = [
   // ── June 2027 ──────────────────────────────────────────────────
@@ -64,7 +68,7 @@ const SYNTHETIC_ROWS: string[][] = [
   // ── July 2027 continued ───────────────────────────────────────
   ["11/07/2027", "11:00 AM", "Santosh Kumar", "Preethi K","9876543226", "Class 2",  "ADMISSION DONE",      "", "Suresh",  "Walk-In",   "12/07/2027", "", ""],
   ["12/07/2027", "03:30 PM", "Mala Reddy",    "Abhishek R","9876543227","Class 3",  "TRANSFERRED",         "", "Mohan",   "Referral",  "", "", ""],
-];
+].map(withCentre);
 
 // ── Non-blank row count (excludes the 2 blank rows above) ────────
 const EXPECTED_TOTAL_LEADS = 18;
@@ -168,8 +172,8 @@ describe("aggregateCrmRows — CRM Leads Tracker parser", () => {
 describe("aggregateCrmRows — date format handling", () => {
   it("parses DD/MM/YYYY correctly (canonical sheet format)", () => {
     const rows: string[][] = [
-      ["29/07/2027", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
-      ["01/08/2027", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
+      withCentre(["29/07/2027", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
+      withCentre(["01/08/2027", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
     ];
     const r = aggregateCrmRows(rows);
     expect(r.kpis.totalLeads).toBe(2);
@@ -180,8 +184,8 @@ describe("aggregateCrmRows — date format handling", () => {
 
   it("parses YYYY-MM-DD correctly (fallback format)", () => {
     const rows: string[][] = [
-      ["2027-07-29", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
-      ["2027-08-01", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
+      withCentre(["2027-07-29", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
+      withCentre(["2027-08-01", "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
     ];
     const r = aggregateCrmRows(rows);
     expect(r.kpis.totalLeads).toBe(2);
@@ -192,8 +196,8 @@ describe("aggregateCrmRows — date format handling", () => {
 
   it("assigns 'Unknown' month label to unrecognised date formats without crashing", () => {
     const rows: string[][] = [
-      ["July 2027",   "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
-      ["not-a-date",  "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""],
+      withCentre(["July 2027",   "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
+      withCentre(["not-a-date",  "", "", "", "", "Class 1", "OPEN", "", "", "Walk-In", "", "", ""]),
     ];
     const r = aggregateCrmRows(rows);
     expect(r.kpis.totalLeads).toBe(2);
@@ -202,8 +206,8 @@ describe("aggregateCrmRows — date format handling", () => {
 
   it("handles mixed DD/MM/YYYY and YYYY-MM-DD in the same sheet", () => {
     const rows: string[][] = [
-      ["15/07/2027", "", "", "", "", "Class 1", "ADMISSION DONE", "", "", "", "", "", ""],
-      ["2027-07-20", "", "", "", "", "Class 2", "ADMISSION DONE", "", "", "", "", "", ""],
+      withCentre(["15/07/2027", "", "", "", "", "Class 1", "ADMISSION DONE", "", "", "", "", "", ""]),
+      withCentre(["2027-07-20", "", "", "", "", "Class 2", "ADMISSION DONE", "", "", "", "", "", ""]),
     ];
     const r = aggregateCrmRows(rows);
     expect(r.kpis.totalLeads).toBe(2);

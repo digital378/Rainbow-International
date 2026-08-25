@@ -72,6 +72,16 @@ vi.mock("../server/db", () => ({
   },
 }));
 
+// Full resync is called directly here to isolate dropdown construction. Live
+// routes acquire the durable lease first; lease behaviour is covered separately.
+vi.mock("../server/walkinSyncCoordinator", () => ({
+  beginWalkinSyncShutdown: vi.fn(),
+  fencedWalkinSheetWrite: (_name: string, write: () => Promise<unknown>) => write(),
+  isWalkinSyncDraining: () => false,
+  runWalkinSheetOperation: (_name: string, operation: () => Promise<unknown>) => operation(),
+  waitForWalkinSyncDrain: async () => true,
+}));
+
 // ── Import subjects under test ────────────────────────────────────────────────
 import { resyncBrandToSheet, resyncMasterSheet, ALLOWED_GRADES_RIS, ALLOWED_GRADES_MASTER } from "../server/walkinSheets";
 import { db } from "../server/db";
