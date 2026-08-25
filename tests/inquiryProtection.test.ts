@@ -54,6 +54,24 @@ describe("public enquiry abuse protection", () => {
     expect(mockExecute).toHaveBeenCalledTimes(3);
   });
 
+  it("uses normalized phone and email values for duplicate detection", async () => {
+    mockExecute
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValueOnce({ rows: [{ exists: 1 }] });
+
+    await expect(checkInquiryProtection({
+      ...inquiry,
+      phone: "+91 98765 43210",
+      email: " Parent@Example.com ",
+    })).resolves.toEqual({ allowed: false, reason: "duplicate" });
+
+    const duplicateQuery = mockExecute.mock.calls[2]?.[0]?.queryChunks
+      ?.map((chunk: { value?: unknown }) => chunk.value)
+      ?.join("") ?? "";
+    expect(duplicateQuery).toContain("regexp_replace(phone");
+  });
+
   it("allows one valid submission after durable checks pass", async () => {
     mockExecute
       .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })

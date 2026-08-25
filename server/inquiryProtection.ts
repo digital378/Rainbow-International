@@ -90,9 +90,10 @@ export async function checkInquiryProtection(
   const duplicate = await db.execute(sql`
     SELECT 1
     FROM inquiries
-    WHERE phone = ${input.phone}
+    WHERE regexp_replace(phone, '[^0-9]', '', 'g') =
+        regexp_replace(${input.phone}, '[^0-9]', '', 'g')
       AND (
-        (${input.email || ""} <> "" AND lower(coalesce(email, '')) = lower(${input.email || ""}))
+        (${input.email || ""} <> "" AND lower(trim(coalesce(email, ''))) = lower(trim(${input.email || ""})))
         OR (${input.email || ""} = '' AND coalesce(email, '') = '')
       )
       AND created_at >= now() - (${DUPLICATE_WINDOW_MS} * interval '1 millisecond')
