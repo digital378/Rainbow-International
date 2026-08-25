@@ -1,0 +1,99 @@
+CONTEXT
+I am planning to migrate this exact project from Replit's North America
+publishing geography to Asia, to cut latency for our users in India.
+
+Current production: Autoscale (4 vCPU / 8 GiB RAM / 5 max), North America
+geography, production database connected, serving
+https://rainbowinternationalschool.in and https://www.rainbowinternationalschool.in
+
+Replit has indicated that publishing geography is fixed at first publish, and
+that moving to Asia requires creating a new project in an Asia workspace,
+republishing there, and migrating everything across manually.
+
+Before I touch anything, I need a complete and accurate picture of this system.
+
+RULES FOR THIS TASK — READ FIRST
+1. This is INVESTIGATION ONLY. Do NOT modify, create or delete any file. Do NOT
+   run any database migration. Do NOT deploy or republish. Do NOT change any
+   setting. Report only.
+2. NEVER print the value of any secret, token, key or credential. Names only.
+3. If you cannot verify something from the actual codebase or config, write
+   "UNKNOWN — could not verify". Do not guess, do not infer, do not fill gaps
+   with plausible answers. I am making production decisions from this.
+4. For every claim about the code, cite the file path and line number.
+5. Answer using the exact numbered structure below.
+
+1. SURFACE AREA
+   1a. Every route and endpoint this app exposes. For each: the path, what it
+       does, and whether it is public or requires authentication. Include the
+       public website pages, /mcp, /openapi.yaml, the admin panel, /leads, the
+       branch walk-in forms, and any API routes.
+   1b. Every scheduled job, cron task, or background worker, with its schedule
+       and what it writes to.
+   1c. Is Replit Object Storage used? If yes, what is stored there and how large?
+   1d. The NAMES ONLY of every secret / environment variable, and what each is for.
+
+2. DATABASE
+   2a. Database type and provider, total size, and every table with its row count.
+   2b. Which tables receive writes during normal daily use, and roughly how often.
+   2c. Which tables hold the AY 2027-28 CRM lead data.
+   2d. Any extensions, sequences, triggers, or migration tooling that must be
+       reproduced on a new database.
+   2e. Exact steps to take a complete backup and restore it into a brand-new
+       Replit database on a different project. I am not a developer and have no
+       terminal — give me steps I can follow from the Replit UI, or tell me
+       precisely what to ask you to run on my behalf.
+
+3. EXTERNAL INTEGRATIONS
+   3a. Every external service this app talks to (Google Sheets, Google OAuth,
+       Google Ads, Meta Ads, anything else) and how each one authenticates.
+   3b. Exactly how the app WRITES to the Google Sheets WALKINs tabs, and how it
+       READS the live dashboard sheets. Are sheet IDs hardcoded or in secrets?
+   3c. Where are Google OAuth redirect URIs configured — in code, in secrets, or
+       only in Google Cloud Console?
+   3d. Any incoming or outgoing webhooks.
+   3e. Does any external service allowlist our current server IP address? Moving
+       region will change our outbound IP — flag anything that would break.
+
+4. PORTABILITY BLOCKERS
+   4a. Search the ENTIRE codebase for hardcoded absolute URLs — anything
+       containing "replit.app", "rainbowinternationalschool.in", or a full
+       https:// address. List every occurrence with file and line number.
+   4b. For each one, state whether it breaks if this app runs at a different
+       .replit.app subdomain.
+   4c. Any CORS allowlists, cookie domain settings, or CSP headers tied to the
+       current domain.
+
+5. PARALLEL-RUN SAFETY — IMPORTANT
+   5a. If a second copy of this app ran at the same time with the same secrets,
+       would BOTH copies write to the same Google Sheets? Would both write to
+       the same database? Would both run the same scheduled jobs?
+   5b. Give me a single environment variable or config flag that puts a copy into
+       a fully safe state: no Google Sheets writes, no scheduled jobs, no
+       outbound webhooks, no writes to production data — while leaving the rest
+       of the app testable.
+   5c. If no such flag exists, tell me exactly what would need to change to
+       create one.
+
+6. WHAT CARRIES OVER
+   If I fork this project into a new project in an Asia workspace and publish it
+   there, state clearly for each: does it carry over automatically, yes or no?
+   - The production database and its data
+   - Object Storage contents
+   - Secrets / environment variables
+   - Scheduled jobs
+   - Custom domain configuration
+   Also: check current Replit documentation and confirm whether publishing
+   geography is genuinely permanent, or whether it can be changed on an existing
+   deployment.
+
+7. CUTOVER
+   7a. When I move the custom domain from the old deployment to the new one, what
+       is the realistic total downtime, including SSL certificate issuance?
+   7b. Is there any way to reduce that window?
+   7c. What is the fastest rollback if the new deployment fails after cutover?
+
+8. YOUR ASSESSMENT
+   8a. Rank the top 5 things most likely to break in this migration, most likely
+       first, with why.
+   8b. What have I NOT asked about that I should have? Be specific.
