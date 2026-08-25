@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
   mockFencedWrite,
+  mockGoogleRefreshToken,
   mockInsert,
   mockDelete,
   mockSheetsAppend,
@@ -9,6 +10,7 @@ const {
   mockSpreadsheetsGet,
 } = vi.hoisted(() => ({
   mockFencedWrite: vi.fn(),
+  mockGoogleRefreshToken: vi.fn(),
   mockInsert: vi.fn(),
   mockDelete: vi.fn(),
   mockSheetsAppend: vi.fn(),
@@ -45,7 +47,7 @@ vi.mock("../server/db", () => ({
 }));
 
 vi.mock("../server/googleCredentials", () => ({
-  getGoogleRefreshToken: vi.fn().mockResolvedValue("test-refresh-token"),
+  getGoogleRefreshToken: mockGoogleRefreshToken,
 }));
 
 vi.mock("../server/walkinSyncCoordinator", () => ({
@@ -97,6 +99,7 @@ async function settleQueue(): Promise<void> {
 describe("queueUpsert reconciliation fencing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGoogleRefreshToken.mockReturnValue("test-refresh-token");
     mockInsert.mockImplementation(reconciliationInsert);
     mockDelete.mockImplementation(reconciliationDelete);
     mockSpreadsheetsGet.mockResolvedValue({
@@ -124,5 +127,16 @@ describe("queueUpsert reconciliation fencing", () => {
 
     expect(mockSheetsAppend).toHaveBeenCalledTimes(2);
     expect(mockDelete).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps markers pending when authentication fails before any Sheet request", async () => {
+    mockGoogleRefreshToken.mockReturnValue(null);
+
+    queueUpsert("RIS", lead);
+    await settleQueue();
+
+    expect(mockInsert).toHaveBeenCalledTimes(2);
+    expect(mockSheetsAppend).not.toHaveBeenCalled();
+    expect(mockDelete).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,39 @@
+Approving the release, but the runbook has a gap I need closed first.
+
+Section 3 says to reauthorize only if the encrypted credential state is not
+healthy. That skips revoking the exposed token. That token has spreadsheets
+read+write and adwords scopes and has been valid since May 2026 — it must be
+revoked regardless of app health, because the point is invalidating the exposed
+credential, not fixing a broken connection.
+
+Rewrite section 3 as a mandatory sequence and give me the click-by-click:
+
+1. What exactly I click to reach the Google grant revoke page, and how I identify
+   the correct grant ("Rainbow Group Bot") among the others listed.
+2. What breaks the moment I revoke, and how I will see it break — which dashboard
+   goes blank, which log line appears, what the admin credential state shows.
+3. Exactly where I click to restart the OAuth consent flow, what Google's screen
+   will look like, and what confirms a NEW refresh token was issued rather than
+   the old one returned.
+4. What the admin screen should show afterward.
+5. How long the whole window realistically takes, and what I check to confirm the
+   sync resumed cleanly.
+
+Also confirm three things:
+
+a. During the revoke-to-reauth window the sync fails authentication every 60
+   seconds. Confirm those failures leave reconciliation markers pending rather
+   than clearing them, and that the first successful post-reauth cycle drains
+   them correctly. Point me at the test that proves it.
+
+b. The Master sheet currently has 2 rows where only 1 is canonical — the extra is
+   the legacy malformed row. Tell me whether the first normal sync after deploy
+   touches that row, or whether it only gets cleaned up by a deliberate full
+   resync. I want to know if it disappears on its own.
+
+c. Section 2 says stop if any proposed schema change looks destructive. List the
+   exact schema changes I should expect to see so I can recognise an unexpected
+   one — I will not be able to judge that on the spot.
+
+Give me the revised runbook with section 3 rewritten. Then hold — I will tell you
+when to publish.
