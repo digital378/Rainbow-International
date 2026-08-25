@@ -1,0 +1,47 @@
+First: stop and fix #286 today
+
+The report flags "Current potential OAuth-value exposure — High" and proposes follow-up #286, "prevent confidential OAuth details appearing in HTML."
+
+That means OAuth credentials may be rendering into publicly served HTML on your live school website, right now. That has nothing to do with the migration and doesn't wait for it. Ask the Agent today:
+
+Implement follow-up #286. Show me exactly which OAuth values are currently reachable in served HTML, on which routes, and since when. After fixing, tell me which credentials I must rotate in Google Cloud Console and Meta.
+
+Assume anything exposed is compromised and rotate it.
+
+What the audit did to my earlier plan
+
+You cannot test the Asia copy. server/index.ts:67-88 — in production, any *.replit.app request is 301-redirected to your custom domain. So the moment you publish the copy, visiting its own URL bounces you to the old site. My Phase 2 ("test on the .replit.app URL before touching DNS") is impossible until follow-up #288 is done.
+
+An unguarded copy can destroy your live lead data. This is the finding that matters most. The walk-in reverse sync (walkinSheets.ts:2291-2325) starts 30 seconds after boot, then runs every 60 seconds, and it "archives missing rows and rewrites brand sheets."
+
+Read that again. A copy booted with real Sheets credentials and a restored-but-stale database will, within half a minute and unprompted, rewrite your live RIS and RPS WALKINs tabs from its own stale data — and those tabs feed your Master Tracker through IMPORTRANGE. That's not a duplicate-rows problem. That's your admissions pipeline overwritten, with no undo.
+
+The Agent confirmed there is no safe mode to prevent this (#287 proposes building one).
+
+My recommendation: don't do this migration now
+
+Weigh what's actually on each side.
+
+Gain: roughly 300–500ms off TTFB. LCP from 2,453ms to maybe 2,000ms. No ranking change — same domain, same URLs, .in ccTLD already handling geo-targeting.
+
+Cost: build a safe mode (#287), centralize host config across ~20 files touching canonicals, sitemap, robots, SSR metadata and monitoring (#288), fix a security exposure (#286), migrate a database with sequence preservation, relocate blog images off ephemeral disk, re-register OAuth redirect URIs across Google Cloud Console and MCP, reauthorize 19 MCP OAuth clients and 17 refresh tokens, run a write-freeze, and reconnect your Claude connectors — all on a system running live admissions, executed by someone who isn't a developer.
+
+That's weeks of engineering risk for 400 milliseconds. The Agent reached the same conclusion independently: "Do not execute the regional move immediately."
+
+Do this instead, in order
+#286 today. Security, not optional.
+Check whether your blog images are already broken. The audit found blog uploads live on local disk at ./uploads/blog, not Object Storage — and Autoscale filesystems aren't durable. With 96 blog posts and frequent republishes, some images may already be gone. Open five older blog posts and look. If they're broken, that's a live bug worth more than the migration.
+The image optimization from my first message. Still your best speed lever — 1,243ms of image discovery and download time, versus 400ms from the region move, at a fraction of the risk.
+#288, host centralization. Worth doing on its own merits — it removes hardcoded-domain fragility and makes any future move trivial.
+Re-measure Core Web Vitals in four weeks. If LCP is comfortably under 2,000ms by then, the region move has no remaining justification.
+One thing to resolve
+
+walkin_leads shows only 4 rows, while walkin_checkins has 218 and AY 2027-28 is supposedly database-backed. Ask the Agent:
+
+If AY 2027-28 CRM data lives in walkin_leads, why are there only 4 rows? Where is the actual lead volume for this cycle — in the database, or in the Google Sheets?
+
+If the answer is "the Sheets," then your Sheets are the crown jewels, not the database — and the reverse-sync overwrite risk is even more serious than the report already makes it sound.
+
+If you migrate anyway
+
+Then #286, #287 and #288 are hard gates, not suggestions. Nothing gets published to Asia until the safe mode exists and is verified — because without it, the failure mode isn't downtime, it's silently rewriting your live admissions sheets during a season you can't repeat.
