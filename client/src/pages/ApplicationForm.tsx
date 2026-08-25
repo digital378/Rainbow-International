@@ -29,7 +29,7 @@ const timeSlots = [
 const emptyForm = {
   studentName: "", dateOfBirth: "", gradeApplying: "",
   parentName: "", email: "", phone: "",
-  currentSchool: "", address: "", preferredDate: "", timeSlot: "", message: "",
+  currentSchool: "", address: "", preferredDate: "", timeSlot: "", message: "", website: "",
 };
 
 export default function ApplicationForm() {
@@ -48,6 +48,7 @@ export default function ApplicationForm() {
         preferredTime: data.timeSlot,
         message: `Application Form | DOB: ${data.dateOfBirth} | Current School: ${data.currentSchool} | Preferred Visit: ${data.preferredDate} ${data.timeSlot} | Address: ${data.address} | Notes: ${data.message}`,
         ...getFormTrackingData("Application Form"),
+        website: data.website,
       }),
     onSuccess: () => setSubmitted(true),
     onError: () => toast({ title: "Submission failed", description: "Please try again or call us directly.", variant: "destructive" }),
@@ -140,6 +141,7 @@ export default function ApplicationForm() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                <input name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px opacity-0" />
                 {/* Student details */}
                 <h3 className="text-lg font-bold text-[#091a4f] border-b border-gray-100 pb-3">Student Details</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

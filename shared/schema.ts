@@ -24,6 +24,23 @@ export const inquiries = pgTable("inquiries", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const inquiryAbuseBuckets = pgTable("inquiry_abuse_buckets", {
+  bucketKey: text("bucket_key").primaryKey(),
+  windowStartedAt: timestamp("window_started_at").notNull(),
+  requestCount: integer("request_count").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("inquiry_abuse_buckets_updated_at_idx").on(table.updatedAt),
+]);
+
+const safeTrackingValue = (maxLength: number, label: string) =>
+  z.string()
+    .trim()
+    .max(maxLength, `${label} is too long`)
+    .regex(/^[^<>{}$`\\]*$/, `${label} contains unsupported characters`)
+    .optional()
+    .or(z.literal(""));
+
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
@@ -36,14 +53,14 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({
   preferredTime: z.string().trim().max(120, "Preferred time is too long").optional().or(z.literal("")),
   email: z.string().trim().email("Please enter a valid email").max(254, "Email is too long").optional().or(z.literal("")),
   message: z.string().trim().max(3000, "Message is too long").optional().or(z.literal("")),
-  pagePath: z.string().trim().max(500, "Page path is too long").optional().or(z.literal("")),
-  pageTitle: z.string().trim().max(200, "Page title is too long").optional().or(z.literal("")),
-  formLocation: z.string().trim().max(120, "Form location is too long").optional().or(z.literal("")),
-  utmSource: z.string().trim().max(100, "Campaign source is too long").optional().or(z.literal("")),
-  utmMedium: z.string().trim().max(100, "Campaign medium is too long").optional().or(z.literal("")),
-  utmCampaign: z.string().trim().max(200, "Campaign name is too long").optional().or(z.literal("")),
-  utmTerm: z.string().trim().max(200, "Campaign term is too long").optional().or(z.literal("")),
-  utmContent: z.string().trim().max(200, "Campaign content is too long").optional().or(z.literal("")),
+  pagePath: safeTrackingValue(500, "Page path"),
+  pageTitle: safeTrackingValue(200, "Page title"),
+  formLocation: safeTrackingValue(120, "Form location"),
+  utmSource: safeTrackingValue(100, "Campaign source"),
+  utmMedium: safeTrackingValue(100, "Campaign medium"),
+  utmCampaign: safeTrackingValue(200, "Campaign name"),
+  utmTerm: safeTrackingValue(200, "Campaign term"),
+  utmContent: safeTrackingValue(200, "Campaign content"),
 });
 
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;

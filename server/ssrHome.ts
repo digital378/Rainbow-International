@@ -431,6 +431,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
         </div>
         <div class="hero-form-body">
           <form action="/api/inquiries" method="POST">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;opacity:0" />
             <input type="text" name="parentName" placeholder="Parent Name *" required />
             <input type="tel" name="phone" placeholder="Phone Number *" required />
             <input type="text" name="studentName" placeholder="Child's Name *" required />

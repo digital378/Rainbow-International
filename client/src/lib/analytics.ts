@@ -162,6 +162,7 @@ export function pushToDataLayer(event: Record<string, any>): void {
 }
 
 const UTM_STORAGE_KEY = "ris_utm_params";
+const FORM_STARTED_AT = Date.now();
 
 function captureAndStoreUTM(): void {
   const params = new URLSearchParams(window.location.search);

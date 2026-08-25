@@ -36,7 +36,7 @@ const contactDetails = [
 export default function ScheduleAppointment() {
   const { toast } = useToast();
   const [form, setForm] = useState({
-    name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "",
+    name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "", website: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -52,6 +52,7 @@ export default function ScheduleAppointment() {
         preferredTime: data.timeSlot,
         message: `Appointment Request | Purpose: ${data.purpose} | Date: ${data.date} | Time: ${data.timeSlot} | Notes: ${data.message}`,
         ...getFormTrackingData("Schedule Appointment Form"),
+        website: data.website,
       }),
     onSuccess: () => setSubmitted(true),
     onError: () => toast({ title: "Submission failed", description: "Please call us directly.", variant: "destructive" }),
@@ -130,7 +131,7 @@ export default function ScheduleAppointment() {
                 <h3 className="text-2xl font-extrabold text-[#091a4f] mb-2">Thank You!</h3>
                 <p className="text-gray-500 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
                 <button
-                  onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "" }); }}
+                  onClick={() => { setSubmitted(false); setForm({ name: "", phone: "", email: "", purpose: "", date: "", timeSlot: "", message: "", website: "" }); }}
                   data-testid="button-schedule-another-request"
                   className="px-7 py-2.5 text-sm font-semibold border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
                 >
@@ -139,6 +140,7 @@ export default function ScheduleAppointment() {
               </div>
             ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              <input name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px opacity-0" />
               <h3 className="text-lg font-bold text-[#091a4f] mb-2">Book Your Campus Visit</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>

@@ -20,6 +20,7 @@ export function HeroForm() {
   const [submitted, setSubmitted] = useState(false);
   const [location, setLocation] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
+  const [website, setWebsite] = useState("");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
@@ -41,6 +42,7 @@ export function HeroForm() {
           ...data,
           message: messageParts || undefined,
           ...trackingData,
+          website,
         }),
       });
       if (!res.ok) throw new Error();
@@ -56,6 +58,7 @@ export function HeroForm() {
       reset();
       setLocation("");
       setPreferredDate("");
+      setWebsite("");
     } catch {
       toast.error("Could not submit. Please try again.");
     } finally {
@@ -99,6 +102,15 @@ export function HeroForm() {
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+            <input
+              name="website"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[10000px] h-px w-px opacity-0"
+            />
             {/* Parent Name + Phone */}
             <div className="grid grid-cols-2 gap-3">
               <div>

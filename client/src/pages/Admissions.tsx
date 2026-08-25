@@ -149,7 +149,7 @@ function GradeCard({ g }: { g: typeof gradeBlocks[0] }) {
 
 // ── Form state ────────────────────────────────────────────────────────────────
 
-const emptyForm = { parentName: "", phone: "", studentName: "", gradeApplying: "", location: "", preferredDate: "", message: "" };
+const emptyForm = { parentName: "", phone: "", studentName: "", gradeApplying: "", location: "", preferredDate: "", message: "", website: "" };
 
 export default function Admissions() {
   const { toast } = useToast();
@@ -165,6 +165,7 @@ export default function Admissions() {
         grade: data.gradeApplying,
         message: `Admissions Page | Location: ${data.location} | Preferred Visit: ${data.preferredDate} | Notes: ${data.message}`,
         ...getFormTrackingData("Admissions Landing Page"),
+        website: data.website,
       }),
     onSuccess: () => setSubmitted(true),
     onError: () => toast({ title: "Submission failed", description: "Please try again or call us at +91 82915 68972.", variant: "destructive" }),
@@ -292,6 +293,7 @@ export default function Admissions() {
                   <p className="text-gray-500 text-xs mt-1">Our counsellor will call you back within one working day.</p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4" data-testid="form-enquiry">
+                  <input name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px opacity-0" />
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className={lbl}>Parent Name *</label>
@@ -557,6 +559,7 @@ export default function Admissions() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5" data-testid="form-bottom-enquiry">
+                <input name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px opacity-0" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className={lbl}>Parent Name *</label>

@@ -51,6 +51,7 @@ export default function ContactUs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [website, setWebsite] = useState("");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<InsertInquiry>({
     resolver: zodResolver(insertInquirySchema),
@@ -63,7 +64,7 @@ export default function ContactUs() {
       const response = await fetch("/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ...trackingData }),
+        body: JSON.stringify({ ...data, ...trackingData, website }),
       });
       if (!response.ok) throw new Error("Failed");
       trackFormSubmit({
@@ -76,6 +77,7 @@ export default function ContactUs() {
       setSubmitted(true);
       reset();
       setAgreed(false);
+      setWebsite("");
     } catch {
       toast.error("Submission failed. Please try again or call us directly.");
     } finally {
@@ -174,6 +176,15 @@ export default function ContactUs() {
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <input
+                      name="website"
+                      value={website}
+                      onChange={(event) => setWebsite(event.target.value)}
+                      tabIndex={-1}
+                      autoComplete="off"
+                      aria-hidden="true"
+                      className="absolute -left-[10000px] h-px w-px opacity-0"
+                    />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Parent Name *</label>
