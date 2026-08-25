@@ -254,6 +254,8 @@ export function getFormTrackingData(formLocation: string) {
     utmCampaign: utm.utm_campaign,
     utmTerm: utm.utm_term,
     utmContent: utm.utm_content,
+    formStartedAt: FORM_STARTED_AT,
+    website: "",
   };
 }
 

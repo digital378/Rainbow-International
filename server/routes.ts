@@ -54,6 +54,7 @@ import {
   parseCounselorPerformanceFilters,
   type CounselorPerformanceRecord,
 } from "./counselorPerformance";
+import { checkInquiryProtection } from "./inquiryProtection";
 
 /** Derive "Mon-YY" month label from a YYYY-MM-DD date string (e.g. "2027-06-15" → "Jun-27"). */
 function crmMonthLabel(dateStr: string): string {
@@ -198,9 +199,19 @@ function getTransporter() {
   };
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[character] || character);
+}
+
 function tableRow(label: string, value: string | undefined | null) {
   if (!value) return "";
-  return `<tr><td style="padding:8px 14px;font-weight:bold;border-bottom:1px solid #eee;color:#091a4f;">${label}</td><td style="padding:8px 14px;border-bottom:1px solid #eee;">${value}</td></tr>`;
+  return `<tr><td style="padding:8px 14px;font-weight:bold;border-bottom:1px solid #eee;color:#091a4f;">${escapeHtml(label)}</td><td style="padding:8px 14px;border-bottom:1px solid #eee;">${escapeHtml(value)}</td></tr>`;
 }
 
 function getLeadSourceLabel(utmSource?: string | null, utmMedium?: string | null): string {
@@ -263,7 +274,7 @@ async function sendInquiryEmail(data: {
     from: mailer.from,
     to: mailer.to,
     replyTo: data.email || undefined,
-    subject: `New Admission Enquiry – ${data.studentName} (${data.grade})`,
+    subject: `New Admission Enquiry – ${String(data.studentName).replace(/[\r\n]/g, " ")} (${String(data.grade).replace(/[\r\n]/g, " ")})`,
     html: `
       <div style="font-family:'Segoe UI',sans-serif;max-width:600px;">
         <div style="background:#091a4f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
@@ -686,6 +697,24 @@ export async function registerRoutes(
   app.post("/api/inquiries", async (req, res) => {
     try {
       const validatedData = insertInquirySchema.parse(req.body);
+      const protection = await checkInquiryProtection({
+        ipAddress: req.ip || req.headers["x-forwarded-for"]?.toString().split(",")[0]?.trim() || "unknown",
+        parentName: validatedData.parentName,
+        studentName: validatedData.studentName,
+        phone: validatedData.phone,
+        email: validatedData.email,
+        grade: validatedData.grade,
+        honeypot: req.body?.website,
+        formStartedAt: req.body?.formStartedAt,
+      });
+      if (!protection.allowed) {
+        console.warn(`[inquiry] Rejected public submission: ${protection.reason}`);
+        return res.status(protection.reason === "rate_limited" ? 429 : 400).json({
+          message: protection.reason === "rate_limited"
+            ? "Too many submissions. Please wait a few minutes and try again."
+            : "Unable to submit this enquiry. Please call the admissions office directly.",
+        });
+      }
       const inquiry = await storage.createInquiry(validatedData);
       sendInquiryEmail(validatedData).catch((err) =>
         console.error("[inquiry] Email error:", err)
@@ -702,7 +731,7 @@ export async function registerRoutes(
         grade: validatedData.grade,
         phone: validatedData.phone,
         email: validatedData.email ?? "",
-        source: typeof req.body?.source === "string" ? req.body.source : "",
+        source: validatedData.utmSource || "",
       }).then(() => bustCrmStatsCache("RIS")).catch((err) => console.error("[inquiry] CRM Leads Tracker append error:", err));
       res.status(201).json(inquiry);
     } catch (error: any) {
