@@ -1,0 +1,34 @@
+Diff approved. Before deploying, resolve these:
+
+1. Prove the 22 failing tests are pre-existing. Stash your changes, run the
+   full suite on the unmodified code, and show me the failure count and names.
+   Then unstash and re-run. I need to see the same 22 fail both times.
+
+2. SESSION_SECRET is now the encryption key material. If it is ever rotated or
+   lost, the encrypted record becomes undecryptable and the app fails to boot by
+   design. Document the exact recovery procedure for that scenario, and tell me
+   whether SESSION_SECRET is currently set explicitly in Secrets or generated at
+   runtime. If it is generated at runtime rather than pinned, the encrypted
+   record will break on the next deploy — confirm which it is.
+
+3. After re-auth creates the encrypted record, the plaintext GOOGLE_REFRESH_TOKEN
+   secret becomes redundant. Tell me at exactly which step I should delete it
+   from Replit Secrets, and what verification proves the encrypted record is
+   being used before I remove the fallback.
+
+4. Deployment mechanics: republishing production restarts the app, which restarts
+   the 60-second walk-in sheet reverse sync and all startup bootstrap writes.
+   Confirm what happens to an in-flight sync during republish, and confirm the
+   deploy causes no data loss or duplicate sheet writes.
+
+5. Rollback: if the new boot-time validation fails on production and the app will
+   not start, what is my exact rollback? Confirm I can roll back to the previous
+   deployment version from the Publishing UI, and tell me how.
+
+Then give me the complete cutover runbook as click-by-click steps I can follow
+without a terminal. I am not a developer. For every step state: exactly where to
+click, what I should see if it worked, and what to do if it did not. Include the
+exact URL for revoking the Google grant, which specific grant to revoke, and the
+exact URL or button that re-runs the OAuth consent flow with prompt=consent.
+
+Do not deploy until I confirm.
