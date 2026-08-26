@@ -43,6 +43,7 @@ import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
 import { registerMcpGateway } from "./mcpGateway";
+import { isDestinationReadOnly } from "./destinationReadOnly";
 import { db } from "./db";
 import {
   getGoogleRefreshToken,
@@ -187,6 +188,11 @@ function resumeContentMatchesType(file: Express.Multer.File): boolean {
 
 // ── Email helpers ───────────────────────────────────────────────
 function getTransporter() {
+  if (isDestinationReadOnly()) {
+    console.log("[mail] Destination read-only mode: SMTP disabled.");
+    return null;
+  }
+
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = Number(process.env.SMTP_PORT) || 587;
   const smtpUser = process.env.SMTP_USER;

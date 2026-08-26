@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "./db";
+import { assertDestinationWritable } from "./destinationReadOnly";
 
 const LEASE_NAME = "walkin-sheets";
 const LEASE_TTL_MS = 90_000;
@@ -179,6 +180,8 @@ export async function runWalkinSheetOperation<T>(
   operationName: string,
   operation: () => Promise<T>,
 ): Promise<T> {
+  assertDestinationWritable(operationName);
+
   let releaseLocalSlot!: () => void;
   const priorLocalOperation = localOperationTail;
   localOperationTail = new Promise<void>((resolve) => { releaseLocalSlot = resolve; });
@@ -202,6 +205,7 @@ export async function fencedWalkinSheetWrite<T>(
   writeName: string,
   write: () => Promise<T>,
 ): Promise<T> {
+  assertDestinationWritable(writeName);
   return coordinator.fencedWrite(writeName, write);
 }
 

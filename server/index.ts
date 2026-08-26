@@ -13,6 +13,7 @@ import {
   applyNonCanonicalRobotsPolicy,
   applyProductionHostRedirect,
 } from "./productionHostPolicy";
+import { blockDestinationMutations, isDestinationReadOnly } from "./destinationReadOnly";
 
 const app = express();
 const httpServer = createServer(app);
@@ -101,6 +102,7 @@ app.use(
 );
 
 app.use(express.urlencoded({ extended: false }));
+app.use(blockDestinationMutations);
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -143,11 +145,15 @@ app.use((req, res, next) => {
   // Validate encrypted Google OAuth storage before any route or background
   // worker can use Google services. A corrupt encrypted record must stop boot.
   await initializeGoogleCredentials();
-  await autoSeedBlogsIfEmpty();
-  await runWalkinSheetOperation("startup bootstrap", async () => {
-    await bootstrapWalkinSequences();
-    await bootstrapWalkinLookups();
-  });
+  if (isDestinationReadOnly()) {
+    console.log("[startup] Destination read-only mode: write bootstraps skipped.");
+  } else {
+    await autoSeedBlogsIfEmpty();
+    await runWalkinSheetOperation("startup bootstrap", async () => {
+      await bootstrapWalkinSequences();
+      await bootstrapWalkinLookups();
+    });
+  }
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

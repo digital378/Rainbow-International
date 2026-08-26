@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   WalkinLeaseCoordinator,
   WalkinSyncLeaseLostError,
@@ -47,6 +47,22 @@ function coordinator(ownerId: string, store: ReturnType<typeof makeLeaseStore>["
 }
 
 describe("walk-in Sheets durable lease fencing", () => {
+  afterEach(() => {
+    delete process.env.DESTINATION_READ_ONLY;
+  });
+
+  it("rejects a sync operation before it can claim a lease or reach Google in destination read-only mode", async () => {
+    process.env.DESTINATION_READ_ONLY = "true";
+    const lease = makeLeaseStore();
+    const readOnlyCoordinator = coordinator("read-only-instance", lease.store);
+    const operation = vi.fn().mockResolvedValue(undefined);
+
+    await expect(readOnlyCoordinator.run("manual resync", operation))
+      .rejects.toThrow("Destination copy is read-only");
+    expect(operation).not.toHaveBeenCalled();
+    expect(await lease.store.isHeld("read-only-instance")).toBe(false);
+  });
+
   it("recovers deterministically after an instance is killed without SIGTERM mid-cycle", async () => {
     const lease = makeLeaseStore();
     const killedInstance = coordinator("killed-instance", lease.store);

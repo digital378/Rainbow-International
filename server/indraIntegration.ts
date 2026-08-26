@@ -2,6 +2,7 @@ import type { Express, NextFunction, Request, Response } from "express";
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { and, desc, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
 import { db } from "./db";
+import { isDestinationReadOnly } from "./destinationReadOnly";
 import {
   blogPostsTable,
   brochureRequests,
@@ -812,6 +813,10 @@ async function buildPushPayload(since: Date | null, checkpointAt: Date, delivery
 }
 
 export async function runIndraPush(): Promise<{ deliveryId: string; sent: boolean; reason?: string }> {
+  if (isDestinationReadOnly()) {
+    return { deliveryId: "", sent: false, reason: "Destination copy is read-only" };
+  }
+
   const pushUrl = process.env.INDRA_PUSH_URL || DEFAULT_PUSH_URL;
   const pushSecret = process.env.INDRA_PUSH_SECRET;
   if (process.env.INDRA_PUSH_ENABLED !== "true" || !pushSecret || !isAllowedPushUrl(pushUrl)) {
@@ -865,6 +870,11 @@ export async function runIndraPush(): Promise<{ deliveryId: string; sent: boolea
 export function startIndraPushScheduler() {
   if (schedulerStarted) return;
   schedulerStarted = true;
+  if (isDestinationReadOnly()) {
+    console.log("[indra] Destination read-only mode: scheduled delivery disabled.");
+    return;
+  }
+
   const intervalMinutes = Number.parseInt(process.env.INDRA_PUSH_INTERVAL_MINUTES || "0", 10) || 0;
   if (process.env.INDRA_PUSH_ENABLED !== "true" || intervalMinutes < 5) {
     console.log("[indra] Scheduled delivery disabled. Enable it only after the Indra receiver and shared secret are configured.");

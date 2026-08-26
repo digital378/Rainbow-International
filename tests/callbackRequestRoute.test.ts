@@ -19,6 +19,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import nodemailer from "nodemailer";
 import express from "express";
 import { createServer } from "node:http";
 
@@ -246,6 +247,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  delete process.env.DESTINATION_READ_ONLY;
   await new Promise<void>((resolve, reject) =>
     httpServer.close((err) => (err ? reject(err) : resolve()))
   );
@@ -253,6 +255,19 @@ afterEach(async () => {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("/api/callback-requests: atomic transaction then CRM stats cache bust", () => {
+  it("does not create an SMTP transport when destination read-only mode is enabled", async () => {
+    process.env.DESTINATION_READ_ONLY = "true";
+
+    const res = await fetch(`${serverUrl}/api/callback-requests`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: "Preview Parent", phone: "9123456789", preferredTime: "Morning" }),
+    });
+
+    expect(res.status).toBe(201);
+    expect(vi.mocked(nodemailer.createTransport)).not.toHaveBeenCalled();
+  });
+
   it("POST returns 201 and the saved callback request body", async () => {
     mockDbWhere.mockResolvedValue(makeDbRows(0));
 

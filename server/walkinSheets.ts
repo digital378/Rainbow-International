@@ -51,12 +51,21 @@ import {
   runWalkinSheetOperation,
   waitForWalkinSyncDrain,
 } from "./walkinSyncCoordinator";
+import {
+  assertDestinationWritable,
+  isDestinationReadOnly,
+} from "./destinationReadOnly";
 
 // ── Startup bootstrap ─────────────────────────────────────────────
 // Creates per-brand sequences and backfills brand_seq_num for any
 // existing rows that predate this change. Idempotent — safe to run
 // on every startup.
 export async function bootstrapWalkinSequences(): Promise<void> {
+  if (isDestinationReadOnly()) {
+    console.log("[walkin/bootstrap] Destination read-only mode: sequence bootstrap skipped.");
+    return;
+  }
+
   try {
     // 1. Ensure the brand_seq_num column exists (idempotent DDL — safe on any environment,
     //    including production where db:push may not have been run yet).
@@ -116,6 +125,11 @@ export async function bootstrapWalkinSequences(): Promise<void> {
  * has rows).  This ensures production has real data after a fresh deploy.
  */
 export async function bootstrapWalkinLookups(): Promise<void> {
+  if (isDestinationReadOnly()) {
+    console.log("[walkin/bootstrap] Destination read-only mode: lookup bootstrap skipped.");
+    return;
+  }
+
   try {
     // ── Branches ──────────────────────────────────────────────────
     const branchRows = await db.execute<{ cnt: string }>(
@@ -394,6 +408,8 @@ async function recoverPendingReconciliations(): Promise<void> {
 
 // ── Auth client ───────────────────────────────────────────────────
 function getAuthClient() {
+  assertDestinationWritable("Google Sheets access");
+
   const refreshToken = getGoogleRefreshToken();
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -611,6 +627,11 @@ export async function upsertLeadToSheet(
 // ── Fire-and-forget wrapper (used in API route handlers) ─────────
 // Never throws — sheet failure must not block the API response.
 export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
+  if (isDestinationReadOnly()) {
+    console.log(`[walkin/sheets] Destination read-only mode: skipping ${brand} lead queue.`);
+    return;
+  }
+
   // Mark before trying to claim the lease. If another Autoscale instance owns
   // it, the DB lead still leaves a durable workbook-reconciliation request
   // instead of losing the fire-and-forget Sheet mirror attempt.
@@ -1992,6 +2013,11 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
 // ── Fire-and-forget wrapper for archival sheet updates ────────────
 // Never throws — sheet failure must not block the API response.
 export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
+  if (isDestinationReadOnly()) {
+    console.log(`[walkin/sheets] Destination read-only mode: skipping ${brand} removal queue.`);
+    return;
+  }
+
   // Persist the recovery intent before lease acquisition for the same reason
   // as queueUpsert: temporary cross-instance contention must not erase it.
   void markReconciliation(brand, "MASTER")
@@ -2457,6 +2483,11 @@ async function runAutoPullCycle(): Promise<void> {
 }
 
 export function startAutoPull(): void {
+  if (isDestinationReadOnly()) {
+    console.log("[walkin/sheets] Destination read-only mode: auto-pull timer disabled.");
+    return;
+  }
+
   const INTERVAL_MS = 60 * 1000; // 1-min fallback; instant sync via Apps Script webhook
 
   const run = async () => {

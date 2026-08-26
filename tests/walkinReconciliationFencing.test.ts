@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
   mockFencedWrite,
@@ -60,7 +60,13 @@ vi.mock("../server/walkinSyncCoordinator", () => ({
   waitForWalkinSyncDrain: async () => true,
 }));
 
-import { queueUpsert } from "../server/walkinSheets";
+import {
+  bootstrapWalkinLookups,
+  bootstrapWalkinSequences,
+  queueRemove,
+  queueUpsert,
+  startAutoPull,
+} from "../server/walkinSheets";
 
 const lead = {
   id: "lease-fence-test-lead",
@@ -100,6 +106,7 @@ async function settleQueue(): Promise<void> {
 
 describe("queueUpsert reconciliation fencing", () => {
   beforeEach(() => {
+    delete process.env.DESTINATION_READ_ONLY;
     vi.clearAllMocks();
     mockGoogleRefreshToken.mockReturnValue("test-refresh-token");
     mockRunOperation.mockImplementation((_name: string, operation: () => Promise<unknown>) => operation());
@@ -110,6 +117,30 @@ describe("queueUpsert reconciliation fencing", () => {
     });
     mockSheetsGet.mockResolvedValue({ data: { values: [] } });
     mockSheetsAppend.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    delete process.env.DESTINATION_READ_ONLY;
+  });
+
+  it("blocks bootstrap, queues, timers, and every Google request in destination read-only mode", async () => {
+    process.env.DESTINATION_READ_ONLY = "true";
+    const timerSpy = vi.spyOn(globalThis, "setTimeout");
+
+    await bootstrapWalkinSequences();
+    await bootstrapWalkinLookups();
+    queueUpsert("RIS", lead);
+    queueRemove("RIS", lead.id);
+    startAutoPull();
+    await settleQueue();
+
+    expect(mockInsert).not.toHaveBeenCalled();
+    expect(mockDelete).not.toHaveBeenCalled();
+    expect(mockRunOperation).not.toHaveBeenCalled();
+    expect(mockSpreadsheetsGet).not.toHaveBeenCalled();
+    expect(mockSheetsGet).not.toHaveBeenCalled();
+    expect(mockSheetsAppend).not.toHaveBeenCalled();
+    expect(timerSpy).not.toHaveBeenCalled();
   });
 
   it("keeps durable markers after a stale holder is rejected, then clears them after the next owner retries", async () => {

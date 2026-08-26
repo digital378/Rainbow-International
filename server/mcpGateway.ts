@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { mcpAuditLogs, mcpIdempotencyKeys } from "@shared/schema";
 import { authenticateMcpBearer, registerMcpOAuthRoutes, type McpAuthPrincipal } from "./mcpOAuth";
+import { isDestinationReadOnly } from "./destinationReadOnly";
 
 const MAX_REQUESTS_PER_MINUTE = 120;
 const SESSION_TTL_MS = 30 * 60_000;
@@ -290,6 +291,13 @@ function createMcpServer() {
     inputSchema,
     annotations: { readOnlyHint, destructiveHint: !readOnlyHint, openWorldHint: false },
   }, async (args) => {
+    if (isDestinationReadOnly() && !readOnlyHint) {
+      return jsonResult({
+        ok: false,
+        error: "Destination copy is read-only; MCP mutation tools are disabled.",
+      }, true);
+    }
+
     const requestId = randomUUID();
     const startedAt = Date.now();
     try {
