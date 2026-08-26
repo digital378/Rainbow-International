@@ -9,6 +9,10 @@ import { startSeoMonitor } from "./seoMonitor";
 import { bootstrapWalkinSequences, bootstrapWalkinLookups, stopAutoPullForShutdown } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { initializeGoogleCredentials } from "./googleCredentials";
+import {
+  applyNonCanonicalRobotsPolicy,
+  applyProductionHostRedirect,
+} from "./productionHostPolicy";
 
 const app = express();
 const httpServer = createServer(app);
@@ -69,26 +73,8 @@ app.get("/global-brand-associations", (req, res) => {
 if (process.env.NODE_ENV === "production") {
   // Block staging / non-production hosts from being indexed by search engines.
   // Production canonical host is rainbowinternationalschool.in.
-  app.use((req, res, next) => {
-    const host = (req.hostname || "").toLowerCase();
-    const isProductionHost =
-      host === "rainbowinternationalschool.in" || host === "www.rainbowinternationalschool.in";
-    if (!isProductionHost) {
-      res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
-    }
-    next();
-  });
-
-  app.use((req, res, next) => {
-    const host = req.hostname;
-    if (host && host.startsWith("www.") && host.includes("rainbowinternationalschool.in")) {
-      return res.redirect(301, `https://rainbowinternationalschool.in${req.originalUrl}`);
-    }
-    if (host && host.includes("replit.app")) {
-      return res.redirect(301, `https://rainbowinternationalschool.in${req.originalUrl}`);
-    }
-    next();
-  });
+  app.use(applyNonCanonicalRobotsPolicy);
+  app.use(applyProductionHostRedirect);
 
   app.use((req, res, next) => {
     const path = req.path;
