@@ -1,4 +1,5 @@
 import type { BlogPost } from "@shared/schema";
+import { resolveBlogImageUrl } from "@shared/blogImage";
 
 /**
  * Shared building blocks for server-rendered blog pages.
@@ -30,9 +31,6 @@ export function toISODate(dateStr: string): string {
   return d.toISOString().split("T")[0];
 }
 
-const FALLBACK_OG_IMAGE =
-  "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg";
-
 /**
  * Everything inside <head> except the page-specific <style> block:
  * analytics, meta tags, canonical, Open Graph, and all JSON-LD schema.
@@ -40,6 +38,8 @@ const FALLBACK_OG_IMAGE =
  * This is the SEO surface. It must render identically for every layout.
  */
 export function renderHeadMeta(post: BlogPost): string {
+  const imageUrl = resolveBlogImageUrl(post.heroUrl);
+
   return `  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
@@ -52,7 +52,7 @@ export function renderHeadMeta(post: BlogPost): string {
   <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />
-  <meta property="og:image" content="${e(post.heroUrl || FALLBACK_OG_IMAGE)}" />
+  <meta property="og:image" content="${e(imageUrl)}" />
   <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -63,7 +63,7 @@ export function renderHeadMeta(post: BlogPost): string {
     "@type": "BlogPosting",
     "headline": post.metaTitle || post.title,
     "description": post.metaDescription,
-    "image": post.heroUrl || FALLBACK_OG_IMAGE,
+    "image": imageUrl,
     "datePublished": toISODate(post.date),
     "dateModified": toISODate(post.date),
     "author": {

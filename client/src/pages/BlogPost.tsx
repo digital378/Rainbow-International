@@ -7,6 +7,7 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 import { ContactForm } from "@/components/home/ContactForm";
 import { Calendar, Tag, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { resolveBlogImageUrl } from "@shared/blogImage";
 
 interface BlogSection {
   heading?: string;
@@ -133,6 +134,8 @@ export default function BlogPost() {
     );
   }
 
+  const imageUrl = resolveBlogImageUrl(post.heroUrl);
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
@@ -141,7 +144,7 @@ export default function BlogPost() {
         description={post.metaDescription}
         keywords={post.keywords}
         canonical={`https://rainbowinternationalschool.in/blog/${post.slug}`}
-        ogImage={post.heroUrl}
+        ogImage={imageUrl}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Blogs", href: "https://rainbowinternationalschool.in/blogs" },
@@ -160,7 +163,7 @@ export default function BlogPost() {
       >
         <div
           className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{ backgroundImage: `url(${post.heroUrl})` }}
+          style={{ backgroundImage: `url(${imageUrl})` }}
         />
         <div className="relative z-10 max-w-4xl mx-auto">
           <span className="inline-block text-xs font-semibold uppercase tracking-widest rounded-full px-4 py-1.5 mb-5" style={{ background: "#f97316", color: "#fff" }}>

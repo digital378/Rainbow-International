@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { storage } from "./storage";
 import type { BlogPost } from "@shared/schema";
+import { resolveBlogImageUrl } from "@shared/blogImage";
 import { renderImmersiveArticle } from "./ssrBlogImmersive";
 
 /**
@@ -66,6 +67,7 @@ function toISODate(dateStr: string): string {
 async function renderBlogSSR(slug: string): Promise<string | null> {
   const post = await storage.getBlogPostBySlug(slug);
   if (!post) return null;
+  const imageUrl = resolveBlogImageUrl(post.heroUrl);
 
   const relatedPosts: BlogPost[] = [];
   for (const s of (post.relatedSlugs || []).slice(0, 3)) {
@@ -139,7 +141,7 @@ async function renderBlogSSR(slug: string): Promise<string | null> {
   <link rel="canonical" href="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:title" content="${e(post.metaTitle)}" />
   <meta property="og:description" content="${e(post.metaDescription)}" />
-  <meta property="og:image" content="${e(post.heroUrl || 'https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg')}" />
+  <meta property="og:image" content="${e(imageUrl)}" />
   <meta property="og:url" content="https://rainbowinternationalschool.in/blog/${e(post.slug)}" />
   <meta property="og:type" content="article" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -150,7 +152,7 @@ async function renderBlogSSR(slug: string): Promise<string | null> {
     "@type": "BlogPosting",
     "headline": post.metaTitle || post.title,
     "description": post.metaDescription,
-    "image": post.heroUrl || "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
+    "image": imageUrl,
     "datePublished": toISODate(post.date),
     "dateModified": toISODate(post.date),
     "author": {
@@ -392,7 +394,7 @@ async function renderBlogSSR(slug: string): Promise<string | null> {
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-bg" style="background-image: url('${e(post.heroUrl)}');"></div>
+  <div class="hero-bg" style="background-image: url('${e(imageUrl)}');"></div>
   <div class="hero-inner">
     <span class="hero-cat">${e(post.cat)}</span>
     <h1>${e(post.title)}</h1>

@@ -7,6 +7,7 @@ import { useState } from "react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useQuery } from "@tanstack/react-query";
 import { CODE_OWNED_BLOGS, type CodeOwnedBlog } from "@shared/codeOwnedBlogs";
+import { resolveBlogImageUrl } from "@shared/blogImage";
 
 interface BlogPost {
   id: string;
@@ -15,6 +16,8 @@ interface BlogPost {
   date: string;
   cat: string;
   intro: string;
+  thumbUrl?: string | null;
+  heroUrl?: string;
   publishedAt?: string;
 }
 
@@ -64,6 +67,8 @@ export default function Blogs() {
         date: p.date,
         cat: p.cat,
         intro: p.intro,
+        thumbUrl: p.thumbUrl,
+        heroUrl: p.heroUrl,
       })),
   });
 
@@ -162,6 +167,15 @@ export default function Blogs() {
                       : { borderColor: "#f3f4f6" }
                   }
                 >
+                  {(blog.thumbUrl || blog.heroUrl) && (
+                    <img
+                      src={resolveBlogImageUrl(blog.thumbUrl || blog.heroUrl)}
+                      alt=""
+                      className="w-full aspect-[16/9] object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
                   <div className="p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5" style={{ color: "#f97316" }}>

@@ -9,6 +9,7 @@ import {
   renderHeadMeta,
   META_PIXEL,
 } from "./ssrBlogShared";
+import { resolveBlogImageUrl } from "@shared/blogImage";
 
 /**
  * Immersive article renderer — "The Class of 2038".
@@ -323,6 +324,7 @@ function renderSectionBody(sec: Section): string {
 export function renderImmersiveArticle(post: BlogPost, related: BlogPost[]): string {
   const sections = (post.sections || []) as Section[];
   const lastIndex = Math.max(sections.length - 1, 1);
+  const imageUrl = resolveBlogImageUrl(post.heroUrl);
 
   const stationsHtml = sections
     .map((sec, i) => {
@@ -418,7 +420,7 @@ ${NAVBAR_HTML}
 <!-- Hero: the journey begins -->
 <header class="hero-immersive">
   <canvas id="constellation" aria-hidden="true"></canvas>
-  <div class="hero-veil" style="background-image: url('${e(post.heroUrl)}');" aria-hidden="true"></div>
+  <div class="hero-veil" style="background-image: url('${e(imageUrl)}');" aria-hidden="true"></div>
   <div class="hero-glow" aria-hidden="true"></div>
   <div class="hero-inner">
     <span class="hero-cat">${e(post.cat)}</span>
