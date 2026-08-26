@@ -72,6 +72,7 @@ export class WalkinLeaseCoordinator {
   }
 
   async run<T>(operationName: string, operation: () => Promise<T>): Promise<T> {
+    assertDestinationWritable(operationName);
     if (this.options.shouldDrain?.()) {
       throw new Error("Walk-in synchronization is draining for shutdown");
     }

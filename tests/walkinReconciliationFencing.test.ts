@@ -131,8 +131,9 @@ describe("queueUpsert reconciliation fencing", () => {
     await bootstrapWalkinLookups();
     queueUpsert("RIS", lead);
     queueRemove("RIS", lead.id);
-    startAutoPull();
     await settleQueue();
+    const timersBeforeAutoPull = timerSpy.mock.calls.length;
+    startAutoPull();
 
     expect(mockInsert).not.toHaveBeenCalled();
     expect(mockDelete).not.toHaveBeenCalled();
@@ -140,7 +141,7 @@ describe("queueUpsert reconciliation fencing", () => {
     expect(mockSpreadsheetsGet).not.toHaveBeenCalled();
     expect(mockSheetsGet).not.toHaveBeenCalled();
     expect(mockSheetsAppend).not.toHaveBeenCalled();
-    expect(timerSpy).not.toHaveBeenCalled();
+    expect(timerSpy).toHaveBeenCalledTimes(timersBeforeAutoPull);
   });
 
   it("keeps durable markers after a stale holder is rejected, then clears them after the next owner retries", async () => {

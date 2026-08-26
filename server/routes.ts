@@ -38,12 +38,12 @@ import {
   isKnownBlogSlug,
 } from "./blogRoutes";
 import { runAndAlert } from "./seoMonitor";
-import { google } from "googleapis";
+import { google, type sheets_v4 } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
 import { registerMcpGateway } from "./mcpGateway";
-import { isDestinationReadOnly } from "./destinationReadOnly";
+import { assertDestinationWritable, isDestinationReadOnly } from "./destinationReadOnly";
 import { db } from "./db";
 import {
   getGoogleRefreshToken,
@@ -1081,6 +1081,17 @@ export async function registerRoutes(
     return oauth2Client;
   }
 
+  /**
+   * The sole direct Google Sheets client factory in this module. This keeps a
+   * destination copy from ever contacting source spreadsheets, even when a
+   * route helper is invoked outside the HTTP mutation middleware.
+   */
+  async function getSheetClient(auth: any): Promise<sheets_v4.Sheets> {
+    assertDestinationWritable("Google Sheets access");
+    const { google: sheetsGoogle } = await import("googleapis");
+    return sheetsGoogle.sheets({ version: "v4", auth });
+  }
+
   app.get("/auth/google", (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -2102,8 +2113,7 @@ export async function registerRoutes(
         try {
           const auth = getAuthenticatedClient();
           if (!auth) return (_masterTabs = []);
-          const { google: goog } = await import("googleapis");
-          const sheets = goog.sheets({ version: "v4", auth });
+          const sheets = await getSheetClient(auth);
           const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_IDS.master });
           _masterTabs = (meta.data.sheets ?? []).map((s: any) => s.properties?.title ?? "");
         } catch { _masterTabs = []; }
@@ -2723,8 +2733,7 @@ export async function registerRoutes(
   async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
     return (res.data.values || []) as string[][];
   }
@@ -2739,8 +2748,7 @@ export async function registerRoutes(
     if (!sheetId) throw new Error("WALKIN_SHEET_ID env var not set");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const dt = new Date(checkin.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
     const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
@@ -2762,8 +2770,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
     const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const dd = now.getDate().toString().padStart(2, "0");
@@ -2797,8 +2804,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
     const dd   = now.getDate().toString().padStart(2, "0");
     const mm   = (now.getMonth() + 1).toString().padStart(2, "0");
@@ -2842,8 +2848,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const dt = new Date(checkin.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
     const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
@@ -5163,8 +5168,7 @@ paths:
     if (!sheetId) throw new Error("Alliances sheet ID not configured");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     await ensureFriendshipSheetTab(sheets, sheetId, tabName);
     const dt = new Date(lead.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
@@ -5264,8 +5268,7 @@ paths:
     if (!sheetId) throw new Error("Alliances sheet ID not configured");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     await ensureAggregateLeadsTab(sheets, sheetId);
     const rows = leads.map(lead => {
       const dt = new Date(lead.submittedAt);
@@ -5540,8 +5543,7 @@ paths:
       const sheetId = process.env.ALLIANCES_SHEET_ID;
       const auth = getAuthenticatedClient();
       if (sheetId && auth && !school.name.startsWith("e2e-")) {
-        import("googleapis").then(({ google: goog }) => {
-          const sheets = goog.sheets({ version: "v4", auth });
+        getSheetClient(auth).then((sheets) => {
           ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
             console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
           });
@@ -5646,8 +5648,7 @@ paths:
     if (!sheetId) return;
     const auth = getAuthenticatedClient();
     if (!auth) return;
-    const { google: goog } = await import("googleapis");
-    const sheets = goog.sheets({ version: "v4", auth });
+    const sheets = await getSheetClient(auth);
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
       range: `${AGGREGATE_TAB}!A:K`,
@@ -5689,8 +5690,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const { google: goog } = await import("googleapis");
-      const sheets = goog.sheets({ version: "v4", auth });
+      const sheets = await getSheetClient(auth);
 
       // Single read of the entire aggregate tab
       const response = await sheets.spreadsheets.values.get({
@@ -5779,8 +5779,7 @@ paths:
       const school = await storage.getFriendshipSchoolById(schoolId);
       if (!school) return res.status(404).json({ message: "School not found" });
 
-      const { google: goog } = await import("googleapis");
-      const sheets = goog.sheets({ version: "v4", auth });
+      const sheets = await getSheetClient(auth);
 
       // Read aggregate tab — cols A:K
       // A=Date B=School C=Student D=Grade E=Parent F=Phone G=Email H=Source I=Status J=Ref Amt K=Remarks
@@ -5860,8 +5859,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const { google: goog } = await import("googleapis");
-      const sheets = goog.sheets({ version: "v4", auth });
+      const sheets = await getSheetClient(auth);
 
       const meta = await sheets.spreadsheets.get({
         spreadsheetId: sheetId,
@@ -5919,8 +5917,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const { google: goog } = await import("googleapis");
-      const sheets = goog.sheets({ version: "v4", auth });
+      const sheets = await getSheetClient(auth);
 
       // Get all sheet tab metadata (title → numeric sheetId)
       const meta = await sheets.spreadsheets.get({
@@ -6046,8 +6043,7 @@ paths:
       if (!sheetIdsToClean.length) return res.status(503).json({ message: "Alliances sheet ID not configured" });
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(503).json({ message: "Google not connected" });
-      const { google: goog } = await import("googleapis");
-      const sheets = goog.sheets({ version: "v4", auth });
+      const sheets = await getSheetClient(auth);
 
       // We fix the aggregate tab from the dedicated aggSheetId sheet.
       const sheetId = aggSheetId || envSheetId;

@@ -266,6 +266,7 @@ describe("/api/callback-requests: atomic transaction then CRM stats cache bust",
 
     expect(res.status).toBe(201);
     expect(vi.mocked(nodemailer.createTransport)).not.toHaveBeenCalled();
+    expect(mockSheetsAppend).not.toHaveBeenCalled();
   });
 
   it("POST returns 201 and the saved callback request body", async () => {

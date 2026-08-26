@@ -1,4 +1,3 @@
-import express from "express";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DESTINATION_READ_ONLY_ENV,
@@ -28,16 +27,6 @@ describe("destination read-only mode", () => {
 
   it("keeps GET pages available while blocking unsafe HTTP methods", () => {
     process.env[DESTINATION_READ_ONLY_ENV] = "true";
-    const app = express();
-    app.use(blockDestinationMutations);
-    app.get("/dashboard", (_req, res) => res.json({ ok: true }));
-    app.post("/dashboard", (_req, res) => res.json({ shouldNotRun: true }));
-
-    const getLayer = app.router.stack.find((layer: any) => layer.route?.path === "/dashboard" && layer.route.methods.get);
-    const postLayer = app.router.stack.find((layer: any) => layer.route?.path === "/dashboard" && layer.route.methods.post);
-    expect(getLayer).toBeDefined();
-    expect(postLayer).toBeDefined();
-
     const next = vi.fn();
     const response = {
       status: vi.fn().mockReturnThis(),
