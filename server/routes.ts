@@ -55,6 +55,13 @@ import {
   type CounselorPerformanceRecord,
 } from "./counselorPerformance";
 import { checkInquiryProtection } from "./inquiryProtection";
+import {
+  escapeHtml,
+  getLeadSourceLabel,
+  getMediumLabel,
+  normalizeAttribution,
+  safeSubjectPart,
+} from "./inquirySanitization";
 
 /** Derive "Mon-YY" month label from a YYYY-MM-DD date string (e.g. "2027-06-15" → "Jun-27"). */
 function crmMonthLabel(dateStr: string): string {
@@ -199,46 +206,12 @@ function getTransporter() {
   };
 }
 
-export function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[character] || character);
-}
-
 function tableRow(label: string, value: string | undefined | null) {
   if (!value) return "";
   return `<tr><td style="padding:8px 14px;font-weight:bold;border-bottom:1px solid #eee;color:#091a4f;">${escapeHtml(label)}</td><td style="padding:8px 14px;border-bottom:1px solid #eee;">${escapeHtml(value)}</td></tr>`;
 }
 
-function getLeadSourceLabel(utmSource?: string | null, utmMedium?: string | null): string {
-  if (!utmSource && !utmMedium) return "Organic / Direct";
-  const src = (utmSource || "").toLowerCase();
-  const med = (utmMedium || "").toLowerCase();
-  if (src === "google" && (med === "cpc" || med === "paid" || med.includes("paid"))) return "Google Ads";
-  if (src === "facebook" || src === "instagram" || src === "meta") return "Meta Ads";
-  if (med === "cpc" || med === "ppc" || med.includes("paid")) return `Paid Ads (${utmSource || "Unknown"})`;
-  if (med === "email") return "Email Campaign";
-  if (med === "social" || med === "organic_social") return `Social Media (${utmSource || "Unknown"})`;
-  if (med === "referral") return `Referral (${utmSource || "Unknown"})`;
-  return utmSource || "Organic / Direct";
-}
-
-function getMediumLabel(utmMedium?: string | null): string {
-  if (!utmMedium) return "Direct";
-  const med = utmMedium.toLowerCase();
-  if (med === "cpc" || med === "ppc") return "Paid Ads";
-  if (med === "display") return "Paid Ads";
-  if (med === "paid_social") return "Paid Ads";
-  if (med === "social" || med === "organic_social") return "Social";
-  if (med === "email") return "Email";
-  if (med === "referral") return "Referral";
-  if (med === "organic") return "Organic Search";
-  return utmMedium;
-}
+export { escapeHtml, getLeadSourceLabel, getMediumLabel, normalizeAttribution };
 
 async function sendInquiryEmail(data: {
   parentName: string;
@@ -274,7 +247,7 @@ async function sendInquiryEmail(data: {
     from: mailer.from,
     to: mailer.to,
     replyTo: data.email || undefined,
-    subject: `New Admission Enquiry – ${String(data.studentName).replace(/[\r\n]/g, " ")} (${String(data.grade).replace(/[\r\n]/g, " ")})`,
+    subject: `New Admission Enquiry – ${safeSubjectPart(data.studentName)} (${safeSubjectPart(data.grade, 80)})`,
     html: `
       <div style="font-family:'Segoe UI',sans-serif;max-width:600px;">
         <div style="background:#091a4f;color:#fff;padding:20px 24px;border-radius:8px 8px 0 0;">
@@ -706,9 +679,23 @@ export async function registerRoutes(
         grade: validatedData.grade,
         honeypot: req.body?.website,
         formStartedAt: req.body?.formStartedAt,
+        challengeToken: req.body?.challengeToken,
+        challengeAnswer: req.body?.challengeAnswer,
       });
       if (!protection.allowed) {
         console.warn(`[inquiry] Rejected public submission: ${protection.reason}`);
+        if (protection.reason === "challenge_required") {
+          return res.status(403).json({
+            code: "challenge_required",
+            message: "Please complete the quick security check and try again.",
+            challenge: protection.challenge,
+          });
+        }
+        if (protection.reason === "challenge_unavailable") {
+          return res.status(503).json({
+            message: "The security check is temporarily unavailable. Please try again shortly.",
+          });
+        }
         return res.status(protection.reason === "rate_limited" ? 429 : 400).json({
           message: protection.reason === "rate_limited"
             ? "Too many submissions. Please wait a few minutes and try again."

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createHash } from "node:crypto";
 
 const mockExecute = vi.hoisted(() => vi.fn());
 
@@ -6,7 +7,11 @@ vi.mock("../server/db", () => ({
   db: { execute: mockExecute },
 }));
 
-import { checkInquiryProtection } from "../server/inquiryProtection";
+import {
+  checkInquiryProtection,
+  issueInquiryChallenge,
+  verifyInquiryChallenge,
+} from "../server/inquiryProtection";
 import { insertInquirySchema } from "../shared/schema";
 
 const inquiry = {
@@ -21,6 +26,7 @@ const inquiry = {
 describe("public enquiry abuse protection", () => {
   beforeEach(() => {
     mockExecute.mockReset();
+    process.env.INQUIRY_CHALLENGE_SECRET = "test-inquiry-challenge-secret";
   });
 
   it("rejects a filled honeypot before making a database request", async () => {
@@ -83,6 +89,39 @@ describe("public enquiry abuse protection", () => {
       formStartedAt: Date.now() - 3_000,
       honeypot: "",
     })).resolves.toEqual({ allowed: true });
+  });
+
+  it("requires a signed challenge after normal IP traffic is exceeded", async () => {
+    mockExecute.mockResolvedValueOnce({ rows: [{ request_count: 4 }] });
+
+    const result = await checkInquiryProtection(inquiry);
+
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toBe("challenge_required");
+    if (result.allowed || !result.challenge) throw new Error("Expected a challenge");
+    expect(result.challenge.difficulty).toBeGreaterThan(0);
+    expect(verifyInquiryChallenge(inquiry.ipAddress, result.challenge.token, "0")).toBe(false);
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+  });
+
+  it("accepts only a valid, unexpired challenge for the same IP", async () => {
+    const challenge = issueInquiryChallenge(inquiry.ipAddress);
+    if (!challenge) throw new Error("Expected challenge signing secret");
+
+    let answer = "";
+    for (let counter = 0; counter <= 5_000_000; counter += 1) {
+      const proof = createHash("sha256")
+        .update(`${challenge.token}:${counter}`)
+        .digest("hex");
+      if (proof.startsWith("0".repeat(challenge.difficulty))) {
+        answer = String(counter);
+        break;
+      }
+    }
+    expect(answer).not.toBe("");
+    expect(verifyInquiryChallenge(inquiry.ipAddress, challenge.token, answer)).toBe(true);
+    expect(verifyInquiryChallenge("198.51.100.7", challenge.token, answer)).toBe(false);
+    expect(verifyInquiryChallenge(inquiry.ipAddress, challenge.token, answer, challenge.expiresAt + 1)).toBe(false);
   });
 
   it("rejects template payloads in tracking fields", () => {

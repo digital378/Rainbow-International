@@ -6,8 +6,8 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { getFormTrackingData } from "@/lib/analytics";
+import { submitInquiry } from "@/lib/inquiryProtection";
 import { Phone, Mail, MapPin, Clock, CheckCircle } from "lucide-react";
 
 const timeSlots = [
@@ -43,7 +43,7 @@ export default function ScheduleAppointment() {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof form) =>
-      apiRequest("POST", "/api/inquiries", {
+      submitInquiry({
         parentName: data.name,
         studentName: "N/A",
         phone: data.phone,

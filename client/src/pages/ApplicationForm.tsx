@@ -6,8 +6,8 @@ import ScrollProgress from "@/components/home/ScrollProgress";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { getFormTrackingData } from "@/lib/analytics";
+import { submitInquiry } from "@/lib/inquiryProtection";
 import { CheckCircle } from "lucide-react";
 
 const grades = [
@@ -39,7 +39,7 @@ export default function ApplicationForm() {
 
   const mutation = useMutation({
     mutationFn: async (data: typeof form) =>
-      apiRequest("POST", "/api/inquiries", {
+      submitInquiry({
         parentName: data.parentName,
         studentName: data.studentName,
         email: data.email,

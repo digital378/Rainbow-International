@@ -5,6 +5,7 @@ import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { Send, MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingData } from "@/lib/analytics";
+import { submitInquiry } from "@/lib/inquiryProtection";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -56,11 +57,7 @@ export function ContactForm() {
     setIsSubmitting(true);
     try {
       const trackingData = getFormTrackingData("Contact Section Form");
-      const response = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ...trackingData, website }),
-      });
+      const response = await submitInquiry({ ...data, ...trackingData, website });
       if (!response.ok) throw new Error("Failed");
       trackFormSubmit({
         formType: "inquiry",

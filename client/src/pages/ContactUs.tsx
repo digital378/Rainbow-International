@@ -10,6 +10,7 @@ import { SEO } from "@/components/SEO";
 import { MapPin, Phone, Mail, Clock, CheckCircle, MessageCircle } from "lucide-react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingData } from "@/lib/analytics";
+import { submitInquiry } from "@/lib/inquiryProtection";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -61,11 +62,7 @@ export default function ContactUs() {
     setIsSubmitting(true);
     try {
       const trackingData = getFormTrackingData("Contact Page Form");
-      const response = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, ...trackingData, website }),
-      });
+      const response = await submitInquiry({ ...data, ...trackingData, website });
       if (!response.ok) throw new Error("Failed");
       trackFormSubmit({
         formType: "inquiry",

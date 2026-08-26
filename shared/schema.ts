@@ -41,6 +41,14 @@ const safeTrackingValue = (maxLength: number, label: string) =>
     .optional()
     .or(z.literal(""));
 
+const safeAttributionValue = (maxLength: number, label: string) =>
+  z.string()
+    .trim()
+    .max(maxLength, `${label} is too long`)
+    .regex(/^[a-z0-9][a-z0-9 _./-]*$/i, `${label} contains unsupported characters`)
+    .optional()
+    .or(z.literal(""));
+
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
   id: true,
   createdAt: true,
@@ -56,11 +64,11 @@ export const insertInquirySchema = createInsertSchema(inquiries).omit({
   pagePath: safeTrackingValue(500, "Page path"),
   pageTitle: safeTrackingValue(200, "Page title"),
   formLocation: safeTrackingValue(120, "Form location"),
-  utmSource: safeTrackingValue(100, "Campaign source"),
-  utmMedium: safeTrackingValue(100, "Campaign medium"),
-  utmCampaign: safeTrackingValue(200, "Campaign name"),
-  utmTerm: safeTrackingValue(200, "Campaign term"),
-  utmContent: safeTrackingValue(200, "Campaign content"),
+  utmSource: safeAttributionValue(100, "Campaign source"),
+  utmMedium: safeAttributionValue(100, "Campaign medium"),
+  utmCampaign: safeAttributionValue(200, "Campaign name"),
+  utmTerm: safeAttributionValue(200, "Campaign term"),
+  utmContent: safeAttributionValue(200, "Campaign content"),
 });
 
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;

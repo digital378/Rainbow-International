@@ -5,6 +5,7 @@ import { insertInquirySchema, type InsertInquiry } from "@shared/schema";
 import { toast } from "sonner";
 import { CalendarCheck, ChevronRight, CheckCircle, MessageCircle } from "lucide-react";
 import { trackFormSubmit, getFormTrackingData, trackWhatsAppClick } from "@/lib/analytics";
+import { submitInquiry } from "@/lib/inquiryProtection";
 
 const classOptions = [
   "Nursery", "Jr. KG", "Sr. KG",
@@ -35,15 +36,11 @@ export function HeroForm() {
         preferredDate && `Preferred Visit: ${preferredDate}`,
       ].filter(Boolean).join(" | ");
 
-      const res = await fetch("/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const res = await submitInquiry({
           ...data,
           message: messageParts || undefined,
           ...trackingData,
           website,
-        }),
       });
       if (!res.ok) throw new Error();
       trackFormSubmit({
