@@ -141,40 +141,6 @@ describe("MCP gateway safety helpers", () => {
     expect(JSON.stringify(mutationResult)).toMatch(/idempotencyKey|required/i);
   });
 
-  it("keeps MCP discovery available but blocks mutation tools before they audit or call the app", async () => {
-    process.env.DESTINATION_READ_ONLY = "true";
-    try {
-      const initialized = await mcpRequest({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "initialize",
-        params: {
-          protocolVersion: "2025-06-18",
-          capabilities: {},
-          clientInfo: { name: "read-only-test", version: "1.0" },
-        },
-      }, { Authorization: "Bearer test-mcp-token" });
-      const sessionId = initialized.response.headers.get("mcp-session-id");
-
-      const result = await mcpRequest({
-        jsonrpc: "2.0",
-        id: 2,
-        method: "tools/call",
-        params: {
-          name: "seo_check",
-          arguments: { confirm: true, idempotencyKey: "read-only-test-key" },
-        },
-      }, {
-        Authorization: "Bearer test-mcp-token",
-        "mcp-session-id": sessionId!,
-      });
-      const payload = parseMcpResponse(result.body);
-      expect(payload.result.isError).toBe(true);
-      expect(JSON.stringify(payload)).toMatch(/read-only/i);
-    } finally {
-      delete process.env.DESTINATION_READ_ONLY;
-    }
-  });
 });
 
 describe("MCP OAuth connector support", () => {

@@ -2096,7 +2096,7 @@ export async function registerRoutes(
         try {
           const auth = getAuthenticatedClient();
           if (!auth) return (_masterTabs = []);
-          const sheets = await getSheetClient(auth);
+          const sheets = google.sheets({ version: "v4", auth });
           const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_IDS.master });
           _masterTabs = (meta.data.sheets ?? []).map((s: any) => s.properties?.title ?? "");
         } catch { _masterTabs = []; }
@@ -2716,7 +2716,7 @@ export async function registerRoutes(
   async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const res = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
     return (res.data.values || []) as string[][];
   }
@@ -2731,7 +2731,7 @@ export async function registerRoutes(
     if (!sheetId) throw new Error("WALKIN_SHEET_ID env var not set");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const dt = new Date(checkin.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
     const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
@@ -2753,7 +2753,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
     const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const dd = now.getDate().toString().padStart(2, "0");
@@ -2787,7 +2787,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
     const dd   = now.getDate().toString().padStart(2, "0");
     const mm   = (now.getMonth() + 1).toString().padStart(2, "0");
@@ -2831,7 +2831,7 @@ export async function registerRoutes(
   }): Promise<void> {
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const dt = new Date(checkin.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
     const timeStr = dt.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: true });
@@ -5151,7 +5151,7 @@ paths:
     if (!sheetId) throw new Error("Alliances sheet ID not configured");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     await ensureFriendshipSheetTab(sheets, sheetId, tabName);
     const dt = new Date(lead.submittedAt);
     const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
@@ -5251,7 +5251,7 @@ paths:
     if (!sheetId) throw new Error("Alliances sheet ID not configured");
     const auth = getAuthenticatedClient();
     if (!auth) throw new Error("Google not connected");
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     await ensureAggregateLeadsTab(sheets, sheetId);
     const rows = leads.map(lead => {
       const dt = new Date(lead.submittedAt);
@@ -5526,10 +5526,9 @@ paths:
       const sheetId = process.env.ALLIANCES_SHEET_ID;
       const auth = getAuthenticatedClient();
       if (sheetId && auth && !school.name.startsWith("e2e-")) {
-        getSheetClient(auth).then((sheets) => {
-          ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
-            console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
-          });
+        const sheets = google.sheets({ version: "v4", auth });
+        ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
+          console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
         });
       }
     } catch (err: any) {
@@ -5631,7 +5630,7 @@ paths:
     if (!sheetId) return;
     const auth = getAuthenticatedClient();
     if (!auth) return;
-    const sheets = await getSheetClient(auth);
+    const sheets = google.sheets({ version: "v4", auth });
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
       range: `${AGGREGATE_TAB}!A:K`,
@@ -5673,7 +5672,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const sheets = await getSheetClient(auth);
+      const sheets = google.sheets({ version: "v4", auth });
 
       // Single read of the entire aggregate tab
       const response = await sheets.spreadsheets.values.get({
@@ -5762,7 +5761,7 @@ paths:
       const school = await storage.getFriendshipSchoolById(schoolId);
       if (!school) return res.status(404).json({ message: "School not found" });
 
-      const sheets = await getSheetClient(auth);
+      const sheets = google.sheets({ version: "v4", auth });
 
       // Read aggregate tab — cols A:K
       // A=Date B=School C=Student D=Grade E=Parent F=Phone G=Email H=Source I=Status J=Ref Amt K=Remarks
@@ -5842,7 +5841,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const sheets = await getSheetClient(auth);
+      const sheets = google.sheets({ version: "v4", auth });
 
       const meta = await sheets.spreadsheets.get({
         spreadsheetId: sheetId,
@@ -5900,7 +5899,7 @@ paths:
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(500).json({ message: "Google not connected" });
 
-      const sheets = await getSheetClient(auth);
+      const sheets = google.sheets({ version: "v4", auth });
 
       // Get all sheet tab metadata (title → numeric sheetId)
       const meta = await sheets.spreadsheets.get({
@@ -6026,7 +6025,7 @@ paths:
       if (!sheetIdsToClean.length) return res.status(503).json({ message: "Alliances sheet ID not configured" });
       const auth = getAuthenticatedClient();
       if (!auth) return res.status(503).json({ message: "Google not connected" });
-      const sheets = await getSheetClient(auth);
+      const sheets = google.sheets({ version: "v4", auth });
 
       // We fix the aggregate tab from the dedicated aggSheetId sheet.
       const sheetId = aggSheetId || envSheetId;
