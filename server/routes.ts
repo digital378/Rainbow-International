@@ -38,12 +38,11 @@ import {
   isKnownBlogSlug,
 } from "./blogRoutes";
 import { runAndAlert } from "./seoMonitor";
-import { google, type sheets_v4 } from "googleapis";
+import { google } from "googleapis";
 import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
 import { registerMcpGateway } from "./mcpGateway";
-import { assertDestinationWritable, isDestinationReadOnly } from "./destinationReadOnly";
 import { db } from "./db";
 import {
   getGoogleRefreshToken,
@@ -188,11 +187,6 @@ function resumeContentMatchesType(file: Express.Multer.File): boolean {
 
 // ── Email helpers ───────────────────────────────────────────────
 function getTransporter() {
-  if (isDestinationReadOnly()) {
-    console.log("[mail] Destination read-only mode: SMTP disabled.");
-    return null;
-  }
-
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = Number(process.env.SMTP_PORT) || 587;
   const smtpUser = process.env.SMTP_USER;
@@ -1079,17 +1073,6 @@ export async function registerRoutes(
     const oauth2Client = getOAuthClient();
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     return oauth2Client;
-  }
-
-  /**
-   * The sole direct Google Sheets client factory in this module. This keeps a
-   * destination copy from ever contacting source spreadsheets, even when a
-   * route helper is invoked outside the HTTP mutation middleware.
-   */
-  async function getSheetClient(auth: any): Promise<sheets_v4.Sheets> {
-    assertDestinationWritable("Google Sheets access");
-    const { google: sheetsGoogle } = await import("googleapis");
-    return sheetsGoogle.sheets({ version: "v4", auth });
   }
 
   app.get("/auth/google", (req, res) => {

@@ -1,14 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
-export const DESTINATION_REPLIT_PREVIEW_ENV = "ALLOW_DESTINATION_REPLIT_PREVIEW";
 const CANONICAL_HOST = "rainbowinternationalschool.in";
 const REPLIT_APP_SUFFIX = ".replit.app";
-
-export function isDestinationReplitPreviewEnabled(
-  env: NodeJS.ProcessEnv = process.env,
-): boolean {
-  return env[DESTINATION_REPLIT_PREVIEW_ENV] === "true";
-}
 
 function normalizedHost(host: string | undefined): string {
   return (host || "").toLowerCase();
@@ -45,7 +38,7 @@ export function applyProductionHostRedirect(
     return;
   }
 
-  if (isReplitAppHost(host) && !isDestinationReplitPreviewEnabled()) {
+  if (isReplitAppHost(host)) {
     res.redirect(301, `https://${CANONICAL_HOST}${req.originalUrl}`);
     return;
   }
