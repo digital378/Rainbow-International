@@ -42,6 +42,18 @@ export interface CodeOwnedBlog {
 
 export const CODE_OWNED_BLOGS: CodeOwnedBlog[] = [
   {
+    slug: "janmashtami-2026",
+    title: "Janmashtami 2026: Essays, Speeches & Activities | RIS",
+    date: "31 Aug 2026",
+    publishedAt: "2026-08-31",
+    cat: "Events",
+    intro:
+      "Complete Janmashtami 2026 guide for CBSE students — history, significance, essays and speeches in English, Hindi and Marathi, quiz, activities and free downloads.",
+    accentColor: "#E8B93B",
+    emoji: "🪈",
+    badge: "NEW",
+  },
+  {
     slug: "raksha-bandhan-2026",
     title: "Raksha Bandhan 2026: Date, Speech, Essay & Activities for Students",
     date: "14 Aug 2026",

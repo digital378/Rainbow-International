@@ -410,6 +410,12 @@ export async function registerRoutes(
   app.use("/blog/independence-day-2026", express.static(blogDir, { index: "index.html", redirect: false }));
   app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.join(blogDir, "index.html")));
 
+  // Janmashtami 2026 static blog — keep this before generic SSR for the same
+  // production-safe, slashless route behaviour as the Independence Day page.
+  const janmashtamiBlogDir = path.join(process.cwd(), "blog-pages/janmashtami-2026");
+  app.use("/blog/janmashtami-2026", express.static(janmashtamiBlogDir, { index: "index.html", redirect: false }));
+  app.get("/blog/janmashtami-2026", (_req, res) => res.sendFile(path.join(janmashtamiBlogDir, "index.html")));
+
   registerSSRRoutes(app);
 
   // Declare every code-owned blog page from the shared manifest, so a page that
