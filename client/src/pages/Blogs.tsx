@@ -7,7 +7,6 @@ import { useState } from "react";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { useQuery } from "@tanstack/react-query";
 import { CODE_OWNED_BLOGS, type CodeOwnedBlog } from "@shared/codeOwnedBlogs";
-import { resolveBlogImageUrl } from "@shared/blogImage";
 
 interface BlogPost {
   id: string;
@@ -16,8 +15,6 @@ interface BlogPost {
   date: string;
   cat: string;
   intro: string;
-  thumbUrl?: string | null;
-  heroUrl?: string;
   publishedAt?: string;
 }
 
@@ -67,8 +64,6 @@ export default function Blogs() {
         date: p.date,
         cat: p.cat,
         intro: p.intro,
-        thumbUrl: p.thumbUrl,
-        heroUrl: p.heroUrl,
       })),
   });
 
@@ -160,23 +155,14 @@ export default function Blogs() {
                   key={blog.slug}
                   href={cardHref(blog)}
                   data-testid={`card-blog-${blog.slug}`}
-                  className="group block rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                  className="group flex h-full flex-col rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow"
                   style={
                     blog.pinned && blog.accentColor
                       ? { borderColor: "#e2e8f0", borderTop: `3px solid ${blog.accentColor}` }
                       : { borderColor: "#f3f4f6" }
                   }
                 >
-                  {(blog.thumbUrl || blog.heroUrl) && (
-                    <img
-                      src={resolveBlogImageUrl(blog.thumbUrl || blog.heroUrl)}
-                      alt=""
-                      className="w-full aspect-[16/9] object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wide flex items-center gap-1.5" style={{ color: "#f97316" }}>
                         {blog.emoji ? `${blog.emoji} ` : ""}{blog.cat}
@@ -184,22 +170,24 @@ export default function Blogs() {
                           <span className="ml-1 bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">{blog.badge}</span>
                         )}
                       </span>
-                      <span className="text-xs text-gray-400">{blog.date}</span>
+                      <span className="shrink-0 text-xs text-gray-400">{blog.date}</span>
                     </div>
-                    <h3 className="text-base font-bold text-gray-800 leading-snug group-hover:text-blue-800 transition-colors line-clamp-2 mb-3">
+                    <h3 className="min-h-[3rem] text-base font-bold text-gray-800 leading-snug group-hover:text-blue-800 transition-colors line-clamp-2 mb-3">
                       {blog.title}
                     </h3>
-                    {blog.intro && (
-                      <p className="text-sm text-gray-500 line-clamp-2 mb-3">{blog.intro}</p>
-                    )}
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "#0d3b86" }}>
+                    <div className="min-h-[3rem]">
+                      {blog.intro && (
+                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">{blog.intro}</p>
+                      )}
+                    </div>
+                    <span className="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-semibold" style={{ color: "#0d3b86" }}>
                       Read More <ArrowRight size={14} />
                     </span>
                   </div>
                 </a>
               ))}
               {filtered.length === 0 && (
-                <div className="col-span-3 text-center py-16 text-gray-400">
+                <div className="col-span-full text-center py-16 text-gray-400">
                   No articles found. Try a different search or category.
                 </div>
               )}
