@@ -213,6 +213,27 @@ footer{background:var(--navy-2);color:rgba(255,255,255,.62);text-align:center;pa
     "speech-hi": { resource: "speech", language: "hindi", length: "short" },
     "speech-mr": { resource: "speech", language: "marathi", length: "short" }
   };
+  const approvedFaqSlugs = [
+    "when-is-janmashtami-2026",
+    "why-two-janmashtami-dates",
+    "when-is-dahi-handi-2026",
+    "nishita-puja-muhurat-2026",
+    "story-behind-janmashtami",
+    "what-is-gopalkala",
+    "how-schools-celebrate-janmashtami",
+    "janmashtami-essay-topics",
+    "janmashtami-vs-gokulashtami",
+    "janmashtami-vrat-young-children"
+  ];
+  const approvedResourceTabs = {
+    "essay-en": { resource: "essay", language: "english" },
+    "essay-hi": { resource: "essay", language: "hindi" },
+    "essay-mr": { resource: "essay", language: "marathi" },
+    "speech-en-short": { resource: "speech", language: "english" },
+    "speech-en-long": { resource: "speech", language: "english" },
+    "speech-hi": { resource: "speech", language: "hindi" },
+    "speech-mr": { resource: "speech", language: "marathi" }
+  };
   const approvedImageSlugs = new Set([
     "bal-gopal-flute", "peacock-feather-flute", "dahi-handi", "matki-diyas",
     "gita-chakra", "yamuna-basket", "mor-pankh", "krishna-sudama",
@@ -273,6 +294,15 @@ footer{background:var(--navy-2);color:rgba(255,255,255,.62);text-align:center;pa
       list.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
     }));
   }
+  function initFaq() {
+    $$(".faq details").forEach((detail, index) => {
+      const questionSlug = approvedFaqSlugs[index];
+      if (!questionSlug) return;
+      detail.addEventListener("toggle", () => {
+        if (detail.open) trackEvent("janmashtami_faq_opened", { question_slug: questionSlug });
+      });
+    });
+  }
   function initTabs() {
     $$(".tab-group").forEach(group => {
       $$(".tab-btn", group).forEach(button => {
@@ -283,6 +313,8 @@ footer{background:var(--navy-2);color:rgba(255,255,255,.62);text-align:center;pa
           siblingButtons.forEach(item => item.setAttribute("aria-selected", String(item === button)));
           const panels = siblingButtons.map(item => $(`#${item.dataset.tab}`, group)).filter(Boolean);
           panels.forEach(item => { item.hidden = item !== panel; });
+           const analytics = approvedResourceTabs[button.dataset.tab];
+           if (analytics) trackEvent("janmashtami_resource_tab_selected", analytics);
         });
       });
     });
@@ -393,7 +425,7 @@ footer{background:var(--navy-2);color:rgba(255,255,255,.62);text-align:center;pa
     const progress = $("#progress");
     addEventListener("scroll", () => { const max = document.documentElement.scrollHeight - innerHeight; progress.style.width = `${max > 0 ? (scrollY / max) * 100 : 0}%`; }, { passive: true });
   }
-  initContents(); initTabs(); initCopyButtons(); initQuotes(); initFacts(); initQuiz(); initProgress();
+  initContents(); initFaq(); initTabs(); initCopyButtons(); initQuotes(); initFacts(); initQuiz(); initProgress();
 })();
 </script>
 </body>
