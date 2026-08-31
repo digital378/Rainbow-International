@@ -1,0 +1,768 @@
+# REPLIT BUILD PROMPT — Rainbow International School | Janmashtami 2026 Blog
+
+Paste everything below into Replit Agent (or your AI coding assistant of choice) as a single build instruction. It contains the complete, final, approved copy for the page — do not rewrite, shorten, summarise, or regenerate any of the essays, speeches, stories, quotes, slogans, or FAQ content below. Your job is to build the interactive web page AROUND this exact content, not to invent new content.
+
+---
+
+## 1. WHAT YOU ARE BUILDING
+
+A single, fully responsive blog page for **rainbowinternationalschool.in**, to be published at:
+
+`https://rainbowinternationalschool.in/blog/janmashtami-2026`
+
+This page must match the content depth, structure, and interaction quality of the site's existing best-performing blog — **Independence Day 2026** (`https://rainbowinternationalschool.in/blog/independence-day-2026`) — reusing the SAME proven UX patterns (sticky table of contents, tabbed language/length selectors with "Copy Text" buttons, tap-to-reveal flip cards, a scored interactive quiz, an FAQ accordion, a downloadable image gallery, social share bar) but built fresh for **Krishna Janmashtami 2026** content, in **Rainbow International School's own brand identity** (NOT the Rainbow Preschools brand — see Section 3).
+
+This is one of two sister blogs (RIS and Rainbow Preschools each have their own separate Janmashtami blog on separate domains). **This page must be fully self-contained and must NOT be set up as a canonical duplicate of, or copy content from, the Rainbow Preschools version.** See the SEO section near the end of this prompt for the exact canonical-tag requirement.
+
+---
+
+## 2. TECH & SETUP
+
+- If this Replit project is already using a framework for the rest of the site (Next.js, React, etc.), build this as a page/route in that same framework and reuse existing shared components (header, footer, nav) where they already exist.
+- If this is a fresh/standalone Replit project, scaffold it as a clean, semantic, framework-free **HTML5 + CSS + vanilla JavaScript** page with no required build step, so it can be dropped into any CMS or framework later. Keep JavaScript modular (one clearly named function/module per interactive component listed in Section 5) so each piece is easy to lift into a component-based framework afterward.
+- Mobile-first responsive layout. Most traffic on festival content is mobile — design and test mobile first, then scale up.
+- Fast load: no render-blocking scripts, defer non-critical JS, lazy-load below-the-fold images.
+
+---
+
+## 3. BRAND & DESIGN SYSTEM (Rainbow International School — do not deviate)
+
+- **Brand:** Rainbow International School (RIS) — CBSE, Nursery to Grade 12. Tone: confident, warm, aspirational, trustworthy, professional, parent-friendly. NOT childish or playful — that is the Rainbow Preschools (RPS) sister-brand's tone, and the two must never be visually or verbally interchangeable.
+- **Primary brand colour:** Deep navy `#10174F` — use for headings, primary buttons, table headers, the top/bottom accent rule, and the sticky nav active state.
+- **Suggested festive accent (not an official brand rule — flag to the client for sign-off):** a warm gold/mustard tone (e.g. `#E8B93B`) for festive callouts, quote-card borders, and the developer-note styling — used sparingly, never replacing navy as the dominant colour.
+- **Logo:** Use the official RIS logo (client will supply the file — tagline "PASSION FOR EXCELLENCE"). Never stretch, recolour, or crop it. Do not use the Rainbow Preschools logo anywhere on this page except in the small cross-brand footer mention (Section 20 of the content), where it appears only as a text link, never as a logo lockup.
+- **Typography:** No official typeface has been supplied yet — use a clean, accessible system font stack (e.g. `-apple-system, "Segoe UI", Roboto, Calibri, sans-serif`) for Latin text. For Hindi/Marathi (Devanagari) text, add a Devanagari-capable fallback in the stack (e.g. `"Noto Sans Devanagari", "Nirmala UI", sans-serif`) so the Hindi/Marathi sections render correctly on all devices — do not let Devanagari text fall back to tofu/boxes.
+- **Accessibility:** WCAG AA colour contrast minimum everywhere (navy on white passes; test any accent colour combinations). Large tap targets (min 44×44px) on all interactive elements. Full keyboard navigability for tabs, accordion, and quiz. `alt` text on every image (see Section 6 for exact alt-text pattern).
+- **Never fabricate:** Do not invent school facts, phone numbers, addresses, admission dates, or claims beyond what is written in the content below. Any placeholder in square brackets like `[Insert verified phone number]` must remain a clearly visible placeholder in the built page (e.g. styled as an editable/highlighted field) until the client fills it in — never invent a value for it.
+
+---
+
+## 4. FULL PAGE CONTENT (use this exact copy — build the UI around it)
+
+Everything between this line and the "END OF PAGE CONTENT" marker is the final, approved copy for the page, organised by section. Section headings map 1:1 to the H1/H2/H3 structure the page must use. Tables should render as real styled tables. Lines marked **"🛠 Replit / Developer Build Note:"** are instructions to you, the builder — they are NOT copy to display on the page; implement what they describe instead.
+
+---
+
+
+## SEO METADATA BLOCK
+
+- **Suggested URL slug:** /blog/janmashtami-2026
+- **Meta Title (58 chars):** Janmashtami 2026: Essays, Speeches & Activities | RIS
+- **Meta Description (154 chars):** Complete Janmashtami 2026 guide for CBSE students — history, significance, essays & speeches in English, Hindi & Marathi, quiz, activities, free downloads. By Rainbow International School, Thane.
+- **Primary keywords:** Janmashtami 2026, Krishna Janmashtami 2026 date, Janmashtami essay, Janmashtami speech, Dahi Handi 2026, Gopalkala, Janmashtami for school students, Janmashtami activities for schools
+- **Secondary/long-tail keywords:** Janmashtami speech in Hindi, Janmashtami speech in Marathi, Janmashtami slogans, Krishna Janmashtami quotes, Janmashtami quiz, Janmashtami essay in 100 words, Dahi Handi Thane, Janmashtami wishes, Janmashtami images for WhatsApp DP
+- **H1:** Krishna Janmashtami 2026: Complete Guide to History, Significance, Speeches, Essays & School Activities
+- **Subheading:** Celebrating Lord Krishna's Timeless Legacy | September 4–5, 2026 | A Complete Resource for Students, Parents & Teachers
+- **Byline:** Rainbow International School, Thane | Published: August 31, 2026 | ~19 min read
+- **Recommended OG image:** Bal Gopal / peacock feather / Dahi Handi themed illustration (non-photorealistic, brand-colour accented)
+- **[REPLIT NOTE]** Add Article schema (headline, author=Organization "Rainbow International School", datePublished, image) + FAQPage schema (Section 19) + Breadcrumb schema (Home > Blog > Janmashtami 2026). Self-referencing canonical tag pointing ONLY to this URL on rainbowinternationalschool.in — do NOT point to or accept a canonical from rainbowpreschools.com. See full SEO Notes in Section 22.
+
+---
+
+## TABLE OF CONTENTS (jump links)
+
+1. Why Janmashtami 2026 Is Special
+2. Who Was Lord Krishna? A Quick Introduction
+3. The History & Story Behind Janmashtami
+4. The Significance of Janmashtami
+5. Krishna's Symbols & Iconography
+6. Janmashtami Celebrations Across India
+7. Dahi Handi & Gopalkala Explained
+8. Janmashtami Essays for School Students (English, Hindi, Marathi)
+9. Janmashtami Speeches for School Assembly (English, Hindi, Marathi)
+10. Janmashtami Slogans & Quotes
+11. Stories of Bal Krishna for Younger Grades
+12. 10 Fascinating Facts About Janmashtami
+13. Janmashtami Quiz — Test Your Knowledge
+14. Janmashtami Activities for Schools
+15. Festive Recipes & Traditions
+16. A Family Guide to Janmashtami Vrat (Fasting)
+17. Janmashtami Wishes & Messages
+18. Free Downloadable Images for Social Media
+19. Frequently Asked Questions
+20. Explore Rainbow Schools
+21. [REPLIT] Developer Build Notes — Interactive Elements
+22. SEO & Technical Implementation Notes
+
+---
+
+## 1. WHY JANMASHTAMI 2026 IS SPECIAL
+
+Every year, millions of families across India and around the world pause to celebrate the birth of Lord Krishna — one of the most beloved and widely worshipped forms of the divine in Hindu tradition. In 2026, Krishna Janmashtami falls on **Friday, September 4** (Smarta tradition, followed by most households and schools) and **Saturday, September 5** (Vaishnava/ISKCON tradition, followed by temples and monastic communities). Maharashtra's much-loved **Dahi Handi** celebrations take place on **Saturday, September 5, 2026**.
+
+According to the Panchang, the Ashtami Tithi begins at **2:25 AM on September 4** and continues until **12:13 AM on September 5**, with the auspicious **Nishita Kaal Puja Muhurat** — the moment traditionally believed to mark Krishna's midnight birth — falling between **11:55 PM on September 4 and 12:42 AM on September 5** (a 47-minute window).
+
+Janmashtami is more than a date on the calendar. It is a celebration of qualities that remain deeply relevant for children growing up today: courage in the face of injustice, wisdom in decision-making, playfulness balanced with responsibility, and devotion to truth. For schools, Janmashtami offers a wonderful opportunity to blend cultural learning with values education — helping students connect ancient stories to lessons about friendship, honesty, leadership, and resilience.
+
+**[REPLIT NOTE]** Infographic block: "Janmashtami 2026 at a Glance" — 4 stat tiles: Ashtami Begins (2:25 AM, Sep 4), Nishita Puja (11:55 PM–12:42 AM), Dahi Handi (Sep 5), Parana/Fast Ends (after 6:09 AM, Sep 5).
+
+---
+
+## 2. WHO WAS LORD KRISHNA? A QUICK INTRODUCTION
+
+Lord Krishna is revered as the eighth avatar (incarnation) of Lord Vishnu, born to restore dharma (righteousness) at a time when the world was burdened by tyranny. According to the *Bhagavata Purana*, Krishna was born in a prison cell in Mathura to Devaki and Vasudeva, during the reign of the cruel king Kansa, Devaki's own brother, who had been foretold that Devaki's eighth child would end his life.
+
+To protect the infant, Vasudeva carried baby Krishna across the flooded Yamuna river on a stormy night to the home of Nanda and Yashoda in Gokul, where Krishna spent his childhood as a much-loved, mischievous cowherd boy — famous for stealing butter, playing the flute, and performing extraordinary feats that protected his village from danger. As he grew, Krishna returned to Mathura to overthrow Kansa, later became a central guide and charioteer to Arjuna during the Mahabharata war, and delivered the timeless wisdom of the **Bhagavad Gita** — one of the most important philosophical texts in the world, still studied in schools, universities and boardrooms today for its lessons on duty, purpose and equanimity.
+
+Krishna is celebrated in many forms: as **Bal Gopal** (the playful child), **Makhan Chor** (the butter thief), **Govinda** (protector of cows), and **Yogeshwara** (Lord of Yoga) — reflecting a personality that is at once divine, wise, and wonderfully human.
+
+---
+
+## 3. THE HISTORY & STORY BEHIND JANMASHTAMI
+
+The story of Janmashtami begins generations before Krishna's birth. King Kansa of Mathura imprisoned his own sister Devaki and her husband Vasudeva after a prophecy warned that her eighth son would be his destroyer. One by one, Kansa killed six of their children. When Krishna, the eighth child, was born at the stroke of midnight, the prison guards fell into a mysterious sleep, the chains binding Vasudeva loosened, and the doors opened on their own.
+
+Under cover of a fierce thunderstorm, Vasudeva carried the newborn Krishna across the swollen Yamuna river in a basket, said to be protected overhead by the great serpent Shesha. He exchanged the baby with a newborn girl at the home of Nanda and Yashoda in Gokul, and returned to the prison before dawn. Krishna grew up safely in Gokul and later Vrindavan, away from Kansa's reach, until he was old enough to return to Mathura and fulfil the prophecy — freeing his parents and restoring just rule.
+
+This narrative — found in the *Bhagavata Purana*, *Vishnu Purana*, *Harivamsa* and *Mahabharata* — has been retold for thousands of years across Indian oral tradition, classical dance, temple art, folk theatre (Raas Leela), and literature. Janmashtami itself is one of the oldest continuously celebrated Hindu festivals, observed with descriptions dating back over a millennium in classical texts, and today celebrated by an estimated one billion+ Hindus and Krishna devotees worldwide, including large ISKCON communities across the globe.
+
+**Timeline table — Key Milestones in the Krishna Narrative**
+
+| Event | Significance |
+|---|---|
+| Birth in Mathura prison | Midnight birth during Rohini Nakshatra, Ashtami Tithi, Bhadrapada month |
+| Journey to Gokul | Vasudeva crosses the Yamuna to protect infant Krishna |
+| Childhood in Gokul & Vrindavan | Makhan Chor tales, Kaliya Daman, Govardhan Parvat episode |
+| Return to Mathura | Krishna ends Kansa's tyrannical rule |
+| Role in the Mahabharata | Krishna guides Arjuna as charioteer and philosophical guide |
+| The Bhagavad Gita | Krishna's discourse to Arjuna on duty, purpose and dharma |
+| Legacy | Worshipped as Bal Gopal, Govinda, Yogeshwara across India and the world |
+
+**[REPLIT NOTE]** Consider a horizontal scroll-timeline component for the table above (similar to the Independence Day 1757–1947 timeline).
+
+---
+
+## 4. THE SIGNIFICANCE OF JANMASHTAMI
+
+At its heart, Janmashtami celebrates the eternal victory of good over evil, dharma over adharma, and light over darkness — Krishna's very birth is a symbol that even in the darkest circumstances (a prison cell, a kingdom under tyranny), positive change is possible.
+
+For observant Hindu families, the day involves a **vrat (fast)**, prayers, devotional singing (bhajans and kirtans) through the night, and a midnight celebration (Nishita Puja) marking the exact moment of Krishna's birth, followed by **Charanamrit** and **Panchamrit** (a sacred mixture of milk, curd, honey, ghee and sugar) offered to the deity and shared among devotees.
+
+Beyond ritual, Janmashtami carries lessons that resonate strongly with a school's mission to nurture well-rounded individuals:
+
+- **Courage** — Krishna's early life shows that circumstances of birth need not define destiny.
+- **Wisdom & Balance** — the Bhagavad Gita's teachings on doing one's duty without attachment to outcome remain widely referenced in modern leadership and mindfulness education.
+- **Community & Teamwork** — the Dahi Handi tradition itself is built entirely on trust and coordinated effort within a human pyramid.
+- **Joy & Playfulness** — Krishna is also remembered simply as a joyful, mischievous child, reminding us that celebration and learning go hand in hand.
+
+These themes make Janmashtami a meaningful addition to a school's cultural calendar — not only as a religious observance, but as a springboard for conversations about ethics, history, and Indian heritage.
+
+---
+
+## 5. KRISHNA'S SYMBOLS & ICONOGRAPHY
+
+| Symbol | Meaning |
+|---|---|
+| **Bansuri (Flute)** | Represents Krishna's ability to draw hearts through art and music; a symbol of surrender and harmony |
+| **Mor Pankh (Peacock Feather)** | Worn in Krishna's crown; symbolises beauty, pride tempered with humility, and connection with nature |
+| **Makhan (Butter)** | Represents purity, innocence, and the sweetness of devotion (bhakti) |
+| **Kaustubha Mani** | A divine gem worn by Krishna, symbolising the purest form of consciousness |
+| **Sudarshan Chakra** | Krishna's discus weapon, representing the protection of dharma |
+| **Panchajanya** | Krishna's conch shell, whose sound signalled the start of righteous battle in the Mahabharata |
+| **Cows & Govardhan Hill** | Represent Krishna's role as protector (Govinda) of nature, animals and community |
+| **Pitambar (Yellow Garments)** | Krishna is traditionally depicted wearing yellow, a colour associated with knowledge and auspiciousness |
+| **Blue/Dark Complexion** | Symbolic of the vastness of the sky and ocean — the infinite nature of the divine |
+
+**[REPLIT NOTE]** Grid/icon-card layout, similar to the "National Symbols" grid in the Independence Day blog.
+
+---
+
+## 6. JANMASHTAMI CELEBRATIONS ACROSS INDIA
+
+Janmashtami is celebrated with distinct regional flavour across the country:
+
+- **Mathura & Vrindavan (Uttar Pradesh):** Considered Krishna's birthplace and childhood home, these twin towns host the grandest celebrations — elaborate midnight aarti at the Krishna Janmabhoomi temple, Raas Leela performances re-enacting Krishna's life, and lakhs of pilgrims and devotees.
+- **Dwarka (Gujarat):** Believed to be the kingdom Krishna established later in life; the Dwarkadhish Temple hosts grand processions and midnight celebrations.
+- **Maharashtra (including Mumbai & Thane):** Famous for **Dahi Handi** — the dramatic human-pyramid tradition where teams of "Govindas" climb over one another to break a pot (handi) of curd hung high above the street, echoing young Krishna's own butter-stealing escapades. Thane and Mumbai host some of the most energetic Dahi Handi events in the country, often with prize money and community celebrations lasting late into the night.
+- **Manipur:** Celebrated with the classical **Manipuri Raas Leela** dance, a UNESCO-recognised art form depicting Krishna and Radha's divine love.
+- **Odisha:** Closely linked to the worship of Lord Jagannath (a form of Krishna) at Puri, with special prayers and festivities.
+- **South India (Tamil Nadu, Karnataka, Andhra Pradesh):** Known as **Gokulashtami** or **Sri Krishna Jayanthi**, marked by "Uriyadi" (a South Indian version of Dahi Handi), decorative little footprints drawn from the doorstep to the puja room (symbolising Krishna's entry into the home), and elaborate swings (jhula) for the deity.
+- **ISKCON temples worldwide:** From London to Los Angeles, ISKCON (International Society for Krishna Consciousness) temples host some of the largest Janmashtami gatherings outside India, with kirtan, feasts, and midnight abhishekam broadcast globally.
+
+This diversity is part of what makes Janmashtami such a rich, unifying festival — one story, celebrated in dozens of beautiful regional forms.
+
+---
+
+## 7. DAHI HANDI & GOPALKALA EXPLAINED
+
+**Dahi Handi**, meaning "curd pot," is one of Janmashtami's most spectacular traditions, especially in Maharashtra. It re-enacts young Krishna's playful habit of stealing makhan (butter) and curd from earthen pots hung out of his reach by the women of Gokul, who would hang their pots high to keep them safe from the mischievous "Makhan Chor."
+
+On Dahi Handi day, a clay pot filled with curd, milk, and other treats is suspended high above a street or ground. Teams of young men and women, known as **"Govinda" troupes**, form human pyramids — sometimes five or six tiers high — to reach and break the pot, all while a crowd cheers them on and drenches them with water for extra challenge. Mumbai and Thane are particularly famous for large-scale, competitive Dahi Handi events, some offering significant prize money to the winning troupe.
+
+**Gopalkala** refers to the prasad (blessed food) traditionally prepared and shared once the pot is broken — a mixture of flattened rice (poha), curd, milk, butter, and fruits, believed to be one of Krishna's favourite foods. Sharing Gopalkala symbolises community, abundance, and the joy of togetherness.
+
+**In 2026, Dahi Handi celebrations fall on Saturday, September 5** — the day after the main Janmashtami puja in the Smarta tradition.
+
+**A gentle safety note for families and schools:** Dahi Handi human pyramids can be physically demanding. If your school or community is organising or attending a Dahi Handi event, ensure appropriate age-based participation, protective gear (helmets are increasingly used by professional Govinda troupes), adequate hydration, and adult supervision.
+
+---
+
+## 8. JANMASHTAMI ESSAYS FOR SCHOOL STUDENTS
+
+*(Note for readers: Each essay below is written as a ready-to-use, standalone piece for classroom submissions, homework, or recitation. Use the "Copy Text" affordance noted for the live web version.)*
+
+### 8.1 English Essays
+
+**10-Line Essay on Janmashtami (Grades 1–3)**
+1. Janmashtami is the birthday of Lord Krishna.
+2. It is celebrated on the eighth day (Ashtami) of the Hindu month of Bhadrapada.
+3. Lord Krishna was born in Mathura to Devaki and Vasudeva.
+4. He was raised by Nanda and Yashoda in Gokul.
+5. Krishna is known for playing the flute beautifully.
+6. He loved butter so much that he is called "Makhan Chor."
+7. In Maharashtra, people celebrate with the Dahi Handi festival.
+8. Devotees fast, sing bhajans, and pray at midnight on this day.
+9. Temples and homes are decorated with flowers, lights, and swings (jhulas).
+10. Janmashtami teaches us about courage, wisdom, and the victory of good over evil.
+
+**100-Word Essay on Janmashtami (Grades 3–5)**
+Janmashtami is a joyful Hindu festival that celebrates the birth of Lord Krishna, the eighth avatar of Lord Vishnu. He was born at midnight in Mathura to Devaki and Vasudeva but grew up in Gokul with his foster parents, Nanda and Yashoda. Krishna is remembered for his mischievous childhood, his love for butter, his soulful flute music, and his important teachings in the Bhagavad Gita. On Janmashtami, people fast through the day, sing devotional songs, decorate temples, and celebrate at midnight when Krishna is believed to have been born. In Maharashtra, the festival is also marked by the exciting Dahi Handi tradition.
+
+**300-Word Essay on Janmashtami (Grades 5–8)**
+Janmashtami, also known as Krishna Janmashtami or Gokulashtami, is one of the most widely celebrated festivals in Hindu tradition, marking the birth of Lord Krishna. According to the *Bhagavata Purana*, Krishna was born at midnight in a prison in Mathura to Devaki and Vasudeva, during the tyrannical rule of King Kansa. To protect the newborn from Kansa, who had been foretold that Devaki's eighth child would cause his downfall, Vasudeva carried baby Krishna across the flooded Yamuna river to Gokul, where he was raised by Nanda and Yashoda.
+
+Krishna's childhood is filled with memorable stories — stealing butter from neighbours' homes (earning him the nickname "Makhan Chor"), subduing the venomous serpent Kaliya in the Yamuna, and lifting the Govardhan Hill on his finger to shelter villagers from a devastating storm. As an adult, Krishna played a central role in the Mahabharata as Arjuna's charioteer and guide, delivering the profound teachings of the Bhagavad Gita on duty, purpose, and righteous living.
+
+Janmashtami is observed with great devotion across India. Devotees observe a day-long fast, sing bhajans and kirtans, and gather for a midnight puja (Nishita Puja) to mark the exact moment of Krishna's birth. Temples and homes are beautifully decorated, and idols of baby Krishna are placed in cradles and swings. In Maharashtra, the festival includes the thrilling Dahi Handi tradition, where teams form human pyramids to break pots of curd suspended high above the streets, recreating Krishna's playful butter-stealing exploits.
+
+Beyond its religious significance, Janmashtami carries timeless lessons — the triumph of good over evil, the importance of courage and wisdom, and the joy of community celebration. It reminds us that even the most powerful teachings can be wrapped in stories of childhood playfulness and love.
+
+**500-Word Essay on Janmashtami (Grades 8–12)**
+Krishna Janmashtami stands among the most significant festivals in the Hindu calendar, commemorating the birth of Lord Krishna, revered as the eighth avatar of Lord Vishnu and one of the most complex, beloved figures in Indian philosophy and mythology. Celebrated on the Ashtami (eighth day) of the Krishna Paksha in the month of Bhadrapada, the festival typically falls in August or September, and in 2026 is observed on September 4 (Smarta tradition) and September 5 (Vaishnava/ISKCON tradition).
+
+The narrative of Krishna's birth is set against a backdrop of tyranny and prophecy. King Kansa of Mathura, warned that his sister Devaki's eighth child would bring about his end, imprisoned Devaki and her husband Vasudeva and killed their first six children. When Krishna was born as the eighth child, at the stroke of midnight, divine intervention allowed Vasudeva to escape the heavily guarded prison and carry the infant across the storm-swollen Yamuna river to the home of Nanda and Yashoda in Gokul, where Krishna would spend a childhood defined by both mischief and miracles.
+
+Growing up in Gokul and later Vrindavan, young Krishna became famous for his love of butter (earning the endearing title "Makhan Chor," or butter thief), his enchanting flute music that is said to have captivated all of nature, and several extraordinary feats — subduing the poisonous serpent Kaliya who had contaminated the Yamuna, and lifting the Govardhan Hill to protect villagers from Indra's wrath, teaching the community to have faith in their own strength and unity rather than fear.
+
+As an adult, Krishna's role expanded from a beloved cowherd to a statesman, philosopher, and guide. His discourse to the warrior Arjuna on the battlefield of Kurukshetra — recorded as the *Bhagavad Gita* — remains one of the most studied philosophical texts in the world, offering guidance on duty (dharma), detachment from outcomes, self-discipline, and the nature of the self. This dual identity — the playful child of Gokul and the profound philosopher of Kurukshetra — is part of what makes Krishna such an enduringly relatable figure across generations.
+
+Janmashtami celebrations reflect this duality. The day begins with fasting and prayer, builds towards devotional singing and storytelling through the evening, and culminates in a midnight puja (Nishita Puja) that marks the precise, joyous moment of Krishna's birth, followed by the sharing of Panchamrit and festive prasad. In Maharashtra, the following day brings the electric energy of Dahi Handi, where human pyramids of "Govindas" scale each other's shoulders to break pots of curd — a joyous, physical tribute to Krishna's own childhood exploits.
+
+For students, Janmashtami is an opportunity to explore Indian history, mythology, regional diversity, and enduring philosophical ideas — all wrapped in a festival that is, at its heart, a celebration of courage, wisdom, community and joy.
+
+### 8.2 Hindi Essays (हिंदी निबंध)
+
+**10 पंक्तियों में जन्माष्टमी निबंध**
+1. जन्माष्टमी भगवान श्रीकृष्ण के जन्मदिन के रूप में मनाई जाती है।
+2. यह भाद्रपद माह की अष्टमी तिथि को मनाई जाती है।
+3. श्रीकृष्ण का जन्म मथुरा में देवकी और वासुदेव के घर हुआ था।
+4. उनका पालन-पोषण गोकुल में नंद और यशोदा ने किया।
+5. श्रीकृष्ण बांसुरी बहुत सुंदर बजाते थे।
+6. उन्हें माखन बहुत पसंद था, इसलिए उन्हें "माखन चोर" कहा जाता है।
+7. महाराष्ट्र में इस दिन दही हांडी उत्सव मनाया जाता है।
+8. भक्त इस दिन उपवास रखते हैं और आधी रात को पूजा करते हैं।
+9. मंदिरों और घरों को फूलों, झूलों और रोशनी से सजाया जाता है।
+10. जन्माष्टमी हमें साहस, बुद्धि और सत्य की विजय का संदेश देती है।
+
+**200 शब्दों में जन्माष्टमी निबंध**
+कृष्ण जन्माष्टमी हिंदू धर्म के सबसे महत्वपूर्ण त्योहारों में से एक है, जो भगवान विष्णु के आठवें अवतार, भगवान श्रीकृष्ण के जन्म का उत्सव है। पौराणिक कथाओं के अनुसार, श्रीकृष्ण का जन्म मथुरा की जेल में आधी रात को देवकी और वासुदेव के आठवें पुत्र के रूप में हुआ था। अत्याचारी राजा कंस से बचाने के लिए वासुदेव जी उन्हें यमुना नदी पार कराकर गोकुल ले गए, जहाँ नंद और यशोदा ने उनका पालन-पोषण किया।
+
+श्रीकृष्ण का बचपन माखन चुराने, बांसुरी बजाने और कालिया नाग को वश में करने जैसी अद्भुत घटनाओं से भरा है। बड़े होकर उन्होंने महाभारत में अर्जुन के सारथी और मार्गदर्शक के रूप में भगवद्गीता का उपदेश दिया, जो आज भी विश्वभर में पढ़ी जाती है।
+
+जन्माष्टमी के दिन भक्त उपवास रखते हैं, भजन-कीर्तन गाते हैं और आधी रात को विशेष पूजा करते हैं। महाराष्ट्र में इस अवसर पर दही हांडी का रोमांचक आयोजन होता है, जहाँ मानव पिरामिड बनाकर ऊँचाई पर बंधी दही की हांडी फोड़ी जाती है। यह पर्व हमें सत्य की विजय, साहस और एकता का महत्वपूर्ण संदेश देता है।
+
+### 8.3 Marathi Essays (मराठी निबंध)
+
+**10 ओळींचा जन्माष्टमी निबंध**
+1. जन्माष्टमी हा भगवान श्रीकृष्णाचा जन्मदिवस म्हणून साजरा केला जातो.
+2. हा सण भाद्रपद महिन्यातील अष्टमी तिथीला साजरा होतो.
+3. श्रीकृष्णाचा जन्म मथुरेत देवकी आणि वासुदेव यांच्या पोटी झाला.
+4. त्यांचे पालनपोषण गोकुळात नंद आणि यशोदा यांनी केले.
+5. श्रीकृष्ण बासरी अतिशय सुरेख वाजवत असत.
+6. त्यांना लोणी खूप आवडायचे, म्हणून त्यांना "माखनचोर" म्हटले जाते.
+7. महाराष्ट्रात या दिवशी दहीहंडीचा उत्सव मोठ्या उत्साहात साजरा होतो.
+8. भाविक या दिवशी उपवास करतात आणि मध्यरात्री पूजा करतात.
+9. मंदिरे आणि घरे फुले, झुले आणि रोषणाईने सजवली जातात.
+10. जन्माष्टमी आपल्याला धैर्य, बुद्धी आणि सत्याच्या विजयाचा संदेश देते.
+
+**200 शब्दांत जन्माष्टमी निबंध**
+श्रीकृष्ण जन्माष्टमी हा हिंदू धर्मातील एक अत्यंत महत्त्वाचा सण असून, भगवान विष्णूंचा आठवा अवतार असलेल्या श्रीकृष्णाच्या जन्माचा उत्सव आहे. पौराणिक कथेनुसार, श्रीकृष्णाचा जन्म मथुरेतील तुरुंगात मध्यरात्री देवकी आणि वासुदेव यांचा आठवा पुत्र म्हणून झाला. जुलमी राजा कंसापासून बालकाचे रक्षण करण्यासाठी वासुदेवांनी यमुना नदी पार करून त्यांना गोकुळात नेले, जिथे नंद आणि यशोदा यांनी त्यांचा सांभाळ केला.
+
+श्रीकृष्णाचे बालपण लोणी चोरणे, बासरी वाजवणे आणि कालिया नागाला वठणीवर आणणे यांसारख्या अद्भुत प्रसंगांनी भरलेले आहे. मोठे झाल्यावर त्यांनी महाभारतात अर्जुनाचे सारथी व मार्गदर्शक बनून भगवद्गीतेचा उपदेश दिला, जो आजही जगभर वाचला जातो.
+
+जन्माष्टमीच्या दिवशी भाविक उपवास करतात, भजन-कीर्तन गातात आणि मध्यरात्री विशेष पूजा करतात. महाराष्ट्रात या निमित्ताने दहीहंडीचा थरारक कार्यक्रम होतो, ज्यामध्ये मानवी मनोरे रचून उंचावर बांधलेली दहीहंडी फोडली जाते. हा सण आपल्याला सत्याचा विजय, धैर्य आणि एकतेचा संदेश देतो.
+
+**[REPLIT NOTE]** Build this section as tabbed selectors (English / Hindi / Marathi tabs, then length sub-tabs), each with a "Copy Text" button — matching the Independence Day blog's essay UI pattern.
+
+---
+
+## 9. JANMASHTAMI SPEECHES FOR SCHOOL ASSEMBLY
+
+### 9.1 English — Short Speech (~1 minute)
+
+Respected Principal, teachers, and my dear friends, a very good morning to all of you.
+
+Today we have gathered to celebrate Krishna Janmashtami — the joyous birthday of Lord Krishna, one of the most beloved figures in Indian tradition. Krishna was born in Mathura to Devaki and Vasudeva, but grew up in Gokul under the loving care of Nanda and Yashoda. He is remembered for his playful childhood, his beautiful flute music, and his profound teachings in the Bhagavad Gita, where he taught the importance of duty, courage, and doing what is right.
+
+Janmashtami reminds us that goodness always triumphs over evil, and that wisdom can be found even in the simplest stories of childhood. Let us celebrate this day by remembering these timeless values. Thank you, and Jai Shri Krishna!
+
+### 9.2 English — Long Speech (~3 minutes)
+
+Respected Principal, honoured teachers, and my dear friends — a very warm good morning to everyone gathered here today.
+
+We are here to celebrate one of the most cherished festivals in Indian tradition — Krishna Janmashtami, marking the birth of Lord Krishna, revered as the eighth avatar of Lord Vishnu. According to our scriptures, Krishna was born at midnight in a prison cell in Mathura, to Devaki and Vasudeva, at a time when the region suffered under the tyrannical rule of King Kansa. To protect the newborn, his father Vasudeva carried him across the stormy Yamuna river to Gokul, where he was raised by the loving foster parents, Nanda and Yashoda.
+
+Krishna's childhood is filled with stories that continue to inspire us today — his playful love for butter, which earned him the name "Makhan Chor," his enchanting flute that could captivate all of nature, his courage in subduing the serpent Kaliya, and his strength and leadership in lifting the Govardhan Hill to protect his village from a devastating storm. As he grew older, Krishna became a central guiding figure in the Mahabharata, serving as Arjuna's charioteer and delivering the timeless wisdom of the Bhagavad Gita — teachings on duty, self-discipline, and doing right without fear of the outcome, which are studied and admired across the world even today.
+
+Janmashtami is celebrated with great devotion across India — through fasting, devotional singing, midnight prayers, and beautifully decorated temples and homes. In Maharashtra, we also celebrate the exciting tradition of Dahi Handi, where teams form human pyramids to break a pot of curd, recreating young Krishna's own mischievous adventures.
+
+As students, we can learn so much from Krishna's life — the courage to stand up against injustice, the wisdom to make thoughtful decisions, and the importance of balancing responsibility with joy and playfulness. On this Janmashtami, let us carry forward these values in our own lives — at school, at home, and in everything we do.
+
+Thank you, and Jai Shri Krishna!
+
+### 9.3 Hindi — भाषण (लगभग 1 मिनट)
+
+आदरणीय प्राचार्य महोदय, सम्मानित शिक्षकगण एवं मेरे प्रिय साथियों, आप सभी को सुप्रभात।
+
+आज हम श्रीकृष्ण जन्माष्टमी का पावन पर्व मनाने के लिए एकत्रित हुए हैं। भगवान श्रीकृष्ण का जन्म मथुरा में देवकी और वासुदेव के घर हुआ था, परंतु उनका पालन-पोषण गोकुल में नंद और यशोदा ने किया। वे अपने बचपन की शरारतों, मधुर बांसुरी और भगवद्गीता के महान उपदेशों के लिए जाने जाते हैं, जिनमें उन्होंने कर्तव्य, साहस और सत्य के मार्ग पर चलने की शिक्षा दी।
+
+जन्माष्टमी हमें यह संदेश देती है कि सत्य की सदैव विजय होती है, और बचपन की सरल कहानियों में भी गहरी बुद्धिमत्ता छिपी होती है। आइए हम सब इन मूल्यों को अपने जीवन में अपनाएँ।
+
+धन्यवाद। जय श्री कृष्ण!
+
+### 9.4 Marathi — भाषण (सुमारे 1 मिनिट)
+
+आदरणीय मुख्याध्यापक महोदय, सन्माननीय शिक्षकवर्ग आणि माझ्या प्रिय मित्रांनो, आपणा सर्वांना सुप्रभात.
+
+आज आपण श्रीकृष्ण जन्माष्टमी हा पवित्र सण साजरा करण्यासाठी एकत्र आलो आहोत. भगवान श्रीकृष्णाचा जन्म मथुरेत देवकी आणि वासुदेव यांच्या पोटी झाला, परंतु त्यांचे संगोपन गोकुळात नंद आणि यशोदा यांनी केले. ते आपल्या बालपणीच्या खोड्या, मधुर बासरी आणि भगवद्गीतेतील महान उपदेशांसाठी ओळखले जातात, ज्यामध्ये त्यांनी कर्तव्य, धैर्य आणि सत्याच्या मार्गावर चालण्याची शिकवण दिली.
+
+जन्माष्टमी आपल्याला हा संदेश देते की सत्याचा नेहमी विजय होतो, आणि बालपणीच्या साध्या गोष्टींमध्येही खोल शहाणपण दडलेले असते. चला, आपण सर्वजण हे मूल्य आपल्या जीवनात रुजवूया.
+
+धन्यवाद. जय श्री कृष्ण!
+
+**[REPLIT NOTE]** Tabbed language selector with "Copy Text" buttons, same pattern as Section 8.
+
+---
+
+## 10. JANMASHTAMI SLOGANS & QUOTES
+
+### 10.1 Quotes — Wisdom from Krishna & the Bhagavad Gita (English)
+
+1. "You have the right to work, but never to the fruit of work." — Bhagavad Gita
+2. "Whatever happened, happened for the good. Whatever is happening, is happening for the good." — Lord Krishna
+3. "Set thy heart upon thy work, but never on its reward." — Bhagavad Gita
+4. "A person can rise through the efforts of his own mind; or draw himself down, in the same manner." — Bhagavad Gita
+5. "Change is the law of the universe." — Lord Krishna
+6. "The soul is neither born, and nor does it die." — Bhagavad Gita
+7. "There is neither this world, nor the world beyond, nor happiness for the one who doubts." — Bhagavad Gita
+8. "Man is made by his belief. As he believes, so he is." — Bhagavad Gita
+
+### 10.2 Slogans — English (chantable/celebratory)
+
+1. Hare Krishna! Hare Krishna! Krishna Krishna, Hare Hare!
+2. Govinda Ala Re Ala!
+3. Nand Ke Anand Bhayo, Jai Kanhaiya Lal Ki!
+4. Radhe Radhe! Govind Bolo, Hari Gopal Bolo!
+5. Jai Shri Krishna! Jai Kanhaiya!
+6. Makhan Chor, Matki Phod!
+7. Yashoda Ke Bal Gopal Ki Jai!
+8. Vasudev Sutam Devam, Kansa Chanura Mardanam!
+
+### 10.3 उद्धरण एवं नारे (हिंदी)
+
+**उद्धरण (भगवद्गीता से):**
+1. "कर्म करो, फल की चिंता मत करो।"
+2. "जो हुआ अच्छा हुआ, जो हो रहा है वह भी अच्छा हो रहा है।"
+3. "आत्मा न कभी जन्म लेती है, न कभी मरती है।"
+4. "मनुष्य अपने विश्वास से बनता है, जैसा वह विश्वास करता है वैसा ही बन जाता है।"
+
+**नारे:**
+1. हरे कृष्ण! हरे कृष्ण! कृष्ण कृष्ण, हरे हरे!
+2. गोविंदा आला रे आला!
+3. नंद के आनंद भयो, जय कन्हैया लाल की!
+4. राधे राधे! गोविंद बोलो, हरि गोपाल बोलो!
+5. जय श्री कृष्ण! जय कन्हैया!
+6. माखन चोर, मटकी फोड़!
+
+### 10.4 उद्धरण आणि घोषणा (मराठी)
+
+**उद्धरणे (भगवद्गीतेतून):**
+1. "कर्म करत राहा, फळाची अपेक्षा करू नका."
+2. "जे झाले ते चांगल्यासाठीच झाले, जे घडत आहे तेही चांगल्यासाठीच घडत आहे."
+3. "आत्मा कधीच जन्माला येत नाही आणि कधीच मरत नाही."
+
+**घोषणा:**
+1. हरे कृष्ण! हरे कृष्ण! कृष्ण कृष्ण, हरे हरे!
+2. गोविंदा आला रे आला!
+3. नंदाचा आनंद, जय कन्हैयालालाची जय!
+4. राधे राधे! गोविंद बोला, हरी गोपाल बोला!
+5. जय श्री कृष्ण! जय कान्हा!
+6. माखनचोर, मटकी फोड!
+
+**[REPLIT NOTE]** Quote-card carousel for 10.1 with attribution styling; simple chip/badge list for slogans, echoing the Independence Day blog's slogan cards.
+
+---
+
+## 11. STORIES OF BAL KRISHNA FOR YOUNGER GRADES (Nursery–Class 2)
+
+*A gentle introduction to four favourite Krishna stories, written simply for our youngest learners.*
+
+**1. The Basket That Crossed the River**
+On a stormy night, baby Krishna's father, Vasudeva, had to keep him safe from an angry king. He placed baby Krishna in a basket and carried him on his head, walking through a rushing river in the pouring rain. As the water rose higher and higher, a great serpent named Shesha appeared and spread his hood over the baby like an umbrella, keeping him safe and dry. Vasudeva safely crossed the river and left Krishna with a kind couple named Nanda and Yashoda, who loved him as their own. **Moral: Even in the scariest storms, love and courage find a way.**
+
+**2. Makhan Chor — The Little Butter Thief**
+As a little boy in Gokul, Krishna loved butter more than anything! The mothers of the village would hang their pots of butter high on the ceiling so naughty little Krishna couldn't reach them. But clever Krishna would build towers with his friends, climbing on each other's shoulders, to reach the pots anyway! Everyone in the village loved him too much to ever be truly angry — his smile made even the strictest grown-ups laugh. **Moral: A little cleverness and teamwork can help you reach even the highest goals.**
+
+**3. Kaliya and the River**
+A fearsome snake named Kaliya lived in the Yamuna river and had made the water poisonous, so no one could drink it or fish safely. One day, young Krishna jumped into the river and danced on Kaliya's many hoods until the snake agreed to leave and never harm the villagers again. **Moral: Even the smallest and youngest among us can be brave enough to protect our friends and community.**
+
+**4. The Giant Umbrella — Govardhan Hill**
+When the villagers of Gokul were about to face a terrible storm, young Krishna lifted the entire Govardhan Hill on just one finger, holding it up like a giant umbrella so everyone — people, children, and animals — could stay safe and dry underneath. **Moral: True strength is used to protect and care for others.**
+
+**[REPLIT NOTE]** Illustrated storybook-style carousel or expandable "storycards," similar to the freedom-fighter cards on the RPS Independence Day blog, but styled for RIS (navy accents, slightly more text per card given the older RIS audience range).
+
+---
+
+## 12. 10 FASCINATING FACTS ABOUT JANMASHTAMI
+
+1. **A Midnight Birth:** Krishna is believed to have been born at the exact stroke of midnight, during Rohini Nakshatra — which is why the main puja (Nishita Puja) always takes place at midnight.
+2. **108 Names:** Krishna is worshipped by 108 different names, including Govinda, Madhava, Mohan, Gopal, and Shyam — each highlighting a different aspect of his personality.
+3. **The Bhagavad Gita has 700 verses**, delivered by Krishna to Arjuna across 18 chapters on the battlefield of Kurukshetra.
+4. **World's Tallest Human Pyramid:** Dahi Handi human pyramids in Maharashtra have reportedly reached heights of over 40 feet across multiple tiers, drawing massive crowds and even television coverage.
+5. **A Festival Without Borders:** Thanks to the global ISKCON movement, Janmashtami is celebrated in over 100 countries, from the USA to Russia to Australia.
+6. **Two Celebration Days:** Because of small differences in how the lunar calendar is interpreted, Janmashtami is sometimes celebrated on two consecutive days — one by the Smarta tradition and one by the Vaishnava/ISKCON tradition.
+7. **Krishna's Favourite Colour:** Krishna is traditionally shown wearing yellow (Pitambar) with a peacock feather in his hair — both symbols carry deep philosophical meaning about knowledge and humility.
+8. **A Festival of Swings:** In many regions, a beautifully decorated swing (jhula) is prepared for baby Krishna's idol, and devotees take turns gently swinging it as a mark of affection.
+9. **Krishna and Friendship:** The story of Krishna and his childhood friend Sudama — who visited Krishna as an adult with nothing but a humble gift of rice — is one of the most treasured tales in Indian literature about true friendship, regardless of wealth or status.
+10. **Not Just a Religious Festival:** UNESCO has recognised several classical art forms associated with Krishna's life story — including Manipuri dance and various forms of Raas Leela — as part of India's intangible cultural heritage.
+
+**[REPLIT NOTE]** Tap-to-reveal flip cards, same interaction pattern as the Independence Day blog's "10 Amazing Facts" section.
+
+---
+
+## 13. JANMASHTAMI QUIZ — TEST YOUR KNOWLEDGE!
+
+*(15 main questions + 5 bonus questions. Full answer key provided for teacher/parent reference; on the live site this becomes an interactive scored quiz.)*
+
+1. In which city was Lord Krishna born? — **Mathura**
+2. Who were Krishna's birth parents? — **Devaki and Vasudeva**
+3. Who raised Krishna in Gokul? — **Nanda and Yashoda**
+4. Which tyrant king did Krishna's birth prophecy concern? — **Kansa**
+5. What is Krishna's nickname for loving butter? — **Makhan Chor**
+6. Which river did Vasudeva cross with baby Krishna? — **Yamuna**
+7. What instrument is Krishna famous for playing? — **The flute (Bansuri)**
+8. Which serpent did young Krishna subdue in the river? — **Kaliya**
+9. Which hill did Krishna lift to protect villagers? — **Govardhan Hill**
+10. What is the name of Krishna's discourse to Arjuna? — **Bhagavad Gita**
+11. On which battlefield was the Bhagavad Gita spoken? — **Kurukshetra**
+12. What is the Maharashtrian tradition of breaking a curd pot called? — **Dahi Handi**
+13. What is the prasad made after Dahi Handi called? — **Gopalkala**
+14. Which Hindu month does Janmashtami fall in? — **Bhadrapada**
+15. Krishna is the which avatar of Lord Vishnu? — **The eighth (8th) avatar**
+
+**Bonus Round:**
+16. What is the name of Krishna's childhood friend who visited him with a humble gift of rice? — **Sudama**
+17. Which nakshatra (star) is associated with Krishna's birth? — **Rohini**
+18. What is the sacred mixture of milk, curd, honey, ghee and sugar offered on Janmashtami called? — **Panchamrit**
+19. What is Krishna's conch shell called? — **Panchajanya**
+20. What is Krishna's discus weapon called? — **Sudarshan Chakra**
+
+**[REPLIT NOTE]** Build as an interactive scored quiz (0/15 + 0/5 bonus), single-question-at-a-time or full-page format matching the Independence Day blog's quiz UX, with a "Retake Quiz" option.
+
+---
+
+## 14. JANMASHTAMI ACTIVITIES FOR SCHOOLS
+
+1. **Matki (Handi) Decoration Contest:** Students decorate small earthen pots with paint, mirrors, and fabric — a hands-on, low-cost craft activity for all grades.
+2. **Fancy Dress — Bal Gopal & Radha:** Younger students dress up as baby Krishna (with peacock feather crowns and flutes) or Radha, with a small ramp-walk or class parade.
+3. **Essay & Elocution Competition:** Grade-wise competitions (3–5, 6–8, 9–12) using the essays and speeches in Section 8–9, with trilingual (English/Hindi/Marathi) categories.
+4. **Krishna Leela Skit or Play:** Classes present short dramatisations of favourite stories — the Kaliya Daman, the Govardhan Hill episode, or the Dahi Handi legend.
+5. **Bhagavad Gita Shloka Recitation:** For senior grades, a recitation competition featuring well-known verses with simple explanations, connecting ancient philosophy to modern life lessons.
+6. **Mini Dahi Handi (Supervised):** A safe, low-height, adult-supervised version of the Dahi Handi game for older students, focused on teamwork rather than height.
+7. **Poster & Rangoli Making:** Tricolour... rather, Krishna-themed poster and rangoli competitions using peacock, flute, and Govardhan Hill motifs.
+8. **Bhajan & Dance Performance:** School choir or dance troupe performances of popular Krishna bhajans and Raas-inspired choreography.
+9. **Gopalkala Tasting/Sharing:** A simple, supervised class activity where students help prepare and share a version of Gopalkala (poha, curd, fruit) — a lovely way to connect food, culture and community.
+
+**[REPLIT NOTE]** Card grid layout, matching the "Independence Day Activities for Schools" section format (numbered cards with icon + short description).
+
+---
+
+## 15. FESTIVE RECIPES & TRADITIONS
+
+Food plays a central role in Janmashtami celebrations. A few traditional favourites families often prepare together:
+
+- **Panchamrit:** A sacred five-ingredient mixture of milk, curd, honey, ghee, and sugar, offered to Krishna's idol during puja and shared as prasad.
+- **Makhan-Mishri:** Fresh homemade butter mixed with rock sugar (mishri) — Krishna's favourite treat, and a lovely simple recipe to make with young children.
+- **Chappan Bhog:** A traditional offering of 56 different dishes, symbolising abundance — most families prepare a smaller, symbolic version with a handful of sweets and snacks.
+- **Gopalkala/Poha Chivda:** A tangy, light mixture of flattened rice, curd, sev, and fruit, especially popular in Maharashtra after Dahi Handi celebrations.
+- **Kheer/Sheera:** Warm, comforting sweets often prepared for the evening celebration and shared with neighbours.
+
+**A fun family activity:** Let children help measure, mix, and decorate the Panchamrit or Makhan-Mishri — a simple, sensory way to connect them with the festival's traditions.
+
+---
+
+## 16. A FAMILY GUIDE TO JANMASHTAMI VRAT (FASTING)
+
+Many families observe a vrat (fast) on Janmashtami as a mark of devotion, typically breaking it after the midnight puja or the following morning. If your family observes this tradition, here are a few gentle, general pointers (always consult your family's own customs and, where relevant, a doctor for children, elderly members, or anyone with health conditions):
+
+- **Types of fasting:** Some devotees observe a strict "Nirjala" fast (without food or water), while many others — especially families with children — follow a lighter "Phalahar" fast, eating fruits, milk, nuts, and specific fasting-friendly foods (like sabudana khichdi or kuttu flour items) through the day.
+- **For children:** Rather than a full fast, many families let children participate symbolically — perhaps skipping one meal, avoiding certain foods, or simply joining the prayers and staying up for the midnight celebration, making it a positive, inclusive experience rather than a strict obligation.
+- **Staying hydrated:** If observing any form of fast, ensure adequate water and fruit intake through the day, especially for growing children and in warm September weather.
+- **Parana (breaking the fast):** In 2026, the traditional Parana time is after 6:09 AM on September 5, while many families following the modern practice break their fast right after the Nishita Puja concludes around 12:42 AM.
+
+This section is intended as general cultural information, not religious or medical advice — families are encouraged to follow their own beliefs and consult a doctor for any child with specific dietary or health needs.
+
+
+---
+
+## 17. JANMASHTAMI WISHES & MESSAGES
+
+*Ready-to-share captions for school social media pages and parent WhatsApp groups.*
+
+**English:**
+1. "Wishing you a Janmashtami filled with the joy of Bal Gopal and the wisdom of the Gita. Happy Krishna Janmashtami!"
+2. "May Lord Krishna's flute bring melody to your life this Janmashtami. Jai Shri Krishna!"
+3. "Celebrating the birth of the one who taught us that good always triumphs over evil. Happy Janmashtami!"
+
+**Hindi:**
+1. "जन्माष्टमी की हार्दिक शुभकामनाएं! भगवान श्रीकृष्ण का आशीर्वाद आप सभी पर बना रहे।"
+2. "राधे राधे! इस जन्माष्टमी पर कान्हा आपके जीवन में खुशियों की बांसुरी बजाएं।"
+
+**Marathi:**
+1. "जन्माष्टमीच्या हार्दिक शुभेच्छा! श्रीकृष्णाचा आशीर्वाद तुम्हा सर्वांवर सदैव राहो."
+2. "गोविंदा आला रे आला! या जन्माष्टमीला बालकृष्णाचे आशीर्वाद तुम्हाला मिळो."
+
+**[REPLIT NOTE]** "Copy Caption" buttons + WhatsApp/Facebook share icons, matching the Independence Day blog's social-share block.
+
+---
+
+## 18. FREE DOWNLOADABLE IMAGES FOR SOCIAL MEDIA — DESIGN BRIEFS
+
+*(Per project scope, this section provides detailed creative briefs for the design team to produce in Canva/Photoshop — no image files are generated at this stage. All designs must be original illustrations/graphics, NOT depictions of real students, staff, or campus — per brand guidelines.)*
+
+| # | Image Concept | Style Notes | Suggested Overlay Text | Formats/Use |
+|---|---|---|---|---|
+| 1 | Bal Gopal silhouette with flute, sunrise gradient | Navy (#10174F) background, gold/yellow accent line art | "Happy Janmashtami 2026" | WhatsApp DP, Instagram post |
+| 2 | Peacock feather + flute crossed, minimal line art | Navy + gold, elegant/premium feel | "Jai Shri Krishna" | WhatsApp DP, Instagram |
+| 3 | Dahi Handi human pyramid illustration (stylised, not photorealistic) | Dynamic, festive colours with navy frame | "Dahi Handi 2026 — Sept 5" | Instagram, Facebook |
+| 4 | Matki (pot) with butter & diyas, decorative border | Warm tones, navy border/frame | "Govinda Ala Re!" | WhatsApp DP, Instagram |
+| 5 | Bhagavad Gita open book + Sudarshan Chakra motif | Elegant, textured navy background | "Krishna's Wisdom for Life" | Instagram, Facebook |
+| 6 | Yamuna river + basket silhouette (Krishna's journey) | Storybook illustration style | "The Night Krishna Came Home" | Instagram carousel |
+| 7 | Mor Pankh (peacock feather) close-up illustration | Minimalist, single object focus | "Symbol of Krishna" | WhatsApp DP |
+| 8 | Krishna & Sudama friendship illustration | Warm, storybook style | "True Friendship — Krishna & Sudama" | Instagram, Facebook |
+| 9 | RIS-branded event announcement template (blank) | Navy + gold, school logo placement zone | "[School Event Name] — Janmashtami 2026" | Instagram, Facebook event cover |
+| 10 | Quote card template (editable text zone) | Navy background, gold border, quote-mark motif | "[Insert Krishna/Gita quote]" | Instagram, WhatsApp status |
+
+**Design specs:** WhatsApp DP = 500×500px (min); Instagram post = 1080×1080px; Instagram Story/WhatsApp Status = 1080×1920px; Facebook post = 1200×630px. All images should carry a small, tasteful RIS logo watermark (bottom corner) and use only approved brand navy (#10174F), with gold/mustard as a festive accent (suggested supporting colour, not an official brand rule — confirm with design lead).
+
+---
+
+## 19. FREQUENTLY ASKED QUESTIONS
+
+**Q1. When is Janmashtami in 2026?**
+A. Krishna Janmashtami 2026 falls on Friday, September 4 (Smarta tradition) and Saturday, September 5 (Vaishnava/ISKCON tradition).
+
+**Q2. Why are there two different dates for Janmashtami?**
+A. The difference arises from how the Ashtami Tithi and Rohini Nakshatra align with sunrise across different traditions — the Smarta tradition follows one calculation, while the Vaishnava/ISKCON tradition follows another.
+
+**Q3. When is Dahi Handi in 2026?**
+A. Dahi Handi celebrations in Maharashtra take place on Saturday, September 5, 2026.
+
+**Q4. What is the Nishita Puja Muhurat for 2026?**
+A. The Nishita Kaal Puja Muhurat falls between 11:55 PM on September 4 and 12:42 AM on September 5, 2026 — a 47-minute auspicious window.
+
+**Q5. What is the story behind Janmashtami?**
+A. Janmashtami celebrates the birth of Lord Krishna, born in Mathura to Devaki and Vasudeva, and raised in Gokul by Nanda and Yashoda after being carried to safety across the Yamuna river to protect him from King Kansa.
+
+**Q6. What is Gopalkala?**
+A. Gopalkala is the prasad prepared after Dahi Handi, typically a mixture of flattened rice (poha), curd, milk, butter, and fruits — believed to be one of Krishna's favourite foods.
+
+**Q7. How do schools celebrate Janmashtami?**
+A. Common school celebrations include fancy dress as Bal Gopal/Radha, essay and speech competitions, Krishna Leela skits, matki decoration contests, and bhajan performances.
+
+**Q8. What are some easy Janmashtami essay topics for students?**
+A. Popular topics include "The Story of Krishna's Birth," "Lessons from the Bhagavad Gita," "Why We Celebrate Dahi Handi," and "What Janmashtami Teaches Us About Courage."
+
+**Q9. Is Janmashtami the same as Gokulashtami?**
+A. Yes — Gokulashtami and Sri Krishna Jayanthi are regional names (especially in South India) for the same festival celebrating Krishna's birth.
+
+**Q10. What should families keep in mind if observing a Janmashtami vrat (fast) with young children?**
+A. Many families let children participate symbolically rather than a strict fast, ensure adequate hydration and fruit intake, and consult a doctor for any child with specific health or dietary needs.
+
+**[REPLIT NOTE]** Wrap this section in FAQPage schema markup for rich-result eligibility in Google Search (see Section 22).
+
+---
+
+## 20. EXPLORE RAINBOW SCHOOLS
+
+**Rainbow International School**
+CBSE-affiliated, Nursery to Grade 12 | Thane, Maharashtra
+A modern, caring school focused on academic excellence and holistic development — with a 3.5-acre campus, swimming pool, amphitheatre, sports facilities, an organic garden, spacious air-conditioned classrooms, Smart Boards, dedicated Physics, Biology, Chemistry, IT and Mathematics laboratories, 100% female staff, GPS-enabled in-house transport, and a CCTV-enabled environment.
+
+Navigation links: Home | About Us | Academics | Admissions | Gallery | Blog | Contact | Career
+
+**Rainbow International Pre-School**
+Playgroup to Kindergarten (ages 1.5–5.5) | Thane, Maharashtra
+A safe, joyful, nurturing early-learning environment where little ones feel cared for, curious, and excited to learn.
+
+Navigation links: Home | Playgroup | Nursery | Kindergarten | Admissions
+
+*"Give Your Child the Gift of Excellence" — from ancient stories of courage and wisdom to modern classrooms built for the future, Rainbow International School helps every child discover their potential.*
+
+**CTAs:** [Enquire Now] · [Schedule a Campus Visit]
+
+**Footer:** © 2026 Rainbow International School. CBSE-Affiliated. [rainbowinternationalschool.in] All rights reserved.
+
+*[Note: phone number, exact address, and admissions-office contact details are marked as placeholders below — insert verified details before publishing.]*
+[Insert verified phone number] · [Insert verified campus address] · [Insert verified admissions email]
+
+---
+
+## 21. [REPLIT / DEVELOPER] BUILD NOTES — CONSOLIDATED INTERACTIVE ELEMENTS
+
+*Use this checklist as a prompt reference when building the live, interactive web page (e.g., on Replit) from this content.*
+
+1. **Sticky Table of Contents / jump-link nav** (Section: top of page) — anchor-scroll to all 20 numbered sections.
+2. **Stat-tile infographic** (Section 1) — 4 tiles: Ashtami Begins / Nishita Puja / Dahi Handi / Parana.
+3. **Timeline component** (Section 3) — horizontal-scroll or vertical timeline for the milestones table.
+4. **Icon grid** (Section 5) — 9 symbol cards with icon + short meaning, hover/tap expand.
+5. **Tabbed essay selector** (Section 8) — Language tabs (EN/HI/MR) → length sub-tabs → "Copy Text" button on each.
+6. **Tabbed speech selector** (Section 9) — Language tabs (EN/HI/MR) → "Copy Text" button.
+7. **Quote carousel + slogan chip list** (Section 10) — auto-rotating quote cards; tap-to-copy slogan chips.
+8. **Storybook card carousel** (Section 11) — 4 expandable/flippable story cards with illustration placeholders.
+9. **Flip-cards** (Section 12) — 10 tap-to-reveal fact cards.
+10. **Scored interactive quiz** (Section 13) — 15 main + 5 bonus questions, live score counter (0/15, 0/5), "Retake Quiz" button, optional leaderboard/share-score feature.
+11. **Card grid** (Section 14) — 9 activity cards with icons.
+12. **Recipe cards** (Section 15) — optional image + ingredient list toggle.
+13. **Copy-caption buttons + social share icons** (Section 17) — WhatsApp/Facebook/Instagram share intents.
+14. **Downloadable image gallery** (Section 18) — once designs are produced, each with a "Download Free" button (JPG, sized per format).
+15. **FAQ accordion** (Section 19) — expand/collapse, wrapped in FAQPage schema.
+16. **Dual-brand footer CTA block** (Section 20) — RIS primary, RPS secondary mention, both with independent CTAs/links.
+17. **"Copy Link" + social share bar** — sticky or footer position.
+18. Ensure full **mobile responsiveness** and **WCAG-friendly colour contrast** (navy #10174F on white/light backgrounds tested for accessibility).
+
+---
+
+## 22. SEO, AEO & GEO IMPLEMENTATION NOTES (for the person/developer publishing this page)
+
+**On-page SEO**
+- One unique H1 per page (as drafted above); H2/H3 hierarchy exactly as structured — do not skip levels.
+- Meta title ≤60 characters, meta description ≤155 characters (both drafted above); ensure both are unique to this URL and not duplicated from the RPS blog.
+- Target URL slug: `/blog/janmashtami-2026` (short, keyword-rich, no stop-word stuffing).
+- Use descriptive, keyword-rich alt text on every image (e.g., "Janmashtami 2026 Bal Gopal WhatsApp DP illustration — Rainbow International School").
+- Internal links: link to Admissions, About Us, and (non-canonically) to the RPS Janmashtami blog as a "related read" — using a normal `<a>` link, never a canonical or duplicate-content signal.
+- External links (optional, for trust signals): 1–2 links to authoritative sources (e.g., a recognised Panchang/astrology reference for the muhurat timings) — open in new tab, `rel="noopener"`.
+
+**Canonical & duplicate-content control (critical — explicit project requirement)**
+- This page's `<link rel="canonical">` MUST point only to itself: `https://rainbowinternationalschool.in/blog/janmashtami-2026`.
+- Do **NOT** set this page's canonical to the RPS blog (`rainbowpreschools.com/...`) or vice versa — these are two distinct brands with two distinct audiences and must be indexed as fully independent pages.
+- Keep the two blogs substantively different in content and structure (already ensured by this draft — RIS content is written for CBSE K-12 students/parents; RPS content is written for preschool families) so Google does not flag them as near-duplicate content even without a canonical relationship.
+- Ensure `hreflang`/language tags are NOT set to indicate these are translations of each other — they are separate original articles, not translated variants of one page.
+
+**Structured data (Schema.org)**
+- `Article` / `BlogPosting` schema: headline, description, image, author (Organization: Rainbow International School), publisher (with logo), datePublished, dateModified.
+- `FAQPage` schema for Section 19.
+- `BreadcrumbList` schema: Home > Blog > Janmashtami 2026.
+- Optional: `Event` schema if the school publishes a specific on-campus Janmashtami event with a fixed date/time/location.
+
+**AEO (Answer Engine Optimisation — for Google AI Overviews, voice search, ChatGPT/Perplexity-style answer engines)**
+- Lead each major section with a direct, self-contained one- or two-sentence answer before elaborating (already followed in Sections 1, 4, 7, 19) — answer engines favour extractable, quotable answer text.
+- Use the FAQ section's exact question phrasing to mirror real user search queries ("When is Janmashtami 2026?", "What is Gopalkala?") — these map directly to how people ask voice assistants and AI chat tools.
+- Keep factual claims (dates, timings) precise, consistent across the page, and stated only once in a canonical form to avoid contradictory snippets being extracted.
+
+**GEO (Generative Engine Optimisation — for being cited by AI tools like ChatGPT, Gemini, Perplexity, Google AI Overviews)**
+- Include clearly labelled, citable facts and definitions (e.g., "Dahi Handi, meaning 'curd pot,' is..." in Section 7) — generative engines prefer content with clean definitional sentences they can quote/cite.
+- Maintain a distinct byline and organisation identity (Rainbow International School, Thane) so AI answer engines can attribute the source correctly.
+- Add a `dateModified` and keep the content periodically refreshed (e.g., update dates/timings each year) — freshness signals matter for generative engine citation preference.
+- Ensure the page is fully crawlable (no login wall, fast load time, mobile-first rendering, clean semantic HTML — avoid content trapped only inside JS-only interactive widgets; keep an accessible text fallback for the quiz/FAQ/essay content, e.g., server-rendered text under the interactive layer).
+
+**Technical/performance**
+- Optimise all images (WebP format, lazy-loading below the fold, descriptive filenames e.g. `janmashtami-2026-bal-gopal-dp.webp`).
+- Target Core Web Vitals: LCP < 2.5s, CLS < 0.1, INP < 200ms.
+- Ensure mobile-first responsive layout (majority of festival-content traffic is mobile).
+- Add the page to the XML sitemap and request indexing via Google Search Console upon publishing.
+
+**Local SEO angle**
+- Since Dahi Handi is a major Maharashtra/Thane cultural event, consider a locally-flavoured supporting paragraph or FAQ ("Where to see Dahi Handi in Thane") — reinforces local relevance and can support Local Business/Organization schema signals tied to the Thane campus.
+
+---
+
+## END OF PAGE CONTENT
+
+---
+
+## 5. INTERACTIVE COMPONENTS — BUILD SPEC
+
+Implement every component listed below. Section numbers refer to the content sections above.
+
+1. **Sticky Table of Contents.** Collapsible on mobile (hamburger/"On this page" toggle), persistent sidebar or sticky top bar on desktop. Anchor-scroll (smooth scroll) to all 20 numbered sections. Highlight the active section as the user scrolls (IntersectionObserver).
+2. **"At a Glance" stat tiles** (Section 1): 4 tiles — Ashtami Begins (2:25 AM, Sep 4), Nishita Puja (11:55 PM–12:42 AM), Dahi Handi (Sep 5), Parana/Fast Ends (after 6:09 AM, Sep 5). Simple card row, stacks vertically on mobile.
+3. **Timeline component** (Section 3): horizontal-scroll timeline on desktop (snap-scroll), vertical stacked timeline on mobile, built from the milestones table.
+4. **Icon grid** (Section 5): 9 symbol cards (icon/emoji + heading + short meaning). Subtle hover-lift on desktop, static on mobile.
+5. **Tabbed essay selector** (Section 8): Two-level tabs — Language (English / Hindi / Marathi) → Length (10-line / 100-word / 300-word / 500-word, adjusted per language as shown in the content). Each essay panel has a **"Copy Text"** button (`navigator.clipboard.writeText`) with a brief "Copied!" confirmation toast. Devanagari panels must render correctly — verify Hindi/Marathi text visually before shipping.
+6. **Tabbed speech selector** (Section 9): Language tabs (English short / English long / Hindi / Marathi), each with a **"Copy Text"** button.
+7. **Quote carousel + slogan chips** (Section 10): Auto-rotating (5–6s interval, pausable on hover/focus) quote cards with attribution for the "Quotes" subsection; a separate tap-to-copy chip/badge list for the "Slogans" subsection (English/Hindi/Marathi tabs or grouped by language).
+8. **Storybook card carousel** (Section 11): 4 swipeable/expandable story cards (Krishna's basket journey, Makhan Chor, Kaliya Daman, Govardhan Hill), each showing the story text and its "Moral" line. Illustration placeholder per card (final artwork to come from the design team — see Section 6 below on images).
+9. **Flip cards** (Section 12): 10 tap-to-reveal fact cards, front shows the fact number/icon, back reveals the full fact text.
+10. **Scored interactive quiz** (Section 13): 15 main questions + 5 bonus questions, one-question-at-a-time or full-page layout (match the Independence Day blog's UX), live score counter (`0/15`, bonus `0/5`), instant right/wrong feedback, a **"Retake Quiz"** button at the end, and a shareable results line (e.g. "I scored 12/15 on the Rainbow International School Janmashtami Quiz!").
+11. **Activity card grid** (Section 14): 9 cards, icon + title + short description, responsive grid (3 columns desktop, 1–2 mobile).
+12. **Recipe cards** (Section 15): expandable cards, ingredient-style short description; optional image placeholder per recipe.
+13. **Copy-caption buttons + social share bar** (Section 17 and the closing social bar): WhatsApp / Facebook / Instagram share intents, plus a **"Copy Link"** button for the page URL.
+14. **Downloadable image gallery** (Section 18): see the **explicit image generation instruction in Section 6 below** — this overrides the mixed-size guidance that appears inline in the content above.
+15. **FAQ accordion** (Section 19): expand/collapse, one open at a time or multi-open (your call), wrapped in FAQPage schema (see Section 7 below).
+16. **Dual-brand footer CTA block** (Section 20): RIS primary (full styling, logo, CTAs), Rainbow Preschools mentioned only as a secondary text link — never with RPS's red branding or logo on this page.
+17. Ensure the quiz, essays, speeches, and FAQ content all have a **crawlable, accessible plain-text fallback** rendered in the initial HTML (not injected only after a JS interaction) — this matters both for SEO and for users with JS disabled.
+
+---
+
+## 6. DOWNLOADABLE IMAGES — GENERATION INSTRUCTIONS (IMPORTANT — READ CAREFULLY)
+
+Section 18 above ("Free Downloadable Images for Social Media") contains a table of 10 image concepts with style notes and overlay text. **Ignore the mixed WhatsApp DP / Instagram / Facebook pixel dimensions mentioned in the "Design specs" line at the end of that table — that guidance is superseded by this instruction:**
+
+> **Generate all 10 images at a single, uniform size of exactly 1080 × 1080 px (square format).** This one square size will be used across WhatsApp DP, Instagram posts, and Facebook — do not produce multiple sizes per image.
+
+For each of the 10 rows in the Section 18 table:
+1. Use the **Image Concept** and **Style Notes** columns as the generation prompt basis — original, non-photorealistic illustration/graphic style only. Per brand rules, **never generate or use an image that depicts a real student, staff member, or campus facility** — these must be original illustrations, icons, or typographic/graphic designs only.
+2. Render the **Suggested Overlay Text** as clean, legible typography on the image itself (not just alt text) — navy `#10174F` background or accents, white/gold text, generous padding so text isn't cropped on any platform's preview.
+3. Output at **1080×1080px**, export as optimised WebP with a JPG fallback, each file under ~300KB.
+4. Filename pattern: `janmashtami-2026-ris-[short-slug].webp` (e.g. `janmashtami-2026-ris-bal-gopal-flute.webp`).
+5. Add a small, tasteful RIS logo watermark in one corner of every image.
+6. On the live page, render all 10 in a responsive gallery grid, each with a visible **"Download Free"** button (direct file download, not a new tab) and descriptive alt text following the pattern: `"Janmashtami 2026 [image concept] — free download from Rainbow International School"`.
+7. If your image-generation tool cannot produce all 10 in one pass, generate them individually in the order listed in the Section 18 table and confirm each is exactly 1080×1080 before moving to the next.
+
+---
+
+## 7. SEO, AEO & GEO — IMPLEMENTATION (from Section 22 of the content above — implement literally)
+
+**Meta tags** (use exactly, do not rewrite):
+```html
+<title>Janmashtami 2026: Essays, Speeches & Activities | RIS</title>
+<meta name="description" content="Complete Janmashtami 2026 guide for CBSE students — history, significance, essays & speeches in English, Hindi & Marathi, quiz, activities, free downloads. By Rainbow International School, Thane." />
+<link rel="canonical" href="https://rainbowinternationalschool.in/blog/janmashtami-2026" />
+```
+
+**Canonical rule — critical, do not get this wrong:** The canonical tag on this page must point ONLY to itself (`https://rainbowinternationalschool.in/blog/janmashtami-2026`). Do **NOT** set it to, or accept a canonical pointing from, the Rainbow Preschools Janmashtami page (`rainbowpreschools.com/blog/janmashtami-for-kids`). Do not add any `hreflang` tags implying these two pages are translations/alternates of one another — they are two independent, original articles for two different brands and must be indexed as fully separate pages.
+
+**Structured data (JSON-LD)** — add all three:
+- `BlogPosting`/`Article` schema: headline = the page H1, description = the meta description above, image = the primary OG image, author = `Organization` "Rainbow International School", publisher (with logo), `datePublished` = 2026-08-31, `dateModified` = build date.
+- `FAQPage` schema built from Section 19's Q&A pairs exactly as written.
+- `BreadcrumbList` schema: Home > Blog > Janmashtami 2026.
+
+**AEO (answer-engine optimisation):** Keep each major section's opening sentence a direct, self-contained, quotable answer (already written that way in the content above — don't rephrase it into something vaguer). Keep the FAQ question phrasing exactly as written — it mirrors real voice/AI-search queries.
+
+**GEO (generative-engine optimisation):** Keep definitional sentences (e.g. "Dahi Handi, meaning 'curd pot,' is...") intact and unambiguous so AI answer engines can cite them with correct attribution to Rainbow International School. Keep the byline visible in the rendered HTML (not just in schema).
+
+**Technical:**
+- WebP images with lazy-loading below the fold; descriptive filenames as specified in Section 6.
+- Target Core Web Vitals: LCP < 2.5s, CLS < 0.1, INP < 200ms.
+- Add the page to the XML sitemap.
+- Internal links: to Admissions and About Us pages, and one normal (non-canonical) link to the Rainbow Preschools Janmashtami blog as a "for younger siblings" related read.
+
+---
+
+## 8. PRE-LAUNCH QA CHECKLIST
+
+Before marking this done, verify:
+- [ ] Page renders correctly and matches brand (navy #10174F, RIS logo only, no RPS colours/logo except the small footer text link).
+- [ ] All Hindi and Marathi text renders in proper Devanagari on desktop and mobile (no tofu boxes).
+- [ ] Every "Copy Text" / "Copy Caption" / "Copy Link" button works and shows a confirmation.
+- [ ] Quiz scores correctly, resets on "Retake Quiz," and bonus round works independently.
+- [ ] FAQ accordion is keyboard-accessible and screen-reader friendly (correct ARIA attributes).
+- [ ] All 10 downloadable images are exactly 1080×1080px, under ~300KB, with working "Download Free" buttons and correct alt text.
+- [ ] Canonical tag points only to this page's own URL — confirmed NOT set to or from the Rainbow Preschools page.
+- [ ] All three JSON-LD schema blocks validate with no errors (test in Google's Rich Results Test).
+- [ ] Every `[Insert verified ...]` placeholder is visibly flagged in the live page, not silently filled with a guess.
+- [ ] Mobile Lighthouse score: Performance ≥ 90, Accessibility ≥ 95, SEO = 100.
+- [ ] Page is added to the sitemap and the internal link to the RPS Janmashtami blog (and vice versa, once that page exists) is a plain link, not a canonical or duplicate-content signal.
+
+Build the page now. If any content section above is ambiguous about interactivity, default to matching the existing Independence Day 2026 blog's UX pattern for the equivalent section.
