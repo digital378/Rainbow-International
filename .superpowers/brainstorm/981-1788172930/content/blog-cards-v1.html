@@ -1,0 +1,47 @@
+<h2>Which thumbnail-free blog card feels right?</h2>
+<p class="subtitle">Both options remove the broken image area and keep every card aligned. Click a direction to select it.</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">A · Clean editorial cards</div>
+    <div class="mockup-body" data-choice="clean-editorial" onclick="toggleSelect(this)">
+      <style>
+        .demo-a{background:#f8fafc;padding:22px;font-family:system-ui,sans-serif;color:#17213f}
+        .demo-a .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+        .demo-a .title{font:700 24px Georgia,serif}.demo-a .count{color:#77819a;font-size:12px}
+        .demo-a .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        .demo-a .card{background:#fff;border:1px solid #e5e9f0;border-radius:14px;padding:18px;min-height:208px;display:flex;flex-direction:column;box-shadow:0 5px 14px #1421520d}
+        .demo-a .cat{font-size:10px;letter-spacing:.12em;color:#df8b4a;font-weight:800;text-transform:uppercase}
+        .demo-a h3{font-size:14px;line-height:1.35;margin:13px 0 10px}.demo-a p{font-size:12px;line-height:1.5;color:#69758b;margin:0}
+        .demo-a a{margin-top:auto;padding-top:18px;font-size:12px;font-weight:700;color:#284684}
+      </style>
+      <div class="demo-a">
+        <div class="top"><div class="title">Latest from Rainbow</div><div class="count">32 articles</div></div>
+        <div class="grid">
+          <div class="card"><div class="cat">School selection</div><h3>Best CBSE Schools in Thane — What to Look for When Choosing One</h3><p>If you search for “best CBSE schools in Thane,” you will find dozens of results...</p><a>Read More →</a></div>
+          <div class="card"><div class="cat">CBSE school</div><h3>Multiple Intelligence-Based Learning — How It Helps Every Child Succeed</h3><p>Every parent has noticed it: one child picks up music instantly but struggles with maths...</p><a>Read More →</a></div>
+          <div class="card"><div class="cat">Parenting</div><h3>How to Prepare Your Child for Their First Day of School — A Parent's Guide</h3><p>The first day of school is a milestone — for both the child and the parent...</p><a>Read More →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">B · Branded text-first cards</div>
+    <div class="mockup-body" data-choice="branded-text-first" onclick="toggleSelect(this)">
+      <style>
+        .demo-b{background:#10174f;padding:22px;font-family:system-ui,sans-serif;color:#fff}
+        .demo-b .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.demo-b .title{font:700 24px Georgia,serif}.demo-b .count{color:#cad1ed;font-size:12px}
+        .demo-b .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.demo-b .card{background:#fff;color:#17213f;border-radius:3px;padding:18px;min-height:208px;display:flex;flex-direction:column;border-top:4px solid #e8b93b}
+        .demo-b .cat{font-size:10px;letter-spacing:.12em;color:#c9793b;font-weight:800;text-transform:uppercase}.demo-b h3{font-size:14px;line-height:1.35;margin:13px 0 10px}.demo-b p{font-size:12px;line-height:1.5;color:#69758b;margin:0}.demo-b a{margin-top:auto;padding-top:18px;font-size:12px;font-weight:700;color:#284684}
+      </style>
+      <div class="demo-b">
+        <div class="top"><div class="title">Latest from Rainbow</div><div class="count">32 articles</div></div>
+        <div class="grid">
+          <div class="card"><div class="cat">School selection</div><h3>Best CBSE Schools in Thane — What to Look for When Choosing One</h3><p>If you search for “best CBSE schools in Thane,” you will find dozens of results...</p><a>Read More →</a></div>
+          <div class="card"><div class="cat">CBSE school</div><h3>Multiple Intelligence-Based Learning — How It Helps Every Child Succeed</h3><p>Every parent has noticed it: one child picks up music instantly but struggles with maths...</p><a>Read More →</a></div>
+          <div class="card"><div class="cat">Parenting</div><h3>How to Prepare Your Child for Their First Day of School — A Parent's Guide</h3><p>The first day of school is a milestone — for both the child and the parent...</p><a>Read More →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
