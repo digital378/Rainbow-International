@@ -1,0 +1,370 @@
+<style>
+  :root {
+    --ink: #10174f;
+    --ink-soft: #28316d;
+    --gold: #e8b93b;
+    --cream: #f8f4ea;
+    --paper: #fffdf8;
+    --line: rgba(16, 23, 79, .14);
+    --muted: #68708f;
+  }
+  .direction-intro {
+    margin-bottom: 22px;
+  }
+  .direction-intro h2 {
+    color: var(--ink);
+    letter-spacing: -.03em;
+    margin-bottom: 8px;
+  }
+  .direction-intro p {
+    color: var(--muted);
+    max-width: 760px;
+    line-height: 1.6;
+  }
+  .directions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .direction {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--paper);
+    box-shadow: 0 14px 40px rgba(16, 23, 79, .10);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .direction:hover, .direction.selected {
+    transform: translateY(-3px);
+    border-color: var(--gold);
+    box-shadow: 0 18px 46px rgba(16, 23, 79, .16);
+  }
+  .preview {
+    min-height: 390px;
+    padding: 18px;
+    position: relative;
+  }
+  .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font: 700 10px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .label::before {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: currentColor;
+  }
+  .direction-copy {
+    padding: 16px 18px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .direction-copy h3 {
+    color: var(--ink);
+    margin: 0 0 6px;
+  }
+  .direction-copy p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Option A: editorial */
+  .editorial {
+    background:
+      linear-gradient(130deg, rgba(232, 185, 59, .12), transparent 40%),
+      var(--cream);
+    color: var(--ink);
+  }
+  .editorial .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(16, 23, 79, .2);
+    font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .editorial .mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    font: 800 12px/1 Georgia, serif;
+  }
+  .editorial .hero {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 12px;
+    padding: 34px 0 26px;
+  }
+  .editorial h4 {
+    font: 600 clamp(22px, 3vw, 34px)/1.02 Georgia, serif;
+    letter-spacing: -.045em;
+    margin: 0;
+  }
+  .editorial .hero p {
+    color: var(--ink-soft);
+    font-size: 11px;
+    line-height: 1.5;
+    margin: 13px 0 0;
+  }
+  .editorial .feather {
+    min-height: 145px;
+    display: grid;
+    place-items: center;
+    border-left: 1px solid rgba(16, 23, 79, .2);
+    color: var(--gold);
+    font-size: 94px;
+    line-height: 1;
+    transform: rotate(-22deg);
+    filter: drop-shadow(8px 10px 0 rgba(16, 23, 79, .08));
+  }
+  .editorial .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid rgba(16, 23, 79, .2);
+    border-bottom: 1px solid rgba(16, 23, 79, .2);
+  }
+  .editorial .stat {
+    padding: 12px 7px;
+    border-right: 1px solid rgba(16, 23, 79, .2);
+  }
+  .editorial .stat:last-child { border-right: 0; }
+  .editorial .stat strong {
+    display: block;
+    color: var(--ink);
+    font: 700 16px/1 Georgia, serif;
+  }
+  .editorial .stat span {
+    display: block;
+    color: var(--muted);
+    font-size: 8px;
+    line-height: 1.25;
+    margin-top: 4px;
+  }
+  .editorial .article-row {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 16px;
+    padding-top: 22px;
+  }
+  .editorial .toc {
+    color: var(--ink);
+    font: 700 8px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+  }
+  .editorial .toc span {
+    display: block;
+    color: var(--muted);
+    margin: 8px 0;
+  }
+  .editorial .body-line {
+    height: 7px;
+    margin: 7px 0;
+    border-radius: 99px;
+    background: rgba(16, 23, 79, .12);
+  }
+  .editorial .body-line.short { width: 64%; }
+  .editorial .quote {
+    margin-top: 18px;
+    padding: 15px;
+    border-left: 3px solid var(--gold);
+    background: rgba(255, 253, 248, .72);
+    color: var(--ink);
+    font: italic 15px/1.35 Georgia, serif;
+  }
+
+  /* Option B: immersive */
+  .immersive {
+    background:
+      radial-gradient(circle at 80% 7%, rgba(232, 185, 59, .24), transparent 21%),
+      linear-gradient(150deg, #0d1445 0%, #141d5d 64%, #222b73 100%);
+    color: white;
+  }
+  .immersive .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,.7);
+    font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .immersive .topbar strong { color: var(--gold); }
+  .immersive .halo {
+    position: absolute;
+    top: 52px;
+    right: 22px;
+    width: 150px;
+    height: 150px;
+    border: 1px solid rgba(232, 185, 59, .4);
+    border-radius: 50%;
+    box-shadow: 0 0 0 12px rgba(232, 185, 59, .06), 0 0 0 26px rgba(232, 185, 59, .04);
+  }
+  .immersive .hero {
+    position: relative;
+    padding: 62px 0 30px;
+  }
+  .immersive .hero::after {
+    content: "✦";
+    position: absolute;
+    top: 82px;
+    right: 78px;
+    color: var(--gold);
+    font-size: 32px;
+  }
+  .immersive h4 {
+    max-width: 300px;
+    color: #fff;
+    font: 600 clamp(24px, 3vw, 38px)/.98 Georgia, serif;
+    letter-spacing: -.05em;
+    margin: 0;
+  }
+  .immersive .hero p {
+    max-width: 270px;
+    color: rgba(255,255,255,.72);
+    font-size: 11px;
+    line-height: 1.55;
+    margin: 14px 0 0;
+  }
+  .immersive .date {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 8px 11px;
+    border: 1px solid rgba(232, 185, 59, .6);
+    color: var(--gold);
+    font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .immersive .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .immersive .card {
+    min-height: 92px;
+    padding: 11px 8px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 10px;
+    background: rgba(255,255,255,.08);
+    backdrop-filter: blur(8px);
+  }
+  .immersive .card b {
+    display: block;
+    color: var(--gold);
+    font: 700 17px/1 Georgia, serif;
+  }
+  .immersive .card span {
+    display: block;
+    color: rgba(255,255,255,.65);
+    font-size: 8px;
+    line-height: 1.25;
+    margin-top: 7px;
+  }
+  .immersive .feature {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .immersive .feature .panel {
+    min-height: 80px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f7f0dc;
+    color: var(--ink);
+  }
+  .immersive .feature .panel.dark {
+    background: rgba(255,255,255,.08);
+    color: white;
+  }
+  .immersive .panel small {
+    color: var(--gold);
+    font: 700 8px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .immersive .panel p {
+    font: 600 14px/1.15 Georgia, serif;
+    margin: 10px 0 0;
+  }
+  @media (max-width: 720px) {
+    .directions { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="direction-intro">
+  <div class="label">RIS Janmashtami 2026</div>
+  <h2>Choose the page’s visual direction</h2>
+  <p>Both options keep Rainbow International School’s navy at the center and use gold only as a festive signal. The difference is how strongly the page behaves like a magazine feature versus an immersive celebration.</p>
+</div>
+
+<div class="directions">
+  <div class="direction" data-choice="editorial" onclick="toggleSelect(this)">
+    <div class="preview editorial">
+      <div class="masthead"><span>Rainbow International School</span><span class="mark">RIS</span></div>
+      <div class="hero">
+        <div>
+          <div class="label">A complete student resource</div>
+          <h4>Krishna Janmashtami 2026</h4>
+          <p>History, significance, speeches, essays and school activities — presented as a considered editorial feature.</p>
+        </div>
+        <div class="feather">❧</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>04</strong><span>September<br>Smarta</span></div>
+        <div class="stat"><strong>05</strong><span>September<br>Vaishnava</span></div>
+        <div class="stat"><strong>47m</strong><span>Nishita<br>window</span></div>
+        <div class="stat"><strong>20</strong><span>quiz<br>questions</span></div>
+      </div>
+      <div class="article-row">
+        <div class="toc">On this page<span>01 · Story</span><span>02 · Essays</span><span>03 · Quiz</span><span>04 · FAQ</span></div>
+        <div>
+          <div class="body-line"></div><div class="body-line"></div><div class="body-line short"></div>
+          <div class="quote">“A story of courage, wisdom, community and joy.”</div>
+        </div>
+      </div>
+    </div>
+    <div class="direction-copy">
+      <h3>A · Editorial school magazine</h3>
+      <p>Paper warmth, serif headlines, a persistent contents rail and generous reading rhythm. Best for trust, depth and classroom reference.</p>
+    </div>
+  </div>
+
+  <div class="direction" data-choice="immersive" onclick="toggleSelect(this)">
+    <div class="preview immersive">
+      <div class="halo"></div>
+      <div class="topbar"><span>RIS / Journal</span><strong>04—05 SEP 2026</strong></div>
+      <div class="hero">
+        <div class="label">A festival of light and learning</div>
+        <h4>The night Krishna came home</h4>
+        <p>An atmospheric, scroll-led guide that moves from midnight birth to Dahi Handi, with moments to read, play and share.</p>
+        <span class="date">Janmashtami 2026 · Thane</span>
+      </div>
+      <div class="cards">
+        <div class="card"><b>2:25</b><span>Ashtami begins · Sep 4</span></div>
+        <div class="card"><b>11:55</b><span>Nishita puja · midnight</span></div>
+        <div class="card"><b>15+5</b><span>Interactive quiz</span></div>
+      </div>
+      <div class="feature">
+        <div class="panel"><small>Read / listen / learn</small><p>Essays, speeches & stories in three languages.</p></div>
+        <div class="panel dark"><small>Try the quiz</small><p>How well do you know Krishna?</p></div>
+      </div>
+    </div>
+    <div class="direction-copy">
+      <h3>B · Midnight festival journal</h3>
+      <p>Deep navy atmosphere, luminous gold details, glassy stat cards and stronger reveal moments. Best for memorability and mobile engagement.</p>
+    </div>
+  </div>
+</div>
