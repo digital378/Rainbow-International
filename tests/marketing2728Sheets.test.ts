@@ -78,6 +78,40 @@ describe("2027-28 supplementary Sheet parsing", () => {
     }]);
   });
 
+  it("finds dashboard headers after title and blank rows returned by authenticated access", () => {
+    const rows = [
+      ["DM RPS LEAD TO ADMISSION WEEKLY UPDATE FOR AY 27-28"],
+      [],
+      ["Date", "Total Leads", "Closed", "Open", "Bookings", "Walk-ins", "Admissions"],
+      ["July 2026", "15", "0", "13", "2", "1", "0"],
+    ];
+    expect(parseDashboardRows(rows)).toEqual([{
+      month: "Jul-26",
+      leads: 15,
+      closed: 0,
+      open: 13,
+      bookings: 2,
+      walkins: 1,
+      admissions: 0,
+    }]);
+  });
+
+  it("accepts alternate dashboard metric labels", () => {
+    const rows = [
+      ["Month", "Total Enquiries", "Total Closed", "Total Open", "Walk-in Booked", "Walk-in Done", "Admission Done"],
+      ["September 2026", "3", "0", "1", "2", "0", "0"],
+    ];
+    expect(parseDashboardRows(rows)[0]).toEqual({
+      month: "Sep-26",
+      leads: 3,
+      closed: 0,
+      open: 1,
+      bookings: 2,
+      walkins: 0,
+      admissions: 0,
+    });
+  });
+
   it("stops dashboard parsing at the AY 2028-29 boundary", () => {
     const rows = [
       ["Date", "Total Leads", "Closed", "Open", "Bookings", "Walk-ins", "Admissions"],

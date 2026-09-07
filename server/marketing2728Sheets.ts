@@ -168,22 +168,45 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
 
 export function parseDashboardRows(rows: string[][]): SupplementMonth[] {
   if (!rows.length) return [];
-  const headers = rows[0].map(headerKey);
-  const index = (name: string, after = -1) => headers.findIndex((header, i) => i > after && header === headerKey(name));
-  const columns = {
-    leads: index("Total Leads"),
-    closed: index("Closed"),
-    open: index("Open"),
-    bookings: index("Bookings"),
-    walkins: index("Walk-ins"),
-    admissions: index("Admissions"),
+  const aliases = {
+    leads: ["Total Leads", "Leads", "Total Enquiries"],
+    closed: ["Closed", "Total Closed"],
+    open: ["Open", "Total Open"],
+    bookings: ["Bookings", "Walk-in Booked", "Walk-in Bookings"],
+    walkins: ["Walk-ins", "Walk-in Completed", "Walk-in Done"],
+    admissions: ["Admissions", "Admission Done", "Admissions Done"],
   };
-  if (columns.leads < 0) throw new Error("Dashboard headers are not recognised");
+  const aliasKeys = Object.fromEntries(
+    Object.entries(aliases).map(([name, values]) => [name, values.map(headerKey)]),
+  ) as Record<keyof typeof aliases, string[]>;
+  const headerRowIndex = rows.findIndex(row => {
+    const keys = row.map(headerKey);
+    const hasLeads = keys.some(key => aliasKeys.leads.includes(key));
+    const supportingMatches = (["closed", "open", "bookings", "walkins", "admissions"] as const)
+      .filter(name => keys.some(key => aliasKeys[name].includes(key))).length;
+    return hasLeads && supportingMatches >= 2;
+  });
+  if (headerRowIndex < 0) throw new Error("Dashboard headers are not recognised");
+
+  const headers = rows[headerRowIndex].map(headerKey);
+  const index = (...names: string[]) => {
+    const keys = names.map(headerKey);
+    return headers.findIndex(header => keys.includes(header));
+  };
+  const columns = {
+    date: index("Date", "Month", "Reporting Month"),
+    leads: index(...aliases.leads),
+    closed: index(...aliases.closed),
+    open: index(...aliases.open),
+    bookings: index(...aliases.bookings),
+    walkins: index(...aliases.walkins),
+    admissions: index(...aliases.admissions),
+  };
   const months: SupplementMonth[] = [];
   let reportingWindowStart: number | null = null;
-  for (const row of rows.slice(1)) {
+  for (const row of rows.slice(headerRowIndex + 1)) {
     if (row.some(cell => /^AY\s*28\s*[-–]\s*29$/i.test(clean(cell)))) break;
-    const match = clean(row[0]).match(/^([A-Za-z]+)\s+(\d{4})$/);
+    const match = clean(row[columns.date >= 0 ? columns.date : 0]).match(/^([A-Za-z]+)\s+(\d{4})$/);
     if (!match) continue;
     const monthIndex = MONTH_LOOKUP.get(match[1].toLowerCase());
     if (monthIndex == null) continue;
