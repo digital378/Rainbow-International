@@ -7,6 +7,12 @@ import {
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", PURPLE = "#7c3aed", SLATE = "#475569";
 const PIE_COLORS = [NAVY, RED, AMBER, GREEN, BLUE, PURPLE, SLATE, "#0891b2", "#ea580c"];
+const QUIET_BLUE = "#34547a";
+const QUIET_BLUE_LIGHT = "#7994ae";
+const QUIET_TEAL = "#668b8b";
+const QUIET_WARM = "#c4936d";
+const QUIET_ROSE = "#b77d78";
+const QUIET_STATUS_COLORS = [QUIET_BLUE, QUIET_BLUE_LIGHT, QUIET_WARM, QUIET_TEAL, QUIET_ROSE, "#91a8bd", "#788896"];
 
 const PASSCODE = "MKT27";
 const AUTH_KEY  = "mkt27_auth";
@@ -178,20 +184,26 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
 /* ── Shared UI atoms ───────────────────────────── */
 function KpiCard({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: string }) {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
-      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</div>
-      <div className="text-2xl font-black mt-1" style={{ color: accent || NAVY }}>{value}</div>
-      {sub && <div className="text-xs mt-1 text-slate-500">{sub}</div>}
+    <div className="relative overflow-hidden rounded-2xl border bg-white px-5 py-4 shadow-[0_8px_24px_rgba(35,61,89,0.05)]"
+      style={{ borderColor: "#dfe7ef" }}>
+      <span className="absolute inset-y-0 left-0 w-1" style={{ background: accent || QUIET_BLUE }} aria-hidden="true" />
+      <div className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">{label}</div>
+      <div className="mt-1.5 text-2xl font-black tabular-nums" style={{ color: accent || QUIET_BLUE }}>{value}</div>
+      {sub && <div className="mt-1 text-xs text-slate-500">{sub}</div>}
     </div>
   );
 }
 
-function ChartCard({ title, children, height = 260 }: { title: string; children: React.ReactNode; height?: number }) {
+function ChartCard({ title, children, height = 260, responsive = true }: { title: string; children: React.ReactNode; height?: number; responsive?: boolean }) {
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-      <div className="text-sm font-bold mb-3" style={{ color: NAVY }}>{title}</div>
+    <div className="rounded-2xl border bg-white p-5 shadow-[0_10px_30px_rgba(35,61,89,0.055)]"
+      style={{ borderColor: "#dfe7ef" }}>
+      <div className="mb-1 text-sm font-bold tracking-tight" style={{ color: "#233d59" }}>{title}</div>
+      <div className="mb-4 text-[11px] text-slate-400">
+        {title === "Monthly Lead Volume" ? "New enquiries received by month" : title === "Status Breakdown" ? "Where each enquiry sits today" : null}
+      </div>
       <div style={{ height }}>
-        <ResponsiveContainer>{children as any}</ResponsiveContainer>
+        {responsive ? <ResponsiveContainer>{children as any}</ResponsiveContainer> : children}
       </div>
     </div>
   );
@@ -221,7 +233,7 @@ function DashboardContent({ stats, brandTab }: { stats: Stats; brandTab: BrandTa
   const [tab, setTab] = useState<InnerTab>("overview");
   const [filterFrom, setFilterFrom] = useState<string | null>(null);
   const [filterTo,   setFilterTo]   = useState<string | null>(null);
-  const primary = brandTab === "RPS" ? RED : NAVY;
+  const primary = brandTab === "RPS" ? "#667f9d" : QUIET_BLUE;
   const filterAccent = brandTab === "RPS" ? RED : "#d97706";
 
   const { kpis, monthly, monthlyDetail = [], bySource, byOwner, statusBreakdown, byCounsellor = [], byProgram = [] } = stats;
@@ -333,25 +345,43 @@ function DashboardContent({ stats, brandTab }: { stats: Stats; brandTab: BrandTa
             ? <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200"><Empty msg="No monthly data yet" /></div>
             : <ChartCard title="Monthly Lead Volume">
                 <BarChart data={filteredMonthly.map(m => ({ name: m.month, Leads: m.cnt }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="Leads" fill={primary} radius={[3,3,0,0]} />
+                  <CartesianGrid vertical={false} strokeDasharray="3 5" stroke="#e8edf2" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#7b8b9b" }} dy={8} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#91a0af" }} allowDecimals={false} />
+                  <Tooltip cursor={{ fill: "#f3f6f9" }} contentStyle={{ border: "1px solid #dfe7ef", borderRadius: 10, boxShadow: "0 8px 24px rgba(35,61,89,.08)" }} />
+                  <Bar dataKey="Leads" fill={primary} radius={[6,6,2,2]} maxBarSize={46} />
                 </BarChart>
               </ChartCard>
           }
           {statusBreakdown.length === 0
             ? <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200"><Empty msg="No status data yet" /></div>
-            : <ChartCard title="Status Breakdown">
-                <PieChart>
-                  <Pie data={statusBreakdown.map(s => ({ name: s.status, value: s.cnt }))}
-                    dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85}
-                    label={({ name, value }) => `${name}: ${value}`} labelLine={false}>
-                    {statusBreakdown.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
+            : <ChartCard title="Status Breakdown" responsive={false}>
+                <div className="flex h-full min-w-0 items-center gap-2 sm:gap-5">
+                  <div className="h-full min-w-0 flex-1">
+                    <ResponsiveContainer>
+                      <PieChart>
+                        <Pie data={statusBreakdown.map(s => ({ name: s.status, value: s.cnt }))}
+                          dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={54} outerRadius={82}
+                          paddingAngle={2} stroke="#ffffff" strokeWidth={2}>
+                          {statusBreakdown.map((_, i) => <Cell key={i} fill={QUIET_STATUS_COLORS[i % QUIET_STATUS_COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip contentStyle={{ border: "1px solid #dfe7ef", borderRadius: 10, boxShadow: "0 8px 24px rgba(35,61,89,.08)" }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="w-[46%] max-w-[190px] space-y-3">
+                    {statusBreakdown.map((item, i) => (
+                      <div key={item.status} className="flex min-w-0 items-center gap-2 text-xs">
+                        <span className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ background: QUIET_STATUS_COLORS[i % QUIET_STATUS_COLORS.length] }} />
+                        <span className="min-w-0 flex-1 truncate text-slate-500" title={item.status}>
+                          {item.status.replaceAll("-", " ")}
+                        </span>
+                        <span className="font-bold tabular-nums" style={{ color: "#233d59" }}>{fmt(item.cnt)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </ChartCard>
           }
         </div>
@@ -594,7 +624,7 @@ function Dashboard() {
   const activeStats = brandTab === "combined" ? combined : brandTab === "RIS" ? risStats : rpsStats;
 
   return (
-    <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 54%, #eaf0f6 100%)" }}>
       {/* Header */}
       <div className="py-4 px-6 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
         <div className="flex items-center gap-3">
