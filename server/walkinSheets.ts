@@ -43,6 +43,7 @@ import { getGoogleRefreshToken } from "./googleCredentials";
 import { db } from "./db";
 import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
+import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
 import type { WalkinLead } from "@shared/schema";
 import {
   beginWalkinSyncShutdown,
@@ -2090,7 +2091,7 @@ function crmMonthSortKey(label: string): number {
  *   - bookings    = rows where Status === "WALK-IN BOOKED"
  *   - Monthly bucketing uses parseCrmMonthLabel(date) on the Date column.
  */
-export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" | "academicYear" | "generatedAt" | "cachedAt" | "byBranch" | "dataSource" | "warning"> {
+export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" | "academicYear" | "generatedAt" | "cachedAt" | "byBranch" | "dataSource" | "sourceHealth" | "warning"> {
   let totalLeads = 0, bookings = 0, walkins = 0, admissions = 0;
 
   const monthMap       = new Map<string, number>();
@@ -2184,13 +2185,15 @@ export interface CrmStats {
   byCounsellor: Array<{ leadOwner: string; leads: number; walkins: number; admissions: number; closed: number; open: number }>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
-  /** ISO timestamp of when data was fetched from Google Sheets (preserved when served from cache). */
+  /** ISO timestamp of when data was fetched (preserved when served from cache). */
   cachedAt: string;
-  /**
-   * Indicates the origin / health of the data.
-   * Always "sheet" — data was read successfully from the DB (walkin_leads table).
-   */
-  dataSource: "sheet";
+  dataSource: "database" | "hybrid";
+  sourceHealth: {
+    database: "available";
+    supplementary: "available" | "unavailable";
+    supplementaryFetchedAt: string | null;
+    warning?: string;
+  };
   /**
    * True when the response is served from the last-known-good cache because
    * the live fetch (DB or Sheets) failed during this request cycle.
@@ -2282,9 +2285,13 @@ export async function readCrmLeadsTrackerStats(
 
   const fetchPromise = (async (): Promise<CrmStats> => {
     try {
-      // Read all non-archived leads for this brand + AY from the DB
-      const leads = await db
+      // Database rows remain authoritative. Supplementary workbook rows are
+      // added only when the same date/phone/child identity is not in the DB.
+      const databaseLeads = await db
         .select({
+          enquiryDate: walkinLeads.enquiryDate,
+          childName:   walkinLeads.childName,
+          phone:       walkinLeads.phone,
           monthLabel:  walkinLeads.monthLabel,
           status:      walkinLeads.status,
           source:      walkinLeads.source,
@@ -2300,6 +2307,33 @@ export async function readCrmLeadsTrackerStats(
             eq(walkinLeads.isArchived, false),
           ),
         );
+      const supplement = await readMarketing2728Supplement(brand);
+      if (!supplement.available) {
+        const previousHybrid = crmStatsLastGood.get(brand);
+        if (previousHybrid?.data.dataSource === "hybrid") {
+          console.warn(
+            `[walkin/crm-stats] Supplementary source unavailable for ${brand}; preserving complete hybrid cache from ${new Date(previousHybrid.storedAt).toISOString()}`,
+          );
+          return {
+            ...previousHybrid.data,
+            stale: true,
+            sourceHealth: {
+              ...previousHybrid.data.sourceHealth,
+              supplementary: "unavailable",
+              warning: supplement.warning || "Supplementary figures are temporarily unavailable",
+            },
+          };
+        }
+      }
+      const databaseKeys = new Set(databaseLeads.map(row => supplementLeadKey({
+        enquiryDate: row.enquiryDate ?? "",
+        phone: row.phone ?? "",
+        childName: row.childName ?? "",
+      })));
+      const supplementaryLeads = supplement.leads
+        .filter(row => !databaseKeys.has(supplementLeadKey(row)))
+        .map(row => ({ ...row, branchId: null }));
+      const leads = [...databaseLeads, ...supplementaryLeads];
 
       const now = new Date().toISOString();
 
@@ -2357,6 +2391,26 @@ export async function readCrmLeadsTrackerStats(
         counsellorMap.set(owner, cs);
       }
 
+      // The summary dashboard is a gap-filler, not an additive source. Only
+      // months absent from both DB and CRM lead rows are overlaid.
+      for (const month of supplement.months) {
+        if (monthDetailMap.has(month.month)) continue;
+        totalLeads += month.leads;
+        bookings += month.bookings;
+        walkins += month.walkins;
+        admissions += month.admissions;
+        monthMap.set(month.month, month.leads);
+        monthDetailMap.set(month.month, {
+          leads: month.leads,
+          walkins: month.walkins,
+          admissions: month.admissions,
+          closed: month.closed,
+        });
+        if (month.closed) statusMap.set("CLOSED", (statusMap.get("CLOSED") ?? 0) + month.closed);
+        if (month.open) statusMap.set("OPEN", (statusMap.get("OPEN") ?? 0) + month.open);
+        if (month.bookings) statusMap.set("WALK-IN BOOKED", (statusMap.get("WALK-IN BOOKED") ?? 0) + month.bookings);
+      }
+
       const sortFn = (a: { month: string }, b: { month: string }) =>
         crmMonthSortKey(a.month) - crmMonthSortKey(b.month);
 
@@ -2385,7 +2439,17 @@ export async function readCrmLeadsTrackerStats(
         byProgram,
         generatedAt: now,
         cachedAt: now,
-        dataSource: "sheet", // "sheet" = data is good; frontend shows no warning
+        dataSource: supplement.available ? "hybrid" : "database",
+        sourceHealth: {
+          database: "available",
+          supplementary: supplement.available ? "available" : "unavailable",
+          supplementaryFetchedAt: supplement.fetchedAt,
+          ...(!supplement.available
+            ? { warning: supplement.warning || "Supplementary figures are temporarily unavailable; totals may be incomplete" }
+            : supplement.warning
+              ? { warning: supplement.warning }
+              : {}),
+        },
       };
 
       // Only write cache if our generation is still current — a bust that fired
@@ -2394,7 +2458,9 @@ export async function readCrmLeadsTrackerStats(
       if ((crmStatsGeneration.get(brand) ?? 0) === myGeneration) {
         const entry: CrmStatsEntry = { data: result, storedAt: Date.now() };
         crmStatsCache.set(brand, entry);
-        crmStatsLastGood.set(brand, entry);
+        // Only complete hybrid results qualify as last-known-good. A cold-start
+        // DB-only result may be useful, but must never displace complete figures.
+        if (result.dataSource === "hybrid") crmStatsLastGood.set(brand, entry);
         console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
       } else {
         console.log(`[walkin/crm-stats] Discarding stale in-flight result for ${brand} (generation mismatch — bust fired during fetch)`);

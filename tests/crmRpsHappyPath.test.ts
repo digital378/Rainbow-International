@@ -2,7 +2,7 @@
  * End-to-end happy-path tests for the RPS CRM dashboard data pipeline.
  *
  * Verifies that when the walkin_leads DB table has RPS leads:
- *   1. readCrmLeadsTrackerStats("RPS") returns dataSource === "sheet"
+ *   1. readCrmLeadsTrackerStats("RPS") identifies DB-only data correctly
  *   2. kpis.totalLeads > 0 (no silent zero-out)
  *   3. Individual KPIs (totalLeads, admissions, walkins, bookings) match
  *      a hand-counted synthetic dataset
@@ -139,9 +139,10 @@ beforeEach(() => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("RPS CRM dashboard — happy path (DB populated)", () => {
 
-  it("returns dataSource === 'sheet' when the DB has data rows", async () => {
+  it("returns dataSource === 'database' when only DB data is available", async () => {
     const stats = await readCrmLeadsTrackerStats("RPS");
-    expect(stats.dataSource).toBe("sheet");
+    expect(stats.dataSource).toBe("database");
+    expect(stats.sourceHealth.database).toBe("available");
   });
 
   it("kpis.totalLeads is greater than zero", async () => {
@@ -202,24 +203,20 @@ describe("RPS CRM dashboard — happy path (DB populated)", () => {
   });
 });
 
-// ── Warning-banner condition mirroring the frontend guard ─────────────────────
-// The dashboard renders the banner when:
-//   data.dataSource && data.dataSource !== "sheet" && data.warning
-// These tests confirm the condition is correctly absent for the happy path.
-describe("Warning banner condition — frontend guard verification", () => {
-  it("banner does NOT show when dataSource is 'sheet' (healthy data)", async () => {
+// ── Source-health banner condition mirroring the frontend guard ────────────────
+describe("Source-health banner condition — frontend guard verification", () => {
+  it("banner shows when supplementary figures are unavailable", async () => {
     const stats = await readCrmLeadsTrackerStats("RPS");
-    // Replicate the exact TSX guard: dataSource !== "sheet" && warning exists
-    const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
-    expect(bannerShouldShow).toBe(false);
+    const bannerShouldShow = stats.stale || stats.sourceHealth.supplementary === "unavailable";
+    expect(bannerShouldShow).toBe(true);
+    expect(stats.sourceHealth.warning).toBeTruthy();
   });
 
-  it("banner condition evaluates to false when DB returns zero leads", async () => {
+  it("cold-start zero data remains explicitly marked incomplete", async () => {
     mockDbWhere.mockResolvedValueOnce([]);
     const stats = await readCrmLeadsTrackerStats("RPS");
-    // DB path always returns dataSource "sheet" — banner never shows from DB path
-    const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
-    expect(bannerShouldShow).toBe(false);
+    const bannerShouldShow = stats.stale || stats.sourceHealth.supplementary === "unavailable";
+    expect(bannerShouldShow).toBe(true);
     expect(stats.kpis.totalLeads).toBe(0);
   });
 });

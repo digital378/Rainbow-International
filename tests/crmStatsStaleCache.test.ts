@@ -13,6 +13,21 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 const mockWhere = vi.hoisted(() => vi.fn());
 const mockFrom  = vi.hoisted(() => vi.fn());
 
+vi.mock("../server/marketing2728Sheets", () => ({
+  readMarketing2728Supplement: vi.fn().mockResolvedValue({
+    leads: [],
+    months: [],
+    fetchedAt: "2026-09-07T10:00:00.000Z",
+    available: true,
+    mode: "oauth",
+  }),
+  supplementLeadKey: (lead: any) => [
+    lead.enquiryDate ?? "",
+    lead.phone ?? "",
+    lead.childName ?? "",
+  ].join("|"),
+}));
+
 vi.mock("../server/db", () => ({
   db: {
     select: vi.fn().mockReturnValue({

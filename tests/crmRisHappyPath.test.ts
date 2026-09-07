@@ -4,7 +4,7 @@
  * Mirrors crmRpsHappyPath.test.ts for the RIS brand.
  *
  * Verifies that when the walkin_leads DB table has RIS leads:
- *   1. readCrmLeadsTrackerStats("RIS") returns dataSource === "sheet"
+ *   1. readCrmLeadsTrackerStats("RIS") reports DB-only source health in tests
  *   2. kpis.totalLeads > 0 (no silent zero-out)
  *   3. Individual KPIs (totalLeads, admissions, walkins, bookings) match
  *      a hand-counted synthetic dataset
@@ -153,9 +153,10 @@ beforeEach(() => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("RIS CRM dashboard — happy path (DB populated)", () => {
 
-  it("returns dataSource === 'sheet' when the DB has data rows", async () => {
+  it("returns dataSource === 'database' when the supplementary source is unavailable", async () => {
     const stats = await readCrmLeadsTrackerStats("RIS");
-    expect(stats.dataSource).toBe("sheet");
+    expect(stats.dataSource).toBe("database");
+    expect(stats.sourceHealth.supplementary).toBe("unavailable");
   });
 
   it("kpis.totalLeads is greater than zero", async () => {
@@ -240,25 +241,21 @@ describe("RIS CRM dashboard — happy path (DB populated)", () => {
   });
 });
 
-// ── Warning-banner condition mirroring the frontend TSX guard ─────────────────
-// The dashboard renders the banner when:
-//   data.dataSource && data.dataSource !== "sheet" && data.warning
-// These tests confirm the condition is correctly absent for the happy path.
-describe("RIS warning banner condition — frontend guard verification", () => {
+// ── Source-health banner condition mirroring the frontend TSX guard ────────────
+describe("RIS source-health banner condition — frontend guard verification", () => {
 
-  it("banner does NOT show when dataSource is 'sheet' (healthy data)", async () => {
+  it("banner shows when supplementary figures are unavailable", async () => {
     const stats = await readCrmLeadsTrackerStats("RIS");
-    // Replicate the exact TSX guard
-    const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
-    expect(bannerShouldShow).toBe(false);
+    const bannerShouldShow = stats.stale || stats.sourceHealth.supplementary === "unavailable";
+    expect(bannerShouldShow).toBe(true);
+    expect(stats.sourceHealth.warning).toBeTruthy();
   });
 
-  it("banner condition evaluates to false when DB returns zero leads", async () => {
+  it("cold-start zero data remains explicitly marked incomplete", async () => {
     mockDbWhere.mockResolvedValueOnce([]);
     const stats = await readCrmLeadsTrackerStats("RIS");
-    // DB path always returns dataSource "sheet" — banner never shows from DB path
-    const bannerShouldShow = stats.dataSource !== "sheet" && Boolean(stats.warning);
-    expect(bannerShouldShow).toBe(false);
+    const bannerShouldShow = stats.stale || stats.sourceHealth.supplementary === "unavailable";
+    expect(bannerShouldShow).toBe(true);
     expect(stats.kpis.totalLeads).toBe(0);
   });
 
@@ -268,6 +265,6 @@ describe("RIS warning banner condition — frontend guard verification", () => {
     // Second call is served from cache — DB queried only once
     expect(mockDbSelect).toHaveBeenCalledTimes(1);
     expect(second.kpis.totalLeads).toBe(first.kpis.totalLeads);
-    expect(second.dataSource).toBe("sheet");
+    expect(second.dataSource).toBe("database");
   });
 });

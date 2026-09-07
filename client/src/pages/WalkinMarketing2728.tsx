@@ -25,7 +25,15 @@ type Stats = {
   byCounsellor: Array<CounsellorStat>;
   byProgram: Array<{ program: string; cnt: number }>;
   generatedAt: string;
-
+  cachedAt?: string;
+  dataSource?: "database" | "hybrid";
+  stale?: true;
+  sourceHealth?: {
+    database: "available";
+    supplementary: "available" | "unavailable";
+    supplementaryFetchedAt: string | null;
+    warning?: string;
+  };
 };
 
 type BrandTab = "combined" | "RIS" | "RPS";
@@ -83,6 +91,15 @@ function mergeStats(ris: Stats, rps: Stats): Stats {
     statusBreakdown, byCounsellor,
     byProgram: merge([ris.byProgram, rps.byProgram], "program"),
     generatedAt: ris.generatedAt,
+    cachedAt: ris.cachedAt,
+    dataSource: ris.dataSource === "hybrid" || rps.dataSource === "hybrid" ? "hybrid" : "database",
+    stale: ris.stale || rps.stale ? true : undefined,
+    sourceHealth: {
+      database: "available",
+      supplementary: ris.sourceHealth?.supplementary === "available" && rps.sourceHealth?.supplementary === "available" ? "available" : "unavailable",
+      supplementaryFetchedAt: [ris.sourceHealth?.supplementaryFetchedAt, rps.sourceHealth?.supplementaryFetchedAt].filter(Boolean).sort().at(-1) ?? null,
+      ...((ris.sourceHealth?.warning || rps.sourceHealth?.warning) ? { warning: [ris.sourceHealth?.warning, rps.sourceHealth?.warning].filter(Boolean).join("; ") } : {}),
+    },
   };
 }
 
@@ -255,6 +272,22 @@ function DashboardContent({ stats, brandTab }: { stats: Stats; brandTab: BrandTa
 
   return (
     <div className="space-y-8">
+      <div className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-xs ${
+        stats.stale || stats.sourceHealth?.supplementary === "unavailable"
+          ? "border-amber-200 bg-amber-50 text-amber-900"
+          : "border-emerald-200 bg-emerald-50 text-emerald-900"
+      }`}>
+        <span className="font-semibold">
+          {stats.stale
+            ? "Showing last available figures"
+            : stats.dataSource === "hybrid"
+              ? "Database and supplementary figures are up to date"
+              : "Database figures are up to date; supplementary figures are temporarily unavailable"}
+        </span>
+        <span className="shrink-0 text-slate-500">
+          Updated {new Date(stats.cachedAt || stats.generatedAt).toLocaleString("en-IN")}
+        </span>
+      </div>
       {/* Inner tab bar */}
       <div className="flex gap-1 flex-wrap">
         {INNER_TABS.map(t => (
