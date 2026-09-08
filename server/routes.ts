@@ -416,6 +416,12 @@ export async function registerRoutes(
   app.use("/blog/janmashtami-2026", express.static(janmashtamiBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/janmashtami-2026", (_req, res) => res.sendFile(path.join(janmashtamiBlogDir, "index.html")));
 
+  // Ganesh Chaturthi 2026 static blog — preserve the supplied crawlable HTML,
+  // embedded styles and interactions without routing it through the SPA or SSR.
+  const ganeshChaturthiBlogDir = path.join(process.cwd(), "blog-pages/ganesh-chaturthi-2026");
+  app.use("/blog/ganesh-chaturthi-2026", express.static(ganeshChaturthiBlogDir, { index: "index.html", redirect: false }));
+  app.get("/blog/ganesh-chaturthi-2026", (_req, res) => res.sendFile(path.join(ganeshChaturthiBlogDir, "index.html")));
+
   registerSSRRoutes(app);
 
   // Declare every code-owned blog page from the shared manifest, so a page that

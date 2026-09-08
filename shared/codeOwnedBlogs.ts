@@ -42,6 +42,18 @@ export interface CodeOwnedBlog {
 
 export const CODE_OWNED_BLOGS: CodeOwnedBlog[] = [
   {
+    slug: "ganesh-chaturthi-2026",
+    title: "Ganesh Chaturthi 2026: History, Significance, Speeches, Essays & Celebration Guide",
+    date: "7 Sep 2026",
+    publishedAt: "2026-09-07",
+    cat: "Events",
+    intro:
+      "A complete Ganesh Chaturthi 2026 guide for students, teachers and parents, with history, significance, speeches and essays in English, Hindi and Marathi, shlokas, quiz, activities and social media resources.",
+    accentColor: "#E58A2B",
+    emoji: "🐘",
+    badge: "NEW",
+  },
+  {
     slug: "janmashtami-2026",
     title: "Janmashtami 2026: Essays, Speeches & Activities | RIS",
     date: "31 Aug 2026",
