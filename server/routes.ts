@@ -5082,6 +5082,8 @@ paths:
   // ── Friendship School QR Portal ─────────────────────────────────────────────
 
   const FRIENDSHIP_TEMPLATE_PATH = path.resolve("./server/assets/friendship_school_template.xlsx");
+  const isE2eFriendshipArtifact = (...values: Array<string | null | undefined>): boolean =>
+    values.some(value => /^e2e(?:-|(?:\s))/i.test(String(value ?? "").trim()));
 
   async function ensureFriendshipSheetTab(sheets: any, sheetId: string, tabName: string): Promise<void> {
     const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title,sheets.properties.sheetId" });
@@ -5528,10 +5530,11 @@ paths:
       const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
       res.status(201).json(school);
-      // Auto-create the Sheets tab (non-blocking) — skip for e2e test schools
+      // Auto-create the Sheets tab (non-blocking) — never create external
+      // workbook artifacts for automated test records.
       const sheetId = process.env.ALLIANCES_SHEET_ID;
       const auth = getAuthenticatedClient();
-      if (sheetId && auth && !school.name.startsWith("e2e-")) {
+      if (sheetId && auth && !isE2eFriendshipArtifact(school.name, school.sheetsTabName)) {
         const sheets = google.sheets({ version: "v4", auth });
         ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
           console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
@@ -6021,8 +6024,9 @@ paths:
   });
 
   // Admin: one-shot sheet cleanup — fix aggregate tab schema + delete junk/per-school tabs
-  app.post("/api/admin/alliances/friendship/cleanup-sheets", requireAdmin, async (_req, res) => {
+  app.post("/api/admin/alliances/friendship/cleanup-sheets", requireAdmin, async (req, res) => {
     try {
+      const e2eOnly = req.query.scope === "e2e";
       // School tabs may be in the env-var sheet; aggregate tab is in the hardcoded SHEET_IDS.alliances.
       // Deduplicate so we don't double-clean when they're the same sheet.
       const envSheetId = process.env.ALLIANCES_SHEET_ID ?? "";
@@ -6048,7 +6052,7 @@ paths:
 
       // Fix "All Friendship Leads" header + dropdowns (even if tab already existed)
       const aggregateTab = allTabs.find(t => t.title === AGGREGATE_TAB);
-      if (aggregateTab) {
+      if (aggregateTab && !e2eOnly) {
         await sheets.spreadsheets.values.update({
           spreadsheetId: sheetId,
           range: `${AGGREGATE_TAB}!A1:K1`,
@@ -6107,7 +6111,7 @@ paths:
       );
       const junkTabs = allTabsBySheet.filter(t =>
         t.title !== AGGREGATE_TAB &&
-        (t.title.startsWith("e2e-") || knownSchoolNames.has(t.title))
+        (isE2eFriendshipArtifact(t.title) || (!e2eOnly && knownSchoolNames.has(t.title)))
       );
 
       // Group deletions by spreadsheet so each sheet gets one batchUpdate call
@@ -6127,7 +6131,8 @@ paths:
       }
 
       res.json({
-        aggregateTabFixed: !!aggregateTab,
+        aggregateTabFixed: !e2eOnly && !!aggregateTab,
+        scope: e2eOnly ? "e2e" : "full",
         sheetsScanned: sheetIdsToClean,
         deletedTabs: junkTabs.map(t => t.title),
         deleted,
