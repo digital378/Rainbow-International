@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Space+Mono:wght@400;700&display=swap');
+
+.museum-shell {
+  --museum-ink: #f7efd9;
+  --museum-night: #091332;
+  --museum-navy: #101e4b;
+  --museum-paper: #f5edd9;
+  --museum-marigold: #f3b43f;
+  --museum-saffron: #d9612e;
+  --museum-olive: #829078;
+  background: var(--museum-paper);
+  color: #132044;
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow: hidden;
+}
+.museum-shell * { box-sizing: border-box; }
+.museum-serif { font-family: 'Libre Baskerville', serif; }
+.museum-mono { font-family: 'Space Mono', monospace; }
+.museum-grain::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .085; z-index: 30;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+.museum-shell ::selection { background: #f3b43f; color: #091332; }
+@media (prefers-reduced-motion: reduce) {
+  .museum-shell *, .museum-shell *::before, .museum-shell *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
