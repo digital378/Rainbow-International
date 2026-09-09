@@ -19,7 +19,7 @@
  */
 
 import { type Express, type Request, type Response, type NextFunction } from "express";
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { db } from "./db";
 import {
@@ -33,6 +33,7 @@ import * as XLSX from "xlsx";
 import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
+import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -437,7 +438,7 @@ export function registerWalkinRoutes(app: Express) {
       const SIZE = Math.min(200, Math.max(1, parseInt(pageSize, 10)));
       const OFFSET = (PAGE - 1) * SIZE;
 
-      const conditions: any[] = [];
+      const conditions: any[] = [eq(walkinLeads.academicYear, "2027-28")];
       if (brand) conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
       if (status) conditions.push(eq(walkinLeads.status, status));
@@ -468,14 +469,86 @@ export function registerWalkinRoutes(app: Express) {
 
       const where = conditions.length ? and(...conditions) : undefined;
 
-      const [rows, [{ total }]] = await Promise.all([
+      const [databaseRows, allDatabaseIdentities] = await Promise.all([
         db.select().from(walkinLeads)
           .where(where)
-          .orderBy(desc(walkinLeads.createdAt))
-          .limit(SIZE)
-          .offset(OFFSET),
-        db.select({ total: sql<number>`cast(count(*) as int)` }).from(walkinLeads).where(where),
+          .orderBy(desc(walkinLeads.createdAt)),
+        db.select({
+          enquiryDate: walkinLeads.enquiryDate,
+          phone: walkinLeads.phone,
+          childName: walkinLeads.childName,
+        }).from(walkinLeads).where(eq(walkinLeads.academicYear, "2027-28")),
       ]);
+
+      // Marketing 27-28 overlays historical CRM tracker rows that have not
+      // yet entered the database. Include those same rows here as read-only
+      // records, while allowing any DB row (including an archived one) to win.
+      const databaseKeys = new Set(allDatabaseIdentities.map(supplementLeadKey));
+      const requestedBrands: Array<"RIS" | "RPS"> = brand === "RIS" || brand === "RPS"
+        ? [brand]
+        : ["RIS", "RPS"];
+      const supplements = await Promise.all(
+        requestedBrands.map(async supplementBrand => ({
+          brand: supplementBrand,
+          result: await readMarketing2728Supplement(supplementBrand),
+        })),
+      );
+
+      const normalizedPhoneQuery = phoneQ?.replace(/\D/g, "").slice(-10);
+      const searchLower = search?.trim().toLowerCase();
+      const supplementalRows = supplements.flatMap(({ brand: supplementBrand, result }) =>
+        result.leads
+          .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
+          .filter(lead => !branchId)
+          .filter(lead => !status || lead.status === status)
+          .filter(lead => !leadOwner || lead.leadOwner === leadOwner)
+          .filter(lead => !dateFrom || lead.enquiryDate >= dateFrom)
+          .filter(lead => !dateTo || lead.enquiryDate <= dateTo)
+          .filter(lead => !normalizedPhoneQuery || lead.phone.includes(normalizedPhoneQuery))
+          .filter(lead => !searchLower || [lead.childName, lead.phone]
+            .some(value => value.toLowerCase().includes(searchLower)))
+          .map(lead => {
+            const identity = `${supplementBrand}|${supplementLeadKey(lead)}`;
+            const timestamp = `${lead.enquiryDate}T00:00:00.000Z`;
+            return {
+              id: `crm-${createHash("sha256").update(identity).digest("hex").slice(0, 20)}`,
+              brand: supplementBrand,
+              branchId: null,
+              academicYear: "2027-28",
+              enquiryDate: lead.enquiryDate,
+              monthLabel: lead.monthLabel,
+              parentName: "",
+              motherName: null,
+              childName: lead.childName,
+              phone: lead.phone,
+              altPhone: null,
+              email: null,
+              program: lead.program,
+              source: lead.source,
+              status: lead.status,
+              closeReason: null,
+              remark: null,
+              leadOwner: lead.leadOwner || null,
+              walkInDate: null,
+              revisitDate: null,
+              revisitDate2: null,
+              misCallingRemarks: null,
+              seqNum: 0,
+              brandSeqNum: null,
+              isArchived: false,
+              createdBy: "crm-supplement",
+              updatedBy: null,
+              createdAt: timestamp,
+              updatedAt: timestamp,
+              readOnly: true,
+            };
+          }),
+      );
+
+      const combinedRows = [...databaseRows, ...supplementalRows]
+        .sort((a, b) => b.enquiryDate.localeCompare(a.enquiryDate));
+      const total = combinedRows.length;
+      const rows = combinedRows.slice(OFFSET, OFFSET + SIZE);
 
       res.json({ leads: rows, total, page: PAGE, pageSize: SIZE });
     } catch (err: any) {

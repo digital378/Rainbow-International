@@ -20,6 +20,7 @@ type Lead = {
   misCallingRemarks: string | null;
   isArchived: boolean; createdBy: string; updatedBy: string | null;
   createdAt: string; updatedAt: string;
+  readOnly?: boolean;
 };
 type Lookups = {
   programs: { id: number; label: string; brand: string | null }[];
@@ -732,21 +733,28 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                       </td>
                       <td className="px-3 py-2.5 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
-                          {!lead.isArchived && (
+                          {!lead.isArchived && !lead.readOnly && (
                             <button
                               onClick={() => setEditLead(lead)}
                               className="px-2.5 py-1 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
                             >Edit</button>
                           )}
-                          <button
-                            onClick={() => setHistoryLead(lead)}
-                            className="px-2.5 py-1 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
-                          >History</button>
-                          {!lead.isArchived && (
+                          {!lead.readOnly && (
+                            <button
+                              onClick={() => setHistoryLead(lead)}
+                              className="px-2.5 py-1 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                            >History</button>
+                          )}
+                          {!lead.isArchived && !lead.readOnly && (
                             <button
                               onClick={() => setArchiveLead(lead)}
                               className="px-2.5 py-1 rounded text-[10px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition"
                             >Archive</button>
+                          )}
+                          {lead.readOnly && (
+                            <span className="px-2.5 py-1 rounded text-[10px] font-semibold bg-amber-50 text-amber-700">
+                              Tracker record
+                            </span>
                           )}
                         </div>
                       </td>
