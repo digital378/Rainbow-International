@@ -494,29 +494,41 @@ export default function Internal() {
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dashboard Passcodes</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
             {[
-              ["Internal Directory", PASSCODE],
-              ["Marketing 2026–27", "8888"],
-              ["RIS Sales 2026–27", "RIS8"],
-              ["RPS Sales 2026–27", "RPS8"],
-              ["Marketing 2027–28", "MKT27"],
-              ["RIS Sales 2027–28", "RIS27"],
-              ["RPS Sales 2027–28", "RPS27"],
-            ].map(([label, code]) => (
+              ["Internal Directory", "/internal", PASSCODE],
+              ["Marketing 2026–27", "/marketing", "8888"],
+              ["RIS Sales 2026–27", "/sales", "RIS8"],
+              ["RPS Sales 2026–27", "/rps-sales", "RPS8"],
+              ["Marketing 2027–28", "/marketing-27-28", "MKT27"],
+              ["RIS Sales 2027–28", "/sales-27-28", "RIS27"],
+              ["RPS Sales 2027–28", "/rps-sales-27-28", "RPS27"],
+            ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                <span className="text-slate-600">{label}</span>
+                <span>
+                  <span className="block text-slate-600">{label}</span>
+                  <code className="block text-[10px] text-slate-400 mt-0.5">{slug}</code>
+                </span>
                 <span className="px-2 py-0.5 rounded bg-slate-800 text-white font-mono font-bold tracking-wider">{code}</span>
               </div>
             ))}
             <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-              <span className="text-amber-800">Alliances</span>
+              <span>
+                <span className="block text-amber-800">Alliances</span>
+                <code className="block text-[10px] text-amber-600 mt-0.5">/alliances</code>
+              </span>
               <span className="font-semibold text-amber-700">🔐 Ask admin</span>
             </div>
             <div className="flex items-center justify-between gap-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
-              <span className="text-orange-800">Leads CRM &amp; Admin Panel</span>
+              <span>
+                <span className="block text-orange-800">Leads CRM &amp; Admin Panel</span>
+                <code className="block text-[10px] text-orange-600 mt-0.5">/leads · /admin/walkin-2728</code>
+              </span>
               <span className="font-semibold text-orange-700">🔑 Admin token</span>
             </div>
             <div className="flex items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
-              <span className="text-green-800">Group Overview</span>
+              <span>
+                <span className="block text-green-800">Group Overview</span>
+                <code className="block text-[10px] text-green-600 mt-0.5">/overview-27-28</code>
+              </span>
               <span className="font-semibold text-green-700">🔓 No passcode</span>
             </div>
           </div>
