@@ -2210,9 +2210,10 @@ interface CrmStatsEntry {
   storedAt: number; // Date.now()
 }
 
-const crmStatsCache   = new Map<"RIS" | "RPS", CrmStatsEntry>();
+type CrmStatsCacheKey = `${"RIS" | "RPS"}:${"tracker" | "sales"}`;
+const crmStatsCache   = new Map<CrmStatsCacheKey, CrmStatsEntry>();
 /** Holds the in-progress fetch promise so concurrent cache-miss requests share one call. */
-const crmStatsInFlight = new Map<"RIS" | "RPS", Promise<CrmStats>>();
+const crmStatsInFlight = new Map<CrmStatsCacheKey, Promise<CrmStats>>();
 /**
  * Monotonically-increasing generation counter per brand.
  * Incremented on every bust so that a pre-bust in-flight fetch, when it
@@ -2224,7 +2225,7 @@ const crmStatsGeneration = new Map<"RIS" | "RPS", number>();
  * Last successfully fetched data per brand — never cleared by bustCrmStatsCache.
  * Used as a stale fallback when the live fetch fails (e.g. DB / Sheets outage).
  */
-const crmStatsLastGood = new Map<"RIS" | "RPS", CrmStatsEntry>();
+const crmStatsLastGood = new Map<CrmStatsCacheKey, CrmStatsEntry>();
 
 /**
  * Invalidates the in-memory CRM stats cache for one or both brands.
@@ -2235,8 +2236,10 @@ export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
     // Increment generation so any in-flight fetch that started before this bust
     // will see a mismatch when it settles and will discard its stale result.
     crmStatsGeneration.set(brand, (crmStatsGeneration.get(brand) ?? 0) + 1);
-    crmStatsCache.delete(brand);
-    crmStatsInFlight.delete(brand);
+    crmStatsCache.delete(`${brand}:tracker`);
+    crmStatsCache.delete(`${brand}:sales`);
+    crmStatsInFlight.delete(`${brand}:tracker`);
+    crmStatsInFlight.delete(`${brand}:sales`);
   } else {
     for (const b of ["RIS", "RPS"] as const) {
       crmStatsGeneration.set(b, (crmStatsGeneration.get(b) ?? 0) + 1);
@@ -2249,11 +2252,9 @@ export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
 
 /**
 /**
- * Returns aggregated CRM stats for a brand by querying the walkin_leads
- * database table directly — the single source of truth.
- *
- * The Google Sheet "CRM Leads Tracker" tab is no longer read here;
- * all leads entered by RAs via the /leads panel live in the DB.
+ * Returns aggregated CRM stats for one brand from database leads plus
+ * supplementary connected-workbook rows not represented in the database.
+ * Sales dashboards may additionally include that brand's WALKINs tab.
  *
  * Results are cached for 2 minutes.  Concurrent cache-miss requests
  * share a single in-flight promise (no duplicate DB queries).
@@ -2261,17 +2262,18 @@ export function bustCrmStatsCache(brand?: "RIS" | "RPS"): void {
  */
 export async function readCrmLeadsTrackerStats(
   brand: "RIS" | "RPS",
-  { bust = false }: { bust?: boolean } = {},
+  { bust = false, includeWalkins = false }: { bust?: boolean; includeWalkins?: boolean } = {},
 ): Promise<CrmStats> {
+  const cacheKey: CrmStatsCacheKey = `${brand}:${includeWalkins ? "sales" : "tracker"}`;
   // 1. Serve cached result immediately (unless busting)
   if (!bust) {
-    const entry = crmStatsCache.get(brand);
+    const entry = crmStatsCache.get(cacheKey);
     if (entry && Date.now() - entry.storedAt < CRM_STATS_TTL_MS) {
       console.log(`[walkin/crm-stats] Cache hit for ${brand}`);
       return entry.data;
     }
     // 2. Coalesce concurrent cache-miss requests
-    const inflight = crmStatsInFlight.get(brand);
+    const inflight = crmStatsInFlight.get(cacheKey);
     if (inflight) {
       console.log(`[walkin/crm-stats] Joining in-flight request for ${brand}`);
       return inflight;
@@ -2309,7 +2311,7 @@ export async function readCrmLeadsTrackerStats(
         );
       const supplement = await readMarketing2728Supplement(brand);
       if (!supplement.available) {
-        const previousHybrid = crmStatsLastGood.get(brand);
+        const previousHybrid = crmStatsLastGood.get(cacheKey);
         if (previousHybrid?.data.dataSource === "hybrid") {
           console.warn(
             `[walkin/crm-stats] Supplementary source unavailable for ${brand}; preserving complete hybrid cache from ${new Date(previousHybrid.storedAt).toISOString()}`,
@@ -2330,9 +2332,35 @@ export async function readCrmLeadsTrackerStats(
         phone: row.phone ?? "",
         childName: row.childName ?? "",
       })));
-      const supplementaryLeads = supplement.leads
+      const supplementByIdentity = new Map<string, (typeof supplement.leads)[number]>();
+      const supplementRows = includeWalkins
+        ? [...supplement.leads, ...(supplement.walkins ?? [])]
+        : supplement.leads;
+      supplementRows.forEach((row, index) => {
+        const hasIdentity = Boolean(row.phone || row.childName);
+        const key = hasIdentity
+          ? supplementLeadKey(row)
+          : `unmatched|${row.enquiryDate}|${row.program}|${row.leadOwner}|${index}`;
+        supplementByIdentity.set(key, row);
+      });
+
+      const branchRows = includeWalkins
+        ? await db.select({
+            id: walkinBranches.id,
+            name: walkinBranches.name,
+          }).from(walkinBranches).where(eq(walkinBranches.brand, brand))
+        : [];
+      const branchIds = new Map(
+        branchRows.map(row => [row.name.trim().toLowerCase(), row.id] as const),
+      );
+      const supplementaryLeads = [...supplementByIdentity.values()]
         .filter(row => !databaseKeys.has(supplementLeadKey(row)))
-        .map(row => ({ ...row, branchId: null }));
+        .map(row => ({
+          ...row,
+          branchId: row.branchName
+            ? branchIds.get(row.branchName.trim().toLowerCase()) ?? null
+            : null,
+        }));
       const leads = [...databaseLeads, ...supplementaryLeads];
 
       const now = new Date().toISOString();
@@ -2457,10 +2485,10 @@ export async function readCrmLeadsTrackerStats(
       // we must discard this stale result rather than overwriting the fresh one.
       if ((crmStatsGeneration.get(brand) ?? 0) === myGeneration) {
         const entry: CrmStatsEntry = { data: result, storedAt: Date.now() };
-        crmStatsCache.set(brand, entry);
+        crmStatsCache.set(cacheKey, entry);
         // Only complete hybrid results qualify as last-known-good. A cold-start
         // DB-only result may be useful, but must never displace complete figures.
-        if (result.dataSource === "hybrid") crmStatsLastGood.set(brand, entry);
+        if (result.dataSource === "hybrid") crmStatsLastGood.set(cacheKey, entry);
         console.log(`[walkin/crm-stats] Fresh data fetched from DB and cached for ${brand} (${totalLeads} leads)`);
       } else {
         console.log(`[walkin/crm-stats] Discarding stale in-flight result for ${brand} (generation mismatch — bust fired during fetch)`);
@@ -2469,7 +2497,7 @@ export async function readCrmLeadsTrackerStats(
     } catch (fetchErr: any) {
       // On any fetch failure, serve the last-known-good data with stale:true so
       // the dashboard keeps showing real numbers instead of zeros or a 500.
-      const lastGood = crmStatsLastGood.get(brand);
+      const lastGood = crmStatsLastGood.get(cacheKey);
       if (lastGood) {
         console.warn(
           `[walkin/crm-stats] Fetch failed for ${brand} — serving stale cache from ${new Date(lastGood.storedAt).toISOString()}. Error: ${fetchErr?.message}`,
@@ -2486,12 +2514,12 @@ export async function readCrmLeadsTrackerStats(
       // the generation check is a safe proxy for identity without a
       // self-referential fetchPromise comparison.
       if ((crmStatsGeneration.get(brand) ?? 0) === myGeneration) {
-        crmStatsInFlight.delete(brand);
+        crmStatsInFlight.delete(cacheKey);
       }
     }
   })();
 
-  crmStatsInFlight.set(brand, fetchPromise);
+  crmStatsInFlight.set(cacheKey, fetchPromise);
   return fetchPromise;
 }
 

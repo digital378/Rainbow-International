@@ -175,7 +175,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
 
   const fetchData = useCallback((bust = false) => {
     setLoading(true);
-    const url = bust ? "/api/walkin/crm-stats?brand=RPS&ay=2027-28&bust=1" : "/api/walkin/crm-stats?brand=RPS&ay=2027-28";
+    const url = bust ? "/api/walkin/crm-stats?brand=RPS&ay=2027-28&includeWalkins=true&bust=1" : "/api/walkin/crm-stats?brand=RPS&ay=2027-28&includeWalkins=true";
     fetch(url)
       .then(r => {
         if (r.status === 401) onLock();
@@ -543,7 +543,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
         </>}
 
         <div className="text-center text-xs text-slate-400">
-          Live from CRM Leads Tracker · AY 2027-28 · RPS · auto-refreshes every 60 s
+          Live from connected RPS lead and WALKINs data · AY 2027-28 · auto-refreshes every 60 s
           <a href="/overview-27-28" className="ml-3 underline" style={{ color: RED }}>Group Overview →</a>
           <a href="/marketing-27-28" className="ml-3 underline" style={{ color: RED }}>Marketing →</a>
         </div>

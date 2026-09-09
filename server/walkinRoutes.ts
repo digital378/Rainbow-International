@@ -1149,8 +1149,9 @@ export function registerWalkinRoutes(app: Express) {
       // Only admins may bypass the cache
       const bustRequested = req.query.bust !== undefined && req.query.bust !== "0" && req.query.bust !== "false";
       const bust = bustRequested && isAdmin(req);
+      const includeWalkins = req.query.includeWalkins === "true";
 
-      const stats = await readCrmLeadsTrackerStats(brand as "RIS" | "RPS", { bust });
+      const stats = await readCrmLeadsTrackerStats(brand as "RIS" | "RPS", { bust, includeWalkins });
       res.json(stats);
     } catch (err: any) {
       console.error("[walkin/crm-stats]", err?.message);
