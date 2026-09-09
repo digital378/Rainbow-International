@@ -138,11 +138,10 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Group Overview",
     url: "/overview-27-28",
-    passcode: "None",
-    open: true,
+    passcode: "OVER",
     who: "All Stakeholders",
     description:
-      "High-level walk-in pipeline across all RIS and RPS branches — total leads, walk-ins, and admissions for AY 27-28. No passcode required.",
+      "High-level walk-in pipeline across all RIS and RPS branches — total leads, walk-ins, and admissions for AY 27-28.",
     accent: "#475569",
   },
   {
@@ -501,6 +500,7 @@ export default function Internal() {
               ["Marketing 2027–28", "/marketing-27-28", "MKT27"],
               ["RIS Sales 2027–28", "/sales-27-28", "RIS27"],
               ["RPS Sales 2027–28", "/rps-sales-27-28", "RPS27"],
+              ["Group Overview", "/overview-27-28", "OVER"],
             ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <span>
@@ -523,13 +523,6 @@ export default function Internal() {
                 <code className="block text-[10px] text-orange-600 mt-0.5">/leads · /admin/walkin-2728</code>
               </span>
               <span className="font-semibold text-orange-700">🔑 Admin token</span>
-            </div>
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
-              <span>
-                <span className="block text-green-800">Group Overview</span>
-                <code className="block text-[10px] text-green-600 mt-0.5">/overview-27-28</code>
-              </span>
-              <span className="font-semibold text-green-700">🔓 No passcode</span>
             </div>
           </div>
         </div>

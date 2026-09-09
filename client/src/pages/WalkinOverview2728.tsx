@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", SLATE = "#64748b", GREY = "#94a3b8";
+const PASSCODE = "OVER";
+const AUTH_KEY = "walkin_overview_2728_auth";
 
 type Stats = {
   brand: string | null;
@@ -18,6 +20,48 @@ type Stats = {
 
 const pct = (n: number) => `${n.toFixed(1)}%`;
 const fmt = (n: number) => n.toLocaleString("en-IN");
+
+function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState(false);
+
+  const submit = () => {
+    if (code.trim().toUpperCase() === PASSCODE) {
+      try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {}
+      onSuccess();
+      return;
+    }
+    setError(true);
+    setCode("");
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }} data-testid="passcode-gate">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-7 shadow-2xl">
+        <div className="mb-6 text-center">
+          <img src="/images/rainbow-group-logo-2.jpg" alt="Rainbow Group" className="mx-auto mb-4 h-14 w-auto rounded-lg" />
+          <h1 className="text-xl font-black text-slate-800">Group Overview</h1>
+          <p className="mt-1 text-sm text-slate-500">AY 2027–28 · Staff access</p>
+        </div>
+        <label className="mb-2 block text-sm font-semibold text-slate-700">Enter passcode</label>
+        <input
+          type="password"
+          autoComplete="off"
+          value={code}
+          onChange={event => { setCode(event.target.value); setError(false); }}
+          onKeyDown={event => event.key === "Enter" && submit()}
+          className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autoFocus
+          data-testid="input-passcode"
+        />
+        {error && <div className="mt-2 text-center text-sm text-red-600">Incorrect passcode</div>}
+        <button onClick={submit} className="mt-4 w-full rounded-lg py-2.5 font-bold text-white" style={{ background: NAVY }}>
+          Open dashboard
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function BrandCard({
   logo, brand, color, stats, loading,
@@ -122,7 +166,7 @@ function FunnelRow({ label, ris, rps }: { label: string; ris: number; rps: numbe
   );
 }
 
-function Dashboard() {
+function Dashboard({ onLock }: { onLock: () => void }) {
   const [risStats, setRisStats] = useState<Stats | null>(null);
   const [rpsStats, setRpsStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -188,6 +232,7 @@ function Dashboard() {
           {lastFetch && `Updated: ${lastFetch.toLocaleTimeString()}`}
           {loading && " · refreshing…"}
           <button onClick={() => fetchData()} className="px-3 py-1.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50">↻ Refresh</button>
+          <button onClick={onLock} className="px-3 py-1.5 rounded border border-slate-300 text-slate-600 hover:bg-slate-50">Lock</button>
         </div>
       </div>
 
@@ -244,7 +289,7 @@ function Dashboard() {
         </div>
 
         <div className="text-center text-xs text-slate-400">
-          AY 2027-28 · walkin_leads DB · auto-refreshes every 60 seconds · no passcode required for overview
+          AY 2027-28 · walkin_leads DB · auto-refreshes every 60 seconds · staff access only
         </div>
       </div>
     </div>
@@ -252,5 +297,14 @@ function Dashboard() {
 }
 
 export default function WalkinOverview2728() {
-  return <Dashboard />;
+  const [authed, setAuthed] = useState(() => {
+    try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
+  });
+
+  if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
+
+  return <Dashboard onLock={() => {
+    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
+    setAuthed(false);
+  }} />;
 }
