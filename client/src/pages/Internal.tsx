@@ -1,15 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 
 /* ── Constants ───────────────────────────────────────────────────────────────── */
-const PASSCODE = "MAIN";
-const AUTH_KEY = "ris_internal_auth";
 const NAVY     = "#091a4f";
 
-function isAuthed(): boolean {
-  try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
-}
-
 /* ── Types ───────────────────────────────────────────────────────────────────── */
+type DashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
+
 type Dashboard = {
   name: string;
   url: string;
@@ -20,6 +16,7 @@ type Dashboard = {
   open?: boolean;
   envVar?: boolean;
   adminToken?: boolean;
+  scope?: DashboardScope;
 };
 
 type FlowStep = {
@@ -139,6 +136,7 @@ const DASHBOARDS_2728: Dashboard[] = [
     name: "Group Overview",
     url: "/overview-27-28",
     passcode: "Staff passcode",
+    scope: "overview",
     who: "All Stakeholders",
     description:
       "High-level walk-in pipeline across all RIS and RPS branches — total leads, walk-ins, and admissions for AY 27-28.",
@@ -148,6 +146,7 @@ const DASHBOARDS_2728: Dashboard[] = [
     name: "Marketing Dashboard",
     url: "/marketing-27-28",
     passcode: "Staff passcode",
+    scope: "marketing",
     who: "Marketing Team",
     description:
       "AY 27-28 marketing performance — campaign spend (Meta + Google), CPL, CPB, combined RIS + RPS brand view, and weekly trends.",
@@ -157,6 +156,7 @@ const DASHBOARDS_2728: Dashboard[] = [
     name: "RIS Sales Dashboard",
     url: "/sales-27-28",
     passcode: "Staff passcode",
+    scope: "ris-sales",
     who: "RIS Counselors",
     description:
       "AY 27-28 RIS live lead funnel — walk-in captures from kiosk, counselor assignments, booking and admission tracking.",
@@ -166,6 +166,7 @@ const DASHBOARDS_2728: Dashboard[] = [
     name: "RPS Sales Dashboard",
     url: "/rps-sales-27-28",
     passcode: "Staff passcode",
+    scope: "rps-sales",
     who: "RPS Counselors",
     description:
       "AY 27-28 RPS live lead funnel by branch — CRM status, pipeline health, conversion metrics, and branch-wise breakdown.",
@@ -208,16 +209,29 @@ const DASHBOARDS_2728: Dashboard[] = [
 function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [code, setCode]   = useState("");
   const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const inputRef          = useRef<HTMLInputElement>(null);
 
-  const submit = () => {
-    if (code.trim() === PASSCODE) {
-      try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {}
-      onSuccess();
-    } else {
+  const submit = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/walkin/internal/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ passcode: code.trim() }),
+      });
+      if (response.ok) {
+        onSuccess();
+        return;
+      }
       setError(true);
       setCode("");
       setTimeout(() => inputRef.current?.focus(), 50);
+    } catch {
+      setError(true);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -247,7 +261,7 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
           autoComplete="off"
           value={code}
           onChange={e => { setCode(e.target.value); setError(false); }}
-          onKeyDown={e => e.key === "Enter" && submit()}
+          onKeyDown={e => e.key === "Enter" && void submit()}
           className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter passcode"
           autoFocus
@@ -256,11 +270,12 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
           <p className="text-red-500 text-xs mt-1.5 text-center">Incorrect passcode</p>
         )}
         <button
-          onClick={submit}
+          onClick={() => void submit()}
+          disabled={submitting}
           style={{ background: NAVY }}
           className="mt-4 w-full text-white text-sm font-semibold py-2.5 rounded-lg hover:opacity-90 transition-opacity"
         >
-          Access Dashboard Directory
+          {submitting ? "Checking…" : "Access Dashboard Directory"}
         </button>
       </div>
     </div>
@@ -333,6 +348,11 @@ function FlowDiagram({ steps }: { steps: FlowStep[] }) {
 }
 
 function PasscodeBadge({ d }: { d: Dashboard }) {
+  if (d.scope) return (
+    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
+      Secure admin access
+    </span>
+  );
   if (d.open) return (
     <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-green-50 border border-green-200 text-green-700">
       🔓 No passcode
@@ -355,6 +375,50 @@ function PasscodeBadge({ d }: { d: Dashboard }) {
   );
 }
 
+function AdminOpenButton({
+  scope,
+  url,
+  className,
+  style,
+  children,
+}: {
+  scope: DashboardScope;
+  url: string;
+  className: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const [opening, setOpening] = useState(false);
+
+  const open = async () => {
+    if (opening) return;
+    const target = window.open("about:blank", "_blank");
+    if (target) target.opener = null;
+    setOpening(true);
+    try {
+      const response = await fetch("/api/walkin/internal/dashboard-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scope }),
+      });
+      if (!response.ok) throw new Error("Could not create dashboard session");
+      if (target) target.location.href = url;
+      else window.location.href = url;
+    } catch {
+      target?.close();
+      window.alert("Your admin session has expired. Lock and unlock the directory, then try again.");
+    } finally {
+      setOpening(false);
+    }
+  };
+
+  return (
+    <button type="button" onClick={() => void open()} disabled={opening} className={className} style={style}>
+      {opening ? "Opening…" : children}
+    </button>
+  );
+}
+
 function DashCard({ d }: { d: Dashboard }) {
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
@@ -365,15 +429,26 @@ function DashCard({ d }: { d: Dashboard }) {
             <h3 className="text-slate-800 font-bold text-base leading-tight">{d.name}</h3>
             <p className="text-slate-400 text-xs mt-0.5">{d.who}</p>
           </div>
-          <a
-            href={d.url}
-            target="_blank"
-            rel="noreferrer"
-            className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-opacity hover:opacity-80 whitespace-nowrap"
-            style={{ background: d.accent }}
-          >
-            Open ↗
-          </a>
+          {d.scope ? (
+            <AdminOpenButton
+              scope={d.scope}
+              url={d.url}
+              className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-opacity hover:opacity-80 disabled:opacity-60 whitespace-nowrap"
+              style={{ background: d.accent }}
+            >
+              Open ↗
+            </AdminOpenButton>
+          ) : (
+            <a
+              href={d.url}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg text-white transition-opacity hover:opacity-80 whitespace-nowrap"
+              style={{ background: d.accent }}
+            >
+              Open ↗
+            </a>
+          )}
         </div>
         <p className="text-slate-600 text-sm leading-relaxed mt-3 mb-4">{d.description}</p>
         <div className="flex flex-wrap items-center gap-2">
@@ -389,7 +464,8 @@ function DashCard({ d }: { d: Dashboard }) {
 
 /* ── Page ────────────────────────────────────────────────────────────────────── */
 export default function Internal() {
-  const [authed, setAuthed] = useState(isAuthed);
+  const [authed, setAuthed] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   // Inject noindex so search engines never index this page
   useEffect(() => {
@@ -406,12 +482,24 @@ export default function Internal() {
     };
   }, []);
 
+  useEffect(() => {
+    fetch("/api/walkin/internal/session")
+      .then(response => response.json())
+      .then(data => setAuthed(data.ok === true))
+      .catch(() => setAuthed(false))
+      .finally(() => setCheckingSession(false));
+  }, []);
+
+  if (checkingSession) {
+    return <div style={{ minHeight: "100vh", background: NAVY }} />;
+  }
+
   if (!authed) {
     return <PasscodeGate onSuccess={() => setAuthed(true)} />;
   }
 
-  const lock = () => {
-    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
+  const lock = async () => {
+    await fetch("/api/walkin/internal/session", { method: "DELETE" }).catch(() => undefined);
     setAuthed(false);
   };
 
@@ -436,7 +524,7 @@ export default function Internal() {
             </p>
           </div>
           <button
-            onClick={lock}
+            onClick={() => void lock()}
             className="text-white/70 hover:text-white text-sm border border-white/20 rounded-lg px-4 py-2 hover:bg-white/10 transition-colors flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -493,14 +581,14 @@ export default function Internal() {
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dashboard Passcodes</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
             {[
-              ["Internal Directory", "/internal", PASSCODE],
+              ["Internal Directory", "/internal", "MAIN"],
               ["Marketing 2026–27", "/marketing", "8888"],
               ["RIS Sales 2026–27", "/sales", "RIS8"],
               ["RPS Sales 2026–27", "/rps-sales", "RPS8"],
-              ["Marketing 2027–28", "/marketing-27-28", "Staff passcode"],
-              ["RIS Sales 2027–28", "/sales-27-28", "Staff passcode"],
-              ["RPS Sales 2027–28", "/rps-sales-27-28", "Staff passcode"],
-              ["Group Overview", "/overview-27-28", "Staff passcode"],
+              ["Marketing 2027–28", "/marketing-27-28", "Admin open"],
+              ["RIS Sales 2027–28", "/sales-27-28", "Admin open"],
+              ["RPS Sales 2027–28", "/rps-sales-27-28", "Admin open"],
+              ["Group Overview", "/overview-27-28", "Admin open"],
             ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <span>

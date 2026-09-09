@@ -35,9 +35,14 @@ import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
 import {
+  createTrustedWalkinDashboardSession,
+  createWalkinInternalSession,
   createWalkinDashboardSession,
+  hasWalkinInternalAccess,
   hasWalkinDashboardAccess,
+  revokeWalkinInternalSession,
   revokeWalkinDashboardSession,
+  WALKIN_INTERNAL_COOKIE,
   walkinDashboardCookieName,
   type WalkinDashboardScope,
 } from "./walkinDashboardAuth";
@@ -1081,6 +1086,46 @@ export function registerWalkinRoutes(app: Express) {
   // Query params:
   //   brand  — required; "RIS" or "RPS"
   //   bust   — optional; any truthy value forces a fresh read (admin only)
+  app.get("/api/walkin/internal/session", (req, res) => {
+    res.json({ ok: hasWalkinInternalAccess(req) });
+  });
+
+  app.post("/api/walkin/internal/session", (req, res) => {
+    const passcode = String(req.body?.passcode || "");
+    const session = createWalkinInternalSession(passcode);
+    if (!session) return res.status(401).json({ ok: false });
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader(
+      "Set-Cookie",
+      `${WALKIN_INTERNAL_COOKIE}=${session}; Path=/api/walkin/internal; HttpOnly; SameSite=Strict${secure}`,
+    );
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/walkin/internal/session", (req, res) => {
+    revokeWalkinInternalSession(req);
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader(
+      "Set-Cookie",
+      `${WALKIN_INTERNAL_COOKIE}=; Path=/api/walkin/internal; HttpOnly; SameSite=Strict; Max-Age=0${secure}`,
+    );
+    res.status(204).end();
+  });
+
+  app.post("/api/walkin/internal/dashboard-session", (req, res) => {
+    if (!hasWalkinInternalAccess(req)) return res.status(401).json({ message: "Unauthorized" });
+    const scope = String(req.body?.scope || "") as WalkinDashboardScope;
+    if (!dashboardScopes.has(scope)) return res.status(400).json({ message: "Invalid dashboard scope" });
+    const session = createTrustedWalkinDashboardSession(scope);
+    if (!session) return res.status(503).json({ message: "Session service unavailable" });
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader(
+      "Set-Cookie",
+      `${walkinDashboardCookieName(scope)}=${session}; Path=/api/walkin/crm-stats; HttpOnly; SameSite=Strict${secure}`,
+    );
+    res.json({ ok: true });
+  });
+
   app.post("/api/walkin/crm-stats/session", (req, res) => {
     const now = Date.now();
     for (const [key, value] of dashboardUnlockAttempts) {

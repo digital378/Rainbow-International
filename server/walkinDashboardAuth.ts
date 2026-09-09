@@ -2,6 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Request } from "express";
 
 export const WALKIN_DASHBOARD_COOKIE = "walkin_dashboard_session";
+export const WALKIN_INTERNAL_COOKIE = "walkin_internal_session";
 
 type DashboardAccess = "RIS" | "RPS" | "GROUP";
 export type WalkinDashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
@@ -15,6 +16,7 @@ const SCOPE_CONFIG: Record<WalkinDashboardScope, { secretKey: string; access: Da
 
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const sessions = new Map<string, { access: DashboardAccess; expiresAt: number }>();
+const internalSessions = new Map<string, number>();
 
 export function walkinDashboardCookieName(scope: WalkinDashboardScope): string {
   return `${WALKIN_DASHBOARD_COOKIE}_${scope.replace("-", "_")}`;
@@ -55,6 +57,41 @@ export function createWalkinDashboardSession(
   const token = randomBytes(32).toString("base64url");
   sessions.set(token, { access: config.access, expiresAt: Date.now() + SESSION_TTL_MS });
   return token;
+}
+
+export function createTrustedWalkinDashboardSession(scope: WalkinDashboardScope): string | null {
+  if (!process.env.SESSION_SECRET) return null;
+  const token = randomBytes(32).toString("base64url");
+  sessions.set(token, {
+    access: SCOPE_CONFIG[scope].access,
+    expiresAt: Date.now() + SESSION_TTL_MS,
+  });
+  return token;
+}
+
+export function createWalkinInternalSession(passcode: string): string | null {
+  const expectedPasscode = process.env.WALKIN_INTERNAL_DASHBOARD_PASSCODE || "MAIN";
+  if (!safeEqual(expectedPasscode, passcode) || !process.env.SESSION_SECRET) return null;
+  const token = randomBytes(32).toString("base64url");
+  internalSessions.set(token, Date.now() + SESSION_TTL_MS);
+  return token;
+}
+
+export function hasWalkinInternalAccess(req: Request): boolean {
+  const token = parseCookies(req.headers.cookie || "")[WALKIN_INTERNAL_COOKIE];
+  if (!token) return false;
+  const expiresAt = internalSessions.get(token);
+  if (!expiresAt) return false;
+  if (expiresAt <= Date.now()) {
+    internalSessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+export function revokeWalkinInternalSession(req: Request): void {
+  const token = parseCookies(req.headers.cookie || "")[WALKIN_INTERNAL_COOKIE];
+  if (token) internalSessions.delete(token);
 }
 
 export function hasWalkinDashboardAccess(req: Request, brand: "RIS" | "RPS"): boolean {
