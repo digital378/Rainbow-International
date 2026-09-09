@@ -455,7 +455,6 @@ export function registerWalkinRoutes(app: Express) {
       if (brand) conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
       if (status) conditions.push(eq(walkinLeads.status, status));
-      if (source) conditions.push(ilike(walkinLeads.source, source));
       if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
       if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
       if (dateTo) conditions.push(lte(walkinLeads.enquiryDate, dateTo));
@@ -523,7 +522,6 @@ export function registerWalkinRoutes(app: Express) {
           .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
           .filter(lead => !branchId)
           .filter(lead => !status || lead.status === status)
-          .filter(lead => !source || lead.source.toLowerCase() === source.toLowerCase())
           .filter(lead => !leadOwner || lead.leadOwner === leadOwner)
           .filter(lead => !dateFrom || lead.enquiryDate >= dateFrom)
           .filter(lead => !dateTo || lead.enquiryDate <= dateTo)
@@ -569,12 +567,21 @@ export function registerWalkinRoutes(app: Express) {
           });
       });
 
-      const combinedRows = [...databaseRows, ...supplementalRows]
+      const allCombinedRows = [...databaseRows, ...supplementalRows]
         .sort((a, b) => b.enquiryDate.localeCompare(a.enquiryDate));
+      const availableSources = [...new Map(
+        allCombinedRows
+          .map(row => row.source?.trim())
+          .filter((value): value is string => Boolean(value))
+          .map(value => [value.toLowerCase(), value] as const),
+      ).values()].sort((a, b) => a.localeCompare(b));
+      const combinedRows = source
+        ? allCombinedRows.filter(row => row.source.toLowerCase() === source.toLowerCase())
+        : allCombinedRows;
       const total = combinedRows.length;
       const rows = combinedRows.slice(OFFSET, OFFSET + SIZE);
 
-      res.json({ leads: rows, total, page: PAGE, pageSize: SIZE });
+      res.json({ leads: rows, total, page: PAGE, pageSize: SIZE, availableSources });
     } catch (err: any) {
       console.error("[walkin/leads GET]", err?.message);
       res.status(500).json({ message: "Failed to fetch leads" });

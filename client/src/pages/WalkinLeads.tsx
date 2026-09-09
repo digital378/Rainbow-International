@@ -481,6 +481,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [lookups, setLookups] = useState<Lookups | null>(null);
+  const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 50;
 
@@ -523,6 +524,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       const data = await res.json();
       setLeads(data.leads);
       setTotal(data.total);
+      setAvailableSources(data.availableSources ?? []);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -635,7 +637,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </select>
           <select className={selectCls} value={filters.source} onChange={e => applyFilter("source", e.target.value)}>
             <option value="">All Sources</option>
-            {lookups?.sources.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
+            {availableSources.map(source => <option key={source.toLowerCase()} value={source}>{source}</option>)}
           </select>
           <select className={selectCls} value={filters.leadOwner} onChange={e => applyFilter("leadOwner", e.target.value)}>
             <option value="">All Owners</option>
