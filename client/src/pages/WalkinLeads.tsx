@@ -12,7 +12,7 @@ function getToken() {
 
 // ── Types ────────────────────────────────────────────────────────
 type Lead = {
-  id: string; brand: string; branchId: number | null; academicYear: string;
+  id: string; brand: string; branchId: number | null; branchName?: string; academicYear: string;
   enquiryDate: string; monthLabel: string; parentName: string; childName: string;
   phone: string; altPhone: string | null; email: string | null; program: string;
   source: string; status: string; closeReason: string | null; remark: string | null;
@@ -703,7 +703,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   <tr><td colSpan={14} className="text-center py-12 text-slate-400">No leads found</td></tr>
                 )}
                 {!loading && leads.map((lead, i) => {
-                  const branchName = lookups?.branches.find(b => b.id === lead.branchId)?.name;
+                   const branchName = lead.branchName || lookups?.branches.find(b => b.id === lead.branchId)?.name;
                   const rowNum = (page - 1) * PAGE_SIZE + i + 1;
                   return (
                     <tr
@@ -718,9 +718,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         </span>
                       </td>
                       <td className="px-3 py-2.5 text-slate-600">{branchName || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 font-medium text-slate-800 max-w-[120px] truncate" title={lead.parentName}>{lead.parentName}</td>
-                      <td className="px-3 py-2.5 text-slate-600 max-w-[100px] truncate" title={lead.childName}>{lead.childName}</td>
-                      <td className="px-3 py-2.5 font-mono text-slate-700 whitespace-nowrap">{lead.phone}</td>
+                      <td className="px-3 py-2.5 font-medium text-slate-800 max-w-[120px] truncate" title={lead.parentName}>{lead.parentName || <span className="text-slate-300">—</span>}</td>
+                      <td className="px-3 py-2.5 text-slate-600 max-w-[100px] truncate" title={lead.childName}>{lead.childName || <span className="text-slate-300">—</span>}</td>
+                      <td className="px-3 py-2.5 font-mono text-slate-700 whitespace-nowrap">{lead.phone || <span className="text-slate-300">—</span>}</td>
                       <td className="px-3 py-2.5 text-slate-600 max-w-[100px] truncate" title={lead.program}>{lead.program}</td>
                       <td className="px-3 py-2.5 text-slate-500 max-w-[80px] truncate" title={lead.source}>{lead.source}</td>
                       <td className="px-3 py-2.5 whitespace-nowrap">

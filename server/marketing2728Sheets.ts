@@ -4,8 +4,11 @@ import { getGoogleRefreshToken } from "./googleCredentials";
 export type SupplementLead = {
   enquiryDate: string;
   monthLabel: string;
+  parentName: string;
   childName: string;
   phone: string;
+  branchName: string;
+  walkInDate: string | null;
   status: string;
   source: string;
   leadOwner: string;
@@ -24,6 +27,7 @@ export type SupplementMonth = {
 
 export type SupplementResult = {
   leads: SupplementLead[];
+  walkins?: SupplementLead[];
   months: SupplementMonth[];
   fetchedAt: string | null;
   available: boolean;
@@ -155,8 +159,11 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
     leads.push({
       enquiryDate: parsedDate.iso,
       monthLabel: parsedDate.month,
+      parentName: "",
       childName: clean(row[columns.child]),
       phone: clean(row[columns.phone]).replace(/\D/g, "").slice(-10),
+      branchName: "",
+      walkInDate: null,
       status,
       source: clean(row[columns.source]) || "Unknown",
       leadOwner: clean(row[columns.owner]),
@@ -164,6 +171,96 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
     });
   }
   return leads;
+}
+
+type WalkinDetail = SupplementLead;
+
+export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
+  if (!rows.length) return [];
+  const headers = rows[0].map(headerKey);
+  const index = (...names: string[]) => names.map(headerKey).map(name => headers.indexOf(name)).find(i => i >= 0) ?? -1;
+  const columns = {
+    date: index("Date", "Enquiry Date"),
+    parent: index("Father Name", "Parent Name"),
+    child: index("Student Name", "Child Name", "Child's Name"),
+    phone: index("Father Contact", "Phone Number", "Phone", "Contact No"),
+    branch: index("Branch"),
+    walkInDate: index("Admission Date", "Walk-In Date", "Walkin Date"),
+    status: index("Status"),
+    program: index("Program", "Programme", "Grade"),
+    owner: index("Lead Owner", "Counsellor Name"),
+  };
+  if (columns.date < 0) return [];
+
+  return rows.slice(1).flatMap(row => {
+    const parsedDate = normalizeDate(row[columns.date] ?? "");
+    if (!parsedDate) return [];
+    const parsedWalkInDate = columns.walkInDate >= 0
+      ? normalizeDate(row[columns.walkInDate] ?? "")?.iso ?? null
+      : null;
+    return [{
+      enquiryDate: parsedDate.iso,
+      monthLabel: parsedDate.month,
+      parentName: clean(row[columns.parent]),
+      childName: clean(row[columns.child]),
+      phone: clean(row[columns.phone]).replace(/\D/g, "").slice(-10),
+      branchName: clean(row[columns.branch]),
+      walkInDate: parsedWalkInDate,
+      status: clean(row[columns.status]).toUpperCase()
+        .replace(/^WALKIN BOOKED$/, "WALK-IN BOOKED")
+        .replace(/^WALKIN COMPLETED$/, "WALK-IN COMPLETED"),
+      program: clean(row[columns.program]),
+      leadOwner: clean(row[columns.owner]),
+      source: clean(row[index("Source")]) || "Unknown",
+    }];
+  });
+}
+
+function normalizedIdentity(value: string): string {
+  return clean(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): SupplementLead[] {
+  const unused = new Set(walkins.map((_, index) => index));
+  return leads.map(lead => {
+    const candidates = [...unused].filter(index => {
+      const detail = walkins[index];
+      if (detail.enquiryDate !== lead.enquiryDate) return false;
+      const phoneMatch = Boolean(lead.phone && detail.phone && lead.phone === detail.phone);
+      const childMatch = Boolean(
+        lead.childName && detail.childName
+        && normalizedIdentity(lead.childName) === normalizedIdentity(detail.childName),
+      );
+      if (phoneMatch || childMatch) return true;
+
+      // Some legacy tracker rows omit the child and/or phone. Only fall back
+      // to operational fields when they identify exactly one WALKINs row.
+      const identityMissing = !lead.phone || !lead.childName;
+      const programMatch = Boolean(
+        lead.program && detail.program
+        && normalizedIdentity(lead.program) === normalizedIdentity(detail.program),
+      );
+      const ownerMatch = Boolean(
+        lead.leadOwner && detail.leadOwner
+        && normalizedIdentity(lead.leadOwner) === normalizedIdentity(detail.leadOwner),
+      );
+      return identityMissing && programMatch && ownerMatch;
+    });
+    if (candidates.length !== 1) return lead;
+
+    const index = candidates[0];
+    unused.delete(index);
+    const detail = walkins[index];
+    return {
+      ...lead,
+      parentName: detail.parentName || lead.parentName,
+      childName: detail.childName || lead.childName,
+      phone: detail.phone || lead.phone,
+      branchName: detail.branchName || lead.branchName,
+      walkInDate: detail.walkInDate || lead.walkInDate,
+      status: detail.status || lead.status,
+    };
+  });
 }
 
 export function parseDashboardRows(rows: string[][]): SupplementMonth[] {
@@ -228,7 +325,7 @@ export function parseDashboardRows(rows: string[][]): SupplementMonth[] {
   return months;
 }
 
-async function readWithOAuth(brand: "RIS" | "RPS"): Promise<{ leads: string[][]; dashboard: string[][] }> {
+async function readWithOAuth(brand: "RIS" | "RPS"): Promise<{ leads: string[][]; dashboard: string[][]; walkins: string[][] }> {
   const refreshToken = getGoogleRefreshToken();
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -237,27 +334,31 @@ async function readWithOAuth(brand: "RIS" | "RPS"): Promise<{ leads: string[][];
   auth.setCredentials({ refresh_token: refreshToken });
   const sheets = google.sheets({ version: "v4", auth });
   const spreadsheetId = SOURCES[brand].spreadsheetId;
-  const [leadResponse, dashboardResponse] = await Promise.all([
+  const [leadResponse, dashboardResponse, walkinResponse] = await Promise.all([
     sheets.spreadsheets.values.get({ spreadsheetId, range: "'CRM Leads Tracker'!A:Z" }),
     sheets.spreadsheets.values.get({ spreadsheetId, range: "'Eshan Sir Dashboard'!A:Z" }),
+    sheets.spreadsheets.values.get({ spreadsheetId, range: "'WALKINs'!A:Z" }),
   ]);
   return {
     leads: (leadResponse.data.values ?? []) as string[][],
     dashboard: (dashboardResponse.data.values ?? []) as string[][],
+    walkins: (walkinResponse.data.values ?? []) as string[][],
   };
 }
 
-async function readPublicCsv(brand: "RIS" | "RPS"): Promise<{ leads: string[][]; dashboard: string[][] }> {
+async function readPublicCsv(brand: "RIS" | "RPS"): Promise<{ leads: string[][]; dashboard: string[][]; walkins: string[][] }> {
   const source = SOURCES[brand];
   const base = `https://docs.google.com/spreadsheets/d/${source.spreadsheetId}/gviz/tq`;
-  const [leadResponse, dashboardResponse] = await Promise.all([
+  const [leadResponse, dashboardResponse, walkinResponse] = await Promise.all([
     fetch(`${base}?tqx=out:csv&sheet=${encodeURIComponent("CRM Leads Tracker")}`),
     fetch(`${base}?tqx=out:csv&gid=${source.dashboardGid}`),
+    fetch(`${base}?tqx=out:csv&sheet=${encodeURIComponent("WALKINs")}`),
   ]);
-  if (!leadResponse.ok || !dashboardResponse.ok) throw new Error("Supplementary workbook is not accessible");
+  if (!leadResponse.ok || !dashboardResponse.ok || !walkinResponse.ok) throw new Error("Supplementary workbook is not accessible");
   return {
     leads: parseCsv(await leadResponse.text()),
     dashboard: parseCsv(await dashboardResponse.text()),
+    walkins: parseCsv(await walkinResponse.text()),
   };
 }
 
@@ -265,7 +366,7 @@ export async function readMarketing2728Supplement(brand: "RIS" | "RPS"): Promise
   if (process.env.NODE_ENV === "test") {
     return { leads: [], months: [], fetchedAt: null, available: false, mode: "unavailable" };
   }
-  let rows: { leads: string[][]; dashboard: string[][] };
+  let rows: { leads: string[][]; dashboard: string[][]; walkins: string[][] };
   let mode: SupplementResult["mode"] = "oauth";
   let oauthWarning: string | undefined;
   try {
@@ -284,7 +385,8 @@ export async function readMarketing2728Supplement(brand: "RIS" | "RPS"): Promise
   }
   try {
     return {
-      leads: parseLeadRows(rows.leads),
+      leads: enrichLeadRows(parseLeadRows(rows.leads), parseWalkinRows(rows.walkins)),
+      walkins: parseWalkinRows(rows.walkins),
       months: parseDashboardRows(rows.dashboard),
       fetchedAt: new Date().toISOString(),
       available: true,

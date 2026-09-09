@@ -509,8 +509,16 @@ export function registerWalkinRoutes(app: Express) {
 
       const normalizedPhoneQuery = phoneQ?.replace(/\D/g, "").slice(-10);
       const searchLower = search?.trim().toLowerCase();
-      const supplementalRows = supplements.flatMap(({ brand: supplementBrand, result }) =>
-        result.leads
+      const supplementalRows = supplements.flatMap(({ brand: supplementBrand, result }) => {
+        const byIdentity = new Map<string, (typeof result.leads)[number]>();
+        [...result.leads, ...(result.walkins ?? [])].forEach((lead, index) => {
+          const hasIdentity = Boolean(lead.phone || lead.childName);
+          const key = hasIdentity
+            ? supplementLeadKey(lead)
+            : `unmatched|${lead.enquiryDate}|${lead.program}|${lead.leadOwner}|${index}`;
+          byIdentity.set(key, lead);
+        });
+        return [...byIdentity.values()]
           .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
           .filter(lead => !branchId)
           .filter(lead => !status || lead.status === status)
@@ -518,7 +526,7 @@ export function registerWalkinRoutes(app: Express) {
           .filter(lead => !dateFrom || lead.enquiryDate >= dateFrom)
           .filter(lead => !dateTo || lead.enquiryDate <= dateTo)
           .filter(lead => !normalizedPhoneQuery || lead.phone.includes(normalizedPhoneQuery))
-          .filter(lead => !searchLower || [lead.childName, lead.phone]
+          .filter(lead => !searchLower || [lead.parentName, lead.childName, lead.phone]
             .some(value => value.toLowerCase().includes(searchLower)))
           .map(lead => {
             const identity = `${supplementBrand}|${supplementLeadKey(lead)}`;
@@ -527,10 +535,11 @@ export function registerWalkinRoutes(app: Express) {
               id: `crm-${createHash("sha256").update(identity).digest("hex").slice(0, 20)}`,
               brand: supplementBrand,
               branchId: null,
+              branchName: lead.branchName,
               academicYear: "2027-28",
               enquiryDate: lead.enquiryDate,
               monthLabel: lead.monthLabel,
-              parentName: "",
+              parentName: lead.parentName,
               motherName: null,
               childName: lead.childName,
               phone: lead.phone,
@@ -542,7 +551,7 @@ export function registerWalkinRoutes(app: Express) {
               closeReason: null,
               remark: null,
               leadOwner: lead.leadOwner || null,
-              walkInDate: null,
+              walkInDate: lead.walkInDate,
               revisitDate: null,
               revisitDate2: null,
               misCallingRemarks: null,
@@ -555,8 +564,8 @@ export function registerWalkinRoutes(app: Express) {
               updatedAt: timestamp,
               readOnly: true,
             };
-          }),
-      );
+          });
+      });
 
       const combinedRows = [...databaseRows, ...supplementalRows]
         .sort((a, b) => b.enquiryDate.localeCompare(a.enquiryDate));
