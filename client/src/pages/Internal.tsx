@@ -92,16 +92,6 @@ const DASHBOARDS_2627: Dashboard[] = [
       "RPS branch-wise CRM pipeline, lead status breakdown, monthly performance vs targets, and closed-reason analysis across all centres.",
     accent: "#7c3aed",
   },
-  {
-    name: "Alliances Dashboard",
-    url: "/alliances",
-    passcode: "ALLIANCES_PASSCODE",
-    envVar: true,
-    who: "Alliances Team",
-    description:
-      "Brand Partners, Corporate tie-ups, Friendship Schools, and Parent Advocacy — referral lead pipeline, MOU status, monthly targets, and CRM sync.",
-    accent: "#d97706",
-  },
 ];
 
 /* ── AY 27-28 data ───────────────────────────────────────────────────────────── */
@@ -181,6 +171,16 @@ const DASHBOARDS_2728: Dashboard[] = [
     description:
       "AY 27-28 RPS live lead funnel by branch — CRM status, pipeline health, conversion metrics, and branch-wise breakdown.",
     accent: "#7c3aed",
+  },
+  {
+    name: "Alliances Dashboard",
+    url: "/alliances",
+    passcode: "ALLIANCES_PASSCODE",
+    envVar: true,
+    who: "Alliances Team",
+    description:
+      "Brand Partners, Corporate tie-ups, Friendship Schools, and Parent Advocacy — referral lead pipeline, MOU status, monthly targets, and CRM sync.",
+    accent: "#d97706",
   },
   {
     name: "Leads CRM",
@@ -489,26 +489,36 @@ export default function Internal() {
           </div>
         </section>
 
-        {/* ── Legend ── */}
+        {/* ── Passcodes ── */}
         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Passcode Legend</p>
-          <div className="flex flex-wrap gap-3 text-xs">
-            <span className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded bg-slate-800 text-white font-mono font-bold">XXXX</span>
-              <span className="text-slate-600">Hardcoded passcode — enter directly in the dashboard</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 font-semibold">🔐 env secret</span>
-              <span className="text-slate-600">Set via Replit Secrets — ask admin for value</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded bg-orange-50 border border-orange-200 text-orange-700 font-semibold">🔑 Admin token</span>
-              <span className="text-slate-600">Uses ADMIN_TOKEN / RIS_ADMIN_TOKEN / RPS_ADMIN_TOKEN env secrets</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded bg-green-50 border border-green-200 text-green-700 font-semibold">🔓 Open</span>
-              <span className="text-slate-600">No passcode — accessible to anyone with the URL</span>
-            </span>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dashboard Passcodes</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+            {[
+              ["Internal Directory", PASSCODE],
+              ["Marketing 2026–27", "8888"],
+              ["RIS Sales 2026–27", "RIS8"],
+              ["RPS Sales 2026–27", "RPS8"],
+              ["Marketing 2027–28", "MKT27"],
+              ["RIS Sales 2027–28", "RIS27"],
+              ["RPS Sales 2027–28", "RPS27"],
+            ].map(([label, code]) => (
+              <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                <span className="text-slate-600">{label}</span>
+                <span className="px-2 py-0.5 rounded bg-slate-800 text-white font-mono font-bold tracking-wider">{code}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+              <span className="text-amber-800">Alliances</span>
+              <span className="font-semibold text-amber-700">🔐 Ask admin</span>
+            </div>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
+              <span className="text-orange-800">Leads CRM &amp; Admin Panel</span>
+              <span className="font-semibold text-orange-700">🔑 Admin token</span>
+            </div>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2">
+              <span className="text-green-800">Group Overview</span>
+              <span className="font-semibold text-green-700">🔓 No passcode</span>
+            </div>
           </div>
         </div>
 
