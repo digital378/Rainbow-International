@@ -443,7 +443,7 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/leads", requireAdmin, async (req, res) => {
     try {
       const {
-        brand, branchId, status, leadOwner, dateFrom, dateTo, phone: phoneQ,
+        brand, branchId, status, source, leadOwner, dateFrom, dateTo, phone: phoneQ,
         search, page = "1", pageSize = "50", includeArchived,
       } = req.query as Record<string, string>;
 
@@ -455,6 +455,7 @@ export function registerWalkinRoutes(app: Express) {
       if (brand) conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
       if (status) conditions.push(eq(walkinLeads.status, status));
+      if (source) conditions.push(ilike(walkinLeads.source, source));
       if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
       if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
       if (dateTo) conditions.push(lte(walkinLeads.enquiryDate, dateTo));
@@ -522,6 +523,7 @@ export function registerWalkinRoutes(app: Express) {
           .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
           .filter(lead => !branchId)
           .filter(lead => !status || lead.status === status)
+          .filter(lead => !source || lead.source.toLowerCase() === source.toLowerCase())
           .filter(lead => !leadOwner || lead.leadOwner === leadOwner)
           .filter(lead => !dateFrom || lead.enquiryDate >= dateFrom)
           .filter(lead => !dateTo || lead.enquiryDate <= dateTo)
@@ -584,7 +586,7 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/leads/export", requireAdmin, async (req, res) => {
     try {
       const {
-        brand, branchId, status, leadOwner, dateFrom, dateTo,
+        brand, branchId, status, source, leadOwner, dateFrom, dateTo,
       } = req.query as Record<string, string>;
       const format = typeof req.query.format === "string" ? req.query.format : "xlsx";
 
@@ -592,6 +594,7 @@ export function registerWalkinRoutes(app: Express) {
       if (brand)    conditions.push(eq(walkinLeads.brand, brand));
       if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
       if (status)   conditions.push(eq(walkinLeads.status, status));
+      if (source)   conditions.push(ilike(walkinLeads.source, source));
       if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
       if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
       if (dateTo)   conditions.push(lte(walkinLeads.enquiryDate, dateTo));

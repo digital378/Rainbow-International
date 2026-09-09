@@ -485,7 +485,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const PAGE_SIZE = 50;
 
   const [filters, setFilters] = useState({
-    brand: "", branchId: "", status: "", leadOwner: "",
+    brand: "", branchId: "", status: "", source: "", leadOwner: "",
     dateFrom: "", dateTo: "", search: "", showArchived: false,
   });
 
@@ -510,6 +510,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
         ...(f.brand && { brand: f.brand }),
         ...(f.branchId && { branchId: f.branchId }),
         ...(f.status && { status: f.status }),
+        ...(f.source && { source: f.source }),
         ...(f.leadOwner && { leadOwner: f.leadOwner }),
         ...(f.dateFrom && { dateFrom: f.dateFrom }),
         ...(f.dateTo && { dateTo: f.dateTo }),
@@ -549,6 +550,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       ...(filters.brand && { brand: filters.brand }),
       ...(filters.branchId && { branchId: filters.branchId }),
       ...(filters.status && { status: filters.status }),
+      ...(filters.source && { source: filters.source }),
       ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
       ...(filters.dateTo && { dateTo: filters.dateTo }),
       token,
@@ -631,6 +633,10 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             <option value="">All Statuses</option>
             {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
           </select>
+          <select className={selectCls} value={filters.source} onChange={e => applyFilter("source", e.target.value)}>
+            <option value="">All Sources</option>
+            {lookups?.sources.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
+          </select>
           <select className={selectCls} value={filters.leadOwner} onChange={e => applyFilter("leadOwner", e.target.value)}>
             <option value="">All Owners</option>
             {ownerOptions.map(o => <option key={o} value={o}>{o}</option>)}
@@ -659,9 +665,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             />
             Show archived
           </label>
-          {(filters.brand || filters.branchId || filters.status || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
+          {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
             <button
-              onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); }}
+              onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); }}
               className="text-xs text-amber-600 font-semibold underline"
             >Clear filters</button>
           )}
