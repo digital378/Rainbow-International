@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { lockWalkinDashboard, unlockWalkinDashboard } from "@/lib/walkinDashboardAuth";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", SLATE = "#64748b", GREY = "#94a3b8";
-const PASSCODE = "OVER";
 const AUTH_KEY = "walkin_overview_2728_auth";
 
 type Stats = {
@@ -24,12 +24,20 @@ const fmt = (n: number) => n.toLocaleString("en-IN");
 function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = () => {
-    if (code.trim().toUpperCase() === PASSCODE) {
-      try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {}
-      onSuccess();
-      return;
+  const submit = async () => {
+    setSubmitting(true);
+    try {
+      if (await unlockWalkinDashboard(code.trim().toUpperCase(), "overview")) {
+        try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {}
+        onSuccess();
+        return;
+      }
+    } catch {
+      // Show the same generic failure as an incorrect passcode.
+    } finally {
+      setSubmitting(false);
     }
     setError(true);
     setCode("");
@@ -55,8 +63,8 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
           data-testid="input-passcode"
         />
         {error && <div className="mt-2 text-center text-sm text-red-600">Incorrect passcode</div>}
-        <button onClick={submit} className="mt-4 w-full rounded-lg py-2.5 font-bold text-white" style={{ background: NAVY }}>
-          Open dashboard
+        <button onClick={submit} disabled={submitting} className="mt-4 w-full rounded-lg py-2.5 font-bold text-white disabled:opacity-60" style={{ background: NAVY }}>
+          {submitting ? "Checking…" : "Open dashboard"}
         </button>
       </div>
     </div>
@@ -179,13 +187,19 @@ function Dashboard({ onLock }: { onLock: () => void }) {
     const qs = bust ? "?brand=RIS&ay=2027-28&bust=1" : "?brand=RIS&ay=2027-28";
     const qsRps = bust ? "?brand=RPS&ay=2027-28&bust=1" : "?brand=RPS&ay=2027-28";
     Promise.all([
-      fetch(`/api/walkin/crm-stats${qs}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-      fetch(`/api/walkin/crm-stats${qsRps}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch(`/api/walkin/crm-stats${qs}`).then(r => {
+        if (r.status === 401) onLock();
+        return r.ok ? r.json() : Promise.reject(r.statusText);
+      }),
+      fetch(`/api/walkin/crm-stats${qsRps}`).then(r => {
+        if (r.status === 401) onLock();
+        return r.ok ? r.json() : Promise.reject(r.statusText);
+      }),
     ]).then(([ris, rps]: [Stats, Stats]) => {
       if (!cancelled.current) { setRisStats(ris); setRpsStats(rps); setError(null); setLastFetch(new Date()); }
     }).catch(e => { if (!cancelled.current) setError(String(e)); })
       .finally(() => { if (!cancelled.current) setLoading(false); });
-  }, []);
+  }, [onLock]);
 
   useEffect(() => {
     document.title = "Group Overview · AY 2027-28";
@@ -300,11 +314,13 @@ export default function WalkinOverview2728() {
   const [authed, setAuthed] = useState(() => {
     try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
   });
+  const handleLock = useCallback(() => {
+    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
+    void lockWalkinDashboard("overview");
+    setAuthed(false);
+  }, []);
 
   if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
 
-  return <Dashboard onLock={() => {
-    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
-    setAuthed(false);
-  }} />;
+  return <Dashboard onLock={handleLock} />;
 }

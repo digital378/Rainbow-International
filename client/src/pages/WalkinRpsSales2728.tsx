@@ -3,13 +3,13 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Line,
 } from "recharts";
+import { lockWalkinDashboard, unlockWalkinDashboard } from "@/lib/walkinDashboardAuth";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", PURPLE = "#7c3aed", SLATE = "#475569";
 const RPS_GRAD = "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)";
 const PIE_COLORS = [RED, AMBER, GREEN, NAVY, BLUE, PURPLE, SLATE, "#0891b2", "#ea580c"];
 
-const PASSCODE = "RPS27";
 const AUTH_KEY  = "rps27_sales_auth";
 
 type CounsellorStat = { leadOwner: string; leads: number; walkins: number; admissions: number; closed: number; open: number };
@@ -46,9 +46,9 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [error, setError] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => { document.title = "RPS Sales · AY 2027-28"; ref.current?.focus(); }, []);
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === PASSCODE) { try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {} onSuccess(); }
+    if (await unlockWalkinDashboard(code, "rps-sales")) { try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {} onSuccess(); }
     else { setError(true); setCode(""); setTimeout(() => setError(false), 600); }
   };
   return (
@@ -163,7 +163,7 @@ function MonthRangeFilter({
 }
 
 /* ── Main Dashboard ────────────────────────────── */
-function Dashboard() {
+function Dashboard({ onLock }: { onLock: () => void }) {
   const [data, setData]       = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
@@ -177,11 +177,14 @@ function Dashboard() {
     setLoading(true);
     const url = bust ? "/api/walkin/crm-stats?brand=RPS&ay=2027-28&bust=1" : "/api/walkin/crm-stats?brand=RPS&ay=2027-28";
     fetch(url)
-      .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+      .then(r => {
+        if (r.status === 401) onLock();
+        return r.ok ? r.json() : Promise.reject(r.statusText);
+      })
       .then((d: Stats) => { if (!cancelled.current) { setData(d); setError(null); setLastFetch(new Date()); } })
       .catch(e => { if (!cancelled.current) setError(String(e)); })
       .finally(() => { if (!cancelled.current) setLoading(false); });
-  }, []);
+  }, [onLock]);
 
   useEffect(() => {
     document.title = "RPS Sales · AY 2027-28";
@@ -279,7 +282,7 @@ function Dashboard() {
             {loading && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
             {lastFetch && <div className="text-xs text-red-200">Updated {lastFetch.toLocaleTimeString()}</div>}
             <button onClick={() => fetchData()} disabled={loading} className="text-xs text-red-100 hover:text-white transition px-3 py-1.5 rounded bg-white/20 hover:bg-white/30">↻ Refresh</button>
-            <button onClick={() => { try { sessionStorage.removeItem(AUTH_KEY); } catch {} window.location.reload(); }}
+            <button onClick={onLock}
               className="text-xs text-red-100 hover:text-white transition px-3 py-1.5 rounded border border-white/30">Lock</button>
           </div>
         </div>
@@ -553,6 +556,11 @@ export default function WalkinRpsSales2728() {
   const [authed, setAuthed] = useState<boolean>(() => {
     try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
   });
+  const handleLock = useCallback(() => {
+    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
+    void lockWalkinDashboard("rps-sales");
+    setAuthed(false);
+  }, []);
   if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
-  return <Dashboard />;
+  return <Dashboard onLock={handleLock} />;
 }

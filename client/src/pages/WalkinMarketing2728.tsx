@@ -3,6 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Line,
 } from "recharts";
+import { lockWalkinDashboard, unlockWalkinDashboard } from "@/lib/walkinDashboardAuth";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", PURPLE = "#7c3aed", SLATE = "#475569";
@@ -14,7 +15,6 @@ const QUIET_WARM = "#c4936d";
 const QUIET_ROSE = "#b77d78";
 const QUIET_STATUS_COLORS = [QUIET_BLUE, QUIET_BLUE_LIGHT, QUIET_WARM, QUIET_TEAL, QUIET_ROSE, "#91a8bd", "#788896"];
 
-const PASSCODE = "MKT27";
 const AUTH_KEY  = "mkt27_auth";
 
 type CounsellorStat = { leadOwner: string; leads: number; walkins: number; admissions: number; closed: number; open: number };
@@ -152,9 +152,9 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [error, setError] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => { document.title = "Marketing · AY 2027-28"; ref.current?.focus(); }, []);
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === PASSCODE) { try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {} onSuccess(); }
+    if (await unlockWalkinDashboard(code, "marketing")) { try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {} onSuccess(); }
     else { setError(true); setCode(""); setTimeout(() => setError(false), 600); }
   };
   return (
@@ -572,7 +572,7 @@ function DashboardContent({ stats, brandTab }: { stats: Stats; brandTab: BrandTa
 }
 
 /* ── Main Dashboard shell ──────────────────────── */
-function Dashboard() {
+function Dashboard({ onLock }: { onLock: () => void }) {
   const [risStats, setRisStats] = useState<Stats | null>(null);
   const [rpsStats, setRpsStats] = useState<Stats | null>(null);
   const [loading, setLoading]   = useState(true);
@@ -586,13 +586,19 @@ function Dashboard() {
     const qs = bust ? "?brand=RIS&ay=2027-28&bust=1" : "?brand=RIS&ay=2027-28";
     const qsRps = bust ? "?brand=RPS&ay=2027-28&bust=1" : "?brand=RPS&ay=2027-28";
     Promise.all([
-      fetch(`/api/walkin/crm-stats${qs}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
-      fetch(`/api/walkin/crm-stats${qsRps}`).then(r => r.ok ? r.json() : Promise.reject(r.statusText)),
+      fetch(`/api/walkin/crm-stats${qs}`).then(r => {
+        if (r.status === 401) onLock();
+        return r.ok ? r.json() : Promise.reject(r.statusText);
+      }),
+      fetch(`/api/walkin/crm-stats${qsRps}`).then(r => {
+        if (r.status === 401) onLock();
+        return r.ok ? r.json() : Promise.reject(r.statusText);
+      }),
     ]).then(([ris, rps]: [Stats, Stats]) => {
       if (!cancelled.current) { setRisStats(ris); setRpsStats(rps); setError(null); setLastFetch(new Date()); }
     }).catch(e => { if (!cancelled.current) setError(String(e)); })
       .finally(() => { if (!cancelled.current) setLoading(false); });
-  }, []);
+  }, [onLock]);
 
   useEffect(() => {
     document.title = "Marketing · AY 2027-28";
@@ -643,7 +649,7 @@ function Dashboard() {
           {lastFetch && `Updated: ${lastFetch.toLocaleTimeString()}`}
           {loading && " · refreshing…"}
           <button onClick={() => fetchData()} className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300">Refresh</button>
-          <button onClick={() => { try { sessionStorage.removeItem(AUTH_KEY); } catch {} window.location.reload(); }}
+          <button onClick={onLock}
             className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">Lock</button>
         </div>
       </div>
@@ -682,6 +688,11 @@ export default function WalkinMarketing2728() {
   const [authed, setAuthed] = useState<boolean>(() => {
     try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
   });
+  const handleLock = useCallback(() => {
+    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
+    void lockWalkinDashboard("marketing");
+    setAuthed(false);
+  }, []);
   if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
-  return <Dashboard />;
+  return <Dashboard onLock={handleLock} />;
 }

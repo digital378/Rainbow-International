@@ -138,7 +138,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Group Overview",
     url: "/overview-27-28",
-    passcode: "OVER",
+    passcode: "Staff passcode",
     who: "All Stakeholders",
     description:
       "High-level walk-in pipeline across all RIS and RPS branches — total leads, walk-ins, and admissions for AY 27-28.",
@@ -147,7 +147,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Marketing Dashboard",
     url: "/marketing-27-28",
-    passcode: "MKT27",
+    passcode: "Staff passcode",
     who: "Marketing Team",
     description:
       "AY 27-28 marketing performance — campaign spend (Meta + Google), CPL, CPB, combined RIS + RPS brand view, and weekly trends.",
@@ -156,7 +156,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "RIS Sales Dashboard",
     url: "/sales-27-28",
-    passcode: "RIS27",
+    passcode: "Staff passcode",
     who: "RIS Counselors",
     description:
       "AY 27-28 RIS live lead funnel — walk-in captures from kiosk, counselor assignments, booking and admission tracking.",
@@ -165,7 +165,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "RPS Sales Dashboard",
     url: "/rps-sales-27-28",
-    passcode: "RPS27",
+    passcode: "Staff passcode",
     who: "RPS Counselors",
     description:
       "AY 27-28 RPS live lead funnel by branch — CRM status, pipeline health, conversion metrics, and branch-wise breakdown.",
@@ -497,10 +497,10 @@ export default function Internal() {
               ["Marketing 2026–27", "/marketing", "8888"],
               ["RIS Sales 2026–27", "/sales", "RIS8"],
               ["RPS Sales 2026–27", "/rps-sales", "RPS8"],
-              ["Marketing 2027–28", "/marketing-27-28", "MKT27"],
-              ["RIS Sales 2027–28", "/sales-27-28", "RIS27"],
-              ["RPS Sales 2027–28", "/rps-sales-27-28", "RPS27"],
-              ["Group Overview", "/overview-27-28", "OVER"],
+              ["Marketing 2027–28", "/marketing-27-28", "Staff passcode"],
+              ["RIS Sales 2027–28", "/sales-27-28", "Staff passcode"],
+              ["RPS Sales 2027–28", "/rps-sales-27-28", "Staff passcode"],
+              ["Group Overview", "/overview-27-28", "Staff passcode"],
             ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <span>

@@ -34,9 +34,15 @@ import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resync
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
+import {
+  createWalkinDashboardSession,
+  hasWalkinDashboardAccess,
+  revokeWalkinDashboardSession,
+  walkinDashboardCookieName,
+  type WalkinDashboardScope,
+} from "./walkinDashboardAuth";
 
 // ── Helpers ─────────────────────────────────────────────────────
-
 function isAdmin(req: Express["request"]): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
   if (!adminToken) return false;
@@ -205,6 +211,13 @@ const updateLeadSchema = z.object({
 // ── Route Registration ───────────────────────────────────────────
 
 export function registerWalkinRoutes(app: Express) {
+  const dashboardUnlockAttempts = new Map<string, { count: number; windowStartedAt: number }>();
+  const dashboardScopes = new Set<WalkinDashboardScope>([
+    "ris-sales",
+    "rps-sales",
+    "overview",
+    "marketing",
+  ]);
 
   // ── GET /api/walkin/lookups ────────────────────────────────────
   // Returns lookup values for the kiosk form dropdowns.
@@ -1049,15 +1062,69 @@ export function registerWalkinRoutes(app: Express) {
   // Query params:
   //   brand  — required; "RIS" or "RPS"
   //   bust   — optional; any truthy value forces a fresh read (admin only)
-  // Public: returns only aggregated counts (no PII). Tokens are accepted
-  // but not required — external callers (Training Platform) may pass
-  // RIS_ADMIN_TOKEN / RPS_ADMIN_TOKEN for future scoped endpoints, but
-  // this endpoint is open so internal dashboards work without headers.
+  app.post("/api/walkin/crm-stats/session", (req, res) => {
+    const now = Date.now();
+    for (const [key, value] of dashboardUnlockAttempts) {
+      if (now - value.windowStartedAt > 5 * 60_000) dashboardUnlockAttempts.delete(key);
+    }
+
+    const forwarded = String(req.headers["x-forwarded-for"] || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const clientKey = forwarded.at(-1) || req.socket.remoteAddress || "unknown";
+    if (!dashboardUnlockAttempts.has(clientKey) && dashboardUnlockAttempts.size >= 1_000) {
+      const oldestKey = dashboardUnlockAttempts.keys().next().value;
+      if (oldestKey) dashboardUnlockAttempts.delete(oldestKey);
+    }
+    const attempt = dashboardUnlockAttempts.get(clientKey);
+    if (!attempt || now - attempt.windowStartedAt > 5 * 60_000) {
+      dashboardUnlockAttempts.set(clientKey, { count: 1, windowStartedAt: now });
+    } else {
+      attempt.count++;
+      if (attempt.count > 10) {
+        return res.status(429).json({ message: "Too many attempts. Please try again later." });
+      }
+    }
+
+    const passcode = String(req.body?.passcode || "");
+    const scope = String(req.body?.scope || "") as WalkinDashboardScope;
+    if (!dashboardScopes.has(scope)) return res.status(400).json({ message: "Invalid dashboard scope" });
+    const session = createWalkinDashboardSession(passcode, scope);
+    if (!session) return res.status(401).json({ ok: false });
+    dashboardUnlockAttempts.delete(clientKey);
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader(
+      "Set-Cookie",
+      `${walkinDashboardCookieName(scope)}=${session}; Path=/api/walkin/crm-stats; HttpOnly; SameSite=Strict${secure}`,
+    );
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/walkin/crm-stats/session", (req, res) => {
+    const scope = String(req.body?.scope || "") as WalkinDashboardScope;
+    if (!dashboardScopes.has(scope)) return res.status(400).json({ message: "Invalid dashboard scope" });
+    revokeWalkinDashboardSession(req, scope);
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    res.setHeader(
+      "Set-Cookie",
+      `${walkinDashboardCookieName(scope)}=; Path=/api/walkin/crm-stats; HttpOnly; SameSite=Strict; Max-Age=0${secure}`,
+    );
+    res.status(204).end();
+  });
+
+  // Requires a server-issued dashboard session or a scoped API/admin token.
   app.get("/api/walkin/crm-stats", async (req, res) => {
     try {
       const brand = typeof req.query.brand === "string" ? req.query.brand : null;
       if (!brand || !["RIS", "RPS"].includes(brand)) {
         return res.status(400).json({ message: "brand must be RIS or RPS" });
+      }
+      if (
+        !hasWalkinDashboardAccess(req, brand as "RIS" | "RPS") &&
+        !isBrandAuthorized(req, brand)
+      ) {
+        return res.status(401).json({ message: "Unauthorized" });
       }
 
       // Only admins may bypass the cache
