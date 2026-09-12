@@ -33,6 +33,14 @@ export const inquiryAbuseBuckets = pgTable("inquiry_abuse_buckets", {
   index("inquiry_abuse_buckets_updated_at_idx").on(table.updatedAt),
 ]);
 
+export const ganeshGalleryDownloads = pgTable("ganesh_gallery_downloads", {
+  assetId: text("asset_id").primaryKey(),
+  downloadCount: integer("download_count").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type GaneshGalleryDownload = typeof ganeshGalleryDownloads.$inferSelect;
+
 const safeTrackingValue = (maxLength: number, label: string) =>
   z.string()
     .trim()

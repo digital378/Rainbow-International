@@ -694,6 +694,38 @@ export async function registerRoutes(
     }
   });
 
+  const ganeshGalleryAssetIds = [
+    "golden-line-art", "bal-ganesha", "newspaper-collage", "grand-procession",
+    "textile-art", "sand-sculpture", "painted-portrait", "nature-sculpture",
+    "blessing-portrait", "cosmic-ganesha",
+  ] as const;
+  const ganeshGalleryAssetSet = new Set<string>(ganeshGalleryAssetIds);
+
+  app.get("/api/ganesh-gallery/download-counts", async (_req, res) => {
+    try {
+      const rows = await storage.getGaneshGalleryDownloadCounts([...ganeshGalleryAssetIds]);
+      const stored = new Map(rows.map((row) => [row.assetId, row.downloadCount]));
+      res.json({
+        counts: Object.fromEntries(ganeshGalleryAssetIds.map((id) => [id, stored.get(id) ?? 0])),
+      });
+    } catch {
+      res.status(500).json({ message: "Failed to fetch download counts" });
+    }
+  });
+
+  app.post("/api/ganesh-gallery/:assetId/download", async (req, res) => {
+    const assetId = req.params.assetId;
+    if (!ganeshGalleryAssetSet.has(assetId)) {
+      return res.status(400).json({ message: "Unknown gallery image" });
+    }
+    try {
+      const row = await storage.incrementGaneshGalleryDownload(assetId);
+      res.json({ id: row.assetId, count: row.downloadCount });
+    } catch {
+      res.status(500).json({ message: "Failed to record download" });
+    }
+  });
+
   // ── Inquiries ───────────────────────────────────────────────
   app.post("/api/inquiries", async (req, res) => {
     try {

@@ -9,8 +9,9 @@ import {
   type BlogPost, type InsertBlogPost,
   type FriendshipSchool, type InsertFriendshipSchool,
   type FriendshipSchoolLead, type InsertFriendshipLead,
+  type GaneshGalleryDownload,
   inquiries, events, callbackRequests, careerApplications, brochureRequests, ras, walkinCheckins, blogPostsTable,
-  friendshipSchools, friendshipSchoolLeads,
+  friendshipSchools, friendshipSchoolLeads, ganeshGalleryDownloads,
 } from "@shared/schema";
 import { db } from "./db";
 import { desc, eq, gte, and, sql, count, inArray } from "drizzle-orm";
@@ -57,6 +58,8 @@ export interface IStorage {
   updateBlogPost(originalSlug: string, data: InsertBlogPost): Promise<BlogPost | undefined>;
   deleteBlogPost(slug: string): Promise<void>;
   getAllBlogSlugs(): Promise<string[]>;
+  getGaneshGalleryDownloadCounts(assetIds: string[]): Promise<GaneshGalleryDownload[]>;
+  incrementGaneshGalleryDownload(assetId: string): Promise<GaneshGalleryDownload>;
 
   // Friendship Schools
   createFriendshipSchool(school: InsertFriendshipSchool): Promise<FriendshipSchool>;
@@ -296,6 +299,28 @@ export class DbStorage implements IStorage {
         publishedAt: data.publishedAt,
       })
       .where(eq(blogPostsTable.slug, originalSlug))
+      .returning();
+    return result;
+  }
+
+  async getGaneshGalleryDownloadCounts(assetIds: string[]): Promise<GaneshGalleryDownload[]> {
+    return await db
+      .select()
+      .from(ganeshGalleryDownloads)
+      .where(inArray(ganeshGalleryDownloads.assetId, assetIds));
+  }
+
+  async incrementGaneshGalleryDownload(assetId: string): Promise<GaneshGalleryDownload> {
+    const [result] = await db
+      .insert(ganeshGalleryDownloads)
+      .values({ assetId, downloadCount: 1, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: ganeshGalleryDownloads.assetId,
+        set: {
+          downloadCount: sql`${ganeshGalleryDownloads.downloadCount} + 1`,
+          updatedAt: new Date(),
+        },
+      })
       .returning();
     return result;
   }
