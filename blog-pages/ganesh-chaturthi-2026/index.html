@@ -177,8 +177,15 @@ tbody tr:nth-child(even){background:var(--green-lt)}
 .quiz-a{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);color:var(--navy);font-weight:600}
 .reveal-all-btn{background:transparent;border:2px solid var(--primary);color:var(--primary);padding:8px 18px;border-radius:999px;cursor:pointer;font-weight:600}
 /* image grid */
-.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px;margin:1.2em 0}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;margin:1.5em 0}
 .img-placeholder{aspect-ratio:1/1;border:2px dashed var(--primary);border-radius:var(--radius);background:repeating-linear-gradient(135deg,var(--saffron-lt),var(--saffron-lt) 10px,#fff 10px,#fff 20px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;gap:4px;transition:transform .15s ease-out;will-change:transform}
+.download-image-card{margin:0;border:1px solid var(--line);background:var(--cream);transition:transform .18s ease,box-shadow .18s ease}
+.download-image-card:hover{transform:translateY(-4px);box-shadow:0 18px 38px rgba(23,32,68,.12)}
+.download-image-card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--deep)}
+.download-image-card figcaption{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:15px}
+.download-image-card .img-caption{margin:0;text-align:left;color:var(--ink);font-size:.88rem;line-height:1.45}
+.image-download-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ink);padding:9px 14px;background:var(--ink);color:#fff;font:600 .76rem/1 var(--sans);letter-spacing:.04em;text-decoration:none;text-transform:uppercase}
+.image-download-btn:hover{background:var(--saffron);border-color:var(--saffron);color:#fff}
 .img-slot-num{font-family:var(--font-heading);font-weight:800;font-size:1.3rem;color:var(--primary)}
 .img-slot-dim{font-size:.72rem;color:var(--text-muted)}
 .img-slot-theme{font-size:.78rem;color:var(--navy)}
@@ -242,13 +249,13 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
 .folio-portal{min-height:clamp(420px,67vh,760px);display:grid;align-content:center;position:relative;overflow:hidden;padding:clamp(74px,10vw,140px) max(30px,calc((100% - 1040px)/2));background:var(--deep);color:var(--cream);isolation:isolate}.folio-portal:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,transparent 0 46px,rgba(201,155,76,.08) 47px,transparent 48px),radial-gradient(circle at 80% 55%,rgba(201,155,76,.18),transparent 18%);z-index:-1}.folio-portal:after{content:attr(data-numeral);position:absolute;right:8%;bottom:-18%;font:600 clamp(13rem,35vw,35rem)/1 var(--serif);color:rgba(201,155,76,.1);z-index:-1}.folio-portal--paper{background:var(--cream);color:var(--ink)}.folio-portal--paper:before{background:radial-gradient(circle at 78% 48%,rgba(201,155,76,.13),transparent 18%),repeating-linear-gradient(120deg,transparent 0 46px,rgba(23,32,68,.045) 47px,transparent 48px)}.folio-kicker{margin:0 0 23px;color:var(--gold);font:10px var(--mono);letter-spacing:.15em;text-transform:uppercase}.folio-portal h2{max-width:720px;margin:0;border:0;padding:0;color:inherit;font:600 clamp(4.2rem,10vw,9.5rem)/.74 var(--serif);letter-spacing:-.065em}.folio-portal h2:before{display:none}.folio-portal h2 em{color:var(--gold);font-weight:500}.folio-portal p:last-child{max-width:420px;margin:35px 0 0;color:inherit;font:500 1.3rem/1.38 var(--serif);opacity:.84}.folio-portal--paper p:last-child{color:#504a3e}.section{padding:clamp(60px,8vw,112px) 0;background:var(--cream)!important;border-bottom:1px solid var(--line)}.section:nth-of-type(even){background:var(--paper)!important}.section .container{max-width:940px}.section.reveal,.section.reveal.in{opacity:1;transform:none;transition:none}h2{color:var(--ink);font:600 clamp(2.5rem,5vw,4.35rem)/.91 var(--serif);letter-spacing:-.05em}h2:before{width:38px;height:1px;background:var(--saffron);margin-bottom:21px}h3,h4{color:var(--ink);font-family:var(--sans)}.p,.list{max-width:740px}.p{font-size:1rem}.table-wrap,.copy-card,.quiz-card,.faq-item,.idea-card,.img-placeholder{box-shadow:none}table,.copy-card,.quiz-card,.faq-item,.idea-card{border-radius:0;border-color:var(--line);background:var(--cream)}th{background:var(--ink);border-color:var(--ink)}td{border-color:var(--line)}tbody tr:nth-child(odd){background:#fbf3e4}tbody tr:nth-child(even){background:#edf1ea}
 .flip-card{height:205px}.flip-card-front,.flip-card-back{border-radius:0;box-shadow:none}.flip-card-front{background:var(--ink);border-top:2px solid var(--gold)}.flip-card-back{background:#f9f0df;border:1px solid var(--line)}.flip-card-inner{transition:transform .45s cubic-bezier(.2,.8,.2,1)}.flip-num{color:var(--gold)}.reveal-btn,.copy-btn,.btn-primary{border-radius:0;background:var(--ink)}.reveal-all-btn,.btn-outline{border-radius:0;border-color:var(--ink)}.lang-tabs{gap:0;border-bottom:1px solid var(--line)}.lang-tab-btn{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:12px 18px}.lang-tab-btn.active{background:transparent;border-color:var(--saffron);color:var(--ink)}.tab-panel{animation:leaf-in .25s ease both}@keyframes leaf-in{from{opacity:.35;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}.faq-q{background:var(--cream);padding:19px 20px}.faq-a{background:#f7f0e3;border-left:2px solid var(--gold)}.idea-card{transition:transform .16s ease,box-shadow .16s ease}.idea-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(23,32,68,.1)}.img-placeholder{border-radius:0;border-color:var(--saffron);background:repeating-linear-gradient(135deg,#fbf3e4,#fbf3e4 10px,#fcf8ef 10px,#fcf8ef 20px)}.wishcard-tool{border-radius:0;border-color:var(--gold);background:#f8ecd8;padding:28px}.schools-section,footer{background:var(--deep)}.btn{border-radius:0}.back-to-top{border-radius:0;background:var(--saffron)}
 /* Hero devotional artwork */
-.school-masthead{height:88px;background:#fff;border-bottom:1px solid #e7dfd0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px clamp(20px,4vw,58px);position:relative;z-index:3}.school-masthead img{width:72px;height:68px;object-fit:contain;justify-self:start}.school-masthead-name{color:var(--ink);font:600 clamp(1.05rem,1.7vw,1.45rem)/1.1 var(--serif);letter-spacing:.015em;text-align:center}.hero{align-items:start;padding:42px 0 76px}.hero-layout{display:grid;grid-template-columns:minmax(0,46%) minmax(440px,54%);align-items:start;gap:clamp(18px,2vw,34px)}.hero-copy{min-width:0}.hero .breadcrumb{display:none}.hero h1{font-size:clamp(3.55rem,5.7vw,5.7rem);line-height:.81;letter-spacing:-.058em}.hero-title-gold{display:inline}.hero-title-gold .hero-title-line{background:linear-gradient(105deg,#9f671b 0%,#e2ac43 17%,#fff0a0 34%,#c48220 52%,#f7d66c 68%,#a86516 84%,#e3b34d 100%);background-size:180% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 1px 0 rgba(255,238,151,.18),0 5px 18px rgba(201,155,76,.12)}.hero-title-line{display:block}.ganesha-hero-art{display:block;width:min(100%,570px);height:auto;max-height:850px;object-fit:contain;justify-self:end;margin-top:0;filter:drop-shadow(0 22px 42px rgba(0,0,0,.2));user-select:none}.hero:after{display:none}
-/* Sacred tilak cursor */
-.cursor-dot{width:5px;height:15px;border-radius:70% 70% 48% 48%;background:var(--vermilion);box-shadow:0 0 0 1px rgba(252,248,239,.7);transform:translate(-50%,-50%)}.cursor-ring{width:30px;height:38px;border:1px solid var(--gold);opacity:.7;transition:width .18s,height .18s,opacity .18s,border-color .18s,transform .05s linear;transform:translate(-50%,-50%);box-shadow:inset 0 0 0 4px rgba(201,155,76,.08),0 0 14px rgba(201,155,76,.14)}.cursor-ring:after{content:"";position:absolute;left:50%;bottom:3px;width:3px;height:3px;border-radius:50%;background:var(--gold);transform:translateX(-50%)}.cursor-ring.big{width:42px;height:52px;opacity:.95;border-color:var(--gold)}
+.school-masthead{height:88px;background:#fff;border-bottom:1px solid #e7dfd0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:8px clamp(20px,4vw,58px);position:relative;z-index:3}.school-masthead img{width:72px;height:68px;object-fit:contain;justify-self:start}.school-masthead-name{color:var(--ink);font:600 clamp(1.05rem,1.7vw,1.45rem)/1.1 var(--serif);letter-spacing:.015em;text-align:center}.hero{align-items:start;padding:42px 0 64px}.hero-layout{display:grid;grid-template-columns:minmax(0,48%) minmax(400px,52%);align-items:start;gap:clamp(18px,2vw,34px)}.hero-copy{min-width:0}.hero .breadcrumb{display:none}.hero h1{font-size:clamp(3.55rem,5.7vw,5.7rem);line-height:.81;letter-spacing:-.058em}.hero-title-gold{display:inline}.hero-title-gold .hero-title-line{background:linear-gradient(105deg,#9f671b 0%,#e2ac43 17%,#fff0a0 34%,#c48220 52%,#f7d66c 68%,#a86516 84%,#e3b34d 100%);background-size:180% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-shadow:0 1px 0 rgba(255,238,151,.18),0 5px 18px rgba(201,155,76,.12)}.hero-title-line{display:block}.ganesha-hero-art{display:block;width:min(100%,500px);height:auto;max-height:750px;object-fit:contain;justify-self:end;margin-top:0;filter:drop-shadow(0 22px 42px rgba(0,0,0,.2));user-select:none}.hero-details{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(28px,5vw,72px);align-items:start;margin-top:8px;padding-top:28px;border-top:1px solid rgba(201,155,76,.22)}.hero-author .hero-sub{margin-top:0}.hero-author .meta-bar{display:flex;flex-direction:column;align-items:flex-start}.hero-details .countdown-bar{max-width:none;margin-top:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}.hero:after{display:none}
+/* Naamam cursor */
+.cursor-dot{width:4px;height:22px;border-radius:70% 70% 45% 45%;background:var(--vermilion);box-shadow:0 0 0 1px rgba(252,248,239,.72),0 0 10px rgba(158,62,42,.28);transform:translate(-50%,-43%)}.cursor-ring{width:26px;height:34px;border:0;opacity:.86;transition:width .18s,height .18s,opacity .18s,transform .05s linear;transform:translate(-50%,-50%);box-shadow:none}.cursor-ring:before{content:"";position:absolute;inset:1px 2px 2px;border-left:3px solid var(--gold);border-right:3px solid var(--gold);border-bottom:3px solid var(--gold);border-radius:0 0 50% 50%;filter:drop-shadow(0 0 5px rgba(201,155,76,.28))}.cursor-ring:after{content:"";position:absolute;left:50%;top:-3px;width:5px;height:5px;background:var(--gold);transform:translateX(-50%) rotate(45deg)}.cursor-ring.big{width:36px;height:46px;opacity:1}
 /* Premium wish-card frame */
 .wishcard-tool{position:relative;overflow:hidden;box-shadow:0 24px 60px rgba(23,32,68,.08)}.wishcard-tool:before,.wishcard-tool:after{content:"";position:absolute;pointer-events:none}.wishcard-tool:before{inset:8px;border:1px solid rgba(201,155,76,.5)}.wishcard-tool:after{width:140px;height:140px;right:-70px;top:-70px;border:1px solid rgba(201,155,76,.35);border-radius:50%;box-shadow:0 0 0 12px rgba(201,155,76,.06)}.wishcard-tool>*{position:relative;z-index:1}#wishCanvas{border:1px solid rgba(201,155,76,.62);box-shadow:0 22px 45px rgba(13,21,54,.2)}
-@media(max-width:900px){.hero-layout{grid-template-columns:minmax(0,49%) minmax(330px,51%);gap:18px}.hero h1{font-size:clamp(3.15rem,7.2vw,4.5rem)}.ganesha-hero-art{width:100%;height:auto;max-height:690px;margin-top:30px}}
-@media(max-width:640px){.school-masthead{height:82px;display:flex;justify-content:center;padding:7px 20px}.school-masthead img{width:72px;height:66px;justify-self:auto}.school-masthead-name{display:none}.hero{min-height:0;padding:52px 0 58px}.hero:after{display:none}.hero-layout{grid-template-columns:1fr;gap:32px}.hero-copy{display:contents}.breadcrumb{order:0;margin-bottom:10px}.hero h1{order:1;font-size:clamp(3rem,15vw,4.65rem)}.hero-sub{order:2}.meta-bar{order:3}.countdown-bar{order:4}.ganesha-hero-art{order:5;width:min(64vw,250px);height:auto;max-height:none;justify-self:center;margin-top:4px}.quickjump a{font-size:8px}.folio-portal{min-height:410px;padding:92px 24px 64px}.folio-portal>*{position:relative;z-index:1}.folio-portal h2{font-size:clamp(3.7rem,16vw,5.8rem)}.folio-portal:after{right:20px;top:22px;bottom:auto;width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(201,155,76,.58);border-radius:50%;background:rgba(201,155,76,.08);color:var(--gold);font:600 1.28rem/1 var(--serif);z-index:0}.folio-portal--paper:after{background:rgba(201,155,76,.1)}.section{padding:58px 0}.wishcard-tool{padding:22px}.flip-grid{grid-template-columns:1fr;gap:14px}.flip-card{height:250px}.flip-card-back{overflow:visible;padding:24px}.flip-card-back .p{font-size:.95rem;line-height:1.55}}
+@media(max-width:900px){.hero-layout{grid-template-columns:minmax(0,49%) minmax(330px,51%);gap:18px}.hero h1{font-size:clamp(3.15rem,7.2vw,4.5rem)}.ganesha-hero-art{width:100%;height:auto;max-height:690px;margin-top:30px}.hero-details{gap:24px}.hero-details .countdown-bar{grid-template-columns:1fr}}
+@media(max-width:640px){.school-masthead{height:82px;display:flex;justify-content:center;padding:7px 20px}.school-masthead img{width:72px;height:66px;justify-self:auto}.school-masthead-name{display:none}.hero{min-height:0;padding:52px 0 58px}.hero:after{display:none}.hero-layout{grid-template-columns:1fr;gap:28px}.hero-copy{display:block;order:1}.hero h1{font-size:clamp(3rem,15vw,4.65rem)}.ganesha-hero-art{order:2;width:min(76vw,290px);height:auto;max-height:none;justify-self:center;margin:0}.hero-details{order:3;grid-column:1;grid-template-columns:1fr;gap:22px;margin-top:0;padding-top:25px}.hero-author .hero-sub{margin-top:0}.hero-details .countdown-bar{grid-template-columns:1fr;margin-top:0}.quickjump a{font-size:8px}.folio-portal{min-height:410px;padding:92px 24px 64px}.folio-portal>*{position:relative;z-index:1}.folio-portal h2{font-size:clamp(3.7rem,16vw,5.8rem)}.folio-portal:after{right:20px;top:22px;bottom:auto;width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(201,155,76,.58);border-radius:50%;background:rgba(201,155,76,.08);color:var(--gold);font:600 1.28rem/1 var(--serif);z-index:0}.folio-portal--paper:after{background:rgba(201,155,76,.1)}.section{padding:58px 0}.wishcard-tool{padding:22px}.flip-grid{grid-template-columns:1fr;gap:14px}.flip-card{height:250px}.flip-card-back{overflow:visible;padding:24px}.flip-card-back .p{font-size:.95rem;line-height:1.55}.img-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}.hero:after{display:none}.section.reveal{opacity:1!important;transform:none!important}}
 </style>
 </head>
@@ -271,9 +278,14 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
   <span class="current">Ganesh Chaturthi 2026</span>
 </nav>
     <h1><span class="hero-title-gold"><span class="hero-title-line">Ganesh</span><span class="hero-title-line">Chaturthi</span><span class="hero-title-line">2026:</span></span><span class="hero-title-line">History,</span><span class="hero-title-line">Significance,</span><span class="hero-title-line">Speeches,</span><span class="hero-title-line">Essays &amp;</span><span class="hero-title-line">Celebration</span><span class="hero-title-line">Guide</span></h1>
-    <p class="hero-sub">By Rainbow International School, Thane | Updated for the 2026 festival season</p>
-    <div class="meta-bar"><span>Rainbow International School</span><span>Ganesh Chaturthi 2026 · 14–25 September</span></div>
-    <div class="countdown-bar" role="group" aria-label="Countdown to Ganesh Chaturthi 2026">
+    </div>
+    <img class="ganesha-hero-art" src="/ganesha-hero-gold.png" alt="Golden devotional line artwork of Lord Ganesha" width="1024" height="1536" decoding="async" fetchpriority="high">
+    <div class="hero-details">
+      <div class="hero-author">
+        <p class="hero-sub">By Rainbow International School, Thane | Updated for the 2026 festival season</p>
+        <div class="meta-bar"><span>Rainbow International School</span><span>Ganesh Chaturthi 2026 · 14–25 September</span></div>
+      </div>
+      <div class="countdown-bar" role="group" aria-label="Countdown to Ganesh Chaturthi 2026">
       <div class="countdown-item">
         <span class="countdown-label">Ganesh Sthapana — Mon, 14 Sep 2026</span>
         <span class="countdown-value" id="cdSthapana">Calculating…</span>
@@ -282,9 +294,8 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
         <span class="countdown-label">Visarjan (Anant Chaturdashi) — Fri, 25 Sep 2026</span>
         <span class="countdown-value" id="cdVisarjan">Calculating…</span>
       </div>
+      </div>
     </div>
-    </div>
-    <img class="ganesha-hero-art" src="/ganesha-hero-gold.png" alt="Golden devotional line artwork of Lord Ganesha" width="1024" height="1536" decoding="async" fetchpriority="high">
    </div>
   </div>
 </div>
@@ -724,93 +735,54 @@ Meaning: &quot;O bestower of happiness, remover of sorrows and troubles, whose l
     <div class="container">
       <h2>Downloadable Ganpati Bappa Images — 1080 × 1080 px (Free for Social Media)</h2>
       <div class="img-grid">
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Ganpati Bappa Morya — Ganesh Chaturthi 2026 devotional portrait">
-        <span class="img-slot-num">1</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Elegant Ganpati Bappa portrait</span>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/golden-line-art-preview.webp" alt="Golden line-art portrait of Lord Ganesha with a diya and Naamam" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Golden Ganesha line art — a serene devotional image for Ganesh Chaturthi wishes.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/golden-line-art-1080.jpg" download="golden-ganesha-line-art-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/bal-ganesha-preview.webp" alt="Bal Ganesha and Mushak peeking into a lamp-lit temple" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Bal Ganesha arrives — a playful temple scene filled with lamps, flowers and festive warmth.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/bal-ganesha-1080.jpg" download="bal-ganesha-temple-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/newspaper-collage-preview.webp" alt="Lord Ganesha crafted as a newspaper and manuscript collage" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Wisdom in every word — an expressive Ganesha artwork shaped from newspaper and manuscript textures.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/newspaper-collage-1080.jpg" download="ganesha-newspaper-collage-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/grand-procession-preview.webp" alt="Grand Ganeshotsav procession with Lord Ganesha and a divine golden backdrop" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Ganpati Bappa Morya — the colour, devotion and energy of a grand public Ganeshotsav procession.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/grand-procession-1080.jpg" download="grand-ganeshotsav-procession-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/textile-art-preview.webp" alt="Textile-inspired Lord Ganesha illustration with Mushak" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Tradition woven with imagination — a tactile textile-style Ganesha with his faithful Mushak.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/textile-art-1080.jpg" download="ganesha-textile-art-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/sand-sculpture-preview.webp" alt="Eco-friendly Lord Ganesha sand sculpture at sunset" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Made from the earth, returned with care — an eco-conscious Ganesha sand sculpture at sunset.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/sand-sculpture-1080.jpg" download="eco-ganesha-sand-sculpture-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/painted-portrait-preview.webp" alt="Vibrant hand-painted portrait of Lord Ganesha" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">A celebration in colour — a vibrant painted portrait welcoming Bappa with joy.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/painted-portrait-1080.jpg" download="vibrant-ganesha-portrait-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/nature-sculpture-preview.webp" alt="Lord Ganesha sculpture formed from stone, leaves and natural textures" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Bappa in harmony with nature — an imaginative sculpture formed from stone, leaves and woodland textures.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/nature-sculpture-1080.jpg" download="nature-ganesha-sculpture-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/blessing-portrait-preview.webp" alt="Traditional portrait of Lord Ganesha raising his hand in blessing" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">May wisdom guide every beginning — a traditional portrait of Ganesha offering his blessing.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/blessing-portrait-1080.jpg" download="ganesha-blessing-portrait-1080.jpg">Download image</a></figcaption>
+        </figure>
+        <figure class="download-image-card">
+          <img src="/ganesh-chaturthi-2026/gallery/cosmic-ganesha-preview.webp" alt="Cosmic blue artwork of Lord Ganesha surrounded by luminous energy" width="720" height="720" loading="lazy" decoding="async">
+          <figcaption><p class="img-caption">Infinite wisdom, luminous presence — a cosmic blue vision of Lord Ganesha.</p><a class="image-download-btn" href="/ganesh-chaturthi-2026/gallery/cosmic-ganesha-1080.jpg" download="cosmic-blue-ganesha-1080.jpg">Download image</a></figcaption>
+        </figure>
       </div>
-      <p class="img-caption">"Ganpati Bappa Morya! 🙏🐘 #GaneshChaturthi2026"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Eco-friendly shadu clay Ganesha idol for Ganesh Chaturthi">
-        <span class="img-slot-num">2</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Eco-friendly clay Ganesha idol</span>
-      </div>
-      <p class="img-caption">"This year, an eco-friendly Bappa 🌱"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Lord Ganesha holding a modak, Ganesh Chaturthi 2026">
-        <span class="img-slot-num">3</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Ganesha with modak</span>
-      </div>
-      <p class="img-caption">"Sweetness of wisdom, sweetness of Bappa 🍬"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Ganesha festive silhouette, Ganeshotsav 2026">
-        <span class="img-slot-num">4</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Ganesha silhouette with tricolour/festive lights</span>
-      </div>
-      <p class="img-caption">"Welcoming Bappa with joy and light ✨"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Vighnaharta Ganesha art, Ganesh Chaturthi wishes">
-        <span class="img-slot-num">5</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Vighnaharta themed art</span>
-      </div>
-      <p class="img-caption">"Vighnaharta, remove every obstacle 🙏"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Dhol tasha Ganeshotsav Maharashtra celebration">
-        <span class="img-slot-num">6</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Dhol-tasha / Maharashtra cultural theme</span>
-      </div>
-      <p class="img-caption">"Dhol beats, Bappa's welcome! 🥁"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Ganpati Bappa Morya text greeting card">
-        <span class="img-slot-num">7</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Ganpati Bappa Morya text art</span>
-      </div>
-      <p class="img-caption">"Ganpati Bappa Morya, Mangal Murti Morya!"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Ganesha with durva grass offering, Ganesh Chaturthi 2026">
-        <span class="img-slot-num">8</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Ganesha with flowers/durva grass</span>
-      </div>
-      <p class="img-caption">"Blessed with wisdom this Ganesh Chaturthi 🌿"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Ganpati visarjan farewell greeting, Anant Chaturdashi">
-        <span class="img-slot-num">9</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Visarjan/farewell themed art</span>
-      </div>
-      <p class="img-caption">"Pudhchya Varshi Lawkar Ya! 🙏"</p>
-    </div>
-    <div class="img-slot">
-      <div class="img-placeholder" role="img" aria-label="Rainbow International School Ganesh Chaturthi 2026 greeting">
-        <span class="img-slot-num">10</span>
-        <span class="img-slot-dim">1080 × 1080</span>
-        <span class="img-slot-theme">Rainbow International School branded Ganesh Chaturthi greeting</span>
-      </div>
-      <p class="img-caption">"Ganesh Chaturthi wishes from Rainbow International School!"</p>
-    </div></div>
-    <p class="img-note">Placeholder grid — drop the final 1080×1080 images in to replace each box; captions and alt text are pre-written above.</p>
+      <p class="img-note">Each download is supplied as a high-quality 1080 × 1080 JPEG, ready for WhatsApp, Instagram and other social platforms.</p>
     </div>
   </section>
 <section class="section wishcard-section" id="create-your-own-wish-card">
     <div class="container">
       <h2>Create Your Own Ganpati Wish Card</h2>
-      <p class="p">Pick a line below, personalise it, and download a ready-to-share 1080 × 1080 image for WhatsApp, Instagram, or your family group — a quick option while the premium photo set above is on its way.</p>
+      <p class="p">Pick a line below, personalise it, and download a ready-to-share 1080 × 1080 image for WhatsApp, Instagram, or your family group.</p>
       <div class="wishcard-tool">
         <div class="wishcard-controls">
           <label for="wishSlogan">Choose a message</label>
@@ -999,7 +971,7 @@ if (canHover && !reducedMotion) {
     cursorDot.style.left = e.clientX + 'px'; cursorDot.style.top = e.clientY + 'px';
     cursorRing.style.left = e.clientX + 'px'; cursorRing.style.top = e.clientY + 'px';
   });
-  var hoverSelector = 'a, button, .flip-card, .idea-card, .img-placeholder, input, select, .quickjump a';
+  var hoverSelector = 'a, button, .flip-card, .idea-card, .download-image-card, input, select, .quickjump a';
   document.addEventListener('mouseover', function(e){ if (e.target.closest && e.target.closest(hoverSelector)) cursorRing.classList.add('big'); });
   document.addEventListener('mouseout', function(e){ if (e.target.closest && e.target.closest(hoverSelector)) cursorRing.classList.remove('big'); });
 }
@@ -1015,7 +987,7 @@ function attachTilt(el){
   el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
 }
 if (canHover && !reducedMotion) {
-  document.querySelectorAll('.img-placeholder, .idea-card').forEach(attachTilt);
+  document.querySelectorAll('.download-image-card, .idea-card').forEach(attachTilt);
 }
 
 // ---------- Sthapana / Visarjan countdown (dates are also stated as plain static text above) ----------
@@ -1069,32 +1041,16 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight){
   var startY = y - ((out.length - 1) * lineHeight) / 2;
   out.forEach(function(l, i){ ctx.fillText(l, x, startY + i * lineHeight); });
 }
-function drawWishMotif(ctx, cx, cy, r){
+var wishHeroArt = new Image();
+wishHeroArt.decoding = 'async';
+wishHeroArt.src = '/ganesha-hero-gold.png';
+function drawWishMotif(ctx, cx, top, height){
+  if (!wishHeroArt.complete || !wishHeroArt.naturalWidth) return;
+  var width = height * (wishHeroArt.naturalWidth / wishHeroArt.naturalHeight);
   ctx.save();
-  var gold = cssVar('--gold') || '#c99b4c';
-  ctx.strokeStyle = gold; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.arc(cx, cy, r * 1.2, 0, Math.PI * 2); ctx.stroke();
-  ctx.strokeStyle = 'rgba(201,155,76,.42)'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(cx, cy, r * 1.38, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = gold;
-  var dots = 20;
-  for (var i = 0; i < dots; i++){
-    var a = (i / dots) * Math.PI * 2;
-    var dx = cx + Math.cos(a) * r * 1.38, dy = cy + Math.sin(a) * r * 1.38;
-    ctx.beginPath(); ctx.arc(dx, dy, 3.5, 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.strokeStyle = gold; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  // Compact Temple Seal: crown, ears, face and a gently curling trunk.
-  ctx.beginPath(); ctx.moveTo(cx,cy-r*.88);ctx.quadraticCurveTo(cx-r*.26,cy-r*.55,cx-r*.3,cy-r*.22);ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx,cy-r*.88);ctx.quadraticCurveTo(cx+r*.26,cy-r*.55,cx+r*.3,cy-r*.22);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-r*.28,cy-r*.38);ctx.bezierCurveTo(cx-r*.9,cy-r*.72,cx-r*1.02,cy+r*.22,cx-r*.42,cy+r*.24);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx+r*.28,cy-r*.38);ctx.bezierCurveTo(cx+r*.9,cy-r*.72,cx+r*1.02,cy+r*.22,cx+r*.42,cy+r*.24);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-r*.28,cy-r*.17);ctx.bezierCurveTo(cx-r*.3,cy+r*.18,cx+r*.02,cy+r*.16,cx,cy+r*.5);ctx.bezierCurveTo(cx-r*.04,cy+r*.92,cx+r*.36,cy+r*.9,cx+r*.5,cy+r*.62);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(cx-r*.22,cy-r*.05);ctx.quadraticCurveTo(cx-r*.1,cy+r*.04,cx,cy-r*.04);ctx.moveTo(cx+r*.05,cy-r*.04);ctx.quadraticCurveTo(cx+r*.16,cy+r*.04,cx+r*.27,cy-r*.05);ctx.stroke();
-  ctx.fillStyle = cssVar('--saffron') || '#c85e2c';
-  ctx.beginPath();
-  ctx.moveTo(cx, cy-r*.34);ctx.quadraticCurveTo(cx+r*.08,cy-r*.2,cx,cy-r*.08);ctx.quadraticCurveTo(cx-r*.08,cy-r*.2,cx,cy-r*.34);
-  ctx.fill();
+  ctx.shadowColor = 'rgba(201,155,76,.2)';
+  ctx.shadowBlur = 22;
+  ctx.drawImage(wishHeroArt, cx - width / 2, top, width, height);
   ctx.restore();
 }
 function drawWishCard(){
@@ -1108,7 +1064,7 @@ function drawWishCard(){
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   ctx.strokeStyle='rgba(201,155,76,.75)';ctx.lineWidth=3;ctx.strokeRect(W*.035,H*.035,W*.93,H*.93);
   ctx.strokeStyle='rgba(201,155,76,.26)';ctx.lineWidth=1;ctx.strokeRect(W*.052,H*.052,W*.896,H*.896);
-  drawWishMotif(ctx, W / 2, H * 0.33, W * 0.135);
+  drawWishMotif(ctx, W / 2, H * 0.08, H * 0.43);
   ctx.textAlign = 'center';
   ctx.fillStyle = cssVar('--amber') || '#FBBF24';
   ctx.font = '800 ' + Math.round(W * 0.062) + 'px "DM Sans", sans-serif';
@@ -1141,6 +1097,7 @@ function refreshWishCard(withConfetti){
 }
 if (wishGenBtn) wishGenBtn.addEventListener('click', function(){ refreshWishCard(true); });
 if (wishSelect) wishSelect.addEventListener('change', function(){ refreshWishCard(false); });
+wishHeroArt.addEventListener('load', function(){ refreshWishCard(false); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ refreshWishCard(false); });
 else refreshWishCard(false);
 
