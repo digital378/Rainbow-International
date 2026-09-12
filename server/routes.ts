@@ -419,6 +419,7 @@ export async function registerRoutes(
   // Ganesh Chaturthi 2026 static blog — preserve the supplied crawlable HTML,
   // embedded styles and interactions without routing it through the SPA or SSR.
   const ganeshChaturthiBlogDir = path.join(process.cwd(), "blog-pages/ganesh-chaturthi-2026");
+  app.get(/^\/blog\/ganesh-chaturthi-2026\/$/, (_req, res) => res.redirect(301, "/blog/ganesh-chaturthi-2026"));
   app.use("/blog/ganesh-chaturthi-2026", express.static(ganeshChaturthiBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/ganesh-chaturthi-2026", (_req, res) => res.sendFile(path.join(ganeshChaturthiBlogDir, "index.html")));
 
