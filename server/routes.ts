@@ -56,6 +56,7 @@ import {
   type CounselorPerformanceRecord,
 } from "./counselorPerformance";
 import { checkInquiryProtection } from "./inquiryProtection";
+import { parseParentAdvocacySheet } from "@shared/parentAdvocacyPac";
 import {
   escapeHtml,
   getLeadSourceLabel,
@@ -4955,7 +4956,7 @@ paths:
         fetchSheetRange(SID, "Brand Partners!A:T"),
         fetchSheetRange(SID, "Corporate Tie-ups!A:R"),
         fetchSheetRange(SID, "Friendship Schools!A:R"),
-        fetchSheetRange(SID, "Parent Advocacy!A:N"),
+        fetchSheetRange(SID, "Parent Advocacy!A:AZ"),
       ]);
 
       const n = (v: string | undefined) => { const x = parseFloat((v ?? "").replace(/,/g, "")); return isNaN(x) ? 0 : x; };
@@ -5037,30 +5038,8 @@ paths:
           totalAdm: n(r[16]) + n(r[17]),
         }));
 
-      // Parent Advocacy
-      // Actual sheet columns (A:N, 0-indexed):
-      // 0=S.No  1=Student Name (RIS student)  2=Branch  3=Ward-Class
-      // 4=Father Name  5=Mother Name  6=Contact Number
-      // 7=Partner Status (H)  8=Referred Family Name  9=Grade Applying For
-      // 10=Status (referral lead stage)  11=Date Referred  12=Last Update  13=Incentive Given?
-      const parentAdvocacy = paRows.slice(1)
-        .filter(r => r[1] && r[1].trim())
-        .map(r => ({
-          sno: r[0] ?? "",
-          referringParent: r[1] ?? "",
-          branch: r[2] ?? "",
-          wardClass: r[3] ?? "",
-          fatherName: r[4] ?? "",
-          motherName: r[5] ?? "",
-          contactNumber: r[6] ?? "",
-          partnerStatus: r[7] ?? "",
-          referredFamily: r[8] ?? "",
-          gradeApplying: r[9] ?? "",
-          status: r[10] ?? "",
-          dateReferred: r[11] ?? "",
-          lastUpdate: r[12] ?? "",
-          incentiveGiven: r[13] ?? "",
-        }));
+      // Parent Advocacy is header-driven because PAC columns may be inserted over time.
+      const { parentAdvocacy, pacMeetings } = parseParentAdvocacySheet(paRows);
 
       // ── Computed aggregates ────────────────────────────────────
       const PIPELINE_STAGES = ["Not Contacted","Initial Discussion","Touchbase Done","Waiting for Revert","MOU Sent","MOU Signing Pending","MOU Done","Not Interested / Dropped"];
@@ -5153,6 +5132,7 @@ paths:
         paStatuses: PA_STATUSES,
         paPartnerStatuses: PA_PARTNER_STATUSES,
         partnerStatusCounts,
+        pacMeetings,
       });
     } catch (err: any) {
       console.error("[alliances] error:", err?.message);

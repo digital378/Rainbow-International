@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import FriendshipQRTab from "./FriendshipQRTab";
+import { matchesParentAdvocacyFilters } from "@shared/parentAdvocacyPac";
 
 const AUTH_KEY = "alliances_auth_v1";
 
@@ -29,7 +30,9 @@ interface ParentAdvocacy {
   referredFamily: string; gradeApplying: string; status: string;
   dateReferred: string; lastUpdate: string; incentiveGiven: string;
   partnerStatus: string;
+  pacAttendance: Record<string, string>;
 }
+interface PacMeeting { key: string; label: string; date: string; attendedCount: number; }
 interface OwnerEntry { name: string; total: number; mouDone: number; admissions: number; followUp: number; }
 interface CategoryEntry { name: string; total: number; mouDone: number; admissions: number; }
 interface AlliancesData {
@@ -51,6 +54,7 @@ interface AlliancesData {
   paStatuses: string[];
   paPartnerStatuses: string[];
   partnerStatusCounts: { accepted: number; pending: number; rejected: number; notReached: number; };
+  pacMeetings: PacMeeting[];
 }
 
 // ── Stage colours ──────────────────────────────────────────────
@@ -1043,28 +1047,18 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
 function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const [search, setSearch] = useState("");
   const [filterPartnerStatus, setFilterPartnerStatus] = useState("");
+  const [filterPac, setFilterPac] = useState("");
+  const [filterPacAttendance, setFilterPacAttendance] = useState("");
 
   // partnerStatus filter options (including a synthetic "Not yet reached" for blank rows)
   const PA_PARTNER_STATUS_OPTIONS = ["Accepted", "To be Decided", "Rejected", "Not yet reached"];
 
-  const rows = data.parentAdvocacy.filter(p => {
-    if (filterPartnerStatus) {
-      if (filterPartnerStatus === "Not yet reached") {
-        if (p.partnerStatus?.trim()) return false;
-      } else {
-        if (p.partnerStatus !== filterPartnerStatus) return false;
-      }
-    }
-    if (search) {
-      const q = search.toLowerCase();
-      if (!p.referringParent.toLowerCase().includes(q) &&
-          !p.referredFamily.toLowerCase().includes(q) &&
-          !p.fatherName.toLowerCase().includes(q) &&
-          !p.motherName.toLowerCase().includes(q) &&
-          !p.contactNumber.includes(q)) return false;
-    }
-    return true;
-  });
+  const rows = data.parentAdvocacy.filter(p => matchesParentAdvocacyFilters(p, {
+    partnerStatus: filterPartnerStatus,
+    pacKey: filterPac,
+    pacAttendance: filterPacAttendance as "Attended" | "Not attended" | "",
+    search,
+  }));
 
   // Ambassador acceptance rate: Accepted ÷ (Accepted + Rejected) — excludes still-pending
   const psc = data.partnerStatusCounts;
@@ -1164,6 +1158,41 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 
         {/* ── Section 2: Referral Pipeline (conditional) ── */}
         <div>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Parent Ambassador Circle Meetings</div>
+          {data.pacMeetings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              {data.pacMeetings.map(meeting => {
+                const eligible = data.parentAdvocacy.length;
+                const rate = eligible > 0 ? Math.round((meeting.attendedCount / eligible) * 100) : 0;
+                return (
+                  <div key={meeting.key} className="rounded-xl border border-amber-100 bg-amber-50/50 px-4 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-black text-[#091a4f]">{meeting.label}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{meeting.date || "Meeting date not recorded"}</div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-xl font-black" style={{ color: C.amber }}><AN value={meeting.attendedCount} /></div>
+                        <div className="text-[10px] text-slate-500">attended</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 h-1.5 rounded-full bg-white overflow-hidden">
+                      <div className="h-full rounded-full bg-amber-400" style={{ width: `${Math.min(rate, 100)}%` }} />
+                    </div>
+                    <div className="mt-1 text-[10px] text-slate-400">{rate}% of targeted parents</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400 italic py-0.5">
+              No PAC meetings have been recorded yet
+            </p>
+          )}
+        </div>
+
+        {/* ── Section 3: Referral Pipeline (conditional) ── */}
+        <div>
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Referral Pipeline</div>
           {hasReferrals ? (
             <div className="flex flex-wrap gap-3">
@@ -1208,6 +1237,17 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
         <Select value={filterPartnerStatus} onChange={setFilterPartnerStatus}
           options={PA_PARTNER_STATUS_OPTIONS} placeholder="All ambassador statuses" />
+        {data.pacMeetings.length > 0 && (
+          <>
+            <Select value={filterPac} onChange={v => {
+              setFilterPac(v);
+              if (!v) setFilterPacAttendance("");
+            }} options={data.pacMeetings.map(meeting => meeting.key)} placeholder="All PAC meetings" />
+            <Select value={filterPacAttendance} onChange={setFilterPacAttendance}
+              options={["Attended", "Not attended"]} placeholder="Any attendance"
+            />
+          </>
+        )}
         <div className="ml-auto text-sm text-slate-500">{rows.length} shown</div>
       </div>
 
@@ -1219,6 +1259,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Student Name</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Ambassador Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 min-w-[180px]">PAC Attendance</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
@@ -1242,6 +1283,26 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                         p.partnerStatus.toLowerCase().includes("reject") || p.partnerStatus.toLowerCase().includes("declin") ? "bg-red-100 text-red-700" :
                         "bg-amber-100 text-amber-700"
                       }`}>{p.partnerStatus}</span>
+                    ) : <span className="text-slate-400 text-xs">—</span>}
+                  </td>
+                  <td className="px-4 py-2.5">
+                    {data.pacMeetings.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {data.pacMeetings.map(meeting => {
+                          const attendedDate = p.pacAttendance?.[meeting.key];
+                          return (
+                            <span
+                              key={meeting.key}
+                              title={attendedDate ? `${meeting.label}: attended ${attendedDate}` : `${meeting.label}: not attended`}
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                attendedDate ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-400"
+                              }`}
+                            >
+                              {meeting.label}{attendedDate ? ` · ${attendedDate}` : " · —"}
+                            </span>
+                          );
+                        })}
+                      </div>
                     ) : <span className="text-slate-400 text-xs">—</span>}
                   </td>
                   <td className="px-4 py-2.5 text-slate-600 text-xs">{p.referredFamily || "—"}</td>
