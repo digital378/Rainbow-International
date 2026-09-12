@@ -266,11 +266,12 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
 @media(max-width:900px){.hero-layout{grid-template-columns:minmax(0,49%) minmax(0,1fr);gap:18px}.hero h1{font-size:clamp(3.15rem,7.2vw,4.5rem)}.ganesha-hero-art{width:100%;height:auto;max-height:690px;margin-top:30px}.hero-details{gap:24px}.hero-details .countdown-bar{grid-template-columns:1fr}}
 @media(max-width:640px){.school-masthead{height:82px;display:flex;justify-content:center;padding:7px 20px}.school-masthead img{width:72px;height:66px;justify-self:auto}.school-masthead-name{display:none}.hero{min-height:0;padding:52px 0 58px}.hero:after{display:none}.hero-layout{grid-template-columns:1fr;gap:28px}.hero-copy{display:block;order:1}.hero h1{font-size:clamp(3rem,15vw,4.65rem)}.ganesha-hero-art{order:2;width:min(76vw,290px);height:auto;max-height:none;justify-self:center;margin:0}.hero-details{order:3;grid-column:1;grid-template-columns:1fr;gap:22px;margin-top:0;padding-top:25px}.hero-author .hero-sub{margin-top:0}.hero-details .countdown-bar{grid-template-columns:1fr;margin-top:0}.quickjump a{font-size:8px}.folio-portal{min-height:410px;padding:92px 24px 64px}.folio-portal>*{position:relative;z-index:1}.folio-portal h2{font-size:clamp(3.7rem,16vw,5.8rem)}.folio-portal:after{right:20px;top:22px;bottom:auto;width:48px;height:48px;display:grid;place-items:center;border:1px solid rgba(201,155,76,.58);border-radius:50%;background:rgba(201,155,76,.08);color:var(--gold);font:600 1.28rem/1 var(--serif);z-index:0}.folio-portal--paper:after{background:rgba(201,155,76,.1)}.section{padding:58px 0}.wishcard-tool{padding:22px}.flip-grid{grid-template-columns:1fr;gap:14px}.flip-card{height:250px}.flip-card-back{overflow:visible;padding:24px}.flip-card-back .p{font-size:.95rem;line-height:1.55}.img-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.hero:after{display:none}.section.reveal{opacity:1!important;transform:none!important}.download-image-card:hover,.idea-card:hover{transform:none!important}}
-.toc-toggle{display:none}.article-layout{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);align-items:start}.article-layout>main{min-width:0}.quickjump{position:sticky;top:24px;z-index:15;max-height:calc(100vh - 48px);overflow:auto;margin:34px 0 34px 24px;padding:22px 18px;background:rgba(252,248,239,.97);border:1px solid var(--line);box-shadow:none;white-space:normal}.quickjump:before{content:"On this Page";display:block;margin:0 0 13px;color:var(--ink);font:600 1.2rem var(--serif)}.quickjump .container{display:flex;flex-direction:column;gap:2px}.quickjump a{display:block;border:0!important;border-left:2px solid transparent!important;border-radius:0;padding:6px 9px;background:none;color:#635b4d;font:9px/1.35 var(--mono);letter-spacing:.035em;text-transform:none}.quickjump a:hover,.quickjump a.active{background:rgba(201,155,76,.1);border-left-color:var(--gold)!important;color:var(--ink)}
+.toc-toggle{display:none}.article-layout{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);align-items:start}.article-layout>main{min-width:0}.quickjump{position:sticky;top:24px;z-index:15;max-height:calc(100vh - 48px);overflow:auto;margin:34px 0 34px 24px;padding:22px 18px;background:rgba(252,248,239,.97);border:1px solid var(--line);box-shadow:none;white-space:normal}.quickjump:before{content:"On this Page";display:block;margin:0 0 13px;color:var(--ink);font:600 1.2rem var(--serif)}.quickjump .container{display:flex;flex-direction:column;gap:0}.quickjump a{display:block;border:0!important;border-left:2px solid transparent!important;border-bottom:1px solid rgba(216,201,170,.52)!important;border-radius:0;padding:8px 9px;background:none;color:#635b4d;font:9px/1.35 var(--mono);letter-spacing:.035em;text-transform:none}.quickjump a:last-child{border-bottom:0!important}.quickjump a:hover,.quickjump a.active{background:rgba(201,155,76,.1);border-left-color:var(--gold)!important;color:var(--ink)}
 .mcq-shell{margin:24px 0;padding:clamp(18px,3vw,30px);border:1px solid var(--line);background:var(--cream)}.mcq-scorebar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--line);font:600 .82rem var(--mono);letter-spacing:.04em}.mcq-grid{display:grid;gap:16px}.question-card{padding:20px;background:#fff;border:1px solid var(--line)}.question-card h3{margin:0 0 14px;font:600 1.05rem/1.45 var(--serif)}.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.option{min-height:46px;padding:10px 13px;text-align:left;background:var(--cream);color:var(--ink);border:1px solid var(--line);font:500 .88rem/1.35 var(--sans);cursor:pointer}.option:hover:not(:disabled),.option:focus-visible{border-color:var(--gold);outline:2px solid rgba(201,155,76,.25)}.option.correct{background:#e5f5e9;border-color:#397a4c;color:#245c36}.option.wrong{background:#fbe7e3;border-color:#a84639;color:#8b3026}.option:disabled{cursor:default}.feedback{min-height:1.4em;margin-top:10px;font-size:.88rem;font-weight:600}.mcq-actions{display:flex;justify-content:flex-end;margin-top:20px}.mcq-reset{padding:10px 18px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-weight:700;cursor:pointer}
 .download-image-card img{aspect-ratio:1/1!important;height:auto!important}.download-count{font:600 .72rem var(--mono);color:#6b6255}.schools-panel{padding:clamp(24px,4vw,48px);background:#f5efe2;border:1px solid var(--line)}.school-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}.school-card{padding:26px;background:#fff;border-top:3px solid var(--gold);box-shadow:0 12px 28px rgba(23,32,68,.08)}.school-card h3{margin-top:0}.school-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:17px}.school-links a{padding:7px 10px;border:1px solid var(--line);font:600 .75rem var(--mono);text-decoration:none}.closing-cta{margin:0;padding:clamp(52px,8vw,96px) 24px;text-align:center;background:var(--navy);color:#fff}.closing-cta .container{max-width:840px}.closing-cta h2{color:#fff;font-size:clamp(2.4rem,6vw,5rem)}.closing-cta p{color:rgba(255,255,255,.82);font-size:1.05rem}.closing-cta .cta-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:25px}.cta-primary,.cta-secondary{padding:12px 18px;text-decoration:none;font-weight:700}.cta-primary{background:var(--gold);color:var(--navy)}.cta-secondary{border:1px solid rgba(255,255,255,.55);color:#fff}
 @media(max-width:1050px){.toc-toggle{display:flex;width:calc(100% - 32px);max-width:760px;justify-content:space-between;align-items:center;margin:20px auto 0;padding:13px 16px;border:1px solid var(--line);background:var(--cream);color:var(--ink);font:600 1rem var(--serif)}.toc-toggle:after{content:"+";font:600 1.25rem var(--mono)}.toc-toggle[aria-expanded=true]:after{content:"−"}.article-layout{display:block}.quickjump{display:none;position:static;max-width:760px;max-height:none;margin:0 auto;padding:10px 16px 17px;border-top:0}.quickjump.open{display:block}.quickjump:before{display:none}.quickjump .container{display:grid;grid-template-columns:1fr 1fr}.quickjump a{padding:8px 10px}}
-@media(max-width:640px){.quickjump .container,.options,.school-grid{grid-template-columns:1fr}.mcq-scorebar{align-items:flex-start;flex-direction:column}}
+@media(min-width:641px){#school-classroom-activity-ideas .card-grid{grid-template-columns:repeat(6,minmax(0,1fr))}#school-classroom-activity-ideas .idea-card{grid-column:span 2}#school-classroom-activity-ideas .idea-card:nth-last-child(2){grid-column:2/span 2}#school-classroom-activity-ideas .idea-card:last-child{grid-column:4/span 2}}
+@media(max-width:640px){.quickjump .container,.options,.school-grid,#school-classroom-activity-ideas .card-grid{grid-template-columns:1fr}.mcq-scorebar{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -314,7 +315,9 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
    </div>
   </div>
 </div>
-<nav class="quickjump" aria-label="Section quick links"><div class="container"><a href="#introduction-why-ganesh-chaturthi-2026-matters">Introduction: Why Ganesh Chaturthi 2026 Matters</a><a href="#ganesh-chaturthi-2026-key-dates-at-a-glance">Ganesh Chaturthi 2026: Key Dates at a Glance</a><a href="#the-story-behind-lord-ganesha-s-birth">The Story Behind Lord Ganesha's Birth</a><a href="#history-of-ganesh-chaturthi-as-a-public-festival">History of Ganesh Chaturthi as a Public Festival</a><a href="#significance-of-ganesh-chaturthi">Significance of Ganesh Chaturthi</a><a href="#ganesh-chaturthi-in-maharashtra-thane-a-living-cultural-celebration">Ganesh Chaturthi in Maharashtra &amp; Thane: A Living Cultural Celebration</a><a href="#celebrating-an-eco-friendly-ganeshotsav">Celebrating an Eco-Friendly Ganeshotsav</a><a href="#ganesh-chaturthi-speeches-for-school-students">Ganesh Chaturthi Speeches for School Students</a><a href="#ganesh-chaturthi-essays-for-school-students">Ganesh Chaturthi Essays for School Students</a><a href="#from-a-private-ritual-to-a-national-movement-a-history-timeline">From a Private Ritual to a National Movement: A History Timeline</a><a href="#do-s-and-don-ts-for-an-eco-friendly-ganeshotsav">Do's and Don'ts for an Eco-Friendly Ganeshotsav</a><a href="#ganesh-vandana-shlokas-aarti-for-the-festival">Ganesh Vandana: Shlokas &amp; Aarti for the Festival</a><a href="#ganesh-chaturthi-slogans-quotes">Ganesh Chaturthi Slogans &amp; Quotes</a><a href="#10-fun-facts-about-ganesh-chaturthi">10 Fun Facts About Ganesh Chaturthi</a><a href="#ganesh-chaturthi-quiz-for-students">Ganesh Chaturthi Quiz for Students</a><a href="#school-classroom-activity-ideas">School &amp; Classroom Activity Ideas</a><a href="#downloadable-ganpati-bappa-images-1080-1080-px-free-for-social-media">Downloadable Ganpati Bappa Images — 1080 × 1080 px (Free for Social Media)</a><a href="#create-your-own-wish-card">Create Your Own Ganpati Wish Card</a><a href="#social-media-caption-ideas-copy-paste-ready">Social Media Caption Ideas (Copy-Paste Ready)</a><a href="#frequently-asked-questions">Frequently Asked Questions</a><a href="#explore-more-at-rainbow-schools">Explore More at Rainbow Schools</a><a href="#celebrate-the-festival-of-wisdom-with-us">Celebrate the Festival of Wisdom With Us</a></div></nav>
+<button type="button" class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="tocList">On this Page</button>
+<div class="article-layout">
+<nav class="quickjump" id="tocList" aria-label="On this page"><div class="container"><a href="#introduction-why-ganesh-chaturthi-2026-matters">Introduction: Why Ganesh Chaturthi 2026 Matters</a><a href="#ganesh-chaturthi-2026-key-dates-at-a-glance">Ganesh Chaturthi 2026: Key Dates at a Glance</a><a href="#the-story-behind-lord-ganesha-s-birth">The Story Behind Lord Ganesha's Birth</a><a href="#history-of-ganesh-chaturthi-as-a-public-festival">History of Ganesh Chaturthi as a Public Festival</a><a href="#significance-of-ganesh-chaturthi">Significance of Ganesh Chaturthi</a><a href="#ganesh-chaturthi-in-maharashtra-thane-a-living-cultural-celebration">Ganesh Chaturthi in Maharashtra &amp; Thane: A Living Cultural Celebration</a><a href="#celebrating-an-eco-friendly-ganeshotsav">Celebrating an Eco-Friendly Ganeshotsav</a><a href="#ganesh-chaturthi-speeches-for-school-students">Ganesh Chaturthi Speeches for School Students</a><a href="#ganesh-chaturthi-essays-for-school-students">Ganesh Chaturthi Essays for School Students</a><a href="#from-a-private-ritual-to-a-national-movement-a-history-timeline">From a Private Ritual to a National Movement: A History Timeline</a><a href="#do-s-and-don-ts-for-an-eco-friendly-ganeshotsav">Do's and Don'ts for an Eco-Friendly Ganeshotsav</a><a href="#ganesh-vandana-shlokas-aarti-for-the-festival">Ganesh Vandana: Shlokas &amp; Aarti for the Festival</a><a href="#ganesh-chaturthi-slogans-quotes">Ganesh Chaturthi Slogans &amp; Quotes</a><a href="#10-fun-facts-about-ganesh-chaturthi">10 Fun Facts About Ganesh Chaturthi</a><a href="#ganesh-chaturthi-quiz-for-students">Ganesh Chaturthi Quiz for Students</a><a href="#school-classroom-activity-ideas">School &amp; Classroom Activity Ideas</a><a href="#downloadable-ganpati-bappa-images-1080-1080-px-free-for-social-media">Downloadable Ganpati Bappa Images — 1080 × 1080 px (Free for Social Media)</a><a href="#create-your-own-wish-card">Create Your Own Ganpati Wish Card</a><a href="#social-media-caption-ideas-copy-paste-ready">Social Media Caption Ideas (Copy-Paste Ready)</a><a href="#frequently-asked-questions">Frequently Asked Questions</a><a href="#explore-more-at-rainbow-schools">Explore More at Rainbow Schools</a><a href="#celebrate-the-festival-of-wisdom-with-us">Celebrate the Festival of Wisdom With Us</a></div></nav>
 <main id="main-content" tabindex="-1">
 <div class="folio-portal folio-portal--paper" id="folio-arrival" data-numeral="I" aria-label="Chapter one: The Arrival"><p class="folio-kicker">Chapter I · A festival begins</p><h2>Make room<br><em>for wonder.</em></h2><p>A guide to the dates, stories, words and small acts of care that give Ganeshotsav its meaning.</p></div>
 <section class="section" id="introduction-why-ganesh-chaturthi-2026-matters">
@@ -920,6 +923,7 @@ Meaning: &quot;O bestower of happiness, remover of sorrows and troubles, whose l
     </div>
   </section>
 </main>
+</div>
 <footer>© 2026 Rainbow International School | All Rights Reserved | <a href="https://rainbowinternationalschool.in" style="color:#fff">rainbowinternationalschool.in</a></footer>
 <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>
@@ -1170,25 +1174,10 @@ else refreshWishCard(false);
 
 // ---------- one native-scroll work loop: progress + back-to-top; navigation uses observers ----------
 document.addEventListener('DOMContentLoaded', function(){
-  // Desktop sticky contents rail; the same source becomes a disclosure on smaller screens.
+  // The server-rendered desktop contents rail becomes a disclosure on smaller screens.
   var existingNav = document.querySelector('.quickjump');
-  var mainContent = document.getElementById('main-content');
-  if (existingNav && mainContent) {
-    existingNav.id = 'tocList';
-    existingNav.setAttribute('aria-label', 'On this page');
-    var tocToggle = document.createElement('button');
-    tocToggle.type = 'button';
-    tocToggle.className = 'toc-toggle';
-    tocToggle.id = 'tocToggle';
-    tocToggle.textContent = 'On this Page';
-    tocToggle.setAttribute('aria-expanded', 'false');
-    tocToggle.setAttribute('aria-controls', 'tocList');
-    var articleLayout = document.createElement('div');
-    articleLayout.className = 'article-layout';
-    existingNav.parentNode.insertBefore(tocToggle, existingNav);
-    existingNav.parentNode.insertBefore(articleLayout, existingNav);
-    articleLayout.appendChild(existingNav);
-    articleLayout.appendChild(mainContent);
+  var tocToggle = document.getElementById('tocToggle');
+  if (existingNav && tocToggle) {
     tocToggle.addEventListener('click', function(){
       var open = tocToggle.getAttribute('aria-expanded') === 'true';
       tocToggle.setAttribute('aria-expanded', String(!open));
@@ -1291,17 +1280,32 @@ document.addEventListener('DOMContentLoaded', function(){
     .catch(function(){});
 
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('.quickjump a'));
-  var navMap = {};
-  navLinks.forEach(function(a){ navMap[a.getAttribute('href').slice(1)] = a; });
-  var spy = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      var link = navMap[entry.target.id];
-      if (!link || !entry.isIntersecting) return;
-      navLinks.forEach(function(a){ a.classList.remove('active'); });
-      link.classList.add('active');
-    });
-  }, { rootMargin: '-18% 0px -72% 0px', threshold: 0 });
-  document.querySelectorAll('.section').forEach(function(s){ spy.observe(s); });
+  var navTargets = navLinks.map(function(link){
+    return { link:link, target:document.getElementById(link.getAttribute('href').slice(1)) };
+  }).filter(function(item){ return item.target; });
+  var activeLink = null;
+  function paintActiveSection(){
+    if (!navTargets.length) return;
+    var atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+    var next = navTargets[0];
+    if (atBottom) {
+      next = navTargets[navTargets.length - 1];
+    } else {
+      var marker = window.scrollY + Math.max(150, window.innerHeight * .3);
+      navTargets.forEach(function(item){ if (item.target.offsetTop <= marker) next = item; });
+    }
+    if (activeLink === next.link) return;
+    navLinks.forEach(function(link){ link.classList.remove('active'); });
+    next.link.classList.add('active');
+    activeLink = next.link;
+    if (window.matchMedia('(min-width:1051px)').matches && existingNav) {
+      var linkTop = next.link.offsetTop;
+      var linkBottom = linkTop + next.link.offsetHeight;
+      if (linkTop < existingNav.scrollTop || linkBottom > existingNav.scrollTop + existingNav.clientHeight) {
+        existingNav.scrollTop = Math.max(0, linkTop - existingNav.clientHeight / 2);
+      }
+    }
+  }
 
   var backBtn = document.getElementById('backToTop');
   var progressBar = document.getElementById('progressBar');
@@ -1312,6 +1316,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var y = window.scrollY;
     backBtn.classList.toggle('show', y > 500);
     progressBar.style.width = Math.min(100, (y / scrollable) * 100) + '%';
+    paintActiveSection();
   }
   function requestPaint(){ if (!ticking) { ticking = true; requestAnimationFrame(paintScroll); } }
   measure(); requestPaint();
