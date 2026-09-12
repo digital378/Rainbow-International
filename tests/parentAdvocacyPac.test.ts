@@ -72,5 +72,7 @@ describe("matchesParentAdvocacyFilters", () => {
     expect(matchesParentAdvocacyFilters(attended, { pacKey: "PAC 1", pacAttendance: "Attended" })).toBe(true);
     expect(matchesParentAdvocacyFilters(absent, { pacKey: "PAC 1", pacAttendance: "Attended" })).toBe(false);
     expect(matchesParentAdvocacyFilters(absent, { pacKey: "PAC 1", pacAttendance: "Not attended" })).toBe(true);
+    expect(matchesParentAdvocacyFilters(attended, { branch: "A" })).toBe(true);
+    expect(matchesParentAdvocacyFilters(attended, { branch: "B" })).toBe(false);
   });
 });

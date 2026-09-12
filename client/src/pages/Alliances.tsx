@@ -22,6 +22,7 @@ interface Corporate {
 interface FriendshipSchool {
   sno: string; name: string; location: string; owner: string; stage: string;
   dateApproached: string; lastUpdate: string; mouDoneDate: string;
+  contactPerson: string; contactNumber: string;
   admJrKg: number; admSrKg: number; totalAdm: number; contractType: string; strength: string;
 }
 interface ParentAdvocacy {
@@ -1008,13 +1009,11 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">School Name</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Location</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contract</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact Person</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Stage</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Owner</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Approached</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500">Jr KG</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500">Sr KG</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500">Total Adm</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">MOU Done Date</th>
+                <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500">Total Admissions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -1023,17 +1022,15 @@ function FriendshipSchoolsTab({ data }: { data: AlliancesData }) {
                   <td className="px-4 py-2.5 text-slate-400 text-xs">{s.sno}</td>
                   <td className="px-4 py-2.5 font-medium text-slate-800 max-w-[200px]"><div className="truncate">{s.name}</div></td>
                   <td className="px-4 py-2.5 text-slate-600 text-xs">{s.location || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-xs">{s.contractType || "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-600 text-xs">{s.contactPerson || "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-600 text-xs whitespace-nowrap">{s.contactNumber || "—"}</td>
                   <td className="px-4 py-2.5"><StageBadge stage={s.stage} palette={STAGE_COLOR} /></td>
-                  <td className="px-4 py-2.5 text-slate-600 text-xs">{s.owner || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-500 text-xs">{s.dateApproached || "—"}</td>
-                  <td className="px-4 py-2.5 text-right text-slate-600 font-semibold">{s.admJrKg > 0 ? s.admJrKg : "—"}</td>
-                  <td className="px-4 py-2.5 text-right text-slate-600 font-semibold">{s.admSrKg > 0 ? s.admSrKg : "—"}</td>
+                  <td className="px-4 py-2.5 text-slate-500 text-xs whitespace-nowrap">{s.mouDoneDate || "—"}</td>
                   <td className="px-4 py-2.5 text-right font-black text-amber-600">{s.totalAdm > 0 ? s.totalAdm : "—"}</td>
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
+                <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
               )}
             </tbody>
           </table>
@@ -1049,6 +1046,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
   const [filterPartnerStatus, setFilterPartnerStatus] = useState("");
   const [filterPac, setFilterPac] = useState("");
   const [filterPacAttendance, setFilterPacAttendance] = useState("");
+  const [filterBranch, setFilterBranch] = useState("");
 
   // partnerStatus filter options (including a synthetic "Not yet reached" for blank rows)
   const PA_PARTNER_STATUS_OPTIONS = ["Accepted", "To be Decided", "Rejected", "Not yet reached"];
@@ -1057,6 +1055,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
     partnerStatus: filterPartnerStatus,
     pacKey: filterPac,
     pacAttendance: filterPacAttendance as "Attended" | "Not attended" | "",
+    branch: filterBranch,
     search,
   }));
 
@@ -1094,6 +1093,7 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
     if (p.partnerStatus?.toLowerCase().includes("accept")) branchMap[br].onBoard++;
   }
   const branches = Object.entries(branchMap).sort((a, b) => b[1].targeted - a[1].targeted);
+  const branchOptions = branches.map(([branch]) => branch);
 
   const total = data.parentAdvocacy.length || 1;
 
@@ -1235,6 +1235,8 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 
       <div className="flex flex-wrap gap-3 items-center">
         <SearchInput value={search} onChange={setSearch} placeholder="Search families…" />
+        <Select value={filterBranch} onChange={setFilterBranch}
+          options={branchOptions} placeholder="All branches" />
         <Select value={filterPartnerStatus} onChange={setFilterPartnerStatus}
           options={PA_PARTNER_STATUS_OPTIONS} placeholder="All ambassador statuses" />
         {data.pacMeetings.length > 0 && (

@@ -113,12 +113,17 @@ export function matchesParentAdvocacyFilters(
     partnerStatus?: string;
     pacKey?: string;
     pacAttendance?: "Attended" | "Not attended" | "";
+    branch?: string;
     search?: string;
   },
 ): boolean {
   if (filters.partnerStatus === "Not yet reached") {
     if (parent.partnerStatus.trim()) return false;
   } else if (filters.partnerStatus && parent.partnerStatus !== filters.partnerStatus) {
+    return false;
+  }
+
+  if (filters.branch && parent.branch.trim().toLowerCase() !== filters.branch.trim().toLowerCase()) {
     return false;
   }
 
