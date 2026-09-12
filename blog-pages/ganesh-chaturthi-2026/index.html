@@ -112,19 +112,6 @@ a{color:var(--primary)}
 .p{margin:0 0 1em}
 .list{margin:0 0 1em;padding-left:1.3em}
 .list li{margin-bottom:.4em}
-/* reading progress bar */
-.progress-bar{position:fixed;top:0;left:0;height:4px;width:0%;background:linear-gradient(90deg,var(--amber),var(--primary));z-index:1000;transition:width .1s linear}
-/* custom cursor (hover-capable pointers only; respects prefers-reduced-motion) */
-.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;display:none}
-body.custom-cursor-on{cursor:none}
-body.custom-cursor-on a,body.custom-cursor-on button,body.custom-cursor-on .flip-card,body.custom-cursor-on .idea-card,body.custom-cursor-on .img-placeholder,body.custom-cursor-on input,body.custom-cursor-on select{cursor:none}
-body.custom-cursor-on .cursor-dot,body.custom-cursor-on .cursor-ring{display:block}
-.cursor-dot{width:8px;height:8px;background:var(--primary);transform:translate(-50%,-50%)}
-.cursor-ring{width:34px;height:34px;border:2px solid var(--primary);opacity:.5;transition:width .18s,height .18s,opacity .18s,border-color .18s,transform .05s linear;transform:translate(-50%,-50%)}
-.cursor-ring.big{width:52px;height:52px;opacity:.85;border-color:var(--amber)}
-/* confetti */
-.confetti-piece{position:fixed;width:6px;height:6px;border-radius:1px;pointer-events:none;z-index:9998;animation:confetti-pop .65s ease-out forwards}
-@keyframes confetti-pop{to{transform:translate(var(--dx),var(--dy)) rotate(220deg);opacity:0}}
 /* hero */
 .hero{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-dark) 100%);color:#fff;padding:56px 0 40px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,255,255,.08),transparent 60%)}
@@ -276,9 +263,6 @@ html{scroll-padding-top:72px} body{background:var(--paper);color:var(--ink);font
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
-<div class="progress-bar" id="progressBar"></div>
-<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 <header class="school-masthead" aria-label="Rainbow International School, Thane">
   <img src="/ris-logo-compact.webp" alt="Rainbow International School logo" width="72" height="68">
   <div class="school-masthead-name">Rainbow International School, Thane</div>
@@ -653,85 +637,27 @@ Meaning: &quot;O bestower of happiness, remover of sorrows and troubles, whose l
 <section class="section" id="ganesh-chaturthi-quiz-for-students">
     <div class="container">
       <h2>Ganesh Chaturthi Quiz for Students</h2>
-      
-    <div class="quiz-progress" id="progress-ganesh-chaturthi-quiz-for-students">0 of 15 revealed</div>
-    <div class="quiz-grid" id="ganesh-chaturthi-quiz-for-students-grid">
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">1</span>On which date does Ganesh Chaturthi (Ganesh Sthapana) fall in 2026?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>14 September 2026</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">2</span>Who are Lord Ganesha's parents?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Lord Shiva and Goddess Parvati</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">3</span>What is Lord Ganesha's vehicle (vahana) called?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Mushak (mouse/rat)</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">4</span>What title means "remover of obstacles"?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Vighnaharta</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">5</span>Which sweet is most associated with Lord Ganesha?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Modak</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">6</span>Who is credited with popularising the public Sarvajanik Ganeshotsav from 1893 through his newspaper Kesari?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Lokmanya Bal Gangadhar Tilak</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">7</span>On what day does Ganpati Visarjan take place in 2026?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>25 September 2026 (Anant Chaturdashi)</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">8</span>What material is used for eco-friendly idols instead of Plaster of Paris?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Shadu clay (natural clay)</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">9</span>Complete the chant: "Ganpati Bappa Morya, Pudhchya Varshi ___ Ya."</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Lawkar</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">10</span>Why did Ganesha win the race around the universe against his brother Kartikeya?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>He walked around his parents, saying they were his entire universe</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">11</span>Which state officially recognises Ganeshotsav as its state festival?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Maharashtra</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">12</span>What does Ganesha's broken tusk symbolise?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Sacrifice made for a greater purpose</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">13</span>What are the traditional drum ensembles seen in Ganeshotsav processions called?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Dhol-tasha pathaks</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">14</span>Why does Ganesha have big ears, according to tradition?</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>To listen more and speak less</div>
-    </div>
-    <div class="quiz-card">
-      <div class="quiz-q"><span class="quiz-num">15</span>Name one civic step being taken to make Ganesh idol immersion more eco-friendly.</div>
-      <button class="reveal-btn" onclick="const a=this.nextElementSibling;const hidden=a.hasAttribute('hidden');if(hidden){a.removeAttribute('hidden');this.textContent='Hide answer';}else{a.setAttribute('hidden','');this.textContent='Reveal answer';}updateQuizProgress('ganesh-chaturthi-quiz-for-students')" data-quiz="ganesh-chaturthi-quiz-for-students">Reveal answer</button>
-      <div class="quiz-a" hidden>Artificial immersion tanks (kritrim talav) / shadu clay idols / seed-embedded idols (any one)</div>
-    </div></div>
-    <button class="reveal-all-btn" onclick="document.querySelectorAll('#ganesh-chaturthi-quiz-for-students-grid .reveal-btn').forEach(b=>{if(b.textContent==='Reveal answer')b.click()})">Reveal all answers</button>
+      <div class="mcq-shell">
+        <div class="mcq-scorebar" aria-live="polite"><span id="mcqProgress">0 of 15 answered</span><span id="mcqScore">Score: 0 / 15</span></div>
+        <div class="mcq-grid" id="mcqGrid">
+          <article class="question-card" data-correct="0"><h3>1. On which date does Ganesh Chaturthi fall in 2026?</h3><div class="options"><button type="button" class="option" data-choice="0">A. 14 September</button><button type="button" class="option" data-choice="1">B. 15 September</button><button type="button" class="option" data-choice="2">C. 25 September</button><button type="button" class="option" data-choice="3">D. 4 September</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="1"><h3>2. Who are Lord Ganesha's parents?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Vishnu and Lakshmi</button><button type="button" class="option" data-choice="1">B. Shiva and Parvati</button><button type="button" class="option" data-choice="2">C. Brahma and Saraswati</button><button type="button" class="option" data-choice="3">D. Rama and Sita</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="2"><h3>3. What is Lord Ganesha's vahana?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Peacock</button><button type="button" class="option" data-choice="1">B. Lion</button><button type="button" class="option" data-choice="2">C. Mouse</button><button type="button" class="option" data-choice="3">D. Swan</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="0"><h3>4. Which title means remover of obstacles?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Vighnaharta</button><button type="button" class="option" data-choice="1">B. Lambodara</button><button type="button" class="option" data-choice="2">C. Ekadanta</button><button type="button" class="option" data-choice="3">D. Ganapati</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="2"><h3>5. Which sweet is most associated with Ganesha?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Jalebi</button><button type="button" class="option" data-choice="1">B. Puran poli</button><button type="button" class="option" data-choice="2">C. Modak</button><button type="button" class="option" data-choice="3">D. Kheer</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="1"><h3>6. Who popularised public Ganeshotsav from 1893?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Mahatma Gandhi</button><button type="button" class="option" data-choice="1">B. Lokmanya Tilak</button><button type="button" class="option" data-choice="2">C. Bhausaheb Rangari</button><button type="button" class="option" data-choice="3">D. Gopal Krishna Gokhale</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="3"><h3>7. When is Ganpati Visarjan in 2026?</h3><div class="options"><button type="button" class="option" data-choice="0">A. 14 September</button><button type="button" class="option" data-choice="1">B. 18 September</button><button type="button" class="option" data-choice="2">C. 21 September</button><button type="button" class="option" data-choice="3">D. 25 September</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="1"><h3>8. Which material is preferred for eco-friendly idols?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Plaster of Paris</button><button type="button" class="option" data-choice="1">B. Shadu clay</button><button type="button" class="option" data-choice="2">C. Plastic</button><button type="button" class="option" data-choice="3">D. Fibreglass</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="0"><h3>9. Complete the chant: Pudhchya Varshi ___ Ya.</h3><div class="options"><button type="button" class="option" data-choice="0">A. Lawkar</button><button type="button" class="option" data-choice="1">B. Mangal</button><button type="button" class="option" data-choice="2">C. Punha</button><button type="button" class="option" data-choice="3">D. Sukhi</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="2"><h3>10. How did Ganesha win the race around the universe?</h3><div class="options"><button type="button" class="option" data-choice="0">A. He flew on Garuda</button><button type="button" class="option" data-choice="1">B. He ran fastest</button><button type="button" class="option" data-choice="2">C. He circled his parents</button><button type="button" class="option" data-choice="3">D. He used a magic chariot</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="2"><h3>11. Which state recognises Ganeshotsav as its state festival?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Gujarat</button><button type="button" class="option" data-choice="1">B. Goa</button><button type="button" class="option" data-choice="2">C. Maharashtra</button><button type="button" class="option" data-choice="3">D. Karnataka</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="1"><h3>12. What does Ganesha's broken tusk symbolise?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Royal power</button><button type="button" class="option" data-choice="1">B. Sacrifice for a greater purpose</button><button type="button" class="option" data-choice="2">C. Victory in battle</button><button type="button" class="option" data-choice="3">D. A harvest blessing</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="0"><h3>13. What are traditional Ganeshotsav drum ensembles called?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Dhol-tasha pathaks</button><button type="button" class="option" data-choice="1">B. Bhajan mandalis</button><button type="button" class="option" data-choice="2">C. Lezim sabhas</button><button type="button" class="option" data-choice="3">D. Kirtan yatras</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="1"><h3>14. What lesson is associated with Ganesha's big ears?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Move quickly</button><button type="button" class="option" data-choice="1">B. Listen more and speak less</button><button type="button" class="option" data-choice="2">C. Always celebrate loudly</button><button type="button" class="option" data-choice="3">D. Remember every detail</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+          <article class="question-card" data-correct="2"><h3>15. Which is an eco-friendly immersion practice?</h3><div class="options"><button type="button" class="option" data-choice="0">A. Natural-lake immersion of POP idols</button><button type="button" class="option" data-choice="1">B. Leaving decorations on the shore</button><button type="button" class="option" data-choice="2">C. Using artificial immersion tanks</button><button type="button" class="option" data-choice="3">D. Adding glitter to clay idols</button></div><div class="feedback" role="status" aria-live="polite"></div></article>
+        </div>
+        <div class="mcq-actions"><button type="button" class="mcq-reset" id="mcqReset">Retake Quiz</button></div>
+      </div>
     </div>
   </section>
 <section class="section" id="school-classroom-activity-ideas">
@@ -947,7 +873,6 @@ function updateQuizProgress(secId){
 
 // ---------- capability checks ----------
 var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 if (reducedMotion) document.documentElement.classList.add('reduced-motion');
 var skipLink = document.querySelector('.skip-link');
 if (skipLink) {
@@ -957,70 +882,6 @@ if (skipLink) {
       if (main) main.focus();
     }, 0);
   });
-}
-
-// ---------- confetti micro-rewards ----------
-var lastConfettiTime = 0;
-function burstConfetti(x, y){
-  var colors = ['var(--amber)','var(--orange)','var(--saffron)','var(--green)','var(--primary)'];
-  for (var i = 0; i < 14; i++){
-    var p = document.createElement('span');
-    p.className = 'confetti-piece';
-    var angle = Math.random() * Math.PI * 2;
-    var dist = 40 + Math.random() * 55;
-    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-    p.style.background = colors[i % colors.length];
-    p.style.left = x + 'px'; p.style.top = y + 'px';
-    document.body.appendChild(p);
-    (function(el){ setTimeout(function(){ el.remove(); }, 700); })(p);
-  }
-}
-function burstConfettiAt(el){
-  if (reducedMotion || !el) return;
-  var now = Date.now();
-  if (now - lastConfettiTime < 180) return;
-  lastConfettiTime = now;
-  var r = el.getBoundingClientRect();
-  burstConfetti(r.left + r.width / 2, r.top + r.height / 2);
-}
-// Non-invasive: layers on top of the existing tested toggle logic via delegation, never replaces it.
-document.addEventListener('click', function(e){
-  if (reducedMotion) return;
-  var flip = e.target.closest && e.target.closest('.flip-card');
-  if (flip) { setTimeout(function(){ if (flip.classList.contains('flipped') && !flip.dataset.celebrated) { flip.dataset.celebrated = '1'; burstConfettiAt(flip); } }, 60); }
-  var reveal = e.target.closest && e.target.closest('.reveal-btn');
-  if (reveal) { setTimeout(function(){ var a = reveal.nextElementSibling; if (a && !a.hasAttribute('hidden')) burstConfettiAt(reveal); }, 60); }
-  var copy = e.target.closest && e.target.closest('.copy-btn');
-  if (copy) { setTimeout(function(){ if (copy.classList.contains('copied')) burstConfettiAt(copy); }, 60); }
-});
-
-// ---------- custom cursor (hover-capable pointers only) ----------
-if (canHover && !reducedMotion) {
-  document.body.classList.add('custom-cursor-on');
-  var cursorDot = document.getElementById('cursorDot');
-  var cursorRing = document.getElementById('cursorRing');
-  window.addEventListener('mousemove', function(e){
-    cursorDot.style.left = e.clientX + 'px'; cursorDot.style.top = e.clientY + 'px';
-    cursorRing.style.left = e.clientX + 'px'; cursorRing.style.top = e.clientY + 'px';
-  });
-  var hoverSelector = 'a, button, .flip-card, .idea-card, .download-image-card, input, select, .quickjump a';
-  document.addEventListener('mouseover', function(e){ if (e.target.closest && e.target.closest(hoverSelector)) cursorRing.classList.add('big'); });
-  document.addEventListener('mouseout', function(e){ if (e.target.closest && e.target.closest(hoverSelector)) cursorRing.classList.remove('big'); });
-}
-
-// ---------- hover-tilt (image placeholders + activity idea cards only — kept clear of the flip-cards' own 3D transform) ----------
-function attachTilt(el){
-  el.addEventListener('mousemove', function(e){
-    var r = el.getBoundingClientRect();
-    var px = (e.clientX - r.left) / r.width - 0.5;
-    var py = (e.clientY - r.top) / r.height - 0.5;
-    el.style.transform = 'perspective(700px) rotateX(' + (-py * 10).toFixed(2) + 'deg) rotateY(' + (px * 10).toFixed(2) + 'deg)';
-  });
-  el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
-}
-if (canHover && !reducedMotion) {
-  document.querySelectorAll('.download-image-card, .idea-card').forEach(attachTilt);
 }
 
 // ---------- Sthapana / Visarjan countdown (dates are also stated as plain static text above) ----------
@@ -1046,7 +907,6 @@ function tickCountdown(){
   else elV.textContent = 'Ganpati Bappa Morya, Pudhchya Varshi Lavkar Ya! 🙏';
 }
 tickCountdown();
-setInterval(tickCountdown, 1000);
 
 // ---------- language tabs (Speeches & Essays) ----------
 document.querySelectorAll('.lang-tabs-wrap').forEach(function(wrap){
@@ -1160,17 +1020,16 @@ function drawWishCard(){
 var wishGenBtn = document.getElementById('wishGenerate');
 var wishSelect = document.getElementById('wishSlogan');
 var wishDownloadLink = document.getElementById('wishDownload');
-function refreshWishCard(withConfetti){
+function refreshWishCard(){
   drawWishCard();
   var canvas = document.getElementById('wishCanvas');
   if (canvas && wishDownloadLink) { wishDownloadLink.href = canvas.toDataURL('image/png'); wishDownloadLink.hidden = false; }
-  if (withConfetti) burstConfettiAt(wishGenBtn);
 }
-if (wishGenBtn) wishGenBtn.addEventListener('click', function(){ refreshWishCard(true); });
-if (wishSelect) wishSelect.addEventListener('change', function(){ refreshWishCard(false); });
-wishHeroArt.addEventListener('load', function(){ refreshWishCard(false); });
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ refreshWishCard(false); });
-else refreshWishCard(false);
+if (wishGenBtn) wishGenBtn.addEventListener('click', refreshWishCard);
+if (wishSelect) wishSelect.addEventListener('change', refreshWishCard);
+wishHeroArt.addEventListener('load', refreshWishCard);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(refreshWishCard);
+else refreshWishCard();
 
 // ---------- one native-scroll work loop: progress + back-to-top; navigation uses observers ----------
 document.addEventListener('DOMContentLoaded', function(){
@@ -1193,61 +1052,49 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Selectable 15-question quiz.
   var quizSection = document.getElementById('ganesh-chaturthi-quiz-for-students');
-  var quizQuestions = [
-    ["On which date does Ganesh Chaturthi fall in 2026?",["14 September","15 September","25 September","4 September"],0],
-    ["Who are Lord Ganesha's parents?",["Vishnu and Lakshmi","Shiva and Parvati","Brahma and Saraswati","Rama and Sita"],1],
-    ["What is Lord Ganesha's vahana?",["Peacock","Lion","Mouse","Swan"],2],
-    ["Which title means remover of obstacles?",["Vighnaharta","Lambodara","Ekadanta","Ganapati"],0],
-    ["Which sweet is most associated with Ganesha?",["Jalebi","Puran poli","Modak","Kheer"],2],
-    ["Who popularised public Ganeshotsav from 1893?",["Mahatma Gandhi","Lokmanya Tilak","Bhausaheb Rangari","Gopal Krishna Gokhale"],1],
-    ["When is Ganpati Visarjan in 2026?",["14 September","18 September","21 September","25 September"],3],
-    ["Which material is preferred for eco-friendly idols?",["Plaster of Paris","Shadu clay","Plastic","Fibreglass"],1],
-    ["Complete the chant: Pudhchya Varshi ___ Ya.",["Lawkar","Mangal","Punha","Sukhi"],0],
-    ["How did Ganesha win the race around the universe?",["He flew on Garuda","He ran fastest","He circled his parents","He used a magic chariot"],2],
-    ["Which state recognises Ganeshotsav as its state festival?",["Gujarat","Goa","Maharashtra","Karnataka"],2],
-    ["What does Ganesha's broken tusk symbolise?",["Royal power","Sacrifice for a greater purpose","Victory in battle","A harvest blessing"],1],
-    ["What are traditional Ganeshotsav drum ensembles called?",["Dhol-tasha pathaks","Bhajan mandalis","Lezim sabhas","Kirtan yatras"],0],
-    ["What lesson is associated with Ganesha's big ears?",["Move quickly","Listen more and speak less","Always celebrate loudly","Remember every detail"],1],
-    ["Which is an eco-friendly immersion practice?",["Natural-lake immersion of POP idols","Leaving decorations on the shore","Using artificial immersion tanks","Adding glitter to clay idols"],2]
-  ];
   if (quizSection) {
-    var quizContainer = quizSection.querySelector('.container');
     var quizScore = 0, quizAnswered = 0;
-    function renderQuiz(){
-      quizScore = 0; quizAnswered = 0;
-      quizContainer.innerHTML = '<h2>Ganesh Chaturthi Quiz for Students</h2><div class="mcq-shell"><div class="mcq-scorebar" aria-live="polite"><span id="mcqProgress">0 of 15 answered</span><span id="mcqScore">Score: 0 / 15</span></div><div class="mcq-grid" id="mcqGrid"></div><div class="mcq-actions"><button type="button" class="mcq-reset" id="mcqReset">Retake Quiz</button></div></div>';
-      var grid = document.getElementById('mcqGrid');
-      quizQuestions.forEach(function(item, questionIndex){
-        var card = document.createElement('article');
-        card.className = 'question-card';
-        card.innerHTML = '<h3>' + (questionIndex + 1) + '. ' + item[0] + '</h3><div class="options">' + item[1].map(function(option, optionIndex){ return '<button type="button" class="option" data-choice="' + optionIndex + '">' + String.fromCharCode(65 + optionIndex) + '. ' + option + '</button>'; }).join('') + '</div><div class="feedback" role="status" aria-live="polite"></div>';
-        card.querySelectorAll('.option').forEach(function(button){
-          button.addEventListener('click', function(){
-            if (card.dataset.answered) return;
-            card.dataset.answered = 'true';
-            var choice = Number(button.dataset.choice);
-            card.querySelectorAll('.option').forEach(function(optionButton, optionIndex){
-              optionButton.disabled = true;
-              if (optionIndex === item[2]) optionButton.classList.add('correct');
-              if (optionIndex === choice && choice !== item[2]) optionButton.classList.add('wrong');
-            });
-            quizAnswered++;
-            if (choice === item[2]) {
-              quizScore++;
-              card.querySelector('.feedback').textContent = 'Correct — well done!';
-              burstConfettiAt(button);
-            } else {
-              card.querySelector('.feedback').textContent = 'The correct answer is ' + item[1][item[2]] + '.';
-            }
-            document.getElementById('mcqProgress').textContent = quizAnswered + ' of 15 answered';
-            document.getElementById('mcqScore').textContent = 'Score: ' + quizScore + ' / 15';
-          });
-        });
-        grid.appendChild(card);
-      });
-      document.getElementById('mcqReset').addEventListener('click', function(){ renderQuiz(); });
+    var quizCards = Array.prototype.slice.call(quizSection.querySelectorAll('.question-card'));
+    function updateMcqScore(){
+      document.getElementById('mcqProgress').textContent = quizAnswered + ' of 15 answered';
+      document.getElementById('mcqScore').textContent = 'Score: ' + quizScore + ' / 15';
     }
-    renderQuiz();
+    quizCards.forEach(function(card){
+      var correctChoice = Number(card.dataset.correct);
+      var options = Array.prototype.slice.call(card.querySelectorAll('.option'));
+      options.forEach(function(button){
+        button.addEventListener('click', function(){
+          if (card.dataset.answered) return;
+          card.dataset.answered = 'true';
+          var choice = Number(button.dataset.choice);
+          options.forEach(function(optionButton, optionIndex){
+            optionButton.disabled = true;
+            if (optionIndex === correctChoice) optionButton.classList.add('correct');
+            if (optionIndex === choice && choice !== correctChoice) optionButton.classList.add('wrong');
+          });
+          quizAnswered++;
+          if (choice === correctChoice) {
+            quizScore++;
+            card.querySelector('.feedback').textContent = 'Correct — well done!';
+          } else {
+            card.querySelector('.feedback').textContent = 'The correct answer is ' + options[correctChoice].textContent.slice(3) + '.';
+          }
+          updateMcqScore();
+        });
+      });
+    });
+    document.getElementById('mcqReset').addEventListener('click', function(){
+      quizScore = 0; quizAnswered = 0;
+      quizCards.forEach(function(card){
+        delete card.dataset.answered;
+        card.querySelector('.feedback').textContent = '';
+        card.querySelectorAll('.option').forEach(function(button){
+          button.disabled = false;
+          button.classList.remove('correct','wrong');
+        });
+      });
+      updateMcqScore();
+    });
   }
 
   // Shared download totals for the fixed gallery assets.
@@ -1308,19 +1155,16 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   var backBtn = document.getElementById('backToTop');
-  var progressBar = document.getElementById('progressBar');
-  var ticking = false, scrollable = 1;
-  function measure(){ scrollable = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
+  var ticking = false;
   function paintScroll(){
     ticking = false;
     var y = window.scrollY;
     backBtn.classList.toggle('show', y > 500);
-    progressBar.style.width = Math.min(100, (y / scrollable) * 100) + '%';
     paintActiveSection();
   }
   function requestPaint(){ if (!ticking) { ticking = true; requestAnimationFrame(paintScroll); } }
-  measure(); requestPaint();
-  window.addEventListener('resize', function(){ measure(); requestPaint(); }, { passive:true });
+  requestPaint();
+  window.addEventListener('resize', requestPaint, { passive:true });
   window.addEventListener('scroll', requestPaint, { passive:true });
 });
 </script>
