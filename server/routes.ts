@@ -6208,9 +6208,30 @@ paths:
     try {
       const schools = await storage.listFriendshipSchools();
       const totalSchools = schools.length;
+      let mouSchools = schools.filter(s => !s.contactOverride).length;
+      try {
+        const rows = await fetchSheetRange(SHEET_IDS.alliances, "Friendship Schools!A:R");
+        const currentMouNames = new Set(
+          rows.slice(1)
+            .filter(r => r[1]?.trim() && String(r[11] ?? "").trim() === "MOU Done")
+            .map(r => {
+              const schoolName = String(r[1]).trim();
+              const location = String(r[2] ?? "").trim();
+              const alreadyHasLocation = location
+                && schoolName.toLowerCase().endsWith(`- ${location.toLowerCase()}`);
+              return (location && !alreadyHasLocation
+                ? `${schoolName} - ${location}`
+                : schoolName).toLowerCase();
+            }),
+        );
+        mouSchools = schools.filter(s => currentMouNames.has(s.name.toLowerCase())).length;
+      } catch {
+        // Keep database-derived counts available during a temporary Sheets outage.
+      }
+      const manualSchools = totalSchools - mouSchools;
       const activeSchools = schools.filter(s => s.leadCount > 0).length;
       const { totalLeads, walkIns, admissions } = await storage.getFriendshipLeadStats();
-      res.json({ totalSchools, activeSchools, totalLeads, walkIns, admissions });
+      res.json({ totalSchools, mouSchools, manualSchools, activeSchools, totalLeads, walkIns, admissions });
     } catch {
       res.status(500).json({ message: "Failed to fetch stats" });
     }
