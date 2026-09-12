@@ -1253,39 +1253,36 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
 
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-auto max-h-[62vh]">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[900px] text-sm">
             <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Student Name</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Ambassador Status</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 min-w-[180px]">PAC Attendance</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referred Family</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Contact</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Grade Applying</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referral Status</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Date Referred</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500">Referral Amount</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 w-8">#</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 min-w-[170px]">Student</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 whitespace-nowrap">Ambassador Status</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 min-w-[160px]">PAC Attendance</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 min-w-[190px]">Referral Details</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 whitespace-nowrap">Referral Status</th>
+                <th className="text-left px-3 py-3 text-xs font-semibold text-slate-500 whitespace-nowrap">Referral Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {rows.map((p, i) => (
                 <tr key={p.sno + i} className={`hover:bg-slate-50 transition ${p.status === "Admission Confirmed" ? "bg-green-50/40" : ""}`}>
-                  <td className="px-4 py-2.5 text-slate-400 text-xs">{p.sno}</td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2.5 text-slate-400 text-xs">{p.sno}</td>
+                  <td className="px-3 py-2.5">
                     <div className="font-medium text-slate-800">{p.referringParent}</div>
                     <div className="text-xs text-slate-400">{[p.branch?.trim(), p.wardClass].filter(Boolean).join(" · ") || "—"}</div>
                   </td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2.5">
                     {p.partnerStatus ? (
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold whitespace-nowrap ${
                         p.partnerStatus.toLowerCase().includes("accept") ? "bg-green-100 text-green-700" :
                         p.partnerStatus.toLowerCase().includes("reject") || p.partnerStatus.toLowerCase().includes("declin") ? "bg-red-100 text-red-700" :
                         "bg-amber-100 text-amber-700"
                       }`}>{p.partnerStatus}</span>
                     ) : <span className="text-slate-400 text-xs">—</span>}
                   </td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2.5">
                     {data.pacMeetings.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {data.pacMeetings.map(meeting => {
@@ -1305,24 +1302,28 @@ function ParentAdvocacyTab({ data }: { data: AlliancesData }) {
                       </div>
                     ) : <span className="text-slate-400 text-xs">—</span>}
                   </td>
-                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.referredFamily || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.contactNumber || "—"}</td>
-                  <td className="px-4 py-2.5 text-slate-600 text-xs">{p.gradeApplying || "—"}</td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2.5">
+                    <div className="text-xs font-medium text-slate-700">{p.referredFamily || "—"}</div>
+                    {(p.contactNumber || p.gradeApplying) && (
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {[p.contactNumber, p.gradeApplying].filter(Boolean).join(" · ")}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-3 py-2.5">
                     <StageBadge stage={p.status} palette={PA_COLOR} label={displayLabel(p.status)} />
                   </td>
-                  <td className="px-4 py-2.5 text-slate-500 text-xs">{p.dateReferred || "—"}</td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-3 py-2.5">
                     {p.incentiveGiven === "Paid"
                       ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Paid</span>
                       : p.incentiveGiven === "Pending"
                       ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pending</span>
-                      : <span className="text-slate-400 text-xs">—</span>}
+                      : <span className="text-slate-600 text-xs whitespace-nowrap">{p.incentiveGiven || "—"}</span>}
                   </td>
                 </tr>
               ))}
               {rows.length === 0 && (
-                <tr><td colSpan={10} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-slate-400">No results</td></tr>
               )}
             </tbody>
           </table>
