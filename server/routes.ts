@@ -389,6 +389,15 @@ export async function registerRoutes(
     redirect: false,
   }));
 
+  // Clear the browser's HTTP cache when the blog index is opened. An earlier
+  // permanent self-redirect for the Ganesh article can otherwise remain cached
+  // by embedded browsers even after the server route has been corrected.
+  app.get("/blogs", (_req, res, next) => {
+    res.setHeader("Clear-Site-Data", '"cache"');
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
+
   // SSR must be registered BEFORE wpRedirects so that search engine bots receive
   // fully-rendered HTML for all registered paths. For bots, the SSR handler returns
   // early with HTML. For regular browsers, SSR calls next() and the redirect fires.
