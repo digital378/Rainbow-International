@@ -18,7 +18,7 @@ All preview holders remain square at every viewport. A single public GET endpoin
 
 ## Closing sections
 
-Adapt the Janmashtami two-card Explore section and full-width closing CTA to the Ganesh manuscript theme. Preserve current school/preschool links and add the three requested preschool links. Rename the gallery and caption headings exactly as requested.
+Adapt the Janmashtami two-card Explore section and full-width closing CTA to the Ganesh manuscript theme. The Rainbow Preschool International card keeps its existing links and adds Homepage, Playgroup, Nursery, and Kindergarten; its wrapping layout must preserve card alignment. Rename the gallery and caption headings exactly as requested.
 
 ## Reliability and accessibility
 
