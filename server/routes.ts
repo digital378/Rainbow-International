@@ -58,6 +58,11 @@ import {
 import { checkInquiryProtection } from "./inquiryProtection";
 import { parseParentAdvocacySheet } from "@shared/parentAdvocacyPac";
 import {
+  FRIENDSHIP_AGGREGATE_HEADERS,
+  friendshipLeadIdentity,
+  validFriendshipAggregateRows,
+} from "@shared/friendshipLeadIdentity";
+import {
   escapeHtml,
   getLeadSourceLabel,
   getMediumLabel,
@@ -5146,94 +5151,6 @@ paths:
   const isE2eFriendshipArtifact = (...values: Array<string | null | undefined>): boolean =>
     values.some(value => /^e2e(?:-|(?:\s))/i.test(String(value ?? "").trim()));
 
-  async function ensureFriendshipSheetTab(sheets: any, sheetId: string, tabName: string): Promise<void> {
-    const meta = await sheets.spreadsheets.get({ spreadsheetId: sheetId, fields: "sheets.properties.title,sheets.properties.sheetId" });
-    const existing = (meta.data.sheets || []).find((s: any) => s.properties?.title === tabName);
-    if (!existing) {
-      const addResp = await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: sheetId,
-        requestBody: { requests: [{ addSheet: { properties: { title: tabName } } }] },
-      });
-      const newSheetId: number | undefined = addResp.data.replies?.[0]?.addSheet?.properties?.sheetId;
-      // Write header row
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: sheetId,
-        range: `${tabName}!A1:J1`,
-        valueInputOption: "USER_ENTERED",
-        requestBody: { values: [["Date", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Referral Amount", "Remarks"]] },
-      });
-      // Add status dropdown on column H (index 7) and Referral Amount dropdown on column I (index 8), rows 2-1000
-      if (newSheetId !== undefined) {
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: sheetId,
-          requestBody: {
-            requests: [
-              {
-                setDataValidation: {
-                  range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 7, endColumnIndex: 8 },
-                  rule: {
-                    condition: {
-                      type: "ONE_OF_LIST",
-                      values: [
-                        { userEnteredValue: "Open" },
-                        { userEnteredValue: "Walk-in Booked" },
-                        { userEnteredValue: "Walk-in Completed" },
-                        { userEnteredValue: "Closed" },
-                        { userEnteredValue: "Future Prospect" },
-                        { userEnteredValue: "Admission Done" },
-                      ],
-                    },
-                    showCustomUi: true,
-                    strict: false,
-                  },
-                },
-              },
-              {
-                setDataValidation: {
-                  range: { sheetId: newSheetId, startRowIndex: 1, endRowIndex: 1000, startColumnIndex: 8, endColumnIndex: 9 },
-                  rule: {
-                    condition: {
-                      type: "ONE_OF_LIST",
-                      values: [
-                        { userEnteredValue: "Pending" },
-                        { userEnteredValue: "Paid" },
-                      ],
-                    },
-                    showCustomUi: true,
-                    strict: false,
-                  },
-                },
-              },
-            ],
-          },
-        });
-      }
-      console.log(`[friendship] Created sheet tab with status dropdown: ${tabName}`);
-    }
-  }
-
-  async function appendFriendshipLeadToSheets(lead: {
-    id: number; submittedAt: Date | string; studentName: string; grade: string;
-    parentName: string; phone: string; email?: string | null; source: string;
-  }, tabName: string): Promise<void> {
-    const sheetId = SHEET_IDS.alliances;  // same sheet as auto-sync — Alliances Dashboard
-    if (!sheetId) throw new Error("Alliances sheet ID not configured");
-    const auth = getAuthenticatedClient();
-    if (!auth) throw new Error("Google not connected");
-    const sheets = google.sheets({ version: "v4", auth });
-    await ensureFriendshipSheetTab(sheets, sheetId, tabName);
-    const dt = new Date(lead.submittedAt);
-    const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: `${tabName}!A:J`,
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values: [[dateStr, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open", "Pending", ""]],
-      },
-    });
-  }
-
   // ── Aggregate "All Friendship Leads" tab helpers ─────────────────
   const AGGREGATE_TAB = "All Friendship Leads";
 
@@ -5251,7 +5168,7 @@ paths:
         spreadsheetId: sheetId,
         range: `${AGGREGATE_TAB}!A1:K1`,
         valueInputOption: "USER_ENTERED",
-        requestBody: { values: [["Date", "School Name", "Student Name", "Grade", "Parent Name", "Phone", "Email", "Source", "Status", "Referral Amount", "Remarks"]] },
+        requestBody: { values: [FRIENDSHIP_AGGREGATE_HEADERS] },
       });
       console.log(`[friendship] Created aggregate tab: ${AGGREGATE_TAB}`);
     } else {
@@ -5322,17 +5239,38 @@ paths:
     if (!auth) throw new Error("Google not connected");
     const sheets = google.sheets({ version: "v4", auth });
     await ensureAggregateLeadsTab(sheets, sheetId);
-    const rows = leads.map(lead => {
+    const currentResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${AGGREGATE_TAB}!A:K`,
+    });
+    const currentRows = currentResponse.data.values || [];
+    if (!validFriendshipAggregateRows(currentRows)) {
+      throw new Error("Shared leads sheet has missing or invalid headers");
+    }
+    const existingIdentities = new Set(
+      currentRows.slice(1)
+        .filter(row => String(row[1] ?? "").trim().toLowerCase() === schoolName.trim().toLowerCase())
+        .map(row => friendshipLeadIdentity(String(row[2] ?? ""), String(row[5] ?? ""))),
+    );
+    const newLeads = leads.filter(lead => {
+      const key = friendshipLeadIdentity(lead.studentName, lead.phone);
+      if (existingIdentities.has(key)) return false;
+      existingIdentities.add(key);
+      return true;
+    });
+    const rows = newLeads.map(lead => {
       const dt = new Date(lead.submittedAt);
       const dateStr = dt.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "2-digit", month: "short", year: "numeric" });
       return [dateStr, schoolName, lead.studentName, lead.grade, lead.parentName, lead.phone, lead.email || "", lead.source, "Open", "Pending", ""];
     });
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: sheetId,
-      range: `${AGGREGATE_TAB}!A:K`,
-      valueInputOption: "USER_ENTERED",
-      requestBody: { values: rows },
-    });
+    if (rows.length) {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: sheetId,
+        range: `${AGGREGATE_TAB}!A:K`,
+        valueInputOption: "USER_ENTERED",
+        requestBody: { values: rows },
+      });
+    }
     // Mark every lead as confirmed in the sheet so the sync-all deletion guard works correctly
     await Promise.all(
       leads
@@ -5394,19 +5332,23 @@ paths:
       if (!school || !school.isActive) return res.status(404).json({ message: "School not found or inactive" });
 
       const input = publicFriendshipLeadSchema.parse(req.body);
-      const lead = await storage.createFriendshipLead({
+      const { inserted, skipped } = await storage.createFriendshipLeadsIdempotent([{
         schoolId: school.id, source: "manual", status: "Open",
         studentName: input.studentName, grade: input.grade,
         parentName: input.parentName, phone: input.phone, email: input.email,
-      });
+      }]);
+      if (!inserted.length) {
+        return res.status(200).json({ success: true, duplicate: true });
+      }
+      try {
+        await queueAppend(inserted, school.name);
+      } catch (err) {
+        await Promise.all(inserted.map(item => storage.markFriendshipLeadSyncFailed(item.id)));
+        console.error(`[friendship] Aggregate tab sync failed for lead ${inserted[0].id}:`, err instanceof Error ? err.message : String(err));
+        return res.status(502).json({ message: "Lead saved, but confirmation sync failed. Please do not submit it again.", saved: true });
+      }
       console.log(`[friendship] Lead submitted: ${input.studentName} → ${school.name}`);
-      res.status(201).json({ success: true, id: lead.id });
-
-      // Append to aggregate "All Friendship Leads" tab (fire-and-forget, serialised via queue)
-      queueAppend([lead], school.name)
-        .catch((err: unknown) => {
-          console.error(`[friendship] Aggregate tab sync failed for lead ${lead.id}:`, err instanceof Error ? err.message : String(err));
-        });
+      res.status(201).json({ success: true, id: inserted[0].id, skipped });
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to submit lead" });
@@ -5464,15 +5406,29 @@ paths:
         studentName: row.studentName, grade: row.grade,
         parentName: row.parentName, phone: row.phone, email: row.email,
       }));
-      const inserted = await storage.createFriendshipLeads(leadsToInsert);
-      console.log(`[friendship] Bulk upload: ${inserted.length} leads for ${school.name} (${skipped.length} skipped)`);
-      res.status(201).json({ success: true, inserted: inserted.length, skipped: skipped.length, skippedDetails: skipped });
-
-      // Append all inserted leads to aggregate tab in one batch call (fire-and-forget, serialised via queue)
-      queueAppend(inserted, school.name)
-        .catch((err: unknown) => {
-          console.error(`[friendship] Aggregate tab bulk sync failed:`, err instanceof Error ? err.message : String(err));
-        });
+      const result = await storage.createFriendshipLeadsIdempotent(leadsToInsert);
+      if (result.inserted.length) {
+        try {
+          await queueAppend(result.inserted, school.name);
+        } catch (err) {
+          await Promise.all(result.inserted.map(item => storage.markFriendshipLeadSyncFailed(item.id)));
+          console.error("[friendship] Aggregate tab bulk sync failed:", err instanceof Error ? err.message : String(err));
+          return res.status(502).json({
+            message: "Leads were saved, but confirmation sync failed. Please do not upload the file again.",
+            saved: true,
+            inserted: result.inserted.length,
+          });
+        }
+      }
+      const skippedExisting = result.skipped;
+      console.log(`[friendship] Bulk upload: ${result.inserted.length} leads for ${school.name} (${skipped.length} invalid, ${skippedExisting} existing)`);
+      res.status(201).json({
+        success: true,
+        inserted: result.inserted.length,
+        skipped: skipped.length,
+        skippedExisting,
+        skippedDetails: skipped,
+      });
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to process bulk upload" });
@@ -5514,6 +5470,7 @@ paths:
           const currentMouNamesLc = new Set(mouDone.map(s => s.name.toLowerCase()));
           for (const school of existing) {
             if (currentMouNamesLc.has(school.name.toLowerCase())) continue; // still live in sheet
+            if (school.leadCount > 0) continue; // never cascade-delete a school that owns leads
             // Only auto-remove schools synced from Sheets — never delete ones the admin manually
             // created with a custom contactOverride (they were added directly in the dashboard).
             if ((school as any).contactOverride) continue;
@@ -5541,7 +5498,7 @@ paths:
               continue;
             }
             // New school — create it
-            const school = await storage.createFriendshipSchool({
+            const school = await storage.upsertFriendshipSchoolFromSheet({
               name: s.name,
               slug: slugify(s.name),
               token: randomBytes(16).toString("hex"),
@@ -5591,16 +5548,8 @@ paths:
       const validated = insertFriendshipSchoolSchema.parse(body);
       const school = await storage.createFriendshipSchool(validated);
       res.status(201).json(school);
-      // Auto-create the Sheets tab (non-blocking) — never create external
-      // workbook artifacts for automated test records.
-      const sheetId = process.env.ALLIANCES_SHEET_ID;
-      const auth = getAuthenticatedClient();
-      if (sheetId && auth && !isE2eFriendshipArtifact(school.name, school.sheetsTabName)) {
-        const sheets = google.sheets({ version: "v4", auth });
-        ensureFriendshipSheetTab(sheets, sheetId, school.sheetsTabName).catch((e: unknown) => {
-          console.error(`[friendship] Tab creation failed for "${school.sheetsTabName}":`, e instanceof Error ? e.message : e);
-        });
-      }
+      // Leads are stored only in the shared aggregate tab. Per-school tabs are legacy
+      // artifacts and must never be created by this endpoint.
     } catch (err: any) {
       if (err.name === "ZodError") return res.status(400).json({ message: fromZodError(err).message });
       res.status(500).json({ message: "Failed to create school" });
@@ -5682,7 +5631,7 @@ paths:
       res.json(lead);
       // Write-back to aggregate sheet (fire-and-forget)
       storage.getFriendshipSchoolById(lead.schoolId).then(school => {
-        if (school) updateAggregateLeadRow(lead.phone, school.name, update).catch((e: unknown) => {
+        if (school) updateAggregateLeadRow(lead.studentName, lead.phone, school.name, update).catch((e: unknown) => {
           console.error("[friendship] aggregate sheet write-back failed:", e instanceof Error ? e.message : e);
         });
       }).catch(() => {});
@@ -5693,7 +5642,7 @@ paths:
 
   // Helper: update a lead's status + referral amount in the aggregate tab (fire-and-forget)
   async function updateAggregateLeadRow(
-    phone: string, schoolName: string,
+    studentName: string, phone: string, schoolName: string,
     fields: { status?: string; commissionPaid?: boolean }
   ): Promise<void> {
     const sheetId = SHEET_IDS.alliances;
@@ -5706,13 +5655,16 @@ paths:
       range: `${AGGREGATE_TAB}!A:K`,
     });
     const rows = resp.data.values || [];
-    const normalised = phone.replace(/\D/g, "");
+    if (!validFriendshipAggregateRows(rows)) {
+      throw new Error("Shared leads sheet has missing or invalid headers");
+    }
+    const identity = friendshipLeadIdentity(studentName, phone);
     const updates: Promise<any>[] = [];
     for (let i = 1; i < rows.length; i++) {
       const r = rows[i];
       const rowSchool = (r[1] || "").toString().trim();
-      const rowPhone  = (r[5] || "").toString().replace(/\D/g, "");
-      if (rowSchool !== schoolName || rowPhone !== normalised) continue;
+      const rowIdentity = friendshipLeadIdentity((r[2] || "").toString(), (r[5] || "").toString());
+      if (rowSchool.toLowerCase() !== schoolName.trim().toLowerCase() || rowIdentity !== identity) continue;
       const rowNum = i + 1; // 1-based sheet row
       if (fields.status !== undefined) {
         updates.push(sheets.spreadsheets.values.update({
@@ -5750,17 +5702,15 @@ paths:
         range: `${AGGREGATE_TAB}!A:K`,
       });
       const allRows = response.data.values || [];
+      if (!validFriendshipAggregateRows(allRows)) {
+        return res.status(409).json({ message: "Shared leads sheet has missing or invalid headers; no records were changed" });
+      }
       const dataRows = allRows.slice(1); // skip header
-
-      // Build phone set across ALL rows (used for deletion check)
-      const allSheetPhones = new Set(
-        dataRows.map(r => (r[5] || "").toString().replace(/\D/g, "")).filter(Boolean)
-      );
 
       // Group sheet rows by school name (col B)
       const rowsBySchool = new Map<string, typeof dataRows>();
       for (const r of dataRows) {
-        const name = (r[1] || "").toString().trim();
+        const name = (r[1] || "").toString().trim().toLowerCase();
         if (!name) continue;
         if (!rowsBySchool.has(name)) rowsBySchool.set(name, []);
         rowsBySchool.get(name)!.push(r);
@@ -5768,49 +5718,67 @@ paths:
 
       // Process every school in DB
       const allSchools = await storage.listFriendshipSchools();
-      let totalUpdated = 0, totalDeleted = 0;
+      let totalUpdated = 0, totalImported = 0;
 
       for (const school of allSchools) {
         try {
-          const existing = await storage.listFriendshipLeads(school.id);
-          const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
-          const schoolRows = rowsBySchool.get(school.name) ?? [];
+          const existing = await storage.listFriendshipLeads(school.id, undefined, 5000, 0);
+          const existingByIdentity = new Map(existing.map(lead => [friendshipLeadIdentity(lead.studentName, lead.phone), lead]));
+          const schoolRows = rowsBySchool.get(school.name.trim().toLowerCase()) ?? [];
 
-          const fieldUpdates: { phone: string; status?: string; commissionPaid?: boolean | null }[] = [];
+          const fieldUpdates: { id: number; status?: string; commissionPaid?: boolean | null }[] = [];
+          const sheetLeads: InsertFriendshipLead[] = [];
 
           for (const r of schoolRows) {
+            const studentName = (r[2] || "").toString().trim();
+            const grade = (r[3] || "").toString().trim();
+            const parentName = (r[4] || "").toString().trim();
             const phone  = (r[5] || "").toString().trim();
             const status = (r[8] || "Open").toString().trim();
-            if (!phone) continue;
-            const entry: { phone: string; status?: string; commissionPaid?: boolean | null } = { phone };
-            if (status) entry.status = status;
+            if (!studentName || !grade || !parentName || phone.replace(/\D/g, "").length < 7) continue;
+            const existingLead = existingByIdentity.get(friendshipLeadIdentity(studentName, phone));
             // Col J = Referral Amount: "Paid" → true, "Pending" / empty → false, absent → null (leave unchanged)
             const refAmt = (r[9] ?? "").toString().trim().toLowerCase();
-            if (refAmt === "paid") entry.commissionPaid = true;
-            else if (refAmt === "pending" || refAmt === "") entry.commissionPaid = false;
-            fieldUpdates.push(entry);
+            if (existingLead) {
+              const entry: { id: number; status?: string; commissionPaid?: boolean | null } = { id: existingLead.id };
+              if (status) entry.status = status;
+              if (refAmt === "paid") entry.commissionPaid = true;
+              else if (refAmt === "pending" || refAmt === "") entry.commissionPaid = false;
+              fieldUpdates.push(entry);
+            }
+            sheetLeads.push({
+              schoolId: school.id,
+              studentName,
+              grade,
+              parentName,
+              phone,
+              email: (r[6] || "").toString().trim() || null,
+              source: (r[7] || "").toString().trim().toLowerCase() === "bulk" ? "bulk" : "manual",
+              status: status || "Open",
+              commissionPaid: refAmt === "paid",
+              remarks: (r[10] || "").toString().trim() || null,
+            });
           }
 
-          // Delete leads absent from the entire sheet (rename-safe: check all phones not just school rows)
-          // Only delete leads confirmed in the sheet (syncedToSheets=true).
-          // Leads still pending their first append are never treated as "removed".
-          const toDelete = existing.filter(l => l.syncedToSheets && !allSheetPhones.has(l.phone.replace(/\D/g, "")));
-          const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
+          const imported = await storage.createFriendshipLeadsIdempotent(sheetLeads);
+          await Promise.all(imported.inserted.map(lead => storage.markFriendshipLeadSynced(lead.id)));
+          await Promise.all(
+            sheetLeads
+              .map(lead => existingByIdentity.get(friendshipLeadIdentity(lead.studentName, lead.phone)))
+              .filter((lead): lead is NonNullable<typeof lead> => Boolean(lead))
+              .map(lead => lead.syncedToSheets ? Promise.resolve() : storage.markFriendshipLeadSynced(lead.id)),
+          );
           const updated = await storage.bulkUpdateFriendshipLeadFields(school.id, fieldUpdates);
 
           totalUpdated += updated;
-          totalDeleted += deleted;
-
-          if (deleted > 0) {
-            console.log(`[friendship] sync-all ${school.name}: ${deleted} deleted`);
-          }
+          totalImported += imported.inserted.length;
         } catch (e: unknown) {
           console.error(`[friendship] sync-all school="${school.name}" error:`, e instanceof Error ? e.message : e);
         }
       }
 
-      console.log(`[friendship] sync-all complete: ${totalUpdated} updated, ${totalDeleted} deleted`);
-      res.json({ updated: totalUpdated, deleted: totalDeleted, schools: allSchools.length });
+      console.log(`[friendship] sync-all complete: ${totalUpdated} updated, ${totalImported} imported`);
+      res.json({ updated: totalUpdated, imported: totalImported, deleted: 0, schools: allSchools.length });
     } catch (err: any) {
       const msg = err?.message || String(err) || "";
       console.error("[sync-all] error:", msg);
@@ -5840,27 +5808,35 @@ paths:
         range: `${AGGREGATE_TAB}!A:K`,
       });
       const allRows = response.data.values || [];
+      if (!validFriendshipAggregateRows(allRows)) {
+        return res.status(409).json({ message: "Shared leads sheet has missing or invalid headers; no records were changed" });
+      }
 
       // Filter to rows for this school
-      const schoolRows = allRows.slice(1).filter(r => (r[1] || "").toString().trim() === school.name);
+      const schoolRows = allRows.slice(1).filter(r =>
+        (r[1] || "").toString().trim().toLowerCase() === school.name.trim().toLowerCase()
+      );
 
       // Get existing DB leads for this school
-      const existing = await storage.listFriendshipLeads(schoolId);
-      const existingPhones = new Set(existing.map(l => l.phone.replace(/\D/g, "")));
+      const existing = await storage.listFriendshipLeads(schoolId, undefined, 5000, 0);
+      const existingByIdentity = new Map(existing.map(l => [friendshipLeadIdentity(l.studentName, l.phone), l]));
 
-      const statusUpdates: { phone: string; status: string }[] = [];
+      const statusUpdates: { id: number; status: string }[] = [];
       const newLeads: InsertFriendshipLead[] = [];
 
       for (const r of schoolRows) {
         const phone  = (r[5] || "").toString().trim();
         const status = (r[8] || "Open").toString().trim();
-        if (!phone) continue;
-        if (status) statusUpdates.push({ phone, status });
+        const studentName = (r[2] || "").toString().trim();
+        if (!studentName || phone.replace(/\D/g, "").length < 7) continue;
+        const identity = friendshipLeadIdentity(studentName, phone);
+        const existingLead = existingByIdentity.get(identity);
+        if (status && existingLead) statusUpdates.push({ id: existingLead.id, status });
         // Rows present in the sheet but missing from the DB → import them
-        if (!existingPhones.has(phone.replace(/\D/g, ""))) {
+        if (!existingLead) {
           newLeads.push({
             schoolId,
-            studentName: (r[2] || "").toString().trim() || "Unknown",
+            studentName,
             grade: (r[3] || "").toString().trim() || "Unknown",
             parentName: (r[4] || "").toString().trim() || "Unknown",
             phone,
@@ -5872,30 +5848,13 @@ paths:
         }
       }
 
-      // Leads in DB but absent from the sheet → delete them.
-      // Use ALL rows in the aggregate tab (not just schoolRows) so that leads appended
-      // under a previous school name (before a rename) are not mistakenly deleted.
-      const allSheetPhones = new Set(
-        allRows.slice(1)
-          .map(r => (r[5] || "").toString().replace(/\D/g, ""))
-          .filter(Boolean)
-      );
-      // Only delete leads confirmed in the sheet (syncedToSheets=true).
-      const toDelete = existing.filter(l => l.syncedToSheets && !allSheetPhones.has(l.phone.replace(/\D/g, "")));
-      const deleted = toDelete.length ? await storage.deleteFriendshipLeads(toDelete.map(l => l.id)) : 0;
-      if (deleted > 0) {
-        console.log(`[friendship] sync-status: deleted ${deleted} leads removed from sheet for ${school.name}`);
-      }
-
       const updated = await storage.bulkUpdateFriendshipLeadStatuses(schoolId, statusUpdates);
-      let imported = 0;
-      if (newLeads.length) {
-        await storage.createFriendshipLeads(newLeads);
-        imported = newLeads.length;
-      }
+      const importResult = await storage.createFriendshipLeadsIdempotent(newLeads);
+      await Promise.all(importResult.inserted.map(lead => storage.markFriendshipLeadSynced(lead.id)));
+      const imported = importResult.inserted.length;
 
-      console.log(`[friendship] sync-status school=${school.name}: ${updated} updated, ${imported} imported, ${deleted} deleted`);
-      res.json({ updated, imported, deleted, total: statusUpdates.length });
+      console.log(`[friendship] sync-status school=${school.name}: ${updated} updated, ${imported} imported`);
+      res.json({ updated, imported, deleted: 0, total: statusUpdates.length });
     } catch (err: any) {
       const msg = err?.message || String(err) || "";
       console.error("[sync-status] error:", msg);
@@ -6079,9 +6038,31 @@ paths:
     }
   });
 
-  // Admin: retry sync (per-school tab sync removed; aggregate tab is fire-and-forget)
+  // Admin: retry failed aggregate writes. Appends are identity-checked, so retries
+  // are safe even when a prior Sheets request succeeded but its response was lost.
   app.post("/api/admin/alliances/friendship/sync-sheets", requireAdmin, async (_req, res) => {
-    res.json({ total: 0, synced: 0, failed: 0, message: "Per-school sheet sync disabled; leads go to the All Friendship Leads aggregate tab only." });
+    const failedLeads = await storage.listFailedFriendshipLeads();
+    const bySchool = new Map<number, typeof failedLeads>();
+    for (const lead of failedLeads) {
+      if (!bySchool.has(lead.schoolId)) bySchool.set(lead.schoolId, []);
+      bySchool.get(lead.schoolId)!.push(lead);
+    }
+    let synced = 0;
+    let failed = 0;
+    for (const [schoolId, leads] of bySchool) {
+      const school = await storage.getFriendshipSchoolById(schoolId);
+      if (!school) {
+        failed += leads.length;
+        continue;
+      }
+      try {
+        await queueAppend(leads, school.name);
+        synced += leads.length;
+      } catch {
+        failed += leads.length;
+      }
+    }
+    res.json({ total: failedLeads.length, synced, failed });
   });
 
   // Admin: one-shot sheet cleanup — fix aggregate tab schema + delete junk/per-school tabs
@@ -6160,19 +6141,17 @@ paths:
 
       // Delete e2e test schools from DB first, then clean their tabs from the sheet
       const allSchools = await storage.listFriendshipSchools();
-      const e2eSchools = allSchools.filter(s => s.name.startsWith("e2e-") || s.sheetsTabName.startsWith("e2e-"));
+      const e2eSchools = allSchools.filter(s => isE2eFriendshipArtifact(s.name, s.sheetsTabName));
       for (const s of e2eSchools) {
         await storage.deleteFriendshipSchool(s.id).catch(() => {});
       }
       console.log(`[friendship] Deleted ${e2eSchools.length} e2e test schools from DB`);
 
-      // Identify junk tabs across ALL sheets we checked: any e2e-* tab + per-school tabs
-      const knownSchoolNames = new Set(
-        (await storage.listFriendshipSchools()).map(s => s.sheetsTabName)
-      );
+      // Cleanup is intentionally restricted to clearly marked automated-test tabs.
+      // Real and legacy school tabs require an explicit, separately reviewed migration.
       const junkTabs = allTabsBySheet.filter(t =>
         t.title !== AGGREGATE_TAB &&
-        (isE2eFriendshipArtifact(t.title) || (!e2eOnly && knownSchoolNames.has(t.title)))
+        isE2eFriendshipArtifact(t.title)
       );
 
       // Group deletions by spreadsheet so each sheet gets one batchUpdate call
@@ -6208,30 +6187,9 @@ paths:
     try {
       const schools = await storage.listFriendshipSchools();
       const totalSchools = schools.length;
-      let mouSchools = schools.filter(s => !s.contactOverride).length;
-      try {
-        const rows = await fetchSheetRange(SHEET_IDS.alliances, "Friendship Schools!A:R");
-        const currentMouNames = new Set(
-          rows.slice(1)
-            .filter(r => r[1]?.trim() && String(r[11] ?? "").trim() === "MOU Done")
-            .map(r => {
-              const schoolName = String(r[1]).trim();
-              const location = String(r[2] ?? "").trim();
-              const alreadyHasLocation = location
-                && schoolName.toLowerCase().endsWith(`- ${location.toLowerCase()}`);
-              return (location && !alreadyHasLocation
-                ? `${schoolName} - ${location}`
-                : schoolName).toLowerCase();
-            }),
-        );
-        mouSchools = schools.filter(s => currentMouNames.has(s.name.toLowerCase())).length;
-      } catch {
-        // Keep database-derived counts available during a temporary Sheets outage.
-      }
-      const manualSchools = totalSchools - mouSchools;
       const activeSchools = schools.filter(s => s.leadCount > 0).length;
       const { totalLeads, walkIns, admissions } = await storage.getFriendshipLeadStats();
-      res.json({ totalSchools, mouSchools, manualSchools, activeSchools, totalLeads, walkIns, admissions });
+      res.json({ totalSchools, activeSchools, totalLeads, walkIns, admissions });
     } catch {
       res.status(500).json({ message: "Failed to fetch stats" });
     }

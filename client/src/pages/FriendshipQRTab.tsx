@@ -29,8 +29,7 @@ type Lead = {
 };
 
 type Stats = {
-  totalSchools: number; mouSchools: number; manualSchools: number;
-  activeSchools: number; totalLeads: number;
+  totalSchools: number; activeSchools: number; totalLeads: number;
   walkIns: number; admissions: number;
 };
 
@@ -410,9 +409,8 @@ function FriendshipQRTabInner({ refreshKey = 0 }: { refreshKey?: number }) {
     <div>
       {/* Stats row */}
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
-          <StatCard label="MOU schools" value={stats.mouSchools} color={NAVY} />
-          <StatCard label="Manual QR entries" value={stats.manualSchools} color="#64748b" />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+          <StatCard label="Schools on board" value={stats.totalSchools} color={NAVY} />
           <StatCard label="QR Active (≥1 lead)" value={stats.activeSchools} color="#0ea5e9" />
           <StatCard label="Total Leads" value={stats.totalLeads} color="#7c3aed" />
           <StatCard label="Walk-ins" value={stats.walkIns} color={AMBER} />

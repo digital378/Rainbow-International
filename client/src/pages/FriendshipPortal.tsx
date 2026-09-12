@@ -86,6 +86,7 @@ export default function FriendshipPortal() {
   const [uploading, setUploading] = useState(false);
   const [bulkSuccess, setBulkSuccess] = useState(0);
   const [bulkSkipped, setBulkSkipped] = useState(0);
+  const [bulkExisting, setBulkExisting] = useState(0);
   const [bulkError, setBulkError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
@@ -209,7 +210,8 @@ export default function FriendshipPortal() {
   const pickFile = useCallback(async (file: File) => {
     if (!file.name.toLowerCase().endsWith(".xlsx")) { setBulkError("Only .xlsx files are accepted."); return; }
     if (file.size > 2 * 1024 * 1024) { setBulkError("File must be under 2 MB."); return; }
-    setBulkError(""); setFileName(file.name); setSelectedFile(file);
+    setBulkError(""); setBulkSuccess(0); setBulkSkipped(0); setBulkExisting(0);
+    setFileName(file.name); setSelectedFile(file);
     setParsedRows([]); setParseErrors([]);
     try {
       const buffer = await file.arrayBuffer();
@@ -270,6 +272,7 @@ export default function FriendshipPortal() {
       if (!res.ok) throw new Error(d.message || "Upload failed");
       setBulkSuccess(d.inserted ?? 0);
       setBulkSkipped(d.skipped ?? 0);
+      setBulkExisting(d.skippedExisting ?? 0);
       setSelectedFile(null); setFileName("");
       loadLeads();
     } catch (err: any) {
@@ -385,11 +388,17 @@ export default function FriendshipPortal() {
 
   const bulkPanel = (
     <div className="px-6 py-5 space-y-4">
-      {bulkSuccess > 0 && (
+      {(bulkSuccess > 0 || bulkExisting > 0) && (
         <div className="p-3 rounded-xl border flex items-center gap-2 text-sm font-semibold"
           style={{ background: "#dcfce7", borderColor: GREEN, color: GREEN }}>
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-          <span>{bulkSuccess} lead{bulkSuccess !== 1 ? "s" : ""} uploaded{bulkSkipped > 0 ? ` · ${bulkSkipped} row${bulkSkipped !== 1 ? "s" : ""} skipped` : ""}!</span>
+          <span>
+            {bulkSuccess > 0
+              ? `${bulkSuccess} lead${bulkSuccess !== 1 ? "s" : ""} uploaded`
+              : "No new leads uploaded"}
+            {bulkExisting > 0 ? ` · ${bulkExisting} already existed` : ""}
+            {bulkSkipped > 0 ? ` · ${bulkSkipped} invalid row${bulkSkipped !== 1 ? "s" : ""} skipped` : ""}
+          </span>
         </div>
       )}
 

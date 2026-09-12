@@ -15,6 +15,10 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { desc, eq, gte, and, sql, count, inArray } from "drizzle-orm";
+import {
+  friendshipLeadIdentity,
+  normalizeFriendshipStudent,
+} from "@shared/friendshipLeadIdentity";
 
 export interface IStorage {
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
@@ -63,6 +67,7 @@ export interface IStorage {
 
   // Friendship Schools
   createFriendshipSchool(school: InsertFriendshipSchool): Promise<FriendshipSchool>;
+  upsertFriendshipSchoolFromSheet(school: InsertFriendshipSchool): Promise<FriendshipSchool>;
   updateFriendshipSchool(id: number, data: Partial<InsertFriendshipSchool>): Promise<FriendshipSchool | undefined>;
   listFriendshipSchools(): Promise<(FriendshipSchool & { leadCount: number })[]>;
   getFriendshipSchoolById(id: number): Promise<FriendshipSchool | undefined>;
@@ -72,13 +77,14 @@ export interface IStorage {
   // Friendship School Leads
   createFriendshipLead(lead: InsertFriendshipLead): Promise<FriendshipSchoolLead>;
   createFriendshipLeads(leads: InsertFriendshipLead[]): Promise<FriendshipSchoolLead[]>;
+  createFriendshipLeadsIdempotent(leads: InsertFriendshipLead[]): Promise<{ inserted: FriendshipSchoolLead[]; skipped: number }>;
   listFriendshipLeads(schoolId?: number, status?: string, limit?: number, offset?: number): Promise<FriendshipSchoolLead[]>;
   listFailedFriendshipLeads(): Promise<FriendshipSchoolLead[]>;
   markFriendshipLeadSynced(id: number): Promise<void>;
   markFriendshipLeadSyncFailed(id: number): Promise<void>;
   updateFriendshipLead(id: number, data: { status?: string; commissionPaid?: boolean }): Promise<FriendshipSchoolLead | undefined>;
-  bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { phone: string; status: string }[]): Promise<number>;
-  bulkUpdateFriendshipLeadFields(schoolId: number, updates: { phone: string; status?: string; commissionPaid?: boolean | null }[]): Promise<number>;
+  bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { id: number; status: string }[]): Promise<number>;
+  bulkUpdateFriendshipLeadFields(schoolId: number, updates: { id: number; status?: string; commissionPaid?: boolean | null }[]): Promise<number>;
   deleteFriendshipLeads(ids: number[]): Promise<number>;
 }
 
@@ -340,6 +346,23 @@ export class DbStorage implements IStorage {
     return result;
   }
 
+  async upsertFriendshipSchoolFromSheet(school: InsertFriendshipSchool): Promise<FriendshipSchool> {
+    const [inserted] = await db
+      .insert(friendshipSchools)
+      .values(school)
+      .onConflictDoNothing({ target: friendshipSchools.slug })
+      .returning();
+    if (inserted) return inserted;
+    const [existing] = await db
+      .select()
+      .from(friendshipSchools)
+      .where(eq(friendshipSchools.slug, school.slug));
+    if (!existing || existing.name.trim().toLowerCase() !== school.name.trim().toLowerCase()) {
+      throw new Error(`Friendship school slug collision for "${school.name}"`);
+    }
+    return existing;
+  }
+
   async updateFriendshipSchool(id: number, data: Partial<InsertFriendshipSchool>): Promise<FriendshipSchool | undefined> {
     const [result] = await db.update(friendshipSchools).set(data).where(eq(friendshipSchools.id, id)).returning();
     return result;
@@ -385,6 +408,38 @@ export class DbStorage implements IStorage {
     return await db.insert(friendshipSchoolLeads).values(leads).returning();
   }
 
+  async createFriendshipLeadsIdempotent(leads: InsertFriendshipLead[]): Promise<{ inserted: FriendshipSchoolLead[]; skipped: number }> {
+    if (leads.length === 0) return { inserted: [], skipped: 0 };
+    const schoolId = leads[0].schoolId;
+    if (leads.some(lead => lead.schoolId !== schoolId)) {
+      throw new Error("Idempotent friendship lead insert must target one school");
+    }
+
+    return await db.transaction(async tx => {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${"friendship-leads:" + schoolId}))`);
+      const existing = await tx
+        .select({ studentName: friendshipSchoolLeads.studentName, phone: friendshipSchoolLeads.phone })
+        .from(friendshipSchoolLeads)
+        .where(eq(friendshipSchoolLeads.schoolId, schoolId));
+      const known = new Set(existing.map(row => friendshipLeadIdentity(row.studentName, row.phone)));
+      const unique: InsertFriendshipLead[] = [];
+      let skipped = 0;
+      for (const lead of leads) {
+        const key = friendshipLeadIdentity(lead.studentName, lead.phone);
+        if (!normalizeFriendshipStudent(lead.studentName) || !key.split("|").slice(1).join("|") || known.has(key)) {
+          skipped++;
+          continue;
+        }
+        known.add(key);
+        unique.push(lead);
+      }
+      const inserted = unique.length
+        ? await tx.insert(friendshipSchoolLeads).values(unique).returning()
+        : [];
+      return { inserted, skipped };
+    });
+  }
+
   async listFriendshipLeads(schoolId?: number, status?: string, limit = 200, offset = 0): Promise<FriendshipSchoolLead[]> {
     const conds = [];
     if (schoolId) conds.push(eq(friendshipSchoolLeads.schoolId, schoolId));
@@ -412,22 +467,25 @@ export class DbStorage implements IStorage {
     return result;
   }
 
-  async bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { phone: string; status: string }[]): Promise<number> {
+  async bulkUpdateFriendshipLeadStatuses(schoolId: number, updates: { id: number; status: string }[]): Promise<number> {
     let count = 0;
-    for (const { phone, status } of updates) {
+    for (const { id, status } of updates) {
       const result = await db
         .update(friendshipSchoolLeads)
         .set({ status })
-        .where(and(eq(friendshipSchoolLeads.schoolId, schoolId), eq(friendshipSchoolLeads.phone, phone)))
+        .where(and(
+          eq(friendshipSchoolLeads.schoolId, schoolId),
+          eq(friendshipSchoolLeads.id, id),
+        ))
         .returning({ id: friendshipSchoolLeads.id });
       count += result.length;
     }
     return count;
   }
 
-  async bulkUpdateFriendshipLeadFields(schoolId: number, updates: { phone: string; status?: string; commissionPaid?: boolean | null }[]): Promise<number> {
+  async bulkUpdateFriendshipLeadFields(schoolId: number, updates: { id: number; status?: string; commissionPaid?: boolean | null }[]): Promise<number> {
     let count = 0;
-    for (const { phone, status, commissionPaid } of updates) {
+    for (const { id, status, commissionPaid } of updates) {
       const patch: Record<string, unknown> = {};
       if (status !== undefined) patch.status = status;
       if (commissionPaid !== undefined) patch.commissionPaid = commissionPaid;
@@ -435,7 +493,10 @@ export class DbStorage implements IStorage {
       const result = await db
         .update(friendshipSchoolLeads)
         .set(patch)
-        .where(and(eq(friendshipSchoolLeads.schoolId, schoolId), eq(friendshipSchoolLeads.phone, phone)))
+        .where(and(
+          eq(friendshipSchoolLeads.schoolId, schoolId),
+          eq(friendshipSchoolLeads.id, id),
+        ))
         .returning({ id: friendshipSchoolLeads.id });
       count += result.length;
     }
