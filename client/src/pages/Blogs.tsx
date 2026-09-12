@@ -46,10 +46,7 @@ const pinnedSlugs = new Set(pinnedCards.map((c) => c.slug));
 /** Build the canonical clean URL for a listing card. */
 function cardHref(blog: BlogCard): string {
   const path = `/blog/${blog.slug}`;
-  // A short-lived recovery query bypasses browsers that cached the previous
-  // permanent redirect for this route. The article itself keeps its clean
-  // canonical URL, so search indexing is unaffected.
-  return blog.slug === "ganesh-chaturthi-2026" ? `${path}?refresh=20260912` : path;
+  return path;
 }
 
 
