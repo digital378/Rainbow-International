@@ -39,6 +39,7 @@ import {
 } from "./blogRoutes";
 import { runAndAlert } from "./seoMonitor";
 import { google } from "googleapis";
+import { ReplitConnectors } from "@replit/connectors-sdk";
 import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
@@ -2773,12 +2774,38 @@ export async function registerRoutes(
     alliances: "1eTo457sA4SXnlQoEthHclcnr2WO_YG6cosUfhcrRmxA",
   };
 
+  const developmentConnectors = new ReplitConnectors();
+
+  async function fetchSheetRangeFromDevelopmentConnection(
+    sheetId: string,
+    range: string,
+  ): Promise<string[][]> {
+    const endpoint = `/v4/spreadsheets/${encodeURIComponent(sheetId)}/values/${encodeURIComponent(range)}`;
+    const response = await developmentConnectors.proxy("google-sheet", endpoint, {
+      method: "GET",
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Development Google Sheets connection failed (${response.status}): ${detail.slice(0, 200)}`);
+    }
+    const payload = await response.json() as { values?: unknown[][] };
+    return (payload.values || []).map((row) => row.map((cell) => String(cell ?? "")));
+  }
+
   async function fetchSheetRange(sheetId: string, range: string): Promise<string[][]> {
-    const auth = getAuthenticatedClient();
-    if (!auth) throw new Error("Google not connected");
-    const sheets = google.sheets({ version: "v4", auth });
-    const res = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
-    return (res.data.values || []) as string[][];
+    try {
+      const auth = getAuthenticatedClient();
+      if (!auth) throw new Error("Google not connected");
+      const sheets = google.sheets({ version: "v4", auth });
+      const res = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range });
+      return (res.data.values || []) as string[][];
+    } catch (error) {
+      // Production keeps using its separately managed OAuth credential. Replit
+      // Preview can recover from an expired development-only token through the
+      // workspace's managed Google Sheets connection.
+      if (process.env.NODE_ENV === "production") throw error;
+      return fetchSheetRangeFromDevelopmentConnection(sheetId, range);
+    }
   }
 
   const WALKIN_SHEET_TAB = process.env.WALKIN_SHEET_TAB || "RA Checkin";
