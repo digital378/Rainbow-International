@@ -154,6 +154,12 @@ export default function Blogs() {
                 <a
                   key={blog.slug}
                   href={cardHref(blog)}
+                  onClick={(event) => {
+                    if (blog.slug === "ganesh-chaturthi-2026") {
+                      event.preventDefault();
+                      window.location.assign(`${cardHref(blog)}?open=1`);
+                    }
+                  }}
                   data-testid={`card-blog-${blog.slug}`}
                   className="group flex h-full flex-col rounded-2xl bg-white border shadow-sm hover:shadow-md transition-shadow"
                   style={
