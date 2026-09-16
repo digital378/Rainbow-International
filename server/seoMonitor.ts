@@ -17,6 +17,9 @@ import nodemailer from "nodemailer";
 const PROD_BASE = "https://rainbowinternationalschool.in";
 const BOT_UA =
   "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 750;
 
 /** Interval between scheduled checks (24 hours). */
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -27,37 +30,87 @@ const STARTUP_DELAY_MS = 60 * 1_000;
 export interface SeoCheckResult {
   name: string;
   passed: boolean;
+  kind?: "regression" | "availability";
   /** Human-readable detail — only meaningful when passed is false. */
   detail?: string;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+type FetchPageOptions = {
+  fetchImpl?: typeof fetch;
+  attempts?: number;
+  retryDelayMs?: number;
+};
+
+const wait = (ms: number) =>
+  ms > 0 ? new Promise<void>((resolve) => setTimeout(resolve, ms)) : Promise.resolve();
+
 async function fetchPage(
   path: string,
+  options: FetchPageOptions = {},
 ): Promise<{ res: Response; body: string }> {
-  const res = await fetch(`${PROD_BASE}${path}`, {
-    redirect: "manual",
-    headers: { "User-Agent": BOT_UA },
-    signal: AbortSignal.timeout(15_000),
-  });
-  const body = res.status < 300 ? await res.text() : "";
-  return { res, body };
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const attempts = options.attempts ?? REQUEST_ATTEMPTS;
+  const retryDelayMs = options.retryDelayMs ?? RETRY_DELAY_MS;
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const res = await fetchImpl(`${PROD_BASE}${path}`, {
+        redirect: "manual",
+        headers: { "User-Agent": BOT_UA },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      if (res.status >= 500) {
+        throw new Error(`HTTP ${res.status} from ${path}`);
+      }
+      const body = res.status < 300 ? await res.text() : "";
+      return { res, body };
+    } catch (err) {
+      lastError = err;
+      if (attempt < attempts) await wait(retryDelayMs * attempt);
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error(`Unable to fetch ${path}`);
 }
 
 // ── The five checks ───────────────────────────────────────────────────────────
 
-export async function runSeoChecks(): Promise<SeoCheckResult[]> {
+export async function runSeoChecks(
+  options: FetchPageOptions = {},
+): Promise<SeoCheckResult[]> {
   const results: SeoCheckResult[] = [];
 
   const ok = (name: string) => results.push({ name, passed: true });
-  const fail = (name: string, detail: string) =>
-    results.push({ name, passed: false, detail });
+  const fail = (
+    name: string,
+    detail: string,
+    kind: SeoCheckResult["kind"] = "regression",
+  ) => results.push({ name, passed: false, detail, kind });
+
+  // Fetch the homepage once so one run evaluates a consistent response and
+  // does not triple the chance of a transient network timeout.
+  let homepage: { res: Response; body: string } | null = null;
+  try {
+    homepage = await fetchPage("/", options);
+  } catch (err) {
+    fail(
+      "Homepage available for SEO verification",
+      `Monitor could not verify the homepage after ${options.attempts ?? REQUEST_ATTEMPTS} attempts: ${String(err)}`,
+      "availability",
+    );
+  }
 
   // 1. og:image on homepage
-  try {
-    const { body } = await fetchPage("/");
-    if (body.includes("og:image") && body.includes("opengraph.jpg")) {
+  if (homepage) {
+    if (
+      homepage.body.includes("og:image") &&
+      homepage.body.includes("opengraph.jpg")
+    ) {
       ok("og:image present on homepage");
     } else {
       fail(
@@ -65,17 +118,14 @@ export async function runSeoChecks(): Promise<SeoCheckResult[]> {
         "og:image meta tag missing or does not reference opengraph.jpg",
       );
     }
-  } catch (err) {
-    fail("og:image present on homepage", String(err));
   }
 
   // 2. No s-maxage on homepage HTML
   // The dangerous regression is s-maxage being re-enabled, which lets a CDN
   // cache bot-vs-browser-differentiated HTML and serve the wrong version.
   // `private` or `no-store` are both fine; only `s-maxage` is a red flag.
-  try {
-    const { res } = await fetchPage("/");
-    const cc = res.headers.get("cache-control") || "";
+  if (homepage) {
+    const cc = homepage.res.headers.get("cache-control") || "";
     if (!cc.includes("s-maxage")) {
       ok("Cache-Control: no s-maxage on homepage HTML");
     } else {
@@ -84,13 +134,11 @@ export async function runSeoChecks(): Promise<SeoCheckResult[]> {
         `Got: "${cc}" — s-maxage would let a CDN cache bot vs browser HTML`,
       );
     }
-  } catch (err) {
-    fail("Cache-Control: no s-maxage on homepage HTML", String(err));
   }
 
   // 3. /amenities no redirect loop
   try {
-    const { res } = await fetchPage("/amenities");
+    const { res } = await fetchPage("/amenities", options);
     const loc = res.headers.get("location") || "";
     const isLoop =
       res.status >= 300 &&
@@ -107,12 +155,16 @@ export async function runSeoChecks(): Promise<SeoCheckResult[]> {
       );
     }
   } catch (err) {
-    fail("/amenities no redirect loop", String(err));
+    fail(
+      "/amenities available for SEO verification",
+      `Monitor could not verify /amenities: ${String(err)}`,
+      "availability",
+    );
   }
 
   // 4. /preschool-thane 301 → /pre-primary-school-thane
   try {
-    const { res } = await fetchPage("/preschool-thane");
+    const { res } = await fetchPage("/preschool-thane", options);
     const loc = res.headers.get("location") || "";
     if (res.status === 301 && loc.includes("/pre-primary-school-thane")) {
       ok("/preschool-thane 301 → /pre-primary-school-thane");
@@ -123,13 +175,16 @@ export async function runSeoChecks(): Promise<SeoCheckResult[]> {
       );
     }
   } catch (err) {
-    fail("/preschool-thane 301 → /pre-primary-school-thane", String(err));
+    fail(
+      "/preschool-thane available for SEO verification",
+      `Monitor could not verify /preschool-thane: ${String(err)}`,
+      "availability",
+    );
   }
 
   // 5. Homepage JSON-LD EducationalOrganization
-  try {
-    const { body } = await fetchPage("/");
-    if (body.includes("EducationalOrganization")) {
+  if (homepage) {
+    if (homepage.body.includes("EducationalOrganization")) {
       ok("Homepage JSON-LD EducationalOrganization schema");
     } else {
       fail(
@@ -137,8 +192,6 @@ export async function runSeoChecks(): Promise<SeoCheckResult[]> {
         "EducationalOrganization not found in page source",
       );
     }
-  } catch (err) {
-    fail("Homepage JSON-LD EducationalOrganization schema", String(err));
   }
 
   return results;
@@ -185,10 +238,24 @@ async function sendAlertEmail(failures: SeoCheckResult[]): Promise<void> {
     )
     .join("\n");
 
+  const hasRegression = failures.some((failure) => failure.kind !== "availability");
+  const heading = hasRegression
+    ? "⚠️ SEO Regression Detected"
+    : "⚠️ SEO Monitor Could Not Verify the Site";
+  const intro = hasRegression
+    ? "The following SEO checks failed"
+    : "The monitor could not complete the following checks";
+  const guidance = hasRegression
+    ? "Fix the regression and re-deploy before Google re-crawls."
+    : "No SEO regression has been confirmed. Check site availability and run the monitor again.";
+  const subject = hasRegression
+    ? `[SEO Alert] ${failures.length} regression${failures.length !== 1 ? "s" : ""} on rainbowinternationalschool.in`
+    : `[SEO Monitor] unable to verify rainbowinternationalschool.in`;
+
   const html = `
 <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">
-  <h2 style="color:#c0392b;">⚠️ SEO Regression Detected</h2>
-  <p>The following SEO checks failed on <strong>rainbowinternationalschool.in</strong>:</p>
+  <h2 style="color:#c0392b;">${heading}</h2>
+  <p>${intro} on <strong>rainbowinternationalschool.in</strong>:</p>
   <table style="width:100%;border-collapse:collapse;border:1px solid #eee;">
     <thead>
       <tr style="background:#f9f9f9;">
@@ -200,7 +267,7 @@ async function sendAlertEmail(failures: SeoCheckResult[]): Promise<void> {
   </table>
   <p style="margin-top:16px;font-size:13px;color:#666;">
     Checked at <strong>${new Date().toISOString()}</strong> UTC.<br/>
-    Fix the regression and re-deploy before Google re-crawls.
+    ${guidance}
   </p>
   <p style="font-size:12px;color:#999;">
     — RIS SEO Monitor (runs every 24 h automatically)
@@ -210,7 +277,7 @@ async function sendAlertEmail(failures: SeoCheckResult[]): Promise<void> {
   await mailer.transport.sendMail({
     from: mailer.from,
     to: mailer.to,
-    subject: `[SEO Alert] ${failures.length} regression${failures.length !== 1 ? "s" : ""} on rainbowinternationalschool.in`,
+    subject,
     html,
   });
 
