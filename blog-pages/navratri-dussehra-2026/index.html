@@ -1104,6 +1104,23 @@
   </footer>
 </main>
 
+<script>
+/* Keep the live DOM compact for browser SEO extensions that serialize the page. */
+(function(){
+  var pageStyles = document.querySelector('style');
+  if (pageStyles && pageStyles.textContent.indexOf('data:image/jpeg;base64,') !== -1) {
+    pageStyles.textContent = pageStyles.textContent.replace(
+      /url\("data:image\/jpeg;base64,[^"]+"\)/,
+      'url("/blog/navratri-dussehra-2026/navratri-dussehra-2026-hero.jpg")'
+    );
+  }
+  var brandMark = document.querySelector('.brand-mark[src^="data:image/png;base64,"]');
+  if (brandMark) {
+    brandMark.src = '/ris-logo-compact.webp';
+  }
+})();
+</script>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
