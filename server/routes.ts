@@ -739,6 +739,41 @@ export async function registerRoutes(
     }
   });
 
+  const navratriDussehraGalleryAssetIds = [
+    "happy-navratri-durga-eyes", "happy-navratri-kalash-greeting",
+    "happy-dussehra-rama-ravana", "happy-navratri-goddess-durga",
+    "happy-navratri-dandiya-sticks", "happy-navratri-garba-dance",
+    "happy-dussehra-bow-arrow", "dussehra-ravana-dahan-celebration",
+    "happy-dussehra-ravana-effigy", "happy-dussehra-rama-vijayadashami",
+    "happy-navratri-durga-diyas", "happy-dussehra-victory-good-over-evil",
+  ] as const;
+  const navratriDussehraGalleryAssetSet = new Set<string>(navratriDussehraGalleryAssetIds);
+
+  app.get("/api/navratri-dussehra-gallery/download-counts", async (_req, res) => {
+    try {
+      const rows = await storage.getGaneshGalleryDownloadCounts([...navratriDussehraGalleryAssetIds]);
+      const stored = new Map(rows.map((row) => [row.assetId, row.downloadCount]));
+      res.json({
+        counts: Object.fromEntries(navratriDussehraGalleryAssetIds.map((id) => [id, stored.get(id) ?? 0])),
+      });
+    } catch {
+      res.status(500).json({ message: "Failed to fetch download counts" });
+    }
+  });
+
+  app.post("/api/navratri-dussehra-gallery/:assetId/download", async (req, res) => {
+    const assetId = req.params.assetId;
+    if (!navratriDussehraGalleryAssetSet.has(assetId)) {
+      return res.status(400).json({ message: "Unknown gallery image" });
+    }
+    try {
+      const row = await storage.incrementGaneshGalleryDownload(assetId);
+      res.json({ id: row.assetId, count: row.downloadCount });
+    } catch {
+      res.status(500).json({ message: "Failed to record download" });
+    }
+  });
+
   // ── Inquiries ───────────────────────────────────────────────
   app.post("/api/inquiries", async (req, res) => {
     try {
