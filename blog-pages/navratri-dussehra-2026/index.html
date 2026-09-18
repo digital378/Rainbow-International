@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10174F">
 <meta name="description" content="Explore nine nights of Navadurga, Rama and Ravana, trilingual essays and speeches, regional traditions, a classroom quiz and festive graphics for RIS.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://rainbowinternationalschool.in/blog/navratri-dussehra-2026">
@@ -12,6 +13,9 @@
 <meta property="og:url" content="https://rainbowinternationalschool.in/blog/navratri-dussehra-2026">
 <meta property="og:site_name" content="Rainbow International School">
 <meta property="og:image" content="https://rainbowinternationalschool.in/blog/navratri-dussehra-2026/navratri-dussehra-2026-hero.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="1197">
 <meta property="og:image:alt" content="Navratri and Dussehra 2026 festival guide illustration">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Navratri &amp; Dussehra 2026 | Rainbow International School">
@@ -26,6 +30,7 @@
     --navy-soft:#1c2568;
     --gold:#C9A227;
     --gold-bright:#E3B93B;
+    --gold-ink:#705610;
     --maroon:#7A1B2B;
     --cream:#FBF3E3;
     --card:#FFFDF6;
@@ -49,7 +54,9 @@
   }
   img{max-width:100%; display:block;}
   a{color:inherit;}
+  a,button,summary,label{touch-action:manipulation;}
   [hidden]{display:none !important;}
+  .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;}
   ::selection{ background:var(--gold); color:var(--navy-deep); }
   .lang-hi,.lang-mr{ font-family:'Noto Serif Devanagari', var(--body-font); }
 
@@ -72,7 +79,7 @@
   .brand{ display:flex; align-items:center; gap:.6rem; text-decoration:none; }
   .brand-mark{ height:2.9rem; width:auto; display:block; }
   .brand-text b{ display:block; font-family:var(--serif); font-weight:600; color:var(--navy); font-size:1.05rem; line-height:1.15; }
-  .brand-text span{ display:block; font-family:var(--eyebrow-font); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); }
+  .brand-text span{ display:block; font-family:var(--eyebrow-font); font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-ink); }
 
   .icon{ width:1.3em; height:1.3em; stroke:currentColor; fill:none; stroke-width:1.4; vertical-align:-.25em; }
 
@@ -186,8 +193,8 @@
   .content{ min-width:0; }
 
   /* ---------- section headings ---------- */
-  .chapter{ padding-bottom:3.6rem; }
-  .chapter-eyebrow{ display:block; font-family:var(--eyebrow-font); text-transform:uppercase; letter-spacing:.2em; font-size:.68rem; color:var(--gold); margin-bottom:.6rem; }
+  .chapter{ padding-bottom:3.6rem; scroll-margin-top:6rem; }
+  .chapter-eyebrow{ display:block; font-family:var(--eyebrow-font); text-transform:uppercase; letter-spacing:.2em; font-size:.68rem; color:var(--gold-ink); margin-bottom:.6rem; }
   .rule{ width:110px; height:3px; background:var(--gold); border-radius:2px; margin-bottom:.9rem; }
   .rule.maroon{ background:var(--maroon); }
   h2.chapter-title{ font-family:var(--serif); font-weight:600; color:var(--navy); font-size:clamp(1.9rem,4.6vw,2.7rem); margin:0 0 1.3rem; text-wrap:balance; }
@@ -207,7 +214,7 @@
   .swatch{ display:inline-block; width:.85em; height:.85em; border-radius:50%; margin-right:.45em; border:1px solid rgba(0,0,0,.15); vertical-align:-.08em; }
 
   .callout{ border:1px solid var(--line); background:var(--card); border-radius:var(--radius); padding:1.1rem 1.3rem; margin:1.5rem 0; max-width:70ch; font-size:.94rem; }
-  .callout .c-label{ display:block; font-family:var(--eyebrow-font); text-transform:uppercase; letter-spacing:.08em; font-size:.64rem; color:var(--gold); margin-bottom:.4rem; }
+  .callout .c-label{ display:block; font-family:var(--eyebrow-font); text-transform:uppercase; letter-spacing:.08em; font-size:.64rem; color:var(--gold-ink); margin-bottom:.4rem; }
 
   /* generic cards grid */
   .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.1rem; margin-top:1.6rem; }
@@ -217,7 +224,7 @@
   .card .r-icon{ color:var(--gold); margin-bottom:.5rem; }
 
   /* durga cards */
-  .d-day{ font-family:var(--eyebrow-font); font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); }
+  .d-day{ font-family:var(--eyebrow-font); font-size:.64rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold-ink); }
   .mantra-block{ border-top:1px dashed var(--line); padding-top:.7rem; margin-top:.7rem; }
   .mantra-dev{ font-family:'Noto Serif Devanagari',serif; font-size:1rem; margin:0 0 .3rem; color:var(--navy); }
   .mantra-translit{ font-style:italic; font-size:.84rem; color:var(--text-soft); margin:0 0 .3rem; }
@@ -227,7 +234,7 @@
   .colour-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem; margin-top:1.4rem; }
   .colour-chip{ display:flex; align-items:center; gap:.8rem; padding:.85rem 1rem; border:1px solid var(--line); border-radius:10px; background:var(--card); }
   .colour-dot{ width:2rem; height:2rem; border-radius:50%; flex:0 0 auto; border:1px solid rgba(0,0,0,.15); }
-  .c-day{ display:block; font-family:var(--eyebrow-font); font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold); }
+  .c-day{ display:block; font-family:var(--eyebrow-font); font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold-ink); }
   .c-name{ font-weight:600; color:var(--navy); }
   .c-desc{ font-size:.82rem; color:var(--text-soft); }
 
@@ -253,17 +260,17 @@
   .len-block[open] summary::after{ content:"–"; }
   .len-body{ padding:1.05rem 1.25rem 1.25rem; }
   .len-body p{ margin:0 0 1rem; }
-  .len-body h5{ font-family:var(--serif); font-size:1.2rem; margin:0 0 .7rem; color:var(--navy); }
-  .copy-btn{ display:inline-flex; align-items:center; gap:.4rem; background:#fff; border:1px solid var(--line); border-radius:999px; padding:.42rem .85rem; font-size:.7rem; font-family:var(--eyebrow-font); letter-spacing:.05em; text-transform:uppercase; color:var(--text-soft); cursor:pointer; min-height:36px; margin-bottom:.85rem; }
+  .len-body h4{ font-family:var(--serif); font-size:1.2rem; margin:0 0 .7rem; color:var(--navy); }
+  .copy-btn{ display:inline-flex; align-items:center; gap:.4rem; background:#fff; border:1px solid var(--line); border-radius:999px; padding:.55rem .9rem; font-size:.7rem; font-family:var(--eyebrow-font); letter-spacing:.05em; text-transform:uppercase; color:var(--text-soft); cursor:pointer; min-height:44px; margin-bottom:.85rem; }
   .copy-btn:hover{ border-color:var(--gold); color:var(--navy); }
   .copy-btn.copied{ color:#2e7d32; border-color:#2e7d32; }
 
   .slogan-item{ border-left:3px solid var(--gold); background:var(--card); padding:.75rem 1rem; border-radius:0 10px 10px 0; font-size:.92rem; }
   .quote-card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.2rem 1.3rem; font-family:var(--serif); font-size:1.12rem; font-style:italic; color:var(--navy); }
-  .quote-card cite{ display:block; margin-top:.5rem; font-family:var(--eyebrow-font); font-style:normal; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold); }
+  .quote-card cite{ display:block; margin-top:.5rem; font-family:var(--eyebrow-font); font-style:normal; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold-ink); }
 
   /* facts */
-  .fact-num{ font-family:var(--serif); font-size:1.8rem; color:var(--gold); line-height:1; display:block; margin-bottom:.4rem; }
+  .fact-num{ font-family:var(--serif); font-size:1.8rem; color:var(--gold-ink); line-height:1; display:block; margin-bottom:.4rem; }
 
   /* quiz */
   .quiz-q{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:1.1rem 1.25rem; margin-bottom:1rem; }
@@ -282,7 +289,7 @@
   #quiz-result .score-num{ font-family:var(--serif); font-size:2.7rem; color:var(--navy); display:block; }
 
   /* activities/wishes */
-  .grade-tag{ display:inline-block; margin-top:.7rem; font-family:var(--eyebrow-font); font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold); border:1px solid var(--line-gold); border-radius:999px; padding:.25rem .65rem; }
+  .grade-tag{ display:inline-block; margin-top:.7rem; font-family:var(--eyebrow-font); font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold-ink); border:1px solid var(--line-gold); border-radius:999px; padding:.25rem .65rem; }
   .wish-card{ background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.95rem 1.05rem; font-size:.9rem; }
 
   /* images */
@@ -342,7 +349,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cinzel:wght@500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body id="top">
+<body>
 
 <a class="skip-link" href="#main">Skip to main content</a>
 <div id="progress-thread"></div>
@@ -534,6 +541,7 @@
         <h2 class="chapter-title" data-reveal>Nine Forms, Nine Nights</h2>
         <p class="lede" data-reveal>Each night of Navratri belongs to one of the Navadurga — nine forms of Goddess Durga, each embodying a different strength. Together they trace a journey from grounded resolve to spiritual mastery.</p>
 
+        <h3 class="sr-only">The Nine Forms of Goddess Durga</h3>
         <div class="grid">
           <article class="card" data-reveal><span class="d-day">Day 1 · 11 October</span><h4>Shailputri</h4><p>"Daughter of the mountain," seated upon Nandi the bull, holding a trishul and a lotus. She represents the raw, grounded power of nature — the foundational form of Shakti from which her other manifestations arise.</p><div class="mantra-block"><p class="mantra-dev">ॐ ऐं ह्रीं क्लीं शैलपुत्र्यै नमः</p><p class="mantra-translit">Om Aim Hreem Kleem Shailaputryai Namah</p><p class="mantra-meaning">"Salutations to the daughter of the mountain."</p></div></article>
           <article class="card" data-reveal><span class="d-day">Day 2 · 12 October</span><h4>Brahmacharini</h4><p>A serene ascetic in white, holding a japa mala and kamandalu, recalling Parvati's austerities to win Shiva. She symbolises perseverance, self-control, and the rewards of unwavering dedication.</p><div class="mantra-block"><p class="mantra-dev">ॐ ऐं ह्रीं क्लीं ब्रह्मचारिण्यै नमः</p><p class="mantra-translit">Om Aim Hreem Kleem Brahmacharinyai Namah</p><p class="mantra-meaning">"Salutations to she who practises penance and discipline."</p></div></article>
@@ -568,6 +576,7 @@
         <h2 class="chapter-title" data-reveal>Across the Land</h2>
         <p class="lede" data-reveal>One of the most remarkable aspects of Navratri and Dussehra is how differently — and how vibrantly — they are celebrated across India's states, each region layering its own history, art forms, and customs onto the same shared themes.</p>
 
+        <h3 class="sr-only">Regional Navratri and Dussehra Traditions</h3>
         <div class="grid">
           <article class="card" data-reveal><span class="r-icon"><svg class="icon" viewBox="0 0 24 24"><use href="#i-circles"></use></svg></span><h4>Garba &amp; Dandiya Raas — Gujarat</h4><p>Performers move in concentric circles around a central lamp or image of the Goddess in Garba, while Dandiya Raas adds decorated sticks clashed rhythmically in pairs. Temple courtyard practices have grown into large-scale night-long celebrations worldwide.</p></article>
           <article class="card" data-reveal><span class="r-icon"><svg class="icon" viewBox="0 0 24 24"><use href="#i-pandal"></use></svg></span><h4>Durga Puja — West Bengal</h4><p>The last five days converge into Durga Puja, with elaborately themed pandals housing artistic idols. The festival culminates in Sindoor Khela before idols are ceremonially immersed, symbolising Durga's return to her celestial abode.</p></article>
@@ -636,7 +645,7 @@
             <details class="len-block"><summary>300 Words</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-en-300"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>Copy Text</button>
               <div id="essay-en-300">
-              <h5>Nine Nights of Devotion, One Day of Triumph</h5>
+              <h4>Nine Nights of Devotion, One Day of Triumph</h4>
               <p>Every autumn, India dresses itself in colour and rhythm to celebrate Navratri and Dussehra, two festivals that flow into one another like verses of the same song. Navratri, meaning "nine nights," is dedicated to the Navadurga — nine forms of Goddess Durga — each representing a different quality: courage, wisdom, prosperity, and grace among them. According to legend, the buffalo demon Mahishasura had grown so powerful that no god could defeat him. The gods combined their energies to create Durga, who battled him for nine days and nights before finally vanquishing him, restoring balance to the universe.</p>
               <p>During these nine nights, families keep fasts, light diyas, and visit pandals adorned with beautifully sculpted idols. In Gujarat and Maharashtra, the swirling steps of garba and dandiya raas fill open grounds every evening, while in many towns the Ramlila — a dramatic retelling of the Ramayana — is performed night after night.</p>
               <p>The tenth day, Dussehra or Vijayadashami, brings the story to its climax. It commemorates the day Lord Rama, aided by his brother Lakshmana and the devoted Hanuman, defeated the ten-headed demon king Ravana and rescued Sita. As dusk falls, towering effigies of Ravana, along with his brothers Kumbhakarna and Meghnad, are set ablaze in open fields, watched by cheering crowds — a moment known as Ravana Dahan.</p>
@@ -646,7 +655,7 @@
             <details class="len-block"><summary>500 Words</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-en-500"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>Copy Text</button>
               <div id="essay-en-500">
-              <h5>Navratri and Dussehra: The Victory of Light Over Darkness</h5>
+              <h4>Navratri and Dussehra: The Victory of Light Over Darkness</h4>
               <p>India is a land where every season brings its own celebration, and the arrival of autumn ushers in Navratri and Dussehra, two of the most cherished festivals in the Indian calendar. Together, they span ten days of devotion, dance, and drama, culminating in a story that has been told for generations — the eternal victory of good over evil.</p>
               <p>The word Navratri literally means "nine nights," and it is devoted to the worship of Navadurga, the nine forms of Goddess Durga. According to mythology, a demon named Mahishasura had won a boon that made him almost invincible, and he began terrorising both heaven and earth. Unable to defeat him individually, the gods Brahma, Vishnu, and Shiva combined their divine energies to create Goddess Durga, armed with weapons from every deity. For nine days and nights, Durga battled Mahishasura, ultimately defeating him on the tenth day. Each of the nine nights is dedicated to a different form of the goddess — Shailputri, Brahmacharini, Chandraghanta, Kushmanda, Skandamata, Katyayani, Kalaratri, Mahagauri, and Siddhidatri — each representing a unique virtue such as courage, knowledge, or compassion.</p>
               <p>The day after Navratri ends, India celebrates Dussehra, also called Vijayadashami, which draws from the epic Ramayana. When the demon king Ravana of Lanka abducted Sita, the wife of Lord Rama, Rama set out with his brother Lakshmana, the vanara king Sugriva, and the devoted Hanuman to rescue her. After a long and fierce battle, Rama finally defeated the ten-headed Ravana, freeing Sita and restoring righteousness to the world. Vijayadashami literally means "the victory on the tenth day," marking this triumph.</p>
@@ -664,7 +673,7 @@
             <details class="len-block"><summary>300 शब्द</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-hi-300"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>पाठ कॉपी करें</button>
               <div id="essay-hi-300">
-              <h5>नौ रातों की भक्ति, एक दिन की विजय</h5>
+              <h4>नौ रातों की भक्ति, एक दिन की विजय</h4>
               <p>शरद ऋतु के आगमन के साथ ही भारत में उत्सवों की एक ऐसी शृंखला शुरू होती है जो नवरात्रि से दशहरे तक निर्बाध रूप से बहती है। नवरात्रि का अर्थ है "नौ रातें", जो देवी दुर्गा के नौ रूपों — नवदुर्गा — को समर्पित हैं। पौराणिक कथा के अनुसार, महिषासुर नामक असुर इतना शक्तिशाली हो गया था कि कोई भी देवता उसे परास्त नहीं कर सका। तब सभी देवताओं ने अपनी शक्तियाँ मिलाकर देवी दुर्गा को उत्पन्न किया, जिन्होंने नौ दिन और रात युद्ध करके अंततः महिषासुर का वध किया।</p>
               <p>इन नौ रातों में लोग उपवास रखते हैं, दीप जलाते हैं और सुंदर सज्जित पंडालों में देवी के दर्शन करते हैं। गुजरात और महाराष्ट्र में गरबा और डांडिया रास की धूम रहती है, वहीं कई स्थानों पर रामलीला का मंचन किया जाता है, जिसमें रामायण की कथा जीवंत हो उठती है।</p>
               <p>दसवें दिन दशहरा, जिसे विजयादशमी भी कहते हैं, इस कथा का चरम बिंदु है। यह वह दिन है जब भगवान राम ने लक्ष्मण और हनुमान की सहायता से दस सिर वाले रावण का वध कर माता सीता को मुक्त कराया था। शाम होते ही रावण, कुम्भकर्ण और मेघनाद के विशाल पुतलों का दहन किया जाता है — इसी को रावण दहन कहा जाता है।</p>
@@ -674,7 +683,7 @@
             <details class="len-block"><summary>500 शब्द</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-hi-500"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>पाठ कॉपी करें</button>
               <div id="essay-hi-500">
-              <h5>नवरात्रि और दशहरा: अंधकार पर प्रकाश की विजय</h5>
+              <h4>नवरात्रि और दशहरा: अंधकार पर प्रकाश की विजय</h4>
               <p>भारत एक ऐसा देश है जहाँ हर मौसम अपने साथ कोई न कोई पर्व लेकर आता है। शरद ऋतु के आगमन पर मनाए जाने वाले नवरात्रि और दशहरा इन्हीं पर्वों में सबसे भव्य और अर्थपूर्ण माने जाते हैं। ये दोनों त्योहार मिलकर हमें यह सिखाते हैं कि चाहे परिस्थितियाँ कितनी भी कठिन क्यों न हों, सत्य और धर्म की राह पर चलने वाले की अंततः विजय अवश्य होती है।</p>
               <p>नवरात्रि का शाब्दिक अर्थ है "नौ रातें"। यह पर्व देवी दुर्गा के नौ स्वरूपों — जिन्हें नवदुर्गा कहा जाता है — की आराधना को समर्पित है। पौराणिक कथाओं के अनुसार, महिषासुर नामक असुर ने अपनी तपस्या के बल पर ऐसा वरदान प्राप्त कर लिया था कि कोई भी पुरुष उसे पराजित नहीं कर सकता था। जब उसका अत्याचार असहनीय हो गया, तब ब्रह्मा, विष्णु और महेश सहित सभी देवताओं ने अपनी दिव्य शक्तियों को मिलाकर देवी दुर्गा को प्रकट किया। नौ दिनों तक चले भीषण युद्ध के बाद देवी ने महिषासुर का वध किया और संसार को उसके अत्याचार से मुक्त कराया।</p>
               <p>नवरात्रि की समाप्ति के अगले दिन दशहरा या विजयादशमी मनाई जाती है, जो रामायण की कथा से जुड़ी है। लंकापति रावण ने माता सीता का हरण कर लिया था, जिसके बाद भगवान राम ने अपने भाई लक्ष्मण, वानरराज सुग्रीव और परम भक्त हनुमान की सेना के साथ लंका पर आक्रमण किया। कई दिनों के घमासान युद्ध के बाद राम ने दस सिर वाले अहंकारी रावण का वध कर सीता को मुक्त कराया और धर्म की स्थापना की।</p>
@@ -692,7 +701,7 @@
             <details class="len-block"><summary>३०० शब्द</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-mr-300"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>मजकूर कॉपी करा</button>
               <div id="essay-mr-300">
-              <h5>नऊ रात्रींची भक्ती, एका दिवसाचा विजय</h5>
+              <h4>नऊ रात्रींची भक्ती, एका दिवसाचा विजय</h4>
               <p>शरद ऋतूच्या आगमनासोबतच भारतात सणांची अशी मालिका सुरू होते जी नवरात्रीपासून दसऱ्यापर्यंत अखंडपणे वाहत राहते. नवरात्री म्हणजे "नऊ रात्री" — देवी दुर्गेच्या नऊ रूपांना, म्हणजेच नवदुर्गेला समर्पित हा सण आहे. पौराणिक कथेनुसार, महिषासुर नावाचा राक्षस इतका शक्तिशाली झाला होता की कोणताही देव त्याला पराभूत करू शकत नव्हता. तेव्हा सर्व देवतांनी आपल्या शक्ती एकत्र करून देवी दुर्गेला निर्माण केले, जिने नऊ दिवस आणि रात्री युद्ध करून अखेर महिषासुराचा वध केला.</p>
               <p>या नऊ रात्रींमध्ये लोक उपवास करतात, दिवे लावतात आणि सुंदर सजवलेल्या मंडपांमध्ये देवीचे दर्शन घेतात. गुजरात आणि महाराष्ट्रात गरबा व दांडिया रासची धूम असते, तर अनेक ठिकाणी रामलीलेचे सादरीकरण केले जाते, ज्यातून रामायणाची कथा जिवंत होते.</p>
               <p>दहाव्या दिवशी साजरा होणारा दसरा, म्हणजेच विजयादशमी, या कथेचा कळस आहे. हा तोच दिवस आहे जेव्हा प्रभू रामाने लक्ष्मण आणि हनुमानाच्या साहाय्याने दहा तोंडांच्या रावणाचा वध करून माता सीतेची सुटका केली. संध्याकाळ होताच रावण, कुंभकर्ण आणि मेघनाद यांचे भव्य पुतळे जाळले जातात — याला रावण दहन असे म्हणतात.</p>
@@ -702,7 +711,7 @@
             <details class="len-block"><summary>५०० शब्द</summary><div class="len-body">
               <button class="copy-btn" data-copy-target="essay-mr-500"><svg class="icon" viewBox="0 0 24 24" style="width:1em;height:1em"><use href="#i-scroll"></use></svg>मजकूर कॉपी करा</button>
               <div id="essay-mr-500">
-              <h5>नवरात्री आणि दसरा: अंधारावर प्रकाशाचा विजय</h5>
+              <h4>नवरात्री आणि दसरा: अंधारावर प्रकाशाचा विजय</h4>
               <p>भारत हा असा देश आहे जिथे प्रत्येक ऋतू आपल्यासोबत काही ना काही सण घेऊन येतो. शरद ऋतूच्या आगमनाबरोबर साजरे होणारे नवरात्री आणि दसरा हे या सणांपैकी सर्वाधिक भव्य आणि अर्थपूर्ण मानले जातात. हे दोन्ही सण मिळून आपल्याला शिकवतात की परिस्थिती कितीही कठीण असली तरी सत्य आणि धर्माच्या मार्गावर चालणाऱ्याचा अखेर विजयच होतो.</p>
               <p>नवरात्री या शब्दाचा अर्थ आहे "नऊ रात्री". हा सण देवी दुर्गेच्या नऊ रूपांच्या — म्हणजेच नवदुर्गेच्या — उपासनेला समर्पित आहे. पौराणिक कथेनुसार, महिषासुर नावाच्या राक्षसाने तपश्चर्येच्या बळावर असा वर मिळवला होता की कोणताही पुरुष त्याला पराभूत करू शकणार नाही. त्याचा अत्याचार असह्य झाल्यावर ब्रह्मा, विष्णू आणि महेश यांच्यासह सर्व देवतांनी आपल्या दिव्य शक्ती एकत्र करून देवी दुर्गेला प्रकट केले. नऊ दिवस चाललेल्या घनघोर युद्धानंतर देवीने महिषासुराचा वध करून सृष्टीला त्याच्या जुलमातून मुक्त केले.</p>
               <p>नवरात्री संपल्यानंतर दुसऱ्या दिवशी दसरा म्हणजेच विजयादशमी साजरी केली जाते, जी रामायणाच्या कथेशी जोडलेली आहे. लंकाधिपती रावणाने माता सीतेचे हरण केले होते, त्यानंतर प्रभू रामाने आपला बंधू लक्ष्मण, वानरराज सुग्रीव आणि परमभक्त हनुमान यांच्या सैन्यासह लंकेवर आक्रमण केले. अनेक दिवस चाललेल्या भीषण युद्धानंतर रामाने दहा तोंडांच्या गर्विष्ठ रावणाचा वध करून सीतेला मुक्त केले आणि धर्माची पुनर्स्थापना केली.</p>
@@ -1099,13 +1108,73 @@
 {
   "@context": "https://schema.org",
   "@graph": [
-    {"@type":"Article","headline":"Navratri & Dussehra 2026: History, Essays, Speeches & More","description":"Navratri & Dussehra 2026 (11–20 Oct): mythology, the 9 goddesses, trilingual essays & speeches, Garba traditions, quiz, activities, FAQs & free images.","publisher":{"@type":"Organization","name":"Rainbow International School"},"datePublished":"2026-10-01"},
-    {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home"},{"@type":"ListItem","position":2,"name":"Blog"},{"@type":"ListItem","position":3,"name":"Navratri & Dussehra 2026"}]},
+    {
+      "@type":"Organization",
+      "@id":"https://rainbowinternationalschool.in/#organization",
+      "name":"Rainbow International School",
+      "url":"https://rainbowinternationalschool.in/",
+      "logo":{"@type":"ImageObject","url":"https://rainbowinternationalschool.in/assets/RIS-logo.png"}
+    },
+    {
+      "@type":"WebSite",
+      "@id":"https://rainbowinternationalschool.in/#website",
+      "url":"https://rainbowinternationalschool.in/",
+      "name":"Rainbow International School",
+      "publisher":{"@id":"https://rainbowinternationalschool.in/#organization"},
+      "inLanguage":"en"
+    },
+    {
+      "@type":"WebPage",
+      "@id":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026#webpage",
+      "url":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026",
+      "name":"Navratri & Dussehra 2026 | Rainbow International School",
+      "isPartOf":{"@id":"https://rainbowinternationalschool.in/#website"},
+      "about":[{"@type":"Thing","name":"Navratri"},{"@type":"Thing","name":"Dussehra"},{"@type":"Thing","name":"Vijayadashami"}],
+      "inLanguage":["en","hi","mr"]
+    },
+    {
+      "@type":"Article",
+      "@id":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026#article",
+      "url":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026",
+      "mainEntityOfPage":{"@id":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026#webpage"},
+      "headline":"Navratri & Dussehra 2026: History, Essays, Speeches & More",
+      "description":"Navratri & Dussehra 2026 (11–20 Oct): mythology, the 9 goddesses, trilingual essays and speeches, Garba traditions, quiz, activities, FAQs and free images.",
+      "image":{"@type":"ImageObject","url":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026/navratri-dussehra-2026-hero.jpg","width":1600,"height":1197},
+      "datePublished":"2026-09-18",
+      "dateModified":"2026-09-18",
+      "author":{"@id":"https://rainbowinternationalschool.in/#organization"},
+      "publisher":{"@id":"https://rainbowinternationalschool.in/#organization"},
+      "inLanguage":["en","hi","mr"],
+      "isAccessibleForFree":true,
+      "keywords":["Navratri 2026","Dussehra 2026","Vijayadashami","Navadurga","Navratri essays","Dussehra speeches","Garba","Ravana Dahan","festival activities for students"],
+      "articleSection":["Festival dates and history","Nine forms of Durga","Regional traditions","Essays and speeches","Quiz and classroom activities","Free social media images"],
+      "about":[{"@type":"Thing","name":"Navratri"},{"@type":"Thing","name":"Dussehra"},{"@type":"Thing","name":"Navadurga"},{"@type":"Thing","name":"Ramayana"}],
+      "speakable":{"@type":"SpeakableSpecification","cssSelector":[".hero-title",".hero-sub","#faq-list"]}
+    },
+    {
+      "@type":"BreadcrumbList",
+      "@id":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026#breadcrumb",
+      "itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Home","item":"https://rainbowinternationalschool.in/"},
+        {"@type":"ListItem","position":2,"name":"Blog","item":"https://rainbowinternationalschool.in/blogs"},
+        {"@type":"ListItem","position":3,"name":"Navratri & Dussehra 2026","item":"https://rainbowinternationalschool.in/blog/navratri-dussehra-2026"}
+      ]
+    },
     {"@type":"FAQPage","mainEntity":[
       {"@type":"Question","name":"When is Navratri 2026, and when does Dussehra fall?","acceptedAnswer":{"@type":"Answer","text":"Navratri 2026 runs for nine nights from 11 October to 19 October 2026, and Dussehra (Vijayadashami) falls the next day, on Tuesday, 20 October 2026."}},
       {"@type":"Question","name":"What is the difference between Navratri and Dussehra?","acceptedAnswer":{"@type":"Answer","text":"Navratri is a nine-night festival dedicated to worshipping the nine forms of Goddess Durga, focusing on devotion, dance, and fasting traditions. Dussehra, also called Vijayadashami, is the tenth day that follows immediately after and specifically celebrates Lord Rama's victory over the demon king Ravana."}},
+      {"@type":"Question","name":"Why is Navratri celebrated for nine days?","acceptedAnswer":{"@type":"Answer","text":"The nine days correspond to the nine forms of Goddess Durga, known as the Navadurga. Each form is honoured for a distinct quality or strength, creating a devotional journey from courage to wisdom."}},
       {"@type":"Question","name":"What is Ravana Dahan?","acceptedAnswer":{"@type":"Answer","text":"Ravana Dahan is the traditional burning of large effigies of the demon king Ravana, along with his brother Kumbhakarna and son Meghnad, performed on Dussehra evening, symbolising the destruction of evil."}},
-      {"@type":"Question","name":"Is fasting compulsory during Navratri?","acceptedAnswer":{"@type":"Answer","text":"No, fasting during Navratri is a personal and voluntary devotional practice, not a mandatory requirement."}}
+      {"@type":"Question","name":"What are the nine colours of Navratri?","acceptedAnswer":{"@type":"Answer","text":"Many communities assign a specific colour to each day of Navratri. The exact sequence can vary by region and year, so families should check a current local calendar for the 2026 order."}},
+      {"@type":"Question","name":"Is fasting compulsory during Navratri?","acceptedAnswer":{"@type":"Answer","text":"No. Fasting during Navratri is a personal and voluntary devotional practice, not a mandatory requirement."}},
+      {"@type":"Question","name":"What is the difference between Navratri and Durga Puja?","acceptedAnswer":{"@type":"Answer","text":"Both festivals honour Goddess Durga and largely overlap in timing. Navratri commonly centres on nine days of worship, Garba and Dandiya, while Durga Puja is known for elaborate pandals and idol installations during the final days, particularly in eastern India."}},
+      {"@type":"Question","name":"Can non-Hindu students participate in or learn about Navratri and Dussehra?","acceptedAnswer":{"@type":"Answer","text":"Yes. Schools can present the festivals as inclusive opportunities for students of all backgrounds to learn about Indian cultural heritage, stories, symbolism and customs."}},
+      {"@type":"Question","name":"How do schools typically celebrate Navratri and Dussehra?","acceptedAnswer":{"@type":"Answer","text":"Schools often organise Garba or Dandiya sessions, art and essay competitions, cultural assemblies and classroom discussions about the festivals' values."}},
+      {"@type":"Question","name":"What is the significance of Kanya Pujan during Navratri?","acceptedAnswer":{"@type":"Answer","text":"Kanya Pujan is commonly observed on Ashtami or Navami, when young girls are honoured as living representations of the Goddess. It reflects the festival's theme of respecting feminine strength and divinity."}},
+      {"@type":"Question","name":"Why do people perform Garba and Dandiya during Navratri?","acceptedAnswer":{"@type":"Answer","text":"Garba and Dandiya are traditional folk dances performed during Navratri as forms of devotion and celebration, often in circles around a lamp or an image of the Goddess."}},
+      {"@type":"Question","name":"Is Dussehra the same date every year?","acceptedAnswer":{"@type":"Answer","text":"No. Dussehra follows the Hindu lunisolar calendar, so its Gregorian date changes each year. In 2026, it falls on 20 October."}},
+      {"@type":"Question","name":"What is Vidyarambham and why is it associated with Vijayadashami?","acceptedAnswer":{"@type":"Answer","text":"Vidyarambham is a ceremony in which young children are formally introduced to reading and writing. Vijayadashami is considered auspicious for new beginnings, making it a traditional day for beginning education."}},
+      {"@type":"Question","name":"How can I learn more about how Rainbow International School celebrates festivals like this with students?","acceptedAnswer":{"@type":"Answer","text":"Rainbow International School, Thane includes festivals in cultural, creative and values-based learning. Families can schedule a campus visit or contact the admissions team to learn more."}}
     ]}
   ]
 }
