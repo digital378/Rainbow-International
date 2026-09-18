@@ -342,6 +342,41 @@
   footer.site-footer{ background:var(--navy-deep); color:#8d87a8; padding:1.6rem 1.25rem calc(1.6rem + env(safe-area-inset-bottom,0px)); text-align:center; font-size:.82rem; }
   footer.site-footer a{ color:var(--gold-bright); text-decoration:none; }
 
+  /* ---------- layout alignment refinements ---------- */
+  .hero{ padding-inline:0; }
+  .hero-inner{ width:100%; max-width:none; }
+  .hero-art-frame{ width:100%; margin-inline:0; aspect-ratio:16/9; }
+  .hero-meta{ width:calc(100% - 2.5rem); }
+
+  .download-image-card{ display:flex; flex-direction:column; height:100%; }
+  .download-image-card figcaption{ display:flex; flex:1; flex-direction:column; }
+  .download-image-card .image-caption{ min-height:0; }
+  .download-card-actions{ flex-wrap:nowrap; margin-top:auto; padding-top:.35rem; }
+
+  .cta-final .hero-cta{ justify-content:center; align-items:stretch; }
+  .cta-final .btn{ flex:0 1 230px; justify-content:center; text-align:center; }
+
+  @media (min-width:601px) and (orientation:landscape){
+    .hero-art-frame{ aspect-ratio:16/9; background-size:110% auto; background-position:center; }
+  }
+  @media (min-width:640px) and (max-width:860px) and (orientation:landscape){
+    .hero-content{
+      position:absolute; inset:0 auto 0 0; width:50%; max-width:440px; min-width:0; height:auto;
+      justify-content:center; text-align:left; padding:1.25rem 1rem 1.25rem 1.5rem;
+    }
+    .hero-eyebrow{ margin-bottom:.65rem; font-size:.56rem; padding:.3rem .7rem; }
+    h1.hero-title{ font-size:clamp(1.65rem,4vw,2.25rem); margin-bottom:.65rem; }
+    .hero-sub{ margin:0 0 .8rem; font-size:.78rem; line-height:1.45; }
+    .hero-content .hero-cta{ justify-content:flex-start; gap:.5rem; }
+    .hero-content .btn{ min-height:38px; padding:.55rem .8rem; font-size:.56rem; }
+  }
+  @media (max-width:520px){
+    .download-card-actions{ align-items:stretch; flex-direction:column; }
+    .image-download-btn{ width:100%; }
+    .cta-final .hero-cta{ flex-direction:column; align-items:stretch; }
+    .cta-final .btn{ flex-basis:auto; width:100%; }
+  }
+
   [data-reveal]{ opacity:0; transform:translateY(18px); }
   [data-reveal].is-visible{ opacity:1; transform:none; transition:opacity .7s ease, transform .7s ease; }
   @media (prefers-reduced-motion:reduce){ [data-reveal]{ opacity:1; transform:none; } }
