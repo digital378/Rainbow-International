@@ -1,0 +1,21 @@
+I'm adding a new standalone content page to the site: a Navratri & Dussehra 2026 festival guide for Rainbow International School. I've uploaded the finished page as ris-navratri-dussehra-2026.html — it's a complete, self-contained HTML file (its own <style> and inline JS, plus one embedded base64 image for the hero illustration). Do not redesign or rewrite its content, layout, or CSS — it is final and has already been approved. Your job is only to wire it into this codebase correctly.
+
+1. First, inspect how existing pages/blog posts on this site are structured: routing (file-based routes, Express routes, a CMS, etc.), whether pages share a common header/footer/layout wrapper, and how the site currently generates <title>, meta description, canonical URL, and Open Graph tags for a page. Follow whatever pattern is already established — do not invent a new one.
+
+2. Add this page at the route /navratri-dussehra-2026 (or /blog/navratri-dussehra-2026 if that matches the existing blog URL pattern — use whichever is consistent with other posts).
+
+3. This page has its own sticky header/navigation built into the design (it is meant to stand alone, similar to a landing page) — do NOT wrap it in the site's normal global header/footer/nav unless removing them would break the site's routing/layout system. If the framework requires a shared layout, extract only the <body> contents and inline <style>/<script> from my file into that layout's content slot, and suppress the global header/footer just for this one route. Preserve the file's CSS and JS exactly as-is and keep them scoped to this page only (they must not leak into or affect any other page's styling).
+
+4. Set SEO metadata for this page, matching the site's existing pattern for other posts:
+   - Title: "Navratri & Dussehra 2026 | Rainbow International School"
+   - Meta description: a 150–160 character summary covering the nine nights of Navadurga, the story of Rama and Ravana, trilingual essays/speeches, regional traditions, a classroom quiz, and festive graphics for the RIS community.
+   - Open Graph tags (og:title, og:description, og:image using the hero illustration, og:url) and Twitter card tags, consistent with other pages.
+   - A canonical URL for this route.
+
+5. Add this page's URL to sitemap.xml (or wherever the site's sitemap is generated) and, if there's a blog/news listing page on the site, add a card/link to this new post there as well, following the exact same format as the other listed posts.
+
+6. This file references six in-page sections by anchor id (#chapter-1 through #chapter-6) and includes a classroom quiz — do not alter these ids or the internal anchor links.
+
+7. After wiring it up, load the page at both desktop and mobile widths and confirm: the hero illustration renders full-bleed edge-to-edge with no cropping or distortion, there are no console errors, and none of the site's global CSS/JS is overriding this page's own styles. Show me a screenshot of both.
+
+Ask me before making any change to shared/global files (global stylesheet, shared layout component, navigation config) beyond what's strictly needed to add this one route.
