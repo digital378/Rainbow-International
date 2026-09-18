@@ -445,6 +445,12 @@ export async function registerRoutes(
   app.use("/blog/ganesh-chaturthi-2026", express.static(ganeshChaturthiBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/ganesh-chaturthi-2026", (_req, res) => res.sendFile(path.join(ganeshChaturthiBlogDir, "index.html")));
 
+  // Navratri & Dussehra 2026 static blog — preserve the approved standalone
+  // HTML, scoped styles, embedded hero and classroom interactions as supplied.
+  const navratriDussehraBlogDir = path.join(process.cwd(), "blog-pages/navratri-dussehra-2026");
+  app.use("/blog/navratri-dussehra-2026", express.static(navratriDussehraBlogDir, { index: "index.html", redirect: false }));
+  app.get("/blog/navratri-dussehra-2026", (_req, res) => res.sendFile(path.join(navratriDussehraBlogDir, "index.html")));
+
   registerSSRRoutes(app);
 
   // Declare every code-owned blog page from the shared manifest, so a page that

@@ -42,6 +42,18 @@ export interface CodeOwnedBlog {
 
 export const CODE_OWNED_BLOGS: CodeOwnedBlog[] = [
   {
+    slug: "navratri-dussehra-2026",
+    title: "Navratri & Dussehra 2026 | Rainbow International School",
+    date: "1 Oct 2026",
+    publishedAt: "2026-10-01",
+    cat: "Events",
+    intro:
+      "Explore nine nights of Navadurga, Rama and Ravana, trilingual essays and speeches, regional traditions, a classroom quiz and festive graphics for the RIS community.",
+    accentColor: "#C9A227",
+    emoji: "🪔",
+    badge: "NEW",
+  },
+  {
     slug: "ganesh-chaturthi-2026",
     title: "Ganesh Chaturthi 2026: History, Significance, Speeches, Essays & Celebration Guide",
     date: "7 Sep 2026",
