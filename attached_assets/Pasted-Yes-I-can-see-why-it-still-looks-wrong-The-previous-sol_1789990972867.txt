@@ -1,0 +1,102 @@
+Yes — I can see why it still looks wrong.
+
+The previous solution has created an extended background, but it has not actually blended the boundary of the original hero artwork. The hard vertical edge is still visible around the right side, and the blurred/extended area is introducing that purple-grey strip. So I would remove the blur-extension approach entirely for this banner.
+
+For this specific artwork, the correct solution is edge feathering + a matched full-width background, while keeping the hero image at exactly the same scale.
+
+Give Replit this exact instruction:
+
+Fix ONLY the large-screen left/right blending of the Navratri & Dussehra hero section.
+
+Important:
+
+Do NOT zoom the hero artwork.
+Do NOT crop the hero artwork.
+Do NOT change its dimensions, aspect ratio, position, height, text positioning, buttons, illustration placement, or desktop composition.
+Do NOT use a blurred enlarged duplicate behind the hero. Remove the current blur/ambient extension because it is creating visible purple side panels.
+Required implementation
+Keep the existing hero artwork at its current size and centered.
+Make the full-width hero section background a dark navy gradient that closely matches the outer colours of the artwork.
+Put the hero artwork on its own background layer/pseudo-element.
+Feather ONLY the left and right edges of that artwork using a CSS mask so the artwork gradually becomes transparent over approximately 100–160px near each outer edge.
+The transparent feathered areas should reveal the matching navy hero background underneath.
+The central 75–80% of the artwork must remain completely opaque and unchanged.
+Do not apply blur to the visible hero artwork.
+Do not allow any purple, grey or differently coloured vertical bands outside the artwork.
+This treatment should activate primarily on desktop screens wider than the original hero content width.
+
+Use a mask similar to:
+
+-webkit-mask-image: linear-gradient(
+  to right,
+  transparent 0%,
+  black 8%,
+  black 92%,
+  transparent 100%
+);
+
+mask-image: linear-gradient(
+  to right,
+  transparent 0%,
+  black 8%,
+  black 92%,
+  transparent 100%
+);
+
+However, apply this mask only to the hero background artwork layer, NOT to the HTML text, buttons, navigation, or any foreground content.
+
+Use a background behind it approximately like:
+
+background:
+  linear-gradient(
+    90deg,
+    #07113d 0%,
+    #081643 35%,
+    #081643 65%,
+    #07113d 100%
+  );
+
+Adjust these navy values by sampling the actual edge colours of the existing hero artwork so that the transition becomes visually seamless.
+
+On ultrawide screens, continue the navy background naturally to both sides rather than enlarging the original artwork.
+
+Success criteria: At 1440px, 1920px, 2560px and ultrawide desktop widths, there should be no visible vertical line showing where the original hero artwork ends. The hero itself must remain at exactly the same visual scale as it is now.
+
+I would also change one important thing
+
+Looking at your latest screenshot, don't try to make the sides look like additional artwork. That's what's producing the artificial-looking strip on the right.
+
+The design already has enough visual information. The most premium treatment would be:
+
+dark navy continuation
+        ↓
+████████████▓▒░ HERO ARTWORK ░▒▓████████████
+                 ↑
+        original size unchanged
+
+Rather than:
+
+blurred duplicate │ original banner │ blurred duplicate
+                  ↑                ↑
+             boundaries remain noticeable
+
+The edge transition should be about 120–140 px, not a huge fade across the banner. That is enough to hide the seam without making the artwork look washed out.
+
+One more thing: your right side needs a slightly different background treatment from the left because the right edge of the artwork contains warmer/purplish illumination while the left is almost pure navy. A single flat background colour won't perfectly blend both sides. Replit should use something closer to:
+
+.hero-section {
+  background:
+    radial-gradient(
+      circle at 88% 42%,
+      rgba(34, 36, 76, 0.65) 0%,
+      rgba(10, 18, 62, 0.25) 28%,
+      transparent 48%
+    ),
+    linear-gradient(
+      90deg,
+      #07113d 0%,
+      #071440 45%,
+      #0a1442 72%,
+      #12163f 100%
+    );
+}

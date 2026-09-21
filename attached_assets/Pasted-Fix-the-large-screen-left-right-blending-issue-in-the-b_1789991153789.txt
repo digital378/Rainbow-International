@@ -1,0 +1,100 @@
+Fix the large-screen left/right blending issue in the blog hero section for the Navratri & Dussehra page.
+
+Goal
+
+On larger desktop screens, the hero artwork currently ends abruptly on the left and right, creating visible vertical seams / side bands. I want the hero to blend smoothly into the full-width section background.
+
+Important constraints
+Do NOT zoom the hero image
+Do NOT crop the hero image
+Do NOT change the scale of the hero artwork
+Do NOT change the composition of the hero
+Do NOT move the text, buttons, or illustration
+Do NOT reduce content width
+Do NOT use a blurred enlarged duplicate of the hero image
+Do NOT create purple/grey side panels
+Keep the hero artwork sharp and unchanged in the center
+Required implementation
+Keep the existing hero artwork centered at its current size.
+Make the outer full-width hero section use a dark navy background / gradient that matches the outer colours of the hero artwork.
+Put the actual hero artwork on a separate layer or pseudo-element.
+Apply a left and right edge feathering effect only to the hero artwork layer using a CSS mask.
+The mask should make only the outer edges gradually transparent so they blend into the full-width navy background underneath.
+The middle 75–80% of the hero artwork must remain fully visible and unchanged.
+This should mainly apply on larger desktop widths where the container is wider than the actual hero artwork.
+Remove any previous implementation that uses blur-extension / enlarged duplicate background if present.
+Suggested visual behaviour
+The left and right edges of the artwork should softly fade out over about 100px to 160px
+The center must remain crisp
+The final result should look like the hero naturally continues into the background, not like the artwork is boxed inside a container
+Suggested CSS approach
+
+Use a structure where:
+
+.hero-section = full-width background wrapper
+.hero-artwork-layer = actual hero image/artwork layer with mask
+foreground content remains untouched above it
+
+Use a mask similar to this on the artwork layer only:
+
+-webkit-mask-image: linear-gradient(
+  to right,
+  transparent 0%,
+  black 8%,
+  black 92%,
+  transparent 100%
+);
+
+mask-image: linear-gradient(
+  to right,
+  transparent 0%,
+  black 8%,
+  black 92%,
+  transparent 100%
+);
+
+Use a section background approximately like:
+
+background:
+  radial-gradient(
+    circle at 88% 42%,
+    rgba(34, 36, 76, 0.45) 0%,
+    rgba(10, 18, 62, 0.18) 28%,
+    transparent 48%
+  ),
+  linear-gradient(
+    90deg,
+    #07113d 0%,
+    #081643 35%,
+    #081643 65%,
+    #10163f 100%
+  );
+
+Adjust the final navy / indigo shades by visually matching the existing hero artwork so the transition looks seamless.
+
+Implementation notes
+The mask must be applied only to the background hero artwork layer
+The mask must not affect:
+heading text
+paragraph text
+buttons
+header/logo
+any foreground content
+Avoid applying blur to the visible main artwork
+Avoid making the entire hero semi-transparent
+Do not change mobile/tablet layout unless required
+Success criteria
+
+At 1440px, 1920px, 2560px and ultrawide desktop widths:
+
+there should be no visible vertical seam
+there should be no obvious coloured side strip
+the hero artwork should remain at exactly the same visual scale
+the section should feel like a seamless premium full-width hero
+Deliverable
+
+Please:
+
+implement the fix,
+show me the updated CSS/HTML changes,
+explain exactly which class controls the edge blending so I can adjust it later if needed.
