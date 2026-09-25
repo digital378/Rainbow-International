@@ -13,8 +13,8 @@
 .rainbow-theatre h2 { font: 800 clamp(32px,4vw,52px)/1.08 "DM Sans",sans-serif; letter-spacing: -.04em; margin: 0 0 12px; }
 .rainbow-theatre h2 em { color: #fbbf24; font-style: normal; }
 .rainbow-theatre__heading p:last-child { margin: 0; color: #c5d7f0; }
-.rainbow-theatre__profile { display: inline-flex; gap: 10px; align-items: center; justify-content: center; flex-shrink: 0; min-height: 46px; border-radius: 999px; padding: 10px 18px; border: 1px solid rgba(255,255,255,.3); color: white; text-decoration: none; font-size: 13px; font-weight: 700; transition: background .2s; }
-.rainbow-theatre__profile:hover { background: rgba(255,255,255,.13); }
+.rainbow-theatre__profile { display: inline-flex; gap: 10px; align-items: center; justify-content: center; flex-shrink: 0; min-height: 46px; border-radius: 999px; padding: 10px 18px; border: 1px solid rgba(255,255,255,.26); background: linear-gradient(115deg,#833ab4 0%,#c13584 35%,#e1306c 66%,#d94b32 100%); box-shadow: 0 8px 22px rgba(76,12,83,.24); color: white; text-decoration: none; font-size: 13px; font-weight: 700; transition: filter .2s, box-shadow .2s; }
+.rainbow-theatre__profile:hover { filter: brightness(1.12); box-shadow: 0 10px 26px rgba(76,12,83,.36); }
 .rainbow-theatre__layout { display: grid; grid-template-columns: minmax(0, 485px) minmax(0, 1fr); align-items: start; gap: clamp(30px,6vw,90px); }
 .rainbow-theatre__stage { width: 100%; min-width: 0; }
 .rainbow-theatre__frame { position: relative; aspect-ratio: 9 / 16; width: min(100%, 425px); margin: 0 auto; overflow: hidden; border-radius: 20px; background: #030b1e; border: 1px solid rgba(255,255,255,.24); box-shadow: 0 28px 80px rgba(0,0,0,.4), 0 0 0 6px rgba(255,255,255,.045); }
