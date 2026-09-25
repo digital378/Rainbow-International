@@ -44,6 +44,7 @@ import { registerWalkinRoutes } from "./walkinRoutes";
 import { bustCrmStatsCache } from "./walkinSheets";
 import { registerIndraIntegrationRoutes, startIndraPushScheduler } from "./indraIntegration";
 import { registerMcpGateway } from "./mcpGateway";
+import { registerInstagramTheatre } from "./instagramTheatre";
 import { db } from "./db";
 import {
   getGoogleRefreshToken,
@@ -378,6 +379,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  registerInstagramTheatre(app);
 
   // Serve admin-uploaded blog images from the persistent uploads directory.
   // This must be registered early so it resolves before the SPA catch-all.

@@ -1,0 +1,11 @@
+Add an immersive Rainbow Theatre section to the admissions page, directly below the complete “Your Admission Journey at RIS” section—including its “Book a Campus Visit” button—and before the next section, “Why Choose Us.” Use the attached screenshot as a placement reference, but make the theatre feel native to the RIS website rather than copying another site’s styling.
+
+Design it for RIS: match the existing navy, blue, saffron-gold and light backgrounds, typography, spacing and buttons. Show Instagram videos in a true 9:16 portrait player on both desktop and mobile. On desktop, place a compact selectable reel playlist beside the player; on mobile, put the player first and make the playlist easy to swipe and tap. Include Previous and Next buttons, a video position indicator, a separate link to RIS’s existing Instagram profile, and sound enabled by default. If the browser blocks autoplay with sound, show a clear tap-to-play control.
+
+For the theatre playlist, include only reels with a video URL that can play in the page. Selecting any listed reel must play it in the theatre—not redirect to Instagram. Keep Instagram navigation on the separate profile button. Handle loading, empty feeds, unavailable videos and API errors visibly, without leaving broken player controls. Lazy-load the feed near the section and pause playback when it’s offscreen.
+
+First inspect the RIS project and reuse its existing Instagram feed endpoint, components and server patterns if available. Use the RIS Instagram access token already stored in this project’s secrets; do not ask me for it, display it, put it in browser code or logs, or reuse a token from another site. If no feed endpoint exists, add a server-side one using the existing RIS token configuration.
+
+Preserve the admissions journey, campus-visit action, other page sections and existing functionality. Don’t submit real enquiries or publish the site.
+
+Verify at desktop and mobile widths: the section is in the requested position, the player stays 9:16, previous/next and playlist selection play available clips in-page, the Instagram link is separate, sound/tap-to-play works, the layout has no horizontal overflow, and feed failures show a useful fallback.

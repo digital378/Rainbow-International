@@ -1,0 +1,64 @@
+.rainbow-theatre {
+  position: relative;
+  overflow: hidden;
+  padding: 120px 20px 96px;
+  background: radial-gradient(circle at 72% 20%, #154b91 0%, #0b285c 35%, #07183e 76%);
+  color: white;
+}
+.rainbow-theatre__glow { position: absolute; width: 500px; height: 500px; right: -160px; top: -190px; border: 1px solid rgba(251,191,36,.22); border-radius: 50%; box-shadow: 0 0 0 72px rgba(251,191,36,.025), 0 0 0 148px rgba(251,191,36,.018); pointer-events: none; }
+.rainbow-theatre__inner { position: relative; max-width: 1152px; margin: 0 auto; }
+.rainbow-theatre__heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+.rainbow-theatre__eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: #fbbf24; font: 700 11px/1.5 "DM Sans",sans-serif; text-transform: uppercase; letter-spacing: .19em; }
+.rainbow-theatre__eyebrow span { display: block; width: 23px; height: 2px; background: #fbbf24; }
+.rainbow-theatre h2 { font: 800 clamp(32px,4vw,52px)/1.08 "DM Sans",sans-serif; letter-spacing: -.04em; margin: 0 0 12px; }
+.rainbow-theatre h2 em { color: #fbbf24; font-style: normal; }
+.rainbow-theatre__heading p:last-child { margin: 0; color: #c5d7f0; }
+.rainbow-theatre__profile { display: inline-flex; gap: 10px; align-items: center; justify-content: center; flex-shrink: 0; min-height: 46px; border-radius: 999px; padding: 10px 18px; border: 1px solid rgba(255,255,255,.3); color: white; text-decoration: none; font-size: 13px; font-weight: 700; transition: background .2s; }
+.rainbow-theatre__profile:hover { background: rgba(255,255,255,.13); }
+.rainbow-theatre__layout { display: grid; grid-template-columns: minmax(0, 485px) minmax(0, 1fr); align-items: start; gap: clamp(30px,6vw,90px); }
+.rainbow-theatre__stage { width: 100%; min-width: 0; }
+.rainbow-theatre__frame { position: relative; aspect-ratio: 9 / 16; width: min(100%, 425px); margin: 0 auto; overflow: hidden; border-radius: 20px; background: #030b1e; border: 1px solid rgba(255,255,255,.24); box-shadow: 0 28px 80px rgba(0,0,0,.4), 0 0 0 6px rgba(255,255,255,.045); }
+.rainbow-theatre__frame video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.rainbow-theatre__play { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; width: 100%; padding: 24px; color: white; background: linear-gradient(180deg,transparent,rgba(0,0,0,.35)); border: 0; font-weight: 800; text-align: center; cursor: pointer; text-shadow: 0 1px 7px #000; }
+.rainbow-theatre__play:disabled { cursor: progress; }
+.rainbow-theatre__play svg { box-sizing: content-box; padding: 17px; border-radius: 50%; background: #fbbf24; color: #091a4f; text-shadow: none; }
+.rainbow-theatre__stage-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 20px; }
+.rainbow-theatre__title { min-width: 0; }
+.rainbow-theatre__title span { display: inline-flex; align-items: center; gap: 7px; color: #fbbf24; font-size: 10px; font-weight: 800; letter-spacing: .15em; }
+.rainbow-theatre__title p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 5px 0 0; font-size: 17px; font-weight: 700; }
+.rainbow-theatre__count { color: #fbbf24; font-size: 13px; font-weight: 800; letter-spacing: .12em; white-space: nowrap; }
+.rainbow-theatre__navigation { display: flex; gap: 10px; margin-top: 18px; }
+.rainbow-theatre__navigation button, .rainbow-theatre__notice button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 20px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; color: white; background: rgba(255,255,255,.08); font-size: 13px; font-weight: 700; cursor: pointer; }
+.rainbow-theatre__navigation button:last-child { background: #fbbf24; border-color: #fbbf24; color: #091a4f; }
+.rainbow-theatre__navigation button:disabled { opacity: .4; cursor: not-allowed; }
+.rainbow-theatre__warning { color: #fbbf24; font-size: 13px; margin: 12px 0 0; }
+.rainbow-theatre__queue { min-width: 0; padding-top: 12px; }
+.rainbow-theatre__queue-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.22); color: #fbbf24; font-size: 11px; font-weight: 800; letter-spacing: .15em; }
+.rainbow-theatre__queue-head span:last-child { font-size: 12px; color: #a7c6ee; text-transform: none; letter-spacing: 0; }
+.rainbow-theatre__playlist { display: grid; gap: 8px; max-height: 640px; overflow-y: auto; padding: 16px 5px 16px 0; scrollbar-color: #6684ae transparent; }
+.rainbow-theatre__reel { display: flex; gap: 16px; align-items: center; min-width: 0; width: 100%; text-align: left; color: white; background: transparent; border: 1px solid transparent; border-radius: 16px; padding: 9px; cursor: pointer; transition: background .2s, border-color .2s; }
+.rainbow-theatre__reel:hover { background: rgba(255,255,255,.09); }
+.rainbow-theatre__reel.is-active { border-color: rgba(251,191,36,.5); background: rgba(251,191,36,.13); }
+.rainbow-theatre__thumb { display: flex; align-items: center; justify-content: center; flex: 0 0 64px; width: 64px; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 9px; background: #102e64; }
+.rainbow-theatre__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.rainbow-theatre__reel-copy { display: grid; gap: 5px; min-width: 0; }
+.rainbow-theatre__reel-copy small { color: #fbbf24; font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.rainbow-theatre__reel-copy strong { font-size: 14px; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.rainbow-theatre__reel-play { flex-shrink: 0; margin-left: auto; color: #fbbf24; }
+.rainbow-theatre__queue-note { color: #a7c6ee; font-size: 12px; }
+.rainbow-theatre__notice { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; min-height: 300px; padding: 32px; border: 1px solid rgba(255,255,255,.2); border-radius: 20px; background: rgba(255,255,255,.06); color: #d7e6fa; text-align: center; }
+.rainbow-theatre__notice p { margin: 0; }
+.rainbow-theatre :is(button,a):focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
+@media (max-width: 767px) {
+  .rainbow-theatre { padding: 64px 16px 70px; }
+  .rainbow-theatre__heading { display: block; margin-bottom: 28px; }
+  .rainbow-theatre__heading p:last-child { font-size: 14px; }
+  .rainbow-theatre__profile { margin-top: 22px; }
+  .rainbow-theatre__layout { display: block; }
+  .rainbow-theatre__frame { width: min(100%, 390px); }
+  .rainbow-theatre__navigation button { flex: 1; }
+  .rainbow-theatre__queue { margin-top: 42px; }
+  .rainbow-theatre__playlist { display: flex; overflow-x: auto; overflow-y: hidden; max-height: none; padding-bottom: 20px; scroll-snap-type: x proximity; }
+  .rainbow-theatre__reel { flex: 0 0 min(73vw, 245px); scroll-snap-align: start; }
+  .rainbow-theatre__thumb { flex-basis: 58px; width: 58px; }
+}

@@ -27,6 +27,7 @@ const HOME_FAQS: WaveOneFaq[] = [
 ];
 
 const AboutPreview        = lazy(() => import("@/components/home/AboutPreview").then(m => ({ default: m.AboutPreview })));
+const RainbowTheatre      = lazy(() => import("@/components/home/RainbowTheatre").then(m => ({ default: m.RainbowTheatre })));
 const AcademicSections    = lazy(() => import("@/components/home/AcademicSections").then(m => ({ default: m.AcademicSections })));
 const Pedagogy            = lazy(() => import("@/components/home/Pedagogy").then(m => ({ default: m.Pedagogy })));
 const DiscoverRainbow     = lazy(() => import("@/components/home/DiscoverRainbow").then(m => ({ default: m.DiscoverRainbow })));
@@ -105,6 +106,9 @@ export default function Home() {
           <AwardsStrip />
           <AdmissionJourney />
 
+          <LazyVisible minHeight={520}>
+            <Suspense fallback={<SectionFallback />}><RainbowTheatre /></Suspense>
+          </LazyVisible>
           <LazyVisible minHeight={400}>
             <Suspense fallback={<SectionFallback />}><AboutPreview /></Suspense>
           </LazyVisible>
