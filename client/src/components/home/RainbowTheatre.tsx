@@ -9,10 +9,14 @@ const PROFILE_URL = "https://www.instagram.com/rainbowinternationalschool/";
 export function RainbowTheatre() {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playlistRef = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
   const [reels, setReels] = useState<Reel[]>([]);
   const [featuredUnavailable, setFeaturedUnavailable] = useState(false);
+  const [visibleThumbs, setVisibleThumbs] = useState<Set<string>>(() => new Set());
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [feedWarning, setFeedWarning] = useState("");
   const [unavailable, setUnavailable] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [feedState, setFeedState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -48,30 +52,51 @@ export function RainbowTheatre() {
     if (!near) return;
     const controller = new AbortController();
     let inFlight = false;
+    const applyFeed = (data: { reels: Reel[]; featuredUnavailable: boolean }) => {
+      setReels(data.reels);
+      setFeaturedUnavailable(data.featuredUnavailable);
+      setUnavailable([]);
+      setActiveId(id => id && data.reels.some(reel => reel.id === id) ? id : data.reels[0]?.id || null);
+      setFeedState("ready");
+      setMessage("");
+      setFeedWarning("");
+      hasLoadedRef.current = true;
+    };
     const load = async () => {
       if (inFlight) return;
       inFlight = true;
       if (!hasLoadedRef.current) setFeedState("loading");
+      let complete = false;
       try {
-        const response = await fetch("/api/instagram/theatre", { signal: controller.signal });
-        if (!response.ok) throw new Error("Feed unavailable");
-        const data = await response.json() as { reels: Reel[]; featuredUnavailable: boolean };
+        const response = await fetch("/api/instagram/theatre?first=1", { signal: controller.signal });
+        if (!response.ok) throw new Error("Preview unavailable");
+        const data = await response.json() as { reels: Reel[]; featuredUnavailable: boolean; complete: boolean };
         if (controller.signal.aborted) return;
-        setReels(data.reels);
-        setFeaturedUnavailable(data.featuredUnavailable);
-        setUnavailable([]);
-        setActiveId(id => id && data.reels.some(reel => reel.id === id) ? id : data.reels[0]?.id || null);
-        setFeedState("ready");
-        setMessage("");
-        hasLoadedRef.current = true;
+        applyFeed(data);
+        complete = data.complete;
+      } catch {
+        // The full feed can still work if the quick preview is unavailable.
+      }
+      if (controller.signal.aborted) return;
+      setLoadingMore(!complete);
+      try {
+        if (!complete) {
+          const response = await fetch("/api/instagram/theatre", { signal: controller.signal });
+          if (!response.ok) throw new Error("Feed unavailable");
+          const data = await response.json() as { reels: Reel[]; featuredUnavailable: boolean };
+          if (!controller.signal.aborted) applyFeed(data);
+        }
       } catch {
         if (!controller.signal.aborted) {
-          setFeedState(hasLoadedRef.current ? "ready" : "error");
-          setMessage(hasLoadedRef.current
-            ? "We couldn't refresh the videos. Showing the last available playlist."
-            : "We couldn't load the videos right now. Please try again.");
+          if (hasLoadedRef.current) {
+            setFeedWarning("Some reels couldn't load right now. Showing the available clips.");
+          } else {
+            setFeedState("error");
+            setMessage("We couldn't load the videos right now. Please try again.");
+          }
         }
       } finally {
+        if (!controller.signal.aborted) setLoadingMore(false);
         inFlight = false;
       }
     };
@@ -85,9 +110,25 @@ export function RainbowTheatre() {
   const index = currentIndex >= 0 ? currentIndex : 0;
   const current = available[index];
 
+  useEffect(() => {
+    const root = playlistRef.current;
+    if (!root || !available.length) return;
+    if (!("IntersectionObserver" in window)) {
+      setVisibleThumbs(new Set(available.map(reel => reel.id)));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      const ids = entries.filter(entry => entry.isIntersecting).map(entry => (entry.target as HTMLElement).dataset.reelId).filter((id): id is string => !!id);
+      if (ids.length) setVisibleThumbs(previous => new Set([...previous, ...ids]));
+    }, { root, rootMargin: "120px" });
+    root.querySelectorAll("[data-reel-id]").forEach(node => observer.observe(node));
+    return () => observer.disconnect();
+  }, [reels, unavailable]);
+
   const startPlayback = useCallback(async () => {
     const video = videoRef.current;
     if (!video || !visibleRef.current) return;
+    setPlayerState("tap");
     video.muted = false;
     try {
       await video.play();
@@ -98,7 +139,7 @@ export function RainbowTheatre() {
   }, []);
 
   useEffect(() => {
-    if (!visible || !current || !videoRef.current?.readyState) return;
+    if (!visible || !current) return;
     void startPlayback();
   }, [visible, current?.id, startPlayback]);
 
@@ -160,8 +201,7 @@ export function RainbowTheatre() {
                   poster={current.thumbnailUrl || undefined}
                   controls
                   playsInline
-                  preload="metadata"
-                  onLoadedData={() => { setPlayerState("tap"); void startPlayback(); }}
+                  preload="none"
                   onPlaying={() => setPlayerState("playing")}
                   onPause={() => { if (visibleRef.current) setPlayerState("tap"); }}
                   onError={onVideoError}
@@ -169,8 +209,8 @@ export function RainbowTheatre() {
                   data-testid="theatre-video"
                 />
                 {(playerState === "loading" || playerState === "tap") && (
-                  <button type="button" className="rainbow-theatre__play" onClick={() => void startPlayback()} disabled={playerState === "loading"} aria-label={playerState === "loading" ? "Loading video" : "Play video with sound"} data-testid="theatre-play">
-                    {playerState === "loading" ? "Loading video…" : <><Play size={25} fill="currentColor" /> Tap to play with sound</>}
+                  <button type="button" className="rainbow-theatre__play" onClick={() => void startPlayback()} aria-label="Play video with sound" data-testid="theatre-play">
+                    <Play size={25} fill="currentColor" /> Tap to play with sound
                   </button>
                 )}
               </div>
@@ -192,8 +232,9 @@ export function RainbowTheatre() {
               {(featuredUnavailable || !available.some(reel => reel.isFeatured)) && (
                 <p className="rainbow-theatre__queue-warning" role="status">The featured reel is not available to play here right now.</p>
               )}
-              {message.includes("refresh") && <p className="rainbow-theatre__queue-warning" role="status">{message}</p>}
-              <div className="rainbow-theatre__playlist" aria-label="Choose a video to play">
+              {feedWarning && <p className="rainbow-theatre__queue-warning" role="status">{feedWarning}</p>}
+              {loadingMore && <p className="rainbow-theatre__queue-note" role="status">Loading more reels…</p>}
+              <div className="rainbow-theatre__playlist" ref={playlistRef} aria-label="Choose a video to play">
                 {available.map((reel, i) => (
                   <button
                     key={reel.id}
@@ -201,10 +242,11 @@ export function RainbowTheatre() {
                     className={`rainbow-theatre__reel ${current.id === reel.id ? "is-active" : ""}`}
                     onClick={() => select(reel.id)}
                     aria-current={current.id === reel.id ? "true" : undefined}
+                    data-reel-id={reel.id}
                     data-testid={`theatre-reel-${i}`}
                   >
                     <span className="rainbow-theatre__thumb">
-                      {reel.thumbnailUrl ? <img src={reel.thumbnailUrl} alt="" loading="lazy" /> : <Play size={20} aria-hidden="true" />}
+                      {reel.thumbnailUrl && visibleThumbs.has(reel.id) ? <img src={reel.thumbnailUrl} alt="" loading="lazy" decoding="async" /> : <Play size={20} aria-hidden="true" />}
                     </span>
                     <span className="rainbow-theatre__reel-copy"><small>{reel.isFeatured ? "FEATURED REEL" : `FILM ${String(i + 1).padStart(2, "0")}`}</small><strong>{reel.title}</strong></span>
                     <Play size={15} className="rainbow-theatre__reel-play" aria-hidden="true" />
