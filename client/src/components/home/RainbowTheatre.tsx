@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, ExternalLink, Instagram, Play, RotateCcw, Volume2 } from "lucide-react";
 import "./RainbowTheatre.css";
 
-type Reel = { id: string; title: string; videoUrl: string; thumbnailUrl: string | null };
+type Reel = { id: string; title: string; videoUrl: string; thumbnailUrl: string | null; isFeatured: boolean };
 
 const PROFILE_URL = "https://www.instagram.com/rainbowinternationalschool/";
 
@@ -12,6 +12,7 @@ export function RainbowTheatre() {
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
   const [reels, setReels] = useState<Reel[]>([]);
+  const [featuredUnavailable, setFeaturedUnavailable] = useState(false);
   const [unavailable, setUnavailable] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [feedState, setFeedState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -19,6 +20,7 @@ export function RainbowTheatre() {
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
   const visibleRef = useRef(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
     const node = sectionRef.current;
@@ -45,27 +47,37 @@ export function RainbowTheatre() {
   useEffect(() => {
     if (!near) return;
     const controller = new AbortController();
-    setFeedState("loading");
-    setMessage("");
-    fetch("/api/instagram/theatre", { signal: controller.signal })
-      .then(async response => {
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.error || "We couldn't load the videos.");
-        return body as { reels: Reel[] };
-      })
-      .then(data => {
+    let inFlight = false;
+    const load = async () => {
+      if (inFlight) return;
+      inFlight = true;
+      if (!hasLoadedRef.current) setFeedState("loading");
+      try {
+        const response = await fetch("/api/instagram/theatre", { signal: controller.signal });
+        if (!response.ok) throw new Error("Feed unavailable");
+        const data = await response.json() as { reels: Reel[]; featuredUnavailable: boolean };
+        if (controller.signal.aborted) return;
         setReels(data.reels);
+        setFeaturedUnavailable(data.featuredUnavailable);
         setUnavailable([]);
-        setActiveId(data.reels[0]?.id || null);
+        setActiveId(id => id && data.reels.some(reel => reel.id === id) ? id : data.reels[0]?.id || null);
         setFeedState("ready");
-      })
-      .catch(() => {
+        setMessage("");
+        hasLoadedRef.current = true;
+      } catch {
         if (!controller.signal.aborted) {
-          setFeedState("error");
-          setMessage("We couldn't load the videos right now. Please try again.");
+          setFeedState(hasLoadedRef.current ? "ready" : "error");
+          setMessage(hasLoadedRef.current
+            ? "We couldn't refresh the videos. Showing the last available playlist."
+            : "We couldn't load the videos right now. Please try again.");
         }
-      });
-    return () => controller.abort();
+      } finally {
+        inFlight = false;
+      }
+    };
+    void load();
+    const timer = window.setInterval(() => void load(), 5 * 60_000 + 2000);
+    return () => { window.clearInterval(timer); controller.abort(); };
   }, [near, attempt]);
 
   const available = reels.filter(reel => !unavailable.includes(reel.id));
@@ -177,6 +189,10 @@ export function RainbowTheatre() {
             </div>
             <div className="rainbow-theatre__queue">
               <div className="rainbow-theatre__queue-head"><span>THE REEL PLAYLIST</span><span>{available.length} films</span></div>
+              {(featuredUnavailable || !available.some(reel => reel.isFeatured)) && (
+                <p className="rainbow-theatre__queue-warning" role="status">The featured reel is not available to play here right now.</p>
+              )}
+              {message.includes("refresh") && <p className="rainbow-theatre__queue-warning" role="status">{message}</p>}
               <div className="rainbow-theatre__playlist" aria-label="Choose a video to play">
                 {available.map((reel, i) => (
                   <button
@@ -190,7 +206,7 @@ export function RainbowTheatre() {
                     <span className="rainbow-theatre__thumb">
                       {reel.thumbnailUrl ? <img src={reel.thumbnailUrl} alt="" loading="lazy" /> : <Play size={20} aria-hidden="true" />}
                     </span>
-                    <span className="rainbow-theatre__reel-copy"><small>FILM {String(i + 1).padStart(2, "0")}</small><strong>{reel.title}</strong></span>
+                    <span className="rainbow-theatre__reel-copy"><small>{reel.isFeatured ? "FEATURED REEL" : `FILM ${String(i + 1).padStart(2, "0")}`}</small><strong>{reel.title}</strong></span>
                     <Play size={15} className="rainbow-theatre__reel-play" aria-hidden="true" />
                   </button>
                 ))}
