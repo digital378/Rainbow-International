@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { lockWalkinDashboard, unlockWalkinDashboard } from "@/lib/walkinDashboardAuth";
+import { unlockWalkinDashboard, useWalkinDashboardSession } from "@/lib/walkinDashboardAuth";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", SLATE = "#64748b", GREY = "#94a3b8";
-const AUTH_KEY = "walkin_overview_2728_auth";
 
 type Stats = {
   brand: string | null;
@@ -23,14 +22,14 @@ const fmt = (n: number) => n.toLocaleString("en-IN");
 
 function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [code, setCode] = useState("");
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
     setSubmitting(true);
     try {
-      if (await unlockWalkinDashboard(code.trim().toUpperCase(), "overview")) {
-        try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {}
+      if (await unlockWalkinDashboard(code.trim().toUpperCase(), "overview", remember)) {
         onSuccess();
         return;
       }
@@ -62,6 +61,10 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
           autoFocus
           data-testid="input-passcode"
         />
+        <label className="mt-4 flex items-center gap-2 text-sm text-slate-700">
+          <input type="checkbox" checked={remember} onChange={event => setRemember(event.target.checked)} />
+          Remember this device for 30 days
+        </label>
         {error && <div className="mt-2 text-center text-sm text-red-600">Incorrect passcode</div>}
         <button onClick={submit} disabled={submitting} className="mt-4 w-full rounded-lg py-2.5 font-bold text-white disabled:opacity-60" style={{ background: NAVY }}>
           {submitting ? "Checking…" : "Open dashboard"}
@@ -311,16 +314,8 @@ function Dashboard({ onLock }: { onLock: () => void }) {
 }
 
 export default function WalkinOverview2728() {
-  const [authed, setAuthed] = useState(() => {
-    try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
-  });
-  const handleLock = useCallback(() => {
-    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
-    void lockWalkinDashboard("overview");
-    setAuthed(false);
-  }, []);
-
-  if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
-
-  return <Dashboard onLock={handleLock} />;
+  const { authed, checking, unlock, lock } = useWalkinDashboardSession("overview");
+  if (checking) return <div className="min-h-screen" style={{ background: NAVY }} />;
+  if (!authed) return <PasscodeGate onSuccess={unlock} />;
+  return <Dashboard onLock={() => void lock()} />;
 }

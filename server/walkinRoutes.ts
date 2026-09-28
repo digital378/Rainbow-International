@@ -40,8 +40,10 @@ import {
   createWalkinDashboardSession,
   hasWalkinInternalAccess,
   hasWalkinDashboardAccess,
+  hasWalkinDashboardSession,
   revokeWalkinInternalSession,
   revokeWalkinDashboardSession,
+  REMEMBER_TTL_SECONDS,
   WALKIN_INTERNAL_COOKIE,
   walkinDashboardCookieName,
   type WalkinDashboardScope,
@@ -1154,15 +1156,23 @@ export function registerWalkinRoutes(app: Express) {
     const passcode = String(req.body?.passcode || "");
     const scope = String(req.body?.scope || "") as WalkinDashboardScope;
     if (!dashboardScopes.has(scope)) return res.status(400).json({ message: "Invalid dashboard scope" });
-    const session = createWalkinDashboardSession(passcode, scope);
+    const remember = req.body?.remember === true;
+    const session = createWalkinDashboardSession(passcode, scope, remember);
     if (!session) return res.status(401).json({ ok: false });
     dashboardUnlockAttempts.delete(clientKey);
     const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
     res.setHeader(
       "Set-Cookie",
-      `${walkinDashboardCookieName(scope)}=${session}; Path=/api/walkin/crm-stats; HttpOnly; SameSite=Strict${secure}`,
+      `${walkinDashboardCookieName(scope)}=${session}; Path=/api/walkin/crm-stats; HttpOnly; SameSite=Strict${secure}${remember ? `; Max-Age=${REMEMBER_TTL_SECONDS}` : ""}`,
     );
     res.json({ ok: true });
+  });
+
+  app.get("/api/walkin/crm-stats/session", (req, res) => {
+    const scope = String(req.query.scope || "") as WalkinDashboardScope;
+    if (!dashboardScopes.has(scope)) return res.status(400).json({ message: "Invalid dashboard scope" });
+    res.setHeader("Cache-Control", "no-store");
+    res.json({ ok: hasWalkinDashboardSession(req, scope) });
   });
 
   app.delete("/api/walkin/crm-stats/session", (req, res) => {

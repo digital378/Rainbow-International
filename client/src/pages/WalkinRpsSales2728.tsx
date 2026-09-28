@@ -3,14 +3,13 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, PieChart, Pie, Cell, ComposedChart, Line,
 } from "recharts";
-import { lockWalkinDashboard, unlockWalkinDashboard } from "@/lib/walkinDashboardAuth";
+import { unlockWalkinDashboard, useWalkinDashboardSession } from "@/lib/walkinDashboardAuth";
 
 const NAVY = "#091a4f", AMBER = "#f59e0b", GREEN = "#059669", RED = "#dc2626";
 const BLUE = "#2563eb", PURPLE = "#7c3aed", SLATE = "#475569";
 const RPS_GRAD = "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)";
 const PIE_COLORS = [RED, AMBER, GREEN, NAVY, BLUE, PURPLE, SLATE, "#0891b2", "#ea580c"];
 
-const AUTH_KEY  = "rps27_sales_auth";
 
 type CounsellorStat = { leadOwner: string; leads: number; walkins: number; admissions: number; closed: number; open: number };
 type Stats = {
@@ -43,12 +42,13 @@ const pct = (n: number, d = 1) => `${n.toFixed(d)}%`;
 /* ── Passcode Gate ─────────────────────────────── */
 function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
   const [code, setCode] = useState("");
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => { document.title = "RPS Sales · AY 2027-28"; ref.current?.focus(); }, []);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (await unlockWalkinDashboard(code, "rps-sales")) { try { sessionStorage.setItem(AUTH_KEY, "1"); } catch {} onSuccess(); }
+    if (await unlockWalkinDashboard(code, "rps-sales", remember)) onSuccess();
     else { setError(true); setCode(""); setTimeout(() => setError(false), 600); }
   };
   return (
@@ -66,6 +66,10 @@ function PasscodeGate({ onSuccess }: { onSuccess: () => void }) {
         <input ref={ref} type="password" autoComplete="off" value={code} onChange={e => setCode(e.target.value)}
           className={`w-full px-4 py-3 rounded-lg border-2 text-lg tracking-[0.4em] text-center font-mono focus:outline-none focus:ring-2 focus:ring-red-400 ${error ? "border-red-500 bg-red-50" : "border-slate-300"}`}
           placeholder="••••" />
+        <label className="mt-4 flex items-center gap-2 text-sm text-slate-700">
+          <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />
+          Remember this device for 30 days
+        </label>
         {error && <div className="mt-2 text-sm text-red-600 text-center">Incorrect passcode</div>}
         <button type="submit" className="mt-5 w-full py-3 rounded-lg font-bold text-white transition"
           style={{ background: RPS_GRAD }}>Unlock</button>
@@ -553,14 +557,8 @@ function Dashboard({ onLock }: { onLock: () => void }) {
 }
 
 export default function WalkinRpsSales2728() {
-  const [authed, setAuthed] = useState<boolean>(() => {
-    try { return sessionStorage.getItem(AUTH_KEY) === "1"; } catch { return false; }
-  });
-  const handleLock = useCallback(() => {
-    try { sessionStorage.removeItem(AUTH_KEY); } catch {}
-    void lockWalkinDashboard("rps-sales");
-    setAuthed(false);
-  }, []);
-  if (!authed) return <PasscodeGate onSuccess={() => setAuthed(true)} />;
-  return <Dashboard onLock={handleLock} />;
+  const { authed, checking, unlock, lock } = useWalkinDashboardSession("rps-sales");
+  if (checking) return <div className="min-h-screen" style={{ background: NAVY }} />;
+  if (!authed) return <PasscodeGate onSuccess={unlock} />;
+  return <Dashboard onLock={() => void lock()} />;
 }
