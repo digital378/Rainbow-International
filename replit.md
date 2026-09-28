@@ -122,6 +122,10 @@ Every file uploaded to the Replit chat is auto-saved into `attached_assets/`. It
 3. Move large served files (videos, hi-res images) to Replit Object Storage and update the references.
 4. Re-run `npm run disk:check` until it shows ✅ before publishing.
 
+## RIS Instagram scheduled job
+
+`scripts/ris-instagram-job.ts` is the separate RIS-only tracker entry point. It is **prepared but not scheduled yet**; the intended run is daily at **9:00 AM IST** with one retry after 60 seconds on failure. Each attempt logs its date, result, and rows written in the scheduled deployment's Publishing logs. Once deployed, pause it by turning off its schedule in Publishing → Adjust settings. Leave the website's existing RIS timer active until the separate job is live, then set `RIS_INSTAGRAM_SCHEDULED_ONLY=true` for the website.
+
 ## External Dependencies
 
 ### Database

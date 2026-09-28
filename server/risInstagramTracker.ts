@@ -124,7 +124,7 @@ function sheetClient() {
   return google.sheets({ version: "v4", auth });
 }
 
-async function reconcile(snapshots: Snapshot[]): Promise<void> {
+async function reconcile(snapshots: Snapshot[]): Promise<{ rowsWritten: number[]; cellsWritten: number }> {
   const sheets = sheetClient();
   const response = await sheets.spreadsheets.values.batchGet({
     spreadsheetId: SPREADSHEET_ID,
@@ -140,9 +140,11 @@ async function reconcile(snapshots: Snapshot[]): Promise<void> {
   }
   const targets = findTrackerTargets(rows, snapshots);
   const writes: { range: string; values: number[][] }[] = [];
+  const rowsWritten = new Set<number>();
   for (const target of targets) {
     for (const field of writableFields(rows[target.row - 1] ?? [], target)) {
       writes.push({ range: `'${TAB}'!${field.column}${target.row}`, values: [[field.value]] });
+      rowsWritten.add(target.row);
     }
   }
   if (writes.length) {
@@ -154,13 +156,16 @@ async function reconcile(snapshots: Snapshot[]): Promise<void> {
   }
   const missing = snapshots.filter(s => !targets.some(t => t.kind === "daily" && t.key === s.day));
   if (missing.length) console.warn(`${PREFIX} ${missing.length} daily snapshot(s) pending a matching Aryaan RIS row`);
+  return { rowsWritten: [...rowsWritten].sort((a, b) => a - b), cellsWritten: writes.length };
 }
 
-async function run(): Promise<void> {
-  if (!await acquireLease()) return;
+export async function runRisInstagramTrackerOnce(): Promise<{
+  day: string; status: "completed" | "lease_busy"; rowsWritten: number[]; cellsWritten: number;
+}> {
+  const today = istDay(new Date());
+  const yesterday = shiftDay(today, -1);
+  if (!await acquireLease()) return { day: yesterday, status: "lease_busy", rowsWritten: [], cellsWritten: 0 };
   try {
-    const today = istDay(new Date());
-    const yesterday = shiftDay(today, -1);
     const existing = await db.execute(sql`SELECT day::text FROM ris_instagram_snapshots WHERE day = ${yesterday}::date`);
     if (!existing.rows.length) {
       const snapshot = await capture(yesterday);
@@ -174,9 +179,10 @@ async function run(): Promise<void> {
     const result = await db.execute(sql`
       SELECT day::text AS day, posts, views FROM ris_instagram_snapshots ORDER BY day
     `);
-    await reconcile(result.rows.map(row => ({
+    const summary = await reconcile(result.rows.map(row => ({
       day: String(row.day), posts: Number(row.posts), views: Number(row.views),
     })));
+    return { day: yesterday, status: "completed", ...summary };
   } finally {
     await releaseLease();
   }
@@ -184,7 +190,8 @@ async function run(): Promise<void> {
 
 /** Production only: retry pending writes, but never re-snapshot a completed day. */
 export function startRisInstagramTracker(): void {
-  if (started || process.env.NODE_ENV !== "production") return;
+  if (started || process.env.NODE_ENV !== "production" ||
+      process.env.RIS_INSTAGRAM_SCHEDULED_ONLY === "true") return;
   started = true;
   const tick = async () => {
     const parts = Object.fromEntries(new Intl.DateTimeFormat("en-GB", {
@@ -196,7 +203,7 @@ export function startRisInstagramTracker(): void {
         Date.now() - lastAttempt < (earlyWindow ? 60_000 : 15 * 60_000)) return;
     lastAttempt = Date.now();
     running = true;
-    try { await run(); }
+    try { await runRisInstagramTrackerOnce(); }
     catch (error) { console.error(`${PREFIX} Sync pending:`, error instanceof Error ? error.message : "unknown error"); }
     finally { running = false; }
   };
