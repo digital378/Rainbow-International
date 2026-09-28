@@ -5,7 +5,15 @@ const NAVY     = "#091a4f";
 
 /* ── Types ───────────────────────────────────────────────────────────────────── */
 type DashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
-type PagePasscodes = { leads: string; panel: string };
+type PagePasscodes = {
+  leads: string;
+  panel: string;
+  overview: string;
+  marketing: string;
+  "ris-sales": string;
+  "rps-sales": string;
+  alliances: string | null;
+};
 
 type Dashboard = {
   name: string;
@@ -15,7 +23,6 @@ type Dashboard = {
   description: string;
   accent: string;
   open?: boolean;
-  envVar?: boolean;
   adminToken?: boolean;
   scope?: DashboardScope;
 };
@@ -176,8 +183,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Alliances Dashboard",
     url: "/alliances",
-    passcode: "ALLIANCES_PASSCODE",
-    envVar: true,
+    passcode: "Loading…",
     who: "Alliances Team",
     description:
       "Brand Partners, Corporate tie-ups, Friendship Schools, and Parent Advocacy — referral lead pipeline, MOU status, monthly targets, and CRM sync.",
@@ -349,24 +355,9 @@ function FlowDiagram({ steps }: { steps: FlowStep[] }) {
 }
 
 function PasscodeBadge({ d }: { d: Dashboard }) {
-  if (d.scope) return (
-    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
-      Secure admin access
-    </span>
-  );
   if (d.open) return (
     <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-green-50 border border-green-200 text-green-700">
       🔓 No passcode
-    </span>
-  );
-  if (d.adminToken) return (
-    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-orange-50 border border-orange-200 text-orange-700">
-      🔑 Separate page passcode
-    </span>
-  );
-  if (d.envVar) return (
-    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-50 border border-amber-200 text-amber-700">
-      🔐 {d.passcode} (env secret)
     </span>
   );
   return (
@@ -504,9 +495,14 @@ export default function Internal() {
       .then(async response => {
         if (!response.ok) throw new Error("Passcodes unavailable");
         const data = await response.json();
-        if (typeof data.leads !== "string" || !data.leads ||
-            typeof data.panel !== "string" || !data.panel) throw new Error("Passcodes unavailable");
-        return { leads: data.leads, panel: data.panel } as PagePasscodes;
+        const required: Array<keyof PagePasscodes> = [
+          "leads", "panel", "overview", "marketing", "ris-sales", "rps-sales",
+        ];
+        if (required.some(key => typeof data[key] !== "string" || !data[key]) ||
+            (data.alliances !== null && typeof data.alliances !== "string")) {
+          throw new Error("Passcodes unavailable");
+        }
+        return data as PagePasscodes;
       })
       .then(codes => { if (active) setPagePasscodes(codes); })
       .catch(() => { if (active) setPasscodesUnavailable(true); });
@@ -527,15 +523,18 @@ export default function Internal() {
     setAuthed(false);
   };
 
-  const passcodeLabel = (scope: keyof PagePasscodes) =>
-    pagePasscodes?.[scope] || (passcodesUnavailable ? "Unavailable" : "Loading…");
-  const visibleDashboards2728 = DASHBOARDS_2728.map(d =>
-    d.adminToken ? {
-      ...d,
-      adminToken: false,
-      passcode: passcodeLabel(d.url === "/leads" ? "leads" : "panel"),
-    } : d,
-  );
+  const passcodeLabel = (scope: keyof PagePasscodes) => {
+    if (!pagePasscodes) return passcodesUnavailable ? "Unavailable" : "Loading…";
+    return pagePasscodes[scope] || "Not configured";
+  };
+  const visibleDashboards2728 = DASHBOARDS_2728.map(d => {
+    const key: keyof PagePasscodes | null = d.scope ||
+      (d.url === "/alliances" ? "alliances"
+        : d.url === "/leads" ? "leads"
+        : d.url === "/admin/walkin-2728" ? "panel"
+        : null);
+    return key ? { ...d, passcode: passcodeLabel(key) } : d;
+  });
 
   return (
     <div style={{ minHeight: "100vh", background: "#f1f5f9" }}>
@@ -619,10 +618,11 @@ export default function Internal() {
               ["Marketing 2026–27", "/marketing", "8888"],
               ["RIS Sales 2026–27", "/sales", "RIS8"],
               ["RPS Sales 2026–27", "/rps-sales", "RPS8"],
-              ["Marketing 2027–28", "/marketing-27-28", "Admin open"],
-              ["RIS Sales 2027–28", "/sales-27-28", "Admin open"],
-              ["RPS Sales 2027–28", "/rps-sales-27-28", "Admin open"],
-              ["Group Overview", "/overview-27-28", "Admin open"],
+              ["Marketing 2027–28", "/marketing-27-28", passcodeLabel("marketing")],
+              ["RIS Sales 2027–28", "/sales-27-28", passcodeLabel("ris-sales")],
+              ["RPS Sales 2027–28", "/rps-sales-27-28", passcodeLabel("rps-sales")],
+              ["Group Overview", "/overview-27-28", passcodeLabel("overview")],
+              ["Alliances", "/alliances", passcodeLabel("alliances")],
               ["Leads CRM", "/leads", passcodeLabel("leads")],
               ["Admin Panel", "/admin/walkin-2728", passcodeLabel("panel")],
             ].map(([label, slug, code]) => (
@@ -634,13 +634,6 @@ export default function Internal() {
                 <span className="px-2 py-0.5 rounded bg-slate-800 text-white font-mono font-bold tracking-wider">{code}</span>
               </div>
             ))}
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-              <span>
-                <span className="block text-amber-800">Alliances</span>
-                <code className="block text-[10px] text-amber-600 mt-0.5">/alliances</code>
-              </span>
-              <span className="font-semibold text-amber-700">🔐 Ask admin</span>
-            </div>
           </div>
         </div>
 

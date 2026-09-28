@@ -1131,8 +1131,8 @@ export function registerWalkinRoutes(app: Express) {
     res.json({ ok: hasWalkinInternalAccess(req) });
   });
 
-  // Only directory sessions may reveal the two page-specific codes. Never
-  // include the master admin token or other dashboard credentials here.
+  // Only directory sessions may reveal page passcodes. The integration master
+  // token is deliberately excluded.
   app.get("/api/walkin/internal/page-passcodes", (req, res) => {
     res.setHeader("Cache-Control", "private, no-store, max-age=0");
     res.setHeader("Pragma", "no-cache");
@@ -1140,8 +1140,19 @@ export function registerWalkinRoutes(app: Express) {
     if (!hasWalkinInternalAccess(req)) return res.status(401).json({ message: "Unauthorized" });
     const leads = process.env.WALKIN_LEADS_PASSCODE;
     const panel = process.env.WALKIN_PANEL_PASSCODE;
-    if (!leads || !panel) return res.status(503).json({ message: "Page passcodes are unavailable" });
-    res.json({ leads, panel });
+    const overview = process.env.WALKIN_OVERVIEW_DASHBOARD_PASSCODE;
+    const marketing = process.env.WALKIN_MARKETING_DASHBOARD_PASSCODE;
+    const risSales = process.env.WALKIN_RIS_DASHBOARD_PASSCODE;
+    const rpsSales = process.env.WALKIN_RPS_DASHBOARD_PASSCODE;
+    if (!leads || !panel || !overview || !marketing || !risSales || !rpsSales) {
+      return res.status(503).json({ message: "Page passcodes are unavailable" });
+    }
+    res.json({
+      leads, panel, overview, marketing,
+      "ris-sales": risSales,
+      "rps-sales": rpsSales,
+      alliances: process.env.ALLIANCES_PASSCODE || null,
+    });
   });
 
   app.post("/api/walkin/internal/session", (req, res) => {
