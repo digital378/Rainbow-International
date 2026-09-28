@@ -1131,6 +1131,19 @@ export function registerWalkinRoutes(app: Express) {
     res.json({ ok: hasWalkinInternalAccess(req) });
   });
 
+  // Only directory sessions may reveal the two page-specific codes. Never
+  // include the master admin token or other dashboard credentials here.
+  app.get("/api/walkin/internal/page-passcodes", (req, res) => {
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Vary", "Cookie");
+    if (!hasWalkinInternalAccess(req)) return res.status(401).json({ message: "Unauthorized" });
+    const leads = process.env.WALKIN_LEADS_PASSCODE;
+    const panel = process.env.WALKIN_PANEL_PASSCODE;
+    if (!leads || !panel) return res.status(503).json({ message: "Page passcodes are unavailable" });
+    res.json({ leads, panel });
+  });
+
   app.post("/api/walkin/internal/session", (req, res) => {
     const passcode = String(req.body?.passcode || "");
     const session = createWalkinInternalSession(passcode);

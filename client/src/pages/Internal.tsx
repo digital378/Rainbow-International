@@ -5,6 +5,7 @@ const NAVY     = "#091a4f";
 
 /* ── Types ───────────────────────────────────────────────────────────────────── */
 type DashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
+type PagePasscodes = { leads: string; panel: string };
 
 type Dashboard = {
   name: string;
@@ -466,6 +467,8 @@ function DashCard({ d }: { d: Dashboard }) {
 export default function Internal() {
   const [authed, setAuthed] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [pagePasscodes, setPagePasscodes] = useState<PagePasscodes | null>(null);
+  const [passcodesUnavailable, setPasscodesUnavailable] = useState(false);
 
   // Inject noindex so search engines never index this page
   useEffect(() => {
@@ -490,6 +493,26 @@ export default function Internal() {
       .finally(() => setCheckingSession(false));
   }, []);
 
+  useEffect(() => {
+    if (!authed) {
+      setPagePasscodes(null);
+      setPasscodesUnavailable(false);
+      return;
+    }
+    let active = true;
+    fetch("/api/walkin/internal/page-passcodes", { credentials: "same-origin", cache: "no-store" })
+      .then(async response => {
+        if (!response.ok) throw new Error("Passcodes unavailable");
+        const data = await response.json();
+        if (typeof data.leads !== "string" || !data.leads ||
+            typeof data.panel !== "string" || !data.panel) throw new Error("Passcodes unavailable");
+        return { leads: data.leads, panel: data.panel } as PagePasscodes;
+      })
+      .then(codes => { if (active) setPagePasscodes(codes); })
+      .catch(() => { if (active) setPasscodesUnavailable(true); });
+    return () => { active = false; };
+  }, [authed]);
+
   if (checkingSession) {
     return <div style={{ minHeight: "100vh", background: NAVY }} />;
   }
@@ -499,9 +522,20 @@ export default function Internal() {
   }
 
   const lock = async () => {
+    setPagePasscodes(null);
     await fetch("/api/walkin/internal/session", { method: "DELETE" }).catch(() => undefined);
     setAuthed(false);
   };
+
+  const passcodeLabel = (scope: keyof PagePasscodes) =>
+    pagePasscodes?.[scope] || (passcodesUnavailable ? "Unavailable" : "Loading…");
+  const visibleDashboards2728 = DASHBOARDS_2728.map(d =>
+    d.adminToken ? {
+      ...d,
+      adminToken: false,
+      passcode: passcodeLabel(d.url === "/leads" ? "leads" : "panel"),
+    } : d,
+  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#f1f5f9" }}>
@@ -572,7 +606,7 @@ export default function Internal() {
           <FlowDiagram steps={FLOW_2728} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            {DASHBOARDS_2728.map(d => <DashCard key={d.url} d={d} />)}
+            {visibleDashboards2728.map(d => <DashCard key={d.url} d={d} />)}
           </div>
         </section>
 
@@ -589,6 +623,8 @@ export default function Internal() {
               ["RIS Sales 2027–28", "/sales-27-28", "Admin open"],
               ["RPS Sales 2027–28", "/rps-sales-27-28", "Admin open"],
               ["Group Overview", "/overview-27-28", "Admin open"],
+              ["Leads CRM", "/leads", passcodeLabel("leads")],
+              ["Admin Panel", "/admin/walkin-2728", passcodeLabel("panel")],
             ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <span>
@@ -604,13 +640,6 @@ export default function Internal() {
                 <code className="block text-[10px] text-amber-600 mt-0.5">/alliances</code>
               </span>
               <span className="font-semibold text-amber-700">🔐 Ask admin</span>
-            </div>
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2">
-              <span>
-                <span className="block text-orange-800">Leads CRM &amp; Admin Panel</span>
-                <code className="block text-[10px] text-orange-600 mt-0.5">/leads · /admin/walkin-2728</code>
-              </span>
-              <span className="font-semibold text-orange-700">🔑 Separate page passcodes</span>
             </div>
           </div>
         </div>

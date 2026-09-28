@@ -132,9 +132,11 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      // Never write page-session bearer tokens or lead records to server logs.
+      // Never write page credentials, session tokens, or lead records to server logs.
       if (capturedJsonResponse && !path.startsWith("/api/indra/") &&
-          path !== "/api/walkin/page-session" && !path.startsWith("/api/walkin/leads")) {
+          path !== "/api/walkin/page-session" &&
+          path !== "/api/walkin/internal/page-passcodes" &&
+          !path.startsWith("/api/walkin/leads")) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
