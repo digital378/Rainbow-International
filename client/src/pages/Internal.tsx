@@ -185,7 +185,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Leads CRM",
     url: "/leads",
-    passcode: "Admin token",
+    passcode: "Leads passcode",
     adminToken: true,
     who: "Admin / Staff",
     description:
@@ -195,7 +195,7 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Admin Panel",
     url: "/admin/walkin-2728",
-    passcode: "Admin token",
+    passcode: "Admin panel passcode",
     adminToken: true,
     who: "Admin",
     description:
@@ -360,7 +360,7 @@ function PasscodeBadge({ d }: { d: Dashboard }) {
   );
   if (d.adminToken) return (
     <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-orange-50 border border-orange-200 text-orange-700">
-      🔑 Admin token (env)
+      🔑 Separate page passcode
     </span>
   );
   if (d.envVar) return (
@@ -610,7 +610,7 @@ export default function Internal() {
                 <span className="block text-orange-800">Leads CRM &amp; Admin Panel</span>
                 <code className="block text-[10px] text-orange-600 mt-0.5">/leads · /admin/walkin-2728</code>
               </span>
-              <span className="font-semibold text-orange-700">🔑 Admin token</span>
+              <span className="font-semibold text-orange-700">🔑 Separate page passcodes</span>
             </div>
           </div>
         </div>

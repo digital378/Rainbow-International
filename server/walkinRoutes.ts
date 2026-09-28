@@ -33,6 +33,7 @@ import * as XLSX from "xlsx";
 import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
+import { createWalkinPageSession, hasWalkinPageSession, isWalkinPageAuthorized, type WalkinPageScope } from "./walkinPageAuth";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
 import {
   createTrustedWalkinDashboardSession,
@@ -52,18 +53,13 @@ import {
 // ── Helpers ─────────────────────────────────────────────────────
 function isAdmin(req: Express["request"]): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
-  if (!adminToken) return false;
   const provided =
     (req.headers["x-api-key"] as string) ||
     (req.headers.authorization || "").replace(/^Bearer\s+/i, "") ||
     (typeof req.query.token === "string" ? req.query.token : "");
-  if (!provided) return false;
-  const padded = provided.padEnd(adminToken.length).slice(0, adminToken.length);
-  try {
-    return timingSafeEqual(Buffer.from(adminToken), Buffer.from(padded));
-  } catch {
-    return false;
-  }
+  if (adminToken && provided && provided.length === adminToken.length &&
+      timingSafeEqual(Buffer.from(adminToken), Buffer.from(provided))) return true;
+  return isWalkinPageAuthorized(req);
 }
 
 function requireAdmin(
@@ -219,12 +215,55 @@ const updateLeadSchema = z.object({
 
 export function registerWalkinRoutes(app: Express) {
   const dashboardUnlockAttempts = new Map<string, { count: number; windowStartedAt: number }>();
+  const pageLoginAttempts = new Map<string, { count: number; windowStartedAt: number }>();
   const dashboardScopes = new Set<WalkinDashboardScope>([
     "ris-sales",
     "rps-sales",
     "overview",
     "marketing",
   ]);
+
+  app.post("/api/walkin/page-session", (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    const scope = req.body?.scope as WalkinPageScope;
+    if (scope !== "leads" && scope !== "panel") return res.status(400).json({ message: "Invalid page" });
+    const now = Date.now();
+    for (const [key, record] of pageLoginAttempts) {
+      if (now - record.windowStartedAt > 15 * 60_000) pageLoginAttempts.delete(key);
+    }
+    const clientKey = `${scope}:${req.ip}`;
+    if (!pageLoginAttempts.has(clientKey) && pageLoginAttempts.size >= 1000) {
+      const oldestKey = pageLoginAttempts.keys().next().value;
+      if (oldestKey) pageLoginAttempts.delete(oldestKey);
+    }
+    const attempt = pageLoginAttempts.get(clientKey);
+    if (attempt && attempt.count >= 5 && now - attempt.windowStartedAt <= 15 * 60_000) {
+      return res.status(429).json({ message: "Too many attempts. Try again in 15 minutes." });
+    }
+    const passcode = req.body?.passcode;
+    if (typeof passcode !== "string" || passcode.length > 128) return res.status(401).json({ ok: false });
+    try {
+      const token = createWalkinPageSession(scope, passcode);
+      if (!token) {
+        pageLoginAttempts.set(clientKey, {
+          count: (attempt?.count || 0) + 1,
+          windowStartedAt: attempt?.windowStartedAt || now,
+        });
+        return res.status(401).json({ ok: false });
+      }
+      pageLoginAttempts.delete(clientKey);
+      return res.json({ ok: true, token });
+    } catch {
+      return res.status(503).json({ message: "Page sign-in is unavailable" });
+    }
+  });
+
+  app.get("/api/walkin/page-session", (req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    const scope = req.query.scope as WalkinPageScope;
+    if (scope !== "leads" && scope !== "panel") return res.status(400).json({ message: "Invalid page" });
+    res.json({ ok: hasWalkinPageSession(req, scope) });
+  });
 
   // ── GET /api/walkin/lookups ────────────────────────────────────
   // Returns lookup values for the kiosk form dropdowns.

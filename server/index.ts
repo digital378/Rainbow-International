@@ -16,13 +16,16 @@ import {
 } from "./productionHostPolicy";
 
 const app = express();
+// Replit forwards requests through a trusted proxy; use the client address
+// supplied by that hop for per-client sign-in throttling.
+app.set("trust proxy", 1);
 const httpServer = createServer(app);
 
 app.use(compression());
 
 // CORS — allow ChatGPT custom GPT actions (and any other API consumer) to call
-// /api/* endpoints cross-origin. Sensitive endpoints are still protected by
-// ADMIN_TOKEN; this only removes the browser-level CORS block.
+// /api/* endpoints cross-origin. Sensitive endpoints still require an
+// authorized credential; this only removes the browser-level CORS block.
 app.use("/api", (req, res, next) => {
   if (req.path.startsWith("/indra/")) {
     const origin = req.headers.origin;
@@ -129,7 +132,9 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse && !path.startsWith("/api/indra/")) {
+      // Never write page-session bearer tokens or lead records to server logs.
+      if (capturedJsonResponse && !path.startsWith("/api/indra/") &&
+          path !== "/api/walkin/page-session" && !path.startsWith("/api/walkin/leads")) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 

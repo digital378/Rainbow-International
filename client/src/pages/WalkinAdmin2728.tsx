@@ -1,7 +1,7 @@
 /**
  * Admin Panel — Walk-in 27-28
  * Route: /admin/walkin-2728
- * Protected by ADMIN_TOKEN (same mechanism as WalkinLeads)
+ * Protected by a dedicated panel passcode and scoped session.
  *
  * Tabs:
  *  1. Branches     — CRUD for walkin_branches
@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { forgetPageSession, restorePageSession, signInPage } from "@/lib/walkinPageAuth";
 import QRCode from "qrcode";
 import {
   DndContext,
@@ -32,7 +33,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 // ── Constants ──────────────────────────────────────────────────
-const ADMIN_AUTH_KEY = "ris_admin_auth";
 const NAV = "#091a4f";
 
 // ── Types ──────────────────────────────────────────────────────
@@ -63,35 +63,29 @@ interface SyncStatus {
   RIS: SheetBrandStatus; RPS: SheetBrandStatus; MASTER: SheetBrandStatus;
 }
 
-// ── Helpers ────────────────────────────────────────────────────
-function getSavedToken() {
-  try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
-}
-
 function hdrs(token: string) {
   return { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
 }
 
 // ── AdminGate ──────────────────────────────────────────────────
 function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
-  const [token, setToken] = useState("");
-  const [error, setError] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => { ref.current?.focus(); }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token.trim()) return;
+    if (!passcode.trim()) return;
     setLoading(true);
     try {
-      // Probe an admin-only endpoint so any non-empty token is not accepted
-      const res = await fetch("/api/walkin/sheets/status", { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) {
-        try { sessionStorage.setItem(ADMIN_AUTH_KEY, token); } catch {}
-        onSuccess(token);
-      } else { setError(true); }
-    } catch { setError(true); }
+      const token = await signInPage("panel", passcode);
+      if (token) onSuccess(token);
+      else { setError("Invalid passcode"); setPasscode(""); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not sign in. Please try again.");
+    }
     setLoading(false);
   };
 
@@ -105,11 +99,11 @@ function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
             <div className="text-xs text-slate-500">AY 2027-28 · Internal</div>
           </div>
         </div>
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Admin token</label>
-        <input ref={ref} type="password" value={token} onChange={e => { setToken(e.target.value); setError(false); }}
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Admin panel passcode</label>
+        <input ref={ref} type="password" autoComplete="off" value={passcode} onChange={e => { setPasscode(e.target.value); setError(""); }}
           className={`w-full px-4 py-3 rounded-lg border-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 ${error ? "border-red-400 bg-red-50" : "border-slate-200"}`}
-          placeholder="Enter admin token" />
-        {error && <div className="mt-2 text-sm text-red-600">Invalid token</div>}
+          placeholder="Enter panel passcode" />
+        {error && <div className="mt-2 text-sm text-red-600" role="alert">{error}</div>}
         <button type="submit" disabled={loading}
           className="mt-5 w-full py-3 rounded-lg text-white font-bold transition disabled:opacity-60"
           style={{ background: NAV }}>
@@ -1691,7 +1685,15 @@ function AdminPanel({ token, onLogout }: { token: string; onLogout: () => void }
 
 // ── Page export ────────────────────────────────────────────────
 export default function WalkinAdmin2728() {
-  const [token, setToken] = useState<string | null>(() => getSavedToken() || null);
+  const [token, setToken] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  useEffect(() => {
+    let mounted = true;
+    void restorePageSession("panel").then(restored => {
+      if (mounted) { setToken(restored); setChecking(false); }
+    });
+    return () => { mounted = false; };
+  }, []);
 
   useEffect(() => {
     let meta = document.querySelector('meta[name="robots"]') as HTMLMetaElement | null;
@@ -1699,6 +1701,7 @@ export default function WalkinAdmin2728() {
     meta.setAttribute("content", "noindex, nofollow");
   }, []);
 
+  if (checking) return <div className="min-h-screen" style={{ background: NAV }} />;
   if (!token) {
     return <AdminGate onSuccess={t => setToken(t)} />;
   }
@@ -1707,7 +1710,7 @@ export default function WalkinAdmin2728() {
     <AdminPanel
       token={token}
       onLogout={() => {
-        try { sessionStorage.removeItem(ADMIN_AUTH_KEY); } catch {}
+        forgetPageSession("panel");
         setToken(null);
       }}
     />

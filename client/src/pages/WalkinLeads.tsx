@@ -1,14 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { forgetPageSession, restorePageSession, signInPage } from "@/lib/walkinPageAuth";
 
 const NAVY = "#091a4f";
 const AMBER = "#f59e0b";
 const GREEN = "#059669";
 const RED = "#dc2626";
-const ADMIN_AUTH_KEY = "ris_admin_auth";
-
-function getToken() {
-  try { return sessionStorage.getItem(ADMIN_AUTH_KEY) || ""; } catch { return ""; }
-}
 
 // ── Types ────────────────────────────────────────────────────────
 type Lead = {
@@ -40,23 +36,21 @@ const CLOSED_STATUS = "CLOSED";
 
 // ── Admin Gate ───────────────────────────────────────────────────
 function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
-  const [token, setToken] = useState("");
-  const [error, setError] = useState(false);
+  const [passcode, setPasscode] = useState("");
+  const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/walkin/leads?page=1&pageSize=1", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      try { sessionStorage.setItem(ADMIN_AUTH_KEY, token); } catch {}
-      onSuccess(token);
-    } else {
-      setError(true); setToken("");
-      setTimeout(() => setError(false), 600);
+    try {
+      const token = await signInPage("leads", passcode);
+      if (token) { onSuccess(token); return; }
+      setError("Invalid passcode");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not sign in. Please try again.");
     }
+    setPasscode("");
   };
 
   return (
@@ -69,17 +63,17 @@ function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
             <div className="text-xs text-slate-500">AY 2027-28 · Internal</div>
           </div>
         </div>
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Admin Token</label>
+        <label className="block text-sm font-semibold text-slate-700 mb-2">Leads passcode</label>
         <input
           ref={inputRef}
           type="password"
           autoComplete="off"
-          value={token}
-          onChange={e => setToken(e.target.value)}
-          placeholder="Enter admin token"
+          value={passcode}
+          onChange={e => { setPasscode(e.target.value); setError(""); }}
+          placeholder="Enter leads passcode"
           className={`w-full px-4 py-3 rounded-lg border-2 text-sm focus:outline-none ${error ? "border-red-500 bg-red-50" : "border-slate-300 focus:border-amber-400"}`}
         />
-        {error && <div className="mt-2 text-sm text-red-600">Invalid token</div>}
+        {error && <div className="mt-2 text-sm text-red-600" role="alert">{error}</div>}
         <button type="submit" className="mt-4 w-full py-3 rounded-lg font-bold text-white" style={{ background: NAVY }}>
           Unlock
         </button>
@@ -547,7 +541,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     setFilters(f => ({ ...f, [field]: value }));
   };
 
-  const downloadExport = () => {
+  const downloadExport = async () => {
     const params = new URLSearchParams({
       ...(filters.brand && { brand: filters.brand }),
       ...(filters.branchId && { branchId: filters.branchId }),
@@ -555,9 +549,25 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       ...(filters.source && { source: filters.source }),
       ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
       ...(filters.dateTo && { dateTo: filters.dateTo }),
-      token,
     });
-    window.open(`/api/walkin/leads/export?${params}`, "_blank");
+    try {
+      const response = await fetch(`/api/walkin/leads/export?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error("Export failed");
+      const blobUrl = URL.createObjectURL(await response.blob());
+      const filename = response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1]
+        || `walkin-leads-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
+    } catch {
+      window.alert("Could not export leads. Please sign in again and retry.");
+    }
   };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -613,7 +623,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           >⬇ Export CSV</button>
           <a href="/admin/ras" className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">← Admin</a>
           <button
-            onClick={() => { try { sessionStorage.removeItem(ADMIN_AUTH_KEY); } catch {} onLogout(); }}
+            onClick={onLogout}
             className="px-3 py-1.5 rounded border border-white/30 text-white/60 hover:bg-white/10"
           >Lock</button>
         </div>
@@ -818,15 +828,22 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
 
 // ── Page Entry Point ──────────────────────────────────────────────
 export default function WalkinLeads() {
-  const [token, setToken] = useState<string | null>(() => {
-    const t = getToken(); return t || null;
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  useEffect(() => {
+    let mounted = true;
+    void restorePageSession("leads").then(restored => {
+      if (mounted) { setToken(restored); setChecking(false); }
+    });
+    return () => { mounted = false; };
+  }, []);
+  if (checking) return <div className="min-h-screen" style={{ background: NAVY }} />;
   if (!token) return <AdminGate onSuccess={t => setToken(t)} />;
   return (
     <LeadsPanel
       token={token}
       onLogout={() => {
-        try { sessionStorage.removeItem(ADMIN_AUTH_KEY); } catch {}
+        forgetPageSession("leads");
         setToken(null);
       }}
     />
