@@ -9,6 +9,7 @@ import { startSeoMonitor } from "./seoMonitor";
 import { bootstrapWalkinSequences, bootstrapWalkinLookups, stopAutoPullForShutdown } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { initializeGoogleCredentials } from "./googleCredentials";
+import { initializeRisInstagramTracker, startRisInstagramTracker } from "./risInstagramTracker";
 import {
   applyNonCanonicalRobotsPolicy,
   applyProductionHostRedirect,
@@ -143,6 +144,7 @@ app.use((req, res, next) => {
   // Validate encrypted Google OAuth storage before any route or background
   // worker can use Google services. A corrupt encrypted record must stop boot.
   await initializeGoogleCredentials();
+  await initializeRisInstagramTracker();
   await autoSeedBlogsIfEmpty();
   await runWalkinSheetOperation("startup bootstrap", async () => {
     await bootstrapWalkinSequences();
@@ -163,6 +165,7 @@ app.use((req, res, next) => {
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
+    startRisInstagramTracker();
     // Start the daily SEO regression monitor (fires 60 s after startup, then every 24 h).
     startSeoMonitor();
   } else {

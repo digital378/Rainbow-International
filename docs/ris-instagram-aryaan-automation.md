@@ -1,0 +1,9 @@
+# RIS Instagram → Aryaan tracker
+
+Only the RIS Instagram account is authorized. No RPS Instagram access is used.
+
+At 07:55 IST each day, collect the prior calendar day's RIS feed/reel/carousel publications and their cumulative per-media views at capture time. Save this once per day in the database. Do not substitute account-wide views for views of newly published posts. Weekly Monday and monthly first-day reports sum the saved daily snapshots only when every calendar date in the period is available; cross-month weeks stay whole in the weekly report, while the monthly report uses calendar dates.
+
+Reconcile to **existing** RIS rows on the Aryaan tab by date or period. Update only columns D (reels/posts published) and E (total views), and only if their current cells are blank or template zero. Do not overwrite other figures, formulas, staff entries, or any RPS rows; never append rows. If a row or a metric is missing, retain the snapshot and retry later. The Google Sheets credential used for this write is the application's production OAuth credential, not the development-only connector. A database lease prevents concurrent workers from writing the same report.
+
+Story counts, organic/paid splits, engagement, followers, Facebook, YouTube, and website measurements remain manual because these APIs do not establish matching historical metrics. A follower count observed today is not a prior day's closing count. Fail explicitly and leave fields unchanged if the Instagram credential does not belong to RIS, pagination or per-media insights are incomplete, the tracker headers change, or Google Sheets authorization fails.
