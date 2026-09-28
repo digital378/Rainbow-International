@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 /* ── Constants ───────────────────────────────────────────────────────────────── */
 const NAVY     = "#091a4f";
+const LIVE_INTERNAL_URL = "https://rainbowinternationalschool.in/internal";
 
 /* ── Types ───────────────────────────────────────────────────────────────────── */
 type DashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
@@ -456,10 +457,16 @@ function DashCard({ d }: { d: Dashboard }) {
 
 /* ── Page ────────────────────────────────────────────────────────────────────── */
 export default function Internal() {
+  const isPreview = typeof window !== "undefined" && window.location.hostname.endsWith(".replit.dev");
+  const embeddedPreview = isPreview && window.self !== window.top;
   const [authed, setAuthed] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const [pagePasscodes, setPagePasscodes] = useState<PagePasscodes | null>(null);
   const [passcodesUnavailable, setPasscodesUnavailable] = useState(false);
+
+  useEffect(() => {
+    if (isPreview && !embeddedPreview) window.location.replace(LIVE_INTERNAL_URL);
+  }, [isPreview, embeddedPreview]);
 
   // Inject noindex so search engines never index this page
   useEffect(() => {
@@ -477,12 +484,13 @@ export default function Internal() {
   }, []);
 
   useEffect(() => {
+    if (isPreview) return;
     fetch("/api/walkin/internal/session")
       .then(response => response.json())
       .then(data => setAuthed(data.ok === true))
       .catch(() => setAuthed(false))
       .finally(() => setCheckingSession(false));
-  }, []);
+  }, [isPreview]);
 
   useEffect(() => {
     if (!authed) {
@@ -508,6 +516,30 @@ export default function Internal() {
       .catch(() => { if (active) setPasscodesUnavailable(true); });
     return () => { active = false; };
   }, [authed]);
+
+  if (isPreview) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4" style={{ background: NAVY }}>
+        <div className="bg-white rounded-xl p-8 max-w-md text-center">
+          <h1 className="text-xl font-bold text-slate-900">Open the live internal directory</h1>
+          <p className="text-sm text-slate-600 mt-3">
+            {embeddedPreview
+              ? "The published site opens in a new tab from Replit Preview."
+              : "Taking you to the published site…"}
+          </p>
+          <a
+            href={LIVE_INTERNAL_URL}
+            target={embeddedPreview ? "_blank" : undefined}
+            rel="noopener noreferrer"
+            className="inline-block mt-5 px-5 py-2.5 rounded-lg text-white font-semibold"
+            style={{ background: NAVY }}
+          >
+            Open live directory ↗
+          </a>
+        </div>
+      </main>
+    );
+  }
 
   if (checkingSession) {
     return <div style={{ minHeight: "100vh", background: NAVY }} />;
