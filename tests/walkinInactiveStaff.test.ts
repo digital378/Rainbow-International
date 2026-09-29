@@ -462,3 +462,49 @@ describe("2027–28 contact checks block repeat walk-ins", () => {
     expect(queueUpsert).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("the original enquiry Source survives walk-in updates", () => {
+  const lead = {
+    id: "existing-lead", brand: "RIS", parentName: "Test Parent",
+    childName: "Test Child", source: "DM", status: "OPEN",
+    isArchived: false, walkInDate: null, closeReason: null,
+  };
+
+  beforeEach(() => {
+    mockDbSelect.mockImplementation(() => ({
+      from: () => ({ where: async () => [lead] }),
+    }));
+  });
+
+  it("rejects a new Source even when the request also records the walk-in", async () => {
+    const res = await fetch(`${baseUrl}/api/walkin/leads/${lead.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-api-key": "test-admin-token" },
+      body: JSON.stringify({
+        source: "Referral", status: "WALK-IN COMPLETED", walkInDate: "2026-09-29",
+      }),
+    });
+    expect(res.status).toBe(409);
+    expect((await res.json()).message).toContain("locked");
+    expect(mockDbUpdate).not.toHaveBeenCalled();
+  });
+
+  it("accepts a walk-in update with unchanged legacy Source but never writes Source", async () => {
+    const set = vi.fn((patch) => ({
+      where: () => ({ returning: async () => [{ ...lead, ...patch }] }),
+    }));
+    mockDbUpdate.mockReturnValue({ set });
+    mockDbInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
+    const res = await fetch(`${baseUrl}/api/walkin/leads/${lead.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-api-key": "test-admin-token" },
+      body: JSON.stringify({
+        source: "DM", status: "WALK-IN COMPLETED", walkInDate: "2026-09-29",
+      }),
+    });
+    expect(res.status).toBe(200);
+    expect((await res.json()).source).toBe("DM");
+    expect(set).toHaveBeenCalledOnce();
+    expect(set.mock.calls[0][0]).not.toHaveProperty("source");
+  });
+});

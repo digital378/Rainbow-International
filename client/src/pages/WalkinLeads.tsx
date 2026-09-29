@@ -123,7 +123,6 @@ function EditPanel({
     altPhone: lead.altPhone || "",
     email: lead.email || "",
     program: lead.program,
-    source: lead.source,
     status: lead.status,
     closeReason: lead.closeReason || "",
     walkInDate: lead.walkInDate || "",
@@ -164,7 +163,6 @@ function EditPanel({
           altPhone: form.altPhone || undefined,
           email: form.email || undefined,
           program: form.program,
-          source: form.source,
           status: form.status,
           closeReason: form.closeReason || undefined,
           walkInDate: form.walkInDate || undefined,
@@ -252,9 +250,10 @@ function EditPanel({
               </select>
             </F>
             <F label="Source" required>
-              <select className={selectCls} value={form.source} onChange={set("source")}>
-                {lookups.sources.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
-              </select>
+              <div className="px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700">
+                {lead.source}
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Original enquiry source · locked after creation</p>
             </F>
           </div>
 

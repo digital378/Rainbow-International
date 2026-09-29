@@ -734,6 +734,9 @@ export function registerWalkinRoutes(app: Express) {
       const [existing] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, req.params.id));
       if (!existing) return res.status(404).json({ message: "Lead not found" });
       if (existing.isArchived) return res.status(400).json({ message: "Cannot update an archived lead" });
+      if (updates.source !== undefined && updates.source !== existing.source) {
+        return res.status(409).json({ message: "Enquiry Source is locked after the lead is created." });
+      }
 
       // Validate status-dependent fields against merged values
       const newStatus = updates.status ?? existing.status;
@@ -750,7 +753,7 @@ export function registerWalkinRoutes(app: Express) {
       // Diff and collect audit rows
       const MUTABLE_FIELDS: (keyof WalkinLead)[] = [
         "parentName", "motherName", "childName", "altPhone", "email", "program",
-        "source", "status", "closeReason", "remark", "leadOwner",
+        "status", "closeReason", "remark", "leadOwner",
         "walkInDate", "revisitDate", "revisitDate2", "branchId", "misCallingRemarks",
       ];
 
