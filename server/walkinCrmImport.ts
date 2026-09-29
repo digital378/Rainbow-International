@@ -5,11 +5,12 @@ import { db } from "./db";
 import { walkinBranches, walkinLeadAuditLog, walkinLeads, walkinSyncReconciliations } from "../shared/schema";
 
 type Brand = "RIS" | "RPS";
-type ImportIssue = { brand: string; reason: string; reference: string };
+type ImportIssue = { brand: string; reason: string; reference: string; sourceLocations?: string[] };
 type PreviewResult = {
   eligible: number;
   alreadyPresent: number;
   review: number;
+  sourceReady: boolean;
   byBrand: { RIS: number; RPS: number };
   issues: ImportIssue[];
 };
@@ -63,9 +64,10 @@ function mergedRows(brand: Brand, leads: SupplementLead[], walkins: SupplementLe
     // it with a different tracker row; exact repeated records can still dedupe.
     const safeKey = lead.phone && lead.childName
       ? key
-      : `partial|${createHash("sha256").update(JSON.stringify(lead)).digest("hex")}`;
+      : `partial|${createHash("sha256").update(JSON.stringify({ ...lead, sourceLocations: undefined })).digest("hex")}`;
     const previous = rows.get(safeKey);
     if (previous) {
+      previous.sourceLocations = [...new Set([...(previous.sourceLocations ?? []), ...(lead.sourceLocations ?? [])])];
       if (previous.childName.trim() && lead.childName.trim()
         && normalizeIdentity(previous.childName) !== normalizeIdentity(lead.childName)) {
         previous.conflicts.push("conflicting child names");
@@ -79,6 +81,7 @@ function mergedRows(brand: Brand, leads: SupplementLead[], walkins: SupplementLe
         previous.conflicts.push("conflicting branches");
       }
       for (const [field, value] of Object.entries(lead)) {
+        if (field === "sourceLocations") continue;
         if (["childName", "status", "branchName"].includes(field)
           && previous.conflicts.some(conflict => conflict.startsWith(`conflicting ${field === "childName" ? "child names" : field === "status" ? "statuses" : "branches"}`))) {
           continue;
@@ -114,7 +117,7 @@ function validateLead(lead: SourceRow, branches: Array<typeof walkinBranches.$in
   const errors: string[] = [];
   const warnings: string[] = [];
   if (!isIsoDate(lead.enquiryDate)) errors.push("Enquiry date is invalid");
-  const phone = lead.phone.replace(/\D/g, "").slice(-10);
+  const phone = lead.phone.replace(/\D/g, "");
   if (!/^\d{10}$/.test(phone)) errors.push("Phone number is missing or invalid");
   if (!lead.childName.trim()) errors.push("Child name is missing");
   const status = normalizeStatus(lead.status);
@@ -175,29 +178,32 @@ async function calculatePreview(sourceOverride?: Awaited<ReturnType<typeof loadS
   const existingKeys = new Set(existing.map(row => `${row.brand}|${supplementLeadKey(row)}`));
   const existingIds = new Set(existing.map(row => row.id));
   const result: PreviewResult = {
-    eligible: 0, alreadyPresent: 0, review: 0, byBrand: { RIS: 0, RPS: 0 }, issues: [...source.issues],
+    eligible: 0, alreadyPresent: 0, review: 0,
+    sourceReady: source.results.every(({ result: item }) => item.available && item.mode === "oauth"),
+    byBrand: { RIS: 0, RPS: 0 }, issues: [...source.issues],
   };
   for (const lead of source.rows) {
     const reference = maskedReference(lead.brand, lead);
     const key = `${lead.brand}|${supplementLeadKey(lead)}`;
     const deterministicId = `crm-${createHash("sha256").update(key).digest("hex")}`;
+    const validation = validateLead(lead, branches);
+    if (validation.errors.length) {
+      result.review += 1;
+      result.issues.push({ brand: lead.brand, reason: validation.errors.join("; "), reference, sourceLocations: lead.sourceLocations });
+      continue;
+    }
     if (existingIds.has(deterministicId) || existingKeys.has(key)) {
       result.alreadyPresent += 1;
       continue;
     }
-    const validation = validateLead(lead, branches);
     if (validation.phone && possibleEditedIdentity(existing, lead, validation.phone)) {
       result.review += 1;
       result.issues.push({
         brand: lead.brand,
         reason: "A lead with the same date and phone but a different child name already exists; identity needs manual review",
         reference,
+        sourceLocations: lead.sourceLocations,
       });
-      continue;
-    }
-    if (validation.errors.length) {
-      result.review += 1;
-      result.issues.push({ brand: lead.brand, reason: validation.errors.join("; "), reference });
       continue;
     }
     if (validation.warnings.length) {
@@ -205,6 +211,7 @@ async function calculatePreview(sourceOverride?: Awaited<ReturnType<typeof loadS
         brand: lead.brand,
         reason: `Warning: ${validation.warnings.join("; ")}`,
         reference,
+        sourceLocations: lead.sourceLocations,
       });
     }
     result.eligible += 1;
@@ -255,23 +262,24 @@ export async function applyCrmImport(): Promise<ApplyResult> {
         const key = `${lead.brand}|${supplementLeadKey(lead)}`;
         const id = `crm-${createHash("sha256").update(key).digest("hex")}`;
         const reference = maskedReference(lead.brand, lead);
+        const validation = validateLead(lead, branches);
+        if (validation.errors.length) {
+          result.review += 1;
+          result.issues.push({ brand: lead.brand, reason: validation.errors.join("; "), reference, sourceLocations: lead.sourceLocations });
+          continue;
+        }
         if (existingIds.has(id) || existingKeys.has(key)) {
           result.skipped += 1;
           continue;
         }
-        const validation = validateLead(lead, branches);
         if (validation.phone && possibleEditedIdentity(existing, lead, validation.phone)) {
           result.review += 1;
           result.issues.push({
             brand: lead.brand,
             reason: "A lead with the same date and phone but a different child name already exists; identity needs manual review",
             reference,
+            sourceLocations: lead.sourceLocations,
           });
-          continue;
-        }
-        if (validation.errors.length) {
-          result.review += 1;
-          result.issues.push({ brand: lead.brand, reason: validation.errors.join("; "), reference });
           continue;
         }
         if (validation.warnings.length) {
@@ -279,6 +287,7 @@ export async function applyCrmImport(): Promise<ApplyResult> {
             brand: lead.brand,
             reason: `Warning: ${validation.warnings.join("; ")}`,
             reference,
+            sourceLocations: lead.sourceLocations,
           });
         }
         // Use the same phone lock as interactive lead creation, then refetch
@@ -307,6 +316,7 @@ export async function applyCrmImport(): Promise<ApplyResult> {
             brand: lead.brand,
             reason: "A lead with the same date and phone but a different child name already exists; identity needs manual review",
             reference,
+            sourceLocations: lead.sourceLocations,
           });
           continue;
         }

@@ -1,12 +1,53 @@
 import { describe, expect, it } from "vitest";
 import {
+  enrichLeadRows,
   parseCsv,
   parseDashboardRows,
   parseLeadRows,
+  parseWalkinRows,
   supplementLeadKey,
 } from "../server/marketing2728Sheets";
 
 describe("2027-28 supplementary Sheet parsing", () => {
+  it("shows original row numbers even when the authenticated sheet includes title and blank rows", () => {
+    const leads = parseLeadRows([
+      ["Tracker title"], [], ["Date", "Status", "Child's Name", "Phone Number"], [],
+      ["12/06/2027", "OPEN", "", ""],
+    ]);
+    const walkins = parseWalkinRows([
+      ["WALKINs title"], ["Date", "Student Name", "Father Contact", "Status"],
+      ["12/06/2027", "Mira", "9876543210", "OPEN"],
+    ]);
+    expect(leads[0].sourceLocations).toEqual(["CRM Leads Tracker row 5"]);
+    expect(walkins[0].sourceLocations).toEqual(["WALKINs row 3"]);
+    expect(enrichLeadRows(leads, walkins)[0]).toMatchObject({
+      childName: "", phone: "", sourceLocations: ["CRM Leads Tracker row 5"],
+    });
+  });
+
+  it("only enriches when both identity fields agree and retains both source references", () => {
+    const leads = parseLeadRows([
+      ["Date", "Status", "Child Name", "Phone"],
+      ["12/06/2027", "OPEN", "Mira", "9876543210"],
+    ]);
+    const walkins = parseWalkinRows([
+      ["Date", "Student Name", "Father Contact", "Status"],
+      ["12/06/2027", "Mira", "9876543210", "CLOSED"],
+    ]);
+    expect(enrichLeadRows(leads, walkins)[0]).toMatchObject({
+      status: "CLOSED",
+      sourceLocations: ["CRM Leads Tracker row 2", "WALKINs row 2"],
+    });
+  });
+
+  it("does not turn malformed contact numbers into valid numbers by dropping leading digits", () => {
+    const rows = [
+      ["Date", "Status", "Child Name", "Phone"],
+      ["12/06/2027", "OPEN", "Mira", "19876543210"],
+      ["12/06/2027", "OPEN", "Riya", "+91 98765 43210"],
+    ];
+    expect(parseLeadRows(rows).map(row => row.phone)).toEqual(["19876543210", "9876543210"]);
+  });
   it("parses quoted CSV fields and embedded commas", () => {
     expect(parseCsv('"Name","Source"\n"Child, One","Meta"\n')).toEqual([
       ["Name", "Source"],

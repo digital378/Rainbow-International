@@ -2,6 +2,8 @@ import { google } from "googleapis";
 import { getGoogleRefreshToken } from "./googleCredentials";
 
 export type SupplementLead = {
+  /** Original workbook coordinates, kept only for reconciliation; not a CRM identity. */
+  sourceLocations?: string[];
   enquiryDate: string;
   monthLabel: string;
   parentName: string;
@@ -60,6 +62,13 @@ function headerKey(value: unknown): string {
 function numberValue(value: unknown): number {
   const parsed = Number(clean(value).replace(/,/g, ""));
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function contactNumber(value: unknown): string {
+  const digits = clean(value).replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+  if (digits.length === 11 && digits.startsWith("0")) return digits.slice(1);
+  return digits;
 }
 
 export function parseCsv(text: string): string[][] {
@@ -131,7 +140,12 @@ function normalizeDate(raw: string): { iso: string; month: string } | null {
 
 export function parseLeadRows(rows: string[][]): SupplementLead[] {
   if (!rows.length) return [];
-  const headers = rows[0].map(headerKey);
+  const headerIndex = rows.findIndex(row => {
+    const keys = row.map(headerKey);
+    return (keys.includes("date") || keys.includes("enquirydate")) && keys.includes("status");
+  });
+  if (headerIndex < 0) throw new Error("CRM lead headers are not recognised");
+  const headers = rows[headerIndex].map(headerKey);
   const index = (...names: string[]) => names.map(headerKey).map(name => headers.indexOf(name)).find(i => i >= 0) ?? -1;
   const columns = {
     date: index("Date", "Enquiry Date"),
@@ -146,7 +160,8 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
   if (columns.date < 0 || columns.status < 0) throw new Error("CRM lead headers are not recognised");
 
   const leads: SupplementLead[] = [];
-  for (const row of rows.slice(1)) {
+  for (const [index, row] of rows.entries()) {
+    if (index <= headerIndex) continue;
     const parsedDate = normalizeDate(row[columns.date] ?? "");
     const rawStatus = clean(row[columns.status]).toUpperCase();
     // In the live tracker this value marks the start of the next academic-year
@@ -158,11 +173,12 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
       .replace(/^WALKIN BOOKED$/, "WALK-IN BOOKED")
       .replace(/^WALKIN COMPLETED$/, "WALK-IN COMPLETED");
     leads.push({
+      sourceLocations: [`CRM Leads Tracker row ${index + 1}`],
       enquiryDate: parsedDate.iso,
       monthLabel: parsedDate.month,
       parentName: "",
       childName: clean(row[columns.child]),
-      phone: clean(row[columns.phone]).replace(/\D/g, "").slice(-10),
+      phone: contactNumber(row[columns.phone]),
       branchName: columns.branch >= 0 ? clean(row[columns.branch]) : "",
       walkInDate: null,
       status,
@@ -178,7 +194,12 @@ type WalkinDetail = SupplementLead;
 
 export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
   if (!rows.length) return [];
-  const headers = rows[0].map(headerKey);
+  const headerIndex = rows.findIndex(row => {
+    const keys = row.map(headerKey);
+    return keys.includes("date") || keys.includes("enquirydate");
+  });
+  if (headerIndex < 0) return [];
+  const headers = rows[headerIndex].map(headerKey);
   const index = (...names: string[]) => names.map(headerKey).map(name => headers.indexOf(name)).find(i => i >= 0) ?? -1;
   const columns = {
     date: index("Date", "Enquiry Date"),
@@ -193,18 +214,20 @@ export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
   };
   if (columns.date < 0) return [];
 
-  return rows.slice(1).flatMap(row => {
+  return rows.flatMap((row, rowIndex) => {
+    if (rowIndex <= headerIndex) return [];
     const parsedDate = normalizeDate(row[columns.date] ?? "");
     if (!parsedDate) return [];
     const parsedWalkInDate = columns.walkInDate >= 0
       ? normalizeDate(row[columns.walkInDate] ?? "")?.iso ?? null
       : null;
     return [{
+      sourceLocations: [`WALKINs row ${rowIndex + 1}`],
       enquiryDate: parsedDate.iso,
       monthLabel: parsedDate.month,
       parentName: clean(row[columns.parent]),
       childName: clean(row[columns.child]),
-      phone: clean(row[columns.phone]).replace(/\D/g, "").slice(-10),
+      phone: contactNumber(row[columns.phone]),
       branchName: clean(row[columns.branch]),
       walkInDate: parsedWalkInDate,
       status: clean(row[columns.status]).toUpperCase()
@@ -221,31 +244,19 @@ function normalizedIdentity(value: string): string {
   return clean(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): SupplementLead[] {
+export function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): SupplementLead[] {
   const unused = new Set(walkins.map((_, index) => index));
   return leads.map(lead => {
     const candidates = [...unused].filter(index => {
       const detail = walkins[index];
       if (detail.enquiryDate !== lead.enquiryDate) return false;
-      const phoneMatch = Boolean(lead.phone && detail.phone && lead.phone === detail.phone);
-      const childMatch = Boolean(
-        lead.childName && detail.childName
+      // Never fill an incomplete identity from operational fields or a single
+      // matching identifier: siblings can share a date and phone.
+      return Boolean(
+        /^\d{10}$/.test(lead.phone) && lead.phone === detail.phone
+        && lead.childName && detail.childName
         && normalizedIdentity(lead.childName) === normalizedIdentity(detail.childName),
       );
-      if (phoneMatch || childMatch) return true;
-
-      // Some legacy tracker rows omit the child and/or phone. Only fall back
-      // to operational fields when they identify exactly one WALKINs row.
-      const identityMissing = !lead.phone || !lead.childName;
-      const programMatch = Boolean(
-        lead.program && detail.program
-        && normalizedIdentity(lead.program) === normalizedIdentity(detail.program),
-      );
-      const ownerMatch = Boolean(
-        lead.leadOwner && detail.leadOwner
-        && normalizedIdentity(lead.leadOwner) === normalizedIdentity(detail.leadOwner),
-      );
-      return identityMissing && programMatch && ownerMatch;
     });
     if (candidates.length !== 1) return lead;
 
@@ -254,6 +265,7 @@ function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): Suppl
     const detail = walkins[index];
     return {
       ...lead,
+      sourceLocations: [...new Set([...(lead.sourceLocations ?? []), ...(detail.sourceLocations ?? [])])],
       parentName: detail.parentName || lead.parentName,
       childName: detail.childName || lead.childName,
       phone: detail.phone || lead.phone,
@@ -385,9 +397,16 @@ export async function readMarketing2728Supplement(brand: "RIS" | "RPS"): Promise
     }
   }
   try {
+    const leads = enrichLeadRows(parseLeadRows(rows.leads), parseWalkinRows(rows.walkins));
+    const walkins = parseWalkinRows(rows.walkins);
+    // Public CSV can omit blank/title rows; its indexes are not trustworthy
+    // workbook coordinates. Import itself requires authenticated access.
+    if (mode !== "oauth") {
+      for (const row of [...leads, ...walkins]) row.sourceLocations = undefined;
+    }
     return {
-      leads: enrichLeadRows(parseLeadRows(rows.leads), parseWalkinRows(rows.walkins)),
-      walkins: parseWalkinRows(rows.walkins),
+      leads,
+      walkins,
       months: parseDashboardRows(rows.dashboard),
       fetchedAt: new Date().toISOString(),
       available: true,

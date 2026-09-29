@@ -90,10 +90,13 @@ describe("historical CRM walk-in import", () => {
 
   it("deduplicates enriched leads with WALKINs rows and marks unsafe rows for review", async () => {
     const valid = lead();
-    const missingPhone = lead({ childName: "Mira", phone: "" });
+    const missingPhone = lead({
+      childName: "Mira", phone: "",
+      sourceLocations: ["CRM Leads Tracker row 42"],
+    });
     mocks.supplement.mockImplementation(async (brand: string) => source(
       brand === "RIS" ? [valid, missingPhone] : [],
-      brand === "RIS" ? [valid, missingPhone] : [],
+      brand === "RIS" ? [valid, { ...missingPhone, sourceLocations: ["WALKINs row 19"] }] : [],
     ));
 
     const result = await previewCrmImport();
@@ -107,6 +110,39 @@ describe("historical CRM walk-in import", () => {
     expect(result.issues[0].reason).toContain("Phone number is missing");
     expect(result.issues[0].reference).toMatch(/^RIS-[a-f0-9]{10}$/);
     expect(result.issues[0].reference).not.toContain("Mira");
+    expect(result.issues[0].sourceLocations).toEqual(["CRM Leads Tracker row 42", "WALKINs row 19"]);
+  });
+
+  it("keeps a missing child name pending without inserting or inventing an identity", async () => {
+    mocks.supplement.mockImplementation(async (brand: string) => source(
+      brand === "RIS" ? [lead({ childName: "", sourceLocations: ["CRM Leads Tracker row 50"] })] : [],
+      [],
+    ));
+    const preview = await previewCrmImport();
+    const applied = await applyCrmImport();
+    expect(preview).toMatchObject({ eligible: 0, review: 1 });
+    expect(preview.issues[0]).toMatchObject({
+      sourceLocations: ["CRM Leads Tracker row 50"],
+      reason: expect.stringContaining("Child name is missing"),
+    });
+    expect(applied).toMatchObject({ imported: 0, review: 1 });
+    expect(mocks.inserted.some(row => row.table === walkinLeads)).toBe(false);
+  });
+
+  it("does not import an eleven-digit malformed phone", async () => {
+    mocks.existing = [{
+      id: "existing-1", brand: "RIS", enquiryDate: "2027-06-12",
+      phone: "9876543210", childName: "Aarav",
+    }];
+    mocks.supplement.mockImplementation(async (brand: string) => source(
+      brand === "RIS" ? [lead({ phone: "19876543210" })] : [],
+      [],
+    ));
+    const preview = await previewCrmImport();
+    const result = await applyCrmImport();
+    expect(preview).toMatchObject({ alreadyPresent: 0, review: 1 });
+    expect(result).toMatchObject({ imported: 0, review: 1 });
+    expect(result.issues[0].reason).toContain("Phone number is missing or invalid");
   });
 
   it("keeps an ambiguous branch null, with a warning rather than blocking import", async () => {
