@@ -7,7 +7,6 @@ const LIVE_INTERNAL_URL = "https://rainbowinternationalschool.in/internal";
 /* ── Types ───────────────────────────────────────────────────────────────────── */
 type DashboardScope = "ris-sales" | "rps-sales" | "overview" | "marketing";
 type PagePasscodes = {
-  leads: string;
   panel: string;
   overview: string;
   marketing: string;
@@ -116,7 +115,7 @@ const FLOW_2728: FlowStep[] = [
   {
     step: 3,
     label: "Leads CRM",
-    sub: "All captured leads in one filterable, editable list",
+    sub: "Brand-specific leads workspace; request your Leads passcode from your administrator",
     items: [{ label: "Leads CRM", url: "/leads" }],
   },
   {
@@ -193,11 +192,11 @@ const DASHBOARDS_2728: Dashboard[] = [
   {
     name: "Leads CRM",
     url: "/leads",
-    passcode: "Leads passcode",
+    passcode: "Ask your administrator",
     adminToken: true,
     who: "Admin / Staff",
     description:
-      "Full AY 27-28 walk-in lead list — filter by brand, branch, and status; edit entries; track counselling progress; and export data.",
+      "Your school's AY 27-28 walk-in leads — track visits, admissions and counselling progress. Separate RIS and RPS Leads passcodes are issued privately.",
     accent: "#dc2626",
   },
   {
@@ -504,7 +503,7 @@ export default function Internal() {
         if (!response.ok) throw new Error("Passcodes unavailable");
         const data = await response.json();
         const required: Array<keyof PagePasscodes> = [
-          "leads", "panel", "overview", "marketing", "ris-sales", "rps-sales",
+          "panel", "overview", "marketing", "ris-sales", "rps-sales",
         ];
         if (required.some(key => typeof data[key] !== "string" || !data[key]) ||
             (data.alliances !== null && typeof data.alliances !== "string")) {
@@ -562,7 +561,6 @@ export default function Internal() {
   const visibleDashboards2728 = DASHBOARDS_2728.map(d => {
     const key: keyof PagePasscodes | null = d.scope ||
       (d.url === "/alliances" ? "alliances"
-        : d.url === "/leads" ? "leads"
         : d.url === "/admin/walkin-2728" ? "panel"
         : null);
     return key ? { ...d, passcode: passcodeLabel(key) } : d;
@@ -655,7 +653,6 @@ export default function Internal() {
               ["RPS Sales 2027–28", "/rps-sales-27-28", passcodeLabel("rps-sales")],
               ["Group Overview", "/overview-27-28", passcodeLabel("overview")],
               ["Alliances", "/alliances", passcodeLabel("alliances")],
-              ["Leads CRM", "/leads", passcodeLabel("leads")],
               ["Admin Panel", "/admin/walkin-2728", passcodeLabel("panel")],
             ].map(([label, slug, code]) => (
               <div key={label} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">

@@ -13,25 +13,11 @@
  *   GOOGLE_CLIENT_ID          — OAuth2 client ID
  *   GOOGLE_CLIENT_SECRET      — OAuth2 client secret
  *
- * Column layout (matches images shared by client, 18 cols):
- *   A  Unique ID     — LD-DD.MM.YYYY-{RIS|RPS}-<brandSeqNum>
- *   B  Date          — DD/MM/YYYY
- *   C  Time          — HH:MM (12h)
- *   D  Student Name
- *   E  Father/Mother Name
- *   F  GRADE
- *   G  Academic Year
- *   H  Contact No
- *   I  Email
- *   J  Counsellor Name
- *   K  Source
- *   L  Status         ← green (branch-editable in sheet)
- *   M  Admission Date ← green
- *   N  Follow up Remarks ← green
- *   O  Reason for Closed ← green
- *   P  Trial / Revisit   ← green
- *   Q  MIS Calling Remarks ← green
- *   R  Lead ID        — hidden; used for upsert row-matching
+ * The historic "Admission Date" column is retained in place as the walk-in
+ * date. "Actual Admission Date" is a separate appended field:
+ *   RIS: O Admission Date, T hidden Lead ID, U Actual Admission Date
+ *   RPS: P Admission Date, U hidden Lead ID, V Actual Admission Date
+ *   Master: Q Admission Date, V hidden Lead ID, W Actual Admission Date
  *
  * Yellow columns (A,D,E,F,J,K) = mandatory at submission; sheet owner–only edit.
  * Green columns (L-Q) = editable by branch staff in sheet.
@@ -64,6 +50,10 @@ export async function bootstrapWalkinSequences(): Promise<void> {
     await db.execute(drizzleSql`
       ALTER TABLE walkin_leads
         ADD COLUMN IF NOT EXISTS brand_seq_num INTEGER;
+    `);
+    await db.execute(drizzleSql`
+      ALTER TABLE walkin_leads
+        ADD COLUMN IF NOT EXISTS admission_date TEXT;
     `);
 
     // 2. Create per-brand sequences (no-op if they already exist)
@@ -270,6 +260,7 @@ export const SHEET_HEADERS = [
   "Revisit 1 Date",        // R(17) ← green
   "Revisit 2 Date",        // S(18) ← green
   "Lead ID",               // T(19) ← hidden; upsert key
+  "Actual Admission Date", // U(20) ← appended; actual admission, not walk-in date
 ] as const;
 
 // RPS has a branch field between grade and academic year.  Keep the established
@@ -309,6 +300,7 @@ export const MASTER_SHEET_HEADERS = [
   "Revisit 1 Date",
   "Revisit 2 Date",
   "Lead ID",
+  "Actual Admission Date",
 ] as const;
 
 const MASTER_LEADS_TAB = "WALKINs";
@@ -425,7 +417,52 @@ async function ensureLeadsTab(
     (s: any) => s.properties?.title === tabName,
   );
 
-  if (exists) return false;
+  if (exists) {
+    // Existing worksheets must keep every current column in place. The new
+    // actual-admission field is appended after Lead ID; legacy "Admission
+    // Date" remains the walk-in date and is never relabeled or migrated.
+    const headerResp = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${tabName}!1:1`,
+    });
+    const currentHeader = headerResp.data.values?.[0] ?? [];
+    const actualAdmissionDateIndexes = currentHeader
+      .map((cell: string, index: number) =>
+        cell.trim().toLowerCase() === "actual admission date" ? index : -1)
+      .filter((index: number) => index >= 0);
+    if (actualAdmissionDateIndexes.length > 1) {
+      throw new Error(`"${tabName}" has duplicate Actual Admission Date headers`);
+    }
+    if (actualAdmissionDateIndexes.length === 0) {
+      const leadIdIndex = currentHeader.findIndex(
+        (cell: string) => cell.trim().toLowerCase() === "lead id",
+      );
+      if (leadIdIndex < 0) {
+        throw new Error(`"${tabName}" is missing its Lead ID header; refusing to shift columns`);
+      }
+      const appendIndex = currentHeader.length;
+      if (appendIndex !== leadIdIndex + 1) {
+        throw new Error(`"${tabName}" has columns after Lead ID; refusing to shift columns`);
+      }
+      await fencedWalkinSheetWrite(`append Actual Admission Date header to ${tabName}`, () =>
+        sheets.spreadsheets.values.update({
+          spreadsheetId,
+          range: `${tabName}!${columnLetter(appendIndex)}1`,
+          valueInputOption: "RAW",
+          requestBody: { values: [["Actual Admission Date"]] },
+        }),
+      );
+    } else {
+      const leadIdIndex = currentHeader.findIndex(
+        (cell: string) => cell.trim().toLowerCase() === "lead id",
+      );
+      if (leadIdIndex < 0 || actualAdmissionDateIndexes[0] !== leadIdIndex + 1 ||
+          actualAdmissionDateIndexes[0] !== currentHeader.length - 1) {
+        throw new Error(`"${tabName}" has an unexpected Actual Admission Date position; refusing to shift columns`);
+      }
+    }
+    return false;
+  }
 
   // Create the tab
   await fencedWalkinSheetWrite(`create ${tabName} tab`, () => sheets.spreadsheets.batchUpdate({
@@ -508,6 +545,7 @@ export async function leadToRow(lead: WalkinLead, brand = lead.brand as "RIS" | 
     "Revisit 1 Date": lead.revisitDate ? formatDateDDMMYYYY(lead.revisitDate) : "",
     "Revisit 2 Date": (lead as any).revisitDate2 ? formatDateDDMMYYYY((lead as any).revisitDate2) : "",
     "Lead ID": String(lead.id),
+    "Actual Admission Date": lead.admissionDate ? formatDateDDMMYYYY(lead.admissionDate) : "",
   };
   return headersForBrand(brand).map((header) => values[header] ?? "");
 }
@@ -1324,11 +1362,11 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Include the hidden Lead ID column. The header is resolved below so RIS
+    // Include the appended admission date. The header is resolved below so RIS
     // and RPS can safely retain their different Branch-column layouts.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!A:U`,
+      range: `${LEADS_TAB}!A:V`,
     });
 
     const rows = resp.data.values ?? [];
@@ -1367,16 +1405,27 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     }
 
     // Collect rows that need propagating to Master after the main loop
-    const pendingMasterUpdates: Array<{ leadId: string; greenValues: string[] }> = [];
+    const pendingMasterUpdates: Array<{
+      leadId: string;
+      greenValues: string[];
+      actualAdmissionDate: string | null;
+    }> = [];
 
     for (const row of dataRows) {
       const hasBranch = header.some((cell) => cell.trim().toLowerCase() === "branch");
       const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", hasBranch ? 20 : 19));
       if (!leadId) continue;
 
-      // Green column values from sheet
+      // Legacy "Admission Date" still maps to walkInDate. The separately
+      // appended Actual Admission Date column maps only to admissionDate.
       const sheetStatus        = cellAt(row, headerIndex(header, "Status", hasBranch ? 14 : 13));
       const sheetWalkInDate    = parseDateFromSheet(cellAt(row, headerIndex(header, "Admission Date", hasBranch ? 15 : 14)));
+      const hasActualAdmissionDate = header.some(
+        (cell) => cell.trim().toLowerCase() === "actual admission date",
+      );
+      const sheetActualAdmissionDate = hasActualAdmissionDate
+        ? parseDateFromSheet(cellAt(row, headerIndex(header, "Actual Admission Date", hasBranch ? 21 : 20)))
+        : null;
       const sheetRemark        = cellAt(row, headerIndex(header, "Follow up Remarks", hasBranch ? 16 : 15));
       const sheetCloseReason   = cellAt(row, headerIndex(header, "Reason for Closed", hasBranch ? 17 : 16));
       const sheetRevisitDate   = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 1 Date", hasBranch ? 18 : 17)));
@@ -1414,6 +1463,9 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         }
       }
       check("walkInDate",          existing.walkInDate,          sheetWalkInDate);
+      if (hasActualAdmissionDate) {
+        check("admissionDate", existing.admissionDate, sheetActualAdmissionDate);
+      }
       check("remark",              existing.remark,              sheetRemark || null);
       if (sheetCloseReason) {
         if (allowedCloseReasons.size > 0 && !allowedCloseReasons.has(sheetCloseReason)) {
@@ -1468,6 +1520,9 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
         // Queue this row for Master propagation
         pendingMasterUpdates.push({
           leadId,
+          actualAdmissionDate: hasActualAdmissionDate
+            ? cellAt(row, headerIndex(header, "Actual Admission Date", hasBranch ? 21 : 20))
+            : null,
           greenValues: [
             sheetStatus,
             cellAt(row, headerIndex(header, "Admission Date", hasBranch ? 15 : 14)),
@@ -1491,10 +1546,11 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
           // location. This safely handles the pre-fix legacy row shape too.
           const masterIdResp = await sheets.spreadsheets.values.get({
             spreadsheetId: masterSheetId,
-            range: `${MASTER_LEADS_TAB}!A:V`,
+            range: `${MASTER_LEADS_TAB}!A:W`,
           });
           const masterIds = masterIdResp.data.values ?? [];
           const masterHeader = masterIds[0] ?? [];
+          await ensureLeadsTab(sheets, masterSheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
           const masterLeadIdIndex = headerIndex(masterHeader, "Lead ID", 21);
           const leadIdToMasterRow = new Map<string, number>();
           masterIds.forEach((r, idx) => {
@@ -1508,6 +1564,13 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
               range: `${MASTER_LEADS_TAB}!P${leadIdToMasterRow.get(u.leadId)}:U${leadIdToMasterRow.get(u.leadId)}`,
               values: [u.greenValues],
             }));
+          const actualAdmissionColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Actual Admission Date"));
+          batchData.push(...pendingMasterUpdates
+            .filter(u => u.actualAdmissionDate !== null && leadIdToMasterRow.has(u.leadId))
+            .map(u => ({
+              range: `${MASTER_LEADS_TAB}!${actualAdmissionColumn}${leadIdToMasterRow.get(u.leadId)}`,
+              values: [[u.actualAdmissionDate!]],
+            })));
 
           if (batchData.length > 0) {
             await fencedWalkinSheetWrite(`propagate ${brand} changes to Master`, () => sheets.spreadsheets.values.batchUpdate({
@@ -1537,7 +1600,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
 }
 
 // ── Master MIS → DB + Brand Sheets pull (reverse sync) ──────────
-// Reads the green columns (M–R) in the Master sheet.
+// Reads the existing green columns plus the appended Actual Admission Date.
 // For each changed row: updates the DB, then back-propagates to the
 // corresponding RIS or RPS brand sheet (columns L–Q).
 // No circular loop: both pulls compare against the DB; after one side
@@ -1569,11 +1632,11 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read through Lead ID. Header names are resolved below because Master has
+    // Read through the appended actual-admission date. Header names are resolved below because Master has
     // Branch and its staff-facing Source/Counsellor order differs from a brand.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheetId,
-      range: `${MASTER_LEADS_TAB}!A:V`,
+      range: `${MASTER_LEADS_TAB}!A:W`,
     });
 
     const rows = resp.data.values ?? [];
@@ -1600,7 +1663,11 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
     }
 
     // Collect rows per brand to back-propagate to their brand sheets after the loop
-    const pendingBrandUpdates: Record<"RIS" | "RPS", Array<{ leadId: string; greenValues: string[] }>> = {
+    const pendingBrandUpdates: Record<"RIS" | "RPS", Array<{
+      leadId: string;
+      greenValues: string[];
+      actualAdmissionDate: string | null;
+    }>> = {
       RIS: [],
       RPS: [],
     };
@@ -1612,9 +1679,16 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", 21));
       if (!leadId) continue;
 
-      // Green columns from Master (P–U in the canonical 22-column layout).
+      // Existing Master green columns remain P–U; actual admission is appended
+      // after the hidden Lead ID in W and is never confused with walk-in date.
       const sheetStatus       = cellAt(row, headerIndex(header, "Status", 15));
       const sheetWalkInDate   = parseDateFromSheet(cellAt(row, headerIndex(header, "Admission Date", 16)));
+      const hasActualAdmissionDate = header.some(
+        (cell) => cell.trim().toLowerCase() === "actual admission date",
+      );
+      const sheetActualAdmissionDate = hasActualAdmissionDate
+        ? parseDateFromSheet(cellAt(row, headerIndex(header, "Actual Admission Date", MASTER_SHEET_HEADERS.indexOf("Actual Admission Date"))))
+        : null;
       const sheetRemark       = cellAt(row, headerIndex(header, "Follow up Remarks", 17));
       const sheetCloseReason  = cellAt(row, headerIndex(header, "Reason for Closed", 18));
       const sheetRevisitDate  = parseDateFromSheet(cellAt(row, headerIndex(header, "Revisit 1 Date", 19)));
@@ -1648,6 +1722,9 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
         }
       }
       check("walkInDate",        existing.walkInDate,        sheetWalkInDate);
+      if (hasActualAdmissionDate) {
+        check("admissionDate", existing.admissionDate, sheetActualAdmissionDate);
+      }
       check("remark",            existing.remark,            sheetRemark || null);
       if (sheetCloseReason) {
         if (allowedCloseReasons.size > 0 && !allowedCloseReasons.has(sheetCloseReason)) {
@@ -1688,6 +1765,9 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
         // Queue back-propagation to brand sheet (O–T → N–S)
         pendingBrandUpdates[brand].push({
           leadId,
+          actualAdmissionDate: hasActualAdmissionDate
+            ? cellAt(row, headerIndex(header, "Actual Admission Date", MASTER_SHEET_HEADERS.indexOf("Actual Admission Date")))
+            : null,
           greenValues: [
             sheetStatus,
             cellAt(row, headerIndex(header, "Admission Date", 16)),
@@ -1711,6 +1791,7 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       if (!brandSheetId) continue;
 
       try {
+        await ensureLeadsTab(sheets, brandSheetId, LEADS_TAB, headersForBrand(brand));
         const brandHeaders = headersForBrand(brand);
         const brandLeadIdColumn = columnLetter(brandHeaders.indexOf("Lead ID"));
         const brandStatusColumn = columnLetter(brandHeaders.indexOf("Status"));
@@ -1733,6 +1814,13 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
             range: `${LEADS_TAB}!${brandStatusColumn}${leadIdToRow.get(u.leadId)}:${brandRevisit2Column}${leadIdToRow.get(u.leadId)}`,
             values: [u.greenValues],
           }));
+        const actualAdmissionColumn = columnLetter(brandHeaders.indexOf("Actual Admission Date"));
+        batchData.push(...updates
+          .filter((u) => u.actualAdmissionDate !== null && leadIdToRow.has(u.leadId))
+          .map((u) => ({
+            range: `${LEADS_TAB}!${actualAdmissionColumn}${leadIdToRow.get(u.leadId)}`,
+            values: [[u.actualAdmissionDate!]],
+          })));
 
         if (batchData.length > 0) {
           await fencedWalkinSheetWrite(`propagate Master changes to ${brand}`, () => sheets.spreadsheets.values.batchUpdate({

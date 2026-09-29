@@ -398,6 +398,7 @@ export const walkinLeads = pgTable(
     remark: text("remark"),                      // free-text; never feeds analytics
     leadOwner: text("lead_owner"),
     walkInDate: text("walk_in_date"),            // YYYY-MM-DD; required for WALK-IN states
+    admissionDate: text("admission_date"),      // YYYY-MM-DD; actual admission, separate from walk-in
     revisitDate: text("revisit_date"),           // Revisit 1 Date (YYYY-MM-DD)
     revisitDate2: text("revisit_date_2"),         // Revisit 2 Date (YYYY-MM-DD)
     misCallingRemarks: text("mis_calling_remarks"),  // kept for backward-compat; not in sheets

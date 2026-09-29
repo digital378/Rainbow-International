@@ -1,0 +1,1 @@
+ALTER TABLE walkin_leads ADD COLUMN IF NOT EXISTS admission_date text;

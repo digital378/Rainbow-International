@@ -86,7 +86,7 @@ vi.mock("../server/walkinSyncCoordinator", () => ({
 }));
 
 // ── Import subjects under test (mocks are already in place) ──────────────────
-import { pullChangesFromMasterSheet } from "../server/walkinSheets";
+import { pullChangesFromMasterSheet, SHEET_HEADERS } from "../server/walkinSheets";
 import { db } from "../server/db";
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -413,7 +413,8 @@ describe("pullChangesFromMasterSheet — back-propagation suppressed on invalid 
     // is non-empty (lead ID 42 found at row 2).
     mockSheetsGet
       .mockResolvedValueOnce({ data: { values: [Array(22).fill("header"), makeMasterSheetRow("RIS", "CLOSED", "42")] } }) // master sheet read
-      .mockResolvedValueOnce({ data: { values: [["Lead ID"], ["42"]] } }); // brand sheet R:R column read
+      .mockResolvedValueOnce({ data: { values: [SHEET_HEADERS] } }) // existing brand headers, including appended date
+      .mockResolvedValueOnce({ data: { values: [["Lead ID"], ["42"]] } }); // brand sheet hidden ID column
 
     await pullChangesFromMasterSheet();
 

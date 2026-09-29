@@ -12,7 +12,7 @@ type Lead = {
   enquiryDate: string; monthLabel: string; parentName: string; childName: string;
   phone: string; altPhone: string | null; email: string | null; program: string;
   source: string; status: string; closeReason: string | null; remark: string | null;
-  leadOwner: string | null; walkInDate: string | null; revisitDate: string | null;
+  leadOwner: string | null; walkInDate: string | null; admissionDate?: string | null; revisitDate: string | null;
   misCallingRemarks: string | null;
   isArchived: boolean; createdBy: string; updatedBy: string | null;
   createdAt: string; updatedAt: string;
@@ -63,8 +63,9 @@ function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
             <div className="text-xs text-slate-500">AY 2027-28 · Internal</div>
           </div>
         </div>
-        <label className="block text-sm font-semibold text-slate-700 mb-2">Leads passcode</label>
+        <label htmlFor="leads-passcode" className="block text-sm font-semibold text-slate-700 mb-2">Leads passcode</label>
         <input
+          id="leads-passcode"
           ref={inputRef}
           type="password"
           autoComplete="off"
@@ -101,12 +102,10 @@ function StatusBadge({ status, archived }: { status: string; archived: boolean }
 // ── Shared form-field wrapper (must be module-level — not inside a component) ──
 function F({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
-    <div>
-      <label className="block text-xs font-semibold text-slate-600 mb-1">
-        {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      {children}
-    </div>
+    <label className="block text-xs font-semibold text-slate-600 mb-1">
+      {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+      <span className="block mt-1">{children}</span>
+    </label>
   );
 }
 
@@ -126,6 +125,7 @@ function EditPanel({
     status: lead.status,
     closeReason: lead.closeReason || "",
     walkInDate: lead.walkInDate || "",
+    admissionDate: lead.admissionDate || "",
     revisitDate: lead.revisitDate || "",
     leadOwner: lead.leadOwner || "",
     remark: lead.remark || "",
@@ -147,7 +147,6 @@ function EditPanel({
     setForm(f => ({ ...f, [field]: e.target.value }));
     if (field === "status") {
       if (e.target.value !== CLOSED_STATUS) setForm(f => ({ ...f, status: e.target.value, closeReason: "" }));
-      if (!WALKIN_STATUSES.includes(e.target.value)) setForm(f => ({ ...f, status: e.target.value, walkInDate: "" }));
     }
   };
 
@@ -165,7 +164,8 @@ function EditPanel({
           program: form.program,
           status: form.status,
           closeReason: form.closeReason || undefined,
-          walkInDate: form.walkInDate || undefined,
+          walkInDate: form.walkInDate || null,
+          admissionDate: form.admissionDate || null,
           revisitDate: form.revisitDate || undefined,
           leadOwner: form.leadOwner || undefined,
           remark: form.remark || undefined,
@@ -187,20 +187,20 @@ function EditPanel({
     }
   };
 
-  const inputCls = "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400";
+  const inputCls = "w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-400";
   const selectCls = inputCls;
 
   return (
-    <div className="fixed inset-0 z-50 flex" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-labelledby="edit-lead-title" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="relative ml-auto w-full max-w-lg bg-white shadow-2xl h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100" style={{ background: NAVY }}>
           <div>
-            <div className="font-bold text-white text-sm">Edit Lead</div>
+            <div id="edit-lead-title" className="font-bold text-white text-sm">Edit Lead</div>
             <div className="text-blue-200 text-xs">{lead.parentName} · {lead.phone}</div>
           </div>
-          <button onClick={onClose} className="text-white/70 hover:text-white text-xl leading-none px-1">✕</button>
+          <button onClick={onClose} aria-label="Close edit panel" className="text-white/70 hover:text-white text-xl leading-none px-2 py-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Close</button>
         </div>
 
         {/* Read-only locked fields */}
@@ -249,12 +249,13 @@ function EditPanel({
                 )}
               </select>
             </F>
-            <F label="Source" required>
-              <div className="px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700">
+            <div>
+              <div className="block text-xs font-semibold text-slate-600 mb-1">Source</div>
+              <div className="px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-700">
                 {lead.source}
               </div>
               <p className="mt-1 text-xs text-slate-500">Original enquiry source · locked after creation</p>
-            </F>
+            </div>
           </div>
 
           <F label="Status" required>
@@ -272,11 +273,15 @@ function EditPanel({
             </F>
           )}
 
-          {needsWalkInDate && (
-            <F label="Walk-in Date" required>
-              <input className={inputCls} type="date" value={form.walkInDate} onChange={set("walkInDate")} />
-            </F>
-          )}
+          <F label="Walk-in Date" required={needsWalkInDate}>
+            <input className={inputCls} type="date" value={form.walkInDate} onChange={set("walkInDate")} />
+          </F>
+          {!needsWalkInDate && <p className="text-xs text-slate-500 -mt-3">Optional unless a walk-in status is selected.</p>}
+
+          <F label="Admission Date">
+            <input className={inputCls} type="date" value={form.admissionDate} onChange={set("admissionDate")} aria-describedby="admission-date-note" />
+          </F>
+          <p id="admission-date-note" className="text-xs text-slate-500 -mt-3">Optional. Older records may not have an admission date.</p>
 
           <div className="grid grid-cols-2 gap-3">
             <F label="Lead Owner">
@@ -355,15 +360,15 @@ function HistoryModal({ lead, token, onClose }: { lead: Lead; token: string; onC
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="history-title" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100" style={{ background: NAVY }}>
           <div>
-            <div className="font-bold text-white text-sm">Change History</div>
+            <div id="history-title" className="font-bold text-white text-sm">Change History</div>
             <div className="text-blue-200 text-xs">{lead.parentName} · {lead.phone}</div>
           </div>
-          <button onClick={onClose} className="text-white/70 hover:text-white text-xl px-1">✕</button>
+          <button onClick={onClose} aria-label="Close change history" className="text-white/70 hover:text-white text-sm px-2 py-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Close</button>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {loading && <div className="text-slate-400 text-sm text-center py-8">Loading history…</div>}
@@ -388,7 +393,7 @@ function HistoryModal({ lead, token, onClose }: { lead: Lead; token: string; onC
                       {row.field !== "created" && row.field !== "archived" && (
                         <div className="text-slate-500">
                           <span className="line-through mr-1">{row.oldValue || "—"}</span>
-                          <span className="text-slate-400 mr-1">→</span>
+                          <span className="text-slate-400 mr-1">to</span>
                           <span className="font-medium text-slate-700">{row.newValue || "—"}</span>
                         </div>
                       )}
@@ -438,10 +443,10 @@ function ArchiveModal({ lead, token, onArchived, onClose }: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="archive-lead-title">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-        <div className="text-lg font-bold text-slate-800 mb-2">Archive this lead?</div>
+        <div id="archive-lead-title" className="text-lg font-bold text-slate-800 mb-2">Archive this lead?</div>
         <div className="text-sm text-slate-600 mb-1">
           <b>{lead.parentName}</b> · {lead.childName} · {lead.phone}
         </div>
@@ -469,6 +474,7 @@ function ArchiveModal({ lead, token, onArchived, onClose }: {
 
 // ── Main Leads Panel ──────────────────────────────────────────────
 function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }) {
+  const [access, setAccess] = useState<"GROUP" | "RIS" | "RPS" | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -482,6 +488,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     brand: "", branchId: "", status: "", source: "", leadOwner: "",
     dateFrom: "", dateTo: "", search: "", showArchived: false,
   });
+  const [statusView, setStatusView] = useState<"all" | "booked" | "walkins" | "admissions">("all");
 
   // Panel / modal state
   const [editLead, setEditLead] = useState<Lead | null>(null);
@@ -495,6 +502,21 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     if (res.ok) setLookups(await res.json());
   }, [token]);
 
+  const fetchPageAccess = useCallback(async () => {
+    const response = await fetch("/api/walkin/page-session?scope=leads", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error("Could not confirm your brand access.");
+    const data: { ok?: boolean; access?: "GROUP" | "RIS" | "RPS" } = await response.json();
+    if (!data.ok || !data.access) throw new Error("Could not confirm your brand access.");
+    setAccess(data.access);
+    setFilters(current => ({
+      ...current,
+      brand: data.access === "GROUP" ? current.brand : (data.access || current.brand),
+    }));
+    setError("");
+  }, [token]);
+
   const fetchLeads = useCallback(async (p = page, f = filters) => {
     setLoading(true); setError("");
     try {
@@ -504,6 +526,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
         ...(f.brand && { brand: f.brand }),
         ...(f.branchId && { branchId: f.branchId }),
         ...(f.status && { status: f.status }),
+        ...(!f.status && statusView === "booked" && { status: "WALK-IN BOOKED" }),
+        ...(!f.status && statusView === "walkins" && { status: "WALK-IN COMPLETED" }),
+        ...(!f.status && statusView === "admissions" && { status: "ADMISSION DONE" }),
         ...(f.source && { source: f.source }),
         ...(f.leadOwner && { leadOwner: f.leadOwner }),
         ...(f.dateFrom && { dateFrom: f.dateFrom }),
@@ -523,7 +548,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     } finally {
       setLoading(false);
     }
-  }, [page, filters, token]);
+  }, [page, filters, statusView, token]);
 
   useEffect(() => {
     document.title = "Leads | Admin · AY 2027-28";
@@ -531,11 +556,18 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
     fetchLookups();
-  }, []);
+    void fetchPageAccess().catch((reason: unknown) => {
+      setError(reason instanceof Error ? reason.message : "Could not confirm your brand access.");
+    });
+  }, [fetchLookups, fetchPageAccess]);
 
-  useEffect(() => { fetchLeads(page, filters); }, [page, filters]);
+  useEffect(() => {
+    if (access) fetchLeads(page, filters);
+  }, [page, filters, statusView, access]);
 
   const applyFilter = (field: string, value: string | boolean) => {
+    if (field === "brand" && access !== "GROUP") return;
+    if (field === "status") setStatusView("all");
     setPage(1);
     setFilters(f => ({ ...f, [field]: value }));
   };
@@ -545,9 +577,15 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       ...(filters.brand && { brand: filters.brand }),
       ...(filters.branchId && { branchId: filters.branchId }),
       ...(filters.status && { status: filters.status }),
+      ...(!filters.status && statusView === "booked" && { status: "WALK-IN BOOKED" }),
+      ...(!filters.status && statusView === "walkins" && { status: "WALK-IN COMPLETED" }),
+      ...(!filters.status && statusView === "admissions" && { status: "ADMISSION DONE" }),
       ...(filters.source && { source: filters.source }),
+      ...(filters.leadOwner && { leadOwner: filters.leadOwner }),
       ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
       ...(filters.dateTo && { dateTo: filters.dateTo }),
+      ...(filters.search && { search: filters.search }),
+      ...(filters.showArchived && { includeArchived: "true" }),
     });
     try {
       const response = await fetch(`/api/walkin/leads/export?${params}`, {
@@ -570,9 +608,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-
-  const inputCls = "px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white";
-  const selectCls = `${inputCls} pr-7`;
 
   // Branch options filtered by brand
   const branchOptions = lookups?.branches.filter(b => !filters.brand || b.brand === filters.brand) ?? [];
@@ -598,106 +633,158 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     setArchiveLead(null);
   };
 
-  const fmtDate = (d: string | null) => d ? d.replace(/^\d{4}-/, "").replace("-", "/") : "—";
+  const fmtDate = (d: string | null | undefined) => d ? d.replace(/^\d{4}-/, "").replace("-", "/") : "—";
+  const inputCls = "px-3 py-2.5 rounded-lg border border-[#d6dfeb] text-sm text-[#243651] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 bg-white";
+  const selectCls = `${inputCls} pr-8`;
+  const selectedSegment = statusView;
+  const setSegment = (view: typeof statusView) => {
+    setStatusView(view);
+    setFilters(f => ({ ...f, status: "" }));
+    setPage(1);
+  };
 
   return (
-    <div className="min-h-screen" style={{ background: "#f1f5f9" }}>
+    <div className="min-h-[100dvh] text-[#20334f]" style={{ background: "#f3f6fa" }}>
       {/* Top bar */}
-      <div className="text-white py-3 px-5 flex flex-wrap items-center justify-between gap-3 border-b-4 border-amber-400" style={{ background: NAVY }}>
+      <div className="text-white py-4 px-4 sm:px-7 flex flex-wrap items-center justify-between gap-4 border-b-[3px] border-[#f4b53f]" style={{ background: NAVY }}>
         <div className="flex items-center gap-3">
-          <img src="/images/ris-logo-2.png" alt="" style={{ height: 36, width: "auto", flexShrink: 0 }} />
+          <img src="/images/ris-logo-2.png" alt="Rainbow International School" style={{ height: 42, width: "auto", flexShrink: 0 }} />
           <div>
-            <div className="font-black text-base leading-tight">Walk-in Leads</div>
-            <div className="text-[11px] text-blue-200">AY 2027-28 · Admin · {total} total</div>
+            <div className="font-black text-lg leading-tight tracking-tight">Walk-in Leads</div>
+            <div className="text-xs text-blue-200 mt-1">AY 2027–28 <span aria-hidden="true">/</span> Admissions operations</div>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
           <button
             onClick={() => fetchLeads(page, filters)}
-            className="px-3 py-1.5 rounded bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300"
+            className="px-4 py-2 rounded-lg bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >Refresh</button>
           <button
             onClick={downloadExport}
-            className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10"
-          >⬇ Export CSV</button>
-          <a href="/admin/ras" className="px-3 py-1.5 rounded border border-white/30 text-white/80 hover:bg-white/10">← Admin</a>
+            className="px-4 py-2 rounded-lg border border-white/30 text-white/90 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >Export</button>
+          <a href="/admin/ras" className="px-4 py-2 rounded-lg border border-white/30 text-white/90 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Admin</a>
           <button
             onClick={onLogout}
-            className="px-3 py-1.5 rounded border border-white/30 text-white/60 hover:bg-white/10"
+            className="px-4 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >Lock</button>
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white border-b border-slate-200 px-5 py-3">
-        <div className="flex flex-wrap gap-2 items-end">
-          <select className={selectCls} value={filters.brand} onChange={e => applyFilter("brand", e.target.value)}>
-            <option value="">All Brands</option>
-            <option value="RIS">RIS</option>
-            <option value="RPS">RPS</option>
-          </select>
-          <select className={selectCls} value={filters.branchId} onChange={e => applyFilter("branchId", e.target.value)}>
-            <option value="">All Branches</option>
-            {branchOptions.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </select>
-          <select className={selectCls} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
-            <option value="">All Statuses</option>
-            {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
-          </select>
-          <select className={selectCls} value={filters.source} onChange={e => applyFilter("source", e.target.value)}>
-            <option value="">All Sources</option>
-            {availableSources.map(source => <option key={source.toLowerCase()} value={source}>{source}</option>)}
-          </select>
-          <select className={selectCls} value={filters.leadOwner} onChange={e => applyFilter("leadOwner", e.target.value)}>
-            <option value="">All Owners</option>
-            {ownerOptions.map(o => <option key={o} value={o}>{o}</option>)}
-          </select>
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500">From</span>
-            <input type="date" className={inputCls} value={filters.dateFrom} onChange={e => applyFilter("dateFrom", e.target.value)} />
+      <main className="max-w-[1680px] mx-auto px-4 sm:px-7 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+          <div>
+            <p className="text-[11px] font-bold tracking-[.16em] uppercase text-[#74839a]">Enquiry desk</p>
+            <h1 className="text-2xl sm:text-[30px] font-bold tracking-tight text-[#172945] mt-1">Parent enquiries</h1>
+            <p className="text-sm text-[#6c7d94] mt-1">{total.toLocaleString()} records in this view <span className="mx-1 text-[#c0c9d5]">/</span> updates are audit-logged</p>
           </div>
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-slate-500">To</span>
-            <input type="date" className={inputCls} value={filters.dateTo} onChange={e => applyFilter("dateTo", e.target.value)} />
+          <div className="flex items-center gap-2 rounded-xl bg-white border border-[#dfe6ee] p-1.5 self-start" aria-label="Brand scope">
+            {access === "GROUP" ? (
+              <>
+                {[["", "All brands"], ["RIS", "RIS"], ["RPS", "RPS"]].map(([value, label]) => (
+                  <button key={value} onClick={() => { applyFilter("brand", value); applyFilter("branchId", ""); }}
+                    aria-pressed={filters.brand === value}
+                    className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${filters.brand === value ? "bg-[#091a4f] text-white shadow-sm" : "text-[#596a81] hover:bg-[#f0f4f8]"}`}>
+                    {label}
+                  </button>
+                ))}
+              </>
+            ) : (
+              <span className="px-3 py-2 text-sm font-semibold text-[#263b59]">{access ? `${access} enquiries` : "Checking access…"}</span>
+            )}
           </div>
-          <input
-            type="text"
-            className={`${inputCls} w-48`}
-            placeholder="Search name or phone…"
-            value={filters.search}
-            onChange={e => applyFilter("search", e.target.value)}
-          />
-          <label className="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filters.showArchived}
-              onChange={e => applyFilter("showArchived", e.target.checked)}
-              className="rounded"
-            />
-            Show archived
-          </label>
-          {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
-            <button
-              onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); }}
-              className="text-xs text-amber-600 font-semibold underline"
-            >Clear filters</button>
-          )}
         </div>
-      </div>
 
+        <section className="rounded-2xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-5 overflow-hidden" aria-label="Lead views and filters">
+          <div className="flex gap-1 overflow-x-auto px-3 sm:px-5 pt-3 border-b border-[#e9eef3]" role="tablist" aria-label="Lead status views">
+            {([
+              ["all", "All enquiries"], ["booked", "Booked"], ["walkins", "Walk-ins"], ["admissions", "Admissions"],
+            ] as const).map(([value, label]) => (
+              <button key={value} type="button" role="tab" aria-selected={selectedSegment === value}
+                onClick={() => setSegment(value)}
+                className={`flex items-center gap-2 whitespace-nowrap px-3 sm:px-4 py-3 text-sm font-semibold border-b-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${selectedSegment === value ? "border-[#f2b63f] text-[#172945]" : "border-transparent text-[#718198] hover:text-[#243956]"}`}>
+                {label}
+                {value === "all" && <span className={`min-w-6 text-center rounded-full px-1.5 py-0.5 text-[11px] tabular-nums ${selectedSegment === value ? "bg-[#fff1d0] text-[#8b5c00]" : "bg-[#f0f3f7] text-[#74839a]"}`}>{total}</span>}
+              </button>
+            ))}
+          </div>
+          <div className="p-4 sm:p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <label className="sm:col-span-2 xl:col-span-1">
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Search enquiries</span>
+                <input type="search" aria-label="Search by parent, child, or phone" className={`${inputCls} w-full`} placeholder="Parent, child, or phone"
+                  value={filters.search} onChange={e => applyFilter("search", e.target.value)} />
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Branch</span>
+                <select aria-label="Filter by branch" className={`${selectCls} w-full`} value={filters.branchId} onChange={e => applyFilter("branchId", e.target.value)}>
+                  <option value="">All branches</option>
+                  {branchOptions.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Status</span>
+                <select aria-label="Filter by status" className={`${selectCls} w-full`} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
+                  <option value="">All statuses in view</option>
+                  {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry source</span>
+                <select aria-label="Filter by source" className={`${selectCls} w-full`} value={filters.source} onChange={e => applyFilter("source", e.target.value)}>
+                  <option value="">All sources</option>
+                  {availableSources.map(source => <option key={source.toLowerCase()} value={source}>{source}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Lead owner</span>
+                <select aria-label="Filter by lead owner" className={`${selectCls} w-full`} value={filters.leadOwner} onChange={e => applyFilter("leadOwner", e.target.value)}>
+                  <option value="">All owners</option>
+                  {ownerOptions.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry date from</span>
+                <input aria-label="Enquiry date from" type="date" className={`${inputCls} w-full`} value={filters.dateFrom} onChange={e => applyFilter("dateFrom", e.target.value)} />
+              </label>
+              <label>
+                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry date to</span>
+                <input aria-label="Enquiry date to" type="date" className={`${inputCls} w-full`} value={filters.dateTo} onChange={e => applyFilter("dateTo", e.target.value)} />
+              </label>
+              <div className="flex flex-wrap items-end justify-between gap-3 sm:col-span-2 xl:col-span-2">
+                <label className="inline-flex items-center gap-2 text-sm text-[#53657d] cursor-pointer min-h-11">
+                  <input aria-label="Include archived leads" type="checkbox" checked={filters.showArchived}
+                    onChange={e => applyFilter("showArchived", e.target.checked)} className="h-4 w-4 rounded border-[#bdc9d8] accent-[#091a4f] focus-visible:ring-2 focus-visible:ring-amber-400" />
+                  Include archived
+                </label>
+                {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
+                  <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: access === "GROUP" ? "" : access || "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
+                    className="text-sm font-semibold text-[#966000] underline underline-offset-4 hover:text-[#654100] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                    Clear filters
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
       {/* Table */}
-      <div className="px-5 py-4">
+      <section className="pb-8" aria-label="Lead records">
         {error && (
-          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="mb-4 rounded-xl bg-[#fff0ed] border border-[#f1c2b8] px-4 py-3 text-sm text-[#963c2d]" role="alert">
+            <div className="flex items-center justify-between gap-3">
+              <span>{error}</span>
+              <button type="button" onClick={() => access ? fetchLeads(page, filters) : void fetchPageAccess().catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not confirm your brand access."))} className="font-semibold underline underline-offset-4">Retry</button>
+            </div>
+          </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="hidden md:block bg-white rounded-2xl shadow-[0_5px_20px_rgba(27,49,79,.04)] border border-[#dfe6ee] overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-xs">
+            <table className="w-full min-w-[1420px] text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wide">
+                <tr className="border-b border-[#e5ebf1] bg-[#f7f9fb] text-[#718198] uppercase text-[10px] tracking-[.1em]">
                   <th className="text-left px-3 py-3 font-semibold">#</th>
-                  <th className="text-left px-3 py-3 font-semibold">Date</th>
+                  <th className="text-left px-3 py-3 font-semibold">Enquiry date</th>
                   <th className="text-left px-3 py-3 font-semibold">Brand</th>
                   <th className="text-left px-3 py-3 font-semibold">Branch</th>
                   <th className="text-left px-3 py-3 font-semibold">Parent</th>
@@ -708,16 +795,27 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   <th className="text-left px-3 py-3 font-semibold">Status</th>
                   <th className="text-left px-3 py-3 font-semibold">Owner</th>
                   <th className="text-left px-3 py-3 font-semibold">Walk-in</th>
+                  <th className="text-left px-3 py-3 font-semibold">Admission date</th>
                   <th className="text-left px-3 py-3 font-semibold">Updated</th>
                   <th className="text-right px-3 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
-                  <tr><td colSpan={14} className="text-center py-12 text-slate-400">Loading…</td></tr>
+                  <>
+                    {Array.from({ length: 6 }, (_, row) => (
+                      <tr key={row} aria-hidden="true" className="border-b border-[#eff2f6] animate-pulse">
+                        {Array.from({ length: 15 }, (_, column) => (
+                          <td key={column} className="px-3 py-4">
+                            <div className={`h-2.5 rounded bg-[#e8edf3] ${column === 4 || column === 5 ? "w-20" : "w-12"}`} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </>
                 )}
                 {!loading && leads.length === 0 && (
-                  <tr><td colSpan={14} className="text-center py-12 text-slate-400">No leads found</td></tr>
+                  <tr><td colSpan={15} className="text-center py-12 text-[#76869a]">No leads found. Try widening your search or clearing a filter.</td></tr>
                 )}
                 {!loading && leads.map((lead, i) => {
                    const branchName = lead.branchName || lookups?.branches.find(b => b.id === lead.branchId)?.name;
@@ -725,7 +823,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   return (
                     <tr
                       key={lead.id}
-                      className={`border-b border-slate-50 hover:bg-slate-50/80 transition-colors ${lead.isArchived ? "opacity-50" : ""}`}
+                      className={`border-b border-[#eff2f6] hover:bg-[#f8fafc] transition-colors ${lead.isArchived ? "opacity-50" : ""}`}
                     >
                       <td className="px-3 py-2.5 text-slate-400 tabular-nums">{rowNum}</td>
                       <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{lead.enquiryDate}</td>
@@ -744,7 +842,8 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         <StatusBadge status={lead.status} archived={lead.isArchived} />
                       </td>
                       <td className="px-3 py-2.5 text-slate-600 max-w-[80px] truncate">{lead.leadOwner || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{fmtDate(lead.walkInDate)}</td>
+                      <td className="px-3 py-2.5 text-[#596b83] whitespace-nowrap">{fmtDate(lead.walkInDate)}</td>
+                      <td className="px-3 py-2.5 text-[#596b83] whitespace-nowrap">{fmtDate(lead.admissionDate)}</td>
                       <td className="px-3 py-2.5 text-slate-400 whitespace-nowrap">
                         {new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
@@ -753,19 +852,22 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                           {!lead.isArchived && !lead.readOnly && (
                             <button
                               onClick={() => setEditLead(lead)}
-                              className="px-2.5 py-1 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                              aria-label={`Edit ${lead.parentName}'s enquiry`}
+                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#edf3fb] text-[#244e83] hover:bg-[#dce9f8] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
                             >Edit</button>
                           )}
                           {!lead.readOnly && (
                             <button
                               onClick={() => setHistoryLead(lead)}
-                              className="px-2.5 py-1 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                              aria-label={`View history for ${lead.parentName}'s enquiry`}
+                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#f0f3f6] text-[#52657d] hover:bg-[#e4eaf0] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
                             >History</button>
                           )}
                           {!lead.isArchived && !lead.readOnly && (
                             <button
                               onClick={() => setArchiveLead(lead)}
-                              className="px-2.5 py-1 rounded text-[10px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition"
+                              aria-label={`Archive ${lead.parentName}'s enquiry`}
+                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#fff0ed] text-[#a34032] hover:bg-[#ffe2dc] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
                             >Archive</button>
                           )}
                           {lead.readOnly && (
@@ -781,10 +883,54 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
               </tbody>
             </table>
           </div>
+        </div>
 
-          {/* Pagination */}
+        {/* Mobile list */}
+        <div className="md:hidden space-y-3">
+          {loading && Array.from({ length: 3 }, (_, index) => (
+            <div key={index} aria-hidden="true" className="h-44 rounded-2xl border border-[#e1e8ef] bg-white animate-pulse" />
+          ))}
+          {!loading && leads.length === 0 && (
+            <div className="rounded-2xl border border-[#dfe6ee] bg-white px-5 py-10 text-center">
+              <p className="font-semibold text-[#253a58]">No enquiries match</p>
+              <p className="mt-1 text-sm text-[#75849a]">Adjust your filters or start with all enquiries.</p>
+              <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: access === "GROUP" ? "" : access || "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
+                className="mt-4 text-sm font-semibold text-[#8a5a00] underline underline-offset-4">Clear filters</button>
+            </div>
+          )}
+          {!loading && leads.map((lead, i) => {
+            const branchName = lead.branchName || lookups?.branches.find(b => b.id === lead.branchId)?.name;
+            const rowNum = (page - 1) * PAGE_SIZE + i + 1;
+            return (
+              <article key={lead.id} className={`rounded-2xl bg-white border border-[#dfe6ee] p-4 shadow-[0_3px_12px_rgba(27,49,79,.035)] ${lead.isArchived ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] text-[#8090a4]">Enquiry {rowNum} <span className="mx-1">/</span> {lead.enquiryDate}</p>
+                    <h2 className="mt-1 font-bold text-[#1b304d] truncate">{lead.parentName || "Parent not recorded"}</h2>
+                    <p className="text-sm text-[#66778d]">{lead.childName || "Child not recorded"} <span className="mx-1 text-[#c4ccd6]">/</span> {lead.program}</p>
+                  </div>
+                  <StatusBadge status={lead.status} archived={lead.isArchived} />
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4 pt-3 border-t border-[#edf1f5] text-sm">
+                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Phone</div><div className="mt-0.5 font-medium text-[#334a68]">{lead.phone || "Not provided"}</div></div>
+                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Branch / owner</div><div className="mt-0.5 text-[#52657d] truncate">{branchName || "Unassigned"} / {lead.leadOwner || "Unassigned"}</div></div>
+                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Walk-in date</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.walkInDate)}</div></div>
+                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Admission date</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.admissionDate)}</div></div>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-[#edf1f5]">
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.parentName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
+                  {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.parentName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.parentName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
+                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record</span>}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {/* Pagination */}
           {total > PAGE_SIZE && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100 bg-slate-50">
+            <div className="flex items-center justify-between px-4 py-3 mt-3 rounded-xl border border-[#dfe6ee] bg-white">
               <div className="text-xs text-slate-500">
                 {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
               </div>
@@ -793,23 +939,22 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="px-3 py-1.5 rounded text-xs font-medium border border-slate-200 disabled:opacity-40 hover:bg-white transition"
-                >← Prev</button>
-                <span className="px-3 text-xs text-slate-600">Page {page} / {totalPages}</span>
+                 >Previous</button>
+                 <span className="px-3 text-xs text-slate-600">Page {page} of {totalPages}</span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="px-3 py-1.5 rounded text-xs font-medium border border-slate-200 disabled:opacity-40 hover:bg-white transition"
-                >Next →</button>
+                 >Next</button>
               </div>
             </div>
           )}
-        </div>
-
         {/* Footer note */}
-        <div className="mt-3 text-[11px] text-slate-400 text-center">
+        <div className="mt-4 text-xs text-[#8795a7] text-center">
           Showing {leads.length} of {total} leads · AY 2027-28 · Changes are audit-logged
         </div>
-      </div>
+      </section>
+      </main>
 
       {/* Overlays */}
       {editLead && lookups && (
