@@ -37,9 +37,7 @@ import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
 import { createWalkinPageSession, hasWalkinPageSession, isWalkinPageAuthorized, type WalkinPageScope } from "./walkinPageAuth";
 import {
-  mergeLeadAndWalkinRows,
-  readMarketing2728Supplement,
-  supplementLeadKey,
+  readBranchWalkinsOnly,
 } from "./marketing2728Sheets";
 import { previewCrmImport, applyCrmImport } from "./walkinCrmImport";
 import {
@@ -533,41 +531,7 @@ export function registerWalkinRoutes(app: Express) {
       const SIZE = Math.min(200, Math.max(1, parseInt(pageSize, 10)));
       const OFFSET = (PAGE - 1) * SIZE;
 
-      const conditions: any[] = [eq(walkinLeads.academicYear, "2027-28")];
-      if (brand) conditions.push(eq(walkinLeads.brand, brand));
-      if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
-      if (status) conditions.push(eq(walkinLeads.status, status));
-      if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
-      if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
-      if (dateTo) conditions.push(lte(walkinLeads.enquiryDate, dateTo));
-      if (!includeArchived || includeArchived !== "true") {
-        conditions.push(eq(walkinLeads.isArchived, false));
-      }
-      if (phoneQ) {
-        try {
-          const norm = normalizePhoneOrThrow(phoneQ);
-          conditions.push(eq(walkinLeads.phone, norm));
-        } catch {
-          // raw search fallback
-          conditions.push(ilike(walkinLeads.phone, `%${phoneQ}%`));
-        }
-      }
-      if (search) {
-        conditions.push(
-          or(
-            ilike(walkinLeads.parentName, `%${search}%`),
-            ilike(walkinLeads.childName, `%${search}%`),
-            ilike(walkinLeads.phone, `%${search}%`),
-          ),
-        );
-      }
-
-      const where = conditions.length ? and(...conditions) : undefined;
-
-      const [databaseRows, allDatabaseRows, branchRows] = await Promise.all([
-        db.select().from(walkinLeads)
-          .where(where)
-          .orderBy(desc(walkinLeads.createdAt)),
+      const [allDatabaseRows, branchRows] = await Promise.all([
         db.select().from(walkinLeads).where(eq(walkinLeads.academicYear, "2027-28")),
         db.select().from(walkinBranches),
       ]);
@@ -590,9 +554,9 @@ export function registerWalkinRoutes(app: Express) {
         return matches.size === 1 ? [...matches.values()][0] : null;
       };
 
-      // Tracker rows are read-only unless the matching WALKINs row already
-      // carries the imported CRM record's ID. This prevents pre-visit enquiries
-      // from being treated as editable walk-in records.
+      // Only an actual RIS/RPS WALKINs row may appear in this temporary view.
+      // DB leads (including imported tracker enquiries) are identity/edit metadata,
+      // not an additional source of rows.
       const databaseById = new Map(allDatabaseRows.map(row => [row.id, row]));
       const requestedBrands: Array<"RIS" | "RPS"> = brand === "RIS" || brand === "RPS"
         ? [brand]
@@ -600,43 +564,39 @@ export function registerWalkinRoutes(app: Express) {
       const supplements = await Promise.all(
         requestedBrands.map(async supplementBrand => ({
           brand: supplementBrand,
-          result: await readMarketing2728Supplement(supplementBrand),
+           result: await readBranchWalkinsOnly(supplementBrand),
         })),
       );
 
       const normalizedPhoneQuery = phoneQ?.replace(/\D/g, "").slice(-10);
       const searchLower = search?.trim().toLowerCase();
-      const representedDatabaseIds = new Set<string>();
       const sourceWarnings = supplements
         .filter(({ result }) => !result.available || result.mode === "public")
         .map(({ brand: supplementBrand, result }) =>
           result.available
-            ? `${supplementBrand} is using a public read-only fallback; source row references cannot be verified`
-            : `${supplementBrand} source unavailable${result.warning ? `: ${result.warning}` : ""}`);
-      const supplementalRows = supplements.flatMap(({ brand: supplementBrand, result }) =>
-        mergeLeadAndWalkinRows(result.leads, result.walkins ?? [])
+            ? `${supplementBrand} WALKINs is using a public read-only fallback; source row references cannot be verified`
+            : `${supplementBrand} WALKINs unavailable${result.warning ? `: ${result.warning}` : ""}`);
+      const walkinRows = supplements.flatMap(({ brand: supplementBrand, result }) => {
+        const visits = result.walkins;
+        const identityCounts = new Map<string, number>();
+        for (const visit of visits) {
+          const child = normalizedBranchIdentity(visit.childName);
+          if (/^\d{10}$/.test(visit.phone) && child) {
+            const key = `${visit.phone}|${child}`;
+            identityCounts.set(key, (identityCounts.get(key) ?? 0) + 1);
+          }
+        }
+        return visits
           .map((lead, leadIndex) => {
-            const identity = `${supplementBrand}|${supplementLeadKey(lead)}`;
-            const hasCrmEnquiry = lead.sourceLocations?.some(location => location.startsWith("CRM Leads Tracker")) ?? false;
-            const hasWalkin = lead.sourceLocations?.some(location => location.startsWith("WALKINs")) ?? false;
-            const canMatchImportedRecord = hasCrmEnquiry && /^\d{10}$/.test(lead.phone) && Boolean(lead.childName.trim());
-            const importedId = canMatchImportedRecord
-              ? `crm-${createHash("sha256").update(identity).digest("hex")}`
-              : null;
-            const importedRecord = importedId ? databaseById.get(importedId) : undefined;
             const sheetLinkedRecord = lead.leadId ? databaseById.get(lead.leadId) : undefined;
             const linkedRecord = sheetLinkedRecord?.brand === supplementBrand
               && sheetLinkedRecord.phone.replace(/\D/g, "").slice(-10) === lead.phone
               && normalizedBranchIdentity(sheetLinkedRecord.childName) === normalizedBranchIdentity(lead.childName)
               ? sheetLinkedRecord
-              : !hasWalkin ? importedRecord : undefined;
-            if (linkedRecord) representedDatabaseIds.add(linkedRecord.id);
-            if (importedId && (!lead.leadId || lead.leadId === importedId)) {
-              representedDatabaseIds.add(importedId);
-            }
+              : undefined;
             const rowId = linkedRecord?.id
-              ?? `crm-${createHash("sha256")
-                .update(`${identity}|${lead.sourceLocations?.join("|") || leadIndex}`)
+              ?? `visit-${createHash("sha256")
+                .update(`${supplementBrand}|${lead.sourceLocations?.join("|") || leadIndex}|${lead.phone}|${lead.childName}`)
                 .digest("hex").slice(0, 20)}`;
             const timestamp = `${lead.enquiryDate}T00:00:00.000Z`;
             const branch = findSupplementBranch(supplementBrand, lead.branchName);
@@ -649,33 +609,33 @@ export function registerWalkinRoutes(app: Express) {
               academicYear: "2027-28",
               enquiryDate: lead.enquiryDate,
               monthLabel: lead.monthLabel,
-              parentName: lead.parentName || linkedRecord?.parentName || "",
+              parentName: lead.parentName || "",
               motherName: linkedRecord?.motherName ?? null,
-              childName: lead.childName || linkedRecord?.childName || "",
-              phone: lead.phone || linkedRecord?.phone || "",
+              childName: lead.childName || "",
+              phone: lead.phone || "",
               altPhone: linkedRecord?.altPhone ?? null,
               email: linkedRecord?.email ?? null,
-              program: lead.program || linkedRecord?.program || "",
-              source: normalizeWalkinLeadSource(lead.source || linkedRecord?.source || "Unknown"),
-              status: lead.status || linkedRecord?.status || "OPEN",
-              closeReason: lead.closeReason || linkedRecord?.closeReason || null,
-              remark: lead.remark || linkedRecord?.remark || null,
-              leadOwner: lead.leadOwner || linkedRecord?.leadOwner || null,
-              walkInDate: lead.walkInDate || linkedRecord?.walkInDate || null,
+              program: lead.program || "",
+              source: normalizeWalkinLeadSource(lead.source || "Unknown"),
+              status: lead.status || "OPEN",
+              closeReason: lead.closeReason || null,
+              remark: lead.remark || null,
+              leadOwner: lead.leadOwner || null,
+              walkInDate: lead.walkInDate || null,
               admissionDate: linkedRecord?.admissionDate ?? null,
               revisitDate: linkedRecord?.revisitDate ?? null,
               revisitDate2: linkedRecord?.revisitDate2 ?? null,
-              misCallingRemarks: lead.misCallingRemarks || linkedRecord?.misCallingRemarks || null,
+              misCallingRemarks: lead.misCallingRemarks || null,
               seqNum: linkedRecord?.seqNum ?? 0,
               brandSeqNum: linkedRecord?.brandSeqNum ?? null,
               isArchived: linkedRecord?.isArchived ?? false,
-              createdBy: linkedRecord?.createdBy ?? "crm-supplement",
+              createdBy: linkedRecord?.createdBy ?? "sheet-walkin",
               updatedBy: linkedRecord?.updatedBy ?? null,
               createdAt: linkedRecord?.createdAt ?? timestamp,
               updatedAt: linkedRecord?.updatedAt ?? timestamp,
               readOnly: !linkedRecord,
-              needsVisitLink: hasWalkin && !linkedRecord,
-              matchNeedsReview: lead.matchNeedsReview ?? false,
+              needsVisitLink: !linkedRecord,
+              matchNeedsReview: (identityCounts.get(`${lead.phone}|${normalizedBranchIdentity(lead.childName)}`) ?? 0) > 1,
             };
           })
           .filter(lead => {
@@ -689,12 +649,10 @@ export function registerWalkinRoutes(app: Express) {
           .filter(lead => !dateTo || lead.enquiryDate <= dateTo)
           .filter(lead => !normalizedPhoneQuery || lead.phone.includes(normalizedPhoneQuery))
           .filter(lead => !searchLower || [lead.parentName, lead.childName, lead.phone]
-            .some(value => value.toLowerCase().includes(searchLower))));
+            .some(value => value.toLowerCase().includes(searchLower)));
+      });
 
-      const allCombinedRows = [
-        ...databaseRows.filter(row => !representedDatabaseIds.has(row.id)),
-        ...supplementalRows,
-      ]
+      const allCombinedRows = walkinRows
         .map(row => ({ ...row, source: normalizeWalkinLeadSource(row.source) }))
         .sort((a, b) => b.enquiryDate.localeCompare(a.enquiryDate));
       const availableSources = [...new Map(
@@ -711,7 +669,7 @@ export function registerWalkinRoutes(app: Express) {
 
       return {
         leads: rows, allRows: combinedRows, total, page: PAGE, pageSize: SIZE, availableSources,
-        warning: sourceWarnings.length ? `Some marketing lead data is incomplete: ${sourceWarnings.join("; ")}` : undefined,
+        warning: sourceWarnings.length ? `Some WALKINs data is incomplete: ${sourceWarnings.join("; ")}` : undefined,
       };
   };
 

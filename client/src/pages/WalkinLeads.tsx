@@ -897,11 +897,11 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           <img src="/images/ris-logo-2.png" alt="Rainbow International School" style={{ height: 42, width: "auto", flexShrink: 0 }} />
           <div>
             <div className="font-black text-lg leading-tight tracking-tight">Walk-in Leads</div>
-            <div className="text-xs text-blue-200 mt-1">AY 2027–28 <span aria-hidden="true">/</span> Admissions operations</div>
+            <div className="text-xs text-blue-200 mt-1">AY 2027–28 <span aria-hidden="true">/</span> RIS &amp; RPS WALKINs only</div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button onClick={() => setNewLeadOpen(true)} className="px-4 py-2 rounded-lg bg-white text-[#091a4f] font-bold hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">+ New lead</button>
+          <span className="px-3 py-2 rounded-lg bg-white/10 text-white/90 text-xs font-semibold" title="Only visits already recorded in RIS or RPS WALKINs appear in this view">Sheet-fed visits</span>
           <button
             onClick={() => { void fetchLeads(page, filters); void fetchReport(filters, groupBy); setRefreshVersion(value => value + 1); }}
             className="px-4 py-2 rounded-lg bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -1219,7 +1219,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
               <article key={lead.id} className={`rounded-2xl bg-white border border-[#dfe6ee] p-4 shadow-[0_3px_12px_rgba(27,49,79,.035)] ${lead.isArchived ? "opacity-60" : ""}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[11px] text-[#8090a4]">Enquiry {rowNum} <span className="mx-1">/</span> {lead.enquiryDate}</p>
+                    <p className="text-[11px] text-[#8090a4]">Visit {rowNum} <span className="mx-1">/</span> {lead.enquiryDate}</p>
                     <h2 className="mt-1 font-bold text-[#1b304d]">{lead.childName || "Child not recorded"}</h2>
                     {lead.matchNeedsReview && <p className="mt-1 text-[11px] font-semibold text-amber-800">Possible match · review</p>}
                     <p className="text-sm text-[#66778d]">{lead.program} <span className="mx-1 text-[#c4ccd6]">/</span> {lead.brand}</p>

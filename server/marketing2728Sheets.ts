@@ -43,6 +43,14 @@ export type SupplementResult = {
   warning?: string;
 };
 
+export type BranchWalkinsResult = {
+  walkins: SupplementLead[];
+  fetchedAt: string | null;
+  available: boolean;
+  mode: "oauth" | "public" | "unavailable";
+  warning?: string;
+};
+
 const SOURCES = {
   RPS: { spreadsheetId: "1cai6w40yIbCcAn6KvjrQomgu4BpBVh_yB00UqKaHEXA", dashboardGid: "853997856" },
   RIS: { spreadsheetId: "1YoMro8ypodwcleFc7PQ5JZ0FccycUm0h_VSeRxwpYhA", dashboardGid: "2097604776" },
@@ -449,6 +457,60 @@ async function readPublicCsv(brand: "RIS" | "RPS"): Promise<{ leads: string[][];
     dashboard: parseCsv(await dashboardResponse.text()),
     walkins: parseCsv(await walkinResponse.text()),
   };
+}
+
+export async function readBranchWalkinsOnly(brand: "RIS" | "RPS"): Promise<BranchWalkinsResult> {
+  if (process.env.NODE_ENV === "test") {
+    return { walkins: [], fetchedAt: null, available: false, mode: "unavailable" };
+  }
+
+  let rows: string[][];
+  let mode: BranchWalkinsResult["mode"] = "oauth";
+  let oauthWarning: string | undefined;
+  try {
+    const refreshToken = getGoogleRefreshToken();
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    if (!refreshToken || !clientId || !clientSecret) throw new Error("Google access is not configured");
+    const auth = new google.auth.OAuth2(clientId, clientSecret);
+    auth.setCredentials({ refresh_token: refreshToken });
+    const sheets = google.sheets({ version: "v4", auth });
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SOURCES[brand].spreadsheetId,
+      range: "'WALKINs'!A:Z",
+    });
+    rows = (response.data.values ?? []) as string[][];
+  } catch (error: any) {
+    oauthWarning = `Authenticated Sheet access failed: ${error?.message ?? "unknown error"}`;
+    try {
+      const source = SOURCES[brand];
+      const base = `https://docs.google.com/spreadsheets/d/${source.spreadsheetId}/gviz/tq`;
+      const response = await fetch(`${base}?tqx=out:csv&sheet=${encodeURIComponent("WALKINs")}`);
+      if (!response.ok) throw new Error("WALKINs tab is not accessible");
+      rows = parseCsv(await response.text());
+      mode = "public";
+    } catch (publicError: any) {
+      return {
+        walkins: [], fetchedAt: null, available: false, mode: "unavailable",
+        warning: `${oauthWarning}; read-only fallback failed: ${publicError?.message ?? "unknown error"}`,
+      };
+    }
+  }
+
+  try {
+    const walkins = parseWalkinRows(rows);
+    // Public CSV may omit blank/title rows, so its row indexes are not reliable
+    // workbook coordinates.
+    if (mode === "public") {
+      for (const row of walkins) row.sourceLocations = ["WALKINs (public read)"];
+    }
+    return { walkins, fetchedAt: new Date().toISOString(), available: true, mode, warning: oauthWarning };
+  } catch (error: any) {
+    return {
+      walkins: [], fetchedAt: null, available: false, mode: "unavailable",
+      warning: `WALKINs data could not be parsed: ${error?.message ?? "unknown error"}`,
+    };
+  }
 }
 
 export async function readMarketing2728Supplement(brand: "RIS" | "RPS"): Promise<SupplementResult> {

@@ -1,5 +1,9 @@
 # Unified leads and completed walk-ins
 
+## Temporary operational scope (29 September 2026)
+
+Until the Master automations are reviewed, the Leads list, report and export show only rows fetched from the RIS and RPS WALKINs tabs. Do not fetch Master or CRM Tracker for this view. Existing CRM imports remain stored but are hidden rather than deleted. Master read/write sync is paused; restoring either source to this view requires a separate decision. The original approved combined-source behavior below remains the longer-term design, not the current view.
+
 ## Approved behavior
 
 The platform lists all leads. CRM Leads Tracker is a DM enquiry source; WALKINs is the record of completed visits, including visits whose later status becomes open or follow-up. Importing or editing a pre-visit DM enquiry must not create a WALKINs row.
