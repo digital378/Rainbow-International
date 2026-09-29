@@ -32,12 +32,13 @@ import express from "express";
 import type { AddressInfo } from "net";
 
 // ── Hoist mock refs ────────────────────────────────────────────────────────────
-const { mockDbSelect, mockDbUpdate, mockDbInsert, mockDbExecute } = vi.hoisted(
+const { mockDbSelect, mockDbUpdate, mockDbInsert, mockDbExecute, mockDbTransaction } = vi.hoisted(
   () => ({
     mockDbSelect: vi.fn(),
     mockDbUpdate: vi.fn(),
     mockDbInsert: vi.fn(),
     mockDbExecute: vi.fn(),
+    mockDbTransaction: vi.fn(),
   }),
 );
 
@@ -48,6 +49,7 @@ vi.mock("../server/db", () => ({
     update: mockDbUpdate,
     insert: mockDbInsert,
     execute: mockDbExecute,
+    transaction: mockDbTransaction,
   },
 }));
 
@@ -96,6 +98,8 @@ vi.mock("../server/walkinSheets", async () => {
 
 // ── Import route registration AFTER mocks ─────────────────────────────────────
 import { registerWalkinRoutes } from "../server/walkinRoutes";
+import { queueUpsert } from "../server/walkinSheets";
+import { walkinLeads } from "../shared/schema";
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -387,5 +391,74 @@ describe("Inactive counsellors hidden from the kiosk form", () => {
     expect(names).not.toContain("Carol Created");   // just deactivated
     expect(names).not.toContain("Bob Inactive");    // was already inactive
     expect(names).toContain("Alice Active");        // still active
+  });
+});
+
+describe("2027–28 contact checks block repeat walk-ins", () => {
+  const father = "9000000011";
+  const mother = "9000000022";
+  const payload = {
+    brand: "RPS", academicYear: "2027-28", enquiryDate: "2026-09-20",
+    parentName: "Test Father", motherName: "Test Mother", childName: "Test Child",
+    phone: father, altPhone: mother, program: "Nursery", source: "Walk-in",
+  };
+
+  function selectResults(rows: Array<{ id: string }>) {
+    mockDbSelect.mockImplementation(() => ({
+      from: () => ({ where: () => ({ orderBy: () => ({ limit: async () => rows }) }) }),
+    }));
+  }
+
+  it("returns only a boolean from the public lookup, including cross-school matches", async () => {
+    selectResults([{ id: "private-existing-lead-id" }]);
+    const res = await fetch(`${baseUrl}/api/walkin/leads/check-duplicate?phone=${father}&altPhone=${mother}&ay=2027-28`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ duplicate: true });
+  });
+
+  it("rejects a repeat at save time without inserting or revealing the matched record", async () => {
+    selectResults([{ id: "private-existing-lead-id" }]);
+    mockDbTransaction.mockImplementation(async (cb) => cb({
+      execute: vi.fn().mockResolvedValue({ rows: [] }),
+      select: mockDbSelect,
+      insert: mockDbInsert,
+    }));
+
+    const res = await fetch(`${baseUrl}/api/walkin/leads`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    expect(res.status).toBe(409);
+    const body = await res.json();
+    expect(body.duplicate).toBe(true);
+    expect(JSON.stringify(body)).not.toContain("private-existing-lead-id");
+    expect(mockDbInsert).not.toHaveBeenCalled();
+  });
+
+  it("saves all siblings in one transaction without self-blocking", async () => {
+    selectResults([]);
+    const storedChildren: string[] = [];
+    const txInsert = vi.fn((table) => ({
+      values: (values: { childName?: string }) => {
+        if (table !== walkinLeads) return Promise.resolve();
+        storedChildren.push(values.childName!);
+        return { returning: async () => [{ ...values, id: `test-${storedChildren.length}` }] };
+      },
+    }));
+    mockDbTransaction.mockImplementation(async (cb) => cb({
+      execute: vi.fn().mockResolvedValue({ rows: [{ brandSeqNum: "1" }] }),
+      select: mockDbSelect,
+      insert: txInsert,
+    }));
+
+    const res = await fetch(`${baseUrl}/api/walkin/leads`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, siblings: [{ name: "Test Sibling", program: "KG" }] }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.siblings).toHaveLength(1);
+    expect(storedChildren).toEqual(["Test Child", "Test Sibling"]);
+    expect(queueUpsert).toHaveBeenCalledTimes(2);
   });
 });

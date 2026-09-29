@@ -6,7 +6,7 @@
  *   POST /api/walkin/leads                — create a lead (kiosk form)
  *   GET  /api/walkin/leads                — list / search leads (admin only)
  *   GET  /api/walkin/leads/export         — .xlsx export of filtered leads (admin only)
- *   GET  /api/walkin/leads/check-duplicate — check if phone already exists for brand+AY
+ *   GET  /api/walkin/leads/check-duplicate — check either parent contact across brands within AY
  *   GET  /api/walkin/leads/:id            — get a single lead (admin only)
  *   PATCH /api/walkin/leads/:id           — update mutable fields (admin only)
  *   POST /api/walkin/leads/:id/archive    — soft-delete (admin only)
@@ -28,6 +28,7 @@ import {
   type WalkinLead,
 } from "@shared/schema";
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
+import { matchingParentContact, normalizeParentContacts } from "./walkinDuplicateContacts";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
 import * as XLSX from "xlsx";
 import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
@@ -109,6 +110,26 @@ function deriveMonthLabel(dateStr: string): string {
   return `${months[month]}-${String(year).padStart(2, "0")}`;
 }
 
+const duplicateLookupAttempts = new Map<string, { count: number; since: number }>();
+function limitDuplicateLookup(req: Request, res: Response, next: NextFunction) {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  if (duplicateLookupAttempts.size > 2_000) {
+    for (const [key, value] of duplicateLookupAttempts) {
+      if (now - value.since >= 60_000) duplicateLookupAttempts.delete(key);
+    }
+  }
+  const attempt = duplicateLookupAttempts.get(ip);
+  if (!attempt || now - attempt.since >= 60_000) {
+    duplicateLookupAttempts.set(ip, { count: 1, since: now });
+    return next();
+  }
+  if (++attempt.count > 60) {
+    return res.status(429).json({ message: "Too many contact checks. Please try again in a minute." });
+  }
+  next();
+}
+
 /** Write one audit log row */
 async function writeAudit(
   leadId: string,
@@ -168,6 +189,10 @@ const createLeadSchema = z.object({
     .or(z.literal(""))
     .transform((v) => v || undefined),
   createdBy: z.string().default("kiosk"),
+  siblings: z.array(z.object({
+    name: z.string().trim().min(2, "Sibling name is required"),
+    program: z.string().min(1, "Sibling program is required"),
+  })).max(8, "Add no more than 8 siblings").optional().default([]),
 });
 
 // Mutable fields only — brand, enquiryDate, createdBy are locked
@@ -338,40 +363,28 @@ export function registerWalkinRoutes(app: Express) {
   });
 
   // ── GET /api/walkin/leads/check-duplicate ─────────────────────
-  app.get("/api/walkin/leads/check-duplicate", async (req, res) => {
+  app.get("/api/walkin/leads/check-duplicate", limitDuplicateLookup, async (req, res) => {
     try {
       const phone = typeof req.query.phone === "string" ? req.query.phone : "";
-      const brand = typeof req.query.brand === "string" ? req.query.brand : "";
+      const altPhone = typeof req.query.altPhone === "string" ? req.query.altPhone : "";
       const ay = typeof req.query.ay === "string" ? req.query.ay : "2027-28";
 
-      if (!phone || !brand) {
-        return res.status(400).json({ message: "phone and brand are required" });
+      if (!phone && !altPhone) {
+        return res.status(400).json({ message: "A parent contact is required" });
       }
 
-      const normResult = normalizePhoneOrThrow(phone);
+      const phones = [phone, altPhone].filter(Boolean).map(normalizePhoneOrThrow);
+      if (phones.length === 2 && phones[0] === phones[1]) {
+        return res.status(400).json({ message: "Father's and mother's contacts must be different." });
+      }
       const [existing] = await db
-        .select({
-          id: walkinLeads.id,
-          enquiryDate: walkinLeads.enquiryDate,
-          program: walkinLeads.program,
-          branchId: walkinLeads.branchId,
-          status: walkinLeads.status,
-        })
+        .select({ id: walkinLeads.id })
         .from(walkinLeads)
-        .where(
-          and(
-            eq(walkinLeads.phone, normResult),
-            eq(walkinLeads.brand, brand),
-            eq(walkinLeads.academicYear, ay),
-            eq(walkinLeads.isArchived, false),
-          ),
-        )
+        .where(matchingParentContact(phones, ay))
+        .orderBy(desc(walkinLeads.createdAt))
         .limit(1);
 
-      if (existing) {
-        return res.json({ duplicate: existing });
-      }
-      res.json({ duplicate: null });
+      res.json({ duplicate: Boolean(existing) });
     } catch (err: any) {
       res.status(400).json({ message: err.message || "Check failed" });
     }
@@ -386,20 +399,12 @@ export function registerWalkinRoutes(app: Express) {
       }
       const data = parsed.data;
 
-      // Normalize phone
       let phone: string;
+      let altPhone: string;
       try {
-        phone = normalizePhoneOrThrow(data.phone);
+        ({ phone, altPhone } = normalizeParentContacts(data.phone, data.altPhone));
       } catch (e: any) {
         return res.status(400).json({ message: e.message });
-      }
-
-      // Normalize altPhone (now mandatory — store raw value if normalization fails)
-      let altPhone: string = data.altPhone;
-      try {
-        altPhone = normalizePhoneOrThrow(data.altPhone);
-      } catch {
-        // non-fatal: store raw value so the lead isn't lost
       }
 
       // Derive monthLabel
@@ -414,70 +419,73 @@ export function registerWalkinRoutes(app: Express) {
         return res.status(400).json({ message: "walkInDate is required for walk-in statuses" });
       }
 
-      // Check duplicate (non-blocking — just return info alongside the created lead)
-      const [existingDuplicate] = await db
-        .select({
-          id: walkinLeads.id,
-          enquiryDate: walkinLeads.enquiryDate,
-          program: walkinLeads.program,
-          status: walkinLeads.status,
-        })
-        .from(walkinLeads)
-        .where(
-          and(
-            eq(walkinLeads.phone, phone),
-            eq(walkinLeads.brand, data.brand),
-            eq(walkinLeads.academicYear, data.academicYear),
-            eq(walkinLeads.isArchived, false),
-          ),
-        )
-        .limit(1);
+      // Serialize competing submissions for either number, including cross-brand submissions.
+      const result = await db.transaction(async tx => {
+        for (const number of [phone, altPhone].sort()) {
+          await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${`walkin:${data.academicYear}:${number}`}, 0))`);
+        }
+        const [duplicate] = await tx
+          .select({ id: walkinLeads.id })
+          .from(walkinLeads)
+          .where(matchingParentContact([phone, altPhone], data.academicYear))
+          .orderBy(desc(walkinLeads.createdAt))
+          .limit(1);
+        if (duplicate) return { duplicate: true, leads: [] as WalkinLead[] };
 
-      // Fetch the next per-brand sequence number before inserting
-      const seqName = data.brand === "RIS" ? "walkin_ris_seq" : "walkin_rps_seq";
-      const seqResult = await db.execute<{ brandSeqNum: string }>(
-        sql`SELECT nextval(${seqName}) AS "brandSeqNum"`,
-      );
-      const brandSeqNum = Number(seqResult.rows[0]?.brandSeqNum);
-      if (!brandSeqNum) throw new Error(`Failed to fetch next sequence value for ${seqName}`);
+        const seqName = data.brand === "RIS" ? "walkin_ris_seq" : "walkin_rps_seq";
+        const leads: WalkinLead[] = [];
+        for (const child of [{ name: data.childName, program: data.program }, ...data.siblings]) {
+          const seqResult = await tx.execute<{ brandSeqNum: string }>(
+            sql`SELECT nextval(${seqName}) AS "brandSeqNum"`,
+          );
+          const brandSeqNum = Number(seqResult.rows[0]?.brandSeqNum);
+          if (!brandSeqNum) throw new Error(`Failed to fetch next sequence value for ${seqName}`);
+          const [lead] = await tx.insert(walkinLeads).values({
+            brand: data.brand,
+            branchId: data.branchId,
+            academicYear: data.academicYear,
+            enquiryDate: data.enquiryDate,
+            monthLabel,
+            parentName: data.parentName,
+            motherName: data.motherName,
+            childName: child.name,
+            phone,
+            altPhone,
+            email: data.email ? data.email.toLowerCase() : undefined,
+            program: child.program,
+            source: data.source,
+            status: data.status,
+            closeReason: data.closeReason,
+            remark: data.remark,
+            leadOwner: data.leadOwner,
+            walkInDate: data.walkInDate,
+            revisitDate: data.revisitDate,
+            createdBy: data.createdBy,
+            brandSeqNum,
+          }).returning();
+          await tx.insert(walkinLeadAuditLog).values({
+            leadId: lead.id,
+            field: "created",
+            oldValue: null,
+            newValue: JSON.stringify({ brand: lead.brand, phone, program: lead.program }),
+            changedBy: data.createdBy,
+          });
+          leads.push(lead);
+        }
+        return { duplicate: false, leads };
+      });
 
-      // Insert lead
-      const [lead] = await db
-        .insert(walkinLeads)
-        .values({
-          brand: data.brand,
-          branchId: data.branchId,
-          academicYear: data.academicYear,
-          enquiryDate: data.enquiryDate,
-          monthLabel,
-          parentName: data.parentName,
-          motherName: data.motherName,
-          childName: data.childName,
-          phone,
-          altPhone,
-          email: data.email ? data.email.toLowerCase() : undefined,
-          program: data.program,
-          source: data.source,
-          status: data.status,
-          closeReason: data.closeReason,
-          remark: data.remark,
-          leadOwner: data.leadOwner,
-          walkInDate: data.walkInDate,
-          revisitDate: data.revisitDate,
-          createdBy: data.createdBy,
-          brandSeqNum: Number(brandSeqNum),
-        })
-        .returning();
-
-      // Write audit row for creation
-      await writeAudit(lead.id, "created", null, JSON.stringify({ brand: lead.brand, phone, program: lead.program }), data.createdBy);
-
-      // Mirror to Google Sheets (fire-and-forget — never blocks the API response)
-      queueUpsert(lead.brand as "RIS" | "RPS", lead);
+      if (result.duplicate) {
+        return res.status(409).json({
+          message: "This parent contact already has a 2027–28 enquiry. Use the existing lead instead.",
+          duplicate: true,
+        });
+      }
+      for (const lead of result.leads) queueUpsert(lead.brand as "RIS" | "RPS", lead);
 
       res.status(201).json({
-        lead,
-        duplicate: existingDuplicate ?? null,
+        lead: result.leads[0],
+        siblings: result.leads.slice(1),
       });
     } catch (err: any) {
       console.error("[walkin/leads POST]", err?.message);

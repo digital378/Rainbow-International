@@ -59,13 +59,6 @@ type ConfirmedLead = {
   siblings?: Array<{ name: string; program: string }>;
 };
 
-type DuplicateInfo = {
-  id: string;
-  enquiryDate: string;
-  program: string;
-  status: string;
-};
-
 // ── Shared Helpers ────────────────────────────────────────────
 
 function today(): string {
@@ -234,9 +227,9 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const [remark, setRemark] = useState("");
 
   // ── Duplicate detection
-  const [duplicate, setDuplicate] = useState<DuplicateInfo | null>(null);
-  const [duplicateResolution, setDuplicateResolution] = useState<"none" | "continue" | "viewed">("none");
+  const [duplicate, setDuplicate] = useState(false);
   const [checkingDuplicate, setCheckingDuplicate] = useState(false);
+  const duplicateCheckId = useRef(0);
 
   // ── Siblings state (array — supports 0 or more additional children)
   const [siblings, setSiblings] = useState<Array<{ name: string; program: string }>>([]);
@@ -288,39 +281,48 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetToWelcome = useCallback(() => {
+    duplicateCheckId.current += 1;
     setScreen("form");
     // Reset form — never show previous parent's data
     setParentName(""); setMotherName(""); setChildName(""); setPhone(""); setPhoneError("");
     setAltPhone(""); setAltPhoneError(""); setEmail(""); setProgram(""); setSource("");
     setLeadOwner(""); setEnquiryDate(today()); setRemark("");
-    setDuplicate(null); setDuplicateResolution("none");
+    setDuplicate(false); setCheckingDuplicate(false);
     setSiblings([]);
     setSubmitError(""); setConfirmedLead(null);
     // Keep branch selection if URL-based, clear if manually chosen
     if (!branchCode) { setSelectedBranchId(null); setSelectedBranchName(""); }
   }, [branchCode]);
 
-  // ── Phone blur: normalize + duplicate check
-  const handlePhoneBlur = async () => {
-    if (!phone) return;
-    const result = normalizePhone(phone);
-    if ("error" in result) {
-      setPhoneError(result.error);
-      setDuplicate(null);
+  // ── Compare both contacts against either parent contact at both schools.
+  const handleContactBlur = async () => {
+    const checkId = ++duplicateCheckId.current;
+    const father = phone.trim() ? normalizePhone(phone) : null;
+    const mother = altPhone.trim() ? normalizePhone(altPhone) : null;
+    setPhoneError(father && "error" in father ? father.error : "");
+    setAltPhoneError(mother && "error" in mother ? mother.error : "");
+    setDuplicate(false);
+    if ((father && "error" in father) || (mother && "error" in mother)) return;
+    if (!father && !mother) return;
+    if (father && mother && father.normalized === mother.normalized) {
+      setAltPhoneError("Father's and mother's contacts must be different.");
       return;
     }
-    setPhoneError("");
-    // Duplicate check
     setCheckingDuplicate(true);
     try {
-      const res = await fetch(`/api/walkin/leads/check-duplicate?phone=${result.normalized}&brand=${brand}&ay=2027-28`);
+      const params = new URLSearchParams({ ay: "2027-28" });
+      if (father) params.set("phone", father.normalized);
+      if (mother) params.set("altPhone", mother.normalized);
+      const res = await fetch(`/api/walkin/leads/check-duplicate?${params}`);
+      if (!res.ok) throw new Error("Duplicate check failed");
       const data = await res.json();
-      setDuplicate(data.duplicate ?? null);
-      setDuplicateResolution("none");
+      if (duplicateCheckId.current === checkId) setDuplicate(data.duplicate === true);
     } catch {
-      // non-fatal
+      if (duplicateCheckId.current === checkId) {
+        setSubmitError("Could not check contacts yet. The form will check again when you save.");
+      }
     } finally {
-      setCheckingDuplicate(false);
+      if (duplicateCheckId.current === checkId) setCheckingDuplicate(false);
     }
   };
 
@@ -331,16 +333,19 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
     if (!parentName.trim() || parentName.trim().length < 2) return false;
     if (!motherName.trim() || motherName.trim().length < 2) return false;
     if (!childName.trim() || childName.trim().length < 2) return false;
-    if (!phone || !("normalized" in normalizePhone(phone))) return false;
+    const fatherResult = normalizePhone(phone);
+    if ("error" in fatherResult) return false;
     if (phoneError) return false;
-    if (!altPhone.trim()) return false;  // Mother Contact is mandatory
+    const motherResult = normalizePhone(altPhone);
+    if ("error" in motherResult) return false;
     if (altPhoneError) return false;
+    if (motherResult.normalized === fatherResult.normalized) return false;
     if (!program) return false;
     if (!source) return false;
     if (!leadOwner) return false;
     if (!enquiryDate) return false;
     if (enquiryDate > today()) return false;
-    if (duplicate && duplicateResolution === "none") return false;
+    if (duplicate || checkingDuplicate) return false;
     if (siblings.some(s => !s.name.trim() || s.name.trim().length < 2)) return false;
     if (siblings.some(s => !s.program)) return false;
     return true;
@@ -350,6 +355,12 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
   const handleSubmit = async () => {
     const phoneResult = normalizePhone(phone);
     if ("error" in phoneResult) { setPhoneError(phoneResult.error); return; }
+    const motherResult = normalizePhone(altPhone);
+    if ("error" in motherResult) { setAltPhoneError(motherResult.error); return; }
+    if (phoneResult.normalized === motherResult.normalized) {
+      setAltPhoneError("Father's and mother's contacts must be different.");
+      return;
+    }
     setSubmitting(true); setSubmitError("");
     try {
       const res = await fetch("/api/walkin/leads", {
@@ -372,38 +383,14 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
           remark: remark.trim() || undefined,
           status: "OPEN",
           createdBy: leadOwner || "kiosk",
-          _duplicateResolution: duplicateResolution !== "none" ? duplicateResolution : undefined,
+          siblings: siblings.map(s => ({ name: s.name.trim(), program: s.program })),
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setSubmitError(data.message || "Submission failed. Please try again."); return; }
-
-      // Submit one lead per sibling
-      for (const sib of siblings) {
-        if (!sib.name.trim() || !sib.program) continue;
-        await fetch("/api/walkin/leads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            brand,
-            branchId: selectedBranchId,
-            academicYear: "2027-28",
-            enquiryDate,
-            parentName: parentName.trim(),
-            motherName: motherName.trim(),
-            childName: sib.name.trim(),
-            phone,
-            altPhone: altPhone.trim(),
-            email: email.trim().toLowerCase() || undefined,
-            program: sib.program,
-            source,
-            leadOwner: leadOwner || undefined,
-            remark: remark.trim() || undefined,
-            status: "OPEN",
-            createdBy: leadOwner || "kiosk",
-            _duplicateResolution: "continue",
-          }),
-        });
+      if (!res.ok) {
+        if (res.status === 409 && data.duplicate) setDuplicate(true);
+        setSubmitError(data.message || "Submission failed. Please try again.");
+        return;
       }
 
       setConfirmedLead({
@@ -653,10 +640,11 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
             <button
               type="button"
               onClick={() => setSiblings(prev => [...prev, { name: "", program: "" }])}
+              disabled={siblings.length >= 8}
               className="flex items-center gap-2 text-sm font-semibold transition px-4 py-3 rounded-xl border-2 border-dashed w-full justify-center hover:opacity-80"
               style={{ borderColor: cfg.primary + "55", color: cfg.primary }}
             >
-              <span className="text-lg leading-none">+</span> Add Sibling Enquiry
+              <span className="text-lg leading-none">+</span> {siblings.length >= 8 ? "Maximum 8 siblings" : "Add Sibling Enquiry"}
             </button>
 
             {/* Father Contact + Mother Contact */}
@@ -669,8 +657,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                     type="tel"
                     autoComplete="off"
                     value={phone}
-                    onChange={e => { setPhone(e.target.value); setPhoneError(""); setDuplicate(null); setDuplicateResolution("none"); }}
-                    onBlur={handlePhoneBlur}
+                    onChange={e => { duplicateCheckId.current += 1; setPhone(e.target.value); setPhoneError(""); setDuplicate(false); setCheckingDuplicate(false); setSubmitError(""); }}
+                    onBlur={handleContactBlur}
                     placeholder="e.g. 9876543210"
                     className={`w-full pl-11 pr-4 py-4 rounded-xl border-2 text-base font-medium focus:outline-none transition
                       ${phoneError ? "border-red-400 bg-red-50" : "border-slate-200 focus:border-slate-500"}`}
@@ -687,7 +675,8 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
                     type="tel"
                     autoComplete="off"
                     value={altPhone}
-                    onChange={e => { setAltPhone(e.target.value); setAltPhoneError(""); }}
+                    onChange={e => { duplicateCheckId.current += 1; setAltPhone(e.target.value); setAltPhoneError(""); setDuplicate(false); setCheckingDuplicate(false); setSubmitError(""); }}
+                    onBlur={handleContactBlur}
                     placeholder="e.g. 9876543211"
                     className={`w-full pl-11 pr-4 py-4 rounded-xl border-2 text-base font-medium focus:outline-none transition
                       ${altPhoneError ? "border-red-400 bg-red-50" : "border-slate-200 focus:border-slate-500"}`}
@@ -698,34 +687,15 @@ export default function WalkinKiosk({ brand }: { brand: Brand }) {
             </div>
 
             {/* Duplicate warning */}
-            {duplicate && duplicateResolution === "none" && (
+            {duplicate && (
               <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-4">
-                <div className="flex gap-2 mb-3">
+                <div className="flex gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-amber-800">
-                    <strong>Duplicate detected</strong> — this phone already has an enquiry<br />
-                    on <strong>{formatDateDisplay(duplicate.enquiryDate)}</strong> for <strong>{duplicate.program}</strong> (Status: {duplicate.status}).
+                    <strong>Duplicate detected</strong> — this parent's contact already has a 2027–28 enquiry at RIS or RPS.
+                    {" "}Find and update the existing lead instead; this form cannot create another with the same contact.
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setDuplicateResolution("continue")}
-                    className="flex-1 py-2 rounded-lg text-sm font-bold border-2 border-amber-400 text-amber-800 hover:bg-amber-100 transition"
-                  >
-                    Continue Anyway
-                  </button>
-                  <button
-                    onClick={() => setDuplicateResolution("viewed")}
-                    className="flex-1 py-2 rounded-lg text-sm font-bold bg-amber-400 text-amber-900 hover:bg-amber-500 transition"
-                  >
-                    I've Reviewed — Proceed
-                  </button>
-                </div>
-              </div>
-            )}
-            {duplicate && duplicateResolution !== "none" && (
-              <div className="rounded-lg px-3 py-2 text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200">
-                ⚠ Duplicate acknowledged — continuing as new enquiry.
               </div>
             )}
 
