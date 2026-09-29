@@ -41,7 +41,7 @@ vi.mock("../server/marketing2728Sheets", () => ({
 
 import { registerWalkinRoutes } from "../server/walkinRoutes";
 import { createWalkinPageSession } from "../server/walkinPageAuth";
-import { walkinLeads } from "../shared/schema";
+import { walkinBranches, walkinLeads } from "../shared/schema";
 
 type Chunk = { name?: string; value?: unknown; queryChunks?: Chunk[] };
 
@@ -105,14 +105,29 @@ const databaseLeads = [
   },
 ];
 
+const branches = [
+  { id: 1, brand: "RIS", name: "RIS Main", code: "ris-main" },
+  { id: 2, brand: "RIS", name: "RIS Branch Two", code: "ris-two" },
+  { id: 1, brand: "RPS", name: "RPS Main", code: "rps-main" },
+  { id: 2, brand: "RPS", name: "RPS Branch Two", code: "rps-two" },
+];
+
 const supplements = {
   RIS: {
-    leads: [{
-      enquiryDate: "2026-09-20", monthLabel: "Sep-26", parentName: "RIS Supplement",
-      childName: "RIS CRM Student", phone: "9000000011", program: "Grade 3",
-      source: "Website", status: "FOLLOW-UP", leadOwner: "RIS Counsellor",
-      walkInDate: null, branchName: "RIS Main",
-    }],
+    leads: [
+      {
+        enquiryDate: "2026-09-20", monthLabel: "Sep-26", parentName: "RIS Supplement",
+        childName: "RIS CRM Student", phone: "9000000011", program: "Grade 3",
+        source: "Website", status: "FOLLOW-UP", leadOwner: "RIS Counsellor",
+        walkInDate: null, branchName: "RIS Main",
+      },
+      {
+        enquiryDate: "2026-09-18", monthLabel: "Sep-26", parentName: "RIS Branchless",
+        childName: "RIS Branchless Student", phone: "9000000013", program: "Grade 3",
+        source: "Website", status: "FOLLOW-UP", leadOwner: "RIS Counsellor",
+        walkInDate: null, branchName: "",
+      },
+    ],
     walkins: [],
   },
   RPS: {
@@ -120,30 +135,46 @@ const supplements = {
       enquiryDate: "2026-09-19", monthLabel: "Sep-26", parentName: "RPS Supplement",
       childName: "RPS CRM Student", phone: "9000000012", program: "Nursery",
       source: "Website", status: "FOLLOW-UP", leadOwner: "RPS Counsellor",
-      walkInDate: null, branchName: "RPS Main",
+      walkInDate: null, branchName: "RPS Branch Two",
     }],
-    walkins: [],
+    walkins: [
+      {
+        enquiryDate: "2026-09-19", monthLabel: "Sep-26", parentName: "",
+        childName: "RPS CRM Student", phone: "9000000012", program: "",
+        source: "", status: "", leadOwner: "",
+        walkInDate: null, branchName: "",
+      },
+      {
+        enquiryDate: "2026-09-17", monthLabel: "Sep-26", parentName: "RPS WALKIN Supplement",
+        childName: "RPS WALKIN Student", phone: "9000000014", program: "Nursery",
+        source: "Walk-in", status: "WALK-IN COMPLETED", leadOwner: "RPS Counsellor",
+        walkInDate: "2026-09-17", branchName: "RPS Main",
+      },
+    ],
   },
 };
 
 function mockDbRows() {
   mockSelect.mockImplementation(() => ({
-    from: (table: unknown) => ({
-      where: (condition: Chunk | undefined) => {
-        if (table !== walkinLeads) return Promise.resolve([]);
-        const requestedBrand = equalityValue(condition, "brand");
-        const requestedBranch = equalityValue(condition, "branch_id");
-        const rows = databaseLeads.filter((lead) =>
-          (requestedBrand === undefined || lead.brand === requestedBrand) &&
-          (requestedBranch === undefined || lead.branchId === Number(requestedBranch)),
-        );
-        const query = Promise.resolve(rows) as Promise<typeof rows> & {
-          orderBy: () => Promise<typeof rows>;
-        };
-        query.orderBy = () => Promise.resolve(rows);
-        return query;
-      },
-    }),
+    from: (table: unknown) => {
+      if (table === walkinBranches) return Promise.resolve(branches);
+      return {
+        where: (condition: Chunk | undefined) => {
+          if (table !== walkinLeads) return Promise.resolve([]);
+          const requestedBrand = equalityValue(condition, "brand");
+          const requestedBranch = equalityValue(condition, "branch_id");
+          const rows = databaseLeads.filter((lead) =>
+            (requestedBrand === undefined || lead.brand === requestedBrand) &&
+            (requestedBranch === undefined || lead.branchId === Number(requestedBranch)),
+          );
+          const query = Promise.resolve(rows) as Promise<typeof rows> & {
+            orderBy: () => Promise<typeof rows>;
+          };
+          query.orderBy = () => Promise.resolve(rows);
+          return query;
+        },
+      };
+    },
   }));
 }
 
@@ -201,7 +232,7 @@ describe("Walk-in Leads brand and branch filters", () => {
     expect(response.status).toBe(200);
     const body = await response.json() as { leads: Array<{ brand: string }> };
     expect(new Set(body.leads.map((lead) => lead.brand))).toEqual(new Set(["RIS", "RPS"]));
-    expect(body.leads).toHaveLength(6);
+    expect(body.leads).toHaveLength(8);
   });
 
   it("filters database and CRM supplement rows by RIS or RPS brand", async () => {
@@ -222,13 +253,32 @@ describe("Walk-in Leads brand and branch filters", () => {
     expect(mockMarketingRead).toHaveBeenCalledWith("RPS");
   });
 
-  it("filters rows by branch within the selected brand and excludes branchless CRM supplements", async () => {
+  it("shows branch names and branch IDs for mapped supplement rows without inventing missing branches", async () => {
+    const response = await get("/api/walkin/leads");
+    const leads = (await response.json() as {
+      leads: Array<{ parentName: string; branchId: number | null; branchName: string }>;
+    }).leads;
+    expect(leads.find((lead) => lead.parentName === "RIS Supplement"))
+      .toMatchObject({ branchId: 1, branchName: "RIS Main" });
+    expect(leads.find((lead) => lead.parentName === "RPS Supplement"))
+      .toMatchObject({
+        parentName: "RPS Supplement",
+        branchId: 2,
+        branchName: "RPS Branch Two",
+      });
+    expect(leads.find((lead) => lead.parentName === "RPS WALKIN Supplement"))
+      .toMatchObject({ branchId: 1, branchName: "RPS Main" });
+    expect(leads.find((lead) => lead.parentName === "RIS Branchless"))
+      .toMatchObject({ branchId: null, branchName: "" });
+  });
+
+  it("filters mapped CRM supplement rows by branch within the selected brand", async () => {
     const risBranch = await get("/api/walkin/leads?brand=RIS&branchId=1");
     expect(risBranch.status).toBe(200);
     const risLeads = (await risBranch.json() as {
       leads: Array<{ brand: string; branchId: number | null; parentName: string }>;
     }).leads;
-    expect(risLeads.map((lead) => lead.parentName)).toEqual(["RIS Branch One"]);
+    expect(risLeads.map((lead) => lead.parentName)).toEqual(["RIS Branch One", "RIS Supplement"]);
     expect(risLeads.every((lead) => lead.brand === "RIS" && lead.branchId === 1)).toBe(true);
 
     const rpsBranch = await get("/api/walkin/leads?brand=RPS&branchId=2");
@@ -236,7 +286,14 @@ describe("Walk-in Leads brand and branch filters", () => {
     const rpsLeads = (await rpsBranch.json() as {
       leads: Array<{ brand: string; branchId: number | null; parentName: string }>;
     }).leads;
-    expect(rpsLeads.map((lead) => lead.parentName)).toEqual(["RPS Branch Two"]);
+    expect(rpsLeads.map((lead) => lead.parentName)).toEqual(["RPS Branch Two", "RPS Supplement"]);
+
+    const optionalWalkinBranch = await get("/api/walkin/leads?brand=RPS&branchId=1");
+    const rpsMainLeads = (await optionalWalkinBranch.json() as {
+      leads: Array<{ parentName: string; branchId: number | null }>;
+    }).leads;
+    expect(rpsMainLeads.map((lead) => lead.parentName)).toContain("RPS WALKIN Supplement");
+    expect(rpsMainLeads.every((lead) => lead.branchId === 1)).toBe(true);
   });
 
   it("filters CSV exports by brand and branch for either school", async () => {

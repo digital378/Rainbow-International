@@ -110,6 +110,11 @@ function deriveMonthLabel(dateStr: string): string {
   return `${months[month]}-${String(year).padStart(2, "0")}`;
 }
 
+function normalizedBranchIdentity(value: string): string {
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
 const duplicateLookupAttempts = new Map<string, { count: number; since: number }>();
 function limitDuplicateLookup(req: Request, res: Response, next: NextFunction) {
   const ip = req.ip || req.socket.remoteAddress || "unknown";
@@ -539,7 +544,7 @@ export function registerWalkinRoutes(app: Express) {
 
       const where = conditions.length ? and(...conditions) : undefined;
 
-      const [databaseRows, allDatabaseIdentities] = await Promise.all([
+      const [databaseRows, allDatabaseIdentities, branchRows] = await Promise.all([
         db.select().from(walkinLeads)
           .where(where)
           .orderBy(desc(walkinLeads.createdAt)),
@@ -548,7 +553,26 @@ export function registerWalkinRoutes(app: Express) {
           phone: walkinLeads.phone,
           childName: walkinLeads.childName,
         }).from(walkinLeads).where(eq(walkinLeads.academicYear, "2027-28")),
+        db.select().from(walkinBranches),
       ]);
+      const branchesByIdentity = new Map<string, typeof branchRows>();
+      for (const branch of branchRows) {
+        const identities = [branch.name, branch.code]
+          .map(normalizedBranchIdentity)
+          .filter(Boolean);
+        for (const identity of identities) {
+          branchesByIdentity.set(identity, [...(branchesByIdentity.get(identity) ?? []), branch]);
+        }
+      }
+      const findSupplementBranch = (supplementBrand: string, branchName: string) => {
+        const matches = new Map<number, (typeof branchRows)[number]>();
+        const identity = normalizedBranchIdentity(branchName);
+        if (!identity) return null;
+        for (const branch of branchesByIdentity.get(identity) ?? []) {
+          if (branch.brand === supplementBrand) matches.set(branch.id, branch);
+        }
+        return matches.size === 1 ? [...matches.values()][0] : null;
+      };
 
       // Marketing 27-28 overlays historical CRM tracker rows that have not
       // yet entered the database. Include those same rows here as read-only
@@ -573,11 +597,25 @@ export function registerWalkinRoutes(app: Express) {
           const key = hasIdentity
             ? supplementLeadKey(lead)
             : `unmatched|${lead.enquiryDate}|${lead.program}|${lead.leadOwner}|${index}`;
-          byIdentity.set(key, lead);
+          const previous = byIdentity.get(key);
+          if (!previous) {
+            byIdentity.set(key, lead);
+            return;
+          }
+          const merged = { ...previous };
+          for (const [field, value] of Object.entries(lead)) {
+            if (value != null && !(typeof value === "string" && !value.trim())) {
+              Object.assign(merged, { [field]: value });
+            }
+          }
+          byIdentity.set(key, merged);
         });
         return [...byIdentity.values()]
           .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
-          .filter(lead => !branchId)
+          .filter(lead => {
+            if (!branchId) return true;
+            return findSupplementBranch(supplementBrand, lead.branchName)?.id === Number(branchId);
+          })
           .filter(lead => !status || lead.status === status)
           .filter(lead => !leadOwner || lead.leadOwner === leadOwner)
           .filter(lead => !dateFrom || lead.enquiryDate >= dateFrom)
@@ -588,10 +626,11 @@ export function registerWalkinRoutes(app: Express) {
           .map(lead => {
             const identity = `${supplementBrand}|${supplementLeadKey(lead)}`;
             const timestamp = `${lead.enquiryDate}T00:00:00.000Z`;
+            const branch = findSupplementBranch(supplementBrand, lead.branchName);
             return {
               id: `crm-${createHash("sha256").update(identity).digest("hex").slice(0, 20)}`,
               brand: supplementBrand,
-              branchId: null,
+              branchId: branch?.id ?? null,
               branchName: lead.branchName,
               academicYear: "2027-28",
               enquiryDate: lead.enquiryDate,

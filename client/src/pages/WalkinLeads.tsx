@@ -96,7 +96,7 @@ function StatusBadge({ status, archived }: { status: string; archived: boolean }
     "NOT INTERESTED": "bg-slate-100 text-slate-500",
   };
   const cls = map[status] || "bg-slate-100 text-slate-600";
-  return <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${cls}`}>{status}</span>;
+  return <span className={`inline-block max-w-full break-words px-2 py-0.5 rounded text-[10px] font-bold leading-tight ${cls}`}>{status}</span>;
 }
 
 // ── Shared form-field wrapper (must be module-level — not inside a component) ──
@@ -198,7 +198,7 @@ function EditPanel({
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100" style={{ background: NAVY }}>
           <div>
             <div id="edit-lead-title" className="font-bold text-white text-sm">Edit Lead</div>
-            <div className="text-blue-200 text-xs">{lead.parentName} · {lead.phone}</div>
+            <div className="text-blue-200 text-xs">{lead.childName} · {lead.phone}</div>
           </div>
           <button onClick={onClose} aria-label="Close edit panel" className="text-white/70 hover:text-white text-xl leading-none px-2 py-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Close</button>
         </div>
@@ -366,7 +366,7 @@ function HistoryModal({ lead, token, onClose }: { lead: Lead; token: string; onC
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100" style={{ background: NAVY }}>
           <div>
             <div id="history-title" className="font-bold text-white text-sm">Change History</div>
-            <div className="text-blue-200 text-xs">{lead.parentName} · {lead.phone}</div>
+            <div className="text-blue-200 text-xs">{lead.childName} · {lead.phone}</div>
           </div>
           <button onClick={onClose} aria-label="Close change history" className="text-white/70 hover:text-white text-sm px-2 py-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Close</button>
         </div>
@@ -448,7 +448,7 @@ function ArchiveModal({ lead, token, onArchived, onClose }: {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div id="archive-lead-title" className="text-lg font-bold text-slate-800 mb-2">Archive this lead?</div>
         <div className="text-sm text-slate-600 mb-1">
-          <b>{lead.parentName}</b> · {lead.childName} · {lead.phone}
+          <b>{lead.childName}</b> · {lead.phone}
         </div>
         <div className="text-xs text-slate-400 mb-5">
           The lead will be hidden from the default view. This can be undone by contacting the system admin.
@@ -489,6 +489,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     dateFrom: "", dateTo: "", search: "", showArchived: false,
   });
   const [statusView, setStatusView] = useState<"all" | "booked" | "walkins" | "admissions">("all");
+  const [moreFilters, setMoreFilters] = useState(false);
 
   // Panel / modal state
   const [editLead, setEditLead] = useState<Lead | null>(null);
@@ -628,9 +629,11 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     setArchiveLead(null);
   };
 
-  const fmtDate = (d: string | null | undefined) => d ? d.replace(/^\d{4}-/, "").replace("-", "/") : "—";
-  const inputCls = "px-3 py-2.5 rounded-lg border border-[#d6dfeb] text-sm text-[#243651] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 bg-white";
-  const selectCls = `${inputCls} pr-8`;
+  const fmtDate = (d: string | null | undefined) => d
+    ? new Date(`${d}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+    : "—";
+  const inputCls = "h-9 px-3 rounded-lg border border-[#d9e1eb] text-xs sm:text-sm text-[#243651] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 bg-white";
+  const selectCls = `${inputCls} pr-7`;
   const selectedSegment = statusView;
   const setSegment = (view: typeof statusView) => {
     setStatusView(view);
@@ -667,93 +670,98 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       </div>
 
       <main className="max-w-[1680px] mx-auto px-4 sm:px-7 py-6 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div>
-            <p className="text-[11px] font-bold tracking-[.16em] uppercase text-[#74839a]">Enquiry desk</p>
-            <h1 className="text-2xl sm:text-[30px] font-bold tracking-tight text-[#172945] mt-1">Parent enquiries</h1>
-            <p className="text-sm text-[#6c7d94] mt-1">{total.toLocaleString()} records in this view <span className="mx-1 text-[#c0c9d5]">/</span> updates are audit-logged</p>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#172945]">Child enquiries</h1>
+            <p className="text-xs text-[#6c7d94] mt-0.5">{total.toLocaleString()} in this view <span className="mx-1 text-[#c0c9d5]">/</span> changes are audit-logged</p>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-white border border-[#dfe6ee] p-1.5 self-start" aria-label="Filter by brand">
+          <div className="flex items-center gap-1 rounded-lg bg-white border border-[#dfe6ee] p-1 self-start" aria-label="Filter by brand">
             {[["", "All brands"], ["RIS", "RIS"], ["RPS", "RPS"]].map(([value, label]) => (
               <button key={value} type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: value, branchId: "" })); }}
                 aria-pressed={filters.brand === value}
-                className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${filters.brand === value ? "bg-[#091a4f] text-white shadow-sm" : "text-[#596a81] hover:bg-[#f0f4f8]"}`}>
+                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${filters.brand === value ? "bg-[#091a4f] text-white shadow-sm" : "text-[#596a81] hover:bg-[#f0f4f8]"}`}>
                 {label}
               </button>
             ))}
           </div>
         </div>
 
-        <section className="rounded-2xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-5 overflow-hidden" aria-label="Lead views and filters">
-          <div className="flex gap-1 overflow-x-auto px-3 sm:px-5 pt-3 border-b border-[#e9eef3]" role="tablist" aria-label="Lead status views">
+        <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4" aria-label="Lead views and filters">
+          <div className="flex gap-1 overflow-x-auto px-3 sm:px-4 pt-1 border-b border-[#e9eef3]" role="tablist" aria-label="Lead status views">
             {([
               ["all", "All enquiries"], ["booked", "Booked"], ["walkins", "Walk-ins"], ["admissions", "Admissions"],
             ] as const).map(([value, label]) => (
               <button key={value} type="button" role="tab" aria-selected={selectedSegment === value}
                 onClick={() => setSegment(value)}
-                className={`flex items-center gap-2 whitespace-nowrap px-3 sm:px-4 py-3 text-sm font-semibold border-b-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${selectedSegment === value ? "border-[#f2b63f] text-[#172945]" : "border-transparent text-[#718198] hover:text-[#243956]"}`}>
+                className={`flex items-center gap-1.5 whitespace-nowrap px-2.5 sm:px-3 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${selectedSegment === value ? "border-[#f2b63f] text-[#172945]" : "border-transparent text-[#718198] hover:text-[#243956]"}`}>
                 {label}
-                {value === "all" && <span className={`min-w-6 text-center rounded-full px-1.5 py-0.5 text-[11px] tabular-nums ${selectedSegment === value ? "bg-[#fff1d0] text-[#8b5c00]" : "bg-[#f0f3f7] text-[#74839a]"}`}>{total}</span>}
+                  {selectedSegment === value && <span className="min-w-5 text-center rounded-full bg-[#fff1d0] text-[#8b5c00] px-1.5 py-0.5 text-[11px] tabular-nums">{loading ? "…" : total}</span>}
               </button>
             ))}
           </div>
-          <div className="p-4 sm:p-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-              <label className="sm:col-span-2 xl:col-span-1">
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Search enquiries</span>
-                <input type="search" aria-label="Search by parent, child, or phone" className={`${inputCls} w-full`} placeholder="Parent, child, or phone"
+          <div className="p-3 sm:px-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="flex-1 min-w-[170px]">
+                <span className="sr-only">Search enquiries</span>
+                <input type="search" aria-label="Search by child or phone" className={`${inputCls} w-full`} placeholder="Search child or phone"
                   value={filters.search} onChange={e => applyFilter("search", e.target.value)} />
               </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Branch</span>
+              <label className="min-w-[135px] flex-1 sm:flex-none sm:w-[160px]">
+                <span className="sr-only">Branch</span>
                 <select aria-label="Filter by branch" className={`${selectCls} w-full`} value={filters.branchId} onChange={e => applyFilter("branchId", e.target.value)}>
                   <option value="">All branches</option>
                   {branchOptions.map(b => <option key={b.id} value={b.id}>{filters.brand ? b.name : `${b.brand} · ${b.name}`}</option>)}
                 </select>
               </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Status</span>
-                <select aria-label="Filter by status" className={`${selectCls} w-full`} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
-                  <option value="">All statuses in view</option>
-                  {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
-                </select>
-              </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry source</span>
+              <label className="min-w-[112px] flex-1 sm:flex-none sm:w-[130px]">
+                <span className="sr-only">Enquiry source</span>
                 <select aria-label="Filter by source" className={`${selectCls} w-full`} value={filters.source} onChange={e => applyFilter("source", e.target.value)}>
                   <option value="">All sources</option>
                   {availableSources.map(source => <option key={source.toLowerCase()} value={source}>{source}</option>)}
                 </select>
               </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Lead owner</span>
+              <label className="min-w-[112px] flex-1 sm:flex-none sm:w-[130px]">
+                <span className="sr-only">Lead owner</span>
                 <select aria-label="Filter by lead owner" className={`${selectCls} w-full`} value={filters.leadOwner} onChange={e => applyFilter("leadOwner", e.target.value)}>
                   <option value="">All owners</option>
                   {ownerOptions.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
               </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry date from</span>
+              <button type="button" onClick={() => setMoreFilters(open => !open)} aria-expanded={moreFilters}
+                className={`h-9 px-3 rounded-lg border text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${moreFilters || filters.status || filters.dateFrom || filters.dateTo || filters.showArchived ? "bg-[#eff4fa] border-[#b5c8df] text-[#1b4679]" : "border-[#d9e1eb] text-[#53657d] hover:bg-[#f4f7fb]"}`}>
+                More filters{filters.status || filters.dateFrom || filters.dateTo || filters.showArchived ? " •" : ""}
+              </button>
+              {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search || filters.showArchived) && (
+                <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); setStatusView("all"); }}
+                  className="h-9 px-2 text-xs font-semibold text-[#885900] hover:text-[#654100] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                  Clear
+                </button>
+              )}
+            </div>
+            {moreFilters && <div className="mt-3 pt-3 border-t border-[#e9eef3] flex flex-wrap items-end gap-3">
+              <label className="min-w-[165px] flex-1">
+                <span className="block text-[11px] font-medium text-[#75849a] mb-1">Status</span>
+                <select aria-label="Filter by status" className={`${selectCls} w-full`} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
+                  <option value="">All statuses in view</option>
+                  {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
+                </select>
+              </label>
+              <label className="min-w-[140px] flex-1">
+                <span className="block text-[11px] font-medium text-[#75849a] mb-1">Enquired from</span>
                 <input aria-label="Enquiry date from" type="date" className={`${inputCls} w-full`} value={filters.dateFrom} onChange={e => applyFilter("dateFrom", e.target.value)} />
               </label>
-              <label>
-                <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Enquiry date to</span>
+              <label className="min-w-[140px] flex-1">
+                <span className="block text-[11px] font-medium text-[#75849a] mb-1">Enquired to</span>
                 <input aria-label="Enquiry date to" type="date" className={`${inputCls} w-full`} value={filters.dateTo} onChange={e => applyFilter("dateTo", e.target.value)} />
               </label>
-              <div className="flex flex-wrap items-end justify-between gap-3 sm:col-span-2 xl:col-span-2">
-                <label className="inline-flex items-center gap-2 text-sm text-[#53657d] cursor-pointer min-h-11">
+              <div className="h-9 flex items-center">
+                <label className="inline-flex items-center gap-2 text-xs text-[#53657d] cursor-pointer">
                   <input aria-label="Include archived leads" type="checkbox" checked={filters.showArchived}
                     onChange={e => applyFilter("showArchived", e.target.checked)} className="h-4 w-4 rounded border-[#bdc9d8] accent-[#091a4f] focus-visible:ring-2 focus-visible:ring-amber-400" />
                   Include archived
                 </label>
-                {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
-                  <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
-                    className="text-sm font-semibold text-[#966000] underline underline-offset-4 hover:text-[#654100] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
-                    Clear filters
-                  </button>
-                )}
               </div>
-            </div>
+            </div>}
           </div>
         </section>
       {/* Table */}
@@ -767,26 +775,24 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </div>
         )}
 
-        <div className="hidden md:block bg-white rounded-2xl shadow-[0_5px_20px_rgba(27,49,79,.04)] border border-[#dfe6ee] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1420px] text-xs">
+        <div className="hidden lg:block bg-white rounded-xl shadow-[0_5px_20px_rgba(27,49,79,.04)] border border-[#dfe6ee] overflow-hidden">
+            <table className="w-full table-fixed text-xs">
+              <colgroup>
+                <col className="w-[8%]" /><col className="w-[15%]" /><col className="w-[11%]" />
+                <col className="w-[14%]" /><col className="w-[9%]" /><col className="w-[16%]" />
+                <col className="w-[10%]" /><col className="w-[8%]" /><col className="w-[9%]" />
+              </colgroup>
               <thead>
                 <tr className="border-b border-[#e5ebf1] bg-[#f7f9fb] text-[#718198] uppercase text-[10px] tracking-[.1em]">
-                  <th className="text-left px-3 py-3 font-semibold">#</th>
-                  <th className="text-left px-3 py-3 font-semibold">Enquiry date</th>
-                  <th className="text-left px-3 py-3 font-semibold">Brand</th>
-                  <th className="text-left px-3 py-3 font-semibold">Branch</th>
-                  <th className="text-left px-3 py-3 font-semibold">Parent</th>
-                  <th className="text-left px-3 py-3 font-semibold">Child</th>
-                  <th className="text-left px-3 py-3 font-semibold">Phone</th>
-                  <th className="text-left px-3 py-3 font-semibold">Program</th>
-                  <th className="text-left px-3 py-3 font-semibold">Source</th>
-                  <th className="text-left px-3 py-3 font-semibold">Status</th>
-                  <th className="text-left px-3 py-3 font-semibold">Owner</th>
-                  <th className="text-left px-3 py-3 font-semibold">Walk-in</th>
-                  <th className="text-left px-3 py-3 font-semibold">Admission date</th>
-                  <th className="text-left px-3 py-3 font-semibold">Updated</th>
-                  <th className="text-right px-3 py-3 font-semibold">Actions</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Enquired</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Child / program</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Phone</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">School / branch</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Source</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Status / admitted</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Owner</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Updated</th>
+                  <th className="text-left px-2.5 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -794,9 +800,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   <>
                     {Array.from({ length: 6 }, (_, row) => (
                       <tr key={row} aria-hidden="true" className="border-b border-[#eff2f6] animate-pulse">
-                        {Array.from({ length: 15 }, (_, column) => (
-                          <td key={column} className="px-3 py-4">
-                            <div className={`h-2.5 rounded bg-[#e8edf3] ${column === 4 || column === 5 ? "w-20" : "w-12"}`} />
+                        {Array.from({ length: 9 }, (_, column) => (
+                          <td key={column} className="px-2.5 py-4">
+                            <div className="h-2.5 w-full max-w-20 rounded bg-[#e8edf3]" />
                           </td>
                         ))}
                       </tr>
@@ -804,78 +810,57 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   </>
                 )}
                 {!loading && leads.length === 0 && (
-                  <tr><td colSpan={15} className="text-center py-12 text-[#76869a]">No leads found. Try widening your search or clearing a filter.</td></tr>
+                  <tr><td colSpan={9} className="text-center py-12 text-[#76869a]">No leads found. Try widening your search or clearing a filter.</td></tr>
                 )}
-                {!loading && leads.map((lead, i) => {
-                   const branchName = lead.branchName || lookups?.branches.find(b => b.id === lead.branchId)?.name;
-                  const rowNum = (page - 1) * PAGE_SIZE + i + 1;
+                {!loading && leads.map(lead => {
+                  const branchName = lead.branchName || lookups?.branches.find(b => b.id === lead.branchId)?.name;
                   return (
                     <tr
                       key={lead.id}
                       className={`border-b border-[#eff2f6] hover:bg-[#f8fafc] transition-colors ${lead.isArchived ? "opacity-50" : ""}`}
                     >
-                      <td className="px-3 py-2.5 text-slate-400 tabular-nums">{rowNum}</td>
-                      <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{lead.enquiryDate}</td>
-                      <td className="px-3 py-2.5">
-                        <span className={`font-bold text-[10px] px-1.5 py-0.5 rounded ${lead.brand === "RIS" ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-700"}`}>
-                          {lead.brand}
-                        </span>
+                      <td className="px-2.5 py-2.5 text-slate-600 tabular-nums">{fmtDate(lead.enquiryDate)}</td>
+                      <td className="px-2.5 py-2.5 min-w-0">
+                        <div className="font-semibold text-slate-800 break-words" title={lead.childName}>{lead.childName || "—"}</div>
+                        <div className="text-[11px] text-[#8290a3] break-words">{lead.program}</div>
                       </td>
-                      <td className="px-3 py-2.5 text-slate-600">{branchName || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 font-medium text-slate-800 max-w-[120px] truncate" title={lead.parentName}>{lead.parentName || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 text-slate-600 max-w-[100px] truncate" title={lead.childName}>{lead.childName || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 font-mono text-slate-700 whitespace-nowrap">{lead.phone || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 text-slate-600 max-w-[100px] truncate" title={lead.program}>{lead.program}</td>
-                      <td className="px-3 py-2.5 text-slate-500 max-w-[80px] truncate" title={lead.source}>{lead.source}</td>
-                      <td className="px-3 py-2.5 whitespace-nowrap">
+                      <td className="px-2.5 py-2.5 font-mono text-slate-700 break-all">{lead.phone || "—"}</td>
+                      <td className="px-2.5 py-2.5 min-w-0">
+                        <span className={`text-[10px] font-bold ${lead.brand === "RIS" ? "text-blue-700" : "text-red-700"}`}>{lead.brand}</span>
+                        <div className="text-slate-600 break-words" title={branchName}>{branchName || "Branch not recorded"}</div>
+                      </td>
+                      <td className="px-2.5 py-2.5 text-slate-500 break-words" title={lead.source}>{lead.source}</td>
+                      <td className="px-2.5 py-2.5 min-w-0">
                         <StatusBadge status={lead.status} archived={lead.isArchived} />
+                        {lead.admissionDate && <div className="mt-1 text-[11px] text-[#596b83]">Admitted {fmtDate(lead.admissionDate)}</div>}
                       </td>
-                      <td className="px-3 py-2.5 text-slate-600 max-w-[80px] truncate">{lead.leadOwner || <span className="text-slate-300">—</span>}</td>
-                      <td className="px-3 py-2.5 text-[#596b83] whitespace-nowrap">{fmtDate(lead.walkInDate)}</td>
-                      <td className="px-3 py-2.5 text-[#596b83] whitespace-nowrap">{fmtDate(lead.admissionDate)}</td>
-                      <td className="px-3 py-2.5 text-slate-400 whitespace-nowrap">
-                        {new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                      <td className="px-2.5 py-2.5 text-slate-600 break-words">{lead.leadOwner || "—"}</td>
+                      <td className="px-2.5 py-2.5 text-slate-500 tabular-nums" title={lead.readOnly ? "Last update date not recorded" : undefined}>
+                        {lead.readOnly ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
-                      <td className="px-3 py-2.5 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {!lead.isArchived && !lead.readOnly && (
-                            <button
-                              onClick={() => setEditLead(lead)}
-                              aria-label={`Edit ${lead.parentName}'s enquiry`}
-                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#edf3fb] text-[#244e83] hover:bg-[#dce9f8] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
-                            >Edit</button>
-                          )}
-                          {!lead.readOnly && (
-                            <button
-                              onClick={() => setHistoryLead(lead)}
-                              aria-label={`View history for ${lead.parentName}'s enquiry`}
-                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#f0f3f6] text-[#52657d] hover:bg-[#e4eaf0] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
-                            >History</button>
-                          )}
-                          {!lead.isArchived && !lead.readOnly && (
-                            <button
-                              onClick={() => setArchiveLead(lead)}
-                              aria-label={`Archive ${lead.parentName}'s enquiry`}
-                              className="px-2.5 py-1.5 rounded-md text-[10px] font-semibold bg-[#fff0ed] text-[#a34032] hover:bg-[#ffe2dc] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500"
-                            >Archive</button>
-                          )}
-                          {lead.readOnly && (
-                            <span className="px-2.5 py-1 rounded text-[10px] font-semibold bg-amber-50 text-amber-700">
-                              Tracker record
-                            </span>
-                          )}
-                        </div>
+                      <td className="px-2.5 py-2.5">
+                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">Tracker record</span> : (
+                          <select aria-label={`Actions for ${lead.childName || "lead"}`} value="" onChange={e => {
+                            if (e.target.value === "edit") setEditLead(lead);
+                            if (e.target.value === "history") setHistoryLead(lead);
+                            if (e.target.value === "archive") setArchiveLead(lead);
+                          }} className="w-full max-w-[112px] rounded-md border border-[#d9e1eb] bg-white px-1 py-1.5 text-[11px] font-medium text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                            <option value="">Actions</option>
+                            {!lead.isArchived && <option value="edit">Edit lead</option>}
+                            <option value="history">View history</option>
+                            {!lead.isArchived && <option value="archive">Archive lead</option>}
+                          </select>
+                        )}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-          </div>
         </div>
 
         {/* Mobile list */}
-        <div className="md:hidden space-y-3">
+        <div className="lg:hidden space-y-3">
           {loading && Array.from({ length: 3 }, (_, index) => (
             <div key={index} aria-hidden="true" className="h-44 rounded-2xl border border-[#e1e8ef] bg-white animate-pulse" />
           ))}
@@ -883,7 +868,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             <div className="rounded-2xl border border-[#dfe6ee] bg-white px-5 py-10 text-center">
               <p className="font-semibold text-[#253a58]">No enquiries match</p>
               <p className="mt-1 text-sm text-[#75849a]">Adjust your filters or start with all enquiries.</p>
-              <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
+              <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); setStatusView("all"); }}
                 className="mt-4 text-sm font-semibold text-[#8a5a00] underline underline-offset-4">Clear filters</button>
             </div>
           )}
@@ -895,21 +880,21 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[11px] text-[#8090a4]">Enquiry {rowNum} <span className="mx-1">/</span> {lead.enquiryDate}</p>
-                    <h2 className="mt-1 font-bold text-[#1b304d] truncate">{lead.parentName || "Parent not recorded"}</h2>
-                    <p className="text-sm text-[#66778d]">{lead.childName || "Child not recorded"} <span className="mx-1 text-[#c4ccd6]">/</span> {lead.program}</p>
+                    <h2 className="mt-1 font-bold text-[#1b304d]">{lead.childName || "Child not recorded"}</h2>
+                    <p className="text-sm text-[#66778d]">{lead.program} <span className="mx-1 text-[#c4ccd6]">/</span> {lead.brand}</p>
                   </div>
                   <StatusBadge status={lead.status} archived={lead.isArchived} />
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4 pt-3 border-t border-[#edf1f5] text-sm">
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Phone</div><div className="mt-0.5 font-medium text-[#334a68]">{lead.phone || "Not provided"}</div></div>
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Branch / owner</div><div className="mt-0.5 text-[#52657d] truncate">{branchName || "Unassigned"} / {lead.leadOwner || "Unassigned"}</div></div>
-                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Walk-in date</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.walkInDate)}</div></div>
-                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Admission date</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.admissionDate)}</div></div>
+                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Last updated</div><div className="mt-0.5 text-[#52657d]">{lead.readOnly ? "Not recorded" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div></div>
+                  {lead.admissionDate && <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Admitted</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.admissionDate)}</div></div>}
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-[#edf1f5]">
-                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.parentName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
-                  {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.parentName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
-                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.parentName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
+                  {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
                   {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record</span>}
                 </div>
               </article>

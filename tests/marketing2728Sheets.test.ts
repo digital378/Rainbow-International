@@ -56,7 +56,16 @@ describe("2027-28 supplementary Sheet parsing", () => {
       status: "OPEN",
       source: "Meta",
       program: "Playgroup",
+      branchName: "Manpada",
     }));
+  });
+
+  it.each(["Centre", "Center", "Branch"])("parses %s as the lead branch header", (branchHeader) => {
+    const rows = [
+      ["Date", "Child Name", "Status", branchHeader],
+      ["22-May-26", "Child", "OPEN", "Manpada"],
+    ];
+    expect(parseLeadRows(rows)[0].branchName).toBe("Manpada");
   });
 
   it("ignores blank, total, and malformed dashboard rows", () => {

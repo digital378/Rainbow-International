@@ -141,6 +141,7 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
     source: index("Source"),
     owner: index("Lead Owner", "Counsellor Name"),
     program: index("Program", "Programme", "Grade"),
+    branch: index("Centre", "Center", "Branch"),
   };
   if (columns.date < 0 || columns.status < 0) throw new Error("CRM lead headers are not recognised");
 
@@ -162,7 +163,7 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
       parentName: "",
       childName: clean(row[columns.child]),
       phone: clean(row[columns.phone]).replace(/\D/g, "").slice(-10),
-      branchName: "",
+      branchName: columns.branch >= 0 ? clean(row[columns.branch]) : "",
       walkInDate: null,
       status,
       source: clean(row[columns.source]) || "Unknown",
@@ -184,7 +185,7 @@ export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
     parent: index("Father Name", "Parent Name"),
     child: index("Student Name", "Child Name", "Child's Name"),
     phone: index("Father Contact", "Phone Number", "Phone", "Contact No"),
-    branch: index("Branch"),
+    branch: index("Branch", "Centre", "Center"),
     walkInDate: index("Admission Date", "Walk-In Date", "Walkin Date"),
     status: index("Status"),
     program: index("Program", "Programme", "Grade"),
