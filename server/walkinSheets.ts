@@ -25,6 +25,7 @@
  */
 
 import { google } from "googleapis";
+import { normalizeWalkinLeadSource } from "@shared/walkinLeadSource";
 import { createHash } from "node:crypto";
 import { getGoogleRefreshToken } from "./googleCredentials";
 import { db } from "./db";
@@ -2617,7 +2618,7 @@ export function aggregateCrmRows(dataRows: string[][]): Omit<CrmStats, "brand" |
     if (!date) continue; // skip completely blank rows
 
     const status     = (row[7] ?? "").toString().trim().toUpperCase();  // [7] Status (Centre is at [6])
-    const source     = (row[10] ?? "").toString().trim() || "Unknown"; // [10] Source
+    const source     = normalizeWalkinLeadSource((row[10] ?? "").toString().trim() || "Unknown"); // [10] Source
     const leadOwner  = (row[9] ?? "").toString().trim() || null;       // [9] Lead Owner
     const program    = (row[5] ?? "").toString().trim() || "Unknown";  // [5] Program
     const monthLabel = parseCrmMonthLabel(date);
@@ -2903,7 +2904,7 @@ export async function readCrmLeadsTrackerStats(
 
       for (const row of leads) {
         const status  = (row.status    ?? "").trim().toUpperCase();
-        const source  = (row.source    ?? "Unknown").trim();
+        const source  = normalizeWalkinLeadSource((row.source ?? "Unknown").trim());
         const owner   = (row.leadOwner ?? "").trim();
         const program = (row.program   ?? "Unknown").trim();
         const month   = (row.monthLabel ?? "").trim() || "Unknown";

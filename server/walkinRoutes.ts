@@ -28,6 +28,7 @@ import {
   type WalkinLead,
 } from "@shared/schema";
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
+import { normalizeWalkinLeadSource } from "@shared/walkinLeadSource";
 import { matchingParentContact, normalizeParentContacts } from "./walkinDuplicateContacts";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
 import * as XLSX from "xlsx";
@@ -368,7 +369,17 @@ export function registerWalkinRoutes(app: Express) {
           .orderBy(walkinBranches.name),
       ]);
 
-      res.json({ programs, sources, statuses: statuses_rows, closeReasons, staff, branches });
+      const seenSources = new Set<string>();
+      const visibleSources = includeInactive
+        ? sources
+        : sources.filter(item => {
+            if (normalizeWalkinLeadSource(item.label) === "DM" && item.label !== "DM") return false;
+            const key = item.label.toLowerCase();
+            if (seenSources.has(key)) return false;
+            seenSources.add(key);
+            return true;
+          });
+      res.json({ programs, sources: visibleSources, statuses: statuses_rows, closeReasons, staff, branches });
     } catch (err: any) {
       console.error("[walkin/lookups]", err?.message);
       res.status(500).json({ message: "Failed to fetch lookups" });
@@ -466,7 +477,7 @@ export function registerWalkinRoutes(app: Express) {
             altPhone,
             email: data.email ? data.email.toLowerCase() : undefined,
             program: child.program,
-            source: data.source,
+            source: normalizeWalkinLeadSource(data.source),
             status: data.status,
             closeReason: data.closeReason,
             remark: data.remark,
@@ -653,7 +664,7 @@ export function registerWalkinRoutes(app: Express) {
               altPhone: null,
               email: null,
               program: lead.program,
-              source: lead.source,
+              source: normalizeWalkinLeadSource(lead.source),
               status: lead.status,
               closeReason: null,
               remark: null,
@@ -676,6 +687,7 @@ export function registerWalkinRoutes(app: Express) {
       });
 
       const allCombinedRows = [...databaseRows, ...supplementalRows]
+        .map(row => ({ ...row, source: normalizeWalkinLeadSource(row.source) }))
         .sort((a, b) => b.enquiryDate.localeCompare(a.enquiryDate));
       const availableSources = [...new Map(
         allCombinedRows
@@ -684,7 +696,7 @@ export function registerWalkinRoutes(app: Express) {
           .map(value => [value.toLowerCase(), value] as const),
       ).values()].sort((a, b) => a.localeCompare(b));
       const combinedRows = source
-        ? allCombinedRows.filter(row => row.source.toLowerCase() === source.toLowerCase())
+        ? allCombinedRows.filter(row => row.source.toLowerCase() === normalizeWalkinLeadSource(source).toLowerCase())
         : allCombinedRows;
       const total = combinedRows.length;
       const rows = combinedRows.slice(OFFSET, OFFSET + SIZE);
@@ -1229,12 +1241,19 @@ export function registerWalkinRoutes(app: Express) {
         .orderBy(walkinLeads.monthLabel);
 
       // By source
-      const bySource = await db
+      const sourceRows = await db
         .select({ source: walkinLeads.source, cnt: sql<number>`cast(count(*) as int)` })
         .from(walkinLeads)
         .where(where)
         .groupBy(walkinLeads.source)
         .orderBy(desc(sql`count(*)`));
+      const sourceTotals = new Map<string, number>();
+      for (const row of sourceRows) {
+        const source = normalizeWalkinLeadSource(row.source);
+        sourceTotals.set(source, (sourceTotals.get(source) ?? 0) + row.cnt);
+      }
+      const bySource = [...sourceTotals].map(([source, cnt]) => ({ source, cnt }))
+        .sort((a, b) => b.cnt - a.cnt);
 
       // By branch
       const byBranch = await db
@@ -1522,6 +1541,9 @@ export function registerWalkinRoutes(app: Express) {
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      if (table === "sources" && normalizeWalkinLeadSource(parsed.data.label) === "DM" && parsed.data.label.trim() !== "DM") {
+        return res.status(409).json({ message: "Google, Meta and Digital Marketing are included under DM. Choose DM instead." });
+      }
 
       // Duplicate-label check (case-insensitive) before inserting
       const newLabelLower = parsed.data.label.trim().toLowerCase();
@@ -1564,6 +1586,10 @@ export function registerWalkinRoutes(app: Express) {
       });
       const parsed = schema.safeParse(req.body);
       if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      if (table === "sources" && parsed.data.label !== undefined
+        && normalizeWalkinLeadSource(parsed.data.label) === "DM" && parsed.data.label.trim() !== "DM") {
+        return res.status(409).json({ message: "Google, Meta and Digital Marketing are included under DM. Choose DM instead." });
+      }
 
       // Duplicate-label check (case-insensitive) when renaming
       if (parsed.data.label !== undefined) {

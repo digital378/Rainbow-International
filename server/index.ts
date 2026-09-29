@@ -7,6 +7,7 @@ import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
 import { startSeoMonitor } from "./seoMonitor";
 import { bootstrapWalkinSequences, bootstrapWalkinLookups, bootstrapWalkinSyncSnapshots, hydrateWalkinSyncSnapshots, stopAutoPullForShutdown } from "./walkinSheets";
+import { consolidateWalkinDigitalMarketingSources } from "./walkinSourceMigration";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { initializeGoogleCredentials } from "./googleCredentials";
 import { initializeRisInstagramTracker, startRisInstagramTracker } from "./risInstagramTracker";
@@ -156,6 +157,7 @@ app.use((req, res, next) => {
   await runWalkinSheetOperation("startup bootstrap", async () => {
     await bootstrapWalkinSequences();
     await bootstrapWalkinLookups();
+    await consolidateWalkinDigitalMarketingSources();
     await bootstrapWalkinSyncSnapshots();
     await hydrateWalkinSyncSnapshots();
   });

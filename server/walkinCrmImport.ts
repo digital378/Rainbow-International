@@ -1,3 +1,4 @@
+import { normalizeWalkinLeadSource } from "@shared/walkinLeadSource";
 import { createHash } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
 import { readMarketing2728Supplement, supplementLeadKey, type SupplementLead } from "./marketing2728Sheets";
@@ -341,7 +342,7 @@ export async function applyCrmImport(): Promise<ApplyResult> {
           altPhone: null,
           email: null,
           program: lead.program || "Unknown",
-          source: lead.source || "Unknown",
+          source: normalizeWalkinLeadSource(lead.source || "Unknown"),
           status: validation.status,
           closeReason: null,
           remark: null,
