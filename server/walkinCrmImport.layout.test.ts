@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { findManagedRow, resolveManagedSheetLayout } from "./walkinSheetLayout";
+import { findManagedRow, findUnlinkedVisitRow, resolveManagedSheetLayout } from "./walkinSheetLayout";
 
 const expected = ["Student Name", "Status", "Follow up Remarks", "Lead ID", "Actual Admission Date"];
 const header = ["Student Name", "Sub Source", "Status", "Remark", "Lead ID", "Lead ID"];
@@ -31,5 +31,26 @@ describe("existing WALKINs layout safety", () => {
       .toThrow(/duplicate Lead IDs/);
     expect(() => resolveManagedSheetLayout([header.filter(name => name !== "Status")], expected))
       .toThrow(/missing "status"/);
+  });
+
+  it("finds only a uniquely matching visit with an empty primary Lead ID", () => {
+    const visitHeader = [
+      "Student Name", "Father Contact", "Status", "Follow up Remarks",
+      "Lead ID", "Lead ID", "Staff Extra",
+    ];
+    const layout = resolveManagedSheetLayout([visitHeader], expected);
+    const unique = [
+      visitHeader,
+      ["Aarav Sharma", "9876543210", "WALK-IN COMPLETED", "staff note", "", "", "keep"],
+    ];
+    expect(findUnlinkedVisitRow(unique, layout, "Aarav-Sharma", "+91 9876543210", "RIS")).toBe(1);
+    expect(() => findUnlinkedVisitRow([
+      ...unique,
+      ["Aarav Sharma", "9876543210", "WALK-IN COMPLETED", "another visit", "", "", "also keep"],
+    ], layout, "Aarav Sharma", "9876543210", "RIS")).toThrow(/Multiple WALKINs rows match/);
+    expect(() => findUnlinkedVisitRow([
+      visitHeader,
+      ["Aarav Sharma", "9876543210", "WALK-IN COMPLETED", "staff note", "already-linked", "", "keep"],
+    ], layout, "Aarav Sharma", "9876543210", "RIS")).toThrow(/already linked to another Lead ID/);
   });
 });

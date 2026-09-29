@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useId } from "react";
 import { forgetPageSession, restorePageSession, signInPage } from "@/lib/walkinPageAuth";
 
 const NAVY = "#091a4f";
@@ -17,6 +17,8 @@ type Lead = {
   isArchived: boolean; createdBy: string; updatedBy: string | null;
   createdAt: string; updatedAt: string;
   readOnly?: boolean;
+  needsVisitLink?: boolean;
+  matchNeedsReview?: boolean;
 };
 type Lookups = {
   programs: { id: number; label: string; brand: string | null }[];
@@ -84,8 +86,19 @@ function AdminGate({ onSuccess }: { onSuccess: (token: string) => void }) {
 }
 
 // ── Status badge ─────────────────────────────────────────────────
-function StatusBadge({ status, archived }: { status: string; archived: boolean }) {
-  if (archived) return <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-400">ARCHIVED</span>;
+function StatusBadge({
+  status, archived, remark, misCallingRemarks, closeReason,
+}: {
+  status: string; archived: boolean; remark?: string | null; misCallingRemarks?: string | null; closeReason?: string | null;
+}) {
+  const notes = [
+    { label: "Remark", value: remark },
+    { label: "Calling remark", value: misCallingRemarks },
+    { label: "Close reason", value: closeReason },
+  ].filter((note): note is { label: string; value: string } => !!note.value?.trim())
+    .map(note => ({ ...note, value: note.value.trim() }));
+  const [isOpen, setIsOpen] = useState(false);
+  const noteId = `status-note-${useId()}`;
   const map: Record<string, string> = {
     "OPEN": "bg-blue-50 text-blue-700",
     "FOLLOW-UP": "bg-amber-50 text-amber-700",
@@ -95,8 +108,52 @@ function StatusBadge({ status, archived }: { status: string; archived: boolean }
     "CLOSED": "bg-red-50 text-red-600",
     "NOT INTERESTED": "bg-slate-100 text-slate-500",
   };
-  const cls = map[status] || "bg-slate-100 text-slate-600";
-  return <span className={`inline-block max-w-full break-words px-2 py-0.5 rounded text-[10px] font-bold leading-tight ${cls}`}>{status}</span>;
+  const badge = archived
+    ? <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-400">ARCHIVED</span>
+    : <span className={`inline-block max-w-full break-words px-2 py-0.5 rounded text-[10px] font-bold leading-tight ${map[status] || "bg-slate-100 text-slate-600"}`}>{status}</span>;
+
+  if (notes.length === 0) return badge;
+  return (
+    <span
+      className="relative inline-block align-top"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={event => {
+        if (!event.currentTarget.contains(document.activeElement)) setIsOpen(false);
+      }}
+    >
+      <button
+        type="button"
+        aria-label={`${archived ? "Archived" : status} status remarks`}
+        aria-expanded={isOpen}
+        aria-describedby={isOpen ? noteId : undefined}
+        onFocus={() => setIsOpen(true)}
+        onBlur={() => setIsOpen(false)}
+        onClick={() => setIsOpen(true)}
+        onKeyDown={event => {
+          if (event.key === "Escape") {
+            event.stopPropagation();
+            setIsOpen(false);
+          }
+        }}
+        className="inline-flex max-w-full rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500"
+      >
+        {badge}
+      </button>
+      {isOpen && (
+        <span
+          id={noteId}
+          role="tooltip"
+          className="absolute right-0 top-full z-50 mt-1 w-max max-w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-[#d9e1eb] bg-white p-2.5 text-left text-[11px] font-normal leading-relaxed text-[#334a68] shadow-lg"
+        >
+          {notes.map(note => (
+            <span key={note.label} className="mb-1 block last:mb-0">
+              <span className="font-bold text-[#253a58]">{note.label}: </span>{note.value}
+            </span>
+          ))}
+        </span>
+      )}
+    </span>
+  );
 }
 
 // ── Shared form-field wrapper (must be module-level — not inside a component) ──
@@ -584,6 +641,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [sourceWarning, setSourceWarning] = useState("");
   const [lookups, setLookups] = useState<Lookups | null>(null);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [report, setReport] = useState<{
@@ -686,7 +744,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   }, [token]);
 
   const fetchLeads = useCallback(async (p = page, f = filters) => {
-    setLoading(true); setError("");
+    setLoading(true); setError(""); setSourceWarning("");
     try {
       const params = new URLSearchParams({
         page: String(p),
@@ -708,6 +766,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       setLeads(data.leads);
       setTotal(data.total);
       setAvailableSources(data.availableSources ?? []);
+      setSourceWarning(data.warning ?? "");
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -962,13 +1021,13 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </div>}
         </section>
 
-        <section className="mb-4 rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-label="Google Sheets sync health">
+        <section className="mb-4 rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-label="RIS and RPS sync health">
           <div>
-            <h2 className="text-sm font-bold text-[#20334f]">Google Sheets sync health</h2>
+            <h2 className="text-sm font-bold text-[#20334f]">RIS and RPS sync health</h2>
             {sheetHealthError ? <p role="alert" className="mt-1 text-xs text-red-700">{sheetHealthError}</p> :
               sheetHealthLoading && !sheetHealth ? <p className="mt-1 text-xs text-[#8290a3]">Checking sync status…</p> :
                 sheetHealth && <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#65768c]">
-                  {(["RIS", "RPS", "MASTER"] as const).map(key => {
+                  {(["RIS", "RPS"] as const).map(key => {
                     const item = sheetHealth[key];
                     return <span key={key}><b className={item?.lastError ? "text-red-700" : item?.pending ? "text-amber-700" : "text-emerald-700"}>{key}</b> {item?.lastError ? `· ${item.lastError}` : item?.pending ? "· sync pending" : item?.lastSyncAt ? `· synced ${new Date(item.lastSyncAt).toLocaleString("en-IN")}` : "· no sync recorded"}</span>;
                   })}
@@ -1045,6 +1104,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
         </section>
       {/* Table */}
       <section className="pb-8" aria-label="Lead records">
+        {sourceWarning && <p role="alert" className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-900">{sourceWarning} Totals may be incomplete.</p>}
         {error && (
           <div className="mb-4 rounded-xl bg-[#fff0ed] border border-[#f1c2b8] px-4 py-3 text-sm text-[#963c2d]" role="alert">
             <div className="flex items-center justify-between gap-3">
@@ -1054,7 +1114,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </div>
         )}
 
-        <div className="hidden lg:block bg-white rounded-xl shadow-[0_5px_20px_rgba(27,49,79,.04)] border border-[#dfe6ee] overflow-hidden">
+        <div className="hidden lg:block bg-white rounded-xl shadow-[0_5px_20px_rgba(27,49,79,.04)] border border-[#dfe6ee] overflow-visible">
             <table className="w-full table-fixed text-xs">
               <colgroup>
                 <col className="w-[8%]" /><col className="w-[15%]" /><col className="w-[11%]" />
@@ -1101,6 +1161,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                       <td className="px-2.5 py-2.5 text-slate-600 tabular-nums">{fmtDate(lead.enquiryDate)}</td>
                       <td className="px-2.5 py-2.5 min-w-0">
                         <div className="font-semibold text-slate-800 break-words" title={lead.childName}>{lead.childName || "—"}</div>
+                        {lead.matchNeedsReview && <div className="mt-1 text-[10px] font-semibold text-amber-800">Possible match · review</div>}
                         <div className="text-[11px] text-[#8290a3] break-words">{lead.program}</div>
                       </td>
                       <td className="px-2.5 py-2.5 font-mono text-slate-700 break-all">{lead.phone || "—"}</td>
@@ -1110,7 +1171,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                       </td>
                       <td className="px-2.5 py-2.5 text-slate-500 break-words" title={lead.source}>{lead.source}</td>
                       <td className="px-2.5 py-2.5 min-w-0">
-                        <StatusBadge status={lead.status} archived={lead.isArchived} />
+                        <StatusBadge status={lead.status} archived={lead.isArchived} remark={lead.remark} misCallingRemarks={lead.misCallingRemarks} closeReason={lead.closeReason} />
                         {lead.admissionDate && <div className="mt-1 text-[11px] text-[#596b83]">Admitted {fmtDate(lead.admissionDate)}</div>}
                       </td>
                       <td className="px-2.5 py-2.5 text-slate-600 break-words">{lead.leadOwner || "—"}</td>
@@ -1118,7 +1179,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         {lead.readOnly ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
                       <td className="px-2.5 py-2.5">
-                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">Tracker record · import to edit</span> : (
+                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">{lead.needsVisitLink ? "Walk-in needs linking to edit" : "Tracker record · import to edit"}</span> : (
                           <select aria-label={`Actions for ${lead.childName || "lead"}`} value="" onChange={e => {
                             if (e.target.value === "edit") setEditLead(lead);
                             if (e.target.value === "history") setHistoryLead(lead);
@@ -1160,9 +1221,10 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   <div className="min-w-0">
                     <p className="text-[11px] text-[#8090a4]">Enquiry {rowNum} <span className="mx-1">/</span> {lead.enquiryDate}</p>
                     <h2 className="mt-1 font-bold text-[#1b304d]">{lead.childName || "Child not recorded"}</h2>
+                    {lead.matchNeedsReview && <p className="mt-1 text-[11px] font-semibold text-amber-800">Possible match · review</p>}
                     <p className="text-sm text-[#66778d]">{lead.program} <span className="mx-1 text-[#c4ccd6]">/</span> {lead.brand}</p>
                   </div>
-                  <StatusBadge status={lead.status} archived={lead.isArchived} />
+                  <StatusBadge status={lead.status} archived={lead.isArchived} remark={lead.remark} misCallingRemarks={lead.misCallingRemarks} closeReason={lead.closeReason} />
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4 pt-3 border-t border-[#edf1f5] text-sm">
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Phone</div><div className="mt-0.5 font-medium text-[#334a68]">{lead.phone || "Not provided"}</div></div>
@@ -1174,7 +1236,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
                   {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
                   {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
-                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record · import to edit</span>}
+                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">{lead.needsVisitLink ? "Walk-in needs linking to edit" : "Tracker record · import to edit"}</span>}
                 </div>
               </article>
             );

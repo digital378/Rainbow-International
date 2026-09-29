@@ -159,7 +159,9 @@ async function loadSource() {
       issues.push({ brand, reason: "CRM source is unavailable", reference: `${brand}-source` });
       continue;
     }
-    rows.push(...mergedRows(brand, result.leads, result.walkins ?? []));
+    // Reviewed imports are DM tracker enquiries only. WALKINs already
+    // represent completed visits and must not become another CRM import.
+    rows.push(...mergedRows(brand, result.leads, []));
   }
   return { results, rows, issues };
 }

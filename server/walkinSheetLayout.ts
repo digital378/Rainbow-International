@@ -76,3 +76,45 @@ export function findManagedRow(rows: string[][], leadIdIndex: number, leadId: st
   if (matching.length > 1) throw new Error(`Duplicate Lead ID "${leadId}"; refusing to update`);
   return matching[0] ?? -1;
 }
+
+function normalizedChild(value: string): string {
+  return String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function normalizedPhone(value: string): string {
+  const digits = String(value ?? "").replace(/\D/g, "");
+  return digits.length >= 10 ? digits.slice(-10) : "";
+}
+
+/**
+ * Find one existing completed visit by the same strong identity used by the
+ * unified lead view. A populated ID, or multiple visits, requires review.
+ */
+export function findUnlinkedVisitRow(
+  rows: string[][],
+  layout: ManagedSheetLayout,
+  childName: string,
+  phone: string,
+  brand?: string,
+): number {
+  const child = normalizedChild(childName);
+  const contact = normalizedPhone(phone);
+  if (!child || !contact) return -1;
+  const childIndex = layout.header.findIndex(name => canonicalHeader(name) === "student name");
+  const phoneIndex = layout.header.findIndex(name => canonicalHeader(name) === "father contact");
+  const brandIndex = layout.header.findIndex(name => canonicalHeader(name) === "brand");
+  if (childIndex < 0 || phoneIndex < 0) {
+    throw new Error("WALKINs identity columns are missing; refusing to link");
+  }
+  const candidates = rows.flatMap((row, index) =>
+    index > 0 && (brandIndex < 0 || !brand || String(row[brandIndex] ?? "").trim() === brand)
+      && normalizedChild(row[childIndex]) === child && normalizedPhone(row[phoneIndex]) === contact
+      ? [index] : []);
+  if (candidates.length > 1) throw new Error("Multiple WALKINs rows match this child and phone; identity needs review");
+  const index = candidates[0];
+  if (index === undefined) return -1;
+  if (String(rows[index][layout.leadIdIndex] ?? "").trim()) {
+    throw new Error("Matching WALKINs row is already linked to another Lead ID; identity needs review");
+  }
+  return index;
+}

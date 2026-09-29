@@ -15,6 +15,12 @@ export type SupplementLead = {
   source: string;
   leadOwner: string;
   program: string;
+  /** First Lead ID value on a WALKINs row, when present. */
+  leadId?: string;
+  remark?: string;
+  misCallingRemarks?: string;
+  closeReason?: string;
+  matchNeedsReview?: boolean;
 };
 
 export type SupplementMonth = {
@@ -182,7 +188,7 @@ export function parseLeadRows(rows: string[][]): SupplementLead[] {
       branchName: columns.branch >= 0 ? clean(row[columns.branch]) : "",
       walkInDate: null,
       status,
-      source: clean(row[columns.source]) || "Unknown",
+      source: clean(row[columns.source]) || "DM",
       leadOwner: clean(row[columns.owner]),
       program: clean(row[columns.program]) || "Unknown",
     });
@@ -211,6 +217,10 @@ export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
     status: index("Status"),
     program: index("Program", "Programme", "Grade"),
     owner: index("Lead Owner", "Counsellor Name"),
+    leadId: index("Lead ID"),
+    remark: index("Follow Up Remark(s)", "Follow Up Remarks", "Follow-up Remarks", "Remark(s)", "Remark"),
+    misCallingRemarks: index("MIS Calling Remarks", "MIS Calling Remark"),
+    closeReason: index("Close Reason", "Reason For Closing"),
   };
   if (columns.date < 0) return [];
 
@@ -236,6 +246,10 @@ export function parseWalkinRows(rows: string[][]): WalkinDetail[] {
       program: clean(row[columns.program]),
       leadOwner: clean(row[columns.owner]),
       source: clean(row[index("Source")]) || "Unknown",
+      leadId: columns.leadId >= 0 ? clean(row[columns.leadId]) : "",
+      remark: columns.remark >= 0 ? clean(row[columns.remark]) : "",
+      misCallingRemarks: columns.misCallingRemarks >= 0 ? clean(row[columns.misCallingRemarks]) : "",
+      closeReason: columns.closeReason >= 0 ? clean(row[columns.closeReason]) : "",
     }];
   });
 }
@@ -244,25 +258,87 @@ function normalizedIdentity(value: string): string {
   return clean(value).toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-export function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): SupplementLead[] {
-  const unused = new Set(walkins.map((_, index) => index));
-  return leads.map(lead => {
-    const candidates = [...unused].filter(index => {
-      const detail = walkins[index];
-      if (detail.enquiryDate !== lead.enquiryDate) return false;
-      // Never fill an incomplete identity from operational fields or a single
-      // matching identifier: siblings can share a date and phone.
-      return Boolean(
-        /^\d{10}$/.test(lead.phone) && lead.phone === detail.phone
-        && lead.childName && detail.childName
-        && normalizedIdentity(lead.childName) === normalizedIdentity(detail.childName),
-      );
-    });
-    if (candidates.length !== 1) return lead;
+function hasSamePerson(left: SupplementLead, right: SupplementLead): boolean {
+  return Boolean(
+    /^\d{10}$/.test(left.phone) && /^\d{10}$/.test(right.phone)
+    && left.phone === right.phone
+    && left.childName && right.childName
+    && normalizedIdentity(left.childName) === normalizedIdentity(right.childName),
+  );
+}
 
-    const index = candidates[0];
-    unused.delete(index);
-    const detail = walkins[index];
+function unambiguousPairs(
+  leads: SupplementLead[],
+  walkins: SupplementLead[],
+  requireSameDate = false,
+): Map<number, number> {
+  const isCandidate = (lead: SupplementLead, walkin: SupplementLead) =>
+    (!requireSameDate || lead.enquiryDate === walkin.enquiryDate) && hasSamePerson(lead, walkin);
+  const leadMatches = leads.map(lead =>
+    walkins.flatMap((walkin, index) => isCandidate(lead, walkin) ? [index] : []));
+  const walkinMatches = walkins.map(walkin =>
+    leads.flatMap((lead, index) => isCandidate(lead, walkin) ? [index] : []));
+  const pairs = new Map<number, number>();
+  leadMatches.forEach((matches, leadIndex) => {
+    if (matches.length !== 1) return;
+    const walkinIndex = matches[0];
+    if (walkinMatches[walkinIndex].length === 1) pairs.set(leadIndex, walkinIndex);
+  });
+  return pairs;
+}
+
+/** Creates one CRM-led row for exact, unambiguous person matches, plus every unmatched visit. */
+export function mergeLeadAndWalkinRows(
+  leads: SupplementLead[],
+  walkins: SupplementLead[],
+): SupplementLead[] {
+  const pairs = unambiguousPairs(leads, walkins);
+  const matchedWalkins = new Set(pairs.values());
+  const walkinMatches = walkins.map(walkin =>
+    leads.flatMap((lead, index) => hasSamePerson(lead, walkin) ? [index] : []));
+  const ambiguousLeads = new Set<number>();
+  const ambiguousWalkins = new Set<number>();
+  leads.forEach((lead, leadIndex) => {
+    const matches = walkins.flatMap((walkin, index) => hasSamePerson(lead, walkin) ? [index] : []);
+    if (matches.length > 1 || matches.some(index => walkinMatches[index].length > 1)) {
+      ambiguousLeads.add(leadIndex);
+      matches.forEach(index => ambiguousWalkins.add(index));
+    }
+  });
+  const merged = leads.map((lead, leadIndex) => {
+    const walkinIndex = pairs.get(leadIndex);
+    if (walkinIndex == null) return { ...lead, matchNeedsReview: ambiguousLeads.has(leadIndex) };
+    const walkin = walkins[walkinIndex];
+    return {
+      ...lead,
+      sourceLocations: [...new Set([...(lead.sourceLocations ?? []), ...(walkin.sourceLocations ?? [])])],
+      parentName: walkin.parentName || lead.parentName,
+      childName: walkin.childName || lead.childName,
+      phone: walkin.phone || lead.phone,
+      branchName: walkin.branchName || lead.branchName,
+      walkInDate: walkin.walkInDate || lead.walkInDate,
+      status: walkin.status || lead.status,
+      program: walkin.program || lead.program,
+      leadOwner: walkin.leadOwner || lead.leadOwner,
+      leadId: walkin.leadId || "",
+      remark: walkin.remark || lead.remark || "",
+      misCallingRemarks: walkin.misCallingRemarks || lead.misCallingRemarks || "",
+      closeReason: walkin.closeReason || lead.closeReason || "",
+    };
+  });
+  return [
+    ...merged,
+    ...walkins.flatMap((walkin, index) => matchedWalkins.has(index)
+      ? [] : [{ ...walkin, matchNeedsReview: ambiguousWalkins.has(index) }]),
+  ];
+}
+
+export function enrichLeadRows(leads: SupplementLead[], walkins: WalkinDetail[]): SupplementLead[] {
+  const pairs = unambiguousPairs(leads, walkins, true);
+  return leads.map((lead, leadIndex) => {
+    const walkinIndex = pairs.get(leadIndex);
+    if (walkinIndex == null) return lead;
+    const detail = walkins[walkinIndex];
     return {
       ...lead,
       sourceLocations: [...new Set([...(lead.sourceLocations ?? []), ...(detail.sourceLocations ?? [])])],
@@ -397,12 +473,15 @@ export async function readMarketing2728Supplement(brand: "RIS" | "RPS"): Promise
     }
   }
   try {
-    const leads = enrichLeadRows(parseLeadRows(rows.leads), parseWalkinRows(rows.walkins));
+    // The tracker is an enquiry source. Do not pre-attach a visit here: doing
+    // so conceals ambiguous matches before the unified view can review them.
+    const leads = parseLeadRows(rows.leads);
     const walkins = parseWalkinRows(rows.walkins);
     // Public CSV can omit blank/title rows; its indexes are not trustworthy
-    // workbook coordinates. Import itself requires authenticated access.
+    // workbook coordinates. Retain source type without claiming row numbers.
     if (mode !== "oauth") {
-      for (const row of [...leads, ...walkins]) row.sourceLocations = undefined;
+      for (const row of leads) row.sourceLocations = ["CRM Leads Tracker (public read)"];
+      for (const row of walkins) row.sourceLocations = ["WALKINs (public read)"];
     }
     return {
       leads,

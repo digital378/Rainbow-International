@@ -88,15 +88,22 @@ describe("historical CRM walk-in import", () => {
     mocks.branches = [{ id: 1, name: "Central", code: "central", brand: "RIS" }];
   });
 
-  it("deduplicates enriched leads with WALKINs rows and marks unsafe rows for review", async () => {
+  it("imports DM tracker rows only and reviews unsafe tracker rows", async () => {
     const valid = lead();
     const missingPhone = lead({
       childName: "Mira", phone: "",
       sourceLocations: ["CRM Leads Tracker row 42"],
     });
+    const completedVisit = lead({
+      childName: "Walk-in only",
+      phone: "9876543212",
+      status: "WALK-IN COMPLETED",
+      walkInDate: "2027-06-12",
+      sourceLocations: ["WALKINs row 19"],
+    });
     mocks.supplement.mockImplementation(async (brand: string) => source(
       brand === "RIS" ? [valid, missingPhone] : [],
-      brand === "RIS" ? [valid, { ...missingPhone, sourceLocations: ["WALKINs row 19"] }] : [],
+      brand === "RIS" ? [valid, completedVisit] : [],
     ));
 
     const result = await previewCrmImport();
@@ -110,7 +117,13 @@ describe("historical CRM walk-in import", () => {
     expect(result.issues[0].reason).toContain("Phone number is missing");
     expect(result.issues[0].reference).toMatch(/^RIS-[a-f0-9]{10}$/);
     expect(result.issues[0].reference).not.toContain("Mira");
-    expect(result.issues[0].sourceLocations).toEqual(["CRM Leads Tracker row 42", "WALKINs row 19"]);
+    expect(result.issues[0].sourceLocations).toEqual(["CRM Leads Tracker row 42"]);
+
+    const applied = await applyCrmImport();
+    const importedLeads = mocks.inserted.filter(row => row.table === walkinLeads).map(row => row.values);
+    expect(applied.imported).toBe(1);
+    expect(importedLeads.map(row => row.childName)).toEqual(["Aarav"]);
+    expect(importedLeads.some(row => row.childName === "Walk-in only")).toBe(false);
   });
 
   it("previews a conflicting identity within the same import batch as needing review", async () => {
@@ -194,15 +207,18 @@ describe("historical CRM walk-in import", () => {
     expect(result.issues[0].reason).toContain("different child name");
   });
 
-  it("refuses to apply read-only public CSV source data", async () => {
+  it("retains the public fallback source type and refuses to apply its read-only data", async () => {
     mocks.supplement.mockImplementation(async (brand: string) => source(
       brand === "RIS" ? [lead()] : [],
       brand === "RIS" ? [lead()] : [],
       brand === "RIS" ? "public" : "oauth",
     ));
 
+    const preview = await previewCrmImport();
     const result = await applyCrmImport();
 
+    expect(preview.sourceReady).toBe(false);
+    expect(preview.eligible).toBe(1);
     expect(result.imported).toBe(0);
     expect(result.review).toBe(1);
     expect(result.issues[0].reason).toContain("authenticated, complete CRM source data");
@@ -249,14 +265,14 @@ describe("historical CRM walk-in import", () => {
     expect(insertedLead).toMatchObject({ branchId: null, closeReason: null, walkInDate: null });
   });
 
-  it("accepts canonical tracker statuses and reviews conflicting source status values", async () => {
+  it("accepts canonical tracker statuses without requiring matching WALKINs statuses", async () => {
     const extraStatuses = ["TRANSFERRED", "INTEGRATED", "NEXT YEAR"];
     const statuses = extraStatuses.map((status, index) => lead({
       childName: `Child ${index}`,
       phone: `987654321${index}`,
       status,
     }));
-    const conflictingLead = lead({ childName: "Conflict", status: "OPEN" });
+    const conflictingLead = lead({ childName: "Conflict", phone: "9876543214", status: "OPEN" });
     const conflictingWalkin = { ...conflictingLead, status: "CLOSED" };
     mocks.supplement.mockImplementation(async (brand: string) => source(
       brand === "RIS" ? [...statuses, conflictingLead] : [],
@@ -265,9 +281,9 @@ describe("historical CRM walk-in import", () => {
 
     const result = await previewCrmImport();
 
-    expect(result.eligible).toBe(3);
-    expect(result.review).toBe(1);
-    expect(result.issues.some(issue => issue.reason.includes("conflicting statuses"))).toBe(true);
+    expect(result.eligible).toBe(4);
+    expect(result.review).toBe(0);
+    expect(result.issues.some(issue => issue.reason.includes("conflicting statuses"))).toBe(false);
   });
 
   it("imports a booked lead without its legacy walk-in date and reports a warning", async () => {

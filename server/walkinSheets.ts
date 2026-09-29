@@ -32,7 +32,7 @@ import { db } from "./db";
 import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations, walkinSyncSnapshots } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
-import { canonicalHeader, findManagedRow, resolveManagedSheetLayout } from "./walkinSheetLayout";
+import { canonicalHeader, findManagedRow, findUnlinkedVisitRow, resolveManagedSheetLayout } from "./walkinSheetLayout";
 import type { WalkinLead } from "@shared/schema";
 import {
   beginWalkinSyncShutdown,
@@ -307,6 +307,9 @@ export const MASTER_SHEET_HEADERS = [
 ] as const;
 
 const MASTER_LEADS_TAB = "WALKINs";
+// Keep Master data and existing reconciliation markers untouched until its
+// workbook automations are ready for use.
+const masterWalkinsDisabled = (): boolean => true;
 
 function headersForBrand(brand: "RIS" | "RPS") {
   return brand === "RPS" ? RPS_SHEET_HEADERS : SHEET_HEADERS;
@@ -535,21 +538,18 @@ async function clearReconciliation(scope: ReconciliationScope): Promise<void> {
 
 async function recoverPendingReconciliations(): Promise<void> {
   const pending = await db.select().from(walkinSyncReconciliations);
-  for (const { scope } of pending) {
-    if (scope === "RIS" || scope === "RPS") {
-      const leads = await db.select().from(walkinLeads).where(eq(walkinLeads.brand, scope));
-      for (const lead of leads) {
-        if (lead.isArchived) await removeLeadFromSheet(scope, lead.id);
-        else await upsertLeadToSheet(scope, lead);
+  if (pending.length) {
+    // These workbook-wide markers predate the distinction between enquiries
+    // and completed visits. Replaying every DB lead would duplicate the
+    // historical, ID-less WALKINs rows. Keep the markers visible for review
+    // rather than converting them into an unbounded write operation.
+    const message = "Workbook-wide recovery paused: review completed-visit links before reconciling";
+    for (const { scope } of pending) {
+      // Master is temporarily out of service. Preserve its pending marker, but
+      // do not attempt to recover or update Master sync status.
+      if (scope === "RIS" || scope === "RPS") {
+        syncStatus[scope].lastError = message;
       }
-      await clearReconciliation(scope);
-    } else if (scope === "MASTER") {
-      const leads = await db.select().from(walkinLeads);
-      for (const lead of leads) {
-        if (lead.isArchived) await removeLeadFromMasterSheet(lead.id);
-        else await upsertLeadToMasterSheet(lead);
-      }
-      await clearReconciliation(scope);
     }
   }
 }
@@ -569,7 +569,7 @@ function getAuthClient() {
 /** Check the write-side OAuth path before a reviewed bulk import changes the CRM. */
 export async function assertWalkinSheetMirrorReady(): Promise<void> {
   const auth = getAuthClient();
-  if (!auth || !getSheetId("RIS") || !getSheetId("RPS") || !process.env.MASTER_WALKIN_SHEET_ID_2728) {
+  if (!auth || !getSheetId("RIS") || !getSheetId("RPS")) {
     throw new Error("Sheet mirroring is not configured");
   }
   await auth.getAccessToken();
@@ -577,7 +577,6 @@ export async function assertWalkinSheetMirrorReady(): Promise<void> {
   for (const [scope, spreadsheetId, headers] of [
     ["RIS", getSheetId("RIS"), SHEET_HEADERS],
     ["RPS", getSheetId("RPS"), RPS_SHEET_HEADERS],
-    ["MASTER", process.env.MASTER_WALKIN_SHEET_ID_2728, MASTER_SHEET_HEADERS],
   ] as const) {
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId!,
@@ -602,7 +601,6 @@ export async function inspectWalkinMirrorState(
   for (const [scope, spreadsheetId, headers] of [
     ["RIS", getSheetId("RIS"), SHEET_HEADERS],
     ["RPS", getSheetId("RPS"), RPS_SHEET_HEADERS],
-    ["MASTER", process.env.MASTER_WALKIN_SHEET_ID_2728, MASTER_SHEET_HEADERS],
   ] as const) {
     if (!spreadsheetId) throw new Error(`${scope} sheet is not configured`);
     const rows = (await sheets.spreadsheets.values.get({
@@ -868,6 +866,64 @@ async function appendManagedRowWithoutShifting(
   }));
 }
 
+function isNewCompletedVisit(lead: WalkinLead): boolean {
+  return lead.createdBy !== "legacy-import"
+    && ["WALK-IN COMPLETED", "ADMISSION DONE"].includes(lead.status.toUpperCase())
+    && Boolean(lead.walkInDate || lead.admissionDate);
+}
+
+async function linkExistingVisit(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tabName: string,
+  snapshot: string[][],
+  layout: ReturnType<typeof resolveManagedSheetLayout>,
+  lead: WalkinLead,
+): Promise<boolean> {
+  const index = findUnlinkedVisitRow(snapshot, layout, lead.childName, lead.phone, lead.brand);
+  if (index < 0) return false;
+
+  // A second CRM enquiry for the same child/phone cannot be assigned this
+  // visit merely because it happened to be processed first.
+  const otherLeads = await db.select({
+    id: walkinLeads.id, phone: walkinLeads.phone, childName: walkinLeads.childName,
+  }).from(walkinLeads).where(eq(walkinLeads.brand, lead.brand));
+  const normalizedChild = lead.childName.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const normalizedPhone = lead.phone.replace(/\D/g, "").slice(-10);
+  if (otherLeads.some(other =>
+    other.id !== lead.id
+    && other.childName.toLowerCase().replace(/[^a-z0-9]+/g, "") === normalizedChild
+    && other.phone.replace(/\D/g, "").slice(-10) === normalizedPhone
+  )) {
+    throw new Error("Multiple CRM enquiries match this visit; identity needs review");
+  }
+
+  const rowNumber = index + 1;
+  const fresh = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${tabName}!A${rowNumber}:AZ${rowNumber}`,
+  });
+  const originalRow = snapshot[index] ?? [];
+  const freshRow = (fresh.data.values?.[0] ?? []) as string[];
+  const width = Math.max(originalRow.length, freshRow.length);
+  if (Array.from({ length: width }, (_, column) =>
+    String(originalRow[column] ?? "").trim() !== String(freshRow[column] ?? "").trim()).some(Boolean)) {
+    throw new Error(`WALKINs row ${rowNumber} changed while linking; no cell was written`);
+  }
+  if (findUnlinkedVisitRow(
+    [layout.header, freshRow], layout, lead.childName, lead.phone, lead.brand,
+  ) !== 1) {
+    throw new Error(`WALKINs row ${rowNumber} changed while linking; no cell was written`);
+  }
+  await fencedWalkinSheetWrite(`link existing ${tabName} visit`, () => sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${tabName}!${columnLetter(layout.leadIdIndex)}${rowNumber}`,
+    valueInputOption: "RAW",
+    requestBody: { values: [[String(lead.id)]] },
+  }));
+  return true;
+}
+
 async function leadToMasterRow(lead: WalkinLead): Promise<string[]> {
   const brandRow = await leadToRow(lead, "RPS");
   const byHeader = new Map<string, string>(
@@ -915,6 +971,7 @@ export async function upsertLeadToSheet(
       const row = layout.project(await leadToRow(lead, brand));
       const existingRowIndex = findManagedRow(snapshot, layout.leadIdIndex, String(lead.id));
 
+      let linkedOnly = false;
       if (existingRowIndex >= 0) {
         // Update existing row (Sheets row = existingRowIndex + 1, 1-based)
         const sheetsRow = existingRowIndex + 1;
@@ -955,16 +1012,20 @@ export async function upsertLeadToSheet(
         );
         console.log(`[walkin/sheets] Updated row ${sheetsRow} for lead ${lead.id} in ${brand} sheet`);
       } else {
-        await appendManagedRowWithoutShifting(
-          sheets, sheetId!, LEADS_TAB, snapshot, row, `append ${brand} lead ${lead.id}`,
-        );
-        console.log(`[walkin/sheets] Appended new lead ${lead.id} to ${brand} sheet`);
+        linkedOnly = await linkExistingVisit(sheets, sheetId!, LEADS_TAB, snapshot, layout, lead);
+        if (!linkedOnly) {
+          if (!isNewCompletedVisit(lead)) return;
+          await appendManagedRowWithoutShifting(
+            sheets, sheetId!, LEADS_TAB, snapshot, row, `append ${brand} lead ${lead.id}`,
+          );
+          console.log(`[walkin/sheets] Appended completed visit ${lead.id} to ${brand} sheet`);
+        }
       }
 
       // Update in-memory sync status
       syncStatus[brand].lastSyncAt = new Date();
       syncStatus[brand].lastError = null;
-      await persistSyncSnapshot(brand, String(lead.id), syncValuesFromLead(lead));
+      if (!linkedOnly) await persistSyncSnapshot(brand, String(lead.id), syncValuesFromLead(lead));
     } catch (err: any) {
       if (!retried && err?.code === 429) {
         console.warn(`[walkin/sheets] Rate-limited (429) for ${brand} — retrying in 2s`);
@@ -983,10 +1044,8 @@ export async function upsertLeadToSheet(
 // ── Fire-and-forget wrapper (used in API route handlers) ─────────
 // Never throws — sheet failure must not block the API response.
 export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
-  // Mark before trying to claim the lease. If another Autoscale instance owns
-  // it, the DB lead still leaves a durable workbook-reconciliation request
-  // instead of losing the fire-and-forget Sheet mirror attempt.
-  void markReconciliation(brand, "MASTER")
+  // Only branch workbooks are active; do not create or clear Master markers.
+  void markReconciliation(brand)
     .then(() => runWalkinSheetOperation("queued lead upsert", async () => {
       const [freshLead] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, lead.id));
       if (!freshLead || freshLead.isArchived) {
@@ -996,9 +1055,7 @@ export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
         throw new Error(`Lead ${lead.id} changed brand to ${freshLead.brand}; ${brand} sheet upsert deferred`);
       }
       await upsertLeadToSheet(brand, freshLead);
-      await upsertLeadToMasterSheet(freshLead);
       await clearReconciliation(brand);
-      await clearReconciliation("MASTER");
     }))
     .catch((err) => console.error("[walkin/sheets] Unexpected queue error:", err?.message));
 }
@@ -1006,24 +1063,18 @@ export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
 /** Mirror a reviewed import as one leased operation, not hundreds of competing
  * fire-and-forget upserts that can clear one another's recovery markers. */
 export function queueImportUpserts(ids: string[]): void {
-  if (ids.length === 0) return;
-  void markReconciliation("RIS", "RPS", "MASTER")
-    .then(() => runWalkinSheetOperation("historical import mirror", async () => {
-      // Reconcile all pending DB records, not just this batch. A normal edit
-      // may have arrived while the import held the sheet lease.
-      await recoverPendingReconciliations();
-    }))
-    .catch((err: any) => {
-      const message = `Historical import mirror is pending: ${err?.message ?? "unknown error"}`;
-      syncStatus.RIS.lastError = message;
-      syncStatus.RPS.lastError = message;
-      syncStatus.MASTER.lastError = message;
-      console.error("[walkin/sheets]", message);
-    });
+  // Reviewed DM enquiries belong in the CRM, not in completed-visit tabs.
+  // Retained temporarily for older callers; importing never starts a mirror.
+  void ids;
 }
 
 // ── Upsert a single lead into the master (combined) sheet ────────
 export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
+  if (masterWalkinsDisabled()) {
+    void lead;
+    throw new Error("Master WALKINs synchronization is temporarily disabled");
+  }
+
   const auth = getAuthClient();
   if (!auth) throw new Error("Google auth not configured for Master upsert");
   const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
@@ -1047,6 +1098,7 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
       const row = layout.project(canonicalRow);
       const existingRowIndex = findManagedRow(snapshot, layout.leadIdIndex, String(lead.id));
 
+      let linkedOnly = false;
       if (existingRowIndex >= 0) {
         const sheetsRow = existingRowIndex + 1;
         const currentRowResp = await sheets.spreadsheets.values.get({
@@ -1085,14 +1137,18 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
           `upsert Master lead ${lead.id}`,
         );
       } else {
-        await appendManagedRowWithoutShifting(
-          sheets, sheetId!, MASTER_LEADS_TAB, snapshot, row, `append Master lead ${lead.id}`,
-        );
+        linkedOnly = await linkExistingVisit(sheets, sheetId!, MASTER_LEADS_TAB, snapshot, layout, lead);
+        if (!linkedOnly) {
+          if (!isNewCompletedVisit(lead)) return;
+          await appendManagedRowWithoutShifting(
+            sheets, sheetId!, MASTER_LEADS_TAB, snapshot, row, `append Master lead ${lead.id}`,
+          );
+        }
       }
 
       syncStatus.MASTER.lastSyncAt = new Date();
       syncStatus.MASTER.lastError = null;
-      await persistSyncSnapshot("MASTER", String(lead.id), syncValuesFromLead(lead));
+      if (!linkedOnly) await persistSyncSnapshot("MASTER", String(lead.id), syncValuesFromLead(lead));
     } catch (err: any) {
       if (!retried && err?.code === 429) {
         await new Promise((r) => setTimeout(r, 2000));
@@ -1492,6 +1548,13 @@ async function applyMasterYellowColumnProtection(
   spreadsheetId: string,
   allowedGrades: readonly string[],
 ): Promise<void> {
+  if (masterWalkinsDisabled()) {
+    void sheets;
+    void spreadsheetId;
+    void allowedGrades;
+    throw new Error("Master WALKINs protection setup is temporarily disabled");
+  }
+
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
   const tab = (meta.data.sheets ?? []).find(
     (s: any) => s.properties?.title === MASTER_LEADS_TAB,
@@ -1531,10 +1594,18 @@ async function applyMasterYellowColumnProtection(
 // ── Full resync: rewrite entire WALKINs tab from DB ──────────────
 // Fetches all non-archived leads for the brand, clears data rows (keeps header),
 // then batch-appends all rows. Returns counts for the admin response.
+function fullResyncBlockedForHistoricalTabs(): boolean {
+  // No full rewrite can preserve the mixed historical completed-visit data.
+  return true;
+}
+
 export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   dbCount: number;
   sheetCount: number;
 }> {
+  if (fullResyncBlockedForHistoricalTabs()) {
+    throw new Error("Full resync is disabled: it would replace completed visits with pre-visit enquiries. Use incremental synchronization.");
+  }
   const auth = getAuthClient();
   if (!auth) throw new Error("Google auth not configured (GOOGLE_REFRESH_TOKEN missing)");
 
@@ -1628,6 +1699,13 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
 // Fetches all non-archived leads for both brands, clears data rows,
 // writes the combined header row, then batch-appends all leads sorted by date.
 export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount: number }> {
+  if (masterWalkinsDisabled()) {
+    throw new Error("Master WALKINs resync is temporarily disabled");
+  }
+
+  if (fullResyncBlockedForHistoricalTabs()) {
+    throw new Error("Full resync is disabled: it would replace completed visits with pre-visit enquiries. Use incremental synchronization.");
+  }
   const auth = getAuthClient();
   if (!auth) throw new Error("Google auth not configured (GOOGLE_REFRESH_TOKEN missing)");
 
@@ -2026,35 +2104,9 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
           entry.errors.push(message);
           syncStatus[brand].lastError = message;
           try {
-            await markReconciliation(brand, "MASTER");
+            await markReconciliation(brand);
           } catch (markerError: any) {
-            entry.errors.push(`Reconciliation marker failed for ${brand}/MASTER lead ${leadId}: ${markerError?.message}`);
-          }
-        }
-
-        if (process.env.MASTER_WALKIN_SHEET_ID_2728) {
-          try {
-            const [freshLead] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, leadId));
-            if (!freshLead || freshLead.isArchived) throw new Error(`Lead ${leadId} is missing or archived after DB update`);
-            await upsertLeadToMasterSheet(freshLead);
-          } catch (propagationError: any) {
-            const message = `Master propagation for lead ${leadId} failed: ${propagationError?.message ?? "Unknown error"}`;
-            entry.errors.push(message);
-            syncStatus.MASTER.lastError = message;
-            try {
-              await markReconciliation("MASTER");
-            } catch (markerError: any) {
-              entry.errors.push(`Master reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
-            }
-          }
-        } else {
-          const message = `Master propagation for lead ${leadId} skipped: MASTER_WALKIN_SHEET_ID_2728 is not set`;
-          entry.errors.push(message);
-          syncStatus.MASTER.lastError = message;
-          try {
-            await markReconciliation("MASTER");
-          } catch (markerError: any) {
-            entry.errors.push(`Master reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+            entry.errors.push(`${brand} reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
           }
         }
       } catch (e: any) {
@@ -2092,6 +2144,11 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
     errors: [],
     changes: [],
   };
+  if (masterWalkinsDisabled()) {
+    entry.errors.push("Master WALKINs synchronization is temporarily disabled");
+    _pullLog.unshift(entry); if (_pullLog.length > 100) _pullLog.pop();
+    return entry;
+  }
 
   const auth = getAuthClient();
   if (!auth) {
@@ -2356,6 +2413,10 @@ export async function syncDeletionsFromMaster(): Promise<{
     details: [] as Array<{ leadId: string; brand: "RIS" | "RPS"; parentName: string }>,
     errors: [] as string[],
   };
+  if (masterWalkinsDisabled()) {
+    result.errors.push("Master WALKINs deletion sync is temporarily disabled");
+    return result;
+  }
 
   const auth = getAuthClient();
   if (!auth) { result.errors.push("Google auth not configured"); return result; }
@@ -2524,6 +2585,11 @@ export async function removeLeadFromSheet(
 // ── Remove (archive) a lead from the Master MIS sheet ────────────
 // Same approach: find by Lead ID (col V) and overwrite Status (col P).
 export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
+  if (masterWalkinsDisabled()) {
+    void leadId;
+    throw new Error("Master WALKINs removal is temporarily disabled");
+  }
+
   const auth = getAuthClient();
   if (!auth) throw new Error("Google auth not configured for Master removal");
   const sheetId = process.env.MASTER_WALKIN_SHEET_ID_2728 || null;
@@ -2577,30 +2643,25 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
 // ── Fire-and-forget wrapper for archival sheet updates ────────────
 // Never throws — sheet failure must not block the API response.
 export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
-  // Persist the recovery intent before lease acquisition for the same reason
-  // as queueUpsert: temporary cross-instance contention must not erase it.
-  void markReconciliation(brand, "MASTER")
+  // Persist recovery intent only for the active branch workbook.
+  void markReconciliation(brand)
     .then(() => runWalkinSheetOperation("queued lead removal", async () => {
       await removeLeadFromSheet(brand, leadId);
-      await removeLeadFromMasterSheet(leadId);
       await clearReconciliation(brand);
-      await clearReconciliation("MASTER");
     }))
     .catch((err) => console.error("[walkin/sheets] Unexpected remove error:", err?.message));
 }
 
-/** Keep the brand and combined workbook changes together for a lead archive. */
+/** Propagate an archive only to the active branch workbook. */
 export async function resyncArchivedLead(brand: "RIS" | "RPS"): Promise<void> {
   await runWalkinSheetOperation("archive propagation", async () => {
-    await markReconciliation(brand, "MASTER");
+    await markReconciliation(brand);
     const archived = await db.select({ id: walkinLeads.id }).from(walkinLeads)
       .where(and(eq(walkinLeads.brand, brand), eq(walkinLeads.isArchived, true)));
     for (const lead of archived) {
       await removeLeadFromSheet(brand, lead.id);
-      await removeLeadFromMasterSheet(lead.id);
     }
     await clearReconciliation(brand);
-    await clearReconciliation("MASTER");
   });
 }
 
@@ -3133,10 +3194,7 @@ let autoPullRun: Promise<void> | null = null;
 
 async function runAutoPullCycle(): Promise<void> {
   await runWalkinSheetOperation("automatic pull", async () => {
-    // MASTER must run first so its DB writes land before the brand pulls compare
-    // brand-sheet values against the DB.
     const results = [
-      await pullChangesFromMasterSheet(),
       await pullChangesFromSheet("RIS"),
       await pullChangesFromSheet("RPS"),
     ];
@@ -3147,9 +3205,6 @@ async function runAutoPullCycle(): Promise<void> {
       return;
     }
     await recoverPendingReconciliations();
-    // Master is a mirror of the canonical CRM. A missing Master row must not
-    // silently archive a newly imported or not-yet-mirrored database lead.
-    // Deletion reconciliation remains an explicit admin-only action.
   });
 }
 

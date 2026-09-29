@@ -11,6 +11,8 @@ const fixture = vi.hoisted(() => ({
   supplement: vi.fn(),
   failAppend: "" as string,
   writes: [] as string[],
+  sheetClients: [] as string[],
+  sheetReads: [] as string[],
 }));
 
 vi.mock("./googleCredentials", () => ({ getGoogleRefreshToken: () => "fixture-only" }));
@@ -91,6 +93,7 @@ vi.mock("googleapis", () => {
   const sheets = {
     spreadsheets: {
       get: async ({ spreadsheetId }: any) => {
+        fixture.sheetReads.push(spreadsheetId);
         if (!fixture.books.has(spreadsheetId)) throw Error("Unexpected workbook");
         const book = fixture.books.get(spreadsheetId)!;
         return { data: { sheets: [{ properties: {
@@ -119,6 +122,7 @@ vi.mock("googleapis", () => {
       },
       values: {
         get: async ({ spreadsheetId, range }: any) => {
+          fixture.sheetReads.push(spreadsheetId);
           const rows = fixture.books.get(spreadsheetId)?.rows;
           if (!rows) throw Error("Unexpected workbook");
           const part = range.split("!")[1];
@@ -163,14 +167,15 @@ vi.mock("googleapis", () => {
             fixture.writes.push(`append:${spreadsheetId}`);
             return;
           }
-          if (!cell || requestBody.values.length !== 1 || requestBody.values[0].length !== 1) {
+          const targetCell = range.match(/!([A-Z]+)(\d+)$/);
+          if (!targetCell || requestBody.values.length !== 1 || requestBody.values[0].length !== 1) {
             throw Error("Unexpected full-row update");
           }
-          if (column(cell[1]) >= (book.columns ?? book.rows[0].length)) {
+          if (column(targetCell[1]) >= (book.columns ?? book.rows[0].length)) {
             throw Error("Header write exceeds grid limits");
           }
-          fixture.books.get(spreadsheetId)!.rows[0][column(cell[1])] = requestBody.values[0][0];
-          fixture.writes.push(`header:${spreadsheetId}`);
+          book.rows[Number(targetCell[2]) - 1][column(targetCell[1])] = requestBody.values[0][0];
+          fixture.writes.push(`cell:${spreadsheetId}!${targetCell[1]}${targetCell[2]}`);
         },
         clear: async () => { throw Error("Unexpected sheet clear"); },
       },
@@ -181,14 +186,19 @@ vi.mock("googleapis", () => {
       setCredentials() {}
       async getAccessToken() { return "fixture-only"; }
     } },
-    sheets: () => sheets,
+    sheets: () => {
+      fixture.sheetClients.push("created");
+      return sheets;
+    },
   } };
 });
 
 import { applyCrmImport, previewCrmImport } from "./walkinCrmImport";
 import {
-  assertWalkinSheetMirrorReady, MASTER_SHEET_HEADERS, queueImportUpserts, RPS_SHEET_HEADERS,
+  MASTER_SHEET_HEADERS, queueImportUpserts, RPS_SHEET_HEADERS,
   SHEET_HEADERS, upsertLeadToMasterSheet, upsertLeadToSheet, getSyncStatus,
+  pullChangesFromMasterSheet, removeLeadFromMasterSheet, queueUpsert, queueRemove,
+  syncDeletionsFromMaster,
   resyncBrandToSheet, resyncMasterSheet,
 } from "./walkinSheets";
 
@@ -209,6 +219,8 @@ describe("historical import against isolated RIS, RPS and Master workbook copies
     fixture.snapshots.clear();
     fixture.books.clear();
     fixture.writes = [];
+    fixture.sheetClients = [];
+    fixture.sheetReads = [];
     fixture.failAppend = "";
     vi.stubEnv("GOOGLE_CLIENT_ID", "fixture-only");
     vi.stubEnv("GOOGLE_CLIENT_SECRET", "fixture-only");
@@ -248,117 +260,120 @@ describe("historical import against isolated RIS, RPS and Master workbook copies
     }
   }
 
-  it("previews without writes; confirms, mirrors and reruns without losing old rows or duplicating imports", async () => {
+  it("imports reviewed enquiries into CRM without mirroring them into WALKINs", async () => {
     expect(await previewCrmImport()).toMatchObject({ eligible: 2, review: 0, byBrand: { RIS: 1, RPS: 1 } });
     expect(fixture.writes).toEqual([]);
     assertUntouched();
-    await assertWalkinSheetMirrorReady();
     const first = await applyCrmImport();
     expect(first).toMatchObject({ imported: 2, skipped: 0, review: 0 });
     expect(first.importedIds).toHaveLength(2);
     queueImportUpserts(first.importedIds);
     await tick();
-    expect(fixture.markers.size).toBe(0);
-    expect(importedRow(ids[0])).toHaveLength(1);
-    expect(importedRow(ids[1])).toHaveLength(1);
-    expect(importedRow(ids[2])).toHaveLength(2);
+    expect(fixture.writes).toEqual([]);
+    expect(importedRow(ids[0])).toHaveLength(0);
+    expect(importedRow(ids[1])).toHaveLength(0);
+    expect(importedRow(ids[2])).toHaveLength(0);
     assertUntouched();
 
     expect(await previewCrmImport()).toMatchObject({ eligible: 0, alreadyPresent: 2 });
     expect(await applyCrmImport()).toMatchObject({ imported: 0, skipped: 2 });
     queueImportUpserts(first.importedIds);
     await tick();
-    expect(importedRow(ids[0])).toHaveLength(1);
-    expect(importedRow(ids[1])).toHaveLength(1);
-    expect(importedRow(ids[2])).toHaveLength(2);
-    assertUntouched();
-    expect(fixture.writes.every(write => /^(append|update):copy-/.test(write))).toBe(true);
-  });
-
-  it("mirrors into the live-style branch headers without shifting historical or extra columns", async () => {
-    const liveHeaders = [
-      ["Unique ID", "Date", "Time", "Student Name", "Father Name", "Mother Name",
-        "GRADE", "Academic Year", "Father Contact", "Mother Contact", "Email",
-        "Counsellor Name", "Source", "Sub Source", "Status", "Admission Date",
-        "Follow up Remarks", "Reason for Closed", "Revisit 1 Date", "Revisit 2 Date",
-        "Lead ID", "Lead ID", "Lead ID"],
-      ["Unique ID", "Date", "Time", "Student Name", "Father Name", "Mother Name",
-        "Grade", "Branch", "Academic Year", "Father Contact", "Mother Contact",
-        "Email", "Counsellor Name", "Source", "Sub Source", "Status",
-        "Reason for Closed", "Admission Date", "Remark", "Revisit 1 Date",
-        "Revisit 2 Date", "Lead ID", "Lead ID", "Lead ID"],
-    ];
-    ids.slice(0, 2).forEach((id, index) => {
-      const historic = fixture.books.get(id)!.rows.slice(1).map(row => {
-        const oldHeader = index === 0 ? SHEET_HEADERS : RPS_SHEET_HEADERS;
-        return liveHeaders[index].map(name => {
-          if (name === "Sub Source") return "historical staff value";
-          const sourceName = name === "Remark" ? "Follow up Remarks" : name;
-          return row[oldHeader.findIndex(old => old.toLowerCase() === sourceName.toLowerCase())] ?? "";
-        });
-      });
-      fixture.books.set(id, { rows: [liveHeaders[index], ...historic], protections: fixture.books.get(id)!.protections });
-      originals.set(id, structuredClone(historic));
-    });
-
-    const result = await applyCrmImport();
-    queueImportUpserts(result.importedIds);
-    await tick();
-
-    expect(fixture.markers.size).toBe(0);
-    for (const [index, id] of ids.slice(0, 2).entries()) {
-      const book = fixture.books.get(id)!.rows;
-      const header = book[0];
-      expect(header.slice(0, liveHeaders[index].length)).toEqual(liveHeaders[index]);
-      expect(header.at(-1)).toBe("Actual Admission Date");
-      const [imported] = importedRow(id);
-      expect(imported).toBeDefined();
-      expect(imported[header.indexOf("Status")]).toBe("OPEN");
-      expect(imported[header.indexOf("Sub Source")]).toBe("");
-      expect(imported[header.indexOf("Lead ID") + 1]).toBe("");
-      expect(imported[header.indexOf("Lead ID") + 2]).toBe("");
-    }
-    expect(importedRow(ids[2])).toHaveLength(2);
-    assertUntouched();
-    queueImportUpserts(result.importedIds);
-    await tick();
-    expect(importedRow(ids[0])).toHaveLength(1);
-    expect(importedRow(ids[1])).toHaveLength(1);
-    assertUntouched();
-  });
-
-  it("retains a durable reconciliation after a mirror interruption and completes on retry", async () => {
-    const result = await applyCrmImport();
-    fixture.failAppend = ids[2];
-    queueImportUpserts(result.importedIds);
-    await tick();
-    expect(fixture.markers.has("MASTER")).toBe(true);
+    expect(fixture.writes).toEqual([]);
+    expect(importedRow(ids[0])).toHaveLength(0);
+    expect(importedRow(ids[1])).toHaveLength(0);
     expect(importedRow(ids[2])).toHaveLength(0);
     assertUntouched();
+  });
+
+  it("leaves a non-completed unmatched DM enquiry out of all WALKINs tabs", async () => {
+    const result = await applyCrmImport();
     queueImportUpserts(result.importedIds);
+    const ris = fixture.rows.find(row => row.brand === "RIS");
+    await upsertLeadToSheet("RIS", ris);
     await tick();
-    expect(fixture.markers.size).toBe(0);
-    expect(importedRow(ids[0])).toHaveLength(1);
-    expect(importedRow(ids[1])).toHaveLength(1);
-    expect(importedRow(ids[2])).toHaveLength(2);
+    expect(fixture.writes).toEqual([]);
+    expect(importedRow(ids[0])).toHaveLength(0);
+    expect(importedRow(ids[1])).toHaveLength(0);
+    expect(importedRow(ids[2])).toHaveLength(0);
     assertUntouched();
+  });
+
+  it("links a unique completed visit by changing only its primary Lead ID cell", async () => {
+    const result = await applyCrmImport();
+    const lead = fixture.rows.find(row => row.brand === "RIS");
+    Object.assign(lead, {
+      createdBy: "kiosk",
+      status: "WALK-IN COMPLETED",
+      walkInDate: "2027-06-20",
+    });
+    const book = fixture.books.get(ids[0])!;
+    const header = book.rows[0];
+    const visit = book.rows[1];
+    visit[header.indexOf("Student Name")] = lead.childName;
+    visit[header.indexOf("Father Contact")] = lead.phone;
+    visit[header.indexOf("Status")] = "WALK-IN COMPLETED";
+    const extraIndex = header.length;
+    header.push("Staff Extra");
+    book.rows.forEach((row, index) => { row[extraIndex] = index === 1 ? "preserve this" : ""; });
+    originals.set(ids[0], structuredClone(book.rows.slice(1)));
+    const before = structuredClone(book.rows);
+    const guard = structuredClone(book.protections);
+
+    await upsertLeadToSheet("RIS", lead);
+
+    const linkedRow = book.rows[1];
+    const idColumn = header.indexOf("Lead ID");
+    expect(linkedRow[idColumn]).toBe(lead.id);
+    const expectedRows = before.slice(1).map(row => [...row]);
+    expectedRows[0][idColumn] = lead.id;
+    expect(book.rows.slice(1)).toEqual(expectedRows);
+    expect(book.protections).toEqual(guard);
+    expect(fixture.writes).toEqual([`cell:${ids[0]}!${String.fromCharCode(65 + idColumn)}2`]);
+  });
+
+  it("refuses ambiguous visit identities without writing", async () => {
+    await applyCrmImport();
+    const lead = fixture.rows.find(row => row.brand === "RIS");
+    Object.assign(lead, {
+      createdBy: "kiosk",
+      status: "WALK-IN COMPLETED",
+      walkInDate: "2027-06-20",
+    });
+    const book = fixture.books.get(ids[0])!;
+    const header = book.rows[0];
+    for (const row of book.rows.slice(1, 3)) {
+      row[header.indexOf("Student Name")] = lead.childName;
+      row[header.indexOf("Father Contact")] = lead.phone;
+      row[header.indexOf("Status")] = "WALK-IN COMPLETED";
+    }
+    const before = structuredClone(book.rows);
+    await expect(upsertLeadToSheet("RIS", lead)).rejects.toThrow(/Multiple WALKINs rows match/);
+    expect(fixture.writes).toEqual([]);
+    expect(book.rows).toEqual(before);
+    expect(book.protections).toEqual(protections.get(ids[0]));
   });
 
   it("rejects full resync on all three copies before clearing historical rows or protections", async () => {
     await applyCrmImport();
-    await expect(resyncBrandToSheet("RIS")).rejects.toThrow(/historical rows without Lead IDs/);
-    await expect(resyncBrandToSheet("RPS")).rejects.toThrow(/historical rows without Lead IDs/);
-    await expect(resyncMasterSheet()).rejects.toThrow(/historical rows without Lead IDs/);
+    await expect(resyncBrandToSheet("RIS")).rejects.toThrow(/Full resync is disabled/);
+    await expect(resyncBrandToSheet("RPS")).rejects.toThrow(/Full resync is disabled/);
+    await expect(resyncMasterSheet()).rejects.toThrow(/Master WALKINs resync is temporarily disabled/);
     expect(fixture.writes).toEqual([]);
     assertUntouched();
   });
 
   it("surfaces a conflicting green-column edit instead of overwriting it", async () => {
-    const result = await applyCrmImport();
-    queueImportUpserts(result.importedIds);
-    await tick();
+    await applyCrmImport();
     const ris = fixture.rows.find(row => row.brand === "RIS");
-    const row = importedRow(ids[0])[0];
+    Object.assign(ris, {
+      createdBy: "kiosk",
+      status: "WALK-IN COMPLETED",
+      walkInDate: "2027-06-20",
+    });
+    await upsertLeadToSheet("RIS", ris);
+    const row = fixture.books.get(ids[0])!.rows.find(item =>
+      item[SHEET_HEADERS.indexOf("Lead ID")] === ris.id)!;
     row[SHEET_HEADERS.indexOf("Status")] = "CLOSED"; // staff changes after the last successful mirror
     ris.status = "WALK-IN BOOKED"; // CRM changes concurrently
     const before = structuredClone(row);
@@ -366,12 +381,57 @@ describe("historical import against isolated RIS, RPS and Master workbook copies
     expect(importedRow(ids[0])[0]).toEqual(before);
     expect(getSyncStatus().RIS.lastError).toContain("status");
     assertUntouched();
-    // Master also has an independent green-column conflict guard.
-    const masterRow = importedRow(ids[2]).find(item => item[MASTER_SHEET_HEADERS.indexOf("Lead ID")] === ris.id)!;
-    masterRow[MASTER_SHEET_HEADERS.indexOf("Status")] = "CLOSED";
-    const masterBefore = structuredClone(masterRow);
-    await expect(upsertLeadToMasterSheet(ris)).rejects.toThrow(/unsynced concurrent edits.*status/);
-    expect(masterRow).toEqual(masterBefore);
+    await expect(upsertLeadToMasterSheet(ris)).rejects.toThrow(/Master WALKINs synchronization is temporarily disabled/);
     assertUntouched();
+  });
+
+  it("fails direct Master operations before Google access and preserves existing Master data and pending markers", async () => {
+    fixture.markers.add("MASTER");
+    const masterBefore = structuredClone(fixture.books.get(ids[2]));
+    const pull = await pullChangesFromMasterSheet();
+    expect(pull.errors).toContain("Master WALKINs synchronization is temporarily disabled");
+    expect(await syncDeletionsFromMaster()).toMatchObject({
+      archived: 0,
+      errors: ["Master WALKINs deletion sync is temporarily disabled"],
+    });
+    await expect(upsertLeadToMasterSheet({ id: "master-disabled" } as any))
+      .rejects.toThrow(/Master WALKINs synchronization is temporarily disabled/);
+    await expect(removeLeadFromMasterSheet("master-disabled"))
+      .rejects.toThrow(/Master WALKINs removal is temporarily disabled/);
+    await expect(resyncMasterSheet())
+      .rejects.toThrow(/Master WALKINs resync is temporarily disabled/);
+
+    expect(fixture.sheetClients).toEqual([]);
+    expect(fixture.sheetReads).toEqual([]);
+    expect(fixture.writes).toEqual([]);
+    expect(fixture.books.get(ids[2])).toEqual(masterBefore);
+    expect(fixture.markers).toEqual(new Set(["MASTER"]));
+  });
+
+  it("queues branch upserts and removals without touching Master or its reconciliation marker", async () => {
+    await applyCrmImport();
+    // Import's separate reconciliation marker is outside this queued mirror;
+    // start without one to verify the queue does not create it.
+    fixture.markers.delete("MASTER");
+    const lead = fixture.rows.find(row => row.brand === "RIS");
+    Object.assign(lead, {
+      createdBy: "kiosk",
+      status: "WALK-IN COMPLETED",
+      walkInDate: "2027-06-20",
+    });
+    const masterBefore = structuredClone(fixture.books.get(ids[2]));
+
+    queueUpsert("RIS", lead);
+    await tick();
+    expect(fixture.markers.has("MASTER")).toBe(false);
+
+    fixture.markers.add("MASTER");
+    queueRemove("RIS", lead.id);
+    await tick();
+
+    expect(fixture.sheetReads.every(id => id !== ids[2])).toBe(true);
+    expect(fixture.writes.every(write => !write.includes(ids[2]))).toBe(true);
+    expect(fixture.books.get(ids[2])).toEqual(masterBefore);
+    expect(fixture.markers.has("MASTER")).toBe(true);
   });
 });
