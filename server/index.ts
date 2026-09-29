@@ -6,7 +6,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { autoSeedBlogsIfEmpty } from "./autoSeedBlogs";
 import { startSeoMonitor } from "./seoMonitor";
-import { bootstrapWalkinSequences, bootstrapWalkinLookups, stopAutoPullForShutdown } from "./walkinSheets";
+import { bootstrapWalkinSequences, bootstrapWalkinLookups, bootstrapWalkinSyncSnapshots, hydrateWalkinSyncSnapshots, stopAutoPullForShutdown } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { initializeGoogleCredentials } from "./googleCredentials";
 import { initializeRisInstagramTracker, startRisInstagramTracker } from "./risInstagramTracker";
@@ -156,6 +156,8 @@ app.use((req, res, next) => {
   await runWalkinSheetOperation("startup bootstrap", async () => {
     await bootstrapWalkinSequences();
     await bootstrapWalkinLookups();
+    await bootstrapWalkinSyncSnapshots();
+    await hydrateWalkinSyncSnapshots();
   });
   await registerRoutes(httpServer, app);
 

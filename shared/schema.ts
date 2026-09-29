@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, integer, jsonb, serial, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, integer, jsonb, serial, index, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -554,6 +554,19 @@ export const walkinSyncReconciliations = pgTable("walkin_sync_reconciliations", 
   scope: text("scope").primaryKey(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Per-lead workbook checkpoints support three-way conflict detection across
+// process restarts and Autoscale instances. Each workbook keeps an independent
+// checkpoint because one destination can lag another after a failed write.
+export const walkinSyncSnapshots = pgTable("walkin_sync_snapshots", {
+  scope: text("scope").notNull(),
+  leadId: text("lead_id").notNull(),
+  snapshot: jsonb("snapshot_values").$type<Record<string, string | null>>().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.scope, table.leadId] }),
+  index("walkin_sync_snapshots_updated_at_idx").on(table.updatedAt),
+]);
 
 // ── Indra Intelligence integration delivery state ───────────────
 // Stores only operational delivery metadata. Payloads, credentials, and

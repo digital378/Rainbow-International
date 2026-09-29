@@ -6,7 +6,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
-    include: ["tests/**/*.test.{ts,tsx}"],
+    include: ["tests/**/*.test.{ts,tsx}", "server/walkinCrmImport.test.ts"],
     exclude: ["tests/friendship-url-utils.test.mjs", "node_modules", ".cache"],
   },
   resolve: {

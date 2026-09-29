@@ -9,10 +9,10 @@ const RED = "#dc2626";
 // ── Types ────────────────────────────────────────────────────────
 type Lead = {
   id: string; brand: string; branchId: number | null; branchName?: string; academicYear: string;
-  enquiryDate: string; monthLabel: string; parentName: string; childName: string;
+  enquiryDate: string; monthLabel: string; parentName: string; motherName?: string; childName: string;
   phone: string; altPhone: string | null; email: string | null; program: string;
   source: string; status: string; closeReason: string | null; remark: string | null;
-  leadOwner: string | null; walkInDate: string | null; admissionDate?: string | null; revisitDate: string | null;
+  leadOwner: string | null; walkInDate: string | null; admissionDate?: string | null; revisitDate: string | null; revisitDate2?: string | null;
   misCallingRemarks: string | null;
   isArchived: boolean; createdBy: string; updatedBy: string | null;
   createdAt: string; updatedAt: string;
@@ -127,6 +127,7 @@ function EditPanel({
     walkInDate: lead.walkInDate || "",
     admissionDate: lead.admissionDate || "",
     revisitDate: lead.revisitDate || "",
+    revisitDate2: lead.revisitDate2 || "",
     leadOwner: lead.leadOwner || "",
     remark: lead.remark || "",
     misCallingRemarks: lead.misCallingRemarks || "",
@@ -135,10 +136,25 @@ function EditPanel({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const needsCloseReason = form.status === CLOSED_STATUS;
-  const needsWalkInDate = WALKIN_STATUSES.includes(form.status);
+  const needsCloseReason = form.status === CLOSED_STATUS &&
+    (form.status !== lead.status || form.closeReason !== (lead.closeReason || ""));
+  const needsWalkInDate = WALKIN_STATUSES.includes(form.status) &&
+    (form.status !== lead.status || form.walkInDate !== (lead.walkInDate || ""));
+  const isTrackerRecord = lead.readOnly || lead.id.startsWith("crm-");
+  const parentChanged = form.parentName.trim() !== (lead.parentName || "").trim();
+  const parentValid = form.parentName.trim()
+    ? form.parentName.trim().length >= 2
+    : isTrackerRecord && !parentChanged;
+  const hasChanges = parentChanged || form.childName !== lead.childName ||
+    form.altPhone !== (lead.altPhone || "") || form.email !== (lead.email || "") ||
+    form.program !== lead.program || form.status !== lead.status ||
+    form.closeReason !== (lead.closeReason || "") || form.walkInDate !== (lead.walkInDate || "") ||
+    form.admissionDate !== (lead.admissionDate || "") || form.revisitDate !== (lead.revisitDate || "") ||
+    form.revisitDate2 !== (lead.revisitDate2 || "") || form.leadOwner !== (lead.leadOwner || "") ||
+    form.remark !== (lead.remark || "") || form.misCallingRemarks !== (lead.misCallingRemarks || "") ||
+    form.branchId !== (lead.branchId ? String(lead.branchId) : "");
   const canSave =
-    form.parentName.trim().length >= 2 &&
+    parentValid &&
     form.childName.trim().length >= 2 &&
     (!needsCloseReason || form.closeReason.trim()) &&
     (!needsWalkInDate || form.walkInDate);
@@ -157,21 +173,22 @@ function EditPanel({
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
-          parentName: form.parentName.trim(),
-          childName: form.childName.trim(),
-          altPhone: form.altPhone || undefined,
-          email: form.email || undefined,
-          program: form.program,
-          status: form.status,
-          closeReason: form.closeReason || undefined,
-          walkInDate: form.walkInDate || null,
-          admissionDate: form.admissionDate || null,
-          revisitDate: form.revisitDate || undefined,
-          leadOwner: form.leadOwner || undefined,
-          remark: form.remark || undefined,
-          misCallingRemarks: form.misCallingRemarks || undefined,
-          branchId: form.branchId ? parseInt(form.branchId, 10) : undefined,
-          updatedBy: "admin",
+          expectedUpdatedAt: lead.updatedAt,
+          ...(form.parentName.trim() !== (lead.parentName || "").trim() && { parentName: form.parentName.trim() }),
+          ...(form.childName !== lead.childName && { childName: form.childName.trim() }),
+          ...(form.altPhone !== (lead.altPhone || "") && { altPhone: form.altPhone || null }),
+          ...(form.email !== (lead.email || "") && { email: form.email || null }),
+          ...(form.program !== lead.program && { program: form.program }),
+          ...(form.status !== lead.status && { status: form.status }),
+          ...(form.closeReason !== (lead.closeReason || "") && { closeReason: form.closeReason || null }),
+          ...(form.walkInDate !== (lead.walkInDate || "") && { walkInDate: form.walkInDate || null }),
+          ...(form.admissionDate !== (lead.admissionDate || "") && { admissionDate: form.admissionDate || null }),
+          ...(form.revisitDate !== (lead.revisitDate || "") && { revisitDate: form.revisitDate || null }),
+          ...(form.revisitDate2 !== (lead.revisitDate2 || "") && { revisitDate2: form.revisitDate2 || null }),
+          ...(form.leadOwner !== (lead.leadOwner || "") && { leadOwner: form.leadOwner }),
+          ...(form.remark !== (lead.remark || "") && { remark: form.remark }),
+          ...(form.misCallingRemarks !== (lead.misCallingRemarks || "") && { misCallingRemarks: form.misCallingRemarks }),
+          ...(form.branchId !== (lead.branchId ? String(lead.branchId) : "") && form.branchId && { branchId: parseInt(form.branchId, 10) }),
         }),
       });
       if (!res.ok) {
@@ -215,7 +232,7 @@ function EditPanel({
         {/* Scrollable form */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <F label="Parent Name" required>
+            <F label="Parent Name" required={!isTrackerRecord || !!form.parentName}>
               <input className={inputCls} value={form.parentName} onChange={set("parentName")} />
             </F>
             <F label="Child Name" required>
@@ -258,8 +275,11 @@ function EditPanel({
             </div>
           </div>
 
-          <F label="Status" required>
+          <F label="Status">
             <select className={selectCls} value={form.status} onChange={set("status")}>
+              {!form.status && <option value="">Unclassified · needs review</option>}
+              {!!form.status && !lookups.statuses.some(s => s.label === form.status) &&
+                <option value={form.status}>{form.status} · historical status</option>}
               {lookups.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
             </select>
           </F>
@@ -294,6 +314,9 @@ function EditPanel({
               <input className={inputCls} type="date" value={form.revisitDate} onChange={set("revisitDate")} />
             </F>
           </div>
+          <F label="Second Revisit Date">
+            <input className={inputCls} type="date" value={form.revisitDate2} onChange={set("revisitDate2")} />
+          </F>
 
           <F label="Follow-up Remarks">
             <textarea
@@ -324,7 +347,7 @@ function EditPanel({
         <div className="px-5 py-4 border-t border-slate-100 flex gap-3">
           <button
             onClick={handleSave}
-            disabled={saving || !canSave}
+            disabled={saving || !canSave || !hasChanges}
             className="flex-1 py-2.5 rounded-lg font-bold text-white text-sm transition disabled:opacity-50"
             style={{ background: canSave && !saving ? NAVY : undefined }}
           >
@@ -335,6 +358,87 @@ function EditPanel({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function NewLeadPanel({ lookups, token, initialBrand, onCreated, onClose }: {
+  lookups: Lookups; token: string; initialBrand: string; onCreated: (lead: Lead) => void; onClose: () => void;
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [form, setForm] = useState({
+    brand: initialBrand || "RIS", branchId: "", enquiryDate: today, parentName: "", motherName: "",
+    childName: "", phone: "", altPhone: "", program: "", source: "", status: "", closeReason: "", walkInDate: "", leadOwner: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(current => ({ ...current, [field]: e.target.value }));
+  const inputCls = "w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300";
+  const branches = lookups.branches.filter(item => item.brand === form.brand);
+  const programs = lookups.programs.filter(item => !item.brand || item.brand === form.brand);
+  const canSubmit = !!form.brand && !!form.branchId && !!form.enquiryDate && form.enquiryDate <= today &&
+    form.parentName.trim().length >= 2 && form.motherName.trim().length >= 2 &&
+    form.childName.trim().length >= 2 && !!form.phone.trim() && !!form.altPhone.trim() &&
+    !!form.program && !!form.source &&
+    (form.status !== CLOSED_STATUS || !!form.closeReason) &&
+    (!["WALK-IN BOOKED", "WALK-IN COMPLETED"].includes(form.status) || !!form.walkInDate);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true); setError("");
+    try {
+      const response = await fetch("/api/walkin/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          brand: form.brand, branchId: Number(form.branchId), enquiryDate: form.enquiryDate,
+          parentName: form.parentName.trim(), motherName: form.motherName.trim(),
+          childName: form.childName.trim(), phone: form.phone.trim(), altPhone: form.altPhone.trim(),
+          program: form.program, source: form.source, ...(form.status && { status: form.status }),
+          ...(form.closeReason && { closeReason: form.closeReason }),
+          ...(form.walkInDate && { walkInDate: form.walkInDate }), ...(form.leadOwner && { leadOwner: form.leadOwner }),
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(response.status === 409 ? (data.message || "A matching lead already exists.") : (data.message || "Could not create lead."));
+      onCreated(data.lead);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Could not create lead.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-labelledby="new-lead-title">
+      <div className="absolute inset-0 bg-black/35" onClick={onClose} />
+      <form onSubmit={submit} className="relative ml-auto w-full max-w-xl bg-white shadow-2xl h-full flex flex-col">
+        <div className="px-5 py-4 flex justify-between items-center" style={{ background: NAVY }}>
+          <div><h2 id="new-lead-title" className="text-white font-bold">Create new lead</h2><p className="text-blue-200 text-xs mt-1">Add an enquiry to the CRM tracker</p></div>
+          <button type="button" onClick={onClose} className="text-white/80 px-2 py-1 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-300">Close</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <F label="Brand" required><select className={inputCls} value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value, branchId: "", program: "" }))}><option value="RIS">RIS</option><option value="RPS">RPS</option></select></F>
+            <F label="Branch" required><select className={inputCls} value={form.branchId} onChange={set("branchId")}><option value="">Select branch</option>{branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></F>
+            <F label="Enquiry date" required><input type="date" max={today} className={inputCls} value={form.enquiryDate} onChange={set("enquiryDate")} /></F>
+            <F label="Program" required><select className={inputCls} value={form.program} onChange={set("program")}><option value="">Select program</option>{programs.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}</select></F>
+            <F label="Parent name" required><input className={inputCls} value={form.parentName} onChange={set("parentName")} /></F>
+            <F label="Mother name" required><input className={inputCls} value={form.motherName} onChange={set("motherName")} /></F>
+            <F label="Child name" required><input className={inputCls} value={form.childName} onChange={set("childName")} /></F>
+            <F label="Phone" required><input type="tel" className={inputCls} value={form.phone} onChange={set("phone")} /></F>
+            <F label="Alternate phone" required><input type="tel" className={inputCls} value={form.altPhone} onChange={set("altPhone")} /></F>
+            <F label="Source" required><select className={inputCls} value={form.source} onChange={set("source")}><option value="">Select source</option>{lookups.sources.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}</select></F>
+            <F label="Status"><select className={inputCls} value={form.status} onChange={set("status")}><option value="">Default (open)</option>{lookups.statuses.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}</select></F>
+            {form.status === CLOSED_STATUS && <F label="Close reason" required><select className={inputCls} value={form.closeReason} onChange={set("closeReason")}><option value="">Select reason</option>{lookups.closeReasons.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}</select></F>}
+            <F label="Walk-in date" required={["WALK-IN BOOKED", "WALK-IN COMPLETED"].includes(form.status)}><input type="date" className={inputCls} value={form.walkInDate} onChange={set("walkInDate")} /></F>
+            <F label="Lead owner"><select className={inputCls} value={form.leadOwner} onChange={set("leadOwner")}><option value="">Unassigned</option>{lookups.staff.map(item => <option key={item.id} value={item.name}>{item.name}</option>)}</select></F>
+          </div>
+          {error && <div role="alert" className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">{error}</div>}
+        </div>
+        <div className="p-5 border-t flex gap-3"><button disabled={!canSubmit || saving} className="flex-1 py-2.5 rounded-lg text-white font-bold disabled:opacity-50" style={{ background: NAVY }}>{saving ? "Creating…" : "Create lead"}</button><button type="button" onClick={onClose} className="px-4 rounded-lg border text-sm">Cancel</button></div>
+      </form>
     </div>
   );
 }
@@ -481,6 +585,24 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [error, setError] = useState("");
   const [lookups, setLookups] = useState<Lookups | null>(null);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
+  const [report, setReport] = useState<{
+    total: number; booked: number; walkins: number; admissions: number; closed: number;
+    trend: { month: string; count: number }[]; breakdown: { label: string; count: number }[]; generatedAt: string;
+  } | null>(null);
+  const [reportError, setReportError] = useState("");
+  const [groupBy, setGroupBy] = useState("source");
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [importPreview, setImportPreview] = useState<{
+    eligible: number; alreadyPresent: number; review: number; byBrand: { RIS: number; RPS: number };
+    issues: { brand: string; reason: string; reference: string }[];
+  } | null>(null);
+  const [importBusy, setImportBusy] = useState(false);
+  const [importMessage, setImportMessage] = useState("");
+  const [importError, setImportError] = useState("");
+  const [sheetHealth, setSheetHealth] = useState<any>(null);
+  const [sheetHealthError, setSheetHealthError] = useState("");
+  const [sheetHealthLoading, setSheetHealthLoading] = useState(false);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 50;
 
@@ -496,6 +618,53 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [archiveLead, setArchiveLead] = useState<Lead | null>(null);
 
   const headers = { Authorization: `Bearer ${token}` };
+
+  const filterParams = (f = filters) => new URLSearchParams({
+    ...(f.brand && { brand: f.brand }),
+    ...(f.branchId && { branchId: f.branchId }),
+    ...(f.status && { status: f.status }),
+    ...(f.source && { source: f.source }),
+    ...(f.leadOwner && { leadOwner: f.leadOwner }),
+    ...(f.dateFrom && { dateFrom: f.dateFrom }),
+    ...(f.dateTo && { dateTo: f.dateTo }),
+    ...(f.search && { search: f.search }),
+    ...(f.showArchived && { includeArchived: "true" }),
+  });
+
+  const fetchReport = useCallback(async (f = filters, group = groupBy) => {
+    setReportError("");
+    try {
+      const params = filterParams(f);
+      params.set("groupBy", group);
+      const response = await fetch(`/api/walkin/leads/report?${params}`, { headers });
+      if (!response.ok) throw new Error("Could not load lead report.");
+      setReport(await response.json());
+    } catch (reason) {
+      setReportError(reason instanceof Error ? reason.message : "Could not load lead report.");
+    }
+  }, [filters, groupBy, token]);
+
+  const fetchSheetHealth = useCallback(async () => {
+    setSheetHealthLoading(true); setSheetHealthError("");
+    try {
+      const response = await fetch("/api/walkin/sheets/status", { headers });
+      if (!response.ok) throw new Error("Could not load Sheets sync health.");
+      setSheetHealth(await response.json());
+    } catch (reason) {
+      setSheetHealthError(reason instanceof Error ? reason.message : "Could not load Sheets sync health.");
+    } finally { setSheetHealthLoading(false); }
+  }, [token]);
+
+  const fetchImportPreview = useCallback(async () => {
+    setImportError(""); setImportMessage("");
+    try {
+      const response = await fetch("/api/walkin/leads/import-preview", { headers });
+      if (!response.ok) throw new Error("Could not load tracker import review.");
+      setImportPreview(await response.json());
+    } catch (reason) {
+      setImportError(reason instanceof Error ? reason.message : "Could not load tracker import review.");
+    }
+  }, [token]);
 
   const fetchLookups = useCallback(async () => {
     const res = await fetch("/api/walkin/lookups", { headers });
@@ -556,7 +725,15 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
 
   useEffect(() => {
     if (sessionReady) fetchLeads(page, filters);
-  }, [page, filters, sessionReady]);
+  }, [page, filters, sessionReady, refreshVersion]);
+
+  useEffect(() => {
+    if (sessionReady) void fetchReport(filters, groupBy);
+  }, [filters, groupBy, sessionReady, refreshVersion]);
+
+  useEffect(() => {
+    if (sessionReady) void fetchSheetHealth();
+  }, [sessionReady, fetchSheetHealth]);
 
   const applyFilter = (field: string, value: string | boolean) => {
     setPage(1);
@@ -595,6 +772,23 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     }
   };
 
+  const importTrackerLeads = async () => {
+    setImportBusy(true); setImportError(""); setImportMessage("");
+    try {
+      const response = await fetch("/api/walkin/leads/import", {
+        method: "POST", headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || "Tracker import failed.");
+      await fetchImportPreview();
+      setImportMessage(`Imported ${result.imported} · skipped ${result.skipped} · needs review ${result.review}.`);
+      setRefreshVersion(value => value + 1);
+    } catch (reason) {
+      setImportError(reason instanceof Error ? reason.message : "Tracker import failed.");
+    } finally { setImportBusy(false); }
+  };
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Branch options filtered by brand
@@ -613,6 +807,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const handleSaved = (updated: Lead) => {
     setLeads(ls => ls.map(l => l.id === updated.id ? updated : l));
     setEditLead(null);
+    setRefreshVersion(value => value + 1);
   };
 
   const handleArchived = (id: string) => {
@@ -623,6 +818,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       setTotal(t => t - 1);
     }
     setArchiveLead(null);
+    setRefreshVersion(value => value + 1);
   };
 
   const fmtDate = (d: string | null | undefined) => d
@@ -643,8 +839,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm">
+          <button onClick={() => setNewLeadOpen(true)} className="px-4 py-2 rounded-lg bg-white text-[#091a4f] font-bold hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">+ New lead</button>
           <button
-            onClick={() => fetchLeads(page, filters)}
+            onClick={() => { void fetchLeads(page, filters); void fetchReport(filters, groupBy); setRefreshVersion(value => value + 1); }}
             className="px-4 py-2 rounded-lg bg-amber-400 text-[#091a4f] font-bold hover:bg-amber-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >Refresh</button>
           <button
@@ -675,6 +872,98 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             ))}
           </div>
         </div>
+
+        <section aria-label="Lead performance overview" className="mb-4 space-y-3">
+          <div className="grid grid-cols-2 xl:grid-cols-5 gap-3">
+            {[
+              ["Total leads", report?.total], ["Walk-ins booked", report?.booked], ["Walk-ins", report?.walkins],
+              ["Admissions", report?.admissions], ["Closed", report?.closed],
+            ].map(([label, value]) => (
+              <article key={label as string} className="rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 shadow-[0_5px_20px_rgba(27,49,79,.035)]">
+                <p className="text-[10px] uppercase tracking-[.12em] font-bold text-[#8290a3]">{label}</p>
+                <p className="mt-1 text-2xl font-black tracking-tight text-[#172945] tabular-nums">{report ? Number(value).toLocaleString() : "—"}</p>
+              </article>
+            ))}
+          </div>
+          <div className="grid lg:grid-cols-[1.5fr_1fr] gap-3">
+            <article className="rounded-xl bg-white border border-[#dfe6ee] p-4 shadow-[0_5px_20px_rgba(27,49,79,.035)] min-w-0">
+              <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+                <div><h2 className="font-bold text-sm text-[#20334f]">Enquiry trend</h2><p className="text-[11px] text-[#8492a5]">Monthly volume · follows active filters</p></div>
+                {report && <span className="text-[10px] text-[#91a0b1]">Updated {new Date(report.generatedAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>}
+              </div>
+              <div className="h-32 flex items-end gap-1 sm:gap-2 border-b border-l border-[#e6ebf1] px-2">
+                {(report?.trend || []).slice(-12).map((point, index, data) => {
+                  const peak = Math.max(1, ...data.map(item => item.count));
+                  const height = Math.max(4, point.count / peak * 100);
+                  return <div key={`${point.month}-${index}`} className="flex-1 min-w-0 h-full flex flex-col justify-end items-center gap-1" title={`${point.month}: ${point.count}`}>
+                    <div className="w-full max-w-8 rounded-t bg-[#315b8e] hover:bg-amber-500 transition-colors" style={{ height: `${height}%` }} />
+                    <span className="h-4 text-[8px] sm:text-[9px] text-[#8290a3] whitespace-nowrap overflow-hidden max-w-full">{point.month}</span>
+                  </div>;
+                })}
+                {!report?.trend?.length && <p className="m-auto pb-8 text-xs text-[#8795a7]">{reportError || "No trend data for these filters."}</p>}
+              </div>
+            </article>
+            <article className="rounded-xl bg-white border border-[#dfe6ee] p-4 shadow-[0_5px_20px_rgba(27,49,79,.035)]">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div><h2 className="font-bold text-sm text-[#20334f]">Lead breakdown</h2><p className="text-[11px] text-[#8492a5]">Grouped by selected dimension</p></div>
+                <select aria-label="Group report by" className={`${inputCls} h-8`} value={groupBy} onChange={e => setGroupBy(e.target.value)}>
+                  <option value="source">Source</option><option value="branch">Branch</option><option value="owner">Owner</option><option value="status">Status</option>
+                </select>
+              </div>
+              <div className="space-y-2 max-h-36 overflow-y-auto">
+                {(report?.breakdown || []).slice(0, 8).map(item => {
+                  const peak = Math.max(1, ...(report?.breakdown || []).map(row => row.count));
+                  return <div key={item.label} className="grid grid-cols-[minmax(0,1fr)_2fr_auto] gap-2 items-center text-xs">
+                    <span title={item.label} className="truncate text-[#63748b]">{item.label || "Unassigned"}</span>
+                    <span className="h-2 rounded-full bg-[#edf1f5] overflow-hidden"><span className="block h-full rounded-full bg-amber-400" style={{ width: `${Math.max(2, item.count / peak * 100)}%` }} /></span>
+                    <b className="tabular-nums text-[#20334f]">{item.count}</b>
+                  </div>;
+                })}
+                {!report?.breakdown?.length && <p className="py-5 text-center text-xs text-[#8795a7]">{reportError || "No breakdown data for these filters."}</p>}
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4 p-4" aria-label="Tracker import review">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="max-w-3xl">
+              <h2 className="font-bold text-sm text-[#20334f]">Legacy tracker import</h2>
+              <p className="mt-1 text-xs leading-relaxed text-[#718198]">Review the tracker migration before importing. Tracker rows remain read-only until imported into the CRM; no rows are imported automatically.</p>
+              {importPreview && <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[#52657d]">
+                <span><b className="text-[#20334f]">{importPreview.eligible}</b> eligible</span>
+                <span><b className="text-[#20334f]">{importPreview.alreadyPresent}</b> already present</span>
+                <span><b className="text-amber-700">{importPreview.review}</b> need review</span>
+                <span>RIS <b>{importPreview.byBrand?.RIS ?? 0}</b></span><span>RPS <b>{importPreview.byBrand?.RPS ?? 0}</b></span>
+              </div>}
+            </div>
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <button type="button" disabled={importBusy} onClick={() => void fetchImportPreview()} className="px-3 py-2 rounded-lg border border-[#d9e1eb] text-xs font-semibold text-[#35577e] disabled:opacity-50">{importPreview ? "Refresh review" : "Review import"}</button>
+              {importPreview && importPreview.eligible > 0 && <button type="button" disabled={importBusy} onClick={() => void importTrackerLeads()} className="px-3 py-2 rounded-lg bg-[#091a4f] text-white text-xs font-bold disabled:opacity-50">{importBusy ? "Importing…" : `Confirm import (${importPreview.eligible})`}</button>}
+            </div>
+          </div>
+          {importMessage && <p role="status" className="mt-3 text-xs font-semibold text-emerald-700">{importMessage}</p>}
+          {importError && <p role="alert" className="mt-3 text-xs text-red-700">{importError}</p>}
+          {!!importPreview?.issues?.length && <div className="mt-3 max-h-28 overflow-y-auto rounded-lg bg-amber-50 border border-amber-100 p-2 space-y-1">
+            {importPreview.issues.slice(0, 20).map((issue, index) => <p key={`${issue.brand}-${issue.reference}-${index}`} className="text-[11px] text-amber-900"><b>{issue.brand}</b> · {issue.reference} — {issue.reason}</p>)}
+            {importPreview.issues.length > 20 && <p className="text-[10px] text-amber-800">And {importPreview.issues.length - 20} more review items.</p>}
+          </div>}
+        </section>
+
+        <section className="mb-4 rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-label="Google Sheets sync health">
+          <div>
+            <h2 className="text-sm font-bold text-[#20334f]">Google Sheets sync health</h2>
+            {sheetHealthError ? <p role="alert" className="mt-1 text-xs text-red-700">{sheetHealthError}</p> :
+              sheetHealthLoading && !sheetHealth ? <p className="mt-1 text-xs text-[#8290a3]">Checking sync status…</p> :
+                sheetHealth && <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#65768c]">
+                  {(["RIS", "RPS", "MASTER"] as const).map(key => {
+                    const item = sheetHealth[key];
+                    return <span key={key}><b className={item?.lastError ? "text-red-700" : item?.pending ? "text-amber-700" : "text-emerald-700"}>{key}</b> {item?.lastError ? `· ${item.lastError}` : item?.pending ? "· sync pending" : item?.lastSyncAt ? `· synced ${new Date(item.lastSyncAt).toLocaleString("en-IN")}` : "· no sync recorded"}</span>;
+                  })}
+                </div>}
+          </div>
+          <button type="button" onClick={() => void fetchSheetHealth()} disabled={sheetHealthLoading} className="px-3 py-2 self-start sm:self-auto rounded-lg border border-[#d9e1eb] text-xs font-semibold text-[#35577e] disabled:opacity-50">{sheetHealthLoading ? "Checking…" : "Refresh health"}</button>
+        </section>
 
         <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4" aria-label="Lead filters">
           <div className="p-3 sm:px-4">
@@ -813,11 +1102,11 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         {lead.admissionDate && <div className="mt-1 text-[11px] text-[#596b83]">Admitted {fmtDate(lead.admissionDate)}</div>}
                       </td>
                       <td className="px-2.5 py-2.5 text-slate-600 break-words">{lead.leadOwner || "—"}</td>
-                      <td className="px-2.5 py-2.5 text-slate-500 tabular-nums" title={lead.readOnly ? "Last update date not recorded" : undefined}>
-                        {lead.readOnly ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                      <td className="px-2.5 py-2.5 text-slate-500 tabular-nums" title={lead.readOnly || lead.id.startsWith("crm-") ? "Last update date not recorded" : undefined}>
+                        {lead.readOnly || lead.id.startsWith("crm-") ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
                       <td className="px-2.5 py-2.5">
-                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">Tracker record</span> : (
+                        {(lead.readOnly || lead.id.startsWith("crm-")) ? <span className="text-[11px] font-medium text-amber-700">Tracker record · import to edit</span> : (
                           <select aria-label={`Actions for ${lead.childName || "lead"}`} value="" onChange={e => {
                             if (e.target.value === "edit") setEditLead(lead);
                             if (e.target.value === "history") setHistoryLead(lead);
@@ -866,14 +1155,14 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4 pt-3 border-t border-[#edf1f5] text-sm">
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Phone</div><div className="mt-0.5 font-medium text-[#334a68]">{lead.phone || "Not provided"}</div></div>
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Branch / owner</div><div className="mt-0.5 text-[#52657d] truncate">{branchName || "Unassigned"} / {lead.leadOwner || "Unassigned"}</div></div>
-                  <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Last updated</div><div className="mt-0.5 text-[#52657d]">{lead.readOnly ? "Not recorded" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div></div>
+                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Last updated</div><div className="mt-0.5 text-[#52657d]">{lead.readOnly || lead.id.startsWith("crm-") ? "Not recorded" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div></div>
                   {lead.admissionDate && <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Admitted</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.admissionDate)}</div></div>}
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-[#edf1f5]">
-                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
-                  {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
-                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
-                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record</span>}
+                  {!lead.isArchived && !lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
+                  {!lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
+                  {!lead.isArchived && !lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
+                  {(lead.readOnly || lead.id.startsWith("crm-")) && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record · import to edit</span>}
                 </div>
               </article>
             );
@@ -911,6 +1200,15 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       {/* Overlays */}
       {editLead && lookups && (
         <EditPanel lead={editLead} lookups={lookups} token={token} onSave={handleSaved} onClose={() => setEditLead(null)} />
+      )}
+      {newLeadOpen && lookups && (
+        <NewLeadPanel
+          lookups={lookups}
+          token={token}
+          initialBrand={filters.brand}
+          onClose={() => setNewLeadOpen(false)}
+          onCreated={() => { setNewLeadOpen(false); setPage(1); setRefreshVersion(value => value + 1); }}
+        />
       )}
       {historyLead && (
         <HistoryModal lead={historyLead} token={token} onClose={() => setHistoryLead(null)} />

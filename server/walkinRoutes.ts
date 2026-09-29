@@ -24,18 +24,19 @@ import { z } from "zod";
 import { db } from "./db";
 import {
   walkinLeads, walkinLeadAuditLog, walkinBranches,
-  walkinPrograms, walkinSources, walkinStatuses, walkinCloseReasons, walkinStaff,
+  walkinPrograms, walkinSources, walkinStatuses, walkinCloseReasons, walkinStaff, walkinSyncReconciliations,
   type WalkinLead,
 } from "@shared/schema";
 import { normalizePhoneOrThrow } from "@shared/phoneNormalizer";
 import { matchingParentContact, normalizeParentContacts } from "./walkinDuplicateContacts";
 import { eq, and, gte, lte, ilike, desc, or, sql, isNull, ne } from "drizzle-orm";
 import * as XLSX from "xlsx";
-import { queueUpsert, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
+import { assertWalkinSheetMirrorReady, queueUpsert, queueImportUpserts, queueRemove, resyncBrandToSheet, resyncMasterSheet, resyncArchivedLead, removeLeadFromMasterSheet, getSyncStatus, startAutoPull, getPullLog, pullChangesFromSheet, pullChangesFromMasterSheet, readCrmLeadsTrackerStats, bustCrmStatsCache, syncDeletionsFromMaster } from "./walkinSheets";
 import { runWalkinSheetOperation } from "./walkinSyncCoordinator";
 import { getGoogleCredentialSource } from "./googleCredentials";
 import { createWalkinPageSession, hasWalkinPageSession, isWalkinPageAuthorized, type WalkinPageScope } from "./walkinPageAuth";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
+import { previewCrmImport, applyCrmImport } from "./walkinCrmImport";
 import {
   createTrustedWalkinDashboardSession,
   createWalkinInternalSession,
@@ -202,42 +203,47 @@ const createLeadSchema = z.object({
 });
 
 // Mutable fields only — brand, enquiryDate, createdBy are locked
-const updateLeadSchema = z.object({
+export const updateLeadSchema = z.object({
+  expectedUpdatedAt: z.string().datetime().optional(),
   parentName: z.string().min(2).trim().optional(),
   motherName: z.string().min(2).trim().optional(),
   childName: z.string().min(2).trim().optional(),
-  altPhone: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
+  altPhone: z.string().nullable().optional().transform((v) => v === "" ? null : v),
   email: z
     .string()
     .email()
+    .nullable()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v === "" ? null : v),
   program: z.string().min(1).optional(),
   source: z.string().min(1).optional(),
   status: z.string().min(1).optional(),
-  closeReason: z.string().optional().or(z.literal("")).transform((v) => v || undefined),
+  closeReason: z.string().nullable().optional().transform((v) => v === "" ? null : v),
   remark: z.string().optional(),
   leadOwner: z.string().optional(),
   walkInDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v === "" ? null : v),
   admissionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional().or(z.literal("")).transform(v => v === "" ? null : v),
   revisitDate: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v === "" ? null : v),
   revisitDate2: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
     .optional()
     .or(z.literal(""))
-    .transform((v) => v || undefined),
+    .transform((v) => v === "" ? null : v),
   branchId: z.number().int().positive().optional(),
   misCallingRemarks: z.string().optional(),
   updatedBy: z.string().default("admin"),
@@ -501,13 +507,12 @@ export function registerWalkinRoutes(app: Express) {
     }
   });
 
-  // ── GET /api/walkin/leads ─────────────────────────────────────
-  app.get("/api/walkin/leads", requireAdmin, async (req, res) => {
-    try {
+  // Share the exact filtered dataset with the list, reports, and exports.
+  const loadLeadView = async (query: Record<string, string>) => {
       const {
         brand, branchId, status, source, leadOwner, dateFrom, dateTo, phone: phoneQ,
         search, page = "1", pageSize = "50", includeArchived,
-      } = req.query as Record<string, string>;
+      } = query;
 
       const PAGE = Math.max(1, parseInt(page, 10));
       const SIZE = Math.min(200, Math.max(1, parseInt(pageSize, 10)));
@@ -549,6 +554,7 @@ export function registerWalkinRoutes(app: Express) {
           .where(where)
           .orderBy(desc(walkinLeads.createdAt)),
         db.select({
+          id: walkinLeads.id,
           enquiryDate: walkinLeads.enquiryDate,
           phone: walkinLeads.phone,
           childName: walkinLeads.childName,
@@ -578,6 +584,7 @@ export function registerWalkinRoutes(app: Express) {
       // yet entered the database. Include those same rows here as read-only
       // records, while allowing any DB row (including an archived one) to win.
       const databaseKeys = new Set(allDatabaseIdentities.map(supplementLeadKey));
+      const databaseIds = new Set(allDatabaseIdentities.map(row => row.id));
       const requestedBrands: Array<"RIS" | "RPS"> = brand === "RIS" || brand === "RPS"
         ? [brand]
         : ["RIS", "RPS"];
@@ -611,7 +618,11 @@ export function registerWalkinRoutes(app: Express) {
           byIdentity.set(key, merged);
         });
         return [...byIdentity.values()]
-          .filter(lead => !databaseKeys.has(supplementLeadKey(lead)))
+          .filter(lead => {
+            const identity = `${supplementBrand}|${supplementLeadKey(lead)}`;
+            const importedId = `crm-${createHash("sha256").update(identity).digest("hex")}`;
+            return !databaseKeys.has(supplementLeadKey(lead)) && !databaseIds.has(importedId);
+          })
           .filter(lead => {
             if (!branchId) return true;
             return findSupplementBranch(supplementBrand, lead.branchName)?.id === Number(branchId);
@@ -678,10 +689,88 @@ export function registerWalkinRoutes(app: Express) {
       const total = combinedRows.length;
       const rows = combinedRows.slice(OFFSET, OFFSET + SIZE);
 
-      res.json({ leads: rows, total, page: PAGE, pageSize: SIZE, availableSources });
+      return { leads: rows, allRows: combinedRows, total, page: PAGE, pageSize: SIZE, availableSources };
+  };
+
+  // ── GET /api/walkin/leads ─────────────────────────────────────
+  app.get("/api/walkin/leads", requireAdmin, async (req, res) => {
+    try {
+      const { allRows: _allRows, ...result } = await loadLeadView(req.query as Record<string, string>);
+      res.json(result);
     } catch (err: any) {
       console.error("[walkin/leads GET]", err?.message);
       res.status(500).json({ message: "Failed to fetch leads" });
+    }
+  });
+
+  app.get("/api/walkin/leads/report", requireAdmin, async (req, res) => {
+    try {
+      const { allRows } = await loadLeadView(req.query as Record<string, string>);
+      const groupBy = typeof req.query.groupBy === "string" ? req.query.groupBy : "status";
+      if (!["status", "source", "owner", "branch"].includes(groupBy)) {
+        return res.status(400).json({ message: "Invalid report grouping" });
+      }
+      const branches = groupBy === "branch" ? await db.select().from(walkinBranches) : [];
+      const branchNames = new Map(branches.map(branch => [branch.id, branch.name]));
+      const groups = new Map<string, number>();
+      const months = new Map<string, number>();
+      let booked = 0, walkins = 0, admissions = 0, closed = 0;
+      for (const lead of allRows) {
+        const state = lead.status?.toUpperCase();
+        if (["WALK-IN BOOKED", "WALK-IN COMPLETED", "ADMISSION DONE"].includes(state)) booked++;
+        if (["WALK-IN COMPLETED", "ADMISSION DONE"].includes(state)) walkins++;
+        if (state === "ADMISSION DONE") admissions++;
+        if (state === "CLOSED") closed++;
+        const month = lead.enquiryDate.slice(0, 7);
+        months.set(month, (months.get(month) ?? 0) + 1);
+        const label = groupBy === "source" ? lead.source || "Unknown"
+          : groupBy === "owner" ? lead.leadOwner || "Unassigned"
+          : groupBy === "branch" ? (lead.branchId ? branchNames.get(lead.branchId) : ("branchName" in lead ? lead.branchName : "")) || "Unassigned"
+          : lead.status || "Unknown";
+        groups.set(label, (groups.get(label) ?? 0) + 1);
+      }
+      res.json({
+        total: allRows.length, booked, walkins, admissions, closed,
+        trend: [...months].sort(([a], [b]) => a.localeCompare(b)).map(([month, count]) => ({ month, count })),
+        breakdown: [...groups].sort((a, b) => b[1] - a[1]).map(([label, count]) => ({ label, count })),
+        generatedAt: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      console.error("[walkin/leads/report]", err?.message);
+      res.status(500).json({ message: "Failed to build lead report" });
+    }
+  });
+
+  // Reviewed, explicit historical import. Preview never writes to the DB or source sheets.
+  app.get("/api/walkin/leads/import-preview", requireAdmin, async (_req, res) => {
+    try {
+      res.json(await previewCrmImport());
+    } catch (err: any) {
+      console.error("[walkin/leads/import-preview]", err?.message);
+      res.status(503).json({ message: "Could not review the tracker import. No leads were changed." });
+    }
+  });
+
+  app.post("/api/walkin/leads/import", requireAdmin, async (req, res) => {
+    if (req.body?.confirm !== true) return res.status(400).json({ message: "Review and confirm the import first." });
+    try {
+      await assertWalkinSheetMirrorReady();
+      const result = await applyCrmImport();
+      if (result.imported === 0 && result.issues.some(issue => issue.reference.endsWith("-source"))) {
+        return res.status(503).json({
+          message: "The authenticated tracker source is unavailable. No leads were imported; refresh the review after access is restored.",
+        });
+      }
+      if (result.imported) {
+        bustCrmStatsCache();
+        // Only new CRM-linked rows are mirrored; historical tracker tabs stay untouched.
+        queueImportUpserts(result.importedIds);
+      }
+      const { importedIds: _ids, ...summary } = result;
+      res.json(summary);
+    } catch (err: any) {
+      console.error("[walkin/leads/import]", err?.message);
+      res.status(503).json({ message: "Import could not finish. Check Google sheet access and review the preview before retrying." });
     }
   });
 
@@ -690,22 +779,10 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/leads/export", requireAdmin, async (req, res) => {
     try {
       const {
-        brand, branchId, status, source, leadOwner, dateFrom, dateTo,
+        brand,
       } = req.query as Record<string, string>;
       const format = typeof req.query.format === "string" ? req.query.format : "xlsx";
-
-      const conditions: any[] = [eq(walkinLeads.isArchived, false), eq(walkinLeads.academicYear, "2027-28")];
-      if (brand) conditions.push(eq(walkinLeads.brand, brand));
-      if (branchId) conditions.push(eq(walkinLeads.branchId, parseInt(branchId, 10)));
-      if (status)   conditions.push(eq(walkinLeads.status, status));
-      if (source)   conditions.push(ilike(walkinLeads.source, source));
-      if (leadOwner) conditions.push(eq(walkinLeads.leadOwner, leadOwner));
-      if (dateFrom) conditions.push(gte(walkinLeads.enquiryDate, dateFrom));
-      if (dateTo)   conditions.push(lte(walkinLeads.enquiryDate, dateTo));
-
-      const rows = await db.select().from(walkinLeads)
-        .where(and(...conditions))
-        .orderBy(desc(walkinLeads.enquiryDate));
+      const { allRows: rows } = await loadLeadView(req.query as Record<string, string>);
 
       const HEADERS = [
         "Enquiry Date", "Month", "Academic Year", "Brand", "Branch ID",
@@ -719,14 +796,15 @@ export function registerWalkinRoutes(app: Express) {
         r.parentName, r.childName, r.phone, r.altPhone ?? "", r.email ?? "",
         r.program, r.source, r.status, r.closeReason ?? "", r.remark ?? "",
         r.leadOwner ?? "", r.walkInDate ?? "", r.admissionDate ?? "", r.revisitDate ?? "",
-        r.createdBy, r.createdAt.toISOString(), r.updatedAt.toISOString(), r.id,
+        r.createdBy, new Date(r.createdAt).toISOString(), new Date(r.updatedAt).toISOString(), r.id,
       ]);
 
       const baseName = `walkin-leads-${brand || "all"}-${new Date().toISOString().slice(0, 10)}`;
 
       if (format === "csv") {
         const escape = (v: string | number | null | undefined) => {
-          const s = String(v ?? "");
+          const raw = String(v ?? "");
+          const s = /^[\s]*[=+\-@]/.test(raw) ? `'${raw}` : raw;
           return (s.includes(",") || s.includes('"') || s.includes("\n"))
             ? `"${s.replace(/"/g, '""')}"` : s;
         };
@@ -768,7 +846,7 @@ export function registerWalkinRoutes(app: Express) {
     try {
       const parsed = updateLeadSchema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ message: parsed.data });
+        return res.status(400).json({ message: parsed.error.issues[0]?.message ?? "Invalid lead update" });
       }
       const updates = parsed.data;
       const changedBy = updates.updatedBy || "admin";
@@ -777,19 +855,31 @@ export function registerWalkinRoutes(app: Express) {
       const [existing] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, req.params.id));
       if (!existing) return res.status(404).json({ message: "Lead not found" });
       if (existing.isArchived) return res.status(400).json({ message: "Cannot update an archived lead" });
+      if (updates.expectedUpdatedAt && existing.updatedAt.getTime() !== new Date(updates.expectedUpdatedAt).getTime()) {
+        return res.status(409).json({ message: "This lead changed since you opened it. Refresh and review the latest version before saving." });
+      }
       if (updates.source !== undefined && updates.source !== existing.source) {
         return res.status(409).json({ message: "Enquiry Source is locked after the lead is created." });
+      }
+      if (updates.branchId !== undefined) {
+        const [branch] = await db.select({ brand: walkinBranches.brand }).from(walkinBranches)
+          .where(eq(walkinBranches.id, updates.branchId));
+        if (!branch || branch.brand !== existing.brand) {
+          return res.status(400).json({ message: "Branch must belong to this lead's school." });
+        }
       }
 
       // Validate status-dependent fields against merged values
       const newStatus = updates.status ?? existing.status;
-      const newCloseReason = updates.closeReason ?? existing.closeReason;
-      const newWalkInDate = updates.walkInDate ?? existing.walkInDate;
-      if (newStatus === "CLOSED" && !newCloseReason) {
+      const newCloseReason = updates.closeReason !== undefined ? updates.closeReason : existing.closeReason;
+      const newWalkInDate = updates.walkInDate !== undefined ? updates.walkInDate : existing.walkInDate;
+      if (newStatus === "CLOSED" && !newCloseReason &&
+          (updates.status !== undefined || updates.closeReason !== undefined)) {
         return res.status(400).json({ message: "closeReason is required when status is CLOSED" });
       }
       const walkinStatusList = ["WALK-IN BOOKED", "WALK-IN COMPLETED"];
-      if (walkinStatusList.includes(newStatus) && !newWalkInDate) {
+      if (walkinStatusList.includes(newStatus) && !newWalkInDate &&
+          (updates.status !== undefined || updates.walkInDate !== undefined)) {
         return res.status(400).json({ message: "walkInDate is required for walk-in statuses" });
       }
 
@@ -821,16 +911,22 @@ export function registerWalkinRoutes(app: Express) {
         if (v !== undefined) (patch as any)[field] = v ?? null;
       }
 
-      const [updated] = await db
-        .update(walkinLeads)
-        .set(patch)
-        .where(eq(walkinLeads.id, req.params.id))
-        .returning();
-
-      // Write audit rows
-      await Promise.all(
-        auditRows.map((r) => writeAudit(req.params.id, r.field, r.oldValue, r.newValue, changedBy)),
-      );
+      const updated = await db.transaction(async tx => {
+        const [saved] = await tx
+          .update(walkinLeads)
+          .set(patch)
+          .where(and(eq(walkinLeads.id, req.params.id), eq(walkinLeads.updatedAt, existing.updatedAt)))
+          .returning();
+        if (!saved) return null;
+        if (auditRows.length) await tx.insert(walkinLeadAuditLog).values(
+          auditRows.map(r => ({
+            leadId: req.params.id, field: r.field,
+            oldValue: r.oldValue, newValue: r.newValue, changedBy,
+          })),
+        );
+        return saved;
+      });
+      if (!updated) return res.status(409).json({ message: "This lead changed while you were saving. Refresh and try again." });
 
       // Mirror update to Google Sheets (fire-and-forget)
       queueUpsert(updated.brand as "RIS" | "RPS", updated);
@@ -1560,6 +1656,8 @@ export function registerWalkinRoutes(app: Express) {
   app.get("/api/walkin/sheets/status", requireAdmin, async (req, res) => {
     try {
       const status = getSyncStatus();
+      const pending = new Set((await db.select({ scope: walkinSyncReconciliations.scope })
+        .from(walkinSyncReconciliations)).map(row => row.scope));
 
       // Also fetch live DB counts for comparison
       const [risCount, rpsCount] = await Promise.all([
@@ -1581,6 +1679,7 @@ export function registerWalkinRoutes(app: Express) {
         googleConfigured,
         credentialSource,
         RIS: {
+          pending: pending.has("RIS"),
           sheetConfigured: risSheetConfigured,
           sheetId: risSheetConfigured ? process.env.RIS_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
           lastSyncAt: status.RIS.lastSyncAt?.toISOString() ?? null,
@@ -1589,6 +1688,7 @@ export function registerWalkinRoutes(app: Express) {
           lastError: status.RIS.lastError,
         },
         RPS: {
+          pending: pending.has("RPS"),
           sheetConfigured: rpsSheetConfigured,
           sheetId: rpsSheetConfigured ? process.env.RPS_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
           lastSyncAt: status.RPS.lastSyncAt?.toISOString() ?? null,
@@ -1597,6 +1697,7 @@ export function registerWalkinRoutes(app: Express) {
           lastError: status.RPS.lastError,
         },
         MASTER: {
+          pending: pending.has("MASTER"),
           sheetConfigured: masterSheetConfigured,
           sheetId: masterSheetConfigured ? process.env.MASTER_WALKIN_SHEET_ID_2728!.slice(0, 8) + "…" : null,
           lastSyncAt: status.MASTER.lastSyncAt?.toISOString() ?? null,

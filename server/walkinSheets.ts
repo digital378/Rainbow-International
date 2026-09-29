@@ -25,9 +25,10 @@
  */
 
 import { google } from "googleapis";
+import { createHash } from "node:crypto";
 import { getGoogleRefreshToken } from "./googleCredentials";
 import { db } from "./db";
-import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations } from "@shared/schema";
+import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations, walkinSyncSnapshots } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
 import type { WalkinLead } from "@shared/schema";
@@ -352,6 +353,167 @@ const syncStatus: Record<"RIS" | "RPS" | "MASTER", SyncStatus> = {
   MASTER: { lastSyncAt: null, dbCount: 0, sheetCount: 0, lastError: null },
 };
 
+// Cache hydrated durable per-lead/per-workbook checkpoints. Reads consult the
+// database each time so another leased application instance's writes are seen.
+type SyncValues = Record<string, string | null>;
+type CachedSyncSnapshot = { snapshot: SyncValues; updatedAt: number };
+const successfulSyncValues = new Map<string, CachedSyncSnapshot>();
+
+function normalizedSyncValue(value: unknown): string | null {
+  return value == null || value === "" ? null : String(value);
+}
+
+function syncValuesFromLead(lead: WalkinLead): SyncValues {
+  return {
+    status: normalizedSyncValue(lead.status),
+    walkInDate: normalizedSyncValue(lead.walkInDate),
+    admissionDate: normalizedSyncValue(lead.admissionDate),
+    remark: normalizedSyncValue(lead.remark),
+    closeReason: normalizedSyncValue(lead.closeReason),
+    revisitDate: normalizedSyncValue(lead.revisitDate),
+    revisitDate2: normalizedSyncValue((lead as any).revisitDate2),
+  };
+}
+
+function syncValuesFromSheet(values: SyncValues): SyncValues {
+  return Object.fromEntries(Object.entries(values).map(([field, value]) => [field, normalizedSyncValue(value)]));
+}
+
+async function getSyncSnapshot(scope: "RIS" | "RPS" | "MASTER", leadId: string): Promise<SyncValues | undefined> {
+  const [stored] = await db.select()
+    .from(walkinSyncSnapshots)
+    .where(and(eq(walkinSyncSnapshots.scope, scope), eq(walkinSyncSnapshots.leadId, leadId)));
+  if (!stored) {
+    successfulSyncValues.delete(`${scope}:${leadId}`);
+    return undefined;
+  }
+  const key = `${scope}:${leadId}`;
+  const updatedAt = new Date(stored.updatedAt).getTime();
+  const cached = successfulSyncValues.get(key);
+  const snapshot = cached?.updatedAt === updatedAt
+    && JSON.stringify(cached.snapshot) === JSON.stringify(stored.snapshot)
+    ? cached.snapshot
+    : stored.snapshot as SyncValues;
+  successfulSyncValues.set(key, { snapshot, updatedAt });
+  return snapshot;
+}
+
+export async function persistSyncSnapshot(scope: "RIS" | "RPS" | "MASTER", leadId: string, snapshot: SyncValues): Promise<void> {
+  const normalized = syncValuesFromSheet(snapshot);
+  const updatedAt = new Date();
+  await db.insert(walkinSyncSnapshots).values({
+    scope,
+    leadId,
+    snapshot: normalized,
+    updatedAt,
+  }).onConflictDoUpdate({
+    target: [walkinSyncSnapshots.scope, walkinSyncSnapshots.leadId],
+    set: { snapshot: normalized, updatedAt },
+  });
+  successfulSyncValues.set(`${scope}:${leadId}`, { snapshot: normalized, updatedAt: updatedAt.getTime() });
+}
+
+async function persistSyncSnapshots(scope: "RIS" | "RPS" | "MASTER", leads: WalkinLead[]): Promise<void> {
+  const values = leads.map((lead) => ({
+    scope,
+    leadId: String(lead.id),
+    snapshot: syncValuesFromLead(lead),
+    updatedAt: new Date(),
+  }));
+  for (let offset = 0; offset < values.length; offset += 200) {
+    const chunk = values.slice(offset, offset + 200);
+    await db.insert(walkinSyncSnapshots).values(chunk).onConflictDoUpdate({
+      target: [walkinSyncSnapshots.scope, walkinSyncSnapshots.leadId],
+      set: {
+        snapshot: drizzleSql`excluded.snapshot_values`,
+        updatedAt: new Date(),
+      },
+    });
+    for (const item of chunk) {
+      successfulSyncValues.set(`${scope}:${item.leadId}`, {
+        snapshot: item.snapshot,
+        updatedAt: item.updatedAt.getTime(),
+      });
+    }
+  }
+}
+
+export async function bootstrapWalkinSyncSnapshots(): Promise<void> {
+  await db.execute(drizzleSql`
+    CREATE TABLE IF NOT EXISTS walkin_sync_snapshots (
+      scope TEXT NOT NULL,
+      lead_id TEXT NOT NULL,
+      snapshot_values JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (scope, lead_id)
+    )
+  `);
+  await db.execute(drizzleSql`
+    CREATE INDEX IF NOT EXISTS walkin_sync_snapshots_updated_at_idx
+      ON walkin_sync_snapshots (updated_at)
+  `);
+}
+
+/** Hydrate durable checkpoints before auto-pull can start. */
+export async function hydrateWalkinSyncSnapshots(): Promise<number> {
+  const snapshots = await db.select().from(walkinSyncSnapshots);
+  successfulSyncValues.clear();
+  for (const { scope, leadId, snapshot, updatedAt } of snapshots) {
+    if (scope === "RIS" || scope === "RPS" || scope === "MASTER") {
+      successfulSyncValues.set(`${scope}:${leadId}`, {
+        snapshot: snapshot as SyncValues,
+        updatedAt: new Date(updatedAt).getTime(),
+      });
+    }
+  }
+  return successfulSyncValues.size;
+}
+
+function getSyncConflicts(baseline: SyncValues | undefined, dbValues: SyncValues, sheetValues: SyncValues): string[] {
+  if (!baseline) return [];
+  return Object.keys(sheetValues).filter((field) =>
+    Object.prototype.hasOwnProperty.call(baseline, field)
+    && normalizedSyncValue(dbValues[field]) !== normalizedSyncValue(baseline[field])
+    && normalizedSyncValue(sheetValues[field]) !== normalizedSyncValue(baseline[field])
+    && normalizedSyncValue(dbValues[field]) !== normalizedSyncValue(sheetValues[field]),
+  );
+}
+
+function getAmbiguousFieldsWithoutBaseline(
+  baseline: SyncValues | undefined,
+  dbValues: SyncValues,
+  sheetValues: SyncValues,
+): string[] {
+  return Object.keys(sheetValues).filter((field) =>
+    (!baseline || !Object.prototype.hasOwnProperty.call(baseline, field))
+    &&
+    normalizedSyncValue(dbValues[field]) !== normalizedSyncValue(sheetValues[field]),
+  );
+}
+
+function getUnappliedSheetEdits(baseline: SyncValues | undefined, dbValues: SyncValues, sheetValues: SyncValues): string[] {
+  if (!baseline) return [];
+  return Object.keys(sheetValues).filter((field) =>
+    Object.prototype.hasOwnProperty.call(baseline, field)
+    && normalizedSyncValue(sheetValues[field]) !== normalizedSyncValue(baseline[field])
+    && normalizedSyncValue(sheetValues[field]) !== normalizedSyncValue(dbValues[field]),
+  );
+}
+
+function buildSafeSyncSnapshot(
+  currentValues: SyncValues,
+  baseline: SyncValues | undefined,
+  preservedFields: string[],
+  ambiguousFields: string[],
+): SyncValues {
+  const snapshot: SyncValues = { ...currentValues };
+  for (const field of new Set([...preservedFields, ...ambiguousFields])) {
+    if (baseline && Object.prototype.hasOwnProperty.call(baseline, field)) snapshot[field] = baseline[field];
+    else delete snapshot[field];
+  }
+  return snapshot;
+}
+
 export function getSyncStatus() {
   return { ...syncStatus };
 }
@@ -376,10 +538,18 @@ async function recoverPendingReconciliations(): Promise<void> {
   const pending = await db.select().from(walkinSyncReconciliations);
   for (const { scope } of pending) {
     if (scope === "RIS" || scope === "RPS") {
-      await resyncBrandToSheet(scope);
+      const leads = await db.select().from(walkinLeads).where(eq(walkinLeads.brand, scope));
+      for (const lead of leads) {
+        if (lead.isArchived) await removeLeadFromSheet(scope, lead.id);
+        else await upsertLeadToSheet(scope, lead);
+      }
       await clearReconciliation(scope);
     } else if (scope === "MASTER") {
-      await resyncMasterSheet();
+      const leads = await db.select().from(walkinLeads);
+      for (const lead of leads) {
+        if (lead.isArchived) await removeLeadFromMasterSheet(lead.id);
+        else await upsertLeadToMasterSheet(lead);
+      }
       await clearReconciliation(scope);
     }
   }
@@ -395,6 +565,15 @@ function getAuthClient() {
   const oauth2 = new google.auth.OAuth2(clientId, clientSecret);
   oauth2.setCredentials({ refresh_token: refreshToken });
   return oauth2;
+}
+
+/** Check the write-side OAuth path before a reviewed bulk import changes the CRM. */
+export async function assertWalkinSheetMirrorReady(): Promise<void> {
+  const auth = getAuthClient();
+  if (!auth || !getSheetId("RIS") || !getSheetId("RPS") || !process.env.MASTER_WALKIN_SHEET_ID_2728) {
+    throw new Error("Sheet mirroring is not configured");
+  }
+  await auth.getAccessToken();
 }
 
 // ── Sheet ID resolver ────────────────────────────────────────────
@@ -547,7 +726,57 @@ export async function leadToRow(lead: WalkinLead, brand = lead.brand as "RIS" | 
     "Lead ID": String(lead.id),
     "Actual Admission Date": lead.admissionDate ? formatDateDDMMYYYY(lead.admissionDate) : "",
   };
-  return headersForBrand(brand).map((header) => values[header] ?? "");
+  // USER_ENTERED parses leading =,+,-,@ as formulas. Protect every value
+  // that can originate in user-entered text before it reaches a workbook.
+  return headersForBrand(brand).map((header) => {
+    const value = values[header] ?? "";
+    return /^[\s]*[=+\-@]/.test(value) ? `'${value}` : value;
+  });
+}
+
+function syncValuesFromSheetRow(header: string[], row: string[], hasActualAdmissionDate: boolean): SyncValues {
+  const value = (name: string, fallback: number) => cellAt(row, headerIndex(header, name, fallback));
+  return syncValuesFromSheet({
+    status: value("Status", 14),
+    walkInDate: parseDateFromSheet(value("Admission Date", 15)),
+    admissionDate: hasActualAdmissionDate
+      ? parseDateFromSheet(value("Actual Admission Date", headerIndex(header, "Actual Admission Date", header.length - 1)))
+      : null,
+    remark: value("Follow up Remarks", 16),
+    closeReason: value("Reason for Closed", 17),
+    revisitDate: parseDateFromSheet(value("Revisit 1 Date", 18)),
+    revisitDate2: parseDateFromSheet(value("Revisit 2 Date", 19)),
+  });
+}
+
+async function updateRowPreservingColumns(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tab: string,
+  rowNumber: number,
+  values: string[],
+  protectedIndices: readonly number[],
+  label: string,
+): Promise<void> {
+  const protectedSet = new Set(protectedIndices);
+  const data: Array<{ range: string; values: string[][] }> = [];
+  let start = -1;
+  for (let index = 0; index <= values.length; index++) {
+    const writable = index < values.length && !protectedSet.has(index);
+    if (writable && start < 0) start = index;
+    if (!writable && start >= 0) {
+      data.push({
+        range: `${tab}!${columnLetter(start)}${rowNumber}:${columnLetter(index - 1)}${rowNumber}`,
+        values: [values.slice(start, index)],
+      });
+      start = -1;
+    }
+  }
+  if (data.length === 0) return;
+  await fencedWalkinSheetWrite(label, () => sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId,
+    requestBody: { valueInputOption: "USER_ENTERED", data },
+  }));
 }
 
 async function leadToMasterRow(lead: WalkinLead): Promise<string[]> {
@@ -610,12 +839,41 @@ export async function upsertLeadToSheet(
       if (existingRowIndex >= 0) {
         // Update existing row (Sheets row = existingRowIndex + 1, 1-based)
         const sheetsRow = existingRowIndex + 1;
-        await fencedWalkinSheetWrite(`upsert ${brand} lead ${lead.id}`, () => sheets.spreadsheets.values.update({
+        const currentRowResp = await sheets.spreadsheets.values.get({
           spreadsheetId: sheetId!,
-          range: `${LEADS_TAB}!A${sheetsRow}`,
-          valueInputOption: "USER_ENTERED",
-          requestBody: { values: [row] },
-        }));
+          range: `${LEADS_TAB}!A${sheetsRow}:${columnLetter(headers.length - 1)}${sheetsRow}`,
+        });
+        const currentRow = currentRowResp.data.values?.[0] ?? [];
+        const currentRowLeadId = leadIdFromRow(currentRow, headers.indexOf("Lead ID"));
+        if (currentRowLeadId !== String(lead.id)) {
+          throw new Error(`Lead ${lead.id} moved while reading ${brand} row ${sheetsRow}; refusing to update a different row`);
+        }
+        const currentSheetValues = syncValuesFromSheetRow(
+          headers as string[],
+          currentRow,
+          headers.some((header) => header.trim().toLowerCase() === "actual admission date"),
+        );
+        const dbValues = syncValuesFromLead(lead);
+        const baseline = await getSyncSnapshot(brand, String(lead.id));
+        const conflicts = getSyncConflicts(baseline, dbValues, currentSheetValues);
+        const ambiguous = getAmbiguousFieldsWithoutBaseline(baseline, dbValues, currentSheetValues);
+        const pendingSheetEdits = getUnappliedSheetEdits(baseline, dbValues, currentSheetValues);
+        if (conflicts.length > 0 || ambiguous.length > 0 || pendingSheetEdits.length > 0) {
+          const fields = [...new Set([...conflicts, ...ambiguous, ...pendingSheetEdits])];
+          const reason = ambiguous.length > 0 ? "ambiguous without a sync baseline" : "unsynced concurrent edits";
+          const message = `Lead ${lead.id}: ${brand} sheet has ${reason} in ${fields.join(", ")}; row left unchanged`;
+          syncStatus[brand].lastError = message;
+          throw new Error(message);
+        }
+        await updateRowPreservingColumns(
+          sheets,
+          sheetId!,
+          LEADS_TAB,
+          sheetsRow,
+          row,
+          [], // CRM is authoritative for protected submission fields too.
+          `upsert ${brand} lead ${lead.id}`,
+        );
         console.log(`[walkin/sheets] Updated row ${sheetsRow} for lead ${lead.id} in ${brand} sheet`);
       } else {
         // Append a new row after the last row
@@ -632,6 +890,7 @@ export async function upsertLeadToSheet(
       // Update in-memory sync status
       syncStatus[brand].lastSyncAt = new Date();
       syncStatus[brand].lastError = null;
+      await persistSyncSnapshot(brand, String(lead.id), syncValuesFromLead(lead));
     } catch (err: any) {
       if (!retried && err?.code === 429) {
         console.warn(`[walkin/sheets] Rate-limited (429) for ${brand} — retrying in 2s`);
@@ -655,12 +914,38 @@ export function queueUpsert(brand: "RIS" | "RPS", lead: WalkinLead): void {
   // instead of losing the fire-and-forget Sheet mirror attempt.
   void markReconciliation(brand, "MASTER")
     .then(() => runWalkinSheetOperation("queued lead upsert", async () => {
-      await upsertLeadToSheet(brand, lead);
-      await upsertLeadToMasterSheet(lead);
+      const [freshLead] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, lead.id));
+      if (!freshLead || freshLead.isArchived) {
+        throw new Error(`Lead ${lead.id} is missing or archived; queued sheet upsert deferred`);
+      }
+      if (freshLead.brand !== brand) {
+        throw new Error(`Lead ${lead.id} changed brand to ${freshLead.brand}; ${brand} sheet upsert deferred`);
+      }
+      await upsertLeadToSheet(brand, freshLead);
+      await upsertLeadToMasterSheet(freshLead);
       await clearReconciliation(brand);
       await clearReconciliation("MASTER");
     }))
     .catch((err) => console.error("[walkin/sheets] Unexpected queue error:", err?.message));
+}
+
+/** Mirror a reviewed import as one leased operation, not hundreds of competing
+ * fire-and-forget upserts that can clear one another's recovery markers. */
+export function queueImportUpserts(ids: string[]): void {
+  if (ids.length === 0) return;
+  void markReconciliation("RIS", "RPS", "MASTER")
+    .then(() => runWalkinSheetOperation("historical import mirror", async () => {
+      // Reconcile all pending DB records, not just this batch. A normal edit
+      // may have arrived while the import held the sheet lease.
+      await recoverPendingReconciliations();
+    }))
+    .catch((err: any) => {
+      const message = `Historical import mirror is pending: ${err?.message ?? "unknown error"}`;
+      syncStatus.RIS.lastError = message;
+      syncStatus.RPS.lastError = message;
+      syncStatus.MASTER.lastError = message;
+      console.error("[walkin/sheets]", message);
+    });
 }
 
 // ── Upsert a single lead into the master (combined) sheet ────────
@@ -693,10 +978,41 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
 
       if (existingRowIndex >= 0) {
         const sheetsRow = existingRowIndex + 1;
-        await fencedWalkinSheetWrite(`upsert Master lead ${lead.id}`, () => sheets.spreadsheets.values.update({
-          spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A${sheetsRow}`,
-          valueInputOption: "USER_ENTERED", requestBody: { values: [row] },
-        }));
+        const currentRowResp = await sheets.spreadsheets.values.get({
+          spreadsheetId: sheetId!,
+          range: `${MASTER_LEADS_TAB}!A${sheetsRow}:${columnLetter(MASTER_SHEET_HEADERS.length - 1)}${sheetsRow}`,
+        });
+        const currentRow = currentRowResp.data.values?.[0] ?? [];
+        const currentRowLeadId = leadIdFromRow(currentRow, MASTER_SHEET_HEADERS.indexOf("Lead ID"));
+        if (currentRowLeadId !== String(lead.id)) {
+          throw new Error(`Lead ${lead.id} moved while reading Master row ${sheetsRow}; refusing to update a different row`);
+        }
+        const currentSheetValues = syncValuesFromSheetRow(
+          MASTER_SHEET_HEADERS as unknown as string[],
+          currentRow,
+          true,
+        );
+        const dbValues = syncValuesFromLead(lead);
+        const baseline = await getSyncSnapshot("MASTER", String(lead.id));
+        const conflicts = getSyncConflicts(baseline, dbValues, currentSheetValues);
+        const ambiguous = getAmbiguousFieldsWithoutBaseline(baseline, dbValues, currentSheetValues);
+        const pendingSheetEdits = getUnappliedSheetEdits(baseline, dbValues, currentSheetValues);
+        if (conflicts.length > 0 || ambiguous.length > 0 || pendingSheetEdits.length > 0) {
+          const fields = [...new Set([...conflicts, ...ambiguous, ...pendingSheetEdits])];
+          const reason = ambiguous.length > 0 ? "ambiguous without a sync baseline" : "unsynced concurrent edits";
+          const message = `Lead ${lead.id}: Master sheet has ${reason} in ${fields.join(", ")}; row left unchanged`;
+          syncStatus.MASTER.lastError = message;
+          throw new Error(message);
+        }
+        await updateRowPreservingColumns(
+          sheets,
+          sheetId!,
+          MASTER_LEADS_TAB,
+          sheetsRow,
+          row,
+          [], // Range protections remain; only this trusted CRM sync writes them.
+          `upsert Master lead ${lead.id}`,
+        );
       } else {
         await fencedWalkinSheetWrite(`append Master lead ${lead.id}`, () => sheets.spreadsheets.values.append({
           spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A1`,
@@ -707,6 +1023,7 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
 
       syncStatus.MASTER.lastSyncAt = new Date();
       syncStatus.MASTER.lastError = null;
+      await persistSyncSnapshot("MASTER", String(lead.id), syncValuesFromLead(lead));
     } catch (err: any) {
       if (!retried && err?.code === 429) {
         await new Promise((r) => setTimeout(r, 2000));
@@ -1173,6 +1490,14 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
   const tabWasCreated = await ensureLeadsTab(sheets, sheetId, LEADS_TAB, headers);
 
   if (!tabWasCreated) {
+    const snapshot = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId, range: `${LEADS_TAB}!A:Z`,
+    });
+    const existing = snapshot.data.values ?? [];
+    const idIndex = (existing[0] ?? []).findIndex(value => value.trim() === "Lead ID");
+    if (idIndex < 0 || existing.slice(1).some(row => row.some(cell => cell?.trim()) && !row[idIndex]?.trim())) {
+      throw new Error(`${brand} sheet contains historical rows without Lead IDs; full resync would erase them. Use incremental synchronization.`);
+    }
     // 3a. Clear existing data rows (A2:end), preserving the header row
     try {
       await fencedWalkinSheetWrite(`clear ${brand} sheet for resync`, () => sheets.spreadsheets.values.clear({
@@ -1213,6 +1538,9 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
     );
   }
 
+  // Persist checkpoints only after the sheet write has completed successfully.
+  await persistSyncSnapshots(brand, leads);
+
   // 7. Update sync status
   syncStatus[brand].lastSyncAt = new Date();
   syncStatus[brand].dbCount = leads.length;
@@ -1252,6 +1580,14 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
   const masterTabWasCreated = await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
 
   if (!masterTabWasCreated) {
+    const snapshot = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId, range: `${MASTER_LEADS_TAB}!A:Z`,
+    });
+    const existing = snapshot.data.values ?? [];
+    const idIndex = (existing[0] ?? []).findIndex(value => value.trim() === "Lead ID");
+    if (idIndex < 0 || existing.slice(1).some(row => row.some(cell => cell?.trim()) && !row[idIndex]?.trim())) {
+      throw new Error("Master sheet contains historical rows without Lead IDs; full resync would erase them. Use incremental synchronization.");
+    }
     // Clear data rows
     try {
       await fencedWalkinSheetWrite("clear Master sheet for resync", () => sheets.spreadsheets.values.clear({
@@ -1285,6 +1621,8 @@ export async function resyncMasterSheet(): Promise<{ dbCount: number; sheetCount
   } catch (err: any) {
     console.warn(`[walkin/sheets] Could not apply Master column protections:`, err?.message);
   }
+
+  await persistSyncSnapshots("MASTER", leads);
 
   syncStatus.MASTER.lastSyncAt = new Date();
   syncStatus.MASTER.dbCount = leads.length;
@@ -1331,6 +1669,44 @@ function parseDateFromSheet(d: string): string | null {
   const [dd, mm, yyyy] = parts;
   if (!yyyy || !mm || !dd) return null;
   return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+}
+
+async function applySheetChangesToDb(
+  leadId: string,
+  existing: any,
+  patch: Record<string, any>,
+  changes: Array<{ field: string; oldVal: string | null; newVal: string | null }>,
+  changedBy: "sheet-sync" | "master-sync",
+): Promise<boolean> {
+  const perform = async (executor: any): Promise<boolean> => {
+    let update = executor.update(walkinLeads).set(patch);
+    update = update.where(existing.updatedAt
+      ? and(eq(walkinLeads.id, leadId), eq(walkinLeads.updatedAt, existing.updatedAt))
+      : eq(walkinLeads.id, leadId));
+    if (existing.updatedAt && typeof update.returning === "function") {
+      const updatedRows = await update.returning({ id: walkinLeads.id });
+      if (updatedRows.length === 0) return false;
+    } else {
+      await update;
+    }
+    await Promise.all(changes.map((change) =>
+      executor.insert(walkinLeadAuditLog).values({
+        leadId,
+        field: change.field,
+        oldValue: change.oldVal,
+        newValue: change.newVal,
+        changedBy,
+      }),
+    ));
+    return true;
+  };
+
+  // Production DB transactions keep the optimistic update and its audit trail
+  // atomic. Lightweight test doubles may not implement transactions.
+  if (typeof (db as any).transaction === "function") {
+    return (db as any).transaction((tx: any) => perform(tx));
+  }
+  return perform(db);
 }
 
 export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLogEntry> {
@@ -1404,13 +1780,6 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       allowedCloseReasons = new Set();
     }
 
-    // Collect rows that need propagating to Master after the main loop
-    const pendingMasterUpdates: Array<{
-      leadId: string;
-      greenValues: string[];
-      actualAdmissionDate: string | null;
-    }> = [];
-
     for (const row of dataRows) {
       const hasBranch = header.some((cell) => cell.trim().toLowerCase() === "branch");
       const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", hasBranch ? 20 : 19));
@@ -1453,7 +1822,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       };
 
       if (sheetStatus) {
-        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus)) {
+        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus) && sheetStatus !== existing.status) {
           // Invalid status from sheet — skip and surface in pull log so an admin can investigate.
           entry.errors.push(
             `Lead ${leadId}: sheet status "${sheetStatus}" is not a recognised status — skipped (valid values: ${[...allowedStatuses].join(", ")})`
@@ -1482,27 +1851,80 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
       check("revisitDate",          existing.revisitDate,          sheetRevisitDate);
       check("revisitDate2",         (existing as any).revisitDate2, sheetRevisitDate2);
 
-      if (changes.length === 0) continue;
+      const sheetSyncValues = syncValuesFromLead(existing as WalkinLead);
+      const requestedValues: SyncValues = { ...sheetSyncValues };
+      for (const change of changes) requestedValues[change.field] = change.newVal;
+      const baseline = await getSyncSnapshot(brand, leadId);
+      const dbValues = syncValuesFromLead(existing as WalkinLead);
+      const conflicts = getSyncConflicts(baseline, dbValues, requestedValues);
+      const ambiguous = getAmbiguousFieldsWithoutBaseline(
+        baseline,
+        dbValues,
+        requestedValues,
+      );
+      const dbOnlyChanges = baseline
+        ? changes.filter((change) =>
+            normalizedSyncValue(existing[change.field]) !== normalizedSyncValue(baseline[change.field])
+            && normalizedSyncValue(requestedValues[change.field]) === normalizedSyncValue(baseline[change.field]),
+          )
+        : [];
+      if (dbOnlyChanges.length > 0) {
+        const fields = dbOnlyChanges.map((change) => change.field);
+        const message = `Lead ${leadId}: DB changed since last sync (${fields.join(", ")}); stale ${brand} sheet values preserved/skipped`;
+        entry.errors.push(message);
+        syncStatus[brand].lastError = message;
+      }
+      if (conflicts.length > 0) {
+        const message = `Lead ${leadId}: concurrent DB and ${brand} sheet edits conflict in ${conflicts.join(", ")}; conflicting fields skipped`;
+        entry.errors.push(message);
+        syncStatus[brand].lastError = message;
+      }
+      if (ambiguous.length > 0) {
+        const message = `Lead ${leadId}: ${brand} sheet/DB mismatch is ambiguous without a successful-sync baseline (${ambiguous.join(", ")}); mismatched fields preserved`;
+        entry.errors.push(message);
+        syncStatus[brand].lastError = message;
+      }
+      const skippedFields = new Set([...dbOnlyChanges.map((change) => change.field), ...conflicts, ...ambiguous]);
+      for (let i = changes.length - 1; i >= 0; i--) {
+        if (skippedFields.has(changes[i].field)) changes.splice(i, 1);
+      }
+
+      if (changes.length === 0) {
+        const safeSnapshot = buildSafeSyncSnapshot(
+          dbValues,
+          baseline,
+          [...conflicts, ...dbOnlyChanges.map((change) => change.field)],
+          ambiguous,
+        );
+        if (JSON.stringify(safeSnapshot) !== JSON.stringify(baseline ?? {})) {
+          try {
+            await persistSyncSnapshot(brand, leadId, safeSnapshot);
+          } catch (snapshotError: any) {
+            const message = `Snapshot persistence failed for ${brand} lead ${leadId}: ${snapshotError?.message ?? "Unknown error"}`;
+            entry.errors.push(message);
+            syncStatus[brand].lastError = message;
+            try {
+              await markReconciliation(brand);
+            } catch (markerError: any) {
+              entry.errors.push(`${brand} reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+            }
+          }
+        }
+        continue;
+      }
 
       // Build patch
       const patch: Record<string, any> = { updatedBy: "sheet-sync", updatedAt: new Date() };
       for (const c of changes) patch[c.field] = c.newVal;
 
       try {
-        await db.update(walkinLeads).set(patch).where(eq(walkinLeads.id, leadId));
-
-        // Write audit rows
-        await Promise.all(
-          changes.map((c) =>
-            db.insert(walkinLeadAuditLog).values({
-              leadId,
-              field: c.field,
-              oldValue: c.oldVal,
-              newValue: c.newVal,
-              changedBy: "sheet-sync",
-            })
-          )
-        );
+        const updateApplied = await applySheetChangesToDb(leadId, existing, patch, changes, "sheet-sync");
+        if (!updateApplied) {
+          const message = `Lead ${leadId}: DB changed during ${brand} pull; sheet values skipped by optimistic check`;
+          entry.errors.push(message);
+          syncStatus[brand].lastError = message;
+          continue;
+        }
 
         entry.changesApplied += changes.length;
 
@@ -1516,73 +1938,53 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
             newVal: c.newVal,
           });
         }
+        const nextBaseline = buildSafeSyncSnapshot(
+          syncValuesFromLead(existing as WalkinLead),
+          baseline,
+          [...conflicts, ...dbOnlyChanges.map((change) => change.field)],
+          ambiguous,
+        );
+        for (const change of changes) nextBaseline[change.field] = normalizedSyncValue(change.newVal);
+        try {
+          await persistSyncSnapshot(brand, leadId, nextBaseline);
+        } catch (snapshotError: any) {
+          const message = `Snapshot persistence failed for ${brand} lead ${leadId}: ${snapshotError?.message ?? "Unknown error"}`;
+          entry.errors.push(message);
+          syncStatus[brand].lastError = message;
+          try {
+            await markReconciliation(brand, "MASTER");
+          } catch (markerError: any) {
+            entry.errors.push(`Reconciliation marker failed for ${brand}/MASTER lead ${leadId}: ${markerError?.message}`);
+          }
+        }
 
-        // Queue this row for Master propagation
-        pendingMasterUpdates.push({
-          leadId,
-          actualAdmissionDate: hasActualAdmissionDate
-            ? cellAt(row, headerIndex(header, "Actual Admission Date", hasBranch ? 21 : 20))
-            : null,
-          greenValues: [
-            sheetStatus,
-            cellAt(row, headerIndex(header, "Admission Date", hasBranch ? 15 : 14)),
-            sheetRemark,
-            sheetCloseReason,
-            cellAt(row, headerIndex(header, "Revisit 1 Date", hasBranch ? 18 : 17)),
-            cellAt(row, headerIndex(header, "Revisit 2 Date", hasBranch ? 19 : 18)),
-          ],
-        });
+        if (process.env.MASTER_WALKIN_SHEET_ID_2728) {
+          try {
+            const [freshLead] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, leadId));
+            if (!freshLead || freshLead.isArchived) throw new Error(`Lead ${leadId} is missing or archived after DB update`);
+            await upsertLeadToMasterSheet(freshLead);
+          } catch (propagationError: any) {
+            const message = `Master propagation for lead ${leadId} failed: ${propagationError?.message ?? "Unknown error"}`;
+            entry.errors.push(message);
+            syncStatus.MASTER.lastError = message;
+            try {
+              await markReconciliation("MASTER");
+            } catch (markerError: any) {
+              entry.errors.push(`Master reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+            }
+          }
+        } else {
+          const message = `Master propagation for lead ${leadId} skipped: MASTER_WALKIN_SHEET_ID_2728 is not set`;
+          entry.errors.push(message);
+          syncStatus.MASTER.lastError = message;
+          try {
+            await markReconciliation("MASTER");
+          } catch (markerError: any) {
+            entry.errors.push(`Master reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+          }
+        }
       } catch (e: any) {
         entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
-      }
-    }
-
-    // ── Propagate edits to Master MIS sheet ─────────────────────
-    if (pendingMasterUpdates.length > 0) {
-      const masterSheetId = process.env.MASTER_WALKIN_SHEET_ID_2728;
-      if (masterSheetId) {
-        try {
-          // Read the full Master row so its header determines the Lead ID
-          // location. This safely handles the pre-fix legacy row shape too.
-          const masterIdResp = await sheets.spreadsheets.values.get({
-            spreadsheetId: masterSheetId,
-            range: `${MASTER_LEADS_TAB}!A:W`,
-          });
-          const masterIds = masterIdResp.data.values ?? [];
-          const masterHeader = masterIds[0] ?? [];
-          await ensureLeadsTab(sheets, masterSheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
-          const masterLeadIdIndex = headerIndex(masterHeader, "Lead ID", 21);
-          const leadIdToMasterRow = new Map<string, number>();
-          masterIds.forEach((r, idx) => {
-            const id = leadIdFromRow(r, masterLeadIdIndex);
-            if (id && idx > 0) leadIdToMasterRow.set(id, idx + 1); // 1-based row number
-          });
-
-          const batchData = pendingMasterUpdates
-            .filter(u => leadIdToMasterRow.has(u.leadId))
-            .map(u => ({
-              range: `${MASTER_LEADS_TAB}!P${leadIdToMasterRow.get(u.leadId)}:U${leadIdToMasterRow.get(u.leadId)}`,
-              values: [u.greenValues],
-            }));
-          const actualAdmissionColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Actual Admission Date"));
-          batchData.push(...pendingMasterUpdates
-            .filter(u => u.actualAdmissionDate !== null && leadIdToMasterRow.has(u.leadId))
-            .map(u => ({
-              range: `${MASTER_LEADS_TAB}!${actualAdmissionColumn}${leadIdToMasterRow.get(u.leadId)}`,
-              values: [[u.actualAdmissionDate!]],
-            })));
-
-          if (batchData.length > 0) {
-            await fencedWalkinSheetWrite(`propagate ${brand} changes to Master`, () => sheets.spreadsheets.values.batchUpdate({
-              spreadsheetId: masterSheetId,
-              requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
-            }));
-            console.log(`[walkin/sheets] Master propagated ${batchData.length} row(s) from ${brand}`);
-          }
-        } catch (e: any) {
-          console.warn(`[walkin/sheets] Master propagation failed: ${e?.message}`);
-          entry.errors.push(`Master propagation: ${e?.message}`);
-        }
       }
     }
   } catch (e: any) {
@@ -1593,6 +1995,8 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
   console.log(
     `[walkin/sheets] Pull ${brand}: scanned=${entry.rowsScanned} changes=${entry.changesApplied} errors=${entry.errors.length}`
   );
+  if (entry.errors.length > 0) syncStatus[brand].lastError = entry.errors[0];
+  else syncStatus[brand].lastError = null;
 
   _pullLog.unshift(entry);
   if (_pullLog.length > 100) _pullLog.pop();
@@ -1662,16 +2066,6 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       allowedCloseReasons = new Set();
     }
 
-    // Collect rows per brand to back-propagate to their brand sheets after the loop
-    const pendingBrandUpdates: Record<"RIS" | "RPS", Array<{
-      leadId: string;
-      greenValues: string[];
-      actualAdmissionDate: string | null;
-    }>> = {
-      RIS: [],
-      RPS: [],
-    };
-
     for (const row of dataRows) {
       const brand = (row[0]?.trim() ?? "") as "RIS" | "RPS";
       if (brand !== "RIS" && brand !== "RPS") continue;
@@ -1713,7 +2107,7 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       };
 
       if (sheetStatus) {
-        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus)) {
+        if (allowedStatuses.size > 0 && !allowedStatuses.has(sheetStatus) && sheetStatus !== existing.status) {
           entry.errors.push(
             `Lead ${leadId}: Master status "${sheetStatus}" not recognised — skipped`
           );
@@ -1740,98 +2134,119 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       check("revisitDate",        existing.revisitDate,           sheetRevisitDate);
       check("revisitDate2",       (existing as any).revisitDate2, sheetRevisitDate2);
 
-      if (changes.length === 0) continue;
+      const requestedValues: SyncValues = { ...syncValuesFromLead(existing as WalkinLead) };
+      for (const change of changes) requestedValues[change.field] = change.newVal;
+      const baseline = await getSyncSnapshot("MASTER", leadId);
+      const dbValues = syncValuesFromLead(existing as WalkinLead);
+      const conflicts = getSyncConflicts(baseline, dbValues, requestedValues);
+      const ambiguous = getAmbiguousFieldsWithoutBaseline(
+        baseline,
+        dbValues,
+        requestedValues,
+      );
+      const dbOnlyChanges = baseline
+        ? changes.filter((change) =>
+            normalizedSyncValue(existing[change.field]) !== normalizedSyncValue(baseline[change.field])
+            && normalizedSyncValue(requestedValues[change.field]) === normalizedSyncValue(baseline[change.field]),
+          )
+        : [];
+      if (dbOnlyChanges.length > 0) {
+        const fields = dbOnlyChanges.map((change) => change.field);
+        const message = `Lead ${leadId}: DB changed since last sync (${fields.join(", ")}); stale Master sheet values preserved/skipped`;
+        entry.errors.push(message);
+        syncStatus.MASTER.lastError = message;
+      }
+      if (conflicts.length > 0) {
+        const message = `Lead ${leadId}: concurrent DB and Master sheet edits conflict in ${conflicts.join(", ")}; conflicting fields skipped`;
+        entry.errors.push(message);
+        syncStatus.MASTER.lastError = message;
+      }
+      if (ambiguous.length > 0) {
+        const message = `Lead ${leadId}: Master sheet/DB mismatch is ambiguous without a successful-sync baseline (${ambiguous.join(", ")}); mismatched fields preserved`;
+        entry.errors.push(message);
+        syncStatus.MASTER.lastError = message;
+      }
+      const skippedFields = new Set([...dbOnlyChanges.map((change) => change.field), ...conflicts, ...ambiguous]);
+      for (let i = changes.length - 1; i >= 0; i--) {
+        if (skippedFields.has(changes[i].field)) changes.splice(i, 1);
+      }
+
+      if (changes.length === 0) {
+        const safeSnapshot = buildSafeSyncSnapshot(
+          dbValues,
+          baseline,
+          [...conflicts, ...dbOnlyChanges.map((change) => change.field)],
+          ambiguous,
+        );
+        if (JSON.stringify(safeSnapshot) !== JSON.stringify(baseline ?? {})) {
+          try {
+            await persistSyncSnapshot("MASTER", leadId, safeSnapshot);
+          } catch (snapshotError: any) {
+            const message = `Snapshot persistence failed for Master lead ${leadId}: ${snapshotError?.message ?? "Unknown error"}`;
+            entry.errors.push(message);
+            syncStatus.MASTER.lastError = message;
+            try {
+              await markReconciliation("MASTER");
+            } catch (markerError: any) {
+              entry.errors.push(`MASTER reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+            }
+          }
+        }
+        continue;
+      }
 
       const patch: Record<string, any> = { updatedBy: "master-sync", updatedAt: new Date() };
       for (const c of changes) patch[c.field] = c.newVal;
 
       try {
-        await db.update(walkinLeads).set(patch).where(eq(walkinLeads.id, leadId));
-        await Promise.all(
-          changes.map((c) =>
-            db.insert(walkinLeadAuditLog).values({
-              leadId, field: c.field,
-              oldValue: c.oldVal, newValue: c.newVal,
-              changedBy: "master-sync",
-            })
-          )
-        );
+        const updateApplied = await applySheetChangesToDb(leadId, existing, patch, changes, "master-sync");
+        if (!updateApplied) {
+          const message = `Lead ${leadId}: DB changed during Master pull; sheet values skipped by optimistic check`;
+          entry.errors.push(message);
+          syncStatus.MASTER.lastError = message;
+          continue;
+        }
 
         entry.changesApplied += changes.length;
         for (const c of changes) {
           entry.changes.push({ leadId, parentName: existing.parentName ?? "", field: c.field, oldVal: c.oldVal, newVal: c.newVal });
         }
+        const nextBaseline = buildSafeSyncSnapshot(
+          syncValuesFromLead(existing as WalkinLead),
+          baseline,
+          [...conflicts, ...dbOnlyChanges.map((change) => change.field)],
+          ambiguous,
+        );
+        for (const change of changes) nextBaseline[change.field] = normalizedSyncValue(change.newVal);
+        try {
+          await persistSyncSnapshot("MASTER", leadId, nextBaseline);
+        } catch (snapshotError: any) {
+          const message = `Snapshot persistence failed for Master lead ${leadId}: ${snapshotError?.message ?? "Unknown error"}`;
+          entry.errors.push(message);
+          syncStatus.MASTER.lastError = message;
+          try {
+            await markReconciliation("MASTER", brand);
+          } catch (markerError: any) {
+            entry.errors.push(`Reconciliation marker failed for MASTER/${brand} lead ${leadId}: ${markerError?.message}`);
+          }
+        }
 
-        // Queue back-propagation to brand sheet (O–T → N–S)
-        pendingBrandUpdates[brand].push({
-          leadId,
-          actualAdmissionDate: hasActualAdmissionDate
-            ? cellAt(row, headerIndex(header, "Actual Admission Date", MASTER_SHEET_HEADERS.indexOf("Actual Admission Date")))
-            : null,
-          greenValues: [
-            sheetStatus,
-            cellAt(row, headerIndex(header, "Admission Date", 16)),
-            sheetRemark,
-            sheetCloseReason,
-            cellAt(row, headerIndex(header, "Revisit 1 Date", 19)),
-            cellAt(row, headerIndex(header, "Revisit 2 Date", 20)),
-          ],
-        });
-      } catch (e: any) {
-        entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
-      }
-    }
-
-    // Back-propagate to RIS / RPS brand sheets
-    for (const brand of ["RIS", "RPS"] as const) {
-      const updates = pendingBrandUpdates[brand];
-      if (updates.length === 0) continue;
-
-      const brandSheetId = getSheetId(brand);
-      if (!brandSheetId) continue;
-
-      try {
-        await ensureLeadsTab(sheets, brandSheetId, LEADS_TAB, headersForBrand(brand));
-        const brandHeaders = headersForBrand(brand);
-        const brandLeadIdColumn = columnLetter(brandHeaders.indexOf("Lead ID"));
-        const brandStatusColumn = columnLetter(brandHeaders.indexOf("Status"));
-        const brandRevisit2Column = columnLetter(brandHeaders.indexOf("Revisit 2 Date"));
-        // Look up row numbers by the brand's hidden Lead ID column.
-        const idResp = await sheets.spreadsheets.values.get({
-          spreadsheetId: brandSheetId,
-          range: `${LEADS_TAB}!${brandLeadIdColumn}:${brandLeadIdColumn}`,
-        });
-        const idRows = idResp.data.values ?? [];
-        const leadIdToRow = new Map<string, number>();
-        idRows.forEach((r, idx) => {
-          const id = r[0]?.trim();
-          if (id && idx > 0) leadIdToRow.set(id, idx + 1); // 1-based
-        });
-
-        const batchData = updates
-          .filter((u) => leadIdToRow.has(u.leadId))
-          .map((u) => ({
-            range: `${LEADS_TAB}!${brandStatusColumn}${leadIdToRow.get(u.leadId)}:${brandRevisit2Column}${leadIdToRow.get(u.leadId)}`,
-            values: [u.greenValues],
-          }));
-        const actualAdmissionColumn = columnLetter(brandHeaders.indexOf("Actual Admission Date"));
-        batchData.push(...updates
-          .filter((u) => u.actualAdmissionDate !== null && leadIdToRow.has(u.leadId))
-          .map((u) => ({
-            range: `${LEADS_TAB}!${actualAdmissionColumn}${leadIdToRow.get(u.leadId)}`,
-            values: [[u.actualAdmissionDate!]],
-          })));
-
-        if (batchData.length > 0) {
-          await fencedWalkinSheetWrite(`propagate Master changes to ${brand}`, () => sheets.spreadsheets.values.batchUpdate({
-            spreadsheetId: brandSheetId,
-            requestBody: { valueInputOption: "USER_ENTERED", data: batchData },
-          }));
-          console.log(`[walkin/sheets] ${brand} sheet back-propagated ${batchData.length} row(s) from Master`);
+        try {
+          const [freshLead] = await db.select().from(walkinLeads).where(eq(walkinLeads.id, leadId));
+          if (!freshLead || freshLead.isArchived) throw new Error(`Lead ${leadId} is missing or archived after DB update`);
+          await upsertLeadToSheet(brand, freshLead);
+        } catch (propagationError: any) {
+          const message = `${brand} back-propagation for lead ${leadId} failed: ${propagationError?.message ?? "Unknown error"}`;
+          entry.errors.push(message);
+          syncStatus[brand].lastError = message;
+          try {
+            await markReconciliation(brand);
+          } catch (markerError: any) {
+            entry.errors.push(`${brand} reconciliation marker failed for lead ${leadId}: ${markerError?.message}`);
+          }
         }
       } catch (e: any) {
-        console.warn(`[walkin/sheets] ${brand} back-propagation failed: ${e?.message}`);
-        entry.errors.push(`${brand} back-propagation: ${e?.message}`);
+        entry.errors.push(`DB update failed for lead ${leadId}: ${e?.message}`);
       }
     }
   } catch (e: any) {
@@ -1841,6 +2256,8 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
   console.log(
     `[walkin/sheets] Pull MASTER: scanned=${entry.rowsScanned} changes=${entry.changesApplied} errors=${entry.errors.length}`
   );
+  if (entry.errors.length > 0) syncStatus.MASTER.lastError = entry.errors[0];
+  else syncStatus.MASTER.lastError = null;
 
   _pullLog.unshift(entry);
   if (_pullLog.length > 100) _pullLog.pop();
@@ -1989,10 +2406,12 @@ export async function removeLeadFromSheet(
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read Lead ID column (T = index 19) to locate the row
+    const headers = headersForBrand(brand);
+    const idColumn = columnLetter(headers.indexOf("Lead ID"));
+    const statusColumn = columnLetter(headers.indexOf("Status"));
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!T:T`,
+      range: `${LEADS_TAB}!${idColumn}:${idColumn}`,
     });
     const cellValues = readResp.data.values ?? [];
 
@@ -2009,10 +2428,9 @@ export async function removeLeadFromSheet(
       return;
     }
 
-    // Overwrite Status cell (column N = index 13) with "ARCHIVED"
     await fencedWalkinSheetWrite(`archive ${brand} lead ${leadId}`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!N${sheetsRow}`,
+      range: `${LEADS_TAB}!${statusColumn}${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
     }));
@@ -2040,10 +2458,11 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Read Lead ID column (V = index 21) to locate the row
+    const idColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Lead ID"));
+    const statusColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Status"));
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!V:V`,
+      range: `${MASTER_LEADS_TAB}!${idColumn}:${idColumn}`,
     });
     const cellValues = readResp.data.values ?? [];
 
@@ -2060,10 +2479,9 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
       return;
     }
 
-    // Overwrite Status cell (column P = index 15) with "ARCHIVED"
     await fencedWalkinSheetWrite(`archive Master lead ${leadId}`, () => sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!P${sheetsRow}`,
+      range: `${MASTER_LEADS_TAB}!${statusColumn}${sheetsRow}`,
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [["ARCHIVED"]] },
     }));
@@ -2097,9 +2515,13 @@ export function queueRemove(brand: "RIS" | "RPS", leadId: string): void {
 export async function resyncArchivedLead(brand: "RIS" | "RPS"): Promise<void> {
   await runWalkinSheetOperation("archive propagation", async () => {
     await markReconciliation(brand, "MASTER");
-    await resyncBrandToSheet(brand);
+    const archived = await db.select({ id: walkinLeads.id }).from(walkinLeads)
+      .where(and(eq(walkinLeads.brand, brand), eq(walkinLeads.isArchived, true)));
+    for (const lead of archived) {
+      await removeLeadFromSheet(brand, lead.id);
+      await removeLeadFromMasterSheet(lead.id);
+    }
     await clearReconciliation(brand);
-    await resyncMasterSheet();
     await clearReconciliation("MASTER");
   });
 }
@@ -2379,6 +2801,7 @@ export async function readCrmLeadsTrackerStats(
       // added only when the same date/phone/child identity is not in the DB.
       const databaseLeads = await db
         .select({
+          id:          walkinLeads.id,
           enquiryDate: walkinLeads.enquiryDate,
           childName:   walkinLeads.childName,
           phone:       walkinLeads.phone,
@@ -2415,11 +2838,21 @@ export async function readCrmLeadsTrackerStats(
           };
         }
       }
-      const databaseKeys = new Set(databaseLeads.map(row => supplementLeadKey({
+      const databaseIdentities = await db.select({
+        id: walkinLeads.id,
+        enquiryDate: walkinLeads.enquiryDate,
+        phone: walkinLeads.phone,
+        childName: walkinLeads.childName,
+      }).from(walkinLeads).where(and(
+        eq(walkinLeads.brand, brand),
+        eq(walkinLeads.academicYear, "2027-28"),
+      ));
+      const databaseKeys = new Set(databaseIdentities.map(row => supplementLeadKey({
         enquiryDate: row.enquiryDate ?? "",
         phone: row.phone ?? "",
         childName: row.childName ?? "",
       })));
+      const databaseIds = new Set(databaseIdentities.map(row => row.id));
       const supplementByIdentity = new Map<string, (typeof supplement.leads)[number]>();
       const supplementRows = includeWalkins
         ? [...supplement.leads, ...(supplement.walkins ?? [])]
@@ -2442,7 +2875,11 @@ export async function readCrmLeadsTrackerStats(
         branchRows.map(row => [row.name.trim().toLowerCase(), row.id] as const),
       );
       const supplementaryLeads = [...supplementByIdentity.values()]
-        .filter(row => !databaseKeys.has(supplementLeadKey(row)))
+        .filter(row => {
+          const key = `${brand}|${supplementLeadKey(row)}`;
+          const importedId = `crm-${createHash("sha256").update(key).digest("hex")}`;
+          return !databaseKeys.has(supplementLeadKey(row)) && !databaseIds.has(importedId);
+        })
         .map(row => ({
           ...row,
           branchId: row.branchName
@@ -2620,21 +3057,21 @@ async function runAutoPullCycle(): Promise<void> {
   await runWalkinSheetOperation("automatic pull", async () => {
     // MASTER must run first so its DB writes land before the brand pulls compare
     // brand-sheet values against the DB.
-    try { await pullChangesFromMasterSheet(); } catch (e: any) {
-      console.error("[walkin/sheets] Auto-pull MASTER failed:", e?.message);
+    const results = [
+      await pullChangesFromMasterSheet(),
+      await pullChangesFromSheet("RIS"),
+      await pullChangesFromSheet("RPS"),
+    ];
+    // A failed/ambiguous pull must never be followed by a full rewrite:
+    // doing so would overwrite staff edits that still need review.
+    if (results.some(result => result.errors.length)) {
+      console.error("[walkin/sheets] Recovery paused until sheet pull errors are resolved");
+      return;
     }
-    try { await pullChangesFromSheet("RIS"); } catch (e: any) {
-      console.error("[walkin/sheets] Auto-pull RIS failed:", e?.message);
-    }
-    try { await pullChangesFromSheet("RPS"); } catch (e: any) {
-      console.error("[walkin/sheets] Auto-pull RPS failed:", e?.message);
-    }
-    // Recover an interrupted rewrite only after current staff edits have been
-    // pulled into the authoritative database.
     await recoverPendingReconciliations();
-    try { await syncDeletionsFromMaster(); } catch (e: any) {
-      console.error("[walkin/sheets] Auto-pull deletion-sync failed:", e?.message);
-    }
+    // Master is a mirror of the canonical CRM. A missing Master row must not
+    // silently archive a newly imported or not-yet-mirrored database lead.
+    // Deletion reconciliation remains an explicit admin-only action.
   });
 }
 
