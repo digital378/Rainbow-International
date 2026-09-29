@@ -1,0 +1,33 @@
+I'm adding a new blog post to the existing RIS blog system: a Gandhi Jayanti 2026 guide.
+
+Before writing any code, find how the most recently added blog post is built — its
+route/file, the shared layout it uses (header, nav, footer, breadcrumb, share buttons,
+related-posts block, enquiry CTA), and how its URL slug and SEO metadata are wired up.
+Follow that exact same technical pattern for this new post. Do not create a second/parallel
+blog template, and do not modify any other blog post, page, or shared component.
+
+The attached HTML file is the finished design and copy for this specific post — treat it as
+the source of truth for everything INSIDE the article: every heading, paragraph, FAQ, quote,
+stat, the countdown box, principles grid, quiz, photo gallery grid, tab-switching activities,
+FAQ accordion, and the "on this page" sticky sub-nav. Reproduce that content and styling
+exactly, and reproduce its interactive behaviour (live countdown, quiz scoring, tab switching,
+accordion, copy-to-clipboard, WhatsApp share, print button, scroll-reveal) as proper React
+state/effects — not inline <script> tags.
+
+Do NOT reuse the header, footer, breadcrumb, "share on WhatsApp"/"copy link" buttons, or
+related-posts section as coded in the attached file — those are placeholders. Use the site's
+real, existing shared components for all of that, the same way every other blog post does.
+
+Routing and metadata, exactly as in the attached file's <head>:
+- URL slug: /blogs/gandhi-jayanti-2026-speech-essay-quotes-students
+- Title: Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi & Marathi
+- Meta description: Gandhi Jayanti 2026 is Friday, 2 October. Speeches, essays, 10 lines in
+  English, Hindi & Marathi, stories, quotes, slogans, quiz and school ideas.
+- H1: Gandhi Jayanti 2026: History, Speech, Essay, Quotes, Stories & Activities for Students
+- Carry over the JSON-LD structured data from the file if the existing blog template supports it.
+
+The hero currently uses a placeholder photo (a public-domain 1931 portrait, base64-embedded)
+and the 13 gallery tiles are empty placeholders — leave both as-is for now, I'll swap in final
+images separately.
+
+Don't take or send me screenshots when you're done — I'll check it myself.
