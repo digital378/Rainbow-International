@@ -52,6 +52,10 @@ export function isWalkinPageAuthorized(req: Request): boolean {
   if (/^\/api\/walkin\/leads(?:\/|$)/.test(path)) {
     return hasWalkinPageSession(req, "leads");
   }
+  // The Leads page needs to read sync health, not operate on sheets.
+  if (path === "/api/walkin/sheets/status") {
+    return hasWalkinPageSession(req, "leads") || hasWalkinPageSession(req, "panel");
+  }
   const panelPath =
     /^\/api\/walkin\/branches(?:\/|$)/.test(path) ||
     /^\/api\/walkin\/staff(?:\/|$)/.test(path) ||

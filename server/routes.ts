@@ -1170,10 +1170,15 @@ export async function registerRoutes(
   ];
 
   function getOAuthClient() {
+    // Preview and the published site have separate stored credentials.
+    // Never send a Preview authorization back to the published callback.
+    const callbackUrl = process.env.NODE_ENV === "development" && process.env.REPLIT_DEV_DOMAIN
+      ? `https://${process.env.REPLIT_DEV_DOMAIN}/auth/google/callback`
+      : "https://rainbowinternationalschool.in/auth/google/callback";
     return new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      "https://rainbowinternationalschool.in/auth/google/callback"
+      callbackUrl
     );
   }
 
