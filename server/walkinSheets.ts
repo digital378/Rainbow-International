@@ -779,7 +779,7 @@ export async function leadToRow(lead: WalkinLead, brand = lead.brand as "RIS" | 
   });
 }
 
-function syncValuesFromSheetRow(header: string[], row: string[], hasActualAdmissionDate: boolean): SyncValues {
+export function syncValuesFromSheetRow(header: string[], row: string[], hasActualAdmissionDate: boolean): SyncValues {
   const value = (name: string, fallback: number) => cellAt(row, headerIndex(header, name, fallback));
   return syncValuesFromSheet({
     status: value("Status", 14),

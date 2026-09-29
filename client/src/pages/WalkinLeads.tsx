@@ -19,6 +19,8 @@ type Lead = {
   readOnly?: boolean;
   needsVisitLink?: boolean;
   matchNeedsReview?: boolean;
+  visitRowNumber?: number;
+  visitFingerprint?: string;
 };
 type Lookups = {
   programs: { id: number; label: string; brand: string | null }[];
@@ -198,7 +200,7 @@ function EditPanel({
   const needsWalkInDate = WALKIN_STATUSES.includes(form.status) &&
     (form.status !== lead.status || form.walkInDate !== (lead.walkInDate || ""));
   const isTrackerRecord = Boolean(lead.readOnly);
-  const mayKeepMissingParent = isTrackerRecord || lead.createdBy === "legacy-import";
+  const mayKeepMissingParent = isTrackerRecord || lead.createdBy === "legacy-import" || lead.createdBy === "sheet-walkin";
   const parentChanged = form.parentName.trim() !== (lead.parentName || "").trim();
   const parentValid = form.parentName.trim()
     ? form.parentName.trim().length >= 2
@@ -668,6 +670,8 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [editLead, setEditLead] = useState<Lead | null>(null);
   const [historyLead, setHistoryLead] = useState<Lead | null>(null);
   const [archiveLead, setArchiveLead] = useState<Lead | null>(null);
+  const [linkingId, setLinkingId] = useState<string | null>(null);
+  const [linkError, setLinkError] = useState<{ id: string; message: string } | null>(null);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -844,6 +848,32 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     }
     setArchiveLead(null);
     setRefreshVersion(value => value + 1);
+  };
+
+  const linkAndEdit = async (lead: Lead) => {
+    if (!lead.visitRowNumber || !lead.visitFingerprint || linkingId) return;
+    if (!window.confirm(`Link ${lead.childName}'s ${lead.brand} visit to an editable lead? Its lead details will match this visit; in the spreadsheet, only the verified Lead ID cell will change now.`)) return;
+    setLinkingId(lead.id);
+    setLinkError(null);
+    try {
+      const response = await fetch("/api/walkin/leads/link-visit", {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brand: lead.brand,
+          rowNumber: lead.visitRowNumber,
+          fingerprint: lead.visitFingerprint,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Could not link this visit.");
+      setRefreshVersion(version => version + 1);
+      setEditLead({ ...lead, ...result.lead, readOnly: false, needsVisitLink: false });
+    } catch (reason) {
+      setLinkError({ id: lead.id, message: reason instanceof Error ? reason.message : "Could not link this visit." });
+    } finally {
+      setLinkingId(null);
+    }
   };
 
   const fmtDate = (d: string | null | undefined) => d
@@ -1112,7 +1142,17 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         {lead.readOnly ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
                       <td className="px-2.5 py-2.5">
-                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">{lead.needsVisitLink ? "Walk-in needs linking to edit" : "Tracker record · import to edit"}</span> : (
+                        {lead.readOnly ? (
+                          <div className="space-y-1">
+                            {lead.visitRowNumber && lead.visitFingerprint ?
+                              <button type="button" onClick={() => void linkAndEdit(lead)} disabled={Boolean(linkingId)}
+                                className="rounded-md border border-amber-300 bg-amber-50 px-2 py-1.5 text-[11px] font-semibold text-amber-900 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
+                                {linkingId === lead.id ? "Linking…" : "Link & edit"}
+                              </button> :
+                              <span className="text-[11px] font-medium text-amber-700">Link unavailable · <a className="underline" href="/auth/google">Reconnect Google access</a></span>}
+                            {linkError?.id === lead.id && <p role="alert" className="text-[11px] text-red-700">{linkError.message}</p>}
+                          </div>
+                        ) : (
                           <select aria-label={`Actions for ${lead.childName || "lead"}`} value="" onChange={e => {
                             if (e.target.value === "edit") setEditLead(lead);
                             if (e.target.value === "history") setHistoryLead(lead);
@@ -1169,7 +1209,17 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
                   {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
                   {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
-                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">{lead.needsVisitLink ? "Walk-in needs linking to edit" : "Tracker record · import to edit"}</span>}
+                  {lead.readOnly && (
+                    <div>
+                      {lead.visitRowNumber && lead.visitFingerprint ?
+                        <button type="button" onClick={() => void linkAndEdit(lead)} disabled={Boolean(linkingId)}
+                          className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800 disabled:opacity-50">
+                          {linkingId === lead.id ? "Linking…" : "Link & edit"}
+                        </button> :
+                        <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Link unavailable · <a className="underline" href="/auth/google">Reconnect Google access</a></span>}
+                      {linkError?.id === lead.id && <p role="alert" className="mt-1 text-xs text-red-700">{linkError.message}</p>}
+                    </div>
+                  )}
                 </div>
               </article>
             );

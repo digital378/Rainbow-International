@@ -40,6 +40,7 @@ import {
   readBranchWalkinsOnly,
 } from "./marketing2728Sheets";
 import { previewCrmImport, applyCrmImport } from "./walkinCrmImport";
+import { linkVisitForEditing, VisitLinkError, visitFingerprint } from "./walkinVisitLink";
 import {
   createTrustedWalkinDashboardSession,
   createWalkinInternalSession,
@@ -635,6 +636,10 @@ export function registerWalkinRoutes(app: Express) {
               updatedAt: linkedRecord?.updatedAt ?? timestamp,
               readOnly: !linkedRecord,
               needsVisitLink: !linkedRecord,
+              visitRowNumber: result.mode === "oauth"
+                ? Number(/^WALKINs row (\d+)$/.exec(lead.sourceLocations?.[0] ?? "")?.[1]) || undefined
+                : undefined,
+              visitFingerprint: result.mode === "oauth" ? visitFingerprint(supplementBrand, lead) : undefined,
               matchNeedsReview: (identityCounts.get(`${lead.phone}|${normalizedBranchIdentity(lead.childName)}`) ?? 0) > 1,
             };
           })
@@ -721,6 +726,27 @@ export function registerWalkinRoutes(app: Express) {
     } catch (err: any) {
       console.error("[walkin/leads/report]", err?.message);
       res.status(500).json({ message: "Failed to build lead report" });
+    }
+  });
+
+  // A user-initiated, single-visit link. Never link by phone alone or overwrite
+  // an occupied Lead ID; the sheet row is re-read under the sync lease.
+  app.post("/api/walkin/leads/link-visit", requireAdmin, async (req, res) => {
+    const parsed = z.object({
+      brand: z.enum(["RIS", "RPS"]),
+      rowNumber: z.number().int().positive(),
+      fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+    }).safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ message: "Refresh the visit list and try again." });
+    try {
+      const lead = await linkVisitForEditing(
+        parsed.data.brand, parsed.data.rowNumber, parsed.data.fingerprint,
+      );
+      res.json({ lead });
+    } catch (error: any) {
+      if (error instanceof VisitLinkError) return res.status(error.status).json({ message: error.message });
+      console.error("[walkin/leads/link-visit]", error?.message);
+      res.status(503).json({ message: "Could not confirm the visit link. Refresh the list before retrying." });
     }
   });
 
