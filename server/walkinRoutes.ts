@@ -695,11 +695,10 @@ export function registerWalkinRoutes(app: Express) {
       const branchNames = new Map(branches.map(branch => [branch.id, branch.name]));
       const groups = new Map<string, number>();
       const months = new Map<string, number>();
-      let booked = 0, walkins = 0, admissions = 0, closed = 0;
+      let booked = 0, admissions = 0, closed = 0;
       for (const lead of allRows) {
         const state = lead.status?.toUpperCase();
-        if (["WALK-IN BOOKED", "WALK-IN COMPLETED", "ADMISSION DONE"].includes(state)) booked++;
-        if (["WALK-IN COMPLETED", "ADMISSION DONE"].includes(state)) walkins++;
+        if (state === "WALK-IN BOOKED") booked++;
         if (state === "ADMISSION DONE") admissions++;
         if (state === "CLOSED") closed++;
         const month = lead.enquiryDate.slice(0, 7);
@@ -711,7 +710,9 @@ export function registerWalkinRoutes(app: Express) {
         groups.set(label, (groups.get(label) ?? 0) + 1);
       }
       res.json({
-        total: allRows.length, booked, walkins, admissions, closed,
+        // Every row comes from a completed-visit tab, even if its current status
+        // later becomes OPEN, WAITING LIST or is blank.
+        total: allRows.length, booked, walkins: allRows.length, admissions, closed,
         trend: [...months].sort(([a], [b]) => a.localeCompare(b)).map(([month, count]) => ({ month, count })),
         breakdown: [...groups].sort((a, b) => b[1] - a[1]).map(([label, count]) => ({ label, count })),
         generatedAt: new Date().toISOString(),

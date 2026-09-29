@@ -652,13 +652,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
   const [groupBy, setGroupBy] = useState("source");
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [newLeadOpen, setNewLeadOpen] = useState(false);
-  const [importPreview, setImportPreview] = useState<{
-    eligible: number; alreadyPresent: number; review: number; sourceReady: boolean; byBrand: { RIS: number; RPS: number };
-    issues: { brand: string; reason: string; reference: string; sourceLocations?: string[] }[];
-  } | null>(null);
-  const [importBusy, setImportBusy] = useState(false);
-  const [importMessage, setImportMessage] = useState("");
-  const [importError, setImportError] = useState("");
   const [sheetHealth, setSheetHealth] = useState<any>(null);
   const [sheetHealthError, setSheetHealthError] = useState("");
   const [sheetHealthLoading, setSheetHealthLoading] = useState(false);
@@ -712,19 +705,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     } catch (reason) {
       setSheetHealthError(reason instanceof Error ? reason.message : "Could not load Sheets sync health.");
     } finally { setSheetHealthLoading(false); }
-  }, [token]);
-
-  const fetchImportPreview = useCallback(async () => {
-    setImportError(""); setImportMessage("");
-    setImportBusy(true);
-    try {
-      const response = await fetch("/api/walkin/leads/import-preview", { headers });
-      if (!response.ok) throw new Error("Could not load tracker import review.");
-      setImportPreview(await response.json());
-    } catch (reason) {
-      setImportPreview(null);
-      setImportError(reason instanceof Error ? reason.message : "Could not load tracker import review.");
-    } finally { setImportBusy(false); }
   }, [token]);
 
   const fetchLookups = useCallback(async () => {
@@ -834,23 +814,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     }
   };
 
-  const importTrackerLeads = async () => {
-    setImportBusy(true); setImportError(""); setImportMessage("");
-    try {
-      const response = await fetch("/api/walkin/leads/import", {
-        method: "POST", headers: { ...headers, "Content-Type": "application/json" },
-        body: JSON.stringify({ confirm: true }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.message || "Tracker import failed.");
-      await fetchImportPreview();
-      setImportMessage(`Imported ${result.imported} · skipped ${result.skipped} · needs review ${result.review}.`);
-      setRefreshVersion(value => value + 1);
-    } catch (reason) {
-      setImportError(reason instanceof Error ? reason.message : "Tracker import failed.");
-    } finally { setImportBusy(false); }
-  };
-
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Branch options filtered by brand
@@ -936,10 +899,14 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
         </div>
 
         <section aria-label="Lead performance overview" className="mb-4 space-y-3">
-          <div className="grid grid-cols-2 xl:grid-cols-5 gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-[.1em] text-[#63748b]">Recorded WALKIN visits only — not all leads</h2>
+            <span className="text-[11px] text-[#8290a3]">Counts follow active filters</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              ["Total leads", report?.total], ["Walk-ins booked", report?.booked], ["Walk-ins", report?.walkins],
-              ["Admissions", report?.admissions], ["Closed", report?.closed],
+              ["Recorded WALKINs", report?.total],
+              ["Admissions marked done", report?.admissions],
             ].map(([label, value]) => (
               <article key={label as string} className="rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 shadow-[0_5px_20px_rgba(27,49,79,.035)]">
                 <p className="text-[10px] uppercase tracking-[.12em] font-bold text-[#8290a3]">{label}</p>
@@ -985,40 +952,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
               </div>
             </article>
           </div>
-        </section>
-
-        <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4 p-4" aria-label="Tracker import review">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-            <div className="max-w-3xl">
-              <h2 className="font-bold text-sm text-[#20334f]">Legacy tracker import</h2>
-              <p className="mt-1 text-xs leading-relaxed text-[#718198]">Review the tracker migration before importing. Tracker rows remain read-only until imported into the CRM; no rows are imported automatically.</p>
-              <div className="mt-2 text-xs leading-relaxed text-[#52657d]">
-                <p className="font-semibold text-[#20334f]">To resolve a row needing review:</p>
-                <ol className="list-decimal ml-5 space-y-1 mt-1">
-                  <li>Use the brand and source tab/row below to find the original in the AY 2027–28 workbook. If no row number appears, restore authenticated Sheet access and refresh first. Check any other listed row and verify the child name, 10-digit contact number, date, and conflicting details against the original enquiry or staff records. Do not guess or copy details from a similar lead.</li>
-                  <li>If verified, correct only the affected cells in the source tracker with your authorised Sheet access. Do not delete the original row or create a replacement CRM lead. If it cannot be verified, leave it unchanged and pending review.</li>
-                  <li>Refresh review, confirm the issue is gone, then use Confirm import for eligible rows. Refresh again to ensure the corrected record is now already present. If a possible duplicate remains, reconcile it with an admin before importing.</li>
-                </ol>
-                <p className="mt-1 text-amber-800">Row numbers refer to the source at the last review; refresh after any edits. Import never writes corrections to these tracker rows.</p>
-              </div>
-              {importPreview && <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-[#52657d]">
-                <span><b className="text-[#20334f]">{importPreview.eligible}</b> eligible</span>
-                <span><b className="text-[#20334f]">{importPreview.alreadyPresent}</b> already present</span>
-                <span><b className="text-amber-700">{importPreview.review}</b> need review</span>
-                <span>RIS <b>{importPreview.byBrand?.RIS ?? 0}</b></span><span>RPS <b>{importPreview.byBrand?.RPS ?? 0}</b></span>
-              </div>}
-              {importPreview && !importPreview.sourceReady && <p role="alert" className="mt-2 text-xs text-amber-800">Authenticated tracker access is unavailable. Review row numbers and import are paused; restore access and refresh before making corrections.</p>}
-            </div>
-            <div className="flex flex-wrap gap-2 shrink-0">
-              <button type="button" disabled={importBusy} onClick={() => void fetchImportPreview()} className="px-3 py-2 rounded-lg border border-[#d9e1eb] text-xs font-semibold text-[#35577e] disabled:opacity-50">{importPreview ? "Refresh review" : "Review import"}</button>
-              {importPreview && importPreview.eligible > 0 && <button type="button" disabled={importBusy || !importPreview.sourceReady} onClick={() => void importTrackerLeads()} className="px-3 py-2 rounded-lg bg-[#091a4f] text-white text-xs font-bold disabled:opacity-50">{importBusy ? "Importing…" : `Confirm import (${importPreview.eligible})`}</button>}
-            </div>
-          </div>
-          {importMessage && <p role="status" className="mt-3 text-xs font-semibold text-emerald-700">{importMessage}</p>}
-          {importError && <p role="alert" className="mt-3 text-xs text-red-700">{importError}</p>}
-          {!!importPreview?.issues?.length && <div className="mt-3 max-h-64 overflow-y-auto rounded-lg bg-amber-50 border border-amber-100 p-2 space-y-2" aria-label="Import review items">
-            {importPreview.issues.map((issue, index) => <p key={`${issue.brand}-${issue.reference}-${index}`} className="text-[11px] text-amber-900"><b>{issue.brand}</b> · {issue.sourceLocations?.length ? issue.sourceLocations.join(" + ") : issue.reference} — {issue.reason} <span className="text-amber-700">({issue.reference})</span></p>)}
-          </div>}
         </section>
 
         <section className="mb-4 rounded-xl bg-white border border-[#dfe6ee] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-label="RIS and RPS sync health">
