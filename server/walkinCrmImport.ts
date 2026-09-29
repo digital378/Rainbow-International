@@ -178,6 +178,9 @@ async function calculatePreview(sourceOverride?: Awaited<ReturnType<typeof loadS
   ]);
   const existingKeys = new Set(existing.map(row => `${row.brand}|${supplementLeadKey(row)}`));
   const existingIds = new Set(existing.map(row => row.id));
+  // Preview the batch in the same order as apply: an earlier eligible row
+  // can make a later same-date/phone, different-name row unsafe to import.
+  const projectedIdentities = [...existing];
   const result: PreviewResult = {
     eligible: 0, alreadyPresent: 0, review: 0,
     sourceReady: source.results.every(({ result: item }) => item.available && item.mode === "oauth"),
@@ -197,7 +200,7 @@ async function calculatePreview(sourceOverride?: Awaited<ReturnType<typeof loadS
       result.alreadyPresent += 1;
       continue;
     }
-    if (validation.phone && possibleEditedIdentity(existing, lead, validation.phone)) {
+    if (validation.phone && possibleEditedIdentity(projectedIdentities, lead, validation.phone)) {
       result.review += 1;
       result.issues.push({
         brand: lead.brand,
@@ -217,6 +220,15 @@ async function calculatePreview(sourceOverride?: Awaited<ReturnType<typeof loadS
     }
     result.eligible += 1;
     result.byBrand[lead.brand] += 1;
+    existingIds.add(deterministicId);
+    existingKeys.add(key);
+    projectedIdentities.push({
+      id: deterministicId,
+      brand: lead.brand,
+      enquiryDate: lead.enquiryDate,
+      phone: validation.phone,
+      childName: lead.childName,
+    });
   }
   return result;
 }

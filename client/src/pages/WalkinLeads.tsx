@@ -140,11 +140,12 @@ function EditPanel({
     (form.status !== lead.status || form.closeReason !== (lead.closeReason || ""));
   const needsWalkInDate = WALKIN_STATUSES.includes(form.status) &&
     (form.status !== lead.status || form.walkInDate !== (lead.walkInDate || ""));
-  const isTrackerRecord = lead.readOnly || lead.id.startsWith("crm-");
+  const isTrackerRecord = Boolean(lead.readOnly);
+  const mayKeepMissingParent = isTrackerRecord || lead.createdBy === "legacy-import";
   const parentChanged = form.parentName.trim() !== (lead.parentName || "").trim();
   const parentValid = form.parentName.trim()
     ? form.parentName.trim().length >= 2
-    : isTrackerRecord && !parentChanged;
+    : mayKeepMissingParent && !parentChanged;
   const hasChanges = parentChanged || form.childName !== lead.childName ||
     form.altPhone !== (lead.altPhone || "") || form.email !== (lead.email || "") ||
     form.program !== lead.program || form.status !== lead.status ||
@@ -232,7 +233,7 @@ function EditPanel({
         {/* Scrollable form */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <F label="Parent Name" required={!isTrackerRecord || !!form.parentName}>
+            <F label="Parent Name" required={!mayKeepMissingParent || !!form.parentName}>
               <input className={inputCls} value={form.parentName} onChange={set("parentName")} />
             </F>
             <F label="Child Name" required>
@@ -1113,11 +1114,11 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                         {lead.admissionDate && <div className="mt-1 text-[11px] text-[#596b83]">Admitted {fmtDate(lead.admissionDate)}</div>}
                       </td>
                       <td className="px-2.5 py-2.5 text-slate-600 break-words">{lead.leadOwner || "—"}</td>
-                      <td className="px-2.5 py-2.5 text-slate-500 tabular-nums" title={lead.readOnly || lead.id.startsWith("crm-") ? "Last update date not recorded" : undefined}>
-                        {lead.readOnly || lead.id.startsWith("crm-") ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                      <td className="px-2.5 py-2.5 text-slate-500 tabular-nums" title={lead.readOnly ? "Last update date not recorded" : undefined}>
+                        {lead.readOnly ? "—" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                       </td>
                       <td className="px-2.5 py-2.5">
-                        {(lead.readOnly || lead.id.startsWith("crm-")) ? <span className="text-[11px] font-medium text-amber-700">Tracker record · import to edit</span> : (
+                        {lead.readOnly ? <span className="text-[11px] font-medium text-amber-700">Tracker record · import to edit</span> : (
                           <select aria-label={`Actions for ${lead.childName || "lead"}`} value="" onChange={e => {
                             if (e.target.value === "edit") setEditLead(lead);
                             if (e.target.value === "history") setHistoryLead(lead);
@@ -1166,14 +1167,14 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-4 pt-3 border-t border-[#edf1f5] text-sm">
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Phone</div><div className="mt-0.5 font-medium text-[#334a68]">{lead.phone || "Not provided"}</div></div>
                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Branch / owner</div><div className="mt-0.5 text-[#52657d] truncate">{branchName || "Unassigned"} / {lead.leadOwner || "Unassigned"}</div></div>
-                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Last updated</div><div className="mt-0.5 text-[#52657d]">{lead.readOnly || lead.id.startsWith("crm-") ? "Not recorded" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div></div>
+                   <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Last updated</div><div className="mt-0.5 text-[#52657d]">{lead.readOnly ? "Not recorded" : new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div></div>
                   {lead.admissionDate && <div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#8a99ab]">Admitted</div><div className="mt-0.5 text-[#52657d]">{fmtDate(lead.admissionDate)}</div></div>}
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-[#edf1f5]">
-                  {!lead.isArchived && !lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
-                  {!lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
-                  {!lead.isArchived && !lead.readOnly && !lead.id.startsWith("crm-") && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
-                  {(lead.readOnly || lead.id.startsWith("crm-")) && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record · import to edit</span>}
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Edit ${lead.childName}'s enquiry`} onClick={() => setEditLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#edf3fb] text-[#244e83] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Edit</button>}
+                  {!lead.readOnly && <button type="button" aria-label={`View history for ${lead.childName}'s enquiry`} onClick={() => setHistoryLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#f0f3f6] text-[#52657d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">History</button>}
+                  {!lead.isArchived && !lead.readOnly && <button type="button" aria-label={`Archive ${lead.childName}'s enquiry`} onClick={() => setArchiveLead(lead)} className="rounded-lg px-3 py-2 text-xs font-semibold bg-[#fff0ed] text-[#a34032] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">Archive</button>}
+                  {lead.readOnly && <span className="rounded-lg px-3 py-2 text-xs font-semibold bg-amber-50 text-amber-800">Tracker record · import to edit</span>}
                 </div>
               </article>
             );

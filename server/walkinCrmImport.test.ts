@@ -113,6 +113,21 @@ describe("historical CRM walk-in import", () => {
     expect(result.issues[0].sourceLocations).toEqual(["CRM Leads Tracker row 42", "WALKINs row 19"]);
   });
 
+  it("previews a conflicting identity within the same import batch as needing review", async () => {
+    mocks.supplement.mockImplementation(async (brand: string) => source(
+      brand === "RIS" ? [lead(), lead({ childName: "Another Child" })] : [],
+      [],
+    ));
+
+    const preview = await previewCrmImport();
+    expect(preview).toMatchObject({
+      eligible: 1,
+      review: 1,
+      byBrand: { RIS: 1, RPS: 0 },
+    });
+    expect(preview.issues[0].reason).toContain("different child name");
+  });
+
   it("keeps a missing child name pending without inserting or inventing an identity", async () => {
     mocks.supplement.mockImplementation(async (brand: string) => source(
       brand === "RIS" ? [lead({ childName: "", sourceLocations: ["CRM Leads Tracker row 50"] })] : [],
@@ -238,6 +253,7 @@ describe("historical CRM walk-in import", () => {
     const extraStatuses = ["TRANSFERRED", "INTEGRATED", "NEXT YEAR"];
     const statuses = extraStatuses.map((status, index) => lead({
       childName: `Child ${index}`,
+      phone: `987654321${index}`,
       status,
     }));
     const conflictingLead = lead({ childName: "Conflict", status: "OPEN" });
