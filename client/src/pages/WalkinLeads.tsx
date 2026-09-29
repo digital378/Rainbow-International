@@ -488,7 +488,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     brand: "", branchId: "", status: "", source: "", leadOwner: "",
     dateFrom: "", dateTo: "", search: "", showArchived: false,
   });
-  const [statusView, setStatusView] = useState<"all" | "booked" | "walkins" | "admissions">("all");
   const [moreFilters, setMoreFilters] = useState(false);
 
   // Panel / modal state
@@ -523,9 +522,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
         ...(f.brand && { brand: f.brand }),
         ...(f.branchId && { branchId: f.branchId }),
         ...(f.status && { status: f.status }),
-        ...(!f.status && statusView === "booked" && { status: "WALK-IN BOOKED" }),
-        ...(!f.status && statusView === "walkins" && { status: "WALK-IN COMPLETED" }),
-        ...(!f.status && statusView === "admissions" && { status: "ADMISSION DONE" }),
         ...(f.source && { source: f.source }),
         ...(f.leadOwner && { leadOwner: f.leadOwner }),
         ...(f.dateFrom && { dateFrom: f.dateFrom }),
@@ -545,7 +541,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     } finally {
       setLoading(false);
     }
-  }, [page, filters, statusView, token]);
+  }, [page, filters, token]);
 
   useEffect(() => {
     document.title = "Leads | Admin · AY 2027-28";
@@ -560,10 +556,9 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
 
   useEffect(() => {
     if (sessionReady) fetchLeads(page, filters);
-  }, [page, filters, statusView, sessionReady]);
+  }, [page, filters, sessionReady]);
 
   const applyFilter = (field: string, value: string | boolean) => {
-    if (field === "status") setStatusView("all");
     setPage(1);
     setFilters(f => ({ ...f, [field]: value }));
   };
@@ -573,9 +568,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       ...(filters.brand && { brand: filters.brand }),
       ...(filters.branchId && { branchId: filters.branchId }),
       ...(filters.status && { status: filters.status }),
-      ...(!filters.status && statusView === "booked" && { status: "WALK-IN BOOKED" }),
-      ...(!filters.status && statusView === "walkins" && { status: "WALK-IN COMPLETED" }),
-      ...(!filters.status && statusView === "admissions" && { status: "ADMISSION DONE" }),
       ...(filters.source && { source: filters.source }),
       ...(filters.leadOwner && { leadOwner: filters.leadOwner }),
       ...(filters.dateFrom && { dateFrom: filters.dateFrom }),
@@ -613,6 +605,10 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     ...(lookups?.staff.map(s => s.name) ?? []),
     ...leads.map(l => l.leadOwner).filter(Boolean) as string[],
   ]));
+  const statusOptions = Array.from(new Set([
+    ...(lookups?.statuses.map(s => s.label) ?? []),
+    "WALK-IN BOOKED", "WALK-IN COMPLETED", "ADMISSION DONE",
+  ]));
 
   const handleSaved = (updated: Lead) => {
     setLeads(ls => ls.map(l => l.id === updated.id ? updated : l));
@@ -634,12 +630,6 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     : "—";
   const inputCls = "h-9 px-3 rounded-lg border border-[#d9e1eb] text-xs sm:text-sm text-[#243651] focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 bg-white";
   const selectCls = `${inputCls} pr-7`;
-  const selectedSegment = statusView;
-  const setSegment = (view: typeof statusView) => {
-    setStatusView(view);
-    setFilters(f => ({ ...f, status: "" }));
-    setPage(1);
-  };
 
   return (
     <div className="min-h-[100dvh] text-[#20334f]" style={{ background: "#f3f6fa" }}>
@@ -672,7 +662,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
       <main className="max-w-[1680px] mx-auto px-4 sm:px-7 py-6 sm:py-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#172945]">Child enquiries</h1>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#172945]">Leads</h1>
             <p className="text-xs text-[#6c7d94] mt-0.5">{total.toLocaleString()} in this view <span className="mx-1 text-[#c0c9d5]">/</span> changes are audit-logged</p>
           </div>
           <div className="flex items-center gap-1 rounded-lg bg-white border border-[#dfe6ee] p-1 self-start" aria-label="Filter by brand">
@@ -686,22 +676,10 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           </div>
         </div>
 
-        <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4" aria-label="Lead views and filters">
-          <div className="flex gap-1 overflow-x-auto px-3 sm:px-4 pt-1 border-b border-[#e9eef3]" role="tablist" aria-label="Lead status views">
-            {([
-              ["all", "All enquiries"], ["booked", "Booked"], ["walkins", "Walk-ins"], ["admissions", "Admissions"],
-            ] as const).map(([value, label]) => (
-              <button key={value} type="button" role="tab" aria-selected={selectedSegment === value}
-                onClick={() => setSegment(value)}
-                className={`flex items-center gap-1.5 whitespace-nowrap px-2.5 sm:px-3 py-2.5 text-xs sm:text-sm font-semibold border-b-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${selectedSegment === value ? "border-[#f2b63f] text-[#172945]" : "border-transparent text-[#718198] hover:text-[#243956]"}`}>
-                {label}
-                  {selectedSegment === value && <span className="min-w-5 text-center rounded-full bg-[#fff1d0] text-[#8b5c00] px-1.5 py-0.5 text-[11px] tabular-nums">{loading ? "…" : total}</span>}
-              </button>
-            ))}
-          </div>
+        <section className="rounded-xl bg-white border border-[#dfe6ee] shadow-[0_5px_20px_rgba(27,49,79,.04)] mb-4" aria-label="Lead filters">
           <div className="p-3 sm:px-4">
             <div className="flex flex-wrap items-center gap-2">
-              <label className="flex-1 min-w-[170px]">
+              <label className="w-full sm:w-[190px] xl:w-[230px] sm:flex-none">
                 <span className="sr-only">Search enquiries</span>
                 <input type="search" aria-label="Search by child or phone" className={`${inputCls} w-full`} placeholder="Search child or phone"
                   value={filters.search} onChange={e => applyFilter("search", e.target.value)} />
@@ -711,6 +689,13 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 <select aria-label="Filter by branch" className={`${selectCls} w-full`} value={filters.branchId} onChange={e => applyFilter("branchId", e.target.value)}>
                   <option value="">All branches</option>
                   {branchOptions.map(b => <option key={b.id} value={b.id}>{filters.brand ? b.name : `${b.brand} · ${b.name}`}</option>)}
+                </select>
+              </label>
+              <label className="min-w-[145px] flex-1 sm:flex-none sm:w-[175px]">
+                <span className="sr-only">Status</span>
+                <select aria-label="Filter by status" className={`${selectCls} w-full`} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
+                  <option value="">All statuses</option>
+                  {statusOptions.map(status => <option key={status} value={status}>{status}</option>)}
                 </select>
               </label>
               <label className="min-w-[112px] flex-1 sm:flex-none sm:w-[130px]">
@@ -728,24 +713,17 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 </select>
               </label>
               <button type="button" onClick={() => setMoreFilters(open => !open)} aria-expanded={moreFilters}
-                className={`h-9 px-3 rounded-lg border text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${moreFilters || filters.status || filters.dateFrom || filters.dateTo || filters.showArchived ? "bg-[#eff4fa] border-[#b5c8df] text-[#1b4679]" : "border-[#d9e1eb] text-[#53657d] hover:bg-[#f4f7fb]"}`}>
-                More filters{filters.status || filters.dateFrom || filters.dateTo || filters.showArchived ? " •" : ""}
+                className={`h-9 px-3 rounded-lg border text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${moreFilters || filters.dateFrom || filters.dateTo || filters.showArchived ? "bg-[#eff4fa] border-[#b5c8df] text-[#1b4679]" : "border-[#d9e1eb] text-[#53657d] hover:bg-[#f4f7fb]"}`}>
+                More filters{filters.dateFrom || filters.dateTo || filters.showArchived ? " •" : ""}
               </button>
               {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search || filters.showArchived) && (
-                <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); setStatusView("all"); }}
+                <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); }}
                   className="h-9 px-2 text-xs font-semibold text-[#885900] hover:text-[#654100] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
                   Clear
                 </button>
               )}
             </div>
             {moreFilters && <div className="mt-3 pt-3 border-t border-[#e9eef3] flex flex-wrap items-end gap-3">
-              <label className="min-w-[165px] flex-1">
-                <span className="block text-[11px] font-medium text-[#75849a] mb-1">Status</span>
-                <select aria-label="Filter by status" className={`${selectCls} w-full`} value={filters.status} onChange={e => applyFilter("status", e.target.value)}>
-                  <option value="">All statuses in view</option>
-                  {lookups?.statuses.map(s => <option key={s.id} value={s.label}>{s.label}</option>)}
-                </select>
-              </label>
               <label className="min-w-[140px] flex-1">
                 <span className="block text-[11px] font-medium text-[#75849a] mb-1">Enquired from</span>
                 <input aria-label="Enquiry date from" type="date" className={`${inputCls} w-full`} value={filters.dateFrom} onChange={e => applyFilter("dateFrom", e.target.value)} />
@@ -867,8 +845,8 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           {!loading && leads.length === 0 && (
             <div className="rounded-2xl border border-[#dfe6ee] bg-white px-5 py-10 text-center">
               <p className="font-semibold text-[#253a58]">No enquiries match</p>
-              <p className="mt-1 text-sm text-[#75849a]">Adjust your filters or start with all enquiries.</p>
-              <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); setStatusView("all"); }}
+              <p className="mt-1 text-sm text-[#75849a]">Adjust your filters or show all leads.</p>
+              <button type="button" onClick={() => { setPage(1); setFilters({ brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "", showArchived: false }); }}
                 className="mt-4 text-sm font-semibold text-[#8a5a00] underline underline-offset-4">Clear filters</button>
             </div>
           )}
