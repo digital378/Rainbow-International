@@ -7,7 +7,7 @@ const fixture = vi.hoisted(() => ({
   rows: [] as any[],
   markers: new Set<string>(),
   snapshots: new Map<string, any>(),
-  books: new Map<string, { rows: string[][]; protections: object[] }>(),
+  books: new Map<string, { rows: string[][]; protections: object[]; columns?: number; rowCount?: number }>(),
   supplement: vi.fn(),
   failAppend: "" as string,
   writes: [] as string[],
@@ -92,9 +92,31 @@ vi.mock("googleapis", () => {
     spreadsheets: {
       get: async ({ spreadsheetId }: any) => {
         if (!fixture.books.has(spreadsheetId)) throw Error("Unexpected workbook");
-        return { data: { sheets: [{ properties: { title: "WALKINs" }, protectedRanges: fixture.books.get(spreadsheetId)!.protections }] } };
+        const book = fixture.books.get(spreadsheetId)!;
+        return { data: { sheets: [{ properties: {
+          title: "WALKINs", sheetId: ids.indexOf(spreadsheetId) + 1,
+          gridProperties: {
+            columnCount: book.columns ?? book.rows[0].length,
+            rowCount: book.rowCount ?? 1028,
+          },
+        }, protectedRanges: book.protections }] } };
       },
-      batchUpdate: async () => { throw Error("Unexpected metadata mutation"); },
+      batchUpdate: async ({ spreadsheetId, requestBody }: any) => {
+        const book = fixture.books.get(spreadsheetId)!;
+        for (const request of requestBody.requests) {
+          if (!request.appendDimension) {
+            throw Error("Unexpected metadata mutation");
+          }
+          if (request.appendDimension.dimension === "COLUMNS") {
+            book.columns = (book.columns ?? book.rows[0].length) + request.appendDimension.length;
+          } else if (request.appendDimension.dimension === "ROWS") {
+            book.rowCount = (book.rowCount ?? 1028) + request.appendDimension.length;
+          } else {
+            throw Error("Unexpected dimension");
+          }
+          fixture.writes.push(`extend:${spreadsheetId}`);
+        }
+      },
       values: {
         get: async ({ spreadsheetId, range }: any) => {
           const rows = fixture.books.get(spreadsheetId)?.rows;
@@ -127,7 +149,29 @@ vi.mock("googleapis", () => {
           }
           fixture.writes.push(`update:${spreadsheetId}`);
         },
-        update: async () => { throw Error("Unexpected full-row update"); },
+        update: async ({ spreadsheetId, range, requestBody }: any) => {
+          const cell = range.match(/!([A-Z]+)1$/);
+          const newRow = range.match(/!A(\d+):([A-Z]+)\1$/);
+          const book = fixture.books.get(spreadsheetId)!;
+          if (newRow) {
+            if (fixture.failAppend === spreadsheetId) {
+              fixture.failAppend = "";
+              throw Error("simulated interrupted mirror");
+            }
+            if (Number(newRow[1]) !== book.rows.length + 1) throw Error("Unexpected row overwrite");
+            book.rows.push(structuredClone(requestBody.values[0]));
+            fixture.writes.push(`append:${spreadsheetId}`);
+            return;
+          }
+          if (!cell || requestBody.values.length !== 1 || requestBody.values[0].length !== 1) {
+            throw Error("Unexpected full-row update");
+          }
+          if (column(cell[1]) >= (book.columns ?? book.rows[0].length)) {
+            throw Error("Header write exceeds grid limits");
+          }
+          fixture.books.get(spreadsheetId)!.rows[0][column(cell[1])] = requestBody.values[0][0];
+          fixture.writes.push(`header:${spreadsheetId}`);
+        },
         clear: async () => { throw Error("Unexpected sheet clear"); },
       },
     },
@@ -229,6 +273,58 @@ describe("historical import against isolated RIS, RPS and Master workbook copies
     expect(importedRow(ids[2])).toHaveLength(2);
     assertUntouched();
     expect(fixture.writes.every(write => /^(append|update):copy-/.test(write))).toBe(true);
+  });
+
+  it("mirrors into the live-style branch headers without shifting historical or extra columns", async () => {
+    const liveHeaders = [
+      ["Unique ID", "Date", "Time", "Student Name", "Father Name", "Mother Name",
+        "GRADE", "Academic Year", "Father Contact", "Mother Contact", "Email",
+        "Counsellor Name", "Source", "Sub Source", "Status", "Admission Date",
+        "Follow up Remarks", "Reason for Closed", "Revisit 1 Date", "Revisit 2 Date",
+        "Lead ID", "Lead ID", "Lead ID"],
+      ["Unique ID", "Date", "Time", "Student Name", "Father Name", "Mother Name",
+        "Grade", "Branch", "Academic Year", "Father Contact", "Mother Contact",
+        "Email", "Counsellor Name", "Source", "Sub Source", "Status",
+        "Reason for Closed", "Admission Date", "Remark", "Revisit 1 Date",
+        "Revisit 2 Date", "Lead ID", "Lead ID", "Lead ID"],
+    ];
+    ids.slice(0, 2).forEach((id, index) => {
+      const historic = fixture.books.get(id)!.rows.slice(1).map(row => {
+        const oldHeader = index === 0 ? SHEET_HEADERS : RPS_SHEET_HEADERS;
+        return liveHeaders[index].map(name => {
+          if (name === "Sub Source") return "historical staff value";
+          const sourceName = name === "Remark" ? "Follow up Remarks" : name;
+          return row[oldHeader.findIndex(old => old.toLowerCase() === sourceName.toLowerCase())] ?? "";
+        });
+      });
+      fixture.books.set(id, { rows: [liveHeaders[index], ...historic], protections: fixture.books.get(id)!.protections });
+      originals.set(id, structuredClone(historic));
+    });
+
+    const result = await applyCrmImport();
+    queueImportUpserts(result.importedIds);
+    await tick();
+
+    expect(fixture.markers.size).toBe(0);
+    for (const [index, id] of ids.slice(0, 2).entries()) {
+      const book = fixture.books.get(id)!.rows;
+      const header = book[0];
+      expect(header.slice(0, liveHeaders[index].length)).toEqual(liveHeaders[index]);
+      expect(header.at(-1)).toBe("Actual Admission Date");
+      const [imported] = importedRow(id);
+      expect(imported).toBeDefined();
+      expect(imported[header.indexOf("Status")]).toBe("OPEN");
+      expect(imported[header.indexOf("Sub Source")]).toBe("");
+      expect(imported[header.indexOf("Lead ID") + 1]).toBe("");
+      expect(imported[header.indexOf("Lead ID") + 2]).toBe("");
+    }
+    expect(importedRow(ids[2])).toHaveLength(2);
+    assertUntouched();
+    queueImportUpserts(result.importedIds);
+    await tick();
+    expect(importedRow(ids[0])).toHaveLength(1);
+    expect(importedRow(ids[1])).toHaveLength(1);
+    assertUntouched();
   });
 
   it("retains a durable reconciliation after a mirror interruption and completes on retry", async () => {

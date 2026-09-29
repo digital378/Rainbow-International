@@ -32,6 +32,7 @@ import { db } from "./db";
 import { walkinLeads, walkinBranches, walkinLeadAuditLog, walkinStatuses, walkinCloseReasons, walkinPrograms, walkinSources, walkinStaff, walkinSyncReconciliations, walkinSyncSnapshots } from "@shared/schema";
 import { eq, and, or, isNull, sql as drizzleSql } from "drizzle-orm";
 import { readMarketing2728Supplement, supplementLeadKey } from "./marketing2728Sheets";
+import { canonicalHeader, findManagedRow, resolveManagedSheetLayout } from "./walkinSheetLayout";
 import type { WalkinLead } from "@shared/schema";
 import {
   beginWalkinSyncShutdown,
@@ -323,7 +324,7 @@ function columnLetter(index: number): string {
 }
 
 function headerIndex(header: string[], name: string, fallback: number): number {
-  const index = header.findIndex((cell) => cell.trim().toLowerCase() === name.toLowerCase());
+  const index = header.findIndex((cell) => canonicalHeader(cell) === canonicalHeader(name));
   return index >= 0 ? index : fallback;
 }
 
@@ -332,12 +333,9 @@ function cellAt(row: string[], index: number): string {
 }
 
 function leadIdFromRow(row: string[], index: number): string {
-  const direct = cellAt(row, index);
-  if (direct) return direct;
-  // Rows written before the Branch-column correction can carry the UUID one
-  // cell left of its header. This transition fallback is read-only and ends
-  // once a normal resync rewrites the row in the canonical layout.
-  return row.find((value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value?.trim() ?? ""))?.trim() ?? "";
+  // Never infer an identity from another column: historical staff cells may
+  // contain UUID-looking text and must not be treated as CRM-managed rows.
+  return cellAt(row, index);
 }
 
 // ── In-memory sync status ────────────────────────────────────────
@@ -575,6 +573,52 @@ export async function assertWalkinSheetMirrorReady(): Promise<void> {
     throw new Error("Sheet mirroring is not configured");
   }
   await auth.getAccessToken();
+  const sheets = google.sheets({ version: "v4", auth });
+  for (const [scope, spreadsheetId, headers] of [
+    ["RIS", getSheetId("RIS"), SHEET_HEADERS],
+    ["RPS", getSheetId("RPS"), RPS_SHEET_HEADERS],
+    ["MASTER", process.env.MASTER_WALKIN_SHEET_ID_2728, MASTER_SHEET_HEADERS],
+  ] as const) {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: spreadsheetId!,
+      range: `${LEADS_TAB}!A:AZ`,
+    });
+    try {
+      resolveManagedSheetLayout(response.data.values ?? [], headers);
+    } catch (error: any) {
+      throw new Error(`${scope} sheet layout is not safe for mirroring: ${error?.message}`);
+    }
+  }
+}
+
+/** Safe summary for verifying incremental mirrors without exposing any row content. */
+export async function inspectWalkinMirrorState(
+  valueRenderOption: "FORMATTED_VALUE" | "FORMULA" = "FORMATTED_VALUE",
+) {
+  const auth = getAuthClient();
+  if (!auth) throw new Error("Google auth not configured");
+  const sheets = google.sheets({ version: "v4", auth });
+  const state: Record<string, { crmRows: number; preservedRows: number; preservedDigest: string }> = {};
+  for (const [scope, spreadsheetId, headers] of [
+    ["RIS", getSheetId("RIS"), SHEET_HEADERS],
+    ["RPS", getSheetId("RPS"), RPS_SHEET_HEADERS],
+    ["MASTER", process.env.MASTER_WALKIN_SHEET_ID_2728, MASTER_SHEET_HEADERS],
+  ] as const) {
+    if (!spreadsheetId) throw new Error(`${scope} sheet is not configured`);
+    const rows = (await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${LEADS_TAB}!A:AZ`,
+      valueRenderOption,
+    })).data.values ?? [];
+    const layout = resolveManagedSheetLayout(rows, headers);
+    const preserved = rows.slice(1).filter(row => !cellAt(row, layout.leadIdIndex).startsWith("crm-"));
+    state[scope] = {
+      crmRows: rows.slice(1).filter(row => cellAt(row, layout.leadIdIndex).startsWith("crm-")).length,
+      preservedRows: preserved.length,
+      preservedDigest: createHash("sha256").update(JSON.stringify(preserved)).digest("hex"),
+    };
+  }
+  return state;
 }
 
 // ── Sheet ID resolver ────────────────────────────────────────────
@@ -593,19 +637,19 @@ async function ensureLeadsTab(
   headers: readonly string[],
 ): Promise<boolean> {
   const meta = await sheets.spreadsheets.get({ spreadsheetId });
-  const exists = (meta.data.sheets ?? []).some(
+  const tab = (meta.data.sheets ?? []).find(
     (s: any) => s.properties?.title === tabName,
   );
 
-  if (exists) {
-    // Existing worksheets must keep every current column in place. The new
-    // actual-admission field is appended after Lead ID; legacy "Admission
-    // Date" remains the walk-in date and is never relabeled or migrated.
-    const headerResp = await sheets.spreadsheets.values.get({
+  if (tab) {
+    // Do not reorder or rewrite historical columns. Validate the live layout
+    // and append only a new, empty column at the far right when needed.
+    const snapshot = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${tabName}!1:1`,
+      range: `${tabName}!A:AZ`,
     });
-    const currentHeader = headerResp.data.values?.[0] ?? [];
+    const rows = snapshot.data.values ?? [];
+    const currentHeader = resolveManagedSheetLayout(rows, headers).header;
     const actualAdmissionDateIndexes = currentHeader
       .map((cell: string, index: number) =>
         cell.trim().toLowerCase() === "actual admission date" ? index : -1)
@@ -614,15 +658,25 @@ async function ensureLeadsTab(
       throw new Error(`"${tabName}" has duplicate Actual Admission Date headers`);
     }
     if (actualAdmissionDateIndexes.length === 0) {
-      const leadIdIndex = currentHeader.findIndex(
-        (cell: string) => cell.trim().toLowerCase() === "lead id",
-      );
-      if (leadIdIndex < 0) {
-        throw new Error(`"${tabName}" is missing its Lead ID header; refusing to shift columns`);
-      }
       const appendIndex = currentHeader.length;
-      if (appendIndex !== leadIdIndex + 1) {
-        throw new Error(`"${tabName}" has columns after Lead ID; refusing to shift columns`);
+      const sheetId = tab.properties?.sheetId;
+      const columnCount = tab.properties?.gridProperties?.columnCount;
+      if (typeof sheetId !== "number" || typeof columnCount !== "number") {
+        throw new Error(`"${tabName}" has incomplete grid metadata; refusing to append a column`);
+      }
+      if (appendIndex >= columnCount) {
+        await fencedWalkinSheetWrite(`extend ${tabName} grid at the right edge`, () =>
+          sheets.spreadsheets.batchUpdate({
+            spreadsheetId,
+            requestBody: { requests: [{
+              appendDimension: {
+                sheetId,
+                dimension: "COLUMNS",
+                length: appendIndex - columnCount + 1,
+              },
+            }] },
+          }),
+        );
       }
       await fencedWalkinSheetWrite(`append Actual Admission Date header to ${tabName}`, () =>
         sheets.spreadsheets.values.update({
@@ -632,14 +686,6 @@ async function ensureLeadsTab(
           requestBody: { values: [["Actual Admission Date"]] },
         }),
       );
-    } else {
-      const leadIdIndex = currentHeader.findIndex(
-        (cell: string) => cell.trim().toLowerCase() === "lead id",
-      );
-      if (leadIdIndex < 0 || actualAdmissionDateIndexes[0] !== leadIdIndex + 1 ||
-          actualAdmissionDateIndexes[0] !== currentHeader.length - 1) {
-        throw new Error(`"${tabName}" has an unexpected Actual Admission Date position; refusing to shift columns`);
-      }
     }
     return false;
   }
@@ -780,6 +826,48 @@ async function updateRowPreservingColumns(
   }));
 }
 
+/** Put new CRM rows after the last populated row, without inserting/shifting history. */
+async function appendManagedRowWithoutShifting(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  tabName: string,
+  snapshot: string[][],
+  row: string[],
+  label: string,
+): Promise<void> {
+  const rowNumber = snapshot.length + 1;
+  const meta = await sheets.spreadsheets.get({ spreadsheetId });
+  const tab = (meta.data.sheets ?? []).find(item => item.properties?.title === tabName);
+  const sheetId = tab?.properties?.sheetId;
+  const rowCount = tab?.properties?.gridProperties?.rowCount;
+  if (typeof sheetId !== "number" || typeof rowCount !== "number") {
+    throw new Error(`"${tabName}" has incomplete row-grid metadata; refusing to append`);
+  }
+  if (rowNumber > rowCount) {
+    await fencedWalkinSheetWrite(`extend ${tabName} rows at the bottom`, () =>
+      sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: { requests: [{ appendDimension: {
+          sheetId, dimension: "ROWS", length: rowNumber - rowCount,
+        } }] },
+      }),
+    );
+  }
+  const target = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${tabName}!A${rowNumber}:AZ${rowNumber}`,
+  });
+  if (target.data.values?.[0]?.some(value => String(value ?? "").trim())) {
+    throw new Error(`"${tabName}" gained data at row ${rowNumber}; refusing to overwrite it`);
+  }
+  await fencedWalkinSheetWrite(label, () => sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${tabName}!A${rowNumber}:${columnLetter(row.length - 1)}${rowNumber}`,
+    valueInputOption: "USER_ENTERED",
+    requestBody: { values: [row] },
+  }));
+}
+
 async function leadToMasterRow(lead: WalkinLead): Promise<string[]> {
   const brandRow = await leadToRow(lead, "RPS");
   const byHeader = new Map<string, string>(
@@ -813,46 +901,36 @@ export async function upsertLeadToSheet(
 
   const sheets = google.sheets({ version: "v4", auth });
   const headers = headersForBrand(brand);
-  const row = await leadToRow(lead, brand);
-  const leadIdColLetter = columnLetter(headers.indexOf("Lead ID"));
 
   // Ensure the WALKINs tab exists (creates it with header row on first use)
   await ensureLeadsTab(sheets, sheetId, LEADS_TAB, headers);
 
   async function doUpsert(retried = false): Promise<void> {
     try {
-      // Read the Lead ID column to find any existing row for this lead
-      const readResp = await sheets.spreadsheets.values.get({
+      const snapshot = (await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId!,
-        range: `${LEADS_TAB}!${leadIdColLetter}:${leadIdColLetter}`,
-      });
-
-      const cellValues = readResp.data.values ?? [];
-      // Row 0 = header, data starts at row 1 (1-based row 2 in Sheets)
-      let existingRowIndex = -1;
-      for (let i = 1; i < cellValues.length; i++) {
-        if (cellValues[i]?.[0] === String(lead.id)) {
-          existingRowIndex = i; // 0-based index in the values array
-          break;
-        }
-      }
+        range: `${LEADS_TAB}!A:AZ`,
+      })).data.values ?? [];
+      const layout = resolveManagedSheetLayout(snapshot, headers);
+      const row = layout.project(await leadToRow(lead, brand));
+      const existingRowIndex = findManagedRow(snapshot, layout.leadIdIndex, String(lead.id));
 
       if (existingRowIndex >= 0) {
         // Update existing row (Sheets row = existingRowIndex + 1, 1-based)
         const sheetsRow = existingRowIndex + 1;
         const currentRowResp = await sheets.spreadsheets.values.get({
           spreadsheetId: sheetId!,
-          range: `${LEADS_TAB}!A${sheetsRow}:${columnLetter(headers.length - 1)}${sheetsRow}`,
+          range: `${LEADS_TAB}!A${sheetsRow}:${columnLetter(layout.header.length - 1)}${sheetsRow}`,
         });
         const currentRow = currentRowResp.data.values?.[0] ?? [];
-        const currentRowLeadId = leadIdFromRow(currentRow, headers.indexOf("Lead ID"));
+        const currentRowLeadId = cellAt(currentRow, layout.leadIdIndex);
         if (currentRowLeadId !== String(lead.id)) {
           throw new Error(`Lead ${lead.id} moved while reading ${brand} row ${sheetsRow}; refusing to update a different row`);
         }
         const currentSheetValues = syncValuesFromSheetRow(
-          headers as string[],
+          layout.header,
           currentRow,
-          headers.some((header) => header.trim().toLowerCase() === "actual admission date"),
+          layout.header.some(header => canonicalHeader(header) === "actual admission date"),
         );
         const dbValues = syncValuesFromLead(lead);
         const baseline = await getSyncSnapshot(brand, String(lead.id));
@@ -872,19 +950,14 @@ export async function upsertLeadToSheet(
           LEADS_TAB,
           sheetsRow,
           row,
-          [], // CRM is authoritative for protected submission fields too.
+          layout.protectedIndices, // Preserve extra staff and duplicate-ID columns.
           `upsert ${brand} lead ${lead.id}`,
         );
         console.log(`[walkin/sheets] Updated row ${sheetsRow} for lead ${lead.id} in ${brand} sheet`);
       } else {
-        // Append a new row after the last row
-        await fencedWalkinSheetWrite(`append ${brand} lead ${lead.id}`, () => sheets.spreadsheets.values.append({
-          spreadsheetId: sheetId!,
-          range: `${LEADS_TAB}!A1`,
-          valueInputOption: "USER_ENTERED",
-          insertDataOption: "INSERT_ROWS",
-          requestBody: { values: [row] },
-        }));
+        await appendManagedRowWithoutShifting(
+          sheets, sheetId!, LEADS_TAB, snapshot, row, `append ${brand} lead ${lead.id}`,
+        );
         console.log(`[walkin/sheets] Appended new lead ${lead.id} to ${brand} sheet`);
       }
 
@@ -959,37 +1032,34 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
   }
 
   const sheets = google.sheets({ version: "v4", auth });
-  const row = await leadToMasterRow(lead);
-  const leadIdColLetter = columnLetter(MASTER_SHEET_HEADERS.indexOf("Lead ID"));
+  const canonicalRow = await leadToMasterRow(lead);
 
   // Ensure the WALKINs tab exists in the master sheet
   await ensureLeadsTab(sheets, sheetId, MASTER_LEADS_TAB, MASTER_SHEET_HEADERS);
 
   async function doUpsert(retried = false): Promise<void> {
     try {
-      const readResp = await sheets.spreadsheets.values.get({
+      const snapshot = (await sheets.spreadsheets.values.get({
         spreadsheetId: sheetId!,
-        range: `${MASTER_LEADS_TAB}!${leadIdColLetter}:${leadIdColLetter}`,
-      });
-      const cellValues = readResp.data.values ?? [];
-      let existingRowIndex = -1;
-      for (let i = 1; i < cellValues.length; i++) {
-        if (cellValues[i]?.[0] === String(lead.id)) { existingRowIndex = i; break; }
-      }
+        range: `${MASTER_LEADS_TAB}!A:AZ`,
+      })).data.values ?? [];
+      const layout = resolveManagedSheetLayout(snapshot, MASTER_SHEET_HEADERS);
+      const row = layout.project(canonicalRow);
+      const existingRowIndex = findManagedRow(snapshot, layout.leadIdIndex, String(lead.id));
 
       if (existingRowIndex >= 0) {
         const sheetsRow = existingRowIndex + 1;
         const currentRowResp = await sheets.spreadsheets.values.get({
           spreadsheetId: sheetId!,
-          range: `${MASTER_LEADS_TAB}!A${sheetsRow}:${columnLetter(MASTER_SHEET_HEADERS.length - 1)}${sheetsRow}`,
+          range: `${MASTER_LEADS_TAB}!A${sheetsRow}:${columnLetter(layout.header.length - 1)}${sheetsRow}`,
         });
         const currentRow = currentRowResp.data.values?.[0] ?? [];
-        const currentRowLeadId = leadIdFromRow(currentRow, MASTER_SHEET_HEADERS.indexOf("Lead ID"));
+        const currentRowLeadId = cellAt(currentRow, layout.leadIdIndex);
         if (currentRowLeadId !== String(lead.id)) {
           throw new Error(`Lead ${lead.id} moved while reading Master row ${sheetsRow}; refusing to update a different row`);
         }
         const currentSheetValues = syncValuesFromSheetRow(
-          MASTER_SHEET_HEADERS as unknown as string[],
+          layout.header,
           currentRow,
           true,
         );
@@ -1011,15 +1081,13 @@ export async function upsertLeadToMasterSheet(lead: WalkinLead): Promise<void> {
           MASTER_LEADS_TAB,
           sheetsRow,
           row,
-          [], // Range protections remain; only this trusted CRM sync writes them.
+          layout.protectedIndices,
           `upsert Master lead ${lead.id}`,
         );
       } else {
-        await fencedWalkinSheetWrite(`append Master lead ${lead.id}`, () => sheets.spreadsheets.values.append({
-          spreadsheetId: sheetId!, range: `${MASTER_LEADS_TAB}!A1`,
-          valueInputOption: "USER_ENTERED", insertDataOption: "INSERT_ROWS",
-          requestBody: { values: [row] },
-        }));
+        await appendManagedRowWithoutShifting(
+          sheets, sheetId!, MASTER_LEADS_TAB, snapshot, row, `append Master lead ${lead.id}`,
+        );
       }
 
       syncStatus.MASTER.lastSyncAt = new Date();
@@ -1495,6 +1563,10 @@ export async function resyncBrandToSheet(brand: "RIS" | "RPS"): Promise<{
       spreadsheetId: sheetId, range: `${LEADS_TAB}!A:Z`,
     });
     const existing = snapshot.data.values ?? [];
+    if (existing[0]?.length !== headers.length ||
+        existing[0].some((value, index) => canonicalHeader(value) !== canonicalHeader(headers[index]))) {
+      throw new Error(`${brand} has custom columns; full resync would shift them. Use incremental synchronization.`);
+    }
     const idIndex = (existing[0] ?? []).findIndex(value => value.trim() === "Lead ID");
     if (idIndex < 0 || existing.slice(1).some(row => row.some(cell => cell?.trim()) && !row[idIndex]?.trim())) {
       throw new Error(`${brand} sheet contains historical rows without Lead IDs; full resync would erase them. Use incremental synchronization.`);
@@ -1743,11 +1815,12 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
     // and RPS can safely retain their different Branch-column layouts.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!A:V`,
+      range: `${LEADS_TAB}!A:AZ`,
     });
 
     const rows = resp.data.values ?? [];
-    const header = rows[0] ?? [];
+    const layout = resolveManagedSheetLayout(rows, headersForBrand(brand));
+    const header = layout.header;
     // Row 0 = header, data starts at 1
     const dataRows = rows.slice(1);
     entry.rowsScanned = dataRows.length;
@@ -1783,7 +1856,7 @@ export async function pullChangesFromSheet(brand: "RIS" | "RPS"): Promise<PullLo
 
     for (const row of dataRows) {
       const hasBranch = header.some((cell) => cell.trim().toLowerCase() === "branch");
-      const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", hasBranch ? 20 : 19));
+      const leadId = leadIdFromRow(row, layout.leadIdIndex);
       if (!leadId) continue;
 
       // Legacy "Admission Date" still maps to walkInDate. The separately
@@ -2041,11 +2114,12 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
     // Branch and its staff-facing Source/Counsellor order differs from a brand.
     const resp = await sheets.spreadsheets.values.get({
       spreadsheetId: masterSheetId,
-      range: `${MASTER_LEADS_TAB}!A:W`,
+      range: `${MASTER_LEADS_TAB}!A:AZ`,
     });
 
     const rows = resp.data.values ?? [];
-    const header = rows[0] ?? [];
+    const layout = resolveManagedSheetLayout(rows, MASTER_SHEET_HEADERS);
+    const header = layout.header;
     const dataRows = rows.slice(1); // skip header
     entry.rowsScanned = dataRows.length;
 
@@ -2071,7 +2145,7 @@ export async function pullChangesFromMasterSheet(): Promise<PullLogEntry> {
       const brand = (row[0]?.trim() ?? "") as "RIS" | "RPS";
       if (brand !== "RIS" && brand !== "RPS") continue;
 
-      const leadId = leadIdFromRow(row, headerIndex(header, "Lead ID", 21));
+      const leadId = leadIdFromRow(row, layout.leadIdIndex);
       if (!leadId) continue;
 
       // Existing Master green columns remain P–U; actual admission is appended
@@ -2407,26 +2481,27 @@ export async function removeLeadFromSheet(
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const headers = headersForBrand(brand);
-    const idColumn = columnLetter(headers.indexOf("Lead ID"));
-    const statusColumn = columnLetter(headers.indexOf("Status"));
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${LEADS_TAB}!${idColumn}:${idColumn}`,
+      range: `${LEADS_TAB}!A:AZ`,
     });
-    const cellValues = readResp.data.values ?? [];
-
-    let sheetsRow = -1;
-    for (let i = 1; i < cellValues.length; i++) {
-      if (cellValues[i]?.[0] === String(leadId)) {
-        sheetsRow = i + 1; // convert 0-based array index to 1-based Sheets row
-        break;
-      }
-    }
+    const rows = readResp.data.values ?? [];
+    const layout = resolveManagedSheetLayout(rows, headersForBrand(brand));
+    const statusColumn = columnLetter(headerIndex(layout.header, "Status", -1));
+    const existingRowIndex = findManagedRow(rows, layout.leadIdIndex, String(leadId));
+    const sheetsRow = existingRowIndex < 0 ? -1 : existingRowIndex + 1;
 
     if (sheetsRow < 0) {
       console.warn(`[walkin/sheets] Lead ${leadId} not found in ${brand} sheet — nothing to remove`);
       return;
+    }
+
+    const fresh = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${LEADS_TAB}!${columnLetter(layout.leadIdIndex)}${sheetsRow}`,
+    });
+    if (fresh.data.values?.[0]?.[0] !== String(leadId)) {
+      throw new Error(`Lead ${leadId} moved while archiving; row left unchanged`);
     }
 
     await fencedWalkinSheetWrite(`archive ${brand} lead ${leadId}`, () => sheets.spreadsheets.values.update({
@@ -2459,25 +2534,27 @@ export async function removeLeadFromMasterSheet(leadId: string): Promise<void> {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const idColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Lead ID"));
-    const statusColumn = columnLetter(MASTER_SHEET_HEADERS.indexOf("Status"));
     const readResp = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: `${MASTER_LEADS_TAB}!${idColumn}:${idColumn}`,
+      range: `${MASTER_LEADS_TAB}!A:AZ`,
     });
-    const cellValues = readResp.data.values ?? [];
-
-    let sheetsRow = -1;
-    for (let i = 1; i < cellValues.length; i++) {
-      if (cellValues[i]?.[0] === String(leadId)) {
-        sheetsRow = i + 1;
-        break;
-      }
-    }
+    const rows = readResp.data.values ?? [];
+    const layout = resolveManagedSheetLayout(rows, MASTER_SHEET_HEADERS);
+    const statusColumn = columnLetter(headerIndex(layout.header, "Status", -1));
+    const existingRowIndex = findManagedRow(rows, layout.leadIdIndex, String(leadId));
+    const sheetsRow = existingRowIndex < 0 ? -1 : existingRowIndex + 1;
 
     if (sheetsRow < 0) {
       console.warn(`[walkin/sheets] Lead ${leadId} not found in Master sheet — nothing to remove`);
       return;
+    }
+
+    const fresh = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: `${MASTER_LEADS_TAB}!${columnLetter(layout.leadIdIndex)}${sheetsRow}`,
+    });
+    if (fresh.data.values?.[0]?.[0] !== String(leadId)) {
+      throw new Error(`Lead ${leadId} moved while archiving; row left unchanged`);
     }
 
     await fencedWalkinSheetWrite(`archive Master lead ${leadId}`, () => sheets.spreadsheets.values.update({
