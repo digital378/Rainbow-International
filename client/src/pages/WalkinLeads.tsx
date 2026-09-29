@@ -474,7 +474,7 @@ function ArchiveModal({ lead, token, onArchived, onClose }: {
 
 // ── Main Leads Panel ──────────────────────────────────────────────
 function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }) {
-  const [access, setAccess] = useState<"GROUP" | "RIS" | "RPS" | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -502,18 +502,14 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     if (res.ok) setLookups(await res.json());
   }, [token]);
 
-  const fetchPageAccess = useCallback(async () => {
+  const confirmPageSession = useCallback(async () => {
     const response = await fetch("/api/walkin/page-session?scope=leads", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error("Could not confirm your brand access.");
-    const data: { ok?: boolean; access?: "GROUP" | "RIS" | "RPS" } = await response.json();
-    if (!data.ok || !data.access) throw new Error("Could not confirm your brand access.");
-    setAccess(data.access);
-    setFilters(current => ({
-      ...current,
-      brand: data.access === "GROUP" ? current.brand : (data.access || current.brand),
-    }));
+    if (!response.ok) throw new Error("Could not confirm your Leads session.");
+    const data: { ok?: boolean } = await response.json();
+    if (!data.ok) throw new Error("Could not confirm your Leads session.");
+    setSessionReady(true);
     setError("");
   }, [token]);
 
@@ -556,17 +552,16 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
     if (!meta) { meta = document.createElement("meta"); meta.name = "robots"; document.head.appendChild(meta); }
     meta.setAttribute("content", "noindex, nofollow");
     fetchLookups();
-    void fetchPageAccess().catch((reason: unknown) => {
-      setError(reason instanceof Error ? reason.message : "Could not confirm your brand access.");
+    void confirmPageSession().catch((reason: unknown) => {
+      setError(reason instanceof Error ? reason.message : "Could not confirm your Leads session.");
     });
-  }, [fetchLookups, fetchPageAccess]);
+  }, [fetchLookups, confirmPageSession]);
 
   useEffect(() => {
-    if (access) fetchLeads(page, filters);
-  }, [page, filters, statusView, access]);
+    if (sessionReady) fetchLeads(page, filters);
+  }, [page, filters, statusView, sessionReady]);
 
   const applyFilter = (field: string, value: string | boolean) => {
-    if (field === "brand" && access !== "GROUP") return;
     if (field === "status") setStatusView("all");
     setPage(1);
     setFilters(f => ({ ...f, [field]: value }));
@@ -678,20 +673,14 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             <h1 className="text-2xl sm:text-[30px] font-bold tracking-tight text-[#172945] mt-1">Parent enquiries</h1>
             <p className="text-sm text-[#6c7d94] mt-1">{total.toLocaleString()} records in this view <span className="mx-1 text-[#c0c9d5]">/</span> updates are audit-logged</p>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-white border border-[#dfe6ee] p-1.5 self-start" aria-label="Brand scope">
-            {access === "GROUP" ? (
-              <>
-                {[["", "All brands"], ["RIS", "RIS"], ["RPS", "RPS"]].map(([value, label]) => (
-                  <button key={value} onClick={() => { applyFilter("brand", value); applyFilter("branchId", ""); }}
-                    aria-pressed={filters.brand === value}
-                    className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${filters.brand === value ? "bg-[#091a4f] text-white shadow-sm" : "text-[#596a81] hover:bg-[#f0f4f8]"}`}>
-                    {label}
-                  </button>
-                ))}
-              </>
-            ) : (
-              <span className="px-3 py-2 text-sm font-semibold text-[#263b59]">{access ? `${access} enquiries` : "Checking access…"}</span>
-            )}
+          <div className="flex items-center gap-2 rounded-xl bg-white border border-[#dfe6ee] p-1.5 self-start" aria-label="Filter by brand">
+            {[["", "All brands"], ["RIS", "RIS"], ["RPS", "RPS"]].map(([value, label]) => (
+              <button key={value} type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: value, branchId: "" })); }}
+                aria-pressed={filters.brand === value}
+                className={`px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500 ${filters.brand === value ? "bg-[#091a4f] text-white shadow-sm" : "text-[#596a81] hover:bg-[#f0f4f8]"}`}>
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -719,7 +708,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                 <span className="block text-[11px] font-semibold text-[#75849a] mb-1.5">Branch</span>
                 <select aria-label="Filter by branch" className={`${selectCls} w-full`} value={filters.branchId} onChange={e => applyFilter("branchId", e.target.value)}>
                   <option value="">All branches</option>
-                  {branchOptions.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  {branchOptions.map(b => <option key={b.id} value={b.id}>{filters.brand ? b.name : `${b.brand} · ${b.name}`}</option>)}
                 </select>
               </label>
               <label>
@@ -758,7 +747,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
                   Include archived
                 </label>
                 {(filters.brand || filters.branchId || filters.status || filters.source || filters.leadOwner || filters.dateFrom || filters.dateTo || filters.search) && (
-                  <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: access === "GROUP" ? "" : access || "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
+                  <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
                     className="text-sm font-semibold text-[#966000] underline underline-offset-4 hover:text-[#654100] focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-500">
                     Clear filters
                   </button>
@@ -773,7 +762,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
           <div className="mb-4 rounded-xl bg-[#fff0ed] border border-[#f1c2b8] px-4 py-3 text-sm text-[#963c2d]" role="alert">
             <div className="flex items-center justify-between gap-3">
               <span>{error}</span>
-              <button type="button" onClick={() => access ? fetchLeads(page, filters) : void fetchPageAccess().catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not confirm your brand access."))} className="font-semibold underline underline-offset-4">Retry</button>
+              <button type="button" onClick={() => sessionReady ? fetchLeads(page, filters) : void confirmPageSession().catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Could not confirm your Leads session."))} className="font-semibold underline underline-offset-4">Retry</button>
             </div>
           </div>
         )}
@@ -894,7 +883,7 @@ function LeadsPanel({ token, onLogout }: { token: string; onLogout: () => void }
             <div className="rounded-2xl border border-[#dfe6ee] bg-white px-5 py-10 text-center">
               <p className="font-semibold text-[#253a58]">No enquiries match</p>
               <p className="mt-1 text-sm text-[#75849a]">Adjust your filters or start with all enquiries.</p>
-              <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: access === "GROUP" ? "" : access || "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
+              <button type="button" onClick={() => { setPage(1); setFilters(f => ({ ...f, brand: "", branchId: "", status: "", source: "", leadOwner: "", dateFrom: "", dateTo: "", search: "" })); setStatusView("all"); }}
                 className="mt-4 text-sm font-semibold text-[#8a5a00] underline underline-offset-4">Clear filters</button>
             </div>
           )}

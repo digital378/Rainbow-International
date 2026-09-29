@@ -1,11 +1,11 @@
-# Brand-scoped leads workspace and dates
+# Leads workspace filters and dates
 
 ## Purpose
-Give RIS and RPS staff a calmer AY 2027–28 leads workspace with independent access, an unambiguous walk-in date, and a distinct admission date.
+Give RIS and RPS staff a calmer AY 2027–28 leads workspace with easy brand and branch filters, an unambiguous walk-in date, and a distinct admission date.
 
 ## Access and flow
-- Sign-in accepts separate RIS and RPS Leads passcodes. Sessions carry a server-verified brand and can read or edit only that brand's leads, including searches, exports, histories, detail views and archives. Request parameters cannot expand the scope. The existing group Leads passcode remains for group admins with access to both brands.
-- The group Leads passcode is no longer exposed in the general internal staff directory. Brand Leads passcodes are also not listed there. Administrators distribute them separately. For effective separation, the old group Leads passcode should be rotated if it was previously shared with branch staff.
+- Keep the existing shared Leads passcode. Anyone signed in to Leads can view both schools; no separate RIS or RPS Leads passcodes are needed.
+- Staff can filter the list and export by RIS, RPS, or all brands, then by a branch within the chosen brand. Changing brands clears an incompatible branch choice.
 - The initial kiosk enquiry form remains able to create a new lead, and the existing Source lock remains in force on later edits.
 
 ## Dates and data
@@ -15,9 +15,9 @@ Give RIS and RPS staff a calmer AY 2027–28 leads workspace with independent ac
 
 ## Visual direction
 - Preserve the existing school identity but make the header, brand/status tabs, filters, table and edit panel easier to scan. Provide roomier controls and responsive mobile presentation.
-- Group admins may switch brands; RIS and RPS users see their own brand only. Status tabs and filters remain usable together.
+- All signed-in staff may switch between RIS, RPS, and all brands. Status tabs and filters remain usable together.
 
 ## Verification
-- Test brand sessions cannot read or mutate another brand through any leads endpoint or query trick; group admins can access both.
+- Test the existing shared sign-in and brand/branch filters across list and export; both schools remain accessible.
 - Test separate date storage, validation, exports and sheet reconciliation without altering historical walk-in dates.
 - Check desktop and mobile views and existing sign-in, search, editing, and save behavior.
