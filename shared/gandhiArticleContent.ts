@@ -29,8 +29,13 @@ export const GANDHI_LAYOUT_CSS = `
    the sticky index from following the page scroll. */
 :host { overflow:visible; }
 .qj { top:var(--gandhi-header-height, 140px); }
-/* The site chat launcher occupies the bottom-right corner. */
-#totop { bottom:calc(100px + env(safe-area-inset-bottom)); }
+/* This page uses the chat launcher's former bottom-right position for Back to top. */
+#totop {
+  right:20px;
+  bottom:calc(20px + env(safe-area-inset-bottom));
+  width:56px;
+  height:56px;
+}
 .hero-layout > .hero-details {
   grid-template-columns:minmax(0,1.8fr) minmax(180px,.85fr) minmax(180px,.85fr);
   gap:20px;
@@ -51,5 +56,11 @@ export const GANDHI_LAYOUT_CSS = `
 @media(max-width:600px) {
   .hero-layout > .hero-details { grid-template-columns:minmax(0,1fr); gap:14px; }
   .hero-meta-card { grid-column:auto; }
+}
+@media(max-width:700px) {
+  .hero { padding-top:18px; }
+  .hero-layout { margin-top:0; gap:28px; }
+  .hero-copy .kicker { margin-top:0!important; margin-bottom:16px; }
+  .chakra-accent, .hero-art-col::before { display:none; }
 }
 `;

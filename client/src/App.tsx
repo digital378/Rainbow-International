@@ -214,12 +214,13 @@ function DeferredExtras() {
     || location === "/marketing-27-28" || location === "/overview-27-28";
   const isInternalDashboard = location === "/alliances";
   const isKioskForm = location.startsWith("/walkin-ris-27-28") || location.startsWith("/walkin-rps-27-28") || location === "/leads" || location === "/admin/walkin-2728";
+  const isGandhiArticle = location === "/gandhi-jayanti-2026";
 
   if (!ready) return null;
   return (
     <Suspense fallback={null}>
       {!isCoarsePointer && !isKioskForm && <RainbowCursor />}
-      {!isSalesDashboard && !isInternalDashboard && !isKioskForm && <ChatBot />}
+      {!isSalesDashboard && !isInternalDashboard && !isKioskForm && !isGandhiArticle && <ChatBot />}
     </Suspense>
   );
 }
