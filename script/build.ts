@@ -40,6 +40,10 @@ async function buildAll() {
 
   console.log("copying blog-pages into dist...");
   await cp("blog-pages", "dist/blog-pages", { recursive: true });
+  await cp(
+    "attached_assets/gandhi-jayanti-2026-blog-preview-v2_1790747569571.html",
+    "dist/gandhi-jayanti-2026-blog-preview-v2_1790747569571.html",
+  );
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));

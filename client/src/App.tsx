@@ -43,6 +43,7 @@ const BrandPartners = lazy(() => import("@/pages/BrandPartners"));
 const StudentsLeavingCertificate = lazy(() => import("@/pages/StudentsLeavingCertificate"));
 const Curriculum = lazy(() => import("@/pages/Curriculum"));
 const BlogPost = lazy(() => import("@/pages/BlogPost"));
+const GandhiJayanti2026 = lazy(() => import("@/pages/GandhiJayanti2026"));
 const BlogSpainArgentina = lazy(() => import("@/pages/BlogSpainArgentina"));
 const ApplicationForm = lazy(() => import("@/pages/ApplicationForm"));
 const GoogleSchool = lazy(() => import("@/pages/GoogleSchool"));
@@ -113,6 +114,7 @@ function Router() {
       <Route path="/contact-us" component={ContactUs} />
       <Route path="/academic-calendar" component={AcademicCalendar} />
       <Route path="/blogs" component={Blogs} />
+      <Route path="/blogs/gandhi-jayanti-2026-speech-essay-quotes-students" component={GandhiJayanti2026} />
       <Route path="/cbse-mandatory-public-disclosures" component={CbseDisclosures} />
       <Route path="/school-managing-committee" component={SchoolManagingCommittee} />
       <Route path="/career" component={Career} />

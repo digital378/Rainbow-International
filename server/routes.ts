@@ -22,6 +22,7 @@ const publicFriendshipLeadSchema = z.object({
 import nodemailer from "nodemailer";
 import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
+import { registerGandhiJayantiBlog } from "./gandhiJayantiBlog";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
@@ -452,6 +453,8 @@ export async function registerRoutes(
   const navratriDussehraBlogDir = path.join(process.cwd(), "blog-pages/navratri-dussehra-2026");
   app.use("/blog/navratri-dussehra-2026", express.static(navratriDussehraBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/navratri-dussehra-2026", (_req, res) => res.sendFile(path.join(navratriDussehraBlogDir, "index.html")));
+
+  registerGandhiJayantiBlog(app);
 
   registerSSRRoutes(app);
 

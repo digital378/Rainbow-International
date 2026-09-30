@@ -42,6 +42,17 @@ export interface CodeOwnedBlog {
 
 export const CODE_OWNED_BLOGS: CodeOwnedBlog[] = [
   {
+    slug: "gandhi-jayanti-2026-speech-essay-quotes-students",
+    title: "Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi & Marathi",
+    date: "28 Sep 2026",
+    publishedAt: "2026-09-28",
+    cat: "Events",
+    intro: "Speeches, essays and 10 lines in English, Hindi and Marathi, plus history, stories, quotes, a quiz and school activities for 2 October.",
+    accentColor: "#B8753C",
+    emoji: "🕊️",
+    badge: "NEW",
+  },
+  {
     slug: "navratri-dussehra-2026",
     title: "Navratri & Dussehra 2026 | Rainbow International School",
     date: "1 Oct 2026",
