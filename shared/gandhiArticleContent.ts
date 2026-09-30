@@ -24,6 +24,13 @@ export function prepareGandhiArticle(source: string): string {
 
 export const GANDHI_LAYOUT_CSS = `
 /* Article-specific corrections; shared site chrome stays untouched. */
+/* The source article gave body overflow-x:hidden; after scoping body to the
+   shadow host, that creates a non-scrolling overflow ancestor and prevents
+   the sticky index from following the page scroll. */
+:host { overflow:visible; }
+.qj { top:var(--gandhi-header-height, 140px); }
+/* The site chat launcher occupies the bottom-right corner. */
+#totop { bottom:calc(100px + env(safe-area-inset-bottom)); }
 .hero-layout > .hero-details {
   grid-template-columns:minmax(0,1.8fr) minmax(180px,.85fr) minmax(180px,.85fr);
   gap:20px;

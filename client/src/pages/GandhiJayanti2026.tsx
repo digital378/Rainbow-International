@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "wouter";
-import { ArrowLeft, Copy, MessageCircle } from "lucide-react";
+import { Copy, MessageCircle } from "lucide-react";
 import sourceHtml from "../../../attached_assets/gandhi-jayanti-2026-blog-preview-v2_1790747569571.html?raw";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -163,6 +163,7 @@ export default function GandhiJayanti2026() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(140);
   const relatedPosts = CODE_OWNED_BLOGS
     .filter(post => post.slug !== "gandhi-jayanti-2026")
     .slice(0, 3);
@@ -193,6 +194,16 @@ export default function GandhiJayanti2026() {
     fontLink.href = FONT_STYLESHEET;
     fontLink.dataset.gandhiFonts = "true";
     if (!fontLink.isConnected) document.head.appendChild(fontLink);
+  }, []);
+
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>('header[role="banner"]');
+    if (!header) return;
+    const measure = () => setHeaderHeight(Math.ceil(header.getBoundingClientRect().height));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
   }, []);
 
   const mountArticle = useCallback((node: HTMLDivElement | null) => {
@@ -574,7 +585,11 @@ export default function GandhiJayanti2026() {
         jsonLd={articleParts?.jsonLd}
       />
       <Navbar />
-      <nav aria-label="Breadcrumb" className="border-b border-[#e6dcc7] bg-[#fffdf9]">
+      <nav
+        aria-label="Breadcrumb"
+        className="border-b border-[#e6dcc7] bg-[#fffdf9]"
+        style={{ marginTop: headerHeight - 140 }}
+      >
         <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 text-sm text-slate-600">
           <Link href="/" className="hover:text-blue-800">Home</Link><span aria-hidden="true">›</span>
           <Link href="/blogs" className="hover:text-blue-800">Blogs</Link><span aria-hidden="true">›</span>
@@ -583,25 +598,16 @@ export default function GandhiJayanti2026() {
       </nav>
 
       <main>
-        <div ref={hostRef} className="gandhi-jayanti-article" aria-label={H1}>
+        <div
+          ref={hostRef}
+          className="gandhi-jayanti-article"
+          aria-label={H1}
+          style={{ "--gandhi-header-height": `${headerHeight}px` } as React.CSSProperties}
+        >
           {!articleParts && <p className="mx-auto max-w-4xl p-8 text-red-700">The Gandhi Jayanti article could not be loaded.</p>}
           {shadowArticle}
           {quiz}
           {liveShare}
-        </div>
-
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-t border-slate-100 px-4 py-8">
-          <Link href="/blogs" className="inline-flex items-center gap-2 font-semibold text-[#0d3b86] hover:underline">
-            <ArrowLeft size={16} aria-hidden="true" /> All Blogs
-          </Link>
-          <div className="flex flex-wrap gap-2">
-            <a href={`https://wa.me/?text=${encodeURIComponent(`${TITLE}\n${PAGE_URL}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">
-              <MessageCircle size={16} aria-hidden="true" /> Share this guide
-            </a>
-            <button type="button" onClick={async () => setToast(await copyText(window.location.href) ? "Link copied" : "Could not copy link")} className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">
-              <Copy size={16} aria-hidden="true" /> Copy link
-            </button>
-          </div>
         </div>
 
         <section aria-labelledby="gandhi-related-title" className="border-t border-[#e6dcc7] bg-[#fffdf9] py-16">
