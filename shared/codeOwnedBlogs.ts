@@ -42,7 +42,7 @@ export interface CodeOwnedBlog {
 
 export const CODE_OWNED_BLOGS: CodeOwnedBlog[] = [
   {
-    slug: "gandhi-jayanti-2026-speech-essay-quotes-students",
+    slug: "gandhi-jayanti-2026",
     title: "Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi & Marathi",
     date: "28 Sep 2026",
     publishedAt: "2026-09-28",

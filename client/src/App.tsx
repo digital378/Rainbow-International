@@ -114,7 +114,7 @@ function Router() {
       <Route path="/contact-us" component={ContactUs} />
       <Route path="/academic-calendar" component={AcademicCalendar} />
       <Route path="/blogs" component={Blogs} />
-      <Route path="/blogs/gandhi-jayanti-2026-speech-essay-quotes-students" component={GandhiJayanti2026} />
+      <Route path="/gandhi-jayanti-2026" component={GandhiJayanti2026} />
       <Route path="/cbse-mandatory-public-disclosures" component={CbseDisclosures} />
       <Route path="/school-managing-committee" component={SchoolManagingCommittee} />
       <Route path="/career" component={Career} />

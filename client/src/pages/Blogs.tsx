@@ -45,6 +45,7 @@ const pinnedSlugs = new Set(pinnedCards.map((c) => c.slug));
 
 /** Build the canonical clean URL for a listing card. */
 function cardHref(blog: BlogCard): string {
+  if (blog.slug === "gandhi-jayanti-2026") return "/gandhi-jayanti-2026";
   const path = `/blog/${blog.slug}`;
   return path;
 }

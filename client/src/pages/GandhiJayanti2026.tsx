@@ -9,8 +9,9 @@ import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { ContactForm } from "@/components/home/ContactForm";
 import { CODE_OWNED_BLOGS } from "@shared/codeOwnedBlogs";
+import { GANDHI_LAYOUT_CSS, GANDHI_PATH, prepareGandhiArticle } from "@shared/gandhiArticleContent";
 
-const PAGE_URL = "https://rainbowinternationalschool.in/blogs/gandhi-jayanti-2026-speech-essay-quotes-students";
+const PAGE_URL = `https://rainbowinternationalschool.in${GANDHI_PATH}`;
 const TITLE = "Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi & Marathi";
 const DESCRIPTION = "Gandhi Jayanti 2026 is Friday, 2 October. Speeches, essays, 10 lines in English, Hindi & Marathi, stories, quotes, slogans, quiz and school ideas.";
 const H1 = "Gandhi Jayanti 2026: History, Speech, Essay, Quotes, Stories & Activities for Students";
@@ -27,7 +28,7 @@ type QuizQuestion = { q: string; o: string[]; a: number; w: string };
 
 function readSource(): ArticleParts | null {
   if (typeof DOMParser === "undefined") return null;
-  const doc = new DOMParser().parseFromString(sourceHtml, "text/html");
+  const doc = new DOMParser().parseFromString(prepareGandhiArticle(sourceHtml), "text/html");
   const style = doc.querySelector("head style")?.textContent ?? "";
   const hero = doc.querySelector("body > .hero");
   const chapterNav = doc.querySelector("body > .qj");
@@ -37,7 +38,11 @@ function readSource(): ArticleParts | null {
   if (!hero || !chapterNav || !intro || !article) return null;
 
   hero.querySelector(".crumbs")?.remove();
-  hero.querySelector(".share-row")?.remove();
+  const heroShare = hero.querySelector(".share-row");
+  if (heroShare) {
+    heroShare.innerHTML = "";
+    heroShare.setAttribute("data-live-share-host", "");
+  }
   const jsonLdScript = doc.querySelector('script[type="application/ld+json"]')?.textContent;
   const quizSource = doc.body.innerHTML.match(/(?:window\.)?QUIZ\s*=\s*(\[[\s\S]*?\]);/)?.[1];
   let jsonLd: Record<string, unknown> | undefined;
@@ -55,12 +60,11 @@ function readSource(): ArticleParts | null {
     .replace(/:host\s*\{/, ":host{display:block;min-width:0;background:var(--bg);color:var(--text);--reader:19px;");
   const markup = [
     hero.outerHTML,
-    `<div class="share-row" data-live-share-host></div>`,
     chapterNav.outerHTML,
     intro.outerHTML,
     article.outerHTML,
   ].join("");
-  return { css: scopedCss, html: markup, jsonLd, quiz };
+  return { css: `${scopedCss}\n${GANDHI_LAYOUT_CSS}`, html: markup, jsonLd, quiz };
 }
 
 const articleParts = readSource();
@@ -161,7 +165,7 @@ export default function GandhiJayanti2026() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const relatedPosts = CODE_OWNED_BLOGS
-    .filter(post => post.slug !== "gandhi-jayanti-2026-speech-essay-quotes-students")
+    .filter(post => post.slug !== "gandhi-jayanti-2026")
     .slice(0, 3);
 
   const canonicalBreadcrumbs = useMemo(() => [
@@ -192,13 +196,16 @@ export default function GandhiJayanti2026() {
     if (!fontLink.isConnected) document.head.appendChild(fontLink);
   }, []);
 
-  useEffect(() => {
-    const root = shadowRef.current;
-    if (!root || !articleParts) return;
-    setQuizTarget(root.querySelector<HTMLElement>("#quizbox"));
-    setShareTarget(root.querySelector<HTMLElement>("[data-live-share-host]"));
-    setActiveGenericTabs(Array.from(root.querySelectorAll("[data-tabs]"), () => 0));
-  }, [shadowRoot]);
+  const mountArticle = useCallback((node: HTMLDivElement | null) => {
+    if (!node || !articleParts) return;
+    // React owns the wrapper, but the supplied article stays a stable DOM
+    // island. Do not reapply innerHTML on state changes: that discards portals
+    // and resets the quiz, share controls and active tabs.
+    if (!node.hasChildNodes()) node.innerHTML = articleParts.html;
+    setQuizTarget(node.querySelector<HTMLElement>("#quizbox"));
+    setShareTarget(node.querySelector<HTMLElement>("[data-live-share-host]"));
+    setActiveGenericTabs(Array.from(node.querySelectorAll("[data-tabs]"), () => 0));
+  }, []);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -530,10 +537,10 @@ export default function GandhiJayanti2026() {
     <>
       <style>{articleParts.css}</style>
       <div
+        ref={mountArticle}
         className="gandhi-article-source"
         onClick={onArticleClick}
         onKeyDown={onArticleKeyDown}
-        dangerouslySetInnerHTML={{ __html: articleParts.html }}
       />
       <button
         id="totop"
@@ -612,22 +619,27 @@ export default function GandhiJayanti2026() {
           </div>
         </div>
 
-        <section aria-labelledby="gandhi-related-title" className="border-t border-slate-100 bg-slate-50 py-14">
+        <section aria-labelledby="gandhi-enquiry-title" className="bg-[#f1e8d9] px-4 pb-10 pt-14 text-center">
+          <h2 id="gandhi-enquiry-title" className="font-serif text-3xl text-[#171c25] md:text-4xl">Looking for a CBSE school in Thane?</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-base text-[#595951]">Explore admissions at Rainbow International School. Our counsellor can help you plan a campus visit.</p>
+        </section>
+        <ContactForm />
+
+        <section aria-labelledby="gandhi-related-title" className="border-t border-[#e6dcc7] bg-[#fffdf9] py-16">
           <div className="mx-auto max-w-7xl px-4">
-            <p className="mb-2 text-center text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Continue reading</p>
-            <h2 id="gandhi-related-title" className="mb-8 text-center text-2xl font-black text-[#0d3b86]">Related Articles</h2>
+            <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-[#8a623a]">Continue reading</p>
+            <h2 id="gandhi-related-title" className="mb-9 text-center font-serif text-3xl text-[#171c25] md:text-4xl">Explore more from Rainbow International School</h2>
             <div className="grid gap-5 md:grid-cols-3">
               {relatedPosts.map(post => (
-                <a key={post.slug} href={`/blog/${post.slug}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                  <span className="text-xs font-bold uppercase tracking-wide text-amber-700">{post.cat}</span>
-                  <h3 className="mt-2 text-lg font-bold leading-snug text-slate-900">{post.title}</h3>
-                  <p className="mt-2 text-xs text-slate-500">{post.date}</p>
+                <a key={post.slug} href={`/blog/${post.slug}`} className="rounded-2xl border border-[#ece4d7] bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                  <span className="text-xs font-bold uppercase tracking-wide text-[#8a623a]">{post.cat}</span>
+                  <h3 className="mt-3 font-serif text-xl leading-snug text-[#171c25]">{post.title}</h3>
+                  <p className="mt-4 text-sm text-[#68645f]">{post.date} · Read article →</p>
                 </a>
               ))}
             </div>
           </div>
         </section>
-        <ContactForm />
       </main>
       <Footer />
       {showToast}
