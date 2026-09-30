@@ -6,6 +6,12 @@ export const GANDHI_OLD_SLUG = "gandhi-jayanti-2026-speech-essay-quotes-students
 export function prepareGandhiArticle(source: string): string {
   return source
     .replaceAll(`/blogs/${GANDHI_OLD_SLUG}`, GANDHI_PATH)
+    // Remove the unpopulated gallery and both links that would otherwise jump
+    // to a missing section (in the article and the crawlable server response).
+    .replace(/<section id="images">[\s\S]*?<\/section>/, "")
+    .replace(/<a href="#images">Images<\/a>/, "")
+    .replace(/<a class="tile[^"]*" href="#images">[\s\S]*?<\/a>/, "")
+    .replace(", mahatma gandhi images", "")
     .replace(
       'Placeholder: add "Reviewed by [name, designation]" and the review date before publishing.',
       "Reviewed by Rainbow International School Team on 29th September, 2026.",

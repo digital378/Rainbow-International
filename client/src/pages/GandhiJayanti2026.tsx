@@ -7,7 +7,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { ContactForm } from "@/components/home/ContactForm";
 import { CODE_OWNED_BLOGS } from "@shared/codeOwnedBlogs";
 import { GANDHI_LAYOUT_CSS, GANDHI_PATH, prepareGandhiArticle } from "@shared/gandhiArticleContent";
 
@@ -480,20 +479,6 @@ export default function GandhiJayanti2026() {
       window.open(shareUrl(whatsApp.getAttribute("data-watext") ?? TITLE), "_blank", "noopener,noreferrer");
       return;
     }
-    const galleryTile = target.closest<HTMLElement>(".gimg");
-    if (galleryTile) {
-      const image = galleryTile.querySelector<HTMLImageElement>("img");
-      const dialog = root.querySelector<HTMLDialogElement>("#lb");
-      const lightboxImage = dialog?.querySelector<HTMLImageElement>("img");
-      if (image && dialog && lightboxImage) {
-        lightboxImage.src = image.dataset.full || image.src;
-        lightboxImage.alt = image.alt;
-        dialog.showModal();
-      }
-      return;
-    }
-    const dialog = target.closest<HTMLDialogElement>("#lb");
-    if (dialog && (target === dialog || target.closest("button"))) dialog.close();
   }, [isSpeaking, setReader]);
 
   const onArticleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -581,7 +566,7 @@ export default function GandhiJayanti2026() {
       <SEO
         title={TITLE}
         description={DESCRIPTION}
-        keywords="gandhi jayanti 2026, gandhi jayanti speech, gandhi jayanti essay, gandhi jayanti in hindi, gandhi jayanti in marathi, 10 lines on gandhi jayanti, gandhi jayanti quotes, gandhi jayanti slogans, gandhi jayanti stories for kids, gandhi jayanti activities for school, mahatma gandhi images, gandhi jayanti quiz, CBSE school Thane blog"
+        keywords="gandhi jayanti 2026, gandhi jayanti speech, gandhi jayanti essay, gandhi jayanti in hindi, gandhi jayanti in marathi, 10 lines on gandhi jayanti, gandhi jayanti quotes, gandhi jayanti slogans, gandhi jayanti stories for kids, gandhi jayanti activities for school, gandhi jayanti quiz, CBSE school Thane blog"
         canonical={PAGE_URL}
         robots="index, follow"
         appendSiteName={false}
@@ -618,12 +603,6 @@ export default function GandhiJayanti2026() {
             </button>
           </div>
         </div>
-
-        <section aria-labelledby="gandhi-enquiry-title" className="bg-[#f1e8d9] px-4 pb-10 pt-14 text-center">
-          <h2 id="gandhi-enquiry-title" className="font-serif text-3xl text-[#171c25] md:text-4xl">Looking for a CBSE school in Thane?</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-base text-[#595951]">Explore admissions at Rainbow International School. Our counsellor can help you plan a campus visit.</p>
-        </section>
-        <ContactForm />
 
         <section aria-labelledby="gandhi-related-title" className="border-t border-[#e6dcc7] bg-[#fffdf9] py-16">
           <div className="mx-auto max-w-7xl px-4">
