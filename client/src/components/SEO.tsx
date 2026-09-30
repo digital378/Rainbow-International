@@ -48,6 +48,7 @@ interface SEOProps {
   description: string;
   canonical?: string;
   ogImage?: string;
+  ogType?: "article" | "website";
   keywords?: string;
   robots?: string;
   breadcrumbs?: BreadcrumbItem[];
@@ -55,7 +56,7 @@ interface SEOProps {
   appendSiteName?: boolean;
 }
 
-export function SEO({ title, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd, appendSiteName = true }: SEOProps) {
+export function SEO({ title, description, canonical, ogImage, ogType = "website", keywords, robots, breadcrumbs, jsonLd, appendSiteName = true }: SEOProps) {
   const fullTitle = !appendSiteName || title.includes("Rainbow International") ? title : `${title} | Rainbow International School`;
   const defaultImage = "https://rainbowinternationalschool.in/opengraph.jpg";
 
@@ -86,7 +87,7 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
     setMeta("og:title", fullTitle, true);
     setMeta("og:description", description, true);
     setMeta("og:image", ogImage || defaultImage, true);
-    setMeta("og:type", "website", true);
+    setMeta("og:type", ogType, true);
     setMeta("og:locale", "en_IN", true);
     setMeta("og:site_name", "Rainbow International School", true);
     if (canonical) setMeta("og:url", canonical, true);
@@ -163,7 +164,7 @@ export function SEO({ title, description, canonical, ogImage, keywords, robots, 
       const scripts = document.querySelectorAll('script[data-seo-jsonld]');
       scripts.forEach(s => s.remove());
     };
-  }, [fullTitle, description, canonical, ogImage, keywords, robots, breadcrumbs, jsonLd]);
+  }, [fullTitle, description, canonical, ogImage, ogType, keywords, robots, breadcrumbs, jsonLd]);
 
   return null;
 }

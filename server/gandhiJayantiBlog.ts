@@ -8,7 +8,7 @@ const SOURCE = "gandhi-jayanti-2026-blog-preview-v2_1790747569571.html";
 /** Serve the same article text to crawlers before React mounts for visitors. */
 export function registerGandhiJayantiBlog(app: Express) {
   for (const oldPath of [`/blog/${GANDHI_OLD_SLUG}`, `/blogs/${GANDHI_OLD_SLUG}`, "/blog/gandhi-jayanti-2026", "/blogs/gandhi-jayanti-2026"]) {
-    app.get(oldPath, (_req, res) => res.redirect(302, GANDHI_PATH));
+    app.get(oldPath, (_req, res) => res.redirect(301, GANDHI_PATH));
   }
   app.get(GANDHI_PATH, (_req, res, next) => {
     try {

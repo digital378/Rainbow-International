@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "wouter";
 import { Copy, MessageCircle } from "lucide-react";
@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { CODE_OWNED_BLOGS } from "@shared/codeOwnedBlogs";
-import { GANDHI_LAYOUT_CSS, GANDHI_PATH, prepareGandhiArticle } from "@shared/gandhiArticleContent";
+import { GANDHI_IMAGE_URL, GANDHI_LAYOUT_CSS, GANDHI_PATH, prepareGandhiArticle } from "@shared/gandhiArticleContent";
 
 const PAGE_URL = `https://rainbowinternationalschool.in${GANDHI_PATH}`;
 const TITLE = "Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi & Marathi";
@@ -168,20 +168,10 @@ export default function GandhiJayanti2026() {
     .filter(post => post.slug !== "gandhi-jayanti-2026")
     .slice(0, 3);
 
-  const canonicalBreadcrumbs = useMemo(() => [
-    { name: "Home", href: "https://rainbowinternationalschool.in/" },
-    { name: "Blogs", href: "https://rainbowinternationalschool.in/blogs" },
-    { name: "Gandhi Jayanti 2026", href: PAGE_URL },
-  ], []);
-
   useEffect(() => {
     // The server provides the complete schema for non-JS crawlers. Once React's
     // SEO component takes over, leave only its copy in the document.
     document.querySelector('script[data-gandhi-source-jsonld]')?.remove();
-    const type = document.querySelector<HTMLMetaElement>('meta[property="og:type"]');
-    if (type) type.content = "article";
-    document.querySelector('meta[property="og:image"]')?.remove();
-    document.querySelector('meta[name="twitter:image"]')?.remove();
   }, []);
 
   useEffect(() => {
@@ -579,9 +569,10 @@ export default function GandhiJayanti2026() {
         description={DESCRIPTION}
         keywords="gandhi jayanti 2026, gandhi jayanti speech, gandhi jayanti essay, gandhi jayanti in hindi, gandhi jayanti in marathi, 10 lines on gandhi jayanti, gandhi jayanti quotes, gandhi jayanti slogans, gandhi jayanti stories for kids, gandhi jayanti activities for school, gandhi jayanti quiz, CBSE school Thane blog"
         canonical={PAGE_URL}
-        robots="index, follow"
+        robots="index, follow, max-image-preview:large, max-snippet:-1"
+        ogImage={GANDHI_IMAGE_URL}
+        ogType="article"
         appendSiteName={false}
-        breadcrumbs={canonicalBreadcrumbs}
         jsonLd={articleParts?.jsonLd}
       />
       <Navbar />

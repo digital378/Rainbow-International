@@ -1,11 +1,30 @@
 export const GANDHI_PATH = "/gandhi-jayanti-2026";
 export const GANDHI_OLD_SLUG = "gandhi-jayanti-2026-speech-essay-quotes-students";
+export const GANDHI_IMAGE_URL = "https://rainbowinternationalschool.in/images/blog/gandhi-jayanti-2026-cover.jpg";
 
 // The uploaded article remains the copy/design source for both the browser and
 // crawlable HTML. Apply editorial corrections once in both rendering paths.
 export function prepareGandhiArticle(source: string): string {
   return source
     .replaceAll(`/blogs/${GANDHI_OLD_SLUG}`, GANDHI_PATH)
+    .replace(
+      /<!-- ADD before publishing: <meta property="og:image"[^>]*> -->/,
+      `<meta property="og:image" content="${GANDHI_IMAGE_URL}">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">`,
+    )
+    .replace(
+      '<meta name="twitter:card" content="summary_large_image">',
+      `<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:image" content="${GANDHI_IMAGE_URL}">`,
+    )
+    .replace(
+      '<meta property="og:title" content="Gandhi Jayanti 2026: Speech, Essay, Quotes, Stories and Activities">',
+      '<meta property="og:title" content="Gandhi Jayanti 2026: Speech, Essay, Quotes in Hindi &amp; Marathi">',
+    )
+    .replace('article:modified_time" content="2026-09-28T09:00:00+05:30"', 'article:modified_time" content="2026-09-30T09:00:00+05:30"')
+    .replace('"dateModified": "2026-09-28",', `"dateModified": "2026-09-30",\n   "image": {"@type": "ImageObject", "url": "${GANDHI_IMAGE_URL}", "width": 1200, "height": 630},`)
+    .replace(
+      'id="wa-top" href="#"',
+      `id="wa-top" href="https://wa.me/?text=${encodeURIComponent(`Gandhi Jayanti 2026: speeches, essays and school activities — https://rainbowinternationalschool.in${GANDHI_PATH}`)}"`,
+    )
     // Remove the unpopulated gallery and both links that would otherwise jump
     // to a missing section (in the article and the crawlable server response).
     .replace(/<section id="images">[\s\S]*?<\/section>/, "")
