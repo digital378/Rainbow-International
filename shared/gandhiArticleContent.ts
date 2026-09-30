@@ -62,5 +62,17 @@ export const GANDHI_LAYOUT_CSS = `
   .hero-layout { margin-top:0; gap:28px; }
   .hero-copy .kicker { margin-top:0!important; margin-bottom:16px; }
   .chakra-accent, .hero-art-col::before { display:none; }
+  .qj-in { padding:0 20px; }
+  .qj-links { display:none; }
+  .qj-toggle {
+    width:100%;
+    min-height:52px;
+    padding:0;
+    justify-content:space-between;
+    text-align:left;
+  }
+  .qj-toggle::after { content:""!important; display:block!important; }
+  .qj-toggle[aria-expanded="true"]::after { transform:rotate(225deg) translateY(-2px); }
+  .tocpanel-in { padding:20px 24px 24px; gap:22px; }
 }
 `;
