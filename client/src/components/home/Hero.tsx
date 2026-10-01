@@ -73,8 +73,8 @@ export function Hero() {
             </button>
 
             <h1 className="text-4xl md:text-5xl xl:text-6xl font-extrabold leading-[1.08] text-white mb-4 tracking-tight">
-              Best CBSE School<br />
-              <span className="text-amber-400">in Thane</span><br />
+              Best CBSE School{" "}<br />
+              <span className="text-amber-400">in Thane</span>{" "}<br />
               <span className="text-3xl md:text-4xl xl:text-5xl">Nursery to Class 12</span>
             </h1>
 

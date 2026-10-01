@@ -399,7 +399,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
           <span class="hero-badge-dot"></span>
           Admissions Open &middot; Academic Year 2026–27
         </div>
-        <h1>Rainbow <span class="gold">International</span><br/>School</h1>
+        <h1>Best CBSE School <br/><span class="gold">in Thane</span> <br/>Nursery to Class 12</h1>
         <p class="hero-sub">Thane's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.</p>
         <div class="hero-stats">
           <div class="hero-stat"><div class="hero-stat-num">50K+</div><div class="hero-stat-label">Happy Students</div></div>
