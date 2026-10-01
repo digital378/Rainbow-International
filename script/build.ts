@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile, cp } from "fs/promises";
+import { rm, readFile, cp, readdir } from "fs/promises";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -40,6 +40,9 @@ async function buildAll() {
 
   console.log("copying blog-pages into dist...");
   await cp("blog-pages", "dist/blog-pages", { recursive: true });
+  const siteCss = (await readdir("dist/public/assets")).find(name => /^index-.*\.css$/.test(name));
+  if (!siteCss) throw new Error("Standalone Gandhi chrome requires the generated site stylesheet");
+  await cp(`dist/public/assets/${siteCss}`, "dist/blog-pages/gandhi-jayanti-2026/site.css");
   await cp(
     "attached_assets/gandhi-jayanti-2026-blog-preview-v2_1790747569571.html",
     "dist/gandhi-jayanti-2026-blog-preview-v2_1790747569571.html",

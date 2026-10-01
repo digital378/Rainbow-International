@@ -43,7 +43,6 @@ const BrandPartners = lazy(() => import("@/pages/BrandPartners"));
 const StudentsLeavingCertificate = lazy(() => import("@/pages/StudentsLeavingCertificate"));
 const Curriculum = lazy(() => import("@/pages/Curriculum"));
 const BlogPost = lazy(() => import("@/pages/BlogPost"));
-const GandhiJayanti2026 = lazy(() => import("@/pages/GandhiJayanti2026"));
 const BlogSpainArgentina = lazy(() => import("@/pages/BlogSpainArgentina"));
 const ApplicationForm = lazy(() => import("@/pages/ApplicationForm"));
 const GoogleSchool = lazy(() => import("@/pages/GoogleSchool"));
@@ -87,6 +86,14 @@ function PageFallback() {
   return <div style={{ minHeight: "100vh" }} />;
 }
 
+function GandhiStandaloneNavigation() {
+  useEffect(() => {
+    // Even a future client-side link must enter the standalone document.
+    window.location.assign(window.location.href);
+  }, []);
+  return <PageFallback />;
+}
+
 function Router() {
   return (
     <>
@@ -114,7 +121,7 @@ function Router() {
       <Route path="/contact-us" component={ContactUs} />
       <Route path="/academic-calendar" component={AcademicCalendar} />
       <Route path="/blogs" component={Blogs} />
-      <Route path="/gandhi-jayanti-2026" component={GandhiJayanti2026} />
+      <Route path="/gandhi-jayanti-2026" component={GandhiStandaloneNavigation} />
       <Route path="/cbse-mandatory-public-disclosures" component={CbseDisclosures} />
       <Route path="/school-managing-committee" component={SchoolManagingCommittee} />
       <Route path="/career" component={Career} />
@@ -184,13 +191,13 @@ function PageViewTracker() {
 
   useEffect(() => {
     initGA();
-    trackPageView(location);
+    if (location !== "/gandhi-jayanti-2026") trackPageView(location);
   }, []);
 
   useEffect(() => {
     if (prevLocation.current !== location) {
       prevLocation.current = location;
-      trackPageView(location);
+      if (location !== "/gandhi-jayanti-2026") trackPageView(location);
     }
   }, [location]);
 

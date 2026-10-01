@@ -1,0 +1,38 @@
+/*
+ * Standalone Gandhi chrome uses the page-local production CSS snapshot.
+ * Keep this entrypoint local so the shell does not rely on a hashed app asset.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@600;700;800&display=swap");
+@import url("/blog-assets/gandhi-jayanti-2026/site.css");
+
+:root {
+  --chrome-header-height: 160.5px;
+}
+
+.chrome-header-spacer {
+  height: 140px;
+}
+
+[data-chrome-breadcrumb] {
+  margin-top: calc(var(--chrome-header-height) - 140px);
+}
+
+#progress {
+  /* The shared React ScrollProgress renders nothing on this site. */
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 400;
+  width: 0;
+  height: 2px;
+  background: #b8753c;
+  pointer-events: none;
+  transition: width 80ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #progress {
+    transition: none;
+  }
+}
