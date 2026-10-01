@@ -27,7 +27,16 @@ describe("Gandhi standalone document parity", () => {
     expect(JSON.parse(doc.querySelector('script[type="application/ld+json"]')!.textContent!))
       .toEqual(JSON.parse(original.querySelector('script[type="application/ld+json"]')!.textContent!));
     const content = doc.querySelector<HTMLTemplateElement>('template[shadowrootmode="open"]')!.content;
-    expect(content.querySelector("h1")?.textContent).toBe(original.querySelector("h1")?.textContent);
+    expect(doc.querySelectorAll("h1")).toHaveLength(1);
+    expect(doc.querySelector("h1")?.textContent).toBe(original.querySelector("h1")?.textContent);
+    expect(doc.querySelector("h1")?.textContent).toBe(
+      "Gandhi Jayanti 2026 History, Speech, Essay, Quotes, Stories & Activities for Students",
+    );
+    expect(doc.querySelector("h1")?.getAttribute("slot")).toBe("gandhi-heading");
+    expect(doc.querySelector("h1")?.closest(".gandhi-jayanti-article")).not.toBeNull();
+    expect(content.querySelector("h1")).toBeNull();
+    expect(content.querySelector('slot[name="gandhi-heading"]')).not.toBeNull();
+    expect(doc.querySelector("h1")?.hasAttribute("hidden")).toBe(false);
     expect([...content.querySelectorAll("article section")].map(e => e.textContent))
       .toEqual([...original.querySelectorAll("article section")].map(e => e.textContent));
     expect(doc.querySelector('script[type="module"]')).toBeNull();

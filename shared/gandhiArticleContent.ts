@@ -6,6 +6,10 @@ export const GANDHI_IMAGE_URL = "https://rainbowinternationalschool.in/images/bl
 // crawlable HTML. Apply editorial corrections once in both rendering paths.
 export function prepareGandhiArticle(source: string): string {
   return source
+    // Line breaks/block spans are visual separators, not text-node spaces.
+    // Keep the same layout while exposing properly separated heading words.
+    .replace('<span class="t1">Gandhi<br>', '<span class="t1">Gandhi <br>')
+    .replace('Jayanti <em>2026</em></span><span class="t2">', 'Jayanti <em>2026</em></span> <span class="t2">')
     .replaceAll(`/blogs/${GANDHI_OLD_SLUG}`, GANDHI_PATH)
     .replace(
       /<!-- ADD before publishing: <meta property="og:image"[^>]*> -->/,

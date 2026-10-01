@@ -2,6 +2,7 @@ import { static as expressStatic, type Express } from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { GANDHI_PATH, GANDHI_OLD_SLUG, GANDHI_LAYOUT_CSS, prepareGandhiArticle } from "../shared/gandhiArticleContent";
+import { projectGandhiHeading } from "./gandhiHeading";
 
 const SOURCE = "gandhi-jayanti-2026-blog-preview-v2_1790747569571.html";
 const ASSET_PATH = "/blog-assets/gandhi-jayanti-2026";
@@ -40,8 +41,9 @@ export function renderGandhiStandalone(source: string, chrome: string, siteTempl
     .replace(/<nav class="crumbs"[\s\S]*?<\/nav>/, "")
     .replace(/<div class="share-row">[\s\S]*?<\/div>/,
       '<div class="share-row" data-live-share-host></div>');
+  const projectedHeading = projectGandhiHeading(hero, style);
   const intro = html.slice(mainStart, articleStart).replace(/^<main[^>]*>/, "");
-  const markup = hero + html.slice(navStart, mainStart) + intro
+  const markup = projectedHeading.hero + html.slice(navStart, mainStart) + intro
     + html.slice(articleStart, articleEnd + "</article>".length);
   // Keep the same isolation and selectors as the existing article. Declarative
   // Shadow DOM displays it at HTML parse time, including with JS disabled.
@@ -51,7 +53,7 @@ export function renderGandhiStandalone(source: string, chrome: string, siteTempl
     .replace(/\bhtml\b/g, ":host")
     .replace(/\bbody\b/g, ":host")
     .replace(/:host\s*\{/, ":host{display:block;min-width:0;background:var(--bg);color:var(--text);--reader:19px;");
-  const article = `<div class="gandhi-jayanti-article" aria-label="Gandhi Jayanti 2026: History, Speech, Essay, Quotes, Stories &amp; Activities for Students"><template shadowrootmode="open"><style>${css}\n${GANDHI_LAYOUT_CSS}</style><div class="gandhi-article-source">${markup}</div></template></div>`;
+  const article = `<div class="gandhi-jayanti-article" aria-label="Gandhi Jayanti 2026: History, Speech, Essay, Quotes, Stories &amp; Activities for Students"><template shadowrootmode="open"><style>${css}\n${GANDHI_LAYOUT_CSS}</style><div class="gandhi-article-source">${markup}</div></template>${projectedHeading.heading}</div>`;
   // Retain the existing site's measurement tags; conversion is not permission
   // to remove tracking. Only the SPA bootstrap is excluded.
   const tracking = [...siteTemplate.matchAll(/<script\b([^>]*)>[\s\S]*?<\/script>/g)]
@@ -69,7 +71,9 @@ ${siteMeta}${icons}
 <meta name="twitter:description" content="Gandhi Jayanti 2026 is Friday, 2 October. Speeches, essays, 10 lines in English, Hindi &amp; Marathi, stories, quotes, slogans, quiz and school ideas.">
 <link rel="stylesheet" href="${ASSET_PATH}/chrome.css">
 <style>
+${projectedHeading.css}
 @media print {
+  html.gandhi-print-reader .gandhi-jayanti-article > h1[slot="gandhi-heading"] { display:none!important; }
   html.gandhi-print-reader #gandhi-page > :not(main) { display:none!important; }
   html.gandhi-print-reader #gandhi-page > main > :not(.gandhi-jayanti-article) { display:none!important; }
   html.gandhi-print-reader #gandhi-page > main { display:block!important; }
