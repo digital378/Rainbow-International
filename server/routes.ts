@@ -323,7 +323,7 @@ async function sendCallbackEmail(data: { name: string; phone: string; preferredT
   console.log("[callback] Email sent to", mailer.to);
 }
 
-const CAREER_EMAIL_TO = "hr.recruiter3@rainbowinternationalschool.in";
+const CAREER_EMAIL_TO = "hr.recruiter2@rainbowinternationalschool.in";
 
 async function sendCareerEmail(
   data: {

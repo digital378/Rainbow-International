@@ -51,7 +51,7 @@ const benefits = [
 
 const HR_PHONE = "+91 87799 81827";
 const HR_PHONE_TEL = "+918779981827";
-const HR_EMAIL = "hr.recruiter3@rainbowinternationalschool.in";
+const HR_EMAIL = "hr.recruiter2@rainbowinternationalschool.in";
 
 const ACCEPTED_RESUME_TYPES = ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_RESUME_BYTES = 5 * 1024 * 1024;

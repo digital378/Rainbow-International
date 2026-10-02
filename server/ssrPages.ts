@@ -1132,7 +1132,7 @@ ${jobs.map(j => `<div class="card">
 </div>`).join("")}
 
 <h2>How to Apply</h2>
-<p>Send your CV and a brief cover letter to <a href="mailto:hr.recruiter3@rainbowinternationalschool.in">hr.recruiter3@rainbowinternationalschool.in</a>. Our HR team will contact shortlisted candidates within 3–5 working days.</p>
+<p>Send your CV and a brief cover letter to <a href="mailto:hr.recruiter2@rainbowinternationalschool.in">hr.recruiter2@rainbowinternationalschool.in</a>. Our HR team will contact shortlisted candidates within 3–5 working days.</p>
 
 <p>Learn more about our school at <a href="/about-rainbow-international-school">About Rainbow International School</a>.</p>
 </div>`;
