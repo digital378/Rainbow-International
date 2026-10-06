@@ -120,7 +120,7 @@ export function AcademicSections() {
             Academic Programmes <span style={{ color: "#091a4f" }}>at a Glance</span>
           </h2>
           <p className="text-gray-500 text-base max-w-md mx-auto">
-            From Nursery to Class 12 — a complete CBSE learning journey under one roof.
+            From KG to Class 12 — a complete CBSE learning journey under one roof.
           </p>
         </div>
 

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { isProtectedSeoPath, normalizePageSchemas } from "@shared/orgSchema";
 
 // Must match the server-side document policy in server/pageTitles.ts.
 // Keeping this small client mirror lets the SEO component reset robots tags
@@ -139,7 +140,11 @@ export function SEO({ title, description, canonical, ogImage, ogType = "website"
       document.head.appendChild(script);
     }
 
-    if (jsonLd) {
+    if (!isProtectedSeoPath(window.location.pathname)) {
+      const pageLd = {
+        "@context": "https://schema.org",
+        "@graph": normalizePageSchemas(jsonLd ? [jsonLd] : []),
+      };
       // Remove server-injected scripts whose @type the client is replacing.
       // Handles both plain {"@type": X} and {"@graph": [...]} payloads.
       const clientTypes = new Set<string>();
@@ -147,15 +152,15 @@ export function SEO({ title, description, canonical, ogImage, ogType = "website"
         const t = node["@type"];
         (Array.isArray(t) ? t : [t]).forEach(v => v && clientTypes.add(String(v)));
       };
-      collect(jsonLd);
-      const graph = jsonLd["@graph"];
+      collect(pageLd);
+      const graph = pageLd["@graph"];
       if (Array.isArray(graph)) graph.forEach(n => n && typeof n === "object" && collect(n as Record<string, unknown>));
       clientTypes.forEach(removeServerScript);
 
       const script = document.createElement("script");
       script.type = "application/ld+json";
       script.setAttribute("data-seo-jsonld", "page");
-      script.textContent = JSON.stringify(jsonLd);
+      script.textContent = JSON.stringify(pageLd);
       document.head.appendChild(script);
     }
 

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { CRAWLER_UA_RE } from "./crawlerUa";
 import { ROUTE_SEO, routeCanonical } from "@shared/routeSeo";
-import { ALL_FAQS_PAGE_ITEMS, ADMISSIONS_FAQS, buildFaqPageLd } from "@shared/faqData";
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 
 function e(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -151,7 +151,7 @@ ${categories.map(c => `<div class="card"><h3>${e(c)}</h3><p>Two research-backed 
 
 function renderTopSchools(): string {
   const schools = [
-    { rank: 1, name: "Rainbow International School", board: "CBSE", grades: "Nursery – Class 12", highlights: "3.5-acre campus, K-12 pathway, MI pedagogy, British Council ISA, 30+ extracurriculars, GPS-tracked transport" },
+    { rank: 1, name: "Rainbow International School", board: "CBSE", grades: "KG – Class 12", highlights: "3.5-acre campus, K-12 pathway, MI pedagogy, British Council ISA, 30+ extracurriculars, GPS-tracked transport" },
     { rank: 2, name: "Smt. Sulochanadevi Singhania School", board: "ICSE/ISC", grades: "Nursery – Class 12", highlights: "Strong ICSE academics, established reputation" },
     { rank: 3, name: "Vasant Vihar High School", board: "SSC/CBSE", grades: "Nursery – Class 10", highlights: "Dual board, affordable, community-focused" },
     { rank: 4, name: "DAV Public School", board: "CBSE", grades: "Class 1 – 12", highlights: "Strong CBSE academics, value-based education" },
@@ -213,7 +213,7 @@ function renderFAQs(): string {
     { title: "Admissions", faqs: [
       { q: "What is the admission process?", a: "Submit an online application, attend an interaction session. For Class 9+, there is a written assessment. Applications are accepted on a first-come, first-served basis." },
       { q: "What is the age criteria?", a: "Nursery: 2.5 years, Jr KG: 3.5 years, Sr KG: 4.5 years, Class 1: 6 years — as on 31st March of the academic year, per CBSE norms." },
-      { q: "When do admissions open?", a: "Admissions for 2026–27 are currently open. Early application is recommended as seats fill quickly." },
+      { q: "When do admissions open?", a: "Admissions for 2027–28 are currently open. Early application is recommended as seats fill quickly." },
     ]},
     { title: "Academics", faqs: [
       { q: "Which board is the school affiliated to?", a: "CBSE (Central Board of Secondary Education), Affiliation No. 1130661." },
@@ -252,7 +252,7 @@ function renderAbout(): string {
   return `
 <div class="section">
 <h2>About Rainbow International School</h2>
-<p>Rainbow International School was founded in April 2009 with a vision to provide world-class education rooted in Indian values. Located on a sprawling 3.5-acre campus in Brahmand Phase 4, Thane, we are one of the leading CBSE-affiliated K–12 schools in Maharashtra, serving over 3,000 students from Nursery to Class 12.</p>
+<p>Rainbow International School was founded in April 2009 with a vision to provide world-class education rooted in Indian values. Located on a sprawling 3.5-acre campus in Brahmand Phase 4, Thane, we are one of the leading CBSE-affiliated K–12 schools in Maharashtra, serving over 3,000 students from KG to Class 12.</p>
 
 <h2>Our Legacy</h2>
 <p>Over the past 17 years, Rainbow International School has impacted more than 1 lakh students. We have consistently been recognised as one of the Best Schools in Thane, earning accolades from national education bodies, the British Council (International School Award), Google for Education, and Meta for Education.</p>
@@ -261,7 +261,7 @@ function renderAbout(): string {
 <p>Our 3.5-acre campus features smart classrooms, fully equipped science and computer labs, a 10,000+ book library, a temperature-controlled swimming pool, skating rink, basketball and football courts, a 500-seat amphitheatre, art and music studios, an organic farm, and a dedicated pre-primary wing with all-female staff.</p>
 
 <h2>Academic Excellence</h2>
-<p>Affiliated to CBSE (Affiliation No. 1130661), we offer classes from Nursery to Class 12 with three streams in senior secondary: Science, Commerce, and Humanities. Our pedagogy is based on the Multiple Intelligence framework, emphasising experiential, project-based, and collaborative learning.</p>
+<p>Affiliated to CBSE (Affiliation No. 1130661), we offer classes from KG to Class 12 with three streams in senior secondary: Science, Commerce, and Humanities. Our pedagogy is based on the Multiple Intelligence framework, emphasising experiential, project-based, and collaborative learning.</p>
 
 <h2>Holistic Development</h2>
 <p>Beyond academics, we offer 30+ extracurricular activities including swimming, skating, robotics, coding, MUN, art, music, dance, drama, cricket, football, and organic farming. Our students regularly participate in inter-school competitions, science exhibitions, and national-level events.</p>
@@ -398,7 +398,7 @@ function renderPrimary(): string {
 <h2>Parent Decision Checklist</h2>
 <p>Choosing a primary school is a long-term decision. We encourage every family to walk the campus, meet a class teacher, see a working classroom, ask about library and lab access, understand assessment philosophy, check transport routes and discuss any specific concerns about their child. Rainbow International School welcomes detailed conversations because we know that the right fit between the child, the family and the school is what makes the primary years successful.</p>
 
-<p>Ready to explore further? Visit our <a href="/pre-primary-school-thane">Pre-Primary section</a>, our <a href="/middle-school-section">Middle School</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
+<p>Ready to explore further? Visit our <a href="/pre-primary-school-thane">Pre-Primary section</a>, our <a href="/middle-school-section">Middle School</a>, or <a href="/admissions">apply for the 2027–28 academic year</a>.</p>
 </div>`;
 }
 
@@ -500,7 +500,7 @@ function renderMiddleSchool(): string {
 <h2>Parent Decision Checklist</h2>
 <p>If you are choosing a CBSE middle school in Thane for Class 6, Class 7 or Class 8, we encourage you to visit the campus, observe a classroom in session, talk to a subject teacher, ask about study load and homework policy, see the labs and library, check the bus route from your area and discuss any specific learning needs your child may have. Rainbow International School welcomes these detailed conversations because the right fit makes the middle school years deeply rewarding.</p>
 
-<p>Explore our <a href="/primary-section">Primary section</a>, our <a href="/secondary-section">Secondary section</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
+<p>Explore our <a href="/primary-section">Primary section</a>, our <a href="/secondary-section">Secondary section</a>, or <a href="/admissions">apply for the 2027–28 academic year</a>.</p>
 </div>`;
 }
 
@@ -601,7 +601,7 @@ function renderSecondary(): string {
 <h2>Parent Decision Checklist</h2>
 <p>If you are choosing a CBSE secondary school in Thane for Class 9 or Class 10, we encourage you to visit the campus, observe a classroom, see the science labs, talk to a subject teacher about board preparation, ask about pre-board strategy, check transport availability from your area and understand how the school supports students who need extra help. Rainbow International School welcomes these detailed conversations because a well-informed family choice is the strongest start to the board years.</p>
 
-<p>Explore our <a href="/middle-school-section">Middle School</a>, our <a href="/senior-secondary-section">Senior Secondary section</a>, or <a href="/admissions">apply for the 2026–27 academic year</a>.</p>
+<p>Explore our <a href="/middle-school-section">Middle School</a>, our <a href="/senior-secondary-section">Senior Secondary section</a>, or <a href="/admissions">apply for the 2027–28 academic year</a>.</p>
 </div>`;
 }
 
@@ -709,7 +709,7 @@ function renderSeniorSecondary(): string {
 <h2>Parent and Student Decision Checklist</h2>
 <p>If you are choosing a CBSE senior secondary school in Thane for Class 11 or Class 12, we encourage you to visit the campus, talk to subject teachers in your stream of interest, see the labs, understand the pre-board and board preparation plan, ask about career counselling and university support, and discuss any specific aspirations or concerns. Rainbow International School welcomes these detailed conversations because the right fit between the student, the family and the school makes the senior secondary years truly transformative.</p>
 
-<p>Explore our <a href="/secondary-section">Secondary section</a>, learn more about <a href="/admissions">2026–27 admissions</a>, or call us at <strong>+91 82915 68972</strong>.</p>
+<p>Explore our <a href="/secondary-section">Secondary section</a>, learn more about <a href="/admissions">2027–28 admissions</a>, or call us at <strong>+91 82915 68972</strong>.</p>
 </div>`;
 }
 
@@ -723,8 +723,8 @@ function renderContact(): string {
 <ul>
 <li><strong>Address:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607, India</li>
 <li><strong>Phone:</strong> +91 82915 68972</li>
-<li><strong>Landline:</strong> (022) 69105000</li>
-<li><strong>Email:</strong> info@rainbowinternationalschool.in</li>
+<li><strong>Landline:</strong> +91 82915 68972</li>
+<li><strong>Email:</strong> admin@rainbowinternationalschool.in</li>
 <li><strong>Working Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</li>
 </ul>
 
@@ -851,9 +851,9 @@ function renderSafety(): string {
 function renderAdmissions(): string {
   return `
 <div class="section">
-<h2>Admissions Open 2026–27 at Rainbow International School, Thane</h2>
-<p>Admissions are now open at Rainbow International School, a CBSE school in Thane, for the 2026–27 academic year. We are accepting applications across all grades — Nursery, Junior KG, Senior KG, Class 1 through Class 8, Class 9, Class 10, Class 11 (Science, Commerce and Humanities) and Class 12. Whether you are looking for a Nursery seat near Hiranandani Estate, a Class 1 admission near Brahmand Phase 4, a Class 6 transfer from another school in Thane, or a Class 11 stream change after Class 10 results, our admissions team will guide you through every step with clarity and care.</p>
-<p>Rainbow International School has been part of the Thane parent community since 2009. Over the years, more than 3,000 students from Brahmand, Manpada, Pokhran Road, Dhokali, Hiranandani Estate, Patlipada, Waghbil, Kavesar, Owale, Kolshet and surrounding neighbourhoods have called this 3.5-acre campus their school home. The 2026–27 admission cycle continues that tradition, offering a CBSE-aligned, future-ready learning environment from Nursery to Class 12 under one roof.</p>
+<h2>Admissions Open 2027–28 at Rainbow International School, Thane</h2>
+<p>Admissions are now open at Rainbow International School, a CBSE school in Thane, for the 2027–28 academic year. We are accepting applications across all grades — Nursery, Junior KG, Senior KG, Class 1 through Class 8, Class 9, Class 10, Class 11 (Science, Commerce and Humanities) and Class 12. Whether you are looking for a Nursery seat near Hiranandani Estate, a Class 1 admission near Brahmand Phase 4, a Class 6 transfer from another school in Thane, or a Class 11 stream change after Class 10 results, our admissions team will guide you through every step with clarity and care.</p>
+<p>Rainbow International School has been part of the Thane parent community since 2009. Over the years, more than 3,000 students from Brahmand, Manpada, Pokhran Road, Dhokali, Hiranandani Estate, Patlipada, Waghbil, Kavesar, Owale, Kolshet and surrounding neighbourhoods have called this 3.5-acre campus their school home. The 2027–28 admission cycle continues that tradition, offering a CBSE-aligned, future-ready learning environment from KG to Class 12 under one roof.</p>
 
 <h2>Admission Process Overview</h2>
 <p>Our admission process is designed to be simple, transparent and parent-friendly. We do not believe in entrance hurdles for young learners. Instead, we focus on getting to know each child and family so we can welcome them into the right grade with the right support from day one.</p>
@@ -865,19 +865,19 @@ function renderAdmissions(): string {
 <li><strong>Step 5 — Confirmation & Onboarding:</strong> Once the seat is offered, complete the fee formalities and receive your welcome kit, uniform list, transport route confirmation and class teacher introduction before the academic year begins.</li>
 </ol>
 
-<h2>Grade-wise Admissions — Nursery to Class 12</h2>
+<h2>Grade-wise Admissions — KG to Class 12</h2>
 
 <h3>Nursery, Junior KG and Senior KG Admissions in Thane</h3>
 <p>Pre-Primary admissions are typically the most sought-after seats every year. We offer Nursery, Junior KG and Senior KG admissions for children aged 2.5 years and above as on 31st March 2026. The Pre-Primary wing operates with a 100% female teaching team, dedicated nap and play zones, age-appropriate furniture, and a play-based curriculum that gently builds early language, numeracy, motor and social skills.</p>
 
 <h3>Class 1 to Class 5 Admissions in Thane</h3>
-<p>Primary admissions for Class 1, Class 2, Class 3, Class 4 and Class 5 are open for 2026–27. The primary years build strong literacy, numeracy and inquiry foundations through experiential learning, daily reading, mental maths, EVS investigations, art, music, sports and computer literacy. New entrants from other Thane schools are supported with a friendly orientation week and a bridge-learning plan where needed.</p>
+<p>Primary admissions for Class 1, Class 2, Class 3, Class 4 and Class 5 are open for 2027–28. The primary years build strong literacy, numeracy and inquiry foundations through experiential learning, daily reading, mental maths, EVS investigations, art, music, sports and computer literacy. New entrants from other Thane schools are supported with a friendly orientation week and a bridge-learning plan where needed.</p>
 
 <h3>Class 6 to Class 8 Admissions in Thane</h3>
 <p>Class 6, Class 7 and Class 8 admissions welcome students moving from another school or progressing from our own primary section. The middle school curriculum deepens subject knowledge in English, Hindi, Mathematics, Science, Social Science and a third language (Sanskrit or French), with strong emphasis on study skills, project work and confidence building.</p>
 
 <h3>Class 9 and Class 10 Admissions in Thane</h3>
-<p>Class 9 admissions and limited Class 10 admissions are available for the 2026–27 session. Students appear for a brief written assessment in core subjects to help us plan academic support. Once admitted, students follow a structured CBSE Class 10 board preparation programme that includes regular tests, doubt-clearing classes and exam strategy workshops.</p>
+<p>Class 9 admissions and limited Class 10 admissions are available for the 2027–28 session. Students appear for a brief written assessment in core subjects to help us plan academic support. Once admitted, students follow a structured CBSE Class 10 board preparation programme that includes regular tests, doubt-clearing classes and exam strategy workshops.</p>
 
 <h3>Class 11 and Class 12 Admissions in Thane</h3>
 <p>Senior Secondary admissions for Class 11 are open across Science, Commerce and Humanities streams. Class 12 admissions are considered on a case-by-case basis subject to subject availability and CBSE transfer norms. Stream selection counselling is offered to every Class 10 student so that the choice is based on aptitude and aspiration, not pressure.</p>
@@ -894,7 +894,7 @@ function renderAdmissions(): string {
 <li>For Class 11 admissions, the Class 10 mark sheet is required at the time of confirmation</li>
 </ul>
 
-<h2>Age Criteria for 2026–27</h2>
+<h2>Age Criteria for 2027–28</h2>
 <ul>
 <li><strong>Nursery:</strong> 2.5 years as on 31st March 2026</li>
 <li><strong>Junior KG:</strong> 3.5 years as on 31st March 2026</li>
@@ -935,8 +935,8 @@ function renderAdmissions(): string {
 
 <h2>Frequently Asked Questions about Admissions</h2>
 
-<h3>When do admissions open for 2026–27?</h3>
-<p>Admissions for the 2026–27 academic year are open now. Pre-Primary and Class 1 seats fill the fastest, so we recommend submitting your enquiry as early as possible.</p>
+<h3>When do admissions open for 2027–28?</h3>
+<p>Admissions for the 2027–28 academic year are open now. Pre-Primary and Class 1 seats fill the fastest, so we recommend submitting your enquiry as early as possible.</p>
 
 <h3>Is there an entrance test for Nursery or Class 1?</h3>
 <p>No. There is no formal entrance test for Pre-Primary or Class 1. Instead, we hold a friendly interaction with the child and parents to understand readiness and family expectations.</p>
@@ -957,9 +957,9 @@ function renderAdmissions(): string {
 <p>We operate routes across Brahmand, Hiranandani Estate, Manpada, Pokhran Road, Dhokali, Patlipada, Waghbil, Kavesar, Owale, Kolshet, Majiwada and surrounding areas. Confirm your route during the admission visit.</p>
 
 <h3>How do I begin the admission process?</h3>
-<p>Call +91 82915 68972, write to info@rainbowinternationalschool.in, or use the application form on this page. We will guide you through enquiry, campus visit, interaction and confirmation.</p>
+<p>Call +91 82915 68972, write to admin@rainbowinternationalschool.in, or use the application form on this page. We will guide you through enquiry, campus visit, interaction and confirmation.</p>
 
-<p>Ready to begin? <a href="/application-form">Start your 2026–27 application</a> or call us at <strong>+91 82915 68972</strong>. You can also explore our <a href="/primary-section">Primary</a>, <a href="/middle-school-section">Middle</a>, <a href="/secondary-section">Secondary</a> and <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
+<p>Ready to begin? <a href="/application-form">Start your 2027–28 application</a> or call us at <strong>+91 82915 68972</strong>. You can also explore our <a href="/primary-section">Primary</a>, <a href="/middle-school-section">Middle</a>, <a href="/secondary-section">Secondary</a> and <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
 </div>`;
 }
 
@@ -1013,7 +1013,7 @@ function renderLocalityBrahmand(): string {
 <h2>Why Brahmand Families Choose Rainbow</h2>
 <ul>
 <li>Walking distance — no long commutes for young children</li>
-<li>K–12 under one roof (Nursery to Class 12, CBSE)</li>
+<li>K–12 under one roof (KG to Class 12, CBSE)</li>
 <li>3.5-acre campus with world-class facilities</li>
 <li>200+ CCTV cameras, on-campus nurse, GPS-tracked buses</li>
 <li>3,000+ students — largest school community in Brahmand</li>
@@ -1043,14 +1043,14 @@ function renderLocalityGhodbunder(): string {
 <h2>Why GB Road Families Choose Rainbow</h2>
 <ul>
 <li>Dedicated bus routes covering the entire GB Road corridor</li>
-<li>Complete K–12 CBSE school (Nursery to Class 12)</li>
+<li>Complete K–12 CBSE school (KG to Class 12)</li>
 <li>3.5-acre campus with swimming pool, skating rink, labs, amphitheatre</li>
 <li>Award-winning school — British Council ISA, Google & Meta partnerships</li>
 <li>3,000+ students, rated 4.8/5 by parents</li>
 <li>GPS-tracked transport with trained attendants</li>
 </ul>
 
-<p>Contact us at <strong>+91 82915 68972</strong> or <a href="/admissions">apply for 2026–27</a>.</p>
+<p>Contact us at <strong>+91 82915 68972</strong> or <a href="/admissions">apply for 2027–28</a>.</p>
 </div>`;
 }
 
@@ -1073,7 +1073,7 @@ function renderLocalityManpada(): string {
 <h2>Why Manpada Families Choose Rainbow</h2>
 <ul>
 <li>5 minutes from Manpada — convenient daily commute</li>
-<li>Nursery to Class 12 CBSE with Science, Commerce, and Humanities</li>
+<li>KG to Class 12 CBSE with Science, Commerce, and Humanities</li>
 <li>3.5-acre campus with smart classrooms, labs, pool, rink, amphitheatre</li>
 <li>Award-winning school — Best School in Thane multiple years</li>
 <li>Dedicated bus routes covering Manpada, Pokhran Road, Majiwada</li>
@@ -1359,7 +1359,7 @@ function renderCurriculum(): string {
   ];
   return `
 <div class="section">
-<h2>CBSE-Aligned Curriculum from Nursery to Class 12</h2>
+<h2>CBSE-Aligned Curriculum from KG to Class 12</h2>
 <p>Rainbow International School follows the CBSE curriculum framework — one of India's most rigorous and widely respected educational standards. Our curriculum spans all stages from Pre-Primary to Class 12, balancing academic depth with holistic development.</p>
 
 ${stages.map(s => `<div class="card">
@@ -1387,8 +1387,8 @@ function renderCbseDisclosures(): string {
     { label: "School Code", value: "27231" },
     { label: "Board", value: "Central Board of Secondary Education (CBSE)" },
     { label: "Address", value: "Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607" },
-    { label: "Contact", value: "(022) 69105000" },
-    { label: "Email", value: "info@rainbowinternationalschool.in" },
+    { label: "Contact", value: "+91 82915 68972" },
+    { label: "Email", value: "admin@rainbowinternationalschool.in" },
     { label: "Principal", value: "Available on request" },
     { label: "School Category", value: "Senior Secondary (Classes 1–12)" },
     { label: "Affiliation Period", value: "2022–2027" },
@@ -1412,7 +1412,7 @@ ${generalInfo.map(r => `<div class="card"><p><strong>${e(r.label)}:</strong> ${e
 <h2>D. Staff (Teaching)</h2>
 <div class="card"><p>All teaching staff hold recognised qualifications as per CBSE norms — B.Ed./M.Ed. for trained graduates, PG degrees for post-graduate teachers. The school employs qualified PRTs (Primary Teachers), TGTs (Trained Graduate Teachers), and PGTs (Post Graduate Teachers) across all sections.</p></div>
 
-<p>For detailed disclosures or document verification, contact us at <a href="mailto:info@rainbowinternationalschool.in">info@rainbowinternationalschool.in</a> or visit our <a href="/contact-us">Contact page</a>.</p>
+<p>For detailed disclosures or document verification, contact us at <a href="mailto:admin@rainbowinternationalschool.in">admin@rainbowinternationalschool.in</a> or visit our <a href="/contact-us">Contact page</a>.</p>
 </div>`;
 }
 
@@ -1591,7 +1591,7 @@ function renderChairpersonsNote(): string {
 <p>When Rainbow International School was founded in April 2009, our vision was clear: to create a school that would become a second home for children — a place where they would be challenged, supported, celebrated, and above all, loved.</p>
 
 <h2>Our Journey</h2>
-<p>Over the past 17 years, we have had the privilege of serving over 1 lakh students and their families. What began as a dream has grown into one of Thane's most respected CBSE K–12 institutions, with over 3,000 students across Nursery to Class 12, a dedicated team of 150+ educators, and a sprawling 3.5-acre campus that continues to evolve with the needs of modern education.</p>
+<p>Over the past 17 years, we have had the privilege of serving over 1 lakh students and their families. What began as a dream has grown into one of Thane's most respected CBSE K–12 institutions, with over 3,000 students across KG to Class 12, a dedicated team of 150+ educators, and a sprawling 3.5-acre campus that continues to evolve with the needs of modern education.</p>
 
 <h2>Our Promise</h2>
 <p>We are committed to providing every child — regardless of their background or learning style — with an education that equips them for life. This means investing in our teachers, continuously upgrading our infrastructure, embracing the best of global pedagogies, and keeping the student at the centre of every decision we make.</p>
@@ -1627,7 +1627,7 @@ ${categories.map(c => `<div class="card">
 <h2>Visit Us in Person</h2>
 <p>Photographs can only capture a glimpse of what makes Rainbow International School special. We invite you to experience our campus firsthand — meet our educators, explore our facilities, and see Rainbow's vibrant learning environment come alive.</p>
 
-<p><a href="/contact-us">Schedule a campus visit</a> or <a href="/admissions">apply for admissions 2026–27</a>.</p>
+<p><a href="/contact-us">Schedule a campus visit</a> or <a href="/admissions">apply for admissions 2027–28</a>.</p>
 </div>`;
 }
 
@@ -1641,9 +1641,9 @@ function renderScheduleAppointment(): string {
 <h3>Book an Appointment</h3>
 <p>To schedule a campus visit or meeting with our admissions team, reach out to us through any of the following:</p>
 <ul>
-<li><strong>Phone:</strong> <a href="tel:02269105000">(022) 69105000</a> &nbsp;|&nbsp; <a href="tel:+918291568972">+91 82915 68972</a></li>
+<li><strong>Phone:</strong> <a href="tel:+918291568972">+91 82915 68972</a> <a href="tel:+918291568972"></a></li>
 <li><strong>WhatsApp:</strong> <a href="https://wa.me/918291568972">+91 82915 68972</a></li>
-<li><strong>Email:</strong> <a href="mailto:info@rainbowinternationalschool.in">info@rainbowinternationalschool.in</a></li>
+<li><strong>Email:</strong> <a href="mailto:admin@rainbowinternationalschool.in">admin@rainbowinternationalschool.in</a></li>
 </ul>
 </div>
 
@@ -1653,7 +1653,7 @@ function renderScheduleAppointment(): string {
 <p><strong>Working Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</p>
 </div>
 
-<p>Interested in admissions for 2026–27? <a href="/admissions">View admissions details</a> or <a href="/contact-us">fill an enquiry form</a> and our team will get back to you promptly.</p>
+<p>Interested in admissions for 2027–28? <a href="/admissions">View admissions details</a> or <a href="/contact-us">fill an enquiry form</a> and our team will get back to you promptly.</p>
 </div>`;
 }
 
@@ -1661,15 +1661,15 @@ function renderWelcomeToRIS(): string {
   return `
 <div class="section">
 <h2>Welcome to Rainbow International School</h2>
-<p>Rainbow International School is a CBSE-affiliated K–12 institution in Thane, Maharashtra, founded in April 2009. Set on a 3.5-acre campus in Brahmand Phase 4, Thane, it serves 3,000+ students from Nursery to Class 12 (CBSE Affiliation No. 1130661).</p>
+<p>Rainbow International School is a CBSE-affiliated K–12 institution in Thane, Maharashtra, founded in April 2009. Set on a 3.5-acre campus in Brahmand Phase 4, Thane, it serves 3,000+ students from KG to Class 12 (CBSE Affiliation No. 1130661).</p>
 
 <div class="card">
 <h3>School At a Glance</h3>
-<p><strong>Founded:</strong> April 2009 &nbsp;|&nbsp; <strong>Campus:</strong> 3.5 acres &nbsp;|&nbsp; <strong>Students:</strong> 3,000+ &nbsp;|&nbsp; <strong>Grades:</strong> Nursery to Class 12 &nbsp;|&nbsp; <strong>CBSE Affiliation:</strong> 1130661</p>
+<p><strong>Founded:</strong> April 2009 &nbsp;|&nbsp; <strong>Campus:</strong> 3.5 acres &nbsp;|&nbsp; <strong>Students:</strong> 3,000+ &nbsp;|&nbsp; <strong>Grades:</strong> KG to Class 12 &nbsp;|&nbsp; <strong>CBSE Affiliation:</strong> 1130661</p>
 <p><strong>Location:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607</p>
 </div>
 
-<p>Admissions for 2026–27 are open. <a href="/admissions">Apply online</a> or <a href="/contact-us">contact our admissions team</a> to learn more.</p>
+<p>Admissions for 2027–28 are open. <a href="/admissions">Apply online</a> or <a href="/contact-us">contact our admissions team</a> to learn more.</p>
 </div>`;
 }
 
@@ -1677,7 +1677,7 @@ const pages: PageSSRConfig[] = [
   {
     path: "/about-rainbow-international-school",
     title: "About Rainbow International School — Best CBSE School in Thane",
-    description: "Rainbow International School, founded in 2009, is a top-rated CBSE K–12 school in Thane. 3.5-acre campus, 3000+ students, award-winning education from Nursery to Class 12.",
+    description: "Rainbow International School, founded in 2009, is a top-rated CBSE K–12 school in Thane. 3.5-acre campus, 3000+ students, award-winning education from KG to Class 12.",
     keywords: "about Rainbow International School, CBSE school Thane, best school Thane, K-12 school Thane, international school Thane",
     canonical: "https://rainbowinternationalschool.in/about-rainbow-international-school",
     breadcrumbs: [
@@ -1690,7 +1690,7 @@ const pages: PageSSRConfig[] = [
   {
     path: "/pre-primary-school-thane",
     title: "Pre-Primary School in Thane — Nursery, Jr KG, Sr KG | Rainbow International School",
-    description: "Best pre-primary school in Thane. Nursery, Jr KG, Sr KG with play-based learning, 100% female staff, CBSE-aligned curriculum. Admissions open for 2026–27.",
+    description: "Best pre-primary school in Thane. Nursery, Jr KG, Sr KG with play-based learning, 100% female staff, CBSE-aligned curriculum. Admissions open for 2027–28.",
     keywords: "pre-primary school Thane, nursery school Thane, Jr KG admission Thane, best preschool Thane, kindergarten Thane",
     canonical: "https://rainbowinternationalschool.in/pre-primary-school-thane",
     breadcrumbs: [
@@ -1759,7 +1759,7 @@ const pages: PageSSRConfig[] = [
   {
     path: "/contact-us",
     title: "Contact Rainbow International School Thane — Phone, Email, Address",
-    description: "Contact Rainbow International School, Thane. Phone: +91 82915 68972. Email: info@rainbowinternationalschool.in. Address: Cosmos Arcade, Brahmand Phase 4, Thane 400607.",
+    description: "Contact Rainbow International School, Thane. Phone: +91 82915 68972. Email: admin@rainbowinternationalschool.in. Address: Cosmos Arcade, Brahmand Phase 4, Thane 400607.",
     keywords: "contact Rainbow International School, school phone number Thane, school address Thane, Rainbow school email, visit campus Thane",
     canonical: "https://rainbowinternationalschool.in/contact-us",
     breadcrumbs: [
@@ -1811,13 +1811,13 @@ const pages: PageSSRConfig[] = [
   {
     path: "/admissions",
     appendSiteName: false,
-    title: "Admissions Open 2026–27 | CBSE School in Thane",
-    description: "Admissions open at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire, book a campus visit or apply today.",
+    title: "Admissions Open 2027–28 | CBSE School in Thane",
+    description: "Admissions open at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire, book a campus visit or apply today.",
     keywords: "school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission",
     canonical: "https://rainbowinternationalschool.in/admissions",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Admissions Open 2026–27 | CBSE School in Thane", url: "https://rainbowinternationalschool.in/admissions" },
+      { name: "Admissions Open 2027–28 | CBSE School in Thane", url: "https://rainbowinternationalschool.in/admissions" },
     ],
     jsonLd: SCHOOL_LD,
     renderBody: renderAdmissions,
@@ -1825,7 +1825,7 @@ const pages: PageSSRConfig[] = [
   {
     path: "/fee-structure",
     title: "CBSE School Fee Structure Thane 2026-27 | Rainbow International School",
-    description: "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
+    description: "Fee structure details for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
     keywords: "CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane",
     canonical: "https://rainbowinternationalschool.in/fee-structure",
     breadcrumbs: [
@@ -1840,8 +1840,8 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/school-near-brahmand-thane",
-    title: "Best School Near Brahmand Thane — CBSE Nursery to Class 12 | Rainbow International School",
-    description: "Rainbow International School — best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus.",
+    title: "Best School Near Brahmand Thane — CBSE KG to Class 12 | Rainbow International School",
+    description: "Rainbow International School — best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. KG to Class 12, 3.5-acre campus.",
     keywords: "school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane",
     canonical: "https://rainbowinternationalschool.in/school-near-brahmand-thane",
     breadcrumbs: [
@@ -1866,8 +1866,8 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/school-near-manpada-thane",
-    title: "Best School Near Manpada Thane — CBSE Nursery to Class 12 | Rainbow International School",
-    description: "Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus.",
+    title: "Best School Near Manpada Thane — CBSE KG to Class 12 | Rainbow International School",
+    description: "Rainbow International School — top CBSE school near Manpada, Thane. KG to Class 12, 3.5-acre campus.",
     keywords: "school near Manpada Thane, best school Manpada, CBSE school Manpada Thane",
     canonical: "https://rainbowinternationalschool.in/school-near-manpada-thane",
     breadcrumbs: [
@@ -2080,7 +2080,7 @@ const pages: PageSSRConfig[] = [
       "@context": "https://schema.org",
       "@type": "Course",
       name: "CBSE K-12 Curriculum — Rainbow International School",
-      description: "Complete CBSE-aligned curriculum from Nursery to Class 12 including Science, Commerce, and Humanities streams.",
+      description: "Complete CBSE-aligned curriculum from KG to Class 12 including Science, Commerce, and Humanities streams.",
       provider: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
       url: "https://rainbowinternationalschool.in/curriculum",
     },
@@ -2123,7 +2123,7 @@ const pages: PageSSRConfig[] = [
       description: "Award-winning preschool in Thane for children aged 1.5–5.5 years. 100% female staff.",
       url: "https://rainbowinternationalschool.in/rainbow-preschool-international",
       address: { "@type": "PostalAddress", streetAddress: "Cosmos Arcade, Brahmand Phase 4", addressLocality: "Thane", addressRegion: "Maharashtra", postalCode: "400607", addressCountry: "IN" },
-      telephone: "(022) 69105000",
+      telephone: "+91-82915-68972",
     },
     renderBody: renderRainbowPreschool,
   },
@@ -2278,7 +2278,7 @@ const pages: PageSSRConfig[] = [
           postalCode: "400607",
           addressCountry: "IN",
         },
-        telephone: "+912269105000",
+        telephone: "+91-82915-68972",
         hasCredential: "CBSE Affiliation No. 1130661",
       },
     },
@@ -2287,7 +2287,7 @@ const pages: PageSSRConfig[] = [
   {
     path: "/schedule-appointment",
     title: "Schedule a Campus Visit | Rainbow International School Thane",
-    description: "Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2026–27.",
+    description: "Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2027–28.",
     keywords: "schedule appointment Rainbow International School, campus visit CBSE school Thane, book school visit Brahmand Thane",
     canonical: "https://rainbowinternationalschool.in/schedule-appointment",
     breadcrumbs: [
@@ -2314,12 +2314,8 @@ export function registerPageSSR(app: Express) {
     // the FAQ routes must serve the same questions to bots that the visible
     // page and the injected shell serve to everyone else.
     const seo = ROUTE_SEO[page.path];
-    const faqLd =
-      page.path === "/faqs" ? buildFaqPageLd(ALL_FAQS_PAGE_ITEMS)
-      : page.path === "/admissions" ? buildFaqPageLd(ADMISSIONS_FAQS)
-      : undefined;
     const cfg: PageSSRConfig = seo
-      ? { ...page, description: seo.description, canonical: routeCanonical(page.path), ...(faqLd ? { jsonLd: faqLd } : {}) }
+      ? { ...page, description: seo.description, canonical: routeCanonical(page.path) }
       : page;
     app.get(page.path, (req, res, next) => {
       const ua = (req.headers["user-agent"] || "").toLowerCase();
@@ -2327,7 +2323,7 @@ export function registerPageSSR(app: Express) {
         const html = shell(cfg);
         res.setHeader("Content-Type", "text/html; charset=utf-8");
         res.setHeader("X-Rendered-By", "Express SSR");
-        return res.send(html);
+        return res.send(normalizeSchemaHtml(html));
       }
       next();
     });

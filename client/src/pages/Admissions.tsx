@@ -18,7 +18,7 @@ import {
 // ── Data ─────────────────────────────────────────────────────────────────────
 
 const grades = [
-  "Nursery", "Jr. KG", "Sr. KG",
+  "Jr. KG", "Sr. KG",
   "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
   "Class 6", "Class 7", "Class 8",
   "Class 9", "Class 10",
@@ -27,8 +27,8 @@ const grades = [
 ];
 
 const benefits = [
-  { icon: GraduationCap, title: "CBSE-Affiliated",      desc: "Full CBSE curriculum, Affiliation No. 1130661, from Nursery through Class 12.",           color: "#e0edff", accent: "#0d3b86" },
-  { icon: BookOpen,      title: "Nursery to Class 12",  desc: "One campus, one community — a complete K-12 journey so your child never has to change schools.", color: "#fff3e0", accent: "#d97706" },
+  { icon: GraduationCap, title: "CBSE-Affiliated",      desc: "Full CBSE curriculum, Affiliation No. 1130661, from KG through Class 12.",           color: "#e0edff", accent: "#0d3b86" },
+  { icon: BookOpen,      title: "KG to Class 12",  desc: "One campus, one community — a complete K-12 journey so your child never has to change schools.", color: "#fff3e0", accent: "#d97706" },
   { icon: MapPin,        title: "3.5-Acre Campus",      desc: "Sprawling Brahmand campus with smart classrooms, labs, library, pool and sports ground.",   color: "#e0f7f0", accent: "#059669" },
   { icon: BadgeCheck,    title: "Strong Academics",     desc: "Multiple Intelligence pedagogy, project-based learning, Olympiad coaching and board prep.",   color: "#f3e0ff", accent: "#7c3aed" },
   { icon: Star,          title: "Sports & Activities",  desc: "Swimming pool, football turf, cricket ground, skating rink, karate, chess and 15+ more.",    color: "#fdf0e0", accent: "#ea580c" },
@@ -182,9 +182,9 @@ export default function Admissions() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Admissions Open 2026–27 | CBSE School in Thane"
+        title="Admissions Open 2027–28 | CBSE School in Thane"
         description={ROUTE_SEO["/admissions"].description}
-        keywords="admissions open in Thane, CBSE school admission in Thane, Nursery admission in Thane, Class 1 admission in Thane, Class 11 admission in Thane, school admission near me, CBSE school admission 2026-27"
+        keywords="admissions open in Thane, CBSE school admission in Thane, KG admission in Thane, Class 1 admission in Thane, Class 11 admission in Thane, school admission near me, CBSE school admission 2027-28"
         canonical="https://rainbowinternationalschool.in/admissions"
         appendSiteName={false}
         breadcrumbs={[
@@ -196,8 +196,8 @@ export default function Admissions() {
           "@graph": [
             {
               "@type": "WebPage",
-              "name": "Admissions Open 2026–27 | Rainbow International School Thane",
-              "description": "CBSE admissions open for 2026-27 at Rainbow International School Thane — Nursery to Class 12.",
+              "name": "Admissions Open 2027–28 | Rainbow International School Thane",
+              "description": "CBSE admissions open for 2027-28 at Rainbow International School Thane — KG to Class 12.",
               "url": "https://rainbowinternationalschool.in/admissions",
             },
             buildFaqPageSchema(PAGE_FAQS),
@@ -232,14 +232,14 @@ export default function Admissions() {
           {/* Left copy */}
           <div className="text-white">
             <span className="inline-flex items-center gap-2 bg-amber-400 text-[#091a4f] text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#091a4f] animate-pulse" /> Admissions Open 2026–27
+              <span className="w-2 h-2 rounded-full bg-[#091a4f] animate-pulse" /> Admissions Open 2027–28
             </span>
             <h1 className="font-['DM_Sans'] font-black text-4xl md:text-5xl lg:text-6xl leading-tight mb-4">
               Give Your Child<br />
               <span className="text-amber-400">the Best Start</span><br />
               in Thane
             </h1>
-            <p className="text-blue-100 text-lg mb-2 font-medium">CBSE Affiliated School | Nursery to Class 12</p>
+            <p className="text-blue-100 text-lg mb-2 font-medium">CBSE Affiliated School | KG to Class 12</p>
             <p className="text-blue-200 text-sm mb-8">Established 2009 · 3.5-acre campus · 3,000+ students · Brahmand, Thane</p>
 
             {/* Trust stats */}

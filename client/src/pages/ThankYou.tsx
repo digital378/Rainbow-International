@@ -76,13 +76,13 @@ export default function ThankYou() {
                 <div className="font-bold text-[#0d3b86] text-sm">+91 82915 68972</div>
               </div>
             </a>
-            <a href="mailto:info@rainbowinternationalschool.in" className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+            <a href="mailto:admin@rainbowinternationalschool.in" className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-sm transition-all">
               <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
                 <Mail className="text-[#0d3b86]" size={18} />
               </div>
               <div className="text-left">
                 <div className="text-xs text-gray-500">Email us</div>
-                <div className="font-bold text-[#0d3b86] text-sm">info@rainbowinternationalschool.in</div>
+                <div className="font-bold text-[#0d3b86] text-sm">admin@rainbowinternationalschool.in</div>
               </div>
             </a>
           </div>

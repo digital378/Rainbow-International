@@ -13,7 +13,7 @@ import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingD
 import { submitInquiry } from "@/lib/inquiryProtection";
 
 const classOptions = [
-  "Nursery", "Jr. KG", "Sr. KG",
+  "Jr. KG", "Sr. KG",
   "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
   "Class 6", "Class 7", "Class 8",
   "Class 9", "Class 10",
@@ -31,8 +31,8 @@ const contactItems = [
   {
     icon: Mail,
     label: "Email",
-    lines: ["info@rainbowinternationalschool.in"],
-    href: "mailto:info@rainbowinternationalschool.in",
+    lines: ["admin@rainbowinternationalschool.in"],
+    href: "mailto:admin@rainbowinternationalschool.in",
   },
   {
     icon: Clock,
@@ -89,7 +89,7 @@ export default function ContactUs() {
       <ScrollProgress />
       <SEO
         title="Contact Us"
-        description="Connect with Rainbow International School, Thane. Call +91 82915 68972, email info@rainbowinternationalschool.in. Admissions open for Nursery to Class 12."
+        description="Connect with Rainbow International School, Thane. Call +91 82915 68972, email admin@rainbowinternationalschool.in. Admissions open for KG to Class 12."
         keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane"
         canonical="https://rainbowinternationalschool.in/contact-us"
         breadcrumbs={[
@@ -100,13 +100,13 @@ export default function ContactUs() {
           "@context": "https://schema.org",
           "@type": "ContactPage",
           "name": "Contact Rainbow International School",
-          "description": "Contact Rainbow International School, Thane — for admissions enquiries, call +91 82915 68972 or email info@rainbowinternationalschool.in.",
+          "description": "Contact Rainbow International School, Thane — for admissions enquiries, call +91 82915 68972 or email admin@rainbowinternationalschool.in.",
           "url": "https://rainbowinternationalschool.in/contact-us",
           "mainEntity": {
             "@type": "EducationalOrganization",
             "name": "Rainbow International School",
-            "telephone": ["+912269105000", "+918291568972"],
-            "email": "info@rainbowinternationalschool.in",
+            "telephone": "+91-82915-68972",
+            "email": "admin@rainbowinternationalschool.in",
             "openingHoursSpecification": {
               "@type": "OpeningHoursSpecification",
               "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],

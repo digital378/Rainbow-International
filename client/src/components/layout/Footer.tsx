@@ -15,7 +15,7 @@ const quickLinks = [
 ];
 
 const exploreLinks = [
-  { label: "Admissions 2026–27", href: "/admissions" },
+  { label: "Admissions 2027–28", href: "/admissions" },
   { label: "Fee Structure", href: "/fee-structure" },
   { label: "Awards & Achievements", href: "/awards-achievements" },
   { label: "Amenities & Facilities", href: "/amenities" },
@@ -38,7 +38,7 @@ const preschoolLinks = [
   { label: "Kindergarten", href: "https://www.rainbowpreschools.com/kindergarten" },
   { label: "Our Centres", href: "https://www.rainbowpreschools.com/preschool-near-me" },
   { label: "Gallery", href: "https://www.rainbowpreschools.com/gallery" },
-  { label: "Best Playschool in Thane", href: "https://www.rainbowpreschools.com/play-school-near-me" },
+  { label: "Playschool in Thane", href: "https://www.rainbowpreschools.com/play-school-near-me" },
   { label: "Preschool Near You", href: "https://www.rainbowpreschools.com/best-preschool-near-me-in-thane" },
   { label: "Apply for Admission", href: "https://www.rainbowpreschools.com/preschool-admissions" },
 ];
@@ -127,7 +127,7 @@ export function Footer() {
             <div>
               <div className="flex items-center gap-3 mb-6">
                 <img
-                  src="/rps-logo.png"
+                  src="/ris-logo.png"
                   alt="Rainbow International School Logo"
                   className="w-14 h-14 object-contain"
                 />
@@ -137,7 +137,7 @@ export function Footer() {
                 </div>
               </div>
               <p className="text-white/60 leading-relaxed text-sm mb-2">
-                <strong className="text-white/80">World-Class Education, Indian Values.</strong>
+                <strong className="text-white/80">CBSE School in Thane West · KG to Class 12</strong>
               </p>
               <p className="text-white/50 leading-relaxed text-sm mb-8">
                 One of the top CBSE schools in Thane — where every child dares to dream and becomes a lifelong learner.
@@ -193,7 +193,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className="font-black text-base mb-6 text-white">Rainbow Preschools</h3>
+              <h3 className="font-black text-base mb-6 text-white">Our Preschool Network</h3>
               <ul className="space-y-2.5">
                 {preschoolLinks.map((link) => (
                   <li key={link.href}>

@@ -8,7 +8,7 @@ const CHIPS = [
   "Our Programmes",
   "Timings & Hours",
   "Campus & Location",
-  "Admissions 2026–27",
+  "Admissions 2027–28",
   "Fees",
   "Safety & Security",
   "Request a Callback",
@@ -26,25 +26,25 @@ function getBotReply(input: string): string {
   const t = input.toLowerCase();
 
   if (t.includes("programme") || t.includes("program") || t.includes("class") || t.includes("grade") || t.includes("stream") || t.includes("curriculum")) {
-    return "We offer Nursery to Class 12 under CBSE (Affiliation No. 1130661).\n\nOur stages:\n• Pre-Primary (Nursery, Jr. KG, Sr. KG)\n• Primary (Class 1 – 5)\n• Middle School (Class 6 – 8)\n• Secondary (Class 9 – 10)\n• Senior Secondary (Class 11 – 12)\n\nClass 11–12 streams:\n• Science\n• Commerce\n• Humanities";
+    return "We offer KG to Class 12 under CBSE (Affiliation No. 1130661).\n\nOur stages:\n• Pre-Primary (Jr KG, Sr KG)\n• Primary (Class 1 – 5)\n• Middle School (Class 6 – 8)\n• Secondary (Class 9 – 10)\n• Senior Secondary (Class 11 – 12)\n\nClass 11–12 streams:\n• Science\n• Commerce\n• Humanities";
   }
   if (t.includes("timing") || t.includes("hour") || t.includes("time") || t.includes("schedule") || t.includes("batch")) {
     return "Our school office hours are Monday to Saturday, 9:00 AM – 6:00 PM.\n\nContact: +91 82915 68972";
   }
   if (t.includes("campus") || t.includes("location") || t.includes("address") || t.includes("centre") || t.includes("center")) {
-    return "We are located at:\nCosmos Arcade, Brahmand Phase 4,\nThane, Maharashtra.\n\nOur campus spans 3.5 acres and serves 3,000+ students from Nursery to Class 12 — all under one roof.";
+    return "We are located at:\nCosmos Arcade, Brahmand Phase 4,\nThane, Maharashtra.\n\nOur campus spans 3.5 acres and serves 3,000+ students from KG to Class 12 — all under one roof.";
   }
   if (t.includes("admission") || t.includes("apply") || t.includes("enrol") || t.includes("enroll") || t.includes("2026")) {
-    return "Admissions are open for Academic Year 2026–27!\n\nWe welcome students from Nursery to Class 12.\n\nCall: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\n\nOr fill the enquiry form on our Contact Us page.";
+    return "Admissions are open for Academic Year 2027–28!\n\nWe welcome students from KG to Class 12.\n\nCall: +91 82915 68972\nEmail: admin@rainbowinternationalschool.in\n\nOr fill the enquiry form on our Contact Us page.";
   }
   if (t.includes("fee") || t.includes("fees") || t.includes("cost")) {
-    return "Fee details vary by grade. Please contact our admissions team for the complete fee structure:\n\nCall: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\nHours: Mon–Sat, 9 AM – 6 PM";
+    return "Fee details vary by grade. Please contact our admissions team for the complete fee structure:\n\nCall: +91 82915 68972\nEmail: admin@rainbowinternationalschool.in\nHours: Mon–Sat, 9 AM – 6 PM";
   }
   if (t.includes("safety") || t.includes("security") || t.includes("safe")) {
     return "Safety is our top priority. We have:\n• 160 CCTV cameras across campus\n• Metal detectors at all entry points\n• GPS-tracked buses with lady attendants\n• Trained nurse & equipped ambulance\n• First aid & self-defence training\n• 100% female staff for Preschool\n• Security personnel with walkie-talkies";
   }
   if (t.includes("talk") || t.includes("speak") || t.includes("call") || t.includes("contact") || t.includes("someone") || t.includes("human")) {
-    return "Reach our team directly:\n\nContact: +91 82915 68972\nEmail: info@rainbowinternationalschool.in\nHours: Mon–Sat, 9:00 AM – 6:00 PM\n\nOr tap the WhatsApp button above to chat with us instantly!";
+    return "Reach our team directly:\n\nContact: +91 82915 68972\nEmail: admin@rainbowinternationalschool.in\nHours: Mon–Sat, 9:00 AM – 6:00 PM\n\nOr tap the WhatsApp button above to chat with us instantly!";
   }
   if (t.includes("transport") || t.includes("bus")) {
     return "Rainbow provides GPS-tracked, CCTV-enabled school buses with trained drivers, safety marshalls, and lady attendants on every route.\n\nCall +91 82915 68972 for route details.";
@@ -59,7 +59,7 @@ function getBotReply(input: string): string {
     return "Our 3.5-acre campus features:\n• Modern Science & Computer Labs\n• Well-stocked Library\n• Smart Classrooms\n• Swimming Pool & Skating Rink\n• Sports Courts & Auditorium\n• Art, Music & Dance Rooms\n• Infirmary with trained nurse";
   }
 
-  return "Thank you for your message! For the best assistance, please call us at +91 82915 68972 or email info@rainbowinternationalschool.in. We're available Mon–Sat, 9:00 AM – 6:00 PM.";
+  return "Thank you for your message! For the best assistance, please call us at +91 82915 68972 or email admin@rainbowinternationalschool.in. We're available Mon–Sat, 9:00 AM – 6:00 PM.";
 }
 
 // ── Types ────────────────────────────────────────────────────────

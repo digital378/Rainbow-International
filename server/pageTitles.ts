@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { blogPostsTable } from "@shared/schema";
-import { ROUTE_SEO, buildBreadcrumbLd, routeCanonical, HOME_ORG_LD } from "@shared/routeSeo";
-import { ALL_FAQS_PAGE_ITEMS, ADMISSIONS_FAQS, buildFaqPageLd } from "@shared/faqData";
+import { ROUTE_SEO, buildBreadcrumbLd, routeCanonical } from "@shared/routeSeo";
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 import { blogSlugFromPath, isKnownBlogSlug } from "./blogRoutes";
 
 export async function resolveBlogTitle(slug: string): Promise<string | null> {
@@ -53,7 +53,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/brand-partners": "Brand Partners | Rainbow International School Thane",
   "/students-leaving-certificate": "Students Leaving Certificate | Rainbow International School",
   "/curriculum": "Curriculum | Rainbow International School",
-  "/application-form": "Application Form 2026–27 | Rainbow International School Thane",
+  "/application-form": "Application Form 2027–28 | Rainbow International School Thane",
   "/google-school-2025-26": "Google School 2025–26 | Rainbow International School",
   "/meta-school-2025-26": "Meta School 2025–26 | Rainbow International School",
   "/faqs": "FAQs — Admissions, Fees, Academics & More | Rainbow International School",
@@ -63,10 +63,10 @@ const PAGE_TITLES: Record<string, string> = {
   "/school-readiness-quiz": "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",
   "/thank-you": "Thank You for Your Enquiry | Rainbow International School",
   "/top-schools-in-thane": "Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School",
-  "/school-near-brahmand-thane": "Best School Near Brahmand Thane — CBSE Nursery to Class 12 | Rainbow International School",
+  "/school-near-brahmand-thane": "Best School Near Brahmand Thane — CBSE KG to Class 12 | Rainbow International School",
   "/school-near-ghodbunder-road-thane": "Best School Near Ghodbunder Road Thane — CBSE K–12 | Rainbow International School",
-  "/school-near-manpada-thane": "Best School Near Manpada Thane — CBSE Nursery to Class 12 | Rainbow International School",
-  "/admissions": "Admissions Open 2026–27 | CBSE School in Thane | Rainbow International School",
+  "/school-near-manpada-thane": "Best School Near Manpada Thane — CBSE KG to Class 12 | Rainbow International School",
+  "/admissions": "Admissions Open 2027–28 | CBSE School in Thane | Rainbow International School",
   "/rps-sales": "Rainbow Preschool | Rainbow International School",
   "/sales": "Admissions | Rainbow International School",
 };
@@ -215,9 +215,6 @@ export function injectSeoHead(html: string, reqPath: string, overrideTitle?: str
   // Canonical + JSON-LD go in just before </head>. index.html ships no
   // canonical link at all, so this is an insert, not a replace.
   const jsonLdBlocks: unknown[] = [buildBreadcrumbLd(basePath, seo.crumb)];
-  if (basePath === "/") jsonLdBlocks.push(HOME_ORG_LD);
-  if (basePath === "/faqs") jsonLdBlocks.push(buildFaqPageLd(ALL_FAQS_PAGE_ITEMS));
-  if (basePath === "/admissions") jsonLdBlocks.push(buildFaqPageLd(ADMISSIONS_FAQS));
 
   // Each script is tagged with its schema @type via data-seo-server-jsonld
   // so the client-side SEO component can dedupe after hydration (it removes
@@ -233,5 +230,5 @@ export function injectSeoHead(html: string, reqPath: string, overrideTitle?: str
       .join("") +
     `\n  </head>`;
   out = out.replace(/<\/head>/, injection);
-  return out;
+  return normalizeSchemaHtml(out);
 }

@@ -27,7 +27,7 @@ const seatData = [
 ];
 
 const quickLinks = [
-  { label: "Admissions 2026–27",  href: "/admissions"                       },
+  { label: "Admissions 2027–28",  href: "/admissions"                       },
   { label: "Fee Structure",        href: "/fee-structure"                    },
   { label: "Pre-Primary",          href: "/pre-primary-school-thane"         },
   { label: "Senior Secondary",     href: "/senior-secondary-section"         },
@@ -68,18 +68,18 @@ export function Hero() {
               <span className="relative flex h-2.5 w-2.5">
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]" />
               </span>
-              <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">Check Seat Availability 2026–27</span>
+              <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">Check Seat Availability 2027–28</span>
               <ChevronRight size={14} className="text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             <h1 className="text-4xl md:text-5xl xl:text-6xl font-extrabold leading-[1.08] text-white mb-4 tracking-tight">
               Best CBSE School{" "}<br />
               <span className="text-amber-400">in Thane</span>{" "}<br />
-              <span className="text-3xl md:text-4xl xl:text-5xl">Nursery to Class 12</span>
+              <span className="text-3xl md:text-4xl xl:text-5xl">KG to Class 12</span>
             </h1>
 
             <p className="text-blue-100 text-base md:text-lg font-semibold mb-2">
-              Admissions Open 2026–27 at Rainbow International School.
+              Admissions Open 2027–28 at Rainbow International School.
             </p>
             <p className="text-blue-200/70 text-sm md:text-base leading-relaxed max-w-lg font-light mb-8">
               A CBSE-affiliated K–12 school with a 3.5-acre campus, strong academics, sports, safety, transport, and holistic learning.
@@ -150,7 +150,7 @@ export function Hero() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
-                <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Seat Availability — AY 2026–27</h2>
+                <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Seat Availability — AY 2027–28</h2>
                 <p className="text-xs text-gray-500 mt-0.5">Rainbow International School, Thane</p>
               </div>
               <button onClick={() => setShowSeats(false)} data-testid="button-close-seats" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">

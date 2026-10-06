@@ -28,7 +28,7 @@ const purposes = [
 
 const contactDetails = [
   { icon: Phone, label: "Phone", value: "+91 82915 68972", href: "tel:+918291568972" },
-  { icon: Mail, label: "Email", value: "info@rainbowinternationalschool.in", href: "mailto:info@rainbowinternationalschool.in" },
+  { icon: Mail, label: "Email", value: "admin@rainbowinternationalschool.in", href: "mailto:admin@rainbowinternationalschool.in" },
   { icon: MapPin, label: "Address", value: "Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra" },
   { icon: Clock, label: "Hours", value: "Monday – Saturday: 9:00 AM – 6:00 PM" },
 ];
@@ -70,7 +70,7 @@ export default function ScheduleAppointment() {
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="Schedule an Appointment"
-        description="Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2026–27."
+        description="Book a campus visit or appointment with the Rainbow International School admissions team. Meet our faculty, tour the campus, and learn about admissions for 2027–28."
         keywords="schedule appointment Rainbow International School, campus visit CBSE school Thane, book school visit Brahmand Thane"
         canonical="https://rainbowinternationalschool.in/schedule-appointment"
       />

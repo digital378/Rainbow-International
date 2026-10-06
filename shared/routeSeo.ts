@@ -11,6 +11,8 @@
  *   - crumb is the short name used in the BreadcrumbList JSON-LD
  */
 
+import { buildOrgNode } from "./orgSchema";
+
 export interface RouteSeo {
   description: string;
   crumb: string;
@@ -25,17 +27,17 @@ export function routeCanonical(basePath: string): string {
 export const ROUTE_SEO: Record<string, RouteSeo> = {
   "/": {
     description:
-      "Rainbow International School is a CBSE school in Thane for Nursery to Class 12 with academics, sports, safety, transport and holistic learning.",
+      "Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning.",
     crumb: "Home",
   },
   "/about-rainbow-international-school": {
     description:
-      "Rainbow International School, founded in 2009, is a CBSE K-12 school in Thane with a 3.5-acre campus and 3000+ students, Nursery to Class 12.",
+      "Rainbow International School, founded in 2009, is a CBSE K-12 school in Thane with a 3.5-acre campus and 3000+ students, KG to Class 12.",
     crumb: "About Us",
   },
   "/welcome-to-ris": {
     description:
-      "Welcome to Rainbow International School, Thane — a CBSE K-12 school on a 3.5-acre Brahmand campus, nurturing students from Nursery to Class 12.",
+      "Welcome to Rainbow International School, Thane — a CBSE K-12 school on a 3.5-acre Brahmand campus, nurturing students from KG to Class 12.",
     crumb: "Welcome",
   },
   "/chairpersons-note": {
@@ -115,7 +117,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/contact-us": {
     description:
-      "Contact Rainbow International School, Thane. Phone +91 82915 68972, email info@rainbowinternationalschool.in. Cosmos Arcade, Brahmand Phase 4.",
+      "Contact Rainbow International School, Thane. Phone +91 82915 68972, email admin@rainbowinternationalschool.in. Cosmos Arcade, Brahmand Phase 4.",
     crumb: "Contact Us",
   },
   "/academic-calendar": {
@@ -195,17 +197,17 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/application-form": {
     description:
-      "Apply online for admission to Rainbow International School, Thane — 2026-27 applications open for Nursery to Class 12.",
+      "Apply online for admission to Rainbow International School, Thane — 2027-28 applications open for KG to Class 12.",
     crumb: "Application Form",
   },
   "/google-school-2025-26": {
     description:
-      "Rainbow International School, Thane — CBSE Nursery to Class 12. Admissions open for 2026-27. Book a campus visit today.",
+      "Rainbow International School, Thane — CBSE KG to Class 12. Admissions open for 2027-28. Book a campus visit today.",
     crumb: "Admissions",
   },
   "/meta-school-2025-26": {
     description:
-      "Rainbow International School, Thane — CBSE K-12 school in Brahmand. Admissions open 2026-27. Enquire online or book a visit.",
+      "Rainbow International School, Thane — CBSE K-12 school in Brahmand. Admissions open 2027-28. Enquire online or book a visit.",
     crumb: "Admissions",
   },
   "/faqs": {
@@ -215,7 +217,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/fee-structure": {
     description:
-      "Fee structure 2026-27 for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
+      "Fee structure 2026-27 for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
     crumb: "Fee Structure",
   },
   "/testimonials": {
@@ -245,7 +247,7 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/school-near-brahmand-thane": {
     description:
-      "Rainbow International School — CBSE school near Brahmand, Thane, located in Brahmand Phase 4. Nursery to Class 12 on a 3.5-acre campus.",
+      "Rainbow International School — CBSE school near Brahmand, Thane, located in Brahmand Phase 4. KG to Class 12 on a 3.5-acre campus.",
     crumb: "School Near Brahmand",
   },
   "/school-near-ghodbunder-road-thane": {
@@ -255,12 +257,12 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
   },
   "/school-near-manpada-thane": {
     description:
-      "Rainbow International School — CBSE school near Manpada, Thane, 5 min from Manpada Junction. Nursery to Class 12 on a 3.5-acre campus.",
+      "Rainbow International School — CBSE school near Manpada, Thane, 5 min from Manpada Junction. KG to Class 12 on a 3.5-acre campus.",
     crumb: "School Near Manpada",
   },
   "/admissions": {
     description:
-      "Admissions open 2026-27 at Rainbow International School, a CBSE school in Thane for Nursery to Class 12. Enquire or book a campus visit.",
+      "Admissions open 2027-28 at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire or book a campus visit.",
     crumb: "Admissions",
   },
 };
@@ -289,57 +291,4 @@ export function buildBreadcrumbLd(basePath: string, crumb: string) {
  * EducationalOrganization schema for the homepage — identical in shape to
  * what the bot-SSR homepage (server/ssrHome.ts) emits.
  */
-export const HOME_ORG_LD = {
-  "@context": "https://schema.org",
-  "@type": ["EducationalOrganization", "School"],
-  name: "Rainbow International School",
-  alternateName: "RIS Thane",
-  url: "https://rainbowinternationalschool.in/",
-  logo: {
-    "@type": "ImageObject",
-    url: "https://rainbowinternationalschool.in/favicon-192.png",
-    width: 192,
-    height: 192,
-  },
-  image: {
-    "@type": "ImageObject",
-    url: "https://rainbowinternationalschool.in/opengraph.jpg",
-    width: 1200,
-    height: 630,
-  },
-  description:
-    "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving students from Nursery to Class 12.",
-  foundingDate: "2009-04-01",
-  educationalLevel: "Nursery to Class 12",
-  identifier: [
-    { "@type": "PropertyValue", name: "CBSE Affiliation Number", value: "1130661" },
-    { "@type": "PropertyValue", name: "CBSE School Code", value: "30562" },
-  ],
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Cosmos Arcade, Brahmand Phase 4",
-    addressLocality: "Thane",
-    addressRegion: "Maharashtra",
-    postalCode: "400607",
-    addressCountry: "IN",
-  },
-  geo: { "@type": "GeoCoordinates", latitude: 19.2287, longitude: 72.9637 },
-  telephone: "+918291568972",
-  email: "info@rainbowinternationalschool.in",
-  sameAs: [
-    "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA",
-    "https://www.facebook.com/RainbowInternationalSchoolThane/",
-    "https://www.instagram.com/rainbowinternationalschool/",
-    "https://www.youtube.com/@RainbowInternationalSchool",
-  ],
-  areaServed: { "@type": "City", name: "Thane" },
-  priceRange: "$$",
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      opens: "09:00",
-      closes: "18:00",
-    },
-  ],
-};
+export const HOME_ORG_LD = buildOrgNode();

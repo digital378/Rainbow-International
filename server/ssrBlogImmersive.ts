@@ -512,7 +512,7 @@ ${NAVBAR_HTML}
         <div class="admissions-box">
           <div class="admissions-emoji">🎓</div>
           <p class="admissions-title">Admissions Open</p>
-          <p class="admissions-sub">2026–27 admissions are now open for Nursery to Class 12.</p>
+          <p class="admissions-sub">2027–28 admissions are now open for KG to Class 12.</p>
           <a href="/contact-us" class="admissions-btn">Apply Now</a>
         </div>
       </aside>

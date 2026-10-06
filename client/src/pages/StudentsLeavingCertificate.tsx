@@ -85,8 +85,8 @@ export default function StudentsLeavingCertificate() {
 
             <div className="mt-8 text-center">
               <p className="text-gray-600 mb-4">For queries, please contact the school office:</p>
-              <a href="tel:+918655003366" onClick={() => { import("@/lib/analytics").then(m => m.trackCallClick({ phone: "+91 86550 03366" })); }} className="inline-block text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity" style={{ background: "#0d3b86" }}>
-                Call +91 86550 03366
+              <a href="tel:+918291568972" onClick={() => { import("@/lib/analytics").then(m => m.trackCallClick({ phone: "+91 82915 68972" })); }} className="inline-block text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transition-opacity" style={{ background: "#0d3b86" }}>
+                Call +91 82915 68972
               </a>
             </div>
           </div>

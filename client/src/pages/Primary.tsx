@@ -17,7 +17,7 @@ const AMBER = "#d97706";
 const AMBER_LIGHT = "#f59e0b";
 
 const WHATSAPP_URL = "https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20Primary%20%28Class%201%E2%80%935%29%20admission%20at%20Rainbow%20International%20School.";
-const PHONE = "+912225976097";
+const PHONE = "+918291568972";
 const DIRECTIONS_URL = "https://maps.google.com/?q=Rainbow+International+School+Brahmand+Phase+4+Thane";
 
 // ── FAQ data ──────────────────────────────────────────────────────────────────
@@ -203,7 +203,7 @@ export default function Primary() {
             style={{ background: AMBER_LIGHT, color: NAVY }}
             data-testid="badge-admissions-open"
           >
-            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
+            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2027–28
           </span>
           <h1
             className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl"
@@ -791,7 +791,7 @@ export default function Primary() {
               <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: AMBER_LIGHT }} />
               <div className="relative z-10">
                 <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>
-                  Admissions 2026–27
+                  Admissions 2027–28
                 </span>
                 <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                   Looking for Class 1 to Class 5 Admission?

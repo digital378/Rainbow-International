@@ -24,6 +24,7 @@ import multer from "multer";
 import { registerSSRRoutes } from "./ssrBlog";
 import { registerGandhiJayantiBlog } from "./gandhiJayantiBlog";
 import { renderNavratriBlog } from "./navratriBlog";
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 import { registerHomeSSR } from "./ssrHome";
 import { registerPageSSR } from "./ssrPages";
 import { registerSpainArgentinaSSR } from "./ssrSpainArgentina";
@@ -427,12 +428,20 @@ export async function registerRoutes(
   // redirect:false prevents express.static from adding a trailing slash, which would
   // loop with the global trailing-slash stripper in server/index.ts (ERR_TOO_MANY_REDIRECTS).
   const blogDir = path.join(process.cwd(), "blog-pages/independence-day-2026");
+  app.get(["/blog/independence-day-2026", "/blog/independence-day-2026/index.html"], (_req, res, next) => {
+    try { res.type("html").send(normalizeSchemaHtml(fs.readFileSync(path.join(blogDir, "index.html"), "utf8"))); }
+    catch (error) { next(error); }
+  });
   app.use("/blog/independence-day-2026", express.static(blogDir, { index: "index.html", redirect: false }));
   app.get("/blog/independence-day-2026", (_req, res) => res.sendFile(path.join(blogDir, "index.html")));
 
   // Janmashtami 2026 static blog — keep this before generic SSR for the same
   // production-safe, slashless route behaviour as the Independence Day page.
   const janmashtamiBlogDir = path.join(process.cwd(), "blog-pages/janmashtami-2026");
+  app.get(["/blog/janmashtami-2026", "/blog/janmashtami-2026/index.html"], (_req, res, next) => {
+    try { res.type("html").send(normalizeSchemaHtml(fs.readFileSync(path.join(janmashtamiBlogDir, "index.html"), "utf8"))); }
+    catch (error) { next(error); }
+  });
   app.use("/blog/janmashtami-2026", express.static(janmashtamiBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/janmashtami-2026", (_req, res) => res.sendFile(path.join(janmashtamiBlogDir, "index.html")));
 
@@ -446,6 +455,10 @@ export async function registerRoutes(
     }
     next();
   });
+  app.get(["/blog/ganesh-chaturthi-2026", "/blog/ganesh-chaturthi-2026/index.html"], (_req, res, next) => {
+    try { res.type("html").send(normalizeSchemaHtml(fs.readFileSync(path.join(ganeshChaturthiBlogDir, "index.html"), "utf8"))); }
+    catch (error) { next(error); }
+  });
   app.use("/blog/ganesh-chaturthi-2026", express.static(ganeshChaturthiBlogDir, { index: "index.html", redirect: false }));
   app.get("/blog/ganesh-chaturthi-2026", (_req, res) => res.sendFile(path.join(ganeshChaturthiBlogDir, "index.html")));
 
@@ -455,7 +468,7 @@ export async function registerRoutes(
   app.get(["/blog/navratri-dussehra-2026", "/blog/navratri-dussehra-2026/index.html"], (_req, res, next) => {
     try {
       const source = fs.readFileSync(path.join(navratriDussehraBlogDir, "index.html"), "utf8");
-      res.type("html").send(renderNavratriBlog(source));
+      res.type("html").send(normalizeSchemaHtml(renderNavratriBlog(source)));
     } catch (error) {
       next(error);
     }
@@ -4079,6 +4092,7 @@ paths:
   // sometimes lags behind client/public/ during deployment. The dynamic route
   // reads the file directly so ChatGPT always gets the current spec.
   app.get("/openapi.yaml", (_req, res) => {
+    res.setHeader("X-Robots-Tag", "noindex, nofollow");
     res.setHeader("Content-Type", "text/yaml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
     res.send(OPENAPI_YAML);

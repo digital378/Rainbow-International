@@ -8,7 +8,7 @@ import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingD
 import { submitInquiry } from "@/lib/inquiryProtection";
 
 const classOptions = [
-  "Nursery", "Jr. KG", "Sr. KG",
+  "Jr. KG", "Sr. KG",
   "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
   "Class 6", "Class 7", "Class 8",
   "Class 9", "Class 10",

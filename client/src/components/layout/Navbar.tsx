@@ -131,7 +131,7 @@ export function Navbar() {
         className="text-center py-1.5 text-[10px] sm:text-[11px] font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase transition-all duration-300 text-white whitespace-nowrap"
         style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 100%)" }}
       >
-        ADMISSIONS OPEN · ACADEMIC YEAR 2026–27
+        ADMISSIONS OPEN · ACADEMIC YEAR 2027–28
       </div>
 
       <div className={`transition-all duration-300 ${isTransparent ? "border-b border-white/10" : "border-b border-gray-100"}`}>
@@ -155,7 +155,6 @@ export function Navbar() {
               <Phone className={`mt-0.5 shrink-0 transition-colors ${isTransparent ? "text-amber-300" : "text-primary"}`} size={16} />
               <div>
                 <a href="tel:+918291568972" onClick={() => trackCallClick({ phone: "+91 82915 68972" })} className={`block text-sm font-semibold transition-colors ${isTransparent ? "text-white hover:text-amber-200" : "text-gray-800 hover:text-primary"}`}>+91 82915 68972</a>
-                <a href="tel:02269105000" onClick={() => trackCallClick({ phone: "(022) 69105000" })} className={`block text-xs transition-colors ${isTransparent ? "text-white/80 hover:text-white" : "text-gray-600 hover:text-primary"}`}>(022) 69105000</a>
               </div>
             </div>
             <div className={`h-8 w-px transition-colors ${isTransparent ? "bg-white/20" : "bg-gray-200"}`} />
@@ -270,7 +269,7 @@ export function Navbar() {
           <div className="p-4 space-y-1">
             {[
               { href: "/", label: "Home" },
-              { href: "/admissions", label: "Admissions 2026–27" },
+              { href: "/admissions", label: "Admissions 2027–28" },
               { href: "/blogs", label: "Blogs" },
               { href: "/contact-us", label: "Connect with us" },
               { href: "/career", label: "Career" },

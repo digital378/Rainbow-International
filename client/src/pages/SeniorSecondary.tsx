@@ -18,7 +18,7 @@ const AMBER = "#d97706";
 const AMBER_LIGHT = "#f59e0b";
 
 const WHATSAPP_URL = "https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%20to%20enquire%20about%20Senior%20Secondary%20%28Class%2011%26%2012%29%20admission%20at%20Rainbow%20International%20School.";
-const PHONE = "+912225976097";
+const PHONE = "+918291568972";
 const DIRECTIONS_URL = "https://maps.google.com/?q=Rainbow+International+School+Brahmand+Phase+4+Thane";
 
 const FAQS: WaveOneFaq[] = [
@@ -182,7 +182,7 @@ export default function SeniorSecondary() {
               "name": "Rainbow International School",
               "url": "https://rainbowinternationalschool.in/",
               "telephone": "+91 82915 68972",
-              "email": "info@rainbowinternationalschool.in",
+              "email": "admin@rainbowinternationalschool.in",
               "sameAs": ["https://maps.app.goo.gl/mfJjMMkksCkcXzMCA"],
               "address": {
                 "@type": "PostalAddress",
@@ -218,7 +218,7 @@ export default function SeniorSecondary() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.78) 60%, rgba(9,26,79,0.65) 100%)" }} />
         <div className="relative z-10 container mx-auto px-4 max-w-6xl py-20 md:py-28 lg:py-32 flex flex-col">
           <span className="inline-flex self-start items-center gap-2 text-[11px] font-extrabold tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: AMBER_LIGHT, color: NAVY }} data-testid="badge-admissions-open">
-            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2026–27
+            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2027–28
           </span>
           <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
             Senior Secondary School in Thane <span className="text-white/40 font-normal">|</span> <span style={{ color: AMBER_LIGHT }}>Class 11 and Class 12</span>
@@ -526,7 +526,7 @@ export default function SeniorSecondary() {
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20" style={{ background: AMBER_LIGHT }} />
               <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: AMBER_LIGHT }} />
               <div className="relative z-10">
-                <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>Admissions 2026–27</span>
+                <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>Admissions 2027–28</span>
                 <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>Looking for Class 11 or Class 12 Admission?</h2>
                 <p className="text-white/85 max-w-2xl mx-auto mb-7 text-sm md:text-base">Explore Senior Secondary at Rainbow International School and speak to our admissions team for stream availability, campus visit and admission guidance.</p>
                 <div className="flex flex-wrap justify-center gap-3">

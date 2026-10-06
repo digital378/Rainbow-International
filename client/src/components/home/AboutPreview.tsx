@@ -3,8 +3,8 @@ import { CalendarCheck, GraduationCap, BookOpen, MapPin, BadgeCheck, Shield, Bus
 import { useEffect, useRef, useState } from "react";
 
 const benefits = [
-  { icon: GraduationCap, title: "CBSE Affiliated Curriculum",                desc: "CBSE No. 1130661. Rigorous, board-recognised curriculum from Nursery through Class 12.",                  color: "#e0edff", accent: "#0d3b86" },
-  { icon: BookOpen,      title: "Nursery to Class 12 Under One Roof",        desc: "No school switches. One campus, one community for a complete K-12 learning journey.",                    color: "#fff3e0", accent: "#d97706" },
+  { icon: GraduationCap, title: "CBSE Affiliated Curriculum",                desc: "CBSE No. 1130661. Rigorous, board-recognised curriculum from KG through Class 12.",                  color: "#e0edff", accent: "#0d3b86" },
+  { icon: BookOpen,      title: "KG to Class 12 Under One Roof",        desc: "No school switches. One campus, one community for a complete K-12 learning journey.",                    color: "#fff3e0", accent: "#d97706" },
   { icon: MapPin,        title: "3.5-Acre Green Campus",                     desc: "Pool, football turf, cricket ground, labs, library — all on one spacious Brahmand campus.",              color: "#e0f7f0", accent: "#059669" },
   { icon: BadgeCheck,    title: "Strong Academics & Co-curricular Learning", desc: "Multiple Intelligence pedagogy, Olympiad coaching, project-based learning and 25+ annual events.",       color: "#f3e0ff", accent: "#7c3aed" },
   { icon: Shield,        title: "Safe & Caring Environment",                 desc: "CCTV, metal detectors, female-led Pre-Primary wing, on-campus infirmary and paediatrician on call.",     color: "#fdf0e0", accent: "#ea580c" },

@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 const faqs = [
   {
     q: "What board is Rainbow International School affiliated with?",
-    a: "Rainbow International School is affiliated with the Central Board of Secondary Education (CBSE), New Delhi. Our affiliation number is 1130661. We follow the CBSE curriculum from Nursery through Class 12, covering Science, Commerce, and Humanities streams in the senior secondary section.",
+    a: "Rainbow International School is affiliated with the Central Board of Secondary Education (CBSE), New Delhi. Our affiliation number is 1130661. We follow the CBSE curriculum from KG through Class 12, covering Science, Commerce, and Humanities streams in the senior secondary section.",
   },
   {
     q: "What grades does Rainbow International School offer?",
@@ -48,7 +48,7 @@ const faqs = [
   },
   {
     q: "How do I find the best school near me for my child in Thane?",
-    a: "When looking for the best school near you in Thane, consider factors like board affiliation, campus infrastructure, extracurricular programmes, teacher quality, and proximity to your home. Rainbow International School checks every box — CBSE-affiliated, award-winning, located centrally in Thane, and offering Nursery to Class 12 with door-to-door bus transport across the city.",
+    a: "When looking for the best school near you in Thane, consider factors like board affiliation, campus infrastructure, extracurricular programmes, teacher quality, and proximity to your home. Rainbow International School checks every box — CBSE-affiliated, award-winning, located centrally in Thane, and offering KG to Class 12 with door-to-door bus transport across the city.",
   },
 ];
 

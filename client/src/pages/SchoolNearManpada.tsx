@@ -8,7 +8,7 @@ import { MapPin, GraduationCap, Shield, Trophy, Users, Bus, Phone } from "lucide
 
 const highlights = [
   { icon: MapPin, title: "Close to Manpada", desc: "Located at Brahmand Phase 4, just 5 minutes from Manpada Junction — convenient access from Manpada, Pokhran Road, and Majiwada." },
-  { icon: GraduationCap, title: "K–12 CBSE School", desc: "Complete education from Nursery to Class 12 with Science, Commerce, and Humanities streams in senior secondary." },
+  { icon: GraduationCap, title: "K–12 CBSE School", desc: "Complete education from KG to Class 12 with Science, Commerce, and Humanities streams in senior secondary." },
   { icon: Shield, title: "World-Class Campus", desc: "3.5-acre campus with smart classrooms, science labs, swimming pool, skating rink, amphitheatre, and organic farm." },
   { icon: Trophy, title: "Award-Winning Excellence", desc: "Multiple 'Best School in Thane' recognitions, British Council ISA, and consistently outstanding board results." },
   { icon: Users, title: "Trusted by 3,000+ Families", desc: "4.8/5 parent rating — one of the most trusted school communities in the Manpada–Brahmand–Majiwada corridor." },
@@ -29,7 +29,7 @@ const faqs = [
   { q: "How far is Rainbow International School from Manpada?", a: "The school is located at Brahmand Phase 4, approximately 5 minutes by road from Manpada Junction via the internal Brahmand road." },
   { q: "Is there a school bus from Manpada?", a: "Yes, GPS-tracked school buses operate on dedicated routes covering Manpada, Pokhran Road, Majiwada, and Dhokali with trained attendants." },
   { q: "Which board is the school affiliated to?", a: "CBSE (Central Board of Secondary Education), Affiliation No. 1130661." },
-  { q: "What age can my child start?", a: "Children can join Nursery from age 2.5 years (as on 31st March). Admissions are open for all classes from Nursery to Class 12." },
+  { q: "What age can my child start?", a: "Children can join Nursery from age 2.5 years (as on 31st March). Admissions are open for all classes from KG to Class 12." },
 ];
 
 export default function SchoolNearManpada() {
@@ -37,8 +37,8 @@ export default function SchoolNearManpada() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Best School Near Manpada Thane — CBSE Nursery to Class 12"
-        description="Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
+        title="Best School Near Manpada Thane — CBSE KG to Class 12"
+        description="Rainbow International School — top CBSE school near Manpada, Thane. 5 min from Manpada Junction. KG to Class 12, 3.5-acre campus, 3000+ students. Admissions 2027-28 open."
         keywords="school near Manpada Thane, best school Manpada, CBSE school Manpada Thane, school near me Manpada, nursery school Manpada Thane, school Pokhran Road"
         canonical="https://rainbowinternationalschool.in/school-near-manpada-thane"
         breadcrumbs={[
@@ -72,7 +72,7 @@ export default function SchoolNearManpada() {
               highest-rated CBSE K–12 school serving the Manpada–Pokhran Road–Majiwada corridor.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              With a 3.5-acre campus, CBSE affiliation, and classes from Nursery to Class 12 (Science, Commerce, and Humanities), 
+              With a 3.5-acre campus, CBSE affiliation, and classes from KG to Class 12 (Science, Commerce, and Humanities),
               Rainbow International is the neighbourhood school that doesn't compromise on quality.
             </p>
           </div>
@@ -132,7 +132,7 @@ export default function SchoolNearManpada() {
         <section className="py-16 bg-gray-50" data-testid="section-cta">
           <div className="container mx-auto px-4 max-w-4xl text-center mb-8">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">Enrol Your Child Today</h2>
-            <p className="text-gray-500 mb-6">Admissions 2026–27 are open. Schedule a campus visit or apply online.</p>
+            <p className="text-gray-500 mb-6">Admissions 2027–28 are open. Schedule a campus visit or apply online.</p>
             <a href="tel:+918291568972" className="inline-flex items-center gap-2 bg-[#091a4f] text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-[#0d3b86] transition" data-testid="btn-call">
               <Phone className="w-4 h-4" /> +91 82915 68972
             </a>

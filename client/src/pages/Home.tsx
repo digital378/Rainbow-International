@@ -10,11 +10,11 @@ import { LazyVisible } from "@/components/util/LazyVisible";
 import { buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
 
 const HOME_QUICK_ANSWER =
-  "Rainbow International School is the best CBSE school in Thane (since 2009) on a 3.5-acre Brahmand campus. The school offers Nursery to Class 12, on-campus sports, science labs, library, transport and an infirmary. Admissions for the 2026-27 academic year are open.";
+  "Rainbow International School is the best CBSE school in Thane (since 2009) on a 3.5-acre Brahmand campus. The school offers KG to Class 12, on-campus sports, science labs, library, transport and an infirmary. Admissions for the 2027-28 academic year are open.";
 
 const HOME_FAQS: WaveOneFaq[] = [
-  { q: "Is Rainbow International School a CBSE school in Thane?",       a: "Yes. RIS is a CBSE-affiliated school in Thane (Brahmand) running classes from Nursery to Class 12 since 2009. Affiliation number 1130661." },
-  { q: "Which classes are admissions open for in 2026-27?",             a: "Admissions are open for Nursery to Class 12 for the 2026-27 academic year, subject to seat availability per class." },
+  { q: "Is Rainbow International School a CBSE school in Thane?",       a: "Yes. RIS is a CBSE-affiliated school in Thane (Brahmand) running classes from KG to Class 12 since 2009. Affiliation number 1130661." },
+  { q: "Which classes are admissions open for in 2027-28?",             a: "Admissions are open for KG to Class 12 for the 2027-28 academic year, subject to seat availability per class." },
   { q: "What is the admission process at RIS?",                          a: "Submit enquiry → counsellor calls back → campus visit → student interaction and document review → admission confirmation and fee payment." },
   { q: "How can parents book a campus visit?",                           a: "Book through the admissions page on the website, call +91 82915 68972, or start a WhatsApp conversation. Visits are available Mon–Sat, 9 AM–5 PM." },
   { q: "Is transport available?",                                        a: "Yes. GPS-tracked school buses with trained attendants cover 30+ routes across Thane — Brahmand, Ghodbunder Road, Manpada, Hiranandani and more." },
@@ -44,8 +44,8 @@ export default function Home() {
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
         title="Best CBSE School in Thane | Nursery to Class 12"
-        description="Rainbow International School is a CBSE school in Thane for Nursery to Class 12 with academics, sports, safety, transport and holistic learning."
-        keywords="best CBSE school in Thane, CBSE school in Thane, CBSE school near me, Nursery to Class 12 school in Thane, top CBSE school in Thane, school in Brahmand Thane, school near Hiranandani Estate, school near Ghodbunder Road"
+        description="Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning."
+        keywords="best CBSE school in Thane, CBSE school in Thane, CBSE school near me, KG to Class 12 school in Thane, top CBSE school in Thane, school in Brahmand Thane, school near Hiranandani Estate, school near Ghodbunder Road"
         canonical="https://rainbowinternationalschool.in/"
         ogImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg"
         appendSiteName={false}
@@ -59,7 +59,7 @@ export default function Home() {
               "url": "https://rainbowinternationalschool.in/",
               "logo": "https://rainbowinternationalschool.in/wp-content/uploads/2024/01/RIS-Logo.png",
               "image": "https://rainbowinternationalschool.in/wp-content/uploads/2022/09/rainbow-international-school-awards-best-preschool-secondary-school-thane-international-school-ad.jpg",
-              "description": "Best CBSE school in Thane — Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving 3000+ students from Nursery to Class 12.",
+              "description": "Best CBSE school in Thane — Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving 3000+ students from KG to Class 12.",
               "foundingDate": "2009-04-01",
               "numberOfStudents": 3000,
               "numberOfEmployees": { "@type": "QuantitativeValue", "value": 200 },
@@ -72,8 +72,8 @@ export default function Home() {
                 "addressCountry": "IN"
               },
               "geo": { "@type": "GeoCoordinates", "latitude": 19.2287, "longitude": 72.9637 },
-              "telephone": "+918291568972",
-              "email": "info@rainbowinternationalschool.in",
+              "telephone": "+91-82915-68972",
+              "email": "admin@rainbowinternationalschool.in",
               "sameAs": [
                 "https://www.facebook.com/RainbowInternationalSchoolThane",
                 "https://www.instagram.com/rainbowinternationalschool",
@@ -97,7 +97,7 @@ export default function Home() {
       <main className="flex-grow" role="main">
         <article itemScope itemType="https://schema.org/School">
           <meta itemProp="name" content="Rainbow International School — Best CBSE School in Thane" />
-          <meta itemProp="description" content="Best CBSE-affiliated K-12 school in Thane, Maharashtra. Nursery to Class 12 with 3.5-acre campus, strong academics, sports, safety and holistic learning." />
+          <meta itemProp="description" content="Best CBSE-affiliated K-12 school in Thane, Maharashtra. KG to Class 12 with 3.5-acre campus, strong academics, sports, safety and holistic learning." />
           <meta itemProp="address" content="Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607" />
           <meta itemProp="telephone" content="+91 82915 68972" />
           <meta itemProp="url" content="https://rainbowinternationalschool.in" />

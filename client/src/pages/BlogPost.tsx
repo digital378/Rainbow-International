@@ -317,7 +317,7 @@ export default function BlogPost() {
               <div className="rounded-2xl p-6 border border-gray-100 shadow-sm bg-white text-center">
                 <div className="text-3xl mb-2">🎓</div>
                 <h3 className="font-black text-base mb-2" style={{ color: "#0d3b86" }}>Admissions Open</h3>
-                <p className="text-gray-500 text-xs mb-4">2026–27 admissions are now open for Nursery to Class 12.</p>
+                <p className="text-gray-500 text-xs mb-4">2027–28 admissions are now open for KG to Class 12.</p>
                 <Link
                   href="/contact-us"
                   className="inline-block w-full py-2 rounded-full text-white text-sm font-semibold"

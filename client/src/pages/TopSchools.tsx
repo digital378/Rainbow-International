@@ -25,7 +25,7 @@ const schools: School[] = [
     rank: 1,
     name: "Rainbow International School",
     board: "CBSE",
-    grades: "Nursery – Class 12",
+    grades: "KG – Class 12",
     location: "Brahmand Phase 4, Thane",
     rating: 4.8,
     reviews: 1240,
@@ -149,7 +149,7 @@ const chooseFactors = [
   { icon: Users, title: "Teacher-Student Ratio", desc: "Smaller class sizes mean more individual attention. A ratio of 1:25 or better is considered ideal for personalised learning." },
   { icon: Trophy, title: "Extracurriculars", desc: "Sports, arts, music, and clubs are essential for holistic development. Look for schools with diverse activity programmes." },
   { icon: Shield, title: "Safety & Infrastructure", desc: "CCTV surveillance, fire safety, trained security, first-aid facilities, and well-maintained buildings are non-negotiable." },
-  { icon: Bus, title: "K–12 Pathway", desc: "A school that covers Nursery to Class 12 provides continuity, stability, and avoids disruptive transitions." },
+  { icon: Bus, title: "K–12 Pathway", desc: "A school that covers KG to Class 12 provides continuity, stability, and avoids disruptive transitions." },
 ];
 
 function StarRating({ rating }: { rating: number }) {

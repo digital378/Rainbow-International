@@ -54,7 +54,7 @@ export default function ChairpersonsNote() {
                 <p>Dear Students, Parents, and Well-wishers,</p>
 
                 <p>
-                  It is with immense pride and joy that I welcome you to Rainbow International School — an institution that has been a beacon of excellence in Thane since 2009. What began as a dream to create a world-class school rooted in Indian values has today grown into one of the most trusted names in education, serving over <strong>3,000 students</strong> across Nursery to Class 12.
+                  It is with immense pride and joy that I welcome you to Rainbow International School — an institution that has been a beacon of excellence in Thane since 2009. What began as a dream to create a world-class school rooted in Indian values has today grown into one of the most trusted names in education, serving over <strong>3,000 students</strong> across KG to Class 12.
                 </p>
 
                 <p>

@@ -81,9 +81,6 @@ export function trackFormSubmit(params: {
     page_path: path,
     page_title: document.title,
     form_type: params.formType || "inquiry",
-    parent_name: params.parentName || "",
-    student_name: params.studentName || "",
-    phone: params.phone || "",
     grade: params.grade || "",
     lead_source: utmParams.utm_source || "direct",
     lead_medium: utmParams.utm_medium || "",
@@ -98,7 +95,7 @@ export function trackFormSubmit(params: {
     value: 1.0,
     currency: "INR",
   });
-  console.log("[GA4] Form submit:", eventName, params);
+  console.log("[GA4] Form submit:", eventName, params.grade || "");
   console.log("[Google Ads] Lead conversion fired:", GOOGLE_ADS_LEAD_CONVERSION);
 }
 
@@ -106,18 +103,21 @@ export function trackCallClick(params: {
   phone: string;
   sourcePage?: string;
 }): void {
+  const phoneLabel = params.phone.replace(/\D/g, "") === "918291568972"
+    ? "+91 82915 68972"
+    : params.phone;
   window.gtag("event", "call_click", {
-    phone: params.phone,
+    phone: phoneLabel,
     source_page: params.sourcePage || window.location.pathname,
     send_to: MEASUREMENT_ID,
   });
   window.gtag("event", "conversion", {
     send_to: MEASUREMENT_ID,
     event_category: "engagement",
-    event_label: params.phone,
+    event_label: phoneLabel,
     conversion_name: "call_click",
   });
-  console.log("[GA4] Call click (key event):", params.phone);
+  console.log("[GA4] Call click (key event):", phoneLabel);
 }
 
 export function trackWhatsAppClick(params?: {

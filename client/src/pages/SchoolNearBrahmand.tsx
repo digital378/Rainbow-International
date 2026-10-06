@@ -8,7 +8,7 @@ import { MapPin, GraduationCap, Shield, Trophy, Users, Bus, Phone } from "lucide
 
 const highlights = [
   { icon: MapPin, title: "Heart of Brahmand", desc: "Located in Brahmand Phase 4 — walking distance from Cosmos Arcade, Brahmand Society, and surrounding residential complexes." },
-  { icon: GraduationCap, title: "K–12 Under One Roof", desc: "Nursery to Class 12 (Science, Commerce, Humanities) — no school changes, seamless transitions." },
+  { icon: GraduationCap, title: "K–12 Under One Roof", desc: "KG to Class 12 (Science, Commerce, Humanities) — no school changes, seamless transitions." },
   { icon: Shield, title: "Safe & Secure Campus", desc: "200+ CCTV cameras, card-based entry, trained security, full-time nurse, and equipped ambulance." },
   { icon: Trophy, title: "Award-Winning School", desc: "Best School in Thane (multiple years), British Council International School Award, Google for Education certified." },
   { icon: Users, title: "3,000+ Students", desc: "One of Thane's largest CBSE school communities, with 200+ dedicated educators." },
@@ -28,8 +28,8 @@ const distances = [
 const faqs = [
   { q: "How far is Rainbow International School from Brahmand?", a: "Rainbow International School is located inside Brahmand Phase 4 itself (Cosmos Arcade). Most Brahmand residents can walk to school in 2–5 minutes." },
   { q: "Is there bus transport within Brahmand?", a: "Yes, school buses operate within all phases of Brahmand and surrounding neighbourhoods. GPS tracking and trained attendants are provided on every route." },
-  { q: "What board does the school follow?", a: "Rainbow International School is affiliated to the CBSE board (Affiliation No. 1130661) and offers classes from Nursery to Class 12." },
-  { q: "Are admissions open for 2026–27?", a: "Yes, admissions for 2026–27 are currently open for all classes from Nursery to Class 12. Contact +91 82915 68972 to apply." },
+  { q: "What board does the school follow?", a: "Rainbow International School is affiliated to the CBSE board (Affiliation No. 1130661) and offers classes from KG to Class 12." },
+  { q: "Are admissions open for 2027–28?", a: "Yes, admissions for 2027–28 are currently open for all classes from KG to Class 12. Contact +91 82915 68972 to apply." },
 ];
 
 export default function SchoolNearBrahmand() {
@@ -37,8 +37,8 @@ export default function SchoolNearBrahmand() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Best School Near Brahmand Thane — CBSE Nursery to Class 12"
-        description="Rainbow International School — the best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. Nursery to Class 12, 3.5-acre campus, 3000+ students. Admissions 2026-27 open."
+        title="Best School Near Brahmand Thane — CBSE KG to Class 12"
+        description="Rainbow International School — the best CBSE school near Brahmand, Thane. Located in Brahmand Phase 4. KG to Class 12, 3.5-acre campus, 3000+ students. Admissions 2027-28 open."
         keywords="school near Brahmand Thane, best school Brahmand, CBSE school Brahmand Thane, school near me Brahmand, nursery school Brahmand Thane"
         canonical="https://rainbowinternationalschool.in/school-near-brahmand-thane"
         breadcrumbs={[
@@ -72,7 +72,7 @@ export default function SchoolNearBrahmand() {
               Brahmand Phase 1 through 4, Hiranandani Estate, and surrounding areas.
             </p>
             <p className="text-gray-600 leading-relaxed">
-              With a 3.5-acre campus, CBSE affiliation, 3,000+ students, and classes from Nursery to Class 12 (including Science, Commerce, and Humanities 
+              With a 3.5-acre campus, CBSE affiliation, 3,000+ students, and classes from KG to Class 12 (including Science, Commerce, and Humanities
               streams), Rainbow International offers everything parents look for — without the long commute.
             </p>
           </div>

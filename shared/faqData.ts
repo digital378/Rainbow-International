@@ -33,7 +33,7 @@ export const FAQ_PAGE_CATEGORIES: FaqCategory[] = [
     faqs: [
       { q: "What is the admission process at Rainbow International School?", a: "The admission process includes submitting an online application form, followed by an interaction session with the child and parents. For senior classes (Class 9 onwards), there is a written assessment. Applications are accepted on a first-come, first-served basis, subject to seat availability.", links: [{ label: "Apply Online", href: "/application-form" }, { label: "Schedule a Visit", href: "/schedule-appointment" }] },
       { q: "What is the age criteria for admission?", a: "For Nursery, the child should be 2.5 years old as on 31st March of the academic year. For Jr KG, the child should be 3.5 years, and for Sr KG, 4.5 years. For Class 1, the child must be 6 years old as on 31st March. Age criteria follow CBSE norms." },
-      { q: "When do admissions open for the new academic year?", a: "Admissions for the academic year 2026–27 are currently open. We recommend applying early as seats fill up quickly, especially for Pre-Primary and Grade 1." },
+      { q: "When do admissions open for the new academic year?", a: "Admissions for the academic year 2027–28 are currently open. We recommend applying early as seats fill up quickly, especially for Pre-Primary and Grade 1." },
       { q: "Is there a waiting list?", a: "Yes, once a class reaches full capacity, applicants are placed on a waiting list. Families on the waiting list are contacted if a seat becomes available." },
       { q: "Can my child join mid-year?", a: "Mid-year admissions are possible subject to seat availability. Please contact our admissions office to check current availability for the desired class." },
     ],
@@ -110,7 +110,7 @@ export const FAQ_PAGE_CATEGORIES: FaqCategory[] = [
 /** FAQ section shown on /admissions. */
 export const ADMISSIONS_FAQS: FaqItem[] = [
   { q: "Which board is Rainbow International School affiliated to?",   a: "Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi. Affiliation No. 1130661." },
-  { q: "Which classes are admissions open for in 2026-27?",           a: "Admissions are open for Nursery to Class 12 for the 2026-27 academic year, subject to seat availability per class." },
+  { q: "Which classes are admissions open for in 2027-28?",           a: "Admissions are open for KG to Class 12 for the 2027-28 academic year, subject to seat availability per class." },
   { q: "What is the admission process at RIS?",                        a: "Submit an enquiry online or by phone → counsellor calls back → campus visit and counselling session → student interaction and document review → admission confirmation on fee payment." },
   { q: "Is school transport available?",                               a: "Yes. GPS-tracked school buses with trained attendants cover Brahmand, Ghodbunder Road, Manpada and 30+ routes across Thane." },
   { q: "What documents are required for admission?",                   a: "Birth certificate, Aadhaar (child and parent), passport photos, address proof, previous school transfer certificate, last two years' report cards, and a medical fitness certificate." },

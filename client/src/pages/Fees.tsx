@@ -15,7 +15,7 @@ const FEES_FAQS: WaveOneFaq[] = [
   { q: "Are transport fees included in the tuition fee?", a: "No. Transport fees are charged separately and are confirmed at admission based on route." },
   { q: "What payment modes are accepted?", a: "Standard payment modes (online transfer, cheque) are accepted; details are shared during admission." },
   { q: "Are there any one-time charges?", a: "Yes. One-time admission charges apply at the time of joining and are listed in the fee structure." },
-  { q: "How do I get the fee structure for a specific class?", a: "The class-wise fee table on the Fee Structure page covers Nursery to Class 12. Contact the admission desk for any clarifications." },
+  { q: "How do I get the fee structure for a specific class?", a: "The class-wise fee table on the Fee Structure page covers KG to Class 12. Contact the admission desk for any clarifications." },
 ];
 
 const inclusions = [
@@ -46,7 +46,7 @@ export default function Fees() {
             {
               "@type": "WebPage",
               "name": "CBSE School Fee Structure Thane 2026-27 — Rainbow International School",
-              "description": "Fee structure details for Rainbow International School, Thane — Nursery to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
+              "description": "Fee structure details for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
               "url": "https://rainbowinternationalschool.in/fee-structure"
             },
             buildFaqPageSchema(FEES_FAQS)
@@ -56,7 +56,7 @@ export default function Fees() {
       <Navbar />
       <PageBanner
         title="Fee Structure"
-        subtitle="Transparent, Value-Based Education — Nursery to Class 12"
+        subtitle="Transparent, Value-Based Education — KG to Class 12"
         bgImage="/images/students/hero-senior-secondary.webp"
       />
 
@@ -65,7 +65,7 @@ export default function Fees() {
           <div className="container mx-auto px-4 max-w-5xl">
             <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">Fee Overview</h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              Rainbow International School offers a comprehensive, value-driven education from Nursery to Class 12 at competitive fee levels. 
+              Rainbow International School offers a comprehensive, value-driven education from KG to Class 12 at competitive fee levels.
               Our fee structure covers tuition, access to world-class facilities on our 3.5-acre campus, and a wide range of co-curricular activities. 
               We believe in complete transparency — there are no hidden charges.
             </p>

@@ -1,3 +1,4 @@
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 import type { Express } from "express";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -324,7 +325,7 @@ export function registerRakshaBandhan2026SSR(app: Express) {
     try {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       res.setHeader("X-Rendered-By", "Express SSR Custom");
-      res.send(renderPage());
+      res.send(normalizeSchemaHtml(renderPage()));
     } catch (error) {
       console.error("[ssrRakshaBandhan2026] Error rendering page:", error);
       res.status(500).send("Internal Server Error");

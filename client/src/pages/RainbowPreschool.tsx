@@ -583,7 +583,7 @@ export default function RainbowPreschool() {
                 style={{ background: "linear-gradient(135deg, #091a4f 0%, #0d3b86 50%, #091a4f 100%)" }}
               >
                 <h2 className="text-3xl md:text-4xl font-black text-white mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  One School. One Journey.<br />Nursery to Class 12.
+                  One School. One Journey.<br />KG to Class 12.
                 </h2>
                 <p className="text-white/85 text-lg leading-relaxed mb-8 max-w-2xl mx-auto">
                   Children who begin at Rainbow Preschool International seamlessly grow into Rainbow International School — with the same values, the same warmth, and the same commitment to excellence at every stage.

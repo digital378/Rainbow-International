@@ -69,7 +69,7 @@ export default function TermsOfUse() {
             <h2 className="text-xl font-black mt-8 mb-3" style={{ color: "#0d3b86" }}>8. Contact Us</h2>
             <p className="text-sm mb-2">For questions about these Terms of Use, please contact us at:</p>
             <ul className="space-y-1 text-sm">
-              <li>Email: <a href="mailto:info@rainbowinternationalschool.in" className="underline" style={{ color: "#0d3b86" }}>info@rainbowinternationalschool.in</a></li>
+              <li>Email: <a href="mailto:admin@rainbowinternationalschool.in" className="underline" style={{ color: "#0d3b86" }}>admin@rainbowinternationalschool.in</a></li>
               <li>Phone: <a href="tel:+918655003366" className="underline" style={{ color: "#0d3b86" }}>+91 86550 03366</a></li>
             </ul>
           </div>

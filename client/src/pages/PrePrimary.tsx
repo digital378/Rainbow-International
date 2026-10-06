@@ -8,7 +8,7 @@ import { ExternalLink } from "lucide-react";
 import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
 
 const PRE_PRIMARY_QUICK_ANSWER =
-  "The Pre-Primary section at Rainbow International School Thane covers Nursery, Junior KG and Senior KG (ages 2.5–5.5) using activity- and play-based learning aligned to the CBSE foundational stage and Multiple Intelligence pedagogy. Admissions for Nursery, Jr KG and Sr KG for the 2026-27 academic year are open at the Brahmand campus.";
+  "The Pre-Primary section at Rainbow International School Thane covers Nursery, Junior KG and Senior KG (ages 2.5–5.5) using activity- and play-based learning aligned to the CBSE foundational stage and Multiple Intelligence pedagogy. Admissions for Nursery, Jr KG and Sr KG for the 2027-28 academic year are open at the Brahmand campus.";
 
 const PRE_PRIMARY_FAQS: WaveOneFaq[] = [
   { q: "What is the age criteria for Nursery, Jr KG and Sr KG admissions?", a: "Indicative age (as on 30 June of the admission year): Nursery 2.5–3.5 years, Junior KG 3.5–4.5 years, Senior KG 4.5–5.5 years. Final age cut-offs are confirmed at the time of admission as per CBSE / state norms." },
@@ -16,7 +16,7 @@ const PRE_PRIMARY_FAQS: WaveOneFaq[] = [
   { q: "How long is the Pre-Primary school day?", a: "The Pre-Primary day is a structured half-to-full-day session with a balance of circle time, structured activities, free play, snack and rest, designed to keep young learners engaged without fatigue. Exact timings are shared at the time of admission." },
   { q: "What is the typical class size in Pre-Primary?", a: "Pre-Primary classes are kept small with a dedicated class teacher and a trained helper to ensure individual attention, safety and personalised support for every child." },
   { q: "How does RIS Thane keep young children safe on campus?", a: "The 3.5-acre Brahmand campus is fully enclosed with CCTV-monitored entry and exit, a female-staff-led Pre-Primary wing, an on-campus infirmary, paediatrician on call and structured pick-up / drop-off protocols." },
-  { q: "How can I apply for Pre-Primary admission for 2026-27?", a: "Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the admission form, fee details and document checklist." },
+  { q: "How can I apply for Pre-Primary admission for 2027-28?", a: "Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the admission form, fee details and document checklist." },
 ];
 
 const curriculum = [
@@ -226,7 +226,7 @@ export default function PrePrimary() {
                 {/* Admission banner */}
                 <div className="rounded-3xl border-2 border-amber-400 p-6 text-center" style={{ background: "#fffbeb" }}>
                   <p className="text-sm font-black uppercase tracking-wide mb-3" style={{ color: "#b45309" }}>
-                    Admissions are Open for the Academic Year 2026–27
+                    Admissions are Open for the Academic Year 2027–28
                   </p>
                   <a
                     href="#contact"
@@ -519,7 +519,7 @@ export default function PrePrimary() {
 
         {/* ── Admissions CTA strip ──────────────────────────────── */}
         <div className="py-14 text-center" style={{ background: "#091a4f" }}>
-          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2026–27</p>
+          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2027–28</p>
           <a href="#contact" className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
             Enquire Now
           </a>

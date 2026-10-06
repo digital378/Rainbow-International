@@ -1,5 +1,6 @@
 import type { BlogPost } from "@shared/schema";
 import { resolveBlogImageUrl } from "@shared/blogImage";
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 
 /**
  * Shared building blocks for server-rendered blog pages.
@@ -40,7 +41,7 @@ export function toISODate(dateStr: string): string {
 export function renderHeadMeta(post: BlogPost): string {
   const imageUrl = resolveBlogImageUrl(post.heroUrl);
 
-  return `  <meta charset="UTF-8" />
+  return normalizeSchemaHtml(`  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
@@ -111,7 +112,7 @@ export function renderHeadMeta(post: BlogPost): string {
       }
     }))
   })}
-  </script>` : ''}`;
+  </script>` : ''}`);
 }
 
 export const META_PIXEL = `  <!-- Meta Pixel Code -->
@@ -120,9 +121,9 @@ export const META_PIXEL = `  <!-- Meta Pixel Code -->
   <!-- End Meta Pixel Code -->`;
 
 export const TOPBAR_HTML = `<div class="topbar">
-  <a href="tel:02269105000">
+  <a href="tel:+918291568972">
     <svg class="topbar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>
-    (022) 69105000
+    +91 82915 68972
   </a>
   <a href="tel:+918291568972">+91 82915 68972</a>
   <span style="margin-left:auto;display:flex;align-items:center;gap:5px;">
@@ -173,7 +174,7 @@ export function renderFooter(): string {
   <div class="footer-inner">
     <div>
       <p class="footer-brand">Rainbow International School</p>
-      <p class="footer-desc">CBSE-affiliated school in Thane, Maharashtra. Nursery to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
+      <p class="footer-desc">CBSE-affiliated school in Thane, Maharashtra. KG to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
       <div class="footer-socials">
         <a href="https://www.facebook.com/RainbowInternationalSchoolThane" class="footer-social-btn" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg>
@@ -222,7 +223,7 @@ export function renderFooter(): string {
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-        <a href="mailto:info@rainbowinternationalschool.in" style="color:rgba(255,255,255,0.60);text-decoration:none;">info@rainbowinternationalschool.in</a>
+        <a href="mailto:admin@rainbowinternationalschool.in" style="color:rgba(255,255,255,0.60);text-decoration:none;">admin@rainbowinternationalschool.in</a>
       </div>
     </div>
   </div>

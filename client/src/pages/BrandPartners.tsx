@@ -122,7 +122,7 @@ export default function BrandPartners() {
     } else {
       setSubmitting(false);
       setConfirmation(
-        "Thank you! Your brochure is being prepared — our team will email it to you shortly. For immediate assistance, call (022) 69105000."
+        "Thank you! Your brochure is being prepared — our team will email it to you shortly. For immediate assistance, call +91 82915 68972."
       );
     }
   };
@@ -299,7 +299,7 @@ export default function BrandPartners() {
               Become Part of the Rainbow Community
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto mb-7">
-              Admissions are open for AY 2026–27. Join 3,000+ RIS families and unlock privileges from day one.
+              Admissions are open for AY 2027–28. Join 3,000+ RIS families and unlock privileges from day one.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link href="/admissions" className="px-6 py-3 rounded-full font-bold text-sm text-white" style={{ background: NAVY }} data-testid="link-cta-admissions">

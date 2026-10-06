@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl font-black mt-8 mb-3" style={{ color: "#0d3b86" }}>7. Contact Us</h2>
             <p className="text-gray-600 text-sm mb-2">If you have any questions about this Privacy Policy, please contact us at:</p>
             <ul className="space-y-1 text-sm text-gray-600">
-              <li>Email: <a href="mailto:info@rainbowinternationalschool.in" className="underline" style={{ color: "#0d3b86" }}>info@rainbowinternationalschool.in</a></li>
+              <li>Email: <a href="mailto:admin@rainbowinternationalschool.in" className="underline" style={{ color: "#0d3b86" }}>admin@rainbowinternationalschool.in</a></li>
               <li>Phone: <a href="tel:+918655003366" className="underline" style={{ color: "#0d3b86" }}>+91 86550 03366</a></li>
               <li>Address: Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra, India</li>
             </ul>

@@ -15,7 +15,7 @@ const generalInfo = [
   { label: "Complete Address with PIN Code", value: "Brahmand Phase 4, Opp. TMC Water Tank, Kolshet Rd, Thane, Maharashtra – 400607" },
   { label: "Principal Name & Qualification", value: "Mrs. Vimlesh Sindhu / MA B.Ed" },
   { label: "Email ID", value: "vimlesh@rainbowpreschools.com" },
-  { label: "Contact Details", value: "(022) 6910 5000 / 87799 04288" },
+  { label: "Contact Details", value: "+91 82915 68972" },
 ];
 
 const documents: { label: string; href: string; fileName: string }[] = [
@@ -300,7 +300,7 @@ export default function CbseDisclosures() {
             <p className="text-sm text-gray-600 leading-relaxed">
               For complete and up-to-date CBSE mandatory disclosures, please refer to the{" "}
               <a href="https://cbse.gov.in" target="_blank" rel="noopener noreferrer" className="font-semibold underline" style={{ color: "#0d3b86" }}>official CBSE website</a>{" "}
-              or contact the school administration at <strong>(022) 6910 5000 / 87799 04288</strong>.
+              or contact the school administration at <strong>+91 82915 68972</strong>.
             </p>
           </div>
 

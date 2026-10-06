@@ -11,7 +11,7 @@ import { submitInquiry } from "@/lib/inquiryProtection";
 import { CheckCircle } from "lucide-react";
 
 const grades = [
-  "Nursery", "Jr. KG", "Sr. KG",
+  "Jr. KG", "Sr. KG",
   "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
   "Class 6", "Class 7", "Class 8",
   "Class 9", "Class 10",
@@ -75,16 +75,16 @@ export default function ApplicationForm() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Application Form 2026–27 | Rainbow International School Thane"
-        description="Submit a detailed admission application to Rainbow International School, Thane. CBSE affiliated, Nursery to Class 12. Schedule a campus visit and complete your application online."
-        keywords="Rainbow International School application form, CBSE school admission Thane 2026-27, apply Rainbow school online"
+        title="Application Form 2027–28 | Rainbow International School Thane"
+        description="Submit a detailed admission application to Rainbow International School, Thane. CBSE affiliated, KG to Class 12. Schedule a campus visit and complete your application online."
+        keywords="Rainbow International School application form, CBSE school admission Thane 2027-28, apply Rainbow school online"
         canonical="https://rainbowinternationalschool.in/application-form"
       />
       <ScrollProgress />
       <Navbar />
       <PageBanner
         title="Application Form"
-        subtitle="Admissions Open for Academic Year 2026–27"
+        subtitle="Admissions Open for Academic Year 2027–28"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Admissions", href: "/admissions" }, { label: "Application Form" }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/04-copy.jpeg"
       />
@@ -94,7 +94,7 @@ export default function ApplicationForm() {
 
           <div className="text-center mb-10">
             <span className="inline-block bg-blue-50 text-blue-700 text-xs font-bold tracking-widest uppercase px-4 py-1 rounded-full mb-4">
-              Detailed Application — 2026–27
+              Detailed Application — 2027–28
             </span>
             <h2 className="text-3xl font-bold text-[#091a4f] mb-3">Complete Your Application</h2>
             <p className="text-gray-500 max-w-xl mx-auto text-sm">
@@ -110,7 +110,7 @@ export default function ApplicationForm() {
           {/* Info strip */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
             {[
-              { label: "Grades",      value: "Nursery – Class 12" },
+              { label: "Grades",      value: "KG – Class 12" },
               { label: "Affiliation", value: "CBSE No. 1130661"   },
               { label: "Campus",      value: "Brahmand, Thane"    },
             ].map(item => (

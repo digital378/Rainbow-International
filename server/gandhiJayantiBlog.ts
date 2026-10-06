@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { GANDHI_PATH, GANDHI_OLD_SLUG, GANDHI_LAYOUT_CSS, prepareGandhiArticle } from "../shared/gandhiArticleContent";
 import { projectGandhiHeading } from "./gandhiHeading";
+import { normalizeSchemaHtml } from "@shared/orgSchema";
 
 const SOURCE = "gandhi-jayanti-2026-blog-preview-v2_1790747569571.html";
 const ASSET_PATH = "/blog-assets/gandhi-jayanti-2026";
@@ -117,7 +118,7 @@ export function registerGandhiJayantiBlog(app: Express) {
         template,
       );
       res.setHeader("Cache-Control", "no-store");
-      res.type("html").send(rendered);
+      res.type("html").send(normalizeSchemaHtml(rendered));
     } catch (error) {
       next(error);
     }

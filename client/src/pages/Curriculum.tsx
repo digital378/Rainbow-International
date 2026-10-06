@@ -257,7 +257,7 @@ export default function Curriculum() {
       <Navbar />
       <PageBanner
         title="Curriculum"
-        subtitle="A balanced, future-ready CBSE curriculum from Nursery to Class 12."
+        subtitle="A balanced, future-ready CBSE curriculum from KG to Class 12."
         breadcrumb={[{ label: "Curriculum" }]}
         bgImage="/images/home/academic/primary-section.jpg"
       />
@@ -425,7 +425,7 @@ export default function Curriculum() {
 
         {/* ── CTA ───────────────────────────────────────────────── */}
         <div className="py-14 text-center" style={{ background: "#091a4f" }}>
-          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2026–27</p>
+          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2027–28</p>
           <a href="#contact" className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
             Enquire Now
           </a>
