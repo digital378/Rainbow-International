@@ -1,0 +1,97 @@
+SEO PROMPT 4 — CLASS PAGES ( /primary-section, /middle-school-section, /secondary-section, /senior-secondary-section )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, section order, button, form, handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+============================================================
+PART A — ONE COPY SOURCE PER PAGE (same pattern as home.ts / admissions.ts)
+============================================================
+Create shared/content/primary.ts, shared/content/middle.ts, shared/content/secondary.ts, shared/content/senior.ts. Move EVERY visible sentence of each page (hero, cards, journeys, grade blocks, lists, FAQs, CTA text) into its file as plain strings/arrays. The React pages (client/src/pages/Primary.tsx, MiddleSchool.tsx, Secondary.tsx, SeniorSecondary.tsx) read their text from these files; icons/colours/images stay in the components, joined by array index. Text not listed in PART C stays word-for-word as it is today.
+server/pageTitles.ts and shared/routeSeo.ts entries for these 4 routes import title/description from the content files (no retyping).
+
+============================================================
+PART B — METADATA (title has NO site-name suffix; appendSiteName={false})
+============================================================
+/primary-section
+  title: "CBSE Primary School in Thane | Class 1 Admission 2027-28"
+  description: "Class 1 to 5 at Rainbow International School, Brahmand, Thane West: CBSE, Spanish, 7:30 am to 1 pm. Class 1 entry from age 6. Admissions 2027-28."
+  keywords: "Class 1 admission in Thane, CBSE primary school in Thane, 1st standard admission Thane, Class 1 to 5 CBSE school Thane West, primary school in Thane West"
+/middle-school-section
+  title: "CBSE Middle School in Thane | Class 6 to 8 Admission"
+  description: "Class 6 to 8 at Rainbow International School, Thane West: CBSE subjects, Spanish up to Grade 8, labs and sports. Timings 7:30 am to 1 pm."
+  keywords: "Class 6 admission in Thane, CBSE middle school in Thane, 6th standard CBSE school Thane, Class 7 admission Thane West, Class 8 admission Thane West"
+/secondary-section
+  title: "CBSE Class 9 & 10 in Thane | Admission 2027-28"
+  description: "Class 9 and 10 at Rainbow International School, Brahmand, Thane West: CBSE board preparation, labs, mentoring. Timings 7:30 am to 1 pm."
+  keywords: "Class 9 admission in Thane, CBSE Class 10 school in Thane, 9th standard CBSE school Thane West, 10th standard CBSE school Thane, CBSE board school Thane"
+/senior-secondary-section
+  title: "CBSE Class 11 & 12 in Thane | Science, Commerce, Humanities"
+  description: "Class 11 admission 2027-28 in Thane West: CBSE Science, Commerce and Humanities at Rainbow International School. Timings 1 pm to 6 pm."
+  keywords: "Class 11 admission in Thane, CBSE schools in Thane for 11th and 12th, 11th science admission Thane CBSE, 11th commerce CBSE Thane, Class 12 CBSE school Thane"
+Breadcrumb last item stays short: "Primary School", "Middle School", "Secondary School", "Senior Secondary".
+JSON-LD on these pages: no FAQPage (remove buildFaqPageSchema if present). Keep only what remains (WebPage/Breadcrumb) plus the shared org graph.
+
+============================================================
+PART C — COPY CHANGES (everything else unchanged)
+============================================================
+--- H1 (keep the existing structure: same <br> / separator span / amber span; only words change) ---
+Primary:   "Primary School in Thane West" + amber "Class 1 to 5"
+Middle:    "Middle School in Thane West" + separator "|" + amber "Class 6 to 8"
+Secondary: "Secondary School in Thane" + separator "|" + amber "Class 9 and 10"
+Senior:    "Class 11 and 12 in Thane" + separator "|" + amber "Science, Commerce, Humanities"
+
+--- Hero second (smaller) paragraph ---
+Primary:   "CBSE-affiliated school in Brahmand, Thane West: school day 7:30 am–1:00 pm, Spanish taught, Class 1 entry from age 6, and school buses within 10 km."
+Middle:    "CBSE-affiliated school in Brahmand, Thane West: school day 7:30 am–1:00 pm, Spanish up to Grade 8, science labs, and school buses within 10 km."
+Secondary: "CBSE-affiliated school in Brahmand, Thane West: school day 7:30 am–1:00 pm, Physics, Chemistry and Biology labs, periodic tests and pre-boards. 100% Class 10 result in 2018-19."
+Senior:    "CBSE Science, Commerce and Humanities in an afternoon shift, 1:00–6:00 pm, in Brahmand, Thane West, with Physics, Chemistry, Biology, IT and Maths labs."
+
+--- New FAQs: insert these at the TOP of each page's FAQ list (same FAQ component) ---
+Primary:
+ "What is the age for Class 1 admission?" / "A child must be at least 6 years old for Class 1 (6 to 7 years), as per CBSE norms. Classes 2 to 5 follow in one-year steps."
+ "What are the Primary school timings?" / "Class 1 to 5: 7:30 am to 1:00 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+ "Is Spanish taught in Primary?" / "Yes. Spanish is taught from KG to Grade 8, so it continues through Class 1 to 5."
+ "Is there an entrance test for Class 1?" / "No. There is no entrance test for KG to Class 8; children have a friendly interaction and documents are reviewed."
+Middle:
+ "What are the Middle School timings?" / "Class 6 to 8: 7:30 am to 1:00 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+ "Is Spanish taught in Class 6 to 8?" / "Yes. Spanish is taught from KG up to Grade 8."
+ "Is there an entrance test for Class 6, 7 or 8?" / "No. There is no entrance test up to Class 8; students have a friendly interaction and documents are reviewed."
+Secondary:
+ "What are the Class 9 and 10 timings?" / "Class 9 and 10: 7:30 am to 1:00 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+ "What was the school's Class 10 board result?" / "100% in the CBSE Class 10 board exams of 2018-19."
+Senior:
+ "What are the Class 11 and 12 timings?" / "Class 11 and 12 run in an afternoon shift, 1:00 pm to 6:00 pm."
+ "Which streams are offered?" / "Science, Commerce and Humanities. Subject combinations for each batch are confirmed by the admissions team."
+ (If the page already has a near-identical streams FAQ, keep the existing one and skip this second new item.)
+
+--- Replace in all 4 pages ---
+1. Transport FAQ answers ("Is transport available for … students?") →
+   "Yes. The school runs its own GPS-enabled buses for homes within 10 km of the Brahmand campus, including Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet and Pokhran Road. Check your route with the admissions team."
+2. Any "make RIS a trusted choice for …" → "make RIS a good fit for …" (rest of the sentence unchanged).
+3. "female-staff-led" / "Female-staff-led primary section" → "100% female staff team" (keep the rest of the sentence).
+4. Secondary: remove the word "Olympiads" from the FAQ answer and the card body (e.g. "Sports, clubs and events alongside structured academics."; "Inter-house sports, science exhibitions, public speaking, music, art and clubs continue…").
+5. Keywords meta: no "best …" phrases anywhere.
+Do not change subject lists, curriculum text, journeys, images or CTAs beyond the above.
+
+============================================================
+PART D — BOT HTML (server/ssrPages.ts)
+============================================================
+For each of the 4 routes:
+1. Config: title, description, keywords from the content file; breadcrumb last item = the short crumb above; set cfg.h1 to exactly the visitor H1's text (whitespace-normalised, including the "|" where the visitor H1 has it, e.g. "Middle School in Thane West | Class 6 to 8"; Primary: "Primary School in Thane West Class 1 to 5"); set cfg.subtitle to the visitor hero's first paragraph.
+2. Rewrite renderPrimary / renderMiddleSchool / renderSecondary / renderSeniorSecondary to render ONLY the content file, in the same section order and with the same headings (h2/h3), paragraphs, lists and FAQs (as <details><summary>) as the visitor page. One tel:+918291568972 link in the body.
+3. Delete all SSR-only text that is not on the visitor page (hyperlocal blocks, "dedicated bus routes", Saturday tour slots, subject-readiness assessment, French/Sanskrit, robotics, student-teacher ratio, female attendant, career-counselling/aptitude test claims, JEE/NEET coaching claims, "2026" cut-off dates).
+4. Exactly one <h1> per page; no FAQPage.
+
+============================================================
+PART E — SITEMAP
+============================================================
+Set <lastmod> to 2026-10-06 for these 4 URLs only.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for these 4 routes only: title, description, canonical and H1 match bot vs visitor; one main tel + footer landline allowed; admin@ only; no FAQPage. Word-count WARNs are fine; do not add filler.
+3 No other routes, tests or screenshots.
+4 git add -A && git commit -m "SEO P4: class pages copy, metadata and bot parity" then git push once (if it fails, report — no retries, no git setting changes).
+5 Write artifacts/reports/seo-p4-class-pages-report.txt: per route — final title, description, H1 (bot and visitor), bot vs visitor words, banned-word result; files changed; anything not done.
+Reply with the report text only. Do not publish.

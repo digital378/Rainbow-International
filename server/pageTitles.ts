@@ -1,3 +1,7 @@
+import { PRIMARY_SEO } from "@shared/content/primary";
+import { MIDDLE_SEO } from "@shared/content/middle";
+import { SECONDARY_SEO } from "@shared/content/secondary";
+import { SENIOR_SEO } from "@shared/content/senior";
 import { ADM_SEO } from "@shared/content/admissions";
 import { HOME_SEO } from "@shared/content/home";
 import { eq } from "drizzle-orm";
@@ -28,10 +32,10 @@ const PAGE_TITLES: Record<string, string> = {
   "/ris-vision-mission": "Vision & Mission | Rainbow International School",
   "/our-philosophy": "Our Philosophy | Rainbow International School",
   "/pre-primary-school-thane": "Pre-Primary (Nursery–Sr KG) Thane | Rainbow International School",
-  "/primary-section": "Primary School in Thane | CBSE Class 1 to 5 | Rainbow International School",
-  "/middle-school-section": "Middle School in Thane | CBSE Class 6 to 8 | Rainbow International School",
-  "/secondary-section": "Secondary School in Thane | CBSE Class 9 & 10 | Rainbow International School",
-  "/senior-secondary-section": "Senior Secondary in Thane | CBSE Class 11 & 12 | Rainbow International School",
+  "/primary-section": PRIMARY_SEO.title,
+  "/middle-school-section": MIDDLE_SEO.title,
+  "/secondary-section": SECONDARY_SEO.title,
+  "/senior-secondary-section": SENIOR_SEO.title,
   "/amenities": "Campus & Facilities | Rainbow International School Thane",
   "/awards-achievements": "Awards & Achievements | Rainbow International School",
   "/student-achievements": "Student Achievements | Rainbow International School",

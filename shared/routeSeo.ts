@@ -1,3 +1,7 @@
+import { PRIMARY_SEO } from "./content/primary";
+import { MIDDLE_SEO } from "./content/middle";
+import { SECONDARY_SEO } from "./content/secondary";
+import { SENIOR_SEO } from "./content/senior";
 import { ADM_SEO } from "./content/admissions";
 /**
  * Single source of truth for per-route SEO metadata served in the raw HTML.
@@ -65,24 +69,24 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Pre-Primary",
   },
   "/primary-section": {
-    description:
-      "Primary School at Rainbow International School, Thane — CBSE Class 1 to 5 with strong academics, activities, safety and care.",
-    crumb: "Primary",
+    title: PRIMARY_SEO.title,
+    description: PRIMARY_SEO.description,
+    crumb: PRIMARY_SEO.crumb,
   },
   "/middle-school-section": {
-    description:
-      "Middle School at Rainbow International School, Thane — CBSE Class 6 to 8 with academics, activities and confidence building.",
-    crumb: "Middle School",
+    title: MIDDLE_SEO.title,
+    description: MIDDLE_SEO.description,
+    crumb: MIDDLE_SEO.crumb,
   },
   "/secondary-section": {
-    description:
-      "Secondary School at Rainbow International School, Thane — CBSE Class 9 and 10 with structured board exam preparation.",
-    crumb: "Secondary",
+    title: SECONDARY_SEO.title,
+    description: SECONDARY_SEO.description,
+    crumb: SECONDARY_SEO.crumb,
   },
   "/senior-secondary-section": {
-    description:
-      "Senior Secondary at Rainbow International School, Thane — CBSE Class 11 and 12 with Science, Commerce and Humanities streams.",
-    crumb: "Senior Secondary",
+    title: SENIOR_SEO.title,
+    description: SENIOR_SEO.description,
+    crumb: SENIOR_SEO.crumb,
   },
   "/amenities": {
     description:

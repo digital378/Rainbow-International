@@ -1,8 +1,9 @@
+import { MIDDLE_SEO, MIDDLE_CONTENT } from "@shared/content/middle";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import { type WaveOneFaq } from "@/components/WaveOneSeoBlock";
 import {
   BookOpen, Calculator, FlaskConical, Globe, Languages, Monitor, Trophy, Heart,
   ShieldCheck, Sparkles, MessageCircle, Phone, MapPin, ChevronRight, GraduationCap,
@@ -20,114 +21,72 @@ const WHATSAPP_URL = "https://wa.me/918291568972?text=Hi%2C%20I%20would%20like%2
 const PHONE = "+918291568972";
 const DIRECTIONS_URL = "https://maps.google.com/?q=Rainbow+International+School+Brahmand+Phase+4+Thane";
 
-const FAQS: WaveOneFaq[] = [
-  { q: "Which classes are included in the Middle School section at Rainbow International School?", a: "Our Middle School section covers Class 6, Class 7 and Class 8, following the CBSE curriculum with NCERT-aligned material." },
-  { q: "Is the Middle School section CBSE-aligned?", a: "Yes. The entire Middle School is CBSE-affiliated, with curriculum, learning outcomes and assessments aligned to CBSE and NEP 2020." },
-  { q: "What subjects are taught in Class 6 to Class 8?", a: "Scholastic subjects include English, Mathematics, Science, Social Science, Hindi, Marathi, Computer Studies and General Knowledge. Co-scholastic learning includes Physical Education, Sports, Art & Craft, Music & Dance, Clubs, Personality Development and Value Education." },
-  { q: "How does RIS help students transition from Primary to Middle School?", a: "We focus on stronger study routines, subject-wise reading comprehension, writing skills, structured numeracy and confident classroom participation in Class 6 — easing the move from Primary to Middle School." },
-  { q: "Does RIS focus on communication and confidence building in Middle School?", a: "Yes. Discussion-based learning, presentations, project work, public speaking and clubs are part of the regular Middle School routine to build communication and confidence." },
-  { q: "Are sports and co-curricular activities part of Middle School?", a: "Yes. Sports, art, music, clubs, value education and personality development are part of the regular Class 6 to Class 8 timetable." },
-  { q: "How does the school assess Middle School students?", a: "Through continuous evaluation — class participation, homework, worksheets, projects, periodic unit tests, reading and writing progress, co-curricular participation, teacher observation and regular parent communication." },
-  { q: "Is transport available for Class 6 to Class 8 students?", a: "Yes. School transport covers Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet, Pokhran Road and nearby Thane areas. Please confirm route availability with the admissions team." },
-  { q: "Is RIS convenient for Class 6 to Class 8 admissions near Hiranandani Estate?", a: "Yes. Our Brahmand Phase 4 campus is easily reachable from Hiranandani Estate, with transport available on this route for middle school students." },
-  { q: "Is RIS convenient for Middle School admissions near Ghodbunder Road?", a: "Yes. Many of our Class 6 to Class 8 families travel along Ghodbunder Road, and transport routes cover this corridor." },
-  { q: "How can parents enquire for Class 6 admission?", a: "Submit the admission enquiry on the Admissions page, WhatsApp us, or call the admissions desk to confirm Class 6 seat availability and book a campus visit." },
-  { q: "How can parents enquire for Class 7 and Class 8 admission?", a: "Class 7 and Class 8 admissions depend on seat availability for each grade. Please connect with the admissions team to check current vacancies and the next steps." },
-  { q: "How can parents book a campus visit for Middle School?", a: "Book a guided campus visit through the Admissions page, by WhatsApp or by calling the admissions desk. Visits include a walkthrough of the middle school classrooms, labs, library and sports facilities." },
-  { q: "What makes RIS a good CBSE Middle School in Thane?", a: "Strong academic foundation, CBSE-aligned curriculum, technology-aided learning, integrated co-curriculars, safe campus and a smooth transition to Secondary School make RIS a trusted choice for parents in Thane." },
-];
+const FAQS: WaveOneFaq[] = MIDDLE_CONTENT.faqs;
 
 const decisionCards = [
-  { icon: BookOpen, title: "Strong Subject Foundation", body: "Deeper conceptual understanding across English, Math, Science and Social Science from Class 6 onwards." },
-  { icon: GraduationCap, title: "CBSE-Aligned Learning", body: "NCERT-based curriculum, CBSE learning outcomes and structured academic routines." },
-  { icon: MessageCircle, title: "Communication & Confidence Building", body: "Presentations, projects, debates and clubs that build voice, clarity and confidence." },
-  { icon: Monitor, title: "Technology & Project-Based Learning", body: "Smart classrooms, digital tools, research-led projects and computer studies from Class 6." },
-  { icon: Trophy, title: "Sports & Co-curricular Exposure", body: "Sports, art, music, dance, clubs and competitions are part of the regular weekly routine." },
-  { icon: ShieldCheck, title: "Safe & Supportive School Environment", body: "Caring teachers, structured routine, safe campus and regular parent communication." },
-];
+  { icon: BookOpen },
+  { icon: GraduationCap },
+  { icon: MessageCircle },
+  { icon: Monitor },
+  { icon: Trophy },
+  { icon: ShieldCheck }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.decisionCards[index] }));
 
-const journey = [
-  { grade: "Class 6", body: "Smooth transition from Primary with stronger subject routines, reading comprehension, writing skills, numeracy and classroom confidence." },
-  { grade: "Class 7", body: "Deeper subject understanding, project work, scientific thinking, communication skills, teamwork and independent study habits." },
-  { grade: "Class 8", body: "Preparing for Secondary School with stronger academics, responsibility, critical thinking, confidence and exam readiness." },
-];
+const journey = MIDDLE_CONTENT.journey;
 
-const gradeAdmissions = [
-  { grade: "Class 6", title: "Class 6 Admission in Thane", body: "A smooth transition into Middle School with stronger academic routines, subject clarity, communication skills and confidence." },
-  { grade: "Class 7", title: "Class 7 Admission in Thane", body: "Focused learning across core subjects with project work, technology exposure, co-curricular development and independent study habits." },
-  { grade: "Class 8", title: "Class 8 Admission in Thane", body: "Preparation for Secondary School through structured academics, conceptual understanding, responsibility and exam readiness." },
-];
+const gradeAdmissions = MIDDLE_CONTENT.gradeAdmissions;
 
 const scholastic = [
-  { name: "English", icon: BookOpen },
-  { name: "Mathematics", icon: Calculator },
-  { name: "Science", icon: FlaskConical },
-  { name: "Social Science", icon: Globe },
-  { name: "Hindi", icon: Languages },
-  { name: "Marathi / Third Language", icon: Languages },
-  { name: "Computer Studies", icon: Monitor },
-  { name: "General Knowledge", icon: Compass },
-];
+  { icon: BookOpen },
+  { icon: Calculator },
+  { icon: FlaskConical },
+  { icon: Globe },
+  { icon: Languages },
+  { icon: Languages },
+  { icon: Monitor },
+  { icon: Compass }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.scholastic[index] }));
 const coScholastic = [
-  { name: "Physical Education", icon: Trophy },
-  { name: "Sports", icon: Trophy },
-  { name: "Art & Craft", icon: Palette },
-  { name: "Music & Dance", icon: Sparkles },
-  { name: "Clubs & Activities", icon: Users },
-  { name: "Personality Development", icon: Heart },
-  { name: "Value Education", icon: Heart },
-];
+  { icon: Trophy },
+  { icon: Trophy },
+  { icon: Palette },
+  { icon: Sparkles },
+  { icon: Users },
+  { icon: Heart },
+  { icon: Heart }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.coScholastic[index] }));
 
 const skills = [
-  { icon: Brain, title: "Critical Thinking", body: "Analyzing, questioning and reasoning across subjects.", color: "#e0edff", accent: NAVY_MID },
-  { icon: MessageCircle, title: "Communication Skills", body: "Speaking, writing and presenting with clarity.", color: "#fff7e0", accent: AMBER },
-  { icon: Monitor, title: "Digital Readiness", body: "Computer literacy and technology-aided learning.", color: "#e0f2fe", accent: "#0369a1" },
-  { icon: Lightbulb, title: "Problem Solving", body: "Real-world thinking applied to academic challenges.", color: "#fdf2f8", accent: "#be185d" },
-  { icon: BookOpen, title: "Reading & Writing Confidence", body: "Stronger comprehension and expression in every subject.", color: "#e0f7f0", accent: "#059669" },
-  { icon: FlaskConical, title: "Scientific Curiosity", body: "Observation, experimentation and inquiry-led learning.", color: "#f3e0ff", accent: "#7c3aed" },
-  { icon: Users, title: "Teamwork & Leadership", body: "Group work, peer learning and student leadership.", color: "#fff7e0", accent: AMBER },
-  { icon: Heart, title: "Values & Responsibility", body: "Empathy, discipline and personal accountability.", color: "#e0edff", accent: NAVY_MID },
-];
+  { icon: Brain, color: "#e0edff", accent: NAVY_MID },
+  { icon: MessageCircle, color: "#fff7e0", accent: AMBER },
+  { icon: Monitor, color: "#e0f2fe", accent: "#0369a1" },
+  { icon: Lightbulb, color: "#fdf2f8", accent: "#be185d" },
+  { icon: BookOpen, color: "#e0f7f0", accent: "#059669" },
+  { icon: FlaskConical, color: "#f3e0ff", accent: "#7c3aed" },
+  { icon: Users, color: "#fff7e0", accent: AMBER },
+  { icon: Heart, color: "#e0edff", accent: NAVY_MID }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.skills[index] }));
 
-const classroom = [
-  { title: "Discussion-Based Learning", body: "Open discussions that build voice and reasoning." },
-  { title: "Group Activities", body: "Collaborative tasks that strengthen teamwork." },
-  { title: "Project Work", body: "Subject-linked projects with real-world application." },
-  { title: "Experiments & Observations", body: "Lab work that brings Science alive." },
-  { title: "Reading & Writing Practice", body: "Daily routines across English, Hindi and Marathi." },
-  { title: "Technology-Aided Lessons", body: "Smart classrooms, visuals and digital resources." },
-  { title: "Teacher-Guided Concept Clarity", body: "Patient teachers, regular doubt-clearing." },
-  { title: "Sports & Co-curricular Exposure", body: "Activities that balance academics with growth." },
-];
+const classroom = MIDDLE_CONTENT.classroom;
 
 const approach = [
-  { title: "Concept Clarity", body: "Students are guided to understand concepts deeply across subjects rather than depending only on memorisation.", color: "#e0edff", accent: NAVY_MID, icon: Lightbulb },
-  { title: "Independent Learning", body: "Middle School students are encouraged to build routines, complete assignments responsibly and ask questions confidently.", color: "#e0f7f0", accent: "#047857", icon: BookOpen },
-  { title: "Application-Based Learning", body: "Activities, examples, discussions and projects help students connect classroom concepts with real-world understanding.", color: "#fff7e0", accent: AMBER, icon: Sparkles },
-  { title: "Continuous Academic Support", body: "Teachers observe progress regularly and support students through feedback, practice and parent communication.", color: "#fdf2f8", accent: "#be185d", icon: ClipboardCheck },
-];
+  { color: "#e0edff", accent: NAVY_MID, icon: Lightbulb },
+  { color: "#e0f7f0", accent: "#047857", icon: BookOpen },
+  { color: "#fff7e0", accent: AMBER, icon: Sparkles },
+  { color: "#fdf2f8", accent: "#be185d", icon: ClipboardCheck }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.approach[index] }));
 
-const evaluationPoints = [
-  "Class participation",
-  "Homework and worksheets",
-  "Projects and assignments",
-  "Unit tests and periodic assessments",
-  "Reading and writing progress",
-  "Subject understanding",
-  "Co-curricular participation",
-  "Teacher feedback",
-  "Parent communication",
-];
+const evaluationPoints = MIDDLE_CONTENT.evaluationPoints;
 
 const transitionCards = [
-  { title: "Stronger Subject Foundation", body: "Conceptual depth that prepares students for Class 9.", icon: GraduationCap },
-  { title: "Study Habits & Responsibility", body: "Routines, time management and personal organisation.", icon: ClipboardCheck },
-  { title: "Communication & Confidence", body: "Speaking, presenting and engaging with peers and teachers.", icon: MessageCircle },
-  { title: "Exam Readiness", body: "Test-taking skills, revision discipline and academic focus.", icon: Brain },
-];
+  { icon: GraduationCap },
+  { icon: ClipboardCheck },
+  { icon: MessageCircle },
+  { icon: Brain }
+].map((visual, index) => ({ ...visual, ...MIDDLE_CONTENT.transitionCards[index] }));
 
-const localities = ["Hiranandani Estate", "Ghodbunder Road", "Brahmand Thane", "Manpada", "Kavesar", "Kolshet"];
-const grades = ["Class 6", "Class 7", "Class 8"];
+const localities = MIDDLE_CONTENT.localities;
+const grades = MIDDLE_CONTENT.grades;
 
 function ctaTrack(label: string) {
   trackEvent("middle_cta_click", "middle_school", label);
@@ -140,59 +99,18 @@ export default function MiddleSchool() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Middle School in Thane | CBSE Class 6 to 8"
-        description="Explore Middle School at Rainbow International School, a CBSE school in Thane for Class 6 to 8 with academics, activities and confidence building."
-        keywords="middle school in Thane, CBSE middle school in Thane, best middle school in Thane, Class 6 admission in Thane, Class 7 admission in Thane, Class 8 admission in Thane, middle school near Hiranandani Estate, middle school near Ghodbunder Road, middle school near Brahmand Phase 4, middle school near Manpada, middle school near Kavesar, middle school near Kolshet"
+        title={MIDDLE_SEO.title}
+        description={MIDDLE_SEO.description}
+        keywords={MIDDLE_SEO.keywords}
         canonical="https://rainbowinternationalschool.in/middle-school-section"
         ogImage="/images/home/academic/middle-section.jpg"
         appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/middle-school-section" },
-          { name: "Middle School (Class 6–8)", href: "https://rainbowinternationalschool.in/middle-school-section" },
+          { name: MIDDLE_SEO.crumb, href: "https://rainbowinternationalschool.in/middle-school-section" },
         ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "WebPage",
-              "@id": "https://rainbowinternationalschool.in/middle-school-section#webpage",
-              "url": "https://rainbowinternationalschool.in/middle-school-section",
-              "name": "Middle School in Thane | CBSE Class 6 to 8",
-              "description": "CBSE-affiliated Middle School (Class 6 to Class 8) at Rainbow International School, Thane.",
-              "inLanguage": "en-IN",
-              "isPartOf": { "@id": "https://rainbowinternationalschool.in/#website" },
-              "about": { "@id": "https://rainbowinternationalschool.in/#school" },
-            },
-            {
-              "@type": ["EducationalOrganization", "School"],
-              "@id": "https://rainbowinternationalschool.in/#school",
-              "name": "Rainbow International School",
-              "url": "https://rainbowinternationalschool.in/",
-              "telephone": "+91 82915 68972",
-              "email": "admin@rainbowinternationalschool.in",
-              "sameAs": ["https://maps.app.goo.gl/mfJjMMkksCkcXzMCA"],
-              "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
-                "addressLocality": "Thane West",
-                "addressRegion": "Maharashtra",
-                "postalCode": "400607",
-                "addressCountry": "IN",
-              },
-            },
-            {
-              "@type": "EducationalOccupationalProgram",
-              "name": "Middle School (Class 6–8)",
-              "description": "CBSE-affiliated middle school education for Class 6 to Class 8 in Thane, covering English, Mathematics, Science, Social Science, Hindi, Marathi, Computer Studies and co-curricular learning.",
-              "provider": { "@id": "https://rainbowinternationalschool.in/#school" },
-              "educationalProgramMode": "full-time",
-              "programPrerequisites": "Completion of Primary / Class 5",
-              "url": "https://rainbowinternationalschool.in/middle-school-section",
-            },
-            buildFaqPageSchema(FAQS),
-          ],
-        }}
+        jsonLd={{ "@context": "https://schema.org", "@type": "WebPage", name: MIDDLE_SEO.title, description: MIDDLE_SEO.description, url: "https://rainbowinternationalschool.in/middle-school-section" }}
       />
       <Navbar />
 
@@ -205,15 +123,15 @@ export default function MiddleSchool() {
         <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(9,26,79,0.92) 0%, rgba(13,59,134,0.78) 60%, rgba(9,26,79,0.65) 100%)" }} />
         <div className="relative z-10 container mx-auto px-4 max-w-6xl py-20 md:py-28 lg:py-32 flex flex-col">
           <span className="inline-flex self-start items-center gap-2 text-[11px] font-extrabold tracking-[0.2em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: AMBER_LIGHT, color: NAVY }} data-testid="badge-admissions-open">
-            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2027–28
+            <Sparkles className="w-3.5 h-3.5" /> {MIDDLE_CONTENT.text.label1}
           </span>
           <h1 className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl" style={{ fontFamily: "'DM Sans', sans-serif" }} data-testid="text-h1">
-            Middle School in Thane <span className="text-white/40 font-normal">|</span> <span style={{ color: AMBER_LIGHT }}>Class 6 to Class 8</span>
+            {MIDDLE_CONTENT.text.h1Lead1} <span className="text-white/40 font-normal">{MIDDLE_CONTENT.text.h1Separator1}</span> <span style={{ color: AMBER_LIGHT }}>{MIDDLE_CONTENT.text.h1Accent1}</span>
           </h1>
-          <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">Building academic confidence, independent thinking, communication skills and strong subject foundations for the middle years.</p>
-          <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">A CBSE-aligned Middle School experience for Class 6 to Class 8 with structured academics, activity-based learning, values, sports, technology exposure and a safe learning environment.</p>
+          <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">{MIDDLE_CONTENT.text.heroIntro1}</p>
+          <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">{MIDDLE_CONTENT.text.heroDetail1}</p>
           <div className="flex flex-wrap gap-2 mt-6 max-w-3xl">
-            {["CBSE-Aligned Middle School", "Class 6 to Class 8", "Strong Academic Foundation", "Technology-Aided Learning", "Sports, Activities & Values"].map((t) => (
+            {MIDDLE_CONTENT.inlineList1.map((t) => (
               <span key={t} className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm" style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)" }}>
                 <CheckCircle2 className="w-3 h-3" /> {t}
               </span>
@@ -221,13 +139,13 @@ export default function MiddleSchool() {
           </div>
           <div className="flex flex-wrap gap-3 mt-8">
             <a href="/admissions" onClick={() => ctaTrack("hero_enquire_class_6_8")} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white shadow-lg hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" }} data-testid="button-hero-enquire">
-              Enquire for Class 6–8 <ArrowRight className="w-4 h-4" />
+              {MIDDLE_CONTENT.text.cta1} <ArrowRight className="w-4 h-4" />
             </a>
             <a href="/admissions#campus-visit" onClick={() => ctaTrack("hero_campus_visit")} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-hero-campus-visit">
-              Book a Campus Visit
+              {MIDDLE_CONTENT.text.cta2}
             </a>
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hero_whatsapp"); trackWhatsAppClick({ sourcePage: "middle_hero" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }} data-testid="button-hero-whatsapp">
-              <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+              <MessageCircle className="w-4 h-4" /> {MIDDLE_CONTENT.text.cta3}
             </a>
           </div>
         </div>
@@ -238,8 +156,8 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>Why RIS for Middle School</span>
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Why Parents Choose RIS for Middle School</h2>
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>{MIDDLE_CONTENT.text.label2}</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h21}</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {decisionCards.map((c, i) => {
@@ -255,7 +173,7 @@ export default function MiddleSchool() {
             </div>
             <div className="text-center mt-10">
               <a href="/admissions" onClick={() => ctaTrack("why_explore_admissions")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: NAVY }} data-testid="button-explore-admissions-1">
-                Explore Admissions for Class 6–8 <ChevronRight className="w-4 h-4" />
+                {MIDDLE_CONTENT.text.cta4} <ChevronRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -265,8 +183,8 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>The Middle School Learning Journey at RIS</h2>
-              <p className="text-gray-600 mt-3">How learning grows year by year, from Class 6 to Class 8.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h22}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph1}</p>
             </div>
             <div className="hidden md:block relative">
               <div className="absolute left-0 right-0 top-7 h-0.5" style={{ background: `linear-gradient(90deg, ${NAVY_MID}, ${AMBER})` }} />
@@ -296,7 +214,7 @@ export default function MiddleSchool() {
             </div>
             <div className="text-center mt-12">
               <a href="/admissions" onClick={() => ctaTrack("journey_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" }} data-testid="button-journey-enquire">
-                Enquire for Middle School Admissions <ArrowRight className="w-4 h-4" />
+                {MIDDLE_CONTENT.text.cta5} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -306,9 +224,9 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#fff7e0", color: AMBER }}>Grade-Wise Admissions</span>
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Class 6 to Class 8 Admissions at RIS</h2>
-              <p className="text-gray-600 mt-3">Each grade has a specific learning focus. Choose your child's grade to enquire.</p>
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#fff7e0", color: AMBER }}>{MIDDLE_CONTENT.text.label3}</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h23}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph2}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {gradeAdmissions.map((g, i) => (
@@ -317,7 +235,7 @@ export default function MiddleSchool() {
                   <h3 className="font-extrabold text-base mb-2" style={{ color: NAVY }}>{g.title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed flex-grow">{g.body}</p>
                   <a href="/admissions" onClick={() => ctaTrack(`grade_enquire_${g.grade.toLowerCase().replace(" ", "_")}`)} className="inline-flex items-center gap-1.5 text-xs font-extrabold mt-5 self-start px-4 py-2 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ color: NAVY, borderColor: NAVY }} data-testid={`button-grade-${i}`}>
-                    Enquire for this Class <ChevronRight className="w-3 h-3" />
+                    {MIDDLE_CONTENT.text.cta6} <ChevronRight className="w-3 h-3" />
                   </a>
                 </div>
               ))}
@@ -329,13 +247,13 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Subjects and Learning Areas in Middle School</h2>
-              <p className="text-gray-600 mt-3">A balanced mix of scholastic and co-scholastic learning across Class 6 to Class 8.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h24}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph3}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="rounded-3xl bg-white border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="px-6 py-4" style={{ background: NAVY_MID }}>
-                  <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2"><BookOpen className="w-5 h-5" /> Scholastic Subjects</h3>
+                  <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2"><BookOpen className="w-5 h-5" /> {MIDDLE_CONTENT.text.h31}</h3>
                 </div>
                 <ul className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
                   {scholastic.map(({ name, icon: Icon }) => (
@@ -348,7 +266,7 @@ export default function MiddleSchool() {
               </div>
               <div className="rounded-3xl bg-white border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="px-6 py-4" style={{ background: AMBER }}>
-                  <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2"><Trophy className="w-5 h-5" /> Co-Scholastic Learning</h3>
+                  <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2"><Trophy className="w-5 h-5" /> {MIDDLE_CONTENT.text.h32}</h3>
                 </div>
                 <ul className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
                   {coScholastic.map(({ name, icon: Icon }) => (
@@ -367,8 +285,8 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Skills We Build from Class 6 to Class 8</h2>
-              <p className="text-gray-600 mt-3">Eight skill areas that grow steadily across Middle School.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h25}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph4}</p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
               {skills.map((s, i) => {
@@ -389,27 +307,27 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Inside the Middle School Classroom</h2>
-              <p className="text-gray-600 mt-3">Real classrooms, real learning — what a typical day at our Middle School looks like.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h26}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph5}</p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               <div className="lg:col-span-7 rounded-3xl overflow-hidden shadow-md aspect-[16/10] lg:aspect-auto lg:min-h-[420px] relative">
                 <img src="/images/home/academic/middle-2.jpg" alt="Class 6 to Class 8 classroom at RIS Thane" className="w-full h-full object-cover" loading="lazy" decoding="async" width={1200} height={750} />
                 <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/70 to-transparent">
-                  <p className="text-white font-extrabold text-base md:text-lg">Discussion-based learning</p>
+                  <p className="text-white font-extrabold text-base md:text-lg">{MIDDLE_CONTENT.text.paragraph6}</p>
                 </div>
               </div>
               <div className="lg:col-span-5 grid grid-cols-2 lg:grid-cols-1 gap-5">
                 <div className="rounded-3xl overflow-hidden shadow-md aspect-[4/3] lg:aspect-auto lg:h-[200px] relative">
                   <img src="/images/home/academic/middle-3.jpg" alt="Middle school students at Rainbow International School Thane" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={400} />
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-white font-extrabold text-sm">Group activities</p>
+                    <p className="text-white font-extrabold text-sm">{MIDDLE_CONTENT.text.paragraph7}</p>
                   </div>
                 </div>
                 <div className="rounded-3xl overflow-hidden shadow-md aspect-[4/3] lg:aspect-auto lg:h-[200px] relative">
                   <img src="/images/students/middle-section.jpg" alt="Class 7 classroom activities at RIS Thane" className="w-full h-full object-cover" loading="lazy" decoding="async" width={600} height={400} />
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-white font-extrabold text-sm">Project work</p>
+                    <p className="text-white font-extrabold text-sm">{MIDDLE_CONTENT.text.paragraph8}</p>
                   </div>
                 </div>
               </div>
@@ -434,7 +352,7 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Our Approach to Middle School Education</h2>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h27}</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {approach.map((a, i) => {
@@ -455,9 +373,9 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20" style={{ background: NAVY }}>
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center max-w-2xl mx-auto mb-10">
-              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: AMBER_LIGHT, color: NAVY }}>Continuous Evaluation</span>
-              <h2 className="text-2xl md:text-4xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>How We Track Student Progress</h2>
-              <p className="text-white/80 mt-3 text-sm md:text-base">Continuous academic observation that helps every Middle School student improve steadily — without unnecessary pressure.</p>
+              <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: AMBER_LIGHT, color: NAVY }}>{MIDDLE_CONTENT.text.label4}</span>
+              <h2 className="text-2xl md:text-4xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h28}</h2>
+              <p className="text-white/80 mt-3 text-sm md:text-base">{MIDDLE_CONTENT.text.paragraph9}</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3 md:gap-4">
               {evaluationPoints.map((pt, i) => (
@@ -469,7 +387,7 @@ export default function MiddleSchool() {
             </div>
             <div className="text-center mt-10">
               <a href="/admissions" onClick={() => ctaTrack("evaluation_speak_counsellor")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full hover:opacity-90 transition-opacity" style={{ background: AMBER, color: "#fff" }} data-testid="button-speak-counsellor">
-                Speak to Our Middle School Counsellor <ArrowRight className="w-4 h-4" />
+                {MIDDLE_CONTENT.text.cta7} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -479,8 +397,8 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Preparing Students for Secondary School</h2>
-              <p className="text-gray-600 mt-3">The Middle School years at RIS prepare students for the academic expectations of Class 9 and Class 10 by building strong study habits, conceptual clarity, confidence, discipline and responsibility.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h29}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph10}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {transitionCards.map((t, i) => {
@@ -496,7 +414,7 @@ export default function MiddleSchool() {
             </div>
             <div className="text-center mt-10">
               <a href="/secondary-section" onClick={() => ctaTrack("transition_secondary")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: NAVY }} data-testid="button-explore-secondary">
-                Explore Secondary School <ChevronRight className="w-4 h-4" />
+                {MIDDLE_CONTENT.text.cta8} <ChevronRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -506,18 +424,18 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}><MapPin className="w-3 h-3" /> Local to Thane</span>
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Middle School Admissions Near You in Thane</h2>
-              <p className="text-gray-600 mt-3 text-sm md:text-base">Rainbow International School is located at Brahmand Phase 4, Thane and is easily accessible for parents looking for Class 6 to Class 8 admission near Hiranandani Estate, Ghodbunder Road, Brahmand, Manpada, Kavesar, Kolshet, Pokhran Road, Patlipada and nearby areas.</p>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}><MapPin className="w-3 h-3" /> {MIDDLE_CONTENT.text.label5}</span>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h210}</h2>
+              <p className="text-gray-600 mt-3 text-sm md:text-base">{MIDDLE_CONTENT.text.paragraph11}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {localities.map((loc, i) => (
                 <div key={loc} className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5" data-testid={`locality-${i}`}>
-                  <div className="flex items-center gap-2 mb-3"><MapPin className="w-4 h-4" style={{ color: AMBER }} /><h3 className="font-extrabold text-base" style={{ color: NAVY }}>Near {loc}</h3></div>
+                  <div className="flex items-center gap-2 mb-3"><MapPin className="w-4 h-4" style={{ color: AMBER }} /><h3 className="font-extrabold text-base" style={{ color: NAVY }}>{MIDDLE_CONTENT.text.h33} {loc}</h3></div>
                   <div className="flex flex-wrap gap-1.5">
                     {grades.map((g) => (
                       <a key={g} href="/admissions" onClick={() => ctaTrack(`hyperlocal_${g}_${loc}`.toLowerCase().replace(/\s+/g, "_"))} className="inline-block text-[11px] font-bold px-2.5 py-1 rounded-full border hover:opacity-80 transition-opacity" style={{ background: "#f8faff", color: NAVY_MID, borderColor: "#dbe7ff" }}>
-                        {g} admission
+                        {g} {MIDDLE_CONTENT.text.cta9}
                       </a>
                     ))}
                   </div>
@@ -526,13 +444,13 @@ export default function MiddleSchool() {
             </div>
             <div className="flex flex-wrap justify-center gap-3 mt-10">
               <a href={DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hyperlocal_directions"); trackDirectionsClick({ sourcePage: "middle_hyperlocal" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: NAVY }} data-testid="button-get-directions">
-                <MapPin className="w-4 h-4" /> Get Directions
+                <MapPin className="w-4 h-4" /> {MIDDLE_CONTENT.text.cta10}
               </a>
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("hyperlocal_transport"); trackWhatsAppClick({ sourcePage: "middle_hyperlocal_transport" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full border-2 hover:opacity-80 transition-opacity" style={{ color: NAVY, borderColor: NAVY }} data-testid="button-check-transport">
-                <Bus className="w-4 h-4" /> Check Transport Availability
+                <Bus className="w-4 h-4" /> {MIDDLE_CONTENT.text.cta11}
               </a>
               <a href="/admissions" onClick={() => ctaTrack("hyperlocal_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-5 py-2.5 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" }} data-testid="button-hyperlocal-enquire">
-                Enquire for Middle School Admissions <ArrowRight className="w-4 h-4" />
+                {MIDDLE_CONTENT.text.cta5} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -545,21 +463,21 @@ export default function MiddleSchool() {
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full opacity-20" style={{ background: AMBER_LIGHT }} />
               <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: AMBER_LIGHT }} />
               <div className="relative z-10">
-                <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>Admissions 2027–28</span>
-                <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>Looking for Class 6 to Class 8 Admission?</h2>
-                <p className="text-white/85 max-w-2xl mx-auto mb-7 text-sm md:text-base">Explore the Middle School at Rainbow International School and speak to our admissions team for grade-wise availability, campus visit and admission guidance.</p>
+                <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>{MIDDLE_CONTENT.text.label6}</span>
+                <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h211}</h2>
+                <p className="text-white/85 max-w-2xl mx-auto mb-7 text-sm md:text-base">{MIDDLE_CONTENT.text.paragraph12}</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <a href="/admissions" onClick={() => ctaTrack("final_enquire")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" }} data-testid="button-final-enquire">
-                    Enquire for Class 6–8 <ArrowRight className="w-4 h-4" />
+                    {MIDDLE_CONTENT.text.cta1} <ArrowRight className="w-4 h-4" />
                   </a>
                   <a href="/admissions#campus-visit" onClick={() => ctaTrack("final_campus_visit")} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-final-campus-visit">
-                    Book a Campus Visit
+                    {MIDDLE_CONTENT.text.cta2}
                   </a>
                   <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("final_whatsapp"); trackWhatsAppClick({ sourcePage: "middle_final" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white hover:opacity-90 transition-opacity" style={{ background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)" }} data-testid="button-final-whatsapp">
-                    <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+                    <MessageCircle className="w-4 h-4" /> {MIDDLE_CONTENT.text.cta3}
                   </a>
                   <a href={`tel:${PHONE}`} onClick={() => { ctaTrack("final_call"); trackCallClick({ phone: PHONE, sourcePage: "middle_final" }); }} className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors" data-testid="button-final-call">
-                    <Phone className="w-4 h-4" /> Call Admissions
+                    <Phone className="w-4 h-4" /> {MIDDLE_CONTENT.text.cta12}
                   </a>
                 </div>
               </div>
@@ -571,8 +489,8 @@ export default function MiddleSchool() {
         <section className="py-16 md:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
-              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>Frequently Asked Questions About Middle School at RIS</h2>
-              <p className="text-gray-600 mt-3">Quick answers about Class 6 to Class 8 admissions, curriculum, transport and more.</p>
+              <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>{MIDDLE_CONTENT.text.h212}</h2>
+              <p className="text-gray-600 mt-3">{MIDDLE_CONTENT.text.paragraph13}</p>
             </div>
             <div className="space-y-3">
               {FAQS.map((f, i) => {
@@ -598,16 +516,16 @@ export default function MiddleSchool() {
       <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-gray-200 bg-white shadow-[0_-4px_12px_rgba(0,0,0,0.08)]" data-testid="mobile-cta-bar">
         <div className="grid grid-cols-4 divide-x divide-gray-200">
           <a href={`tel:${PHONE}`} onClick={() => { ctaTrack("sticky_call"); trackCallClick({ phone: PHONE, sourcePage: "middle_sticky" }); }} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
-            <Phone className="w-4 h-4" style={{ color: NAVY }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Call</span>
+            <Phone className="w-4 h-4" style={{ color: NAVY }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{MIDDLE_CONTENT.text.label7}</span>
           </a>
           <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => { ctaTrack("sticky_whatsapp"); trackWhatsAppClick({ sourcePage: "middle_sticky" }); }} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
-            <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>WhatsApp</span>
+            <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{MIDDLE_CONTENT.text.label8}</span>
           </a>
           <a href="/admissions" onClick={() => ctaTrack("sticky_enquire")} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
-            <ClipboardCheck className="w-4 h-4" style={{ color: AMBER }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Enquire</span>
+            <ClipboardCheck className="w-4 h-4" style={{ color: AMBER }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{MIDDLE_CONTENT.text.label9}</span>
           </a>
           <a href="/admissions#campus-visit" onClick={() => ctaTrack("sticky_book_visit")} className="flex flex-col items-center justify-center py-2.5 gap-0.5 hover:bg-gray-50">
-            <Compass className="w-4 h-4" style={{ color: NAVY_MID }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Book Visit</span>
+            <Compass className="w-4 h-4" style={{ color: NAVY_MID }} /><span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{MIDDLE_CONTENT.text.label10}</span>
           </a>
         </div>
       </div>

@@ -1,8 +1,9 @@
+import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import ScrollProgress from "@/components/home/ScrollProgress";
-import { buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import { type WaveOneFaq } from "@/components/WaveOneSeoBlock";
 import {
   BookOpen, Calculator, FlaskConical, Palette, Users, Monitor, Languages,
   ShieldCheck, Heart, Trophy, Sparkles, MessageCircle, Phone, MapPin, ChevronRight,
@@ -21,122 +22,78 @@ const PHONE = "+918291568972";
 const DIRECTIONS_URL = "https://maps.google.com/?q=Rainbow+International+School+Brahmand+Phase+4+Thane";
 
 // ── FAQ data ──────────────────────────────────────────────────────────────────
-const PRIMARY_FAQS: WaveOneFaq[] = [
-  { q: "Which classes are included in the Primary Section at Rainbow International School?", a: "Our Primary Section covers Class 1 to Class 5, following the CBSE curriculum with NCERT-aligned material." },
-  { q: "Is the Primary Section CBSE-aligned?", a: "Yes. The entire Primary Section is CBSE-affiliated, with curriculum, learning outcomes and assessments aligned to CBSE and NEP 2020." },
-  { q: "What subjects are taught from Class 1 to Class 5?", a: "Scholastic subjects include English, Mathematics, Hindi, Marathi, EVS, Computer and General Knowledge. Co-scholastic learning includes Physical Education, Sports, Value Education, Dance & Music, Personality Development and Art & Craft." },
-  { q: "How does RIS build literacy and numeracy skills?", a: "Through structured reading, phonics, writing practice, recitation, number sense, real-world math and continuous activity-based learning — in line with the Foundational Literacy & Numeracy goals of NEP 2020." },
-  { q: "Are co-curricular activities part of the Primary School routine?", a: "Yes. Music, art, sports, library, value education and personality development are part of the regular Primary timetable." },
-  { q: "Does RIS offer computer education in Primary School?", a: "Yes. Computer literacy and technology-aided learning are introduced from Class 1 onwards in our smart classrooms." },
-  { q: "How does the school assess primary students?", a: "We follow continuous academic observation — class participation, worksheets, project work, homework, reading & writing progress, co-curricular participation and regular parent communication." },
-  { q: "Is transport available for primary students?", a: "Yes. School transport is available across Brahmand, Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet, Pokhran Road and nearby Thane areas. Please check route availability with the admissions team." },
-  { q: "Is RIS convenient for Class 1 to Class 5 students near Hiranandani Estate?", a: "Yes. Our campus at Brahmand Phase 4 is easily reachable from Hiranandani Estate, and transport is available on this route for primary students." },
-  { q: "Is RIS convenient for primary admissions near Ghodbunder Road?", a: "Yes. Many of our Class 1 to Class 5 families travel from along Ghodbunder Road. Transport routes cover this corridor." },
-  { q: "Is RIS close to Brahmand, Manpada, Kavesar and Kolshet?", a: "Yes. RIS is located in Brahmand Phase 4 and is conveniently accessible from Manpada, Kavesar, Kolshet and surrounding Thane neighbourhoods." },
-  { q: "How can parents enquire for Class 1 admission?", a: "Submit the admission enquiry on the Admissions page, WhatsApp us, or call the admissions desk to confirm Class 1 seat availability and book a campus visit." },
-  { q: "How can parents enquire for Class 2 to Class 5 admission?", a: "Class 2–5 admissions depend on seat availability for each grade. Please connect with the admissions team to check current vacancies and the next steps." },
-  { q: "How can parents book a campus visit for the Primary Section?", a: "You can book a guided campus visit through the Admissions page, by WhatsApp or by calling the admissions desk. Visits include a walkthrough of the primary classrooms, library, activity areas and sports facilities." },
-  { q: "What makes RIS a good CBSE primary school in Thane?", a: "Strong literacy and numeracy foundation, CBSE-aligned curriculum, activity-based classrooms, female-staff-led safe environment, integrated co-curriculars and a smooth transition to Middle School make RIS a trusted choice for parents in Thane." },
-];
+const PRIMARY_FAQS: WaveOneFaq[] = PRIMARY_CONTENT.faqs;
 
 // ── Section data ──────────────────────────────────────────────────────────────
 const decisionCards = [
-  { icon: BookOpen, title: "Strong Foundation in English, Math & EVS", body: "Structured literacy, numeracy and EVS lessons that build clarity in core subjects from Class 1 itself." },
-  { icon: GraduationCap, title: "CBSE-Aligned Learning", body: "NCERT-based curriculum, CBSE learning outcomes and NEP 2020-aligned foundational learning." },
-  { icon: Languages, title: "Communication & Language Development", body: "Daily reading, recitation, storytelling and speaking practice in English, Hindi and Marathi." },
-  { icon: Sparkles, title: "Activity-Based Classroom Learning", body: "Pair work, group activities, projects and hands-on tasks make concepts stick — not just rote learning." },
-  { icon: Trophy, title: "Sports, Arts & Co-curricular Exposure", body: "Music, dance, art, craft, sports and clubs are part of the regular weekly timetable." },
-  { icon: ShieldCheck, title: "Safe, Caring & Parent-Friendly Environment", body: "Female-staff-led primary section, structured routine, safe campus and regular parent communication." },
-];
+  { icon: BookOpen },
+  { icon: GraduationCap },
+  { icon: Languages },
+  { icon: Sparkles },
+  { icon: Trophy },
+  { icon: ShieldCheck }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.decisionCards[index] }));
 
 const scholastic = [
-  { name: "English", icon: BookOpen },
-  { name: "Mathematics", icon: Calculator },
-  { name: "Hindi", icon: Languages },
-  { name: "Marathi", icon: Languages },
-  { name: "EVS", icon: FlaskConical },
-  { name: "Computer", icon: Monitor },
-  { name: "General Knowledge", icon: Compass },
-];
+  { icon: BookOpen },
+  { icon: Calculator },
+  { icon: Languages },
+  { icon: Languages },
+  { icon: FlaskConical },
+  { icon: Monitor },
+  { icon: Compass }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.scholastic[index] }));
 const coScholastic = [
-  { name: "Physical Education", icon: Trophy },
-  { name: "Sports (Indoor & Outdoor)", icon: Trophy },
-  { name: "Value Education", icon: Heart },
-  { name: "Dance & Music", icon: Sparkles },
-  { name: "Personality Development", icon: Users },
-  { name: "Art & Craft", icon: Palette },
-];
+  { icon: Trophy },
+  { icon: Trophy },
+  { icon: Heart },
+  { icon: Sparkles },
+  { icon: Users },
+  { icon: Palette }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.coScholastic[index] }));
 
-const journey = [
-  { grade: "Class 1", body: "Settling into formal school learning with strong language and number foundations." },
-  { grade: "Class 2", body: "Building reading fluency, writing confidence, number sense and classroom participation." },
-  { grade: "Class 3", body: "Strengthening comprehension, problem-solving, EVS concepts and activity-based learning." },
-  { grade: "Class 4", body: "Developing independent learning, project work, communication and subject confidence." },
-  { grade: "Class 5", body: "Preparing students for middle school with stronger academics, responsibility and confidence." },
-];
+const journey = PRIMARY_CONTENT.journey;
 
-const gradeAdmissions = [
-  { grade: "Class 1", title: "Class 1 Admission in Thane", body: "A smooth transition into formal schooling with a strong focus on reading, writing, number sense, routines and confidence." },
-  { grade: "Class 2", title: "Class 2 Admission in Thane", body: "Strengthening literacy, numeracy, classroom participation and activity-based learning." },
-  { grade: "Class 3", title: "Class 3 Admission in Thane", body: "Helping students build comprehension, EVS understanding, problem-solving and independent learning habits." },
-  { grade: "Class 4", title: "Class 4 Admission in Thane", body: "Supporting subject clarity, project work, communication skills and academic confidence." },
-  { grade: "Class 5", title: "Class 5 Admission in Thane", body: "Preparing students for middle school with stronger academics, responsibility, confidence and study habits." },
-];
+const gradeAdmissions = PRIMARY_CONTENT.gradeAdmissions;
 
 const skills = [
-  { icon: Languages, title: "Language Skills", body: "English, Hindi and Marathi communication", color: "#e0edff", accent: NAVY_MID },
-  { icon: Calculator, title: "Math Skills", body: "Numeracy, calculations and problem-solving", color: "#fff7e0", accent: AMBER },
-  { icon: FlaskConical, title: "Scientific Skills", body: "EVS, observation and curiosity", color: "#e0f7f0", accent: "#059669" },
-  { icon: Palette, title: "Creative Skills", body: "Music, art, craft and expression", color: "#fdf2f8", accent: "#be185d" },
-  { icon: Users, title: "Interpersonal Skills", body: "Teamwork, values and classroom confidence", color: "#f3e0ff", accent: "#7c3aed" },
-  { icon: Monitor, title: "Digital Readiness", body: "Computers and technology-aided learning", color: "#e0f2fe", accent: "#0369a1" },
-];
+  { icon: Languages, color: "#e0edff", accent: NAVY_MID },
+  { icon: Calculator, color: "#fff7e0", accent: AMBER },
+  { icon: FlaskConical, color: "#e0f7f0", accent: "#059669" },
+  { icon: Palette, color: "#fdf2f8", accent: "#be185d" },
+  { icon: Users, color: "#f3e0ff", accent: "#7c3aed" },
+  { icon: Monitor, color: "#e0f2fe", accent: "#0369a1" }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.skills[index] }));
 
-const classroom = [
-  { title: "Activity-Based Learning", body: "Hands-on tasks, manipulatives and learning by doing." },
-  { title: "Group Work & Peer Learning", body: "Small-group discussions, collaborative projects and peer support." },
-  { title: "Reading, Writing & Speaking", body: "Daily practice across English, Hindi and Marathi." },
-  { title: "Smart Classrooms & Digital Tools", body: "Visual, interactive lessons that bring concepts to life." },
-  { title: "Teacher-Guided Concept Clarity", body: "Patient teachers, regular doubt-clearing and individual attention." },
-  { title: "Project Work & Presentations", body: "Confidence-building through show-and-tell, projects and class presentations." },
-];
+const classroom = PRIMARY_CONTENT.classroom;
 
 const approach = [
-  { title: "Teaching–Learning Strategies", body: "Students learn through explanation, discussion, pair work, group activities, worksheets, projects and hands-on classroom experiences.", color: "#e0edff", accent: NAVY_MID, icon: BookOpen },
-  { title: "Language Development", body: "Regular reading, writing, recitation, storytelling and speaking activities help children become confident communicators.", color: "#e0f7f0", accent: "#047857", icon: Languages },
-  { title: "Numeracy Development", body: "Mathematics is taught through practice, real-life examples, number work, problem-solving and activity-based learning.", color: "#fff7e0", accent: AMBER, icon: Calculator },
-  { title: "Continuous Evaluation", body: "Students are assessed through class participation, worksheets, projects, homework and regular academic observation.", color: "#fdf2f8", accent: "#be185d", icon: ClipboardCheck },
-];
+  { color: "#e0edff", accent: NAVY_MID, icon: BookOpen },
+  { color: "#e0f7f0", accent: "#047857", icon: Languages },
+  { color: "#fff7e0", accent: AMBER, icon: Calculator },
+  { color: "#fdf2f8", accent: "#be185d", icon: ClipboardCheck }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.approach[index] }));
 
-const evaluationPoints = [
-  "Class participation",
-  "Worksheets and assignments",
-  "Project work",
-  "Homework",
-  "Reading and writing progress",
-  "Co-curricular participation",
-  "Teacher observation",
-  "Regular parent communication",
-];
+const evaluationPoints = PRIMARY_CONTENT.evaluationPoints;
 
 const transitionCards = [
-  { title: "Academic Readiness", body: "Subject clarity, study habits and groundwork for middle-school concepts.", icon: GraduationCap },
-  { title: "Confidence & Communication", body: "Speaking, presenting and engaging with peers and teachers.", icon: MessageCircle },
-  { title: "Responsibility & Discipline", body: "Routine, time management, homework and personal organisation.", icon: ClipboardCheck },
-  { title: "Activity & Leadership Exposure", body: "Sports, arts, clubs and class roles that build leadership early.", icon: Trophy },
-];
+  { icon: GraduationCap },
+  { icon: MessageCircle },
+  { icon: ClipboardCheck },
+  { icon: Trophy }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.transitionCards[index] }));
 
 const trustItems = [
-  { icon: Heart, title: "Caring Teachers" },
-  { icon: ShieldCheck, title: "Safe Campus" },
-  { icon: ClipboardCheck, title: "Structured School Routine" },
-  { icon: MessageCircle, title: "Regular Parent Communication" },
-  { icon: Sparkles, title: "Co-curricular Balance" },
-  { icon: Bus, title: "Transport Support" },
-];
+  { icon: Heart },
+  { icon: ShieldCheck },
+  { icon: ClipboardCheck },
+  { icon: MessageCircle },
+  { icon: Sparkles },
+  { icon: Bus }
+].map((visual, index) => ({ ...visual, ...PRIMARY_CONTENT.trustItems[index] }));
 
-const localities = ["Hiranandani Estate", "Ghodbunder Road", "Brahmand Thane", "Manpada", "Kavesar", "Kolshet"];
-const grades = ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5"];
+const localities = PRIMARY_CONTENT.localities;
+const grades = PRIMARY_CONTENT.grades;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function ctaTrack(label: string) {
@@ -151,32 +108,18 @@ export default function Primary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Primary School in Thane | CBSE Class 1 to 5"
-        description="Explore Primary School at Rainbow International School, a CBSE school in Thane for Class 1 to 5 with academics, activities, safety and care."
-        keywords="primary school in Thane, CBSE primary school in Thane, best primary school in Thane, Class 1 admission in Thane, Class 2 admission in Thane, Class 3 admission in Thane, Class 4 admission in Thane, Class 5 admission in Thane, Class 1 admission near Hiranandani Estate, Class 1 admission near Ghodbunder Road, Class 5 admission near Brahmand Thane"
+        title={PRIMARY_SEO.title}
+        description={PRIMARY_SEO.description}
+        keywords={PRIMARY_SEO.keywords}
         canonical="https://rainbowinternationalschool.in/primary-section"
         ogImage="/images/home/academic/primary-section.jpg"
         appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "Academics", href: "https://rainbowinternationalschool.in/primary-section" },
-          { name: "Primary (Class 1–5)", href: "https://rainbowinternationalschool.in/primary-section" },
+          { name: PRIMARY_SEO.crumb, href: "https://rainbowinternationalschool.in/primary-section" },
         ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "EducationalOccupationalProgram",
-              "name": "Primary Section (Class 1–5)",
-              "description": "CBSE-affiliated primary education for Class 1 to Class 5 in Thane, covering English, Math, Hindi, Marathi, EVS, Computer and co-curricular learning with continuous evaluation.",
-              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-              "educationalProgramMode": "full-time",
-              "programPrerequisites": "Completion of Pre-Primary / Age 6 years",
-              "url": "https://rainbowinternationalschool.in/primary-section",
-            },
-            buildFaqPageSchema(PRIMARY_FAQS),
-          ],
-        }}
+        jsonLd={{ "@context": "https://schema.org", "@type": "WebPage", name: PRIMARY_SEO.title, description: PRIMARY_SEO.description, url: "https://rainbowinternationalschool.in/primary-section" }}
       />
       <Navbar />
 
@@ -203,26 +146,26 @@ export default function Primary() {
             style={{ background: AMBER_LIGHT, color: NAVY }}
             data-testid="badge-admissions-open"
           >
-            <Sparkles className="w-3.5 h-3.5" /> Admissions Open 2027–28
+            <Sparkles className="w-3.5 h-3.5" /> {PRIMARY_CONTENT.text.label1}
           </span>
           <h1
             className="text-white font-black leading-[1.05] text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
             data-testid="text-primary-h1"
           >
-            Primary School in Thane <br className="hidden sm:block" />
-            <span style={{ color: AMBER_LIGHT }}>Class 1 to Class 5</span>
+            {PRIMARY_CONTENT.text.h1Lead1} <br className="hidden sm:block" />
+            <span style={{ color: AMBER_LIGHT }}>{PRIMARY_CONTENT.text.h1Accent1}</span>
           </h1>
           <p className="text-white/95 text-base md:text-lg lg:text-xl mt-5 max-w-2xl font-medium">
-            Build strong foundations in literacy, numeracy, confidence, values and joyful learning at Rainbow International School.
+            {PRIMARY_CONTENT.text.heroIntro1}
           </p>
           <p className="text-white/75 text-sm md:text-base mt-3 max-w-2xl">
-            A CBSE-affiliated primary school experience designed for academic growth, communication skills, creativity, co-curricular exposure and a safe learning environment.
+            {PRIMARY_CONTENT.text.heroDetail1}
           </p>
 
           {/* Trust chips */}
           <div className="flex flex-wrap gap-2 mt-6 max-w-3xl">
-            {["CBSE Affiliated", "Class 1 to Class 5", "Strong Literacy & Numeracy", "Safe & Caring Campus", "Activities, Sports & Values"].map((t) => (
+            {PRIMARY_CONTENT.inlineList1.map((t) => (
               <span
                 key={t}
                 className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm"
@@ -242,7 +185,7 @@ export default function Primary() {
               style={{ background: AMBER }}
               data-testid="button-hero-enquire"
             >
-              Enquire for Class 1–5 <ArrowRight className="w-4 h-4" />
+              {PRIMARY_CONTENT.text.cta1} <ArrowRight className="w-4 h-4" />
             </a>
             <a
               href="/admissions#campus-visit"
@@ -250,7 +193,7 @@ export default function Primary() {
               className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors"
               data-testid="button-hero-campus-visit"
             >
-              Book a Campus Visit
+              {PRIMARY_CONTENT.text.cta2}
             </a>
             <a
               href={WHATSAPP_URL}
@@ -260,7 +203,7 @@ export default function Primary() {
               className="inline-flex items-center gap-2 font-extrabold text-sm sm:text-base px-6 py-3 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity"
               data-testid="button-hero-whatsapp"
             >
-              <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+              <MessageCircle className="w-4 h-4" /> {PRIMARY_CONTENT.text.cta3}
             </a>
           </div>
         </div>
@@ -273,10 +216,10 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>
-                Why RIS for Primary
+                {PRIMARY_CONTENT.text.label2}
               </span>
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Why Parents Choose RIS for Primary School
+                {PRIMARY_CONTENT.text.h21}
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -301,7 +244,7 @@ export default function Primary() {
                 style={{ background: NAVY }}
                 data-testid="button-explore-admissions-1"
               >
-                Explore Admissions for Class 1–5 <ChevronRight className="w-4 h-4" />
+                {PRIMARY_CONTENT.text.cta4} <ChevronRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -312,16 +255,16 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Subjects and Learning Areas
+                {PRIMARY_CONTENT.text.h22}
               </h2>
-              <p className="text-gray-600 mt-3">A balanced mix of scholastic and co-scholastic learning across Class 1 to Class 5.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph1}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Scholastic */}
               <div className="rounded-3xl bg-white border border-gray-100 shadow-sm overflow-hidden flex flex-col" data-testid="card-scholastic">
                 <div className="px-6 py-4" style={{ background: NAVY_MID }}>
                   <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" /> Scholastic Subjects
+                    <BookOpen className="w-5 h-5" /> {PRIMARY_CONTENT.text.h31}
                   </h3>
                 </div>
                 <ul className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
@@ -340,7 +283,7 @@ export default function Primary() {
               <div className="rounded-3xl bg-white border border-gray-100 shadow-sm overflow-hidden flex flex-col" data-testid="card-co-scholastic">
                 <div className="px-6 py-4" style={{ background: AMBER }}>
                   <h3 className="text-white font-black text-base uppercase tracking-wide flex items-center gap-2">
-                    <Trophy className="w-5 h-5" /> Co-Scholastic Learning
+                    <Trophy className="w-5 h-5" /> {PRIMARY_CONTENT.text.h32}
                   </h3>
                 </div>
                 <ul className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-3 flex-grow">
@@ -363,9 +306,9 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                The Primary Learning Journey at RIS
+                {PRIMARY_CONTENT.text.h23}
               </h2>
-              <p className="text-gray-600 mt-3">How learning grows year by year, from Class 1 to Class 5.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph2}</p>
             </div>
 
             {/* Desktop horizontal */}
@@ -416,7 +359,7 @@ export default function Primary() {
                 style={{ background: AMBER }}
                 data-testid="button-journey-enquire"
               >
-                Enquire for Primary Admissions <ArrowRight className="w-4 h-4" />
+                {PRIMARY_CONTENT.text.cta5} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -427,12 +370,12 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#fff7e0", color: AMBER }}>
-                Grade-Wise Admissions
+                {PRIMARY_CONTENT.text.label3}
               </span>
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Class 1 to Class 5 Admissions at RIS
+                {PRIMARY_CONTENT.text.h24}
               </h2>
-              <p className="text-gray-600 mt-3">Each grade has a specific learning focus. Choose your child's grade to enquire.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph3}</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {gradeAdmissions.map((g, i) => (
@@ -449,7 +392,7 @@ export default function Primary() {
                     style={{ color: NAVY, borderColor: NAVY }}
                     data-testid={`button-grade-enquire-${i}`}
                   >
-                    Enquire for this Class <ChevronRight className="w-3 h-3" />
+                    {PRIMARY_CONTENT.text.cta6} <ChevronRight className="w-3 h-3" />
                   </a>
                 </div>
               ))}
@@ -462,9 +405,9 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Skills We Build in Primary Years
+                {PRIMARY_CONTENT.text.h25}
               </h2>
-              <p className="text-gray-600 mt-3">Six skill areas that grow steadily across Class 1 to Class 5.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph4}</p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
               {skills.map((s, i) => {
@@ -488,9 +431,9 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Inside the Primary Classroom
+                {PRIMARY_CONTENT.text.h26}
               </h2>
-              <p className="text-gray-600 mt-3">Real classrooms, real learning — what a typical day at our Primary Section looks like.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph5}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -506,7 +449,7 @@ export default function Primary() {
                   height={750}
                 />
                 <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-black/70 to-transparent">
-                  <p className="text-white font-extrabold text-base md:text-lg">Group work and peer learning</p>
+                  <p className="text-white font-extrabold text-base md:text-lg">{PRIMARY_CONTENT.text.paragraph6}</p>
                 </div>
               </div>
               {/* Side images */}
@@ -522,7 +465,7 @@ export default function Primary() {
                     height={400}
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-white font-extrabold text-sm">Class participation</p>
+                    <p className="text-white font-extrabold text-sm">{PRIMARY_CONTENT.text.paragraph7}</p>
                   </div>
                 </div>
                 <div className="rounded-3xl overflow-hidden shadow-md aspect-[4/3] lg:aspect-auto lg:h-[200px] relative">
@@ -536,7 +479,7 @@ export default function Primary() {
                     height={400}
                   />
                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-white font-extrabold text-sm">Activity-based learning</p>
+                    <p className="text-white font-extrabold text-sm">{PRIMARY_CONTENT.text.paragraph8}</p>
                   </div>
                 </div>
               </div>
@@ -563,7 +506,7 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Our Approach to Primary Education
+                {PRIMARY_CONTENT.text.h27}
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -588,13 +531,13 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-5xl">
             <div className="text-center max-w-2xl mx-auto mb-10">
               <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: AMBER_LIGHT, color: NAVY }}>
-                Continuous Evaluation
+                {PRIMARY_CONTENT.text.label4}
               </span>
               <h2 className="text-2xl md:text-4xl font-black text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                How We Track Student Progress
+                {PRIMARY_CONTENT.text.h28}
               </h2>
               <p className="text-white/80 mt-3 text-sm md:text-base">
-                RIS follows continuous academic observation to help every child improve steadily — without unnecessary pressure.
+                {PRIMARY_CONTENT.text.paragraph9}
               </p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
@@ -618,7 +561,7 @@ export default function Primary() {
                 style={{ background: AMBER, color: "#ffffff" }}
                 data-testid="button-speak-counsellor"
               >
-                Speak to Our Primary Section Counsellor <ArrowRight className="w-4 h-4" />
+                {PRIMARY_CONTENT.text.cta7} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -629,10 +572,10 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Preparing Children for Middle School
+                {PRIMARY_CONTENT.text.h29}
               </h2>
               <p className="text-gray-600 mt-3">
-                Our Primary Section prepares students for the next stage of learning by building subject clarity, independent study habits, confidence, teamwork, responsibility and communication skills.
+                {PRIMARY_CONTENT.text.paragraph10}
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -657,7 +600,7 @@ export default function Primary() {
                 style={{ background: NAVY }}
                 data-testid="button-explore-middle-school"
               >
-                Explore Middle School <ChevronRight className="w-4 h-4" />
+                {PRIMARY_CONTENT.text.cta8} <ChevronRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -669,13 +612,13 @@ export default function Primary() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div>
                 <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>
-                  Parent Trust
+                  {PRIMARY_CONTENT.text.label5}
                 </span>
                 <h2 className="text-2xl md:text-4xl font-black mb-4" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                  A Safe and Supportive Primary School Environment
+                  {PRIMARY_CONTENT.text.h210}
                 </h2>
                 <p className="text-gray-600 mb-6 leading-relaxed">
-                  Our Primary Section is led by a caring, female-staff-led team and a structured daily routine that gives parents confidence — and helps children settle, learn and grow happily.
+                  {PRIMARY_CONTENT.text.paragraph11}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {trustItems.map((t) => {
@@ -711,13 +654,13 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-3" style={{ background: "#eef5ff", color: NAVY_MID }}>
-                <MapPin className="w-3 h-3" /> Local to Thane
+                <MapPin className="w-3 h-3" /> {PRIMARY_CONTENT.text.label6}
               </span>
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Primary Admissions Near You in Thane
+                {PRIMARY_CONTENT.text.h211}
               </h2>
               <p className="text-gray-600 mt-3 text-sm md:text-base">
-                Rainbow International School is located at Brahmand Phase 4, Thane and is easily accessible for parents looking for Class 1 to Class 5 admission near Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet, Pokhran Road, Patlipada and nearby areas.
+                {PRIMARY_CONTENT.text.paragraph12}
               </p>
             </div>
 
@@ -727,7 +670,7 @@ export default function Primary() {
                 <div key={loc} className="rounded-2xl bg-white border border-gray-100 shadow-sm p-5" data-testid={`locality-${i}`}>
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-4 h-4" style={{ color: AMBER }} />
-                    <h3 className="font-extrabold text-base" style={{ color: NAVY }}>Near {loc}</h3>
+                    <h3 className="font-extrabold text-base" style={{ color: NAVY }}>{PRIMARY_CONTENT.text.h33} {loc}</h3>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {grades.map((g) => (
@@ -739,7 +682,7 @@ export default function Primary() {
                         style={{ background: "#f8faff", color: NAVY_MID, borderColor: "#dbe7ff" }}
                         data-testid={`chip-${g.toLowerCase().replace(" ", "-")}-${loc.toLowerCase().replace(/\s+/g, "-")}`}
                       >
-                        {g} admission
+                        {g} {PRIMARY_CONTENT.text.cta9}
                       </a>
                     ))}
                   </div>
@@ -757,7 +700,7 @@ export default function Primary() {
                 style={{ background: NAVY }}
                 data-testid="button-get-directions"
               >
-                <MapPin className="w-4 h-4" /> Get Directions
+                <MapPin className="w-4 h-4" /> {PRIMARY_CONTENT.text.cta10}
               </a>
               <a
                 href={WHATSAPP_URL}
@@ -768,7 +711,7 @@ export default function Primary() {
                 style={{ color: NAVY, borderColor: NAVY }}
                 data-testid="button-check-transport"
               >
-                <Bus className="w-4 h-4" /> Check Transport Availability
+                <Bus className="w-4 h-4" /> {PRIMARY_CONTENT.text.cta11}
               </a>
               <a
                 href="/admissions"
@@ -777,7 +720,7 @@ export default function Primary() {
                 style={{ background: AMBER }}
                 data-testid="button-hyperlocal-enquire"
               >
-                Enquire for Primary Admissions <ArrowRight className="w-4 h-4" />
+                {PRIMARY_CONTENT.text.cta5} <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -791,13 +734,13 @@ export default function Primary() {
               <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full opacity-10" style={{ background: AMBER_LIGHT }} />
               <div className="relative z-10">
                 <span className="inline-block text-[11px] font-extrabold tracking-[0.2em] uppercase px-3 py-1.5 rounded-full mb-4" style={{ background: AMBER_LIGHT, color: NAVY }}>
-                  Admissions 2027–28
+                  {PRIMARY_CONTENT.text.label7}
                 </span>
                 <h2 className="text-2xl md:text-4xl font-black text-white mb-3" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  Looking for Class 1 to Class 5 Admission?
+                  {PRIMARY_CONTENT.text.h212}
                 </h2>
                 <p className="text-white/85 max-w-2xl mx-auto mb-7 text-sm md:text-base">
-                  Explore the Primary Section at Rainbow International School and speak to our admissions team for grade-wise availability, campus visit and admission guidance.
+                  {PRIMARY_CONTENT.text.paragraph13}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <a
@@ -807,7 +750,7 @@ export default function Primary() {
                     style={{ background: AMBER }}
                     data-testid="button-final-enquire"
                   >
-                    Enquire for Class 1–5 <ArrowRight className="w-4 h-4" />
+                    {PRIMARY_CONTENT.text.cta1} <ArrowRight className="w-4 h-4" />
                   </a>
                   <a
                     href="/admissions#campus-visit"
@@ -815,7 +758,7 @@ export default function Primary() {
                     className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors"
                     data-testid="button-final-campus-visit"
                   >
-                    Book a Campus Visit
+                    {PRIMARY_CONTENT.text.cta2}
                   </a>
                   <a
                     href={WHATSAPP_URL}
@@ -825,7 +768,7 @@ export default function Primary() {
                     className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full bg-[#25D366] text-white hover:opacity-90 transition-opacity"
                     data-testid="button-final-whatsapp"
                   >
-                    <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+                    <MessageCircle className="w-4 h-4" /> {PRIMARY_CONTENT.text.cta3}
                   </a>
                   <a
                     href={`tel:${PHONE}`}
@@ -833,7 +776,7 @@ export default function Primary() {
                     className="inline-flex items-center gap-2 font-extrabold text-sm px-6 py-3 rounded-full text-white border-2 border-white/80 hover:bg-white hover:text-[#091a4f] transition-colors"
                     data-testid="button-final-call"
                   >
-                    <Phone className="w-4 h-4" /> Call Admissions
+                    <Phone className="w-4 h-4" /> {PRIMARY_CONTENT.text.cta12}
                   </a>
                 </div>
               </div>
@@ -846,9 +789,9 @@ export default function Primary() {
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-12">
               <h2 className="text-2xl md:text-4xl font-black" style={{ color: NAVY, fontFamily: "'DM Sans', sans-serif" }}>
-                Frequently Asked Questions About Primary School at RIS
+                {PRIMARY_CONTENT.text.h213}
               </h2>
-              <p className="text-gray-600 mt-3">Quick answers about Class 1 to Class 5 admissions, curriculum, transport and more.</p>
+              <p className="text-gray-600 mt-3">{PRIMARY_CONTENT.text.paragraph14}</p>
             </div>
             <div className="space-y-3">
               {PRIMARY_FAQS.map((f, i) => {
@@ -891,7 +834,7 @@ export default function Primary() {
             data-testid="sticky-call"
           >
             <Phone className="w-4 h-4" style={{ color: NAVY }} />
-            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Call</span>
+            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{PRIMARY_CONTENT.text.label8}</span>
           </a>
           <a
             href={WHATSAPP_URL}
@@ -902,7 +845,7 @@ export default function Primary() {
             data-testid="sticky-whatsapp"
           >
             <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} />
-            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>WhatsApp</span>
+            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{PRIMARY_CONTENT.text.label9}</span>
           </a>
           <a
             href="/admissions"
@@ -911,7 +854,7 @@ export default function Primary() {
             data-testid="sticky-enquire"
           >
             <ClipboardCheck className="w-4 h-4" style={{ color: AMBER }} />
-            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Enquire</span>
+            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{PRIMARY_CONTENT.text.label10}</span>
           </a>
           <a
             href="/admissions#campus-visit"
@@ -920,7 +863,7 @@ export default function Primary() {
             data-testid="sticky-book-visit"
           >
             <Compass className="w-4 h-4" style={{ color: NAVY_MID }} />
-            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>Book Visit</span>
+            <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>{PRIMARY_CONTENT.text.label11}</span>
           </a>
         </div>
       </div>
