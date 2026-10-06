@@ -39,7 +39,7 @@ export const ADM_HERO = {
 };
 
 export const ADM_FORM = {
-  "subtitle": "Our admissions counsellor will call you back during office hours, Mon–Sat 9 am–6 pm.",
+  "subtitle": "Our counsellor will call you back Mon–Sat, 9 am–6 pm.",
   "footnote": "Mon–Sat · 9 AM–6 PM · No entrance test for KG–Class 8",
   "thankYou": "Our admissions counsellor will contact you shortly to guide you through the next step."
 };
