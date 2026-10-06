@@ -1,0 +1,82 @@
+SEO P4 — CLASS PAGES REPORT
+Date: 2026-10-06
+
+Result: Requested page changes completed locally. GitHub push failed authentication.
+
+CHECKS
+npx tsc --noEmit: PASS.
+parity:check: all four requested routes checked; 0 FAIL, 4 WARN.
+Title, description, canonical, robots and H1 match bot vs visitor.
+Exactly one H1 per page. Phone allowlist/footer-only landline, admin@-only email allowlist, valid JSON-LD, no FAQPage and one organisation node: PASS.
+No filler added to resolve the permitted word-count warnings.
+
+/primary-section
+Title (bot = visitor): CBSE Primary School in Thane | Class 1 Admission 2027-28
+Description (bot = visitor): Class 1 to 5 at Rainbow International School, Brahmand, Thane West: CBSE, Spanish, 7:30 am to 1 pm. Class 1 entry from age 6. Admissions 2027-28.
+H1 bot: Primary School in Thane West Class 1 to 5
+H1 visitor: Primary School in Thane West Class 1 to 5
+Body words: bot 1288; visitor 1483; 86.9% — WARN.
+Banned words: bot None — PASS; visitor top — WARN.
+
+/middle-school-section
+Title (bot = visitor): CBSE Middle School in Thane | Class 6 to 8 Admission
+Description (bot = visitor): Class 6 to 8 at Rainbow International School, Thane West: CBSE subjects, Spanish up to Grade 8, labs and sports. Timings 7:30 am to 1 pm.
+H1 bot: Middle School in Thane West | Class 6 to 8
+H1 visitor: Middle School in Thane West | Class 6 to 8
+Body words: bot 1189; visitor 1378; 86.3% — WARN.
+Banned words: bot None — PASS; visitor top — WARN.
+
+/secondary-section
+Title (bot = visitor): CBSE Class 9 & 10 in Thane | Admission 2027-28
+Description (bot = visitor): Class 9 and 10 at Rainbow International School, Brahmand, Thane West: CBSE board preparation, labs, mentoring. Timings 7:30 am to 1 pm.
+H1 bot: Secondary School in Thane | Class 9 and 10
+H1 visitor: Secondary School in Thane | Class 9 and 10
+Body words: bot 966; visitor 1155; 83.6% — WARN.
+Banned words: bot leading — WARN; visitor top — WARN.
+
+/senior-secondary-section
+Title (bot = visitor): CBSE Class 11 & 12 in Thane | Science, Commerce, Humanities
+Description (bot = visitor): Class 11 admission 2027-28 in Thane West: CBSE Science, Commerce and Humanities at Rainbow International School. Timings 1 pm to 6 pm.
+H1 bot: Class 11 and 12 in Thane | Science, Commerce, Humanities
+H1 visitor: Class 11 and 12 in Thane | Science, Commerce, Humanities
+Body words: bot 1147; visitor 1328; 86.4% — WARN.
+Banned words: bot leading — WARN; visitor top — WARN.
+
+WARNING CONTEXT
+“top” is from the unchanged visitor navigation label “Top Schools in Thane”, outside the requested class-page copy changes.
+“leading” is in the unchanged FAQ wording “leading up to the CBSE Class 10/12 board examination”, not a school-ranking claim. These sentences were preserved as instructed.
+The checker reports identical schema-type lists for these four routes, but its schema comparison currently always marks PASS. A separate checker-reliability follow-up was proposed; the checker itself was not changed.
+
+CHANGES
+All four pages now use their own shared content module for visible copy and metadata; icons, colours and images remain in React.
+Applied the requested H1s, smaller hero paragraphs, top-of-list FAQs, transport answers, good-fit/female-staff wording and Secondary Olympiads removals.
+Senior Secondary keeps its existing streams FAQ; only the new timings FAQ was added.
+Crawler page bodies now use the same content and section order, with native closed details FAQs and one main phone link in each body. Old crawler-only claims and the generic extra crawler CTA were removed for these four routes.
+Page-specific schema is WebPage/Breadcrumb plus the unchanged shared organisation graph; no FAQPage.
+Only the four requested sitemap lastmod values changed, to 2026-10-06.
+React classes, styles, images, icons, handlers, tracking calls and testids were preserved. No changes to forms, APIs, CRM logic or other pages.
+
+FILES CHANGED — COMMITTED
+client/src/pages/Primary.tsx
+client/src/pages/MiddleSchool.tsx
+client/src/pages/Secondary.tsx
+client/src/pages/SeniorSecondary.tsx
+shared/content/primary.ts (new)
+shared/content/middle.ts (new)
+shared/content/secondary.ts (new)
+shared/content/senior.ts (new)
+server/ssrClassPages.ts (new semantic renderers, imported by ssrPages.ts)
+server/ssrPages.ts
+server/pageTitles.ts
+shared/routeSeo.ts
+client/public/sitemap.xml
+attached_assets/Pasted-SEO-PROMPT-4-CLASS-PAGES-primary-section-middle-school-_1791283333002.txt (uploaded brief included by git add -A)
+
+GIT / ANYTHING NOT DONE
+Commit: 5b41eab — SEO P4: class pages copy, metadata and bot parity
+One push attempted; failed: “Invalid username or token. Password authentication is not supported for Git operations.”
+No retries or Git setting changes. The commit is local, not pushed.
+This report was written after the push attempt as requested and is not in that commit:
+artifacts/reports/seo-p4-class-pages-report.txt
+Lighthouse skipped – Claude will run it
+No screenshots, other-route checks, extra test suites, test enquiries or publishing.
