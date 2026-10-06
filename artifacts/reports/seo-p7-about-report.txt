@@ -1,0 +1,61 @@
+SEO P7 — ABOUT PAGE REPORT
+Date: 2026-10-06
+Route: /about-rainbow-international-school
+
+Completed and committed locally. No push performed, as requested.
+
+FINAL METADATA
+Title (bot = visitor): About Rainbow International School, Thane | CBSE since 2009
+Description (bot = visitor): Rainbow International School, Brahmand, Thane West: a CBSE school since April 2009, KG to Class 12, with a 3.5-acre campus and 3,000+ students across two shifts.
+Canonical (bot = visitor): https://rainbowinternationalschool.in/about-rainbow-international-school
+H1 bot: About Rainbow International School
+H1 visitor: About Rainbow International School
+Exactly one H1 in each version; no site-name suffix.
+
+CHANGES
+Created shared/content/about.ts for all About-owned visible text, image alt text, metadata and AboutPage schema. The visitor page and crawler renderer import this shared content.
+Applied the exact supplied banner and two welcome paragraphs; added the supplied curriculum paragraph with six internal links.
+Changed only the two specified image alt texts and "1 Lac+" to "1 Lakh+".
+Preserved Learning Spaces, Chairperson's Note, Vision, Core Values and quote wording.
+Made the two explicitly approved exceptions: removed "world-class" from Mission; changed "give their best" to "give their all" in Philosophy. All other Mission and Philosophy wording is unchanged.
+Breadcrumb is Home > About Us. AboutPage references the shared organisation through about; removed nested EducationalOrganization and numberOfEmployees.
+Crawler body follows visitor section order and heading levels, retaining shared paragraphs, lists and curriculum links. Removed the old crawler-only claims and generic extra CTA. Its contact section reuses the existing shared contact introduction, with exactly one admissions tel link in the body.
+Existing visitor ContactForm, including its two existing links to the same admissions number, is unchanged. Footer mobile and landline remain unchanged.
+Added direct server 301 redirects from /welcome-to-ris and /welcome to About, plus wouter Redirect for /welcome-to-ris.
+Removed the welcome crawler renderer/config, title/SEO registry entries and sitemap URL. WelcomeToRIS.tsx remains in place but unused; its stale breadcrumb link now points to About.
+Updated the remaining welcome URL references in llms.txt and llms-full.txt to About.
+Only About's sitemap lastmod changed to 2026-10-06.
+Existing classes, colours, icons, image files, layout, section order, buttons, forms, handlers, tracking calls and test IDs preserved. New curriculum links use in-text link styling.
+
+CHECKS
+npx tsc --noEmit: PASS.
+npm run parity:check -- /about-rainbow-international-school: WARN, 0 failures.
+Title, description, canonical, H1 count/text: PASS.
+Allowed tel links and footer-only landline: PASS.
+Valid JSON-LD; AboutPage present; no FAQPage; one shared organisation node in each version: PASS.
+Body words: bot 767; visitor 1057; bot is 72.6% — permitted WARN. No filler added; the existing interactive form and richer visitor navigation/footer account for additional visitor text.
+Banned words: bot None — PASS; visitor "top" — WARN from unchanged "Top Schools in Thane" navigation. About-owned copy, metadata and alt text have no banned wording.
+curl -sI /welcome-to-ris: HTTP 301; Location: /about-rainbow-international-school.
+curl -sI /welcome: HTTP 301; Location: /about-rainbow-international-school.
+Both redirects point directly to About, without a chain.
+
+FILES CHANGED IN COMMIT
+shared/content/about.ts
+client/src/pages/About.tsx
+client/src/pages/WelcomeToRIS.tsx
+client/src/App.tsx
+server/routes.ts
+server/ssrPages.ts
+server/pageTitles.ts
+shared/routeSeo.ts
+client/public/sitemap.xml
+client/public/llms.txt
+client/public/llms-full.txt
+
+COMMIT / ANYTHING NOT DONE
+Commit: 6b06cf7
+Message: SEO P7: About page copy, metadata, schema; merge welcome-to-ris
+No push attempted; owner will push from the Git pane.
+Report saved at artifacts/reports/seo-p7-about-report.txt after the commit; not included in that commit.
+Lighthouse skipped – Claude will run it
+No screenshots, test enquiries, other-route checks, additional test suites or publishing performed.
