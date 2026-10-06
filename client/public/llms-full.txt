@@ -401,7 +401,7 @@ Rainbow International School is a day school. There are no boarding facilities. 
 |------|-----|
 | Home | https://rainbowinternationalschool.in/ |
 | About Rainbow International School | https://rainbowinternationalschool.in/about-rainbow-international-school |
-| Welcome to Rainbow International School | https://rainbowinternationalschool.in/welcome-to-ris |
+| Welcome to Rainbow International School | https://rainbowinternationalschool.in/about-rainbow-international-school |
 | Vision & Mission | https://rainbowinternationalschool.in/ris-vision-mission |
 | Chairperson's Note | https://rainbowinternationalschool.in/chairpersons-note |
 | School Managing Committee | https://rainbowinternationalschool.in/school-managing-committee |

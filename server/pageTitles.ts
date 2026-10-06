@@ -1,6 +1,7 @@
 import { PRIMARY_SEO } from "@shared/content/primary";
 import { FEES_SEO } from "@shared/content/fees";
 import { CONTACT_SEO } from "@shared/content/contact";
+import { ABOUT_SEO } from "@shared/content/about";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -28,8 +29,7 @@ export async function resolveBlogTitle(slug: string): Promise<string | null> {
 
 const PAGE_TITLES: Record<string, string> = {
   "/": HOME_SEO.title,
-  "/about-rainbow-international-school": "About Us | Rainbow International School Thane",
-  "/welcome-to-ris": "Welcome to Rainbow International School",
+  "/about-rainbow-international-school": ABOUT_SEO.title,
   "/chairpersons-note": "Chairperson's Note | Rainbow International School",
   "/ris-vision-mission": "Vision & Mission | Rainbow International School",
   "/our-philosophy": "Our Philosophy | Rainbow International School",

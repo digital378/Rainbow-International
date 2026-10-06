@@ -18,7 +18,7 @@ export default function WelcomeToRIS() {
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
           { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
-          { name: "Welcome to RIS", href: "https://rainbowinternationalschool.in/welcome-to-ris" },
+          { name: "Welcome to RIS", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
         ]}
       />
       <Navbar />

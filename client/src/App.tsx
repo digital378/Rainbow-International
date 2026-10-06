@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route, Redirect, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -10,7 +10,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Home from "@/pages/Home";
 
 const About = lazy(() => import("@/pages/About"));
-const WelcomeToRIS = lazy(() => import("@/pages/WelcomeToRIS"));
 const ChairpersonsNote = lazy(() => import("@/pages/ChairpersonsNote"));
 const VisionMission = lazy(() => import("@/pages/VisionMission"));
 const OurPhilosophy = lazy(() => import("@/pages/OurPhilosophy"));
@@ -102,7 +101,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/about-rainbow-international-school" component={About} />
-      <Route path="/welcome-to-ris" component={WelcomeToRIS} />
+      <Route path="/welcome-to-ris"><Redirect to="/about-rainbow-international-school" /></Route>
       <Route path="/chairpersons-note" component={ChairpersonsNote} />
       <Route path="/ris-vision-mission" component={VisionMission} />
       <Route path="/our-philosophy" component={OurPhilosophy} />

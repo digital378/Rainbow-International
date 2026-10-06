@@ -1,6 +1,7 @@
 import { PRIMARY_SEO } from "./content/primary";
 import { FEES_SEO } from "./content/fees";
 import { CONTACT_SEO, CONTACT_BANNER } from "./content/contact";
+import { ABOUT_SEO } from "./content/about";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -41,14 +42,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Home",
   },
   "/about-rainbow-international-school": {
-    description:
-      "Rainbow International School, founded in 2009, is a CBSE K-12 school in Thane with a 3.5-acre campus and 3000+ students, KG to Class 12.",
-    crumb: "About Us",
-  },
-  "/welcome-to-ris": {
-    description:
-      "Welcome to Rainbow International School, Thane — a CBSE K-12 school on a 3.5-acre Brahmand campus, nurturing students from KG to Class 12.",
-    crumb: "Welcome",
+    title: ABOUT_SEO.title,
+    description: ABOUT_SEO.description,
+    crumb: ABOUT_SEO.crumb,
   },
   "/chairpersons-note": {
     description:

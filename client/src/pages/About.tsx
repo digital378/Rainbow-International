@@ -5,112 +5,50 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { CheckCircle2, Target, Eye, BookOpen, Heart, Star, Users } from "lucide-react";
+import { Fragment } from "react";
+import {
+  ABOUT_SEO, ABOUT_BANNER, ABOUT_WELCOME, ABOUT_IMAGE_ALTS, ABOUT_LEARNING,
+  ABOUT_STATS, ABOUT_CHAIRPERSON, ABOUT_PURPOSE, ABOUT_PHILOSOPHY, ABOUT_JSON_LD,
+  type AboutTextPart,
+} from "@shared/content/about";
 
-const academicSpaces = [
-  "State-of-the-art Laboratories",
-  "Library & Reading Room",
-  "Multipurpose Hall",
-  "Music Room",
-  "Art & Craft Room",
-  "Amphitheater",
-  "Organic Farming Area",
-  "Infirmary",
-];
+const academicSpaces = ABOUT_LEARNING.academic;
+const sportsSpaces = ABOUT_LEARNING.sports;
+const stats = ABOUT_STATS.items;
+const philosophyPillars = [BookOpen, Heart, Star, Users].map((icon, i) => ({
+  ...ABOUT_PHILOSOPHY.pillars[i],
+  icon,
+}));
+const missionPoints = ABOUT_PURPOSE.mission;
 
-const sportsSpaces = [
-  "Football Field",
-  "Adventure Sports Field",
-  "Skating Rink",
-  "Swimming Pool",
-  "Multipurpose Courts",
-  "Cricket Ground",
-  "Indoor Sports Facility",
-];
-
-const stats = [
-  { num: "2009", label: "Founded" },
-  { num: "1 Lac+", label: "Students Impacted" },
-  { num: "3.5 Acres", label: "Campus Area" },
-  { num: "3,000+", label: "Current Students" },
-];
-
-const philosophyPillars = [
-  {
-    icon: BookOpen,
-    title: "Holistic Learning",
-    desc: "We believe education extends beyond textbooks. Our curriculum integrates academics, arts, sports, and life skills to develop well-rounded individuals.",
-  },
-  {
-    icon: Heart,
-    title: "Values First",
-    desc: "Empathy, integrity, and respect form the foundation of everything we do. We nurture character alongside intellect, preparing students to be compassionate citizens.",
-  },
-  {
-    icon: Star,
-    title: "Excellence in All",
-    desc: "We set high standards — not just in examinations, but in sports, arts, community service, and personal growth. Every student is encouraged to give their best.",
-  },
-  {
-    icon: Users,
-    title: "Community & Belonging",
-    desc: "Rainbow is a family. We build an inclusive environment where every child feels seen, celebrated, and supported — by teachers, peers, and parents alike.",
-  },
-];
-
-const missionPoints = [
-  "Deliver world-class CBSE education that equips students for a rapidly changing world",
-  "Foster intellectual curiosity, critical thinking, and a lifelong love of learning",
-  "Nurture physical, emotional, and social development alongside academic excellence",
-  "Build a diverse, inclusive community that celebrates every child's unique potential",
-  "Partner with families to create a seamless support system around each student",
-];
+function AboutText({ parts }: { parts: AboutTextPart[] }) {
+  return parts.map((part, i) => part.href
+    ? <a key={i} href={part.href} className="text-[#0d3b86] font-semibold hover:underline">{part.text}</a>
+    : part.strong ? <strong key={i}>{part.text}</strong>
+    : <Fragment key={i}>{part.text}</Fragment>);
+}
 
 export default function About() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="About Us | Rainbow International School Thane"
-        description="Learn about Rainbow International School — founded in April 2009, serving 3000+ students across 3.5 acres in Thane. CBSE affiliated, KG to Class 12."
-        keywords="about Rainbow International School, CBSE school Thane, best school Thane, Rainbow school history"
+        title={ABOUT_SEO.title}
+        description={ABOUT_SEO.description}
+        keywords={ABOUT_SEO.keywords}
+        appendSiteName={false}
         canonical="https://rainbowinternationalschool.in/about-rainbow-international-school"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "About Us", href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+          { name: ABOUT_SEO.crumb, href: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
         ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "AboutPage",
-          "name": "About Rainbow International School — Best CBSE School in Thane",
-          "description": "Rainbow International School, founded in April 2009, is a CBSE-affiliated K-12 school in Thane serving 3000+ students across 3.5 acres.",
-          "url": "https://rainbowinternationalschool.in/about-rainbow-international-school",
-          "sameAs": [
-            "https://www.facebook.com/rainbowinternationalschoolthane",
-            "https://www.instagram.com/rainbow_international_school_"
-          ],
-          "about": {
-            "@type": "EducationalOrganization",
-            "name": "Rainbow International School",
-            "foundingDate": "2009-04",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
-              "addressLocality": "Thane",
-              "addressRegion": "Maharashtra",
-              "postalCode": "400607",
-              "addressCountry": "IN"
-            },
-            "telephone": "+91-82915-68972",
-            "numberOfEmployees": { "@type": "QuantitativeValue", "value": 150 },
-            "hasCredential": "CBSE Affiliation No. 1130661"
-          }
-        }}
+        jsonLd={ABOUT_JSON_LD}
       />
       <ScrollProgress />
       <Navbar />
       <PageBanner
-        title="Welcome to RIS"
-        subtitle="Building tomorrow's leaders since April 2009"
-        breadcrumb={[{ label: "About Us" }, { label: "Welcome to RIS" }]}
+        title={ABOUT_BANNER.title}
+        subtitle={ABOUT_BANNER.subtitle}
+        breadcrumb={[{ label: ABOUT_SEO.crumb }]}
         bgImage="https://rainbowinternationalschool.in/wp-content/uploads/2022/09/Infrastructure-3-1024x536-1.jpg"
       />
 
@@ -122,24 +60,15 @@ export default function About() {
             <div className="max-w-4xl mx-auto">
               <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-6" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                About the School
+                {ABOUT_WELCOME.eyebrow}
               </span>
               <h2 className="text-3xl md:text-4xl font-black mb-6" style={{ color: "#0d3b86" }}>
-                Welcome to Rainbow International School
+                {ABOUT_WELCOME.heading}
               </h2>
               <div className="space-y-4 text-gray-600 text-[15px] leading-[1.8]">
-                <p>
-                  Founded in <strong>April 2009, Rainbow International School</strong> has touched the lives of more than 1 lac students ever since.
-                </p>
-                <p>
-                  Being one of the finest educational institutes in Thane, Rainbow International School has a campus that spans over <strong>3.5 acres</strong>. In addition to being a visible landmark, we are also enormous in terms of many other factors — more than <strong>3,000 students</strong> are enrolled across two shifts.
-                </p>
-                <p>
-                  In addition to being synonymous with quality education, we at Rainbow International School are committed to all-around growth in our students. Rainbow allows its students to explore human excellence through competence, conscience, and compassion.
-                </p>
-                <p>
-                  Our teaching methods integrate comfort, colors, and technology within classrooms, which enables our students not only to learn more effectively but also quickly.
-                </p>
+                {ABOUT_WELCOME.paragraphs.map((parts, i) => (
+                  <p key={i}><AboutText parts={parts} /></p>
+                ))}
               </div>
             </div>
           </div>
@@ -151,7 +80,7 @@ export default function About() {
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <img
                 src="/images/extra/campus/school-front.jpg"
-                alt="Rainbow International School — Main entrance with Rainbow logo"
+                alt={ABOUT_IMAGE_ALTS[0]}
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={800}
                 height={533}
@@ -160,7 +89,7 @@ export default function About() {
               />
               <img
                 src="/images/extra/campus/school-building.jpg"
-                alt="Rainbow International School — Campus building and courtyard"
+                alt={ABOUT_IMAGE_ALTS[1]}
                 className="rounded-3xl shadow-sm w-full object-cover"
                 width={800}
                 height={533}
@@ -171,25 +100,25 @@ export default function About() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-6">
               <img
                 src="/images/extra/classroom/science-lab.jpg"
-                alt="Students doing experiments in science lab"
+                alt={ABOUT_IMAGE_ALTS[2]}
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
                 src="/images/extra/classroom/students-turf.jpg"
-                alt="Primary students enjoying time on the green turf"
+                alt={ABOUT_IMAGE_ALTS[3]}
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
                 src="/images/extra/campus/swimming-pool.jpg"
-                alt="Olympic-standard swimming pool at Rainbow International School"
+                alt={ABOUT_IMAGE_ALTS[4]}
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
               <img
                 src="/images/extra/campus/monument.jpg"
-                alt="Historical monument at Rainbow International School campus"
+                alt={ABOUT_IMAGE_ALTS[5]}
                 className="rounded-2xl shadow-sm w-full object-cover aspect-[4/3]"
                 width={400} height={300} loading="lazy" decoding="async"
               />
@@ -200,10 +129,10 @@ export default function About() {
         {/* Learning Spaces */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-black text-gray-900 text-center mb-12">Our Learning Spaces</h2>
+            <h2 className="text-3xl font-black text-gray-900 text-center mb-12">{ABOUT_LEARNING.heading}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
               <div className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm">
-                <h3 className="font-black text-xl mb-5" style={{ color: "#0d3b86" }}>Academic Spaces</h3>
+                <h3 className="font-black text-xl mb-5" style={{ color: "#0d3b86" }}>{ABOUT_LEARNING.academicHeading}</h3>
                 <ul className="space-y-2.5">
                   {academicSpaces.map((s, i) => (
                     <li key={i} className="flex items-center gap-2.5 text-gray-600 text-sm">
@@ -214,7 +143,7 @@ export default function About() {
                 </ul>
               </div>
               <div className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm">
-                <h3 className="font-black text-xl mb-5" style={{ color: "#10b981" }}>Sports Spaces</h3>
+                <h3 className="font-black text-xl mb-5" style={{ color: "#10b981" }}>{ABOUT_LEARNING.sportsHeading}</h3>
                 <ul className="space-y-2.5">
                   {sportsSpaces.map((s, i) => (
                     <li key={i} className="flex items-center gap-2.5 text-gray-600 text-sm">
@@ -231,7 +160,7 @@ export default function About() {
         {/* Rainbow at a Glance */}
         <section className="py-20" style={{ background: "#091a4f" }}>
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-black text-white mb-12">Rainbow at a Glance</h2>
+            <h2 className="text-3xl font-black text-white mb-12">{ABOUT_STATS.heading}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
               {stats.map((s, i) => (
                 <div key={i} className="bg-white/10 rounded-3xl p-6 border border-white/10">
@@ -250,9 +179,9 @@ export default function About() {
               <div className="text-center mb-14">
                 <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                  Leadership
+                  {ABOUT_CHAIRPERSON.eyebrow}
                 </span>
-                <h2 className="text-3xl md:text-4xl font-black text-gray-900">Chairperson's Note</h2>
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900">{ABOUT_CHAIRPERSON.heading}</h2>
               </div>
 
               <div className="flex flex-col lg:flex-row gap-12 items-start">
@@ -263,8 +192,8 @@ export default function About() {
                   >
                   </div>
                   <div className="text-center">
-                    <p className="font-black text-gray-900 text-base">Chairperson</p>
-                    <p className="text-sm text-gray-500">Rainbow International School</p>
+                    <p className="font-black text-gray-900 text-base">{ABOUT_CHAIRPERSON.role}</p>
+                    <p className="text-sm text-gray-500">{ABOUT_CHAIRPERSON.school}</p>
                   </div>
                 </div>
 
@@ -273,27 +202,15 @@ export default function About() {
                     className="rounded-3xl p-8 md:p-10 relative"
                     style={{ background: "#f8faff", border: "1.5px solid #dbeafe" }}
                   >
-                    <span className="absolute -top-5 left-8 text-7xl leading-none font-serif" style={{ color: "#0d3b86", opacity: 0.15 }}>"</span>
+                    <span className="absolute -top-5 left-8 text-7xl leading-none font-serif" style={{ color: "#0d3b86", opacity: 0.15 }}>{ABOUT_CHAIRPERSON.quoteMark}</span>
                     <div className="space-y-5 text-gray-600 text-[15px] leading-[1.9] relative">
-                      <p>
-                        Dear Students, Parents, and Well-wishers,
-                      </p>
-                      <p>
-                        It is with immense pride and a heart full of gratitude that I welcome you to <strong>Rainbow International School</strong> — a place where every child's story matters, and where the journey of learning is celebrated every single day.
-                      </p>
-                      <p>
-                        When we founded Rainbow International School in <strong>April 2009</strong>, our vision was simple yet profound: to build an institution that nurtures not just academic brilliance, but also the values of empathy, perseverance, and global citizenship. Over the years, we have grown into a community of over <strong>3,000 students</strong> — each one a testament to what is possible when passionate educators, committed families, and curious young minds come together.
-                      </p>
-                      <p>
-                        Education, in its truest sense, is about preparing children for life — not just examinations. At Rainbow, we believe that every child is uniquely gifted, and it is our responsibility to help each one discover, develop, and deploy their gifts in service of the world.
-                      </p>
-                      <p>
-                        I invite you to experience the Rainbow difference — where tradition meets innovation, and every child dares to dream.
-                      </p>
+                      {ABOUT_CHAIRPERSON.paragraphs.map((parts, i) => (
+                        <p key={i}><AboutText parts={parts} /></p>
+                      ))}
                       <p className="font-bold text-gray-800">
-                        With warm regards,<br />
-                        <span style={{ color: "#0d3b86" }}>Mrs. Akila Balbale</span><br />
-                        <span style={{ color: "#0d3b86" }}>Chairperson</span>
+                        {ABOUT_CHAIRPERSON.signoff}<br />
+                        <span style={{ color: "#0d3b86" }}>{ABOUT_CHAIRPERSON.name}</span><br />
+                        <span style={{ color: "#0d3b86" }}>{ABOUT_CHAIRPERSON.role}</span>
                       </p>
                     </div>
                   </div>
@@ -309,9 +226,9 @@ export default function About() {
             <div className="text-center mb-14">
               <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                Our Purpose
+                {ABOUT_PURPOSE.eyebrow}
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900">RIS Vision & Mission</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900">{ABOUT_PURPOSE.heading}</h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-14">
@@ -323,9 +240,9 @@ export default function About() {
                 >
                   <Eye size={26} style={{ color: "#0d3b86" }} />
                 </div>
-                <h3 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>Our Vision</h3>
+                <h3 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>{ABOUT_PURPOSE.visionHeading}</h3>
                 <p className="text-gray-600 text-[15px] leading-[1.8]">
-                  To be a <strong>globally respected centre of learning</strong> that empowers every student to discover their unique potential, embrace lifelong learning, and contribute meaningfully to society — grounded in strong values and an unwavering commitment to excellence.
+                  <AboutText parts={ABOUT_PURPOSE.vision} />
                 </p>
                 <div
                   className="absolute bottom-0 right-0 w-24 h-24 rounded-tl-[40px] opacity-[0.06]"
@@ -341,7 +258,7 @@ export default function About() {
                 >
                   <Target size={26} style={{ color: "#f97316" }} />
                 </div>
-                <h3 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>Our Mission</h3>
+                <h3 className="text-2xl font-black mb-4" style={{ color: "#0d3b86" }}>{ABOUT_PURPOSE.missionHeading}</h3>
                 <ul className="space-y-3">
                   {missionPoints.map((point, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-gray-600 text-[14px] leading-[1.7]">
@@ -364,9 +281,9 @@ export default function About() {
 
             {/* Core Values strip */}
             <div className="max-w-5xl mx-auto">
-              <p className="text-center text-sm font-bold tracking-widest uppercase text-gray-400 mb-6">Our Core Values</p>
+              <p className="text-center text-sm font-bold tracking-widest uppercase text-gray-400 mb-6">{ABOUT_PURPOSE.valuesHeading}</p>
               <div className="flex flex-wrap gap-3 justify-center">
-                {["Integrity", "Empathy", "Excellence", "Innovation", "Inclusion", "Responsibility", "Curiosity", "Resilience"].map((v, i) => (
+                {ABOUT_PURPOSE.values.map((v, i) => (
                   <span
                     key={i}
                     className="px-5 py-2.5 rounded-full text-sm font-bold"
@@ -386,11 +303,11 @@ export default function About() {
             <div className="text-center mb-14">
               <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full mb-5" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                How We Think
+                {ABOUT_PHILOSOPHY.eyebrow}
               </span>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900">Our Philosophy</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900">{ABOUT_PHILOSOPHY.heading}</h2>
               <p className="text-gray-500 text-lg mt-4 max-w-2xl mx-auto">
-                Education is not the filling of a pail, but the lighting of a fire. At Rainbow, we believe every child carries within them a spark — our role is to help it blaze.
+                {ABOUT_PHILOSOPHY.intro}
               </p>
             </div>
 
@@ -421,9 +338,9 @@ export default function About() {
               style={{ background: "linear-gradient(135deg, #0a2763 0%, #0d3b86 100%)" }}
             >
               <p className="text-white/90 text-lg md:text-xl leading-[1.8] font-light italic mb-5">
-                "We do not teach children what to think. We teach them <strong className="font-black text-white not-italic">how</strong> to think — with courage, clarity, and compassion."
+                {ABOUT_PHILOSOPHY.quoteBefore}<strong className="font-black text-white not-italic">{ABOUT_PHILOSOPHY.quoteStrong}</strong>{ABOUT_PHILOSOPHY.quoteAfter}
               </p>
-              <p className="text-white/60 text-sm tracking-widest uppercase font-semibold">— Rainbow International School</p>
+              <p className="text-white/60 text-sm tracking-widest uppercase font-semibold">{ABOUT_PHILOSOPHY.attribution}</p>
             </div>
           </div>
         </section>

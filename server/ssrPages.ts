@@ -1,4 +1,9 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
+import {
+  ABOUT_SEO, ABOUT_BANNER, ABOUT_WELCOME, ABOUT_LEARNING, ABOUT_STATS,
+  ABOUT_CHAIRPERSON, ABOUT_PURPOSE, ABOUT_PHILOSOPHY, ABOUT_CONTACT, ABOUT_JSON_LD,
+  type AboutTextPart,
+} from "@shared/content/about";
 import { CONTACT_SEO, CONTACT_BANNER, CONTACT_CARDS, CONTACT_TOUR, CONTACT_QUOTE, CONTACT_JSON_LD } from "@shared/content/contact";
 import {
   FEES_SEO, FEES_BANNER, FEES_OVERVIEW, FEES_SECTIONS_HEADING, FEES_SECTION_CARDS,
@@ -266,28 +271,59 @@ ${cat.faqs.map(f => `<div class="card">
 </div>`;
 }
 
+function renderAboutText(parts: AboutTextPart[]): string {
+  return parts.map(part => part.href
+    ? `<a href="${e(part.href)}">${e(part.text)}</a>`
+    : part.strong ? `<strong>${e(part.text)}</strong>` : e(part.text)).join("");
+}
+
 function renderAbout(): string {
   return `
 <div class="section">
-<h2>About Rainbow International School</h2>
-<p>Rainbow International School was founded in April 2009 with a vision to provide world-class education rooted in Indian values. Located on a sprawling 3.5-acre campus in Brahmand Phase 4, Thane, we are one of the leading CBSE-affiliated K–12 schools in Maharashtra, serving over 3,000 students from KG to Class 12.</p>
-
-<h2>Our Legacy</h2>
-<p>Over the past 17 years, Rainbow International School has impacted more than 1 lakh students. We have consistently been recognised as one of the Best Schools in Thane, earning accolades from national education bodies, the British Council (International School Award), Google for Education, and Meta for Education.</p>
-
-<h2>Campus & Infrastructure</h2>
-<p>Our 3.5-acre campus features smart classrooms, fully equipped science and computer labs, a 10,000+ book library, a temperature-controlled swimming pool, skating rink, basketball and football courts, a 500-seat amphitheatre, art and music studios, an organic farm, and a dedicated pre-primary wing with all-female staff.</p>
-
-<h2>Academic Excellence</h2>
-<p>Affiliated to CBSE (Affiliation No. 1130661), we offer classes from KG to Class 12 with three streams in senior secondary: Science, Commerce, and Humanities. Our pedagogy is based on the Multiple Intelligence framework, emphasising experiential, project-based, and collaborative learning.</p>
-
-<h2>Holistic Development</h2>
-<p>Beyond academics, we offer 30+ extracurricular activities including swimming, skating, robotics, coding, MUN, art, music, dance, drama, cricket, football, and organic farming. Our students regularly participate in inter-school competitions, science exhibitions, and national-level events.</p>
-
-<h2>Safety & Security</h2>
-<p>With 200+ CCTV cameras, card-based entry, trained security personnel, a full-time nurse, visiting paediatrician, equipped ambulance, and GPS-tracked school buses, Rainbow International School is among the safest schools in Thane.</p>
-
-<p>Learn more about our <a href="/ris-vision-mission">Vision & Mission</a>, <a href="/our-philosophy">Philosophy</a>, or <a href="/contact-us">get in touch</a>.</p>
+<span>${e(ABOUT_WELCOME.eyebrow)}</span>
+<h2>${e(ABOUT_WELCOME.heading)}</h2>
+${ABOUT_WELCOME.paragraphs.map(parts => `<p>${renderAboutText(parts)}</p>`).join("\n")}
+</div>
+<div class="section">
+<h2>${e(ABOUT_LEARNING.heading)}</h2>
+<h3>${e(ABOUT_LEARNING.academicHeading)}</h3>
+<ul>${ABOUT_LEARNING.academic.map(text => `<li>${e(text)}</li>`).join("")}</ul>
+<h3>${e(ABOUT_LEARNING.sportsHeading)}</h3>
+<ul>${ABOUT_LEARNING.sports.map(text => `<li>${e(text)}</li>`).join("")}</ul>
+</div>
+<div class="section">
+<h2>${e(ABOUT_STATS.heading)}</h2>
+${ABOUT_STATS.items.map(item => `<div><div>${e(item.num)}</div><div>${e(item.label)}</div></div>`).join("\n")}
+</div>
+<div class="section" id="chairpersons-note">
+<span>${e(ABOUT_CHAIRPERSON.eyebrow)}</span>
+<h2>${e(ABOUT_CHAIRPERSON.heading)}</h2>
+<p>${e(ABOUT_CHAIRPERSON.role)}</p><p>${e(ABOUT_CHAIRPERSON.school)}</p>
+<span>${e(ABOUT_CHAIRPERSON.quoteMark)}</span>
+${ABOUT_CHAIRPERSON.paragraphs.map(parts => `<p>${renderAboutText(parts)}</p>`).join("\n")}
+<p>${e(ABOUT_CHAIRPERSON.signoff)}<br/><span>${e(ABOUT_CHAIRPERSON.name)}</span><br/><span>${e(ABOUT_CHAIRPERSON.role)}</span></p>
+</div>
+<div class="section" id="vision-mission">
+<span>${e(ABOUT_PURPOSE.eyebrow)}</span>
+<h2>${e(ABOUT_PURPOSE.heading)}</h2>
+<h3>${e(ABOUT_PURPOSE.visionHeading)}</h3>
+<p>${renderAboutText(ABOUT_PURPOSE.vision)}</p>
+<h3>${e(ABOUT_PURPOSE.missionHeading)}</h3>
+<ul>${ABOUT_PURPOSE.mission.map((text, i) => `<li><span>${i + 1}</span> ${e(text)}</li>`).join("")}</ul>
+<p>${e(ABOUT_PURPOSE.valuesHeading)}</p>
+<div>${ABOUT_PURPOSE.values.map(text => `<span>${e(text)}</span>`).join(" ")}</div>
+</div>
+<div class="section" id="our-philosophy">
+<span>${e(ABOUT_PHILOSOPHY.eyebrow)}</span>
+<h2>${e(ABOUT_PHILOSOPHY.heading)}</h2>
+<p>${e(ABOUT_PHILOSOPHY.intro)}</p>
+${ABOUT_PHILOSOPHY.pillars.map(pillar => `<div><h3>${e(pillar.title)}</h3><p>${e(pillar.desc)}</p></div>`).join("\n")}
+<p>${e(ABOUT_PHILOSOPHY.quoteBefore)}<strong>${e(ABOUT_PHILOSOPHY.quoteStrong)}</strong>${e(ABOUT_PHILOSOPHY.quoteAfter)}</p>
+<p>${e(ABOUT_PHILOSOPHY.attribution)}</p>
+</div>
+<div class="section" id="contact">
+<h2>${e(ABOUT_CONTACT.title)}</h2>
+<p><strong>${e(ABOUT_CONTACT.introBeforeBreak)}</strong> ${e(ABOUT_CONTACT.introBeforePhone)} <a href="${e(ABOUT_CONTACT.phoneHref)}">${e(ABOUT_CONTACT.phone)}</a> ${e(ABOUT_CONTACT.introAfterPhone)}</p>
 </div>`;
 }
 
@@ -1158,34 +1194,22 @@ function renderScheduleAppointment(): string {
 </div>`;
 }
 
-function renderWelcomeToRIS(): string {
-  return `
-<div class="section">
-<h2>Welcome to Rainbow International School</h2>
-<p>Rainbow International School is a CBSE-affiliated K–12 institution in Thane, Maharashtra, founded in April 2009. Set on a 3.5-acre campus in Brahmand Phase 4, Thane, it serves 3,000+ students from KG to Class 12 (CBSE Affiliation No. 1130661).</p>
-
-<div class="card">
-<h3>School At a Glance</h3>
-<p><strong>Founded:</strong> April 2009 &nbsp;|&nbsp; <strong>Campus:</strong> 3.5 acres &nbsp;|&nbsp; <strong>Students:</strong> 3,000+ &nbsp;|&nbsp; <strong>Grades:</strong> KG to Class 12 &nbsp;|&nbsp; <strong>CBSE Affiliation:</strong> 1130661</p>
-<p><strong>Location:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607</p>
-</div>
-
-<p>Admissions for 2027–28 are open. <a href="/admissions">Apply online</a> or <a href="/contact-us">contact our admissions team</a> to learn more.</p>
-</div>`;
-}
-
 const pages: PageSSRConfig[] = [
   {
     path: "/about-rainbow-international-school",
-    title: "About Rainbow International School — Best CBSE School in Thane",
-    description: "Rainbow International School, founded in 2009, is a top-rated CBSE K–12 school in Thane. 3.5-acre campus, 3000+ students, award-winning education from KG to Class 12.",
-    keywords: "about Rainbow International School, CBSE school Thane, best school Thane, K-12 school Thane, international school Thane",
+    title: ABOUT_SEO.title,
+    description: ABOUT_SEO.description,
+    keywords: ABOUT_SEO.keywords,
+    appendSiteName: false,
+    h1: ABOUT_BANNER.title,
+    subtitle: ABOUT_BANNER.subtitle,
+    showSharedCta: false,
     canonical: "https://rainbowinternationalschool.in/about-rainbow-international-school",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
+      { name: ABOUT_SEO.crumb, url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
     ],
-    jsonLd: SCHOOL_LD,
+    jsonLd: ABOUT_JSON_LD,
     renderBody: renderAbout,
   },
   {
@@ -1774,41 +1798,6 @@ const pages: PageSSRConfig[] = [
       publisher: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
     },
     renderBody: renderPhotoGallery,
-  },
-  {
-    path: "/welcome-to-ris",
-    title: "Welcome to Rainbow International School",
-    description: "Welcome to Rainbow International School — founded in 2009, one of the finest CBSE-affiliated educational institutes in Thane with 3.5 acres campus and 3000+ students.",
-    keywords: "Welcome Rainbow International School, about Rainbow school, Rainbow International School Thane",
-    canonical: "https://rainbowinternationalschool.in/welcome-to-ris",
-    breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "About Us", url: "https://rainbowinternationalschool.in/about-rainbow-international-school" },
-      { name: "Welcome to RIS", url: "https://rainbowinternationalschool.in/welcome-to-ris" },
-    ],
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: "Welcome to Rainbow International School — Best CBSE School in Thane",
-      description: "Welcome to Rainbow International School, founded in April 2009 — a CBSE-affiliated K–12 school on a 3.5-acre campus in Thane serving 3000+ students.",
-      url: "https://rainbowinternationalschool.in/welcome-to-ris",
-      about: {
-        "@type": "EducationalOrganization",
-        name: "Rainbow International School",
-        foundingDate: "2009-04",
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "Cosmos Arcade, Brahmand Phase 4",
-          addressLocality: "Thane",
-          addressRegion: "Maharashtra",
-          postalCode: "400607",
-          addressCountry: "IN",
-        },
-        telephone: "+91-82915-68972",
-        hasCredential: "CBSE Affiliation No. 1130661",
-      },
-    },
-    renderBody: renderWelcomeToRIS,
   },
   {
     path: "/schedule-appointment",
