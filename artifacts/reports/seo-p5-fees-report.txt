@@ -1,0 +1,51 @@
+SEO P5 — FEE STRUCTURE REPORT
+Date: 2026-10-06
+Route: /fee-structure
+
+Completed locally. GitHub push failed authentication.
+
+FINAL METADATA
+Title (bot = visitor): Fee Structure 2027-28 | Rainbow International School Thane
+Description (bot = visitor): Class-wise fees for 2027-28 are shared by our admissions team. Call or WhatsApp +91 82915 68972 for the fee details for your child's class.
+Canonical (bot = visitor): https://rainbowinternationalschool.in/fee-structure
+H1 bot: Fee Structure 2027-28
+H1 visitor: Fee Structure 2027-28
+Exactly one H1 in both versions.
+
+CHECKS
+npx tsc --noEmit: PASS.
+npm run parity:check -- /fee-structure: WARN, 0 failures.
+Title, description, canonical, robots and H1: PASS.
+Allowed phone links, landline confined to footer, admin@-only email allowlist: PASS.
+JSON-LD valid; no FAQPage; one organisation node: PASS.
+Body words: bot 365; visitor 701; bot is 52.1% — WARN.
+No filler added. The requested crawler body excludes the unchanged interactive form and uses the existing crawler navigation/footer.
+Banned words: bot None — PASS; visitor “top” — WARN from the unchanged “Top Schools in Thane” navigation label.
+
+CHANGES
+Created shared/content/fees.ts and connected the React page, server metadata and crawler body to it.
+Applied the exact supplied banner, overview, notice, six section cards, four inclusion cards, CTA, quick answer and five FAQs.
+Kept all existing icons, classes, colours, images, layout, section order, form, handlers and testids. The notice's existing strong phone element and phone button were retained.
+Added an optional quick-answer heading prop to WaveOneSeoBlock so this heading also comes from fees.ts; the default text and other pages' behaviour are unchanged.
+Page-specific JSON-LD is WebPage with the supplied title/description, alongside the unchanged shared organisation graph and breadcrumb.
+Removed the old fee-page payment, PDF, concession, Nursery and unsupported facility claims. No fee amounts are displayed.
+Crawler sections follow the visitor order, with five closed details FAQs and one main telephone link in the body. The generic extra crawler CTA is disabled for this route.
+Only /fee-structure's sitemap lastmod changed, to 2026-10-06.
+
+FILES CHANGED
+shared/content/fees.ts
+client/src/pages/Fees.tsx
+client/src/components/WaveOneSeoBlock.tsx
+server/ssrPages.ts
+server/pageTitles.ts
+shared/routeSeo.ts
+client/public/sitemap.xml
+attached_assets/Pasted-SEO-PROMPT-5-FEE-STRUCTURE-fee-structure-Follow-SEO-WOR_1791287712755.txt (uploaded brief included by git add -A)
+
+GIT / ANYTHING NOT DONE
+Commit: cc7f4cd — SEO P5: fee structure copy, metadata and bot parity
+One push attempted; failed: “Invalid username or token. Password authentication is not supported for Git operations.”
+No retries or Git setting changes. Commit remains local, not pushed.
+Report written after the push attempt at artifacts/reports/seo-p5-fees-report.txt; it is not included in that commit.
+Lighthouse skipped – Claude will run it
+No screenshots, other-route checks, additional test suites, test enquiries or publishing.
