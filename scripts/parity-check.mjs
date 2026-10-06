@@ -84,7 +84,11 @@ function extract(browser = false, suppliedDocument) {
     Object.values(node).forEach(visit);
   };
   schemas.forEach(visit);
-  const phones = [...new Set(all('a[href^="tel:"]').map(a => a.getAttribute("href").slice(4).replace(/\D/g, "")))].sort();
+  const telLinks = all('a[href^="tel:"]').map(a => ({
+    href: a.getAttribute("href"),
+    inFooter: Boolean(a.closest('footer, [role="contentinfo"]')),
+  }));
+  const phones = [...new Set(telLinks.map(a => a.href.slice(4).replace(/\D/g, "")))].sort();
   const emails = [...new Set(all('a[href^="mailto:"]').flatMap(a =>
     decodeURIComponent(a.getAttribute("href").slice(7).split("?")[0]).split(/[,;]/).map(e => e.trim().toLowerCase())))].sort();
   const h1 = all("h1").map(element => {
@@ -97,7 +101,7 @@ function extract(browser = false, suppliedDocument) {
     description: document.querySelector('meta[name="description"]')?.getAttribute("content") || "",
     canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "",
     robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
-    h1, words: bodyText ? bodyText.split(/\s+/).length : 0, bodyText, warningText, phones, emails,
+    h1, words: bodyText ? bodyText.split(/\s+/).length : 0, bodyText, warningText, phones, telLinks, emails,
     schemaTypes: [...schemaTypes].sort(), organizations, schemaErrors: errors,
     ogTitle: document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "",
     ogDescription: document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
@@ -123,10 +127,11 @@ export function compare(bot, visitor, path) {
   rows.push({ Check: "body words", Bot: String(bot.words), Visitor: String(visitor.words),
     Result: wordsMatch ? "PASS" : "WARN",
     Reason: wordsMatch ? "" : `Bot is ${(ratio * 100).toFixed(1)}% of visitor words; target 90–130%` });
-  add("tel numbers", bot.phones.join(", "), visitor.phones.join(", "),
-    path === "/" ? bot.phones.length === 1 && visitor.phones.length === 1
-      && bot.phones[0] === "918291568972" && visitor.phones[0] === "918291568972"
-      : bot.phones.length <= 1 && visitor.phones.length <= 1, "Unexpected distinct phone numbers");
+  const allowedTel = link => link.href === "tel:+918291568972"
+    || (link.href === "tel:+912269105000" && link.inFooter);
+  add("tel links (landline footer-only)", bot.phones.join(", "), visitor.phones.join(", "),
+    [...bot.telLinks, ...visitor.telLinks].every(allowedTel),
+    "Unapproved tel link or landline outside footer");
   const allowedEmail = email => email === "admin@rainbowinternationalschool.in"
     || (path === "/career" && /^hr(?:[.@]|recruiter)[^@]*@rainbowinternationalschool\.in$/.test(email));
   add("mailto addresses", bot.emails.join(", "), visitor.emails.join(", "),

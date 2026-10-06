@@ -233,6 +233,7 @@ export function Footer() {
                     </div>
                     <div>
                       <a href="tel:+918291568972" onClick={() => trackCallClick({ phone: "+91 82915 68972" })} className="block text-white/60 text-sm hover:text-white transition-colors">+91 82915 68972</a>
+                      <a href="tel:+912269105000" onClick={() => trackCallClick({ phone: "(022) 6910 5000" })} className="block text-white/60 text-sm hover:text-white transition-colors">(022) 6910 5000</a>
                     </div>
                   </div>
                 </li>

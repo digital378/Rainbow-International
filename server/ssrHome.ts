@@ -465,7 +465,7 @@ ${renderHomeMain()}
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>
-        <span>+91 82915 68972</span>
+        <span><a href="tel:+918291568972" style="color:inherit;text-decoration:none;">+91 82915 68972</a><br/><a href="tel:+912269105000" style="color:inherit;text-decoration:none;">(022) 6910 5000</a></span>
       </div>
       <div class="footer-contact-item">
         <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>

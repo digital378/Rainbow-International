@@ -119,6 +119,7 @@ ${cfg.renderBody()}
 </div>
 <footer role="contentinfo">
 <p>&copy; 2009–2026 Rainbow International School. CBSE Affiliation No. 1130661</p>
+<p><a href="tel:+918291568972">+91 82915 68972</a><br/><a href="tel:+912269105000">(022) 6910 5000</a></p>
 <p><a href="/">Home</a> · <a href="/about-rainbow-international-school">About</a> · <a href="/contact-us">Contact</a></p>
 </footer>
 </body>

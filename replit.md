@@ -153,7 +153,8 @@ Every file uploaded to the Replit chat is auto-saved into `attached_assets/`. It
 3. Never publish/deploy. The owner publishes.
 4. Verified facts only:
    - Rainbow International School, Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
-   - Phone +91 82915 68972 (only number). Email admin@rainbowinternationalschool.in (only email)
+   - Phone: +91 82915 68972 is the main admissions number (header, buttons, forms, copy). School landline (022) 6910 5000 appears in the footer only. No other numbers.
+   - Email admin@rainbowinternationalschool.in (only email)
    - Office Mon–Sat 9 am–6 pm. Founded April 2009. CBSE Affiliation No. 1130661, School Code 30562
    - 2027–28 classes: KG (Jr KG, Sr KG) to Class 12. No Nursery. Class 11–12: Science, Commerce, Humanities
    - Ages: Jr KG 3.5–4.5, Sr KG 4.5–5.5, Class 1 minimum 6 (6–7), then one-year steps
