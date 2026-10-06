@@ -1,0 +1,64 @@
+SEO PROMPT 7 — ABOUT PAGE ( /about-rainbow-international-school ) + MERGE /welcome-to-ris
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image file, layout, section order, button, form, handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+============================================================
+PART A — ONE COPY SOURCE (same pattern as home.ts / contact.ts)
+============================================================
+Create shared/content/about.ts. Move EVERY visible sentence of client/src/pages/About.tsx into it (banner, welcome paragraphs, image alt texts, learning-space lists, stats, chairperson's note, vision, mission points, core values, philosophy pillars, quote banner) as plain strings/arrays. About.tsx reads its text from this file; icons/colours/images stay in the component, joined by array index. Text not listed in PART C stays word-for-word as it is today.
+server/pageTitles.ts and shared/routeSeo.ts import the About title/description from about.ts (no retyping).
+
+============================================================
+PART B — METADATA (title has NO site-name suffix; appendSiteName={false})
+============================================================
+title: "About Rainbow International School, Thane | CBSE since 2009"
+description: "Rainbow International School, Brahmand, Thane West: a CBSE school since April 2009, KG to Class 12, with a 3.5-acre campus and 3,000+ students across two shifts."
+keywords: "about Rainbow International School, CBSE school in Thane West, CBSE school Brahmand Thane, Rainbow International School history, K-12 CBSE school Thane"
+Breadcrumb: Home > About Us (remove the "Welcome to RIS" crumb).
+JSON-LD: replace the page's own JSON-LD (Helmet and SSR SCHOOL_LD) with ONE AboutPage node: url = the canonical, name = the title, "about": {"@id": "https://rainbowinternationalschool.in/#organization"}, plus the BreadcrumbList and the shared org graph from shared/orgSchema.ts. No second EducationalOrganization, no numberOfEmployees, no FAQPage.
+
+============================================================
+PART C — COPY CHANGES (everything else unchanged)
+============================================================
+1. Banner title (this is the H1): "About Rainbow International School"
+   Banner subtitle: "CBSE school in Brahmand, Thane West, since April 2009"
+2. Welcome section paragraph 1 → "Founded in <strong>April 2009</strong>, Rainbow International School has touched the lives of more than 1 lakh students since then."
+3. Welcome paragraph 2 → "Our campus in Brahmand, Thane West spans <strong>3.5 acres</strong>, and more than <strong>3,000 students</strong> are enrolled across two shifts." (removes "one of the finest" and "enormous")
+4. Add ONE new paragraph at the end of the Welcome section (same <p> style as the others, plain text links styled like existing in-text links on the site):
+   "We follow the CBSE curriculum from Kindergarten to Class 12 (CBSE Affiliation No. 1130661, School Code 30562): <a href="/primary-section">Primary, Class 1 to 5</a>, <a href="/middle-school-section">Middle School, Class 6 to 8</a>, <a href="/secondary-section">Secondary, Class 9 and 10</a> and <a href="/senior-secondary-section">Senior Secondary, Class 11 and 12</a> with Science, Commerce and Humanities. See <a href="/admissions">Admissions 2027-28</a> or <a href="/contact-us">contact us</a>."
+5. Image alt texts: "Olympic-standard swimming pool at Rainbow International School" → "Swimming pool at Rainbow International School"; "Historical monument at Rainbow International School campus" → "Monument on the Rainbow International School campus".
+6. Stats: change "1 Lac+" to "1 Lakh+" (labels unchanged). Keep 2009, 3.5 Acres, 3,000+.
+7. Keep the Learning Spaces lists, Chairperson's Note, Vision, Mission, Core Values, Philosophy and quote banner word-for-word.
+8. Remove any "best", "top", "No. 1", "leading", "trusted", "finest" wording anywhere in this page's metadata, alt text or copy.
+
+============================================================
+PART D — MERGE /welcome-to-ris INTO ABOUT
+============================================================
+1. server/routes.ts: add a 301 "/welcome-to-ris" → "/about-rainbow-international-school" (same mechanism as the existing legacy redirects), and change "/welcome" to point straight to "/about-rainbow-international-school" (no chain).
+2. client/src/App.tsx: the /welcome-to-ris route redirects client-side to /about-rainbow-international-school (wouter Redirect). Leave WelcomeToRIS.tsx file in place but unused.
+3. Remove the /welcome-to-ris entries from server/ssrPages.ts (config + renderWelcomeToRIS), server/pageTitles.ts, shared/routeSeo.ts and client/public/sitemap.xml.
+4. Replace any remaining internal link to /welcome-to-ris (nav, footer, SSR templates, other pages) with /about-rainbow-international-school.
+
+============================================================
+PART E — BOT HTML (server/ssrPages.ts)
+============================================================
+1. Config: title, description, keywords from about.ts; breadcrumb Home > About Us; cfg.h1 = "About Rainbow International School"; cfg.subtitle = the banner subtitle.
+2. Rewrite renderAbout to render ONLY about.ts, in the same section order and with the same h2/h3 headings, paragraphs, lists and links as the visitor page.
+3. Delete all SSR-only text that is not on the visitor page (e.g. "top-rated", "award-winning education", "Best CBSE School").
+4. Exactly one <h1>; one tel:+918291568972 link in the body; footer landline as today.
+
+============================================================
+PART F — SITEMAP
+============================================================
+Set <lastmod> 2026-10-06 for /about-rainbow-international-school only. /welcome-to-ris removed (PART D).
+
+============================================================
+PART G — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /about-rainbow-international-school only: title, description, canonical and H1 match bot vs visitor; one main tel + footer landline; no FAQPage; one org node. Word-count WARN is fine; no filler.
+3 curl -sI the local dev server for /welcome-to-ris and /welcome → both 301 to /about-rainbow-international-school.
+4 No other routes, tests or screenshots.
+5 git add -A && git commit -m "SEO P7: About page copy, metadata, schema; merge welcome-to-ris" — do NOT git push (I push from the Git pane).
+6 Write artifacts/reports/seo-p7-about-report.txt: final title, description, H1 (bot and visitor), bot vs visitor words, banned-word result, redirect results, files changed, anything not done.
+Reply with the report text only. Do not publish.
