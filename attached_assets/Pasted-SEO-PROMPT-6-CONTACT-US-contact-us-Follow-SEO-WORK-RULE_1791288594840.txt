@@ -1,0 +1,37 @@
+SEO PROMPT 6 — CONTACT US ( /contact-us )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, section order, form field, form handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+PART A — ONE COPY SOURCE
+Create shared/content/contact.ts with every visible sentence of the page (banner, the 4 contact cards, "Book a Campus Tour" intro, form labels/placeholders/button text, thank-you text, the quote). client/src/pages/ContactUs.tsx reads its text from it. server/pageTitles.ts and shared/routeSeo.ts "/contact-us" import title/description from it.
+
+PART B — METADATA (no site-name suffix; appendSiteName={false})
+title: "Contact Rainbow International School, Brahmand, Thane West"
+description: "Cosmos Arcade, Brahmand Phase 4, Thane West 400607. Admissions: +91 82915 68972, admin@rainbowinternationalschool.in. Mon to Sat, 9 am to 6 pm."
+keywords: "Rainbow International School contact number, Rainbow International School address, school in Brahmand contact, Rainbow International School Thane phone"
+JSON-LD: keep the ContactPage node (name "Contact Rainbow International School", url /contact-us) but replace its nested EducationalOrganization object with "about": {"@id": "https://rainbowinternationalschool.in/#organization"} so there is only one organization node (the shared one from shared/orgSchema.ts). No FAQPage.
+
+PART C — EXACT COPY
+Banner (PageBanner) title = H1: "Contact Us"   (replaces "Connect with Us")
+Banner subtitle: "Admissions, campus visits and general queries — Monday to Saturday, 9 am to 6 pm."
+Contact cards (label / lines / href), same icons and order:
+ "Phone" / ["+91 82915 68972"] / tel:+918291568972   (unchanged)
+ "Email" / ["admin@rainbowinternationalschool.in"] / mailto (unchanged)
+ "Working Hours" / ["Monday – Saturday", "9 am – 6 pm"] / none
+ "Address" / ["Cosmos Arcade, Brahmand Phase 4", "Thane West, Maharashtra 400607"] / https://maps.google.com/?q=Rainbow+International+School+Thane (unchanged)   (label "Locations" → "Address")
+"Book a Campus Tour" section: eyebrow, h2 and intro unchanged.
+Thank-you text: "We've received your request. Our admissions team will contact you during office hours (Mon–Sat, 9 am–6 pm)."   (replaces "within 24 hours")
+Programme dropdown: must start at Jr KG (no Nursery). Labels, placeholders, button text and the Mark Twain quote unchanged.
+
+PART D — BOT HTML (server/ssrPages.ts)
+"/contact-us" config: title/description/keywords from contact.ts; breadcrumb last item "Contact Us"; cfg.h1 = "Contact Us"; cfg.subtitle = the banner subtitle; jsonLd = the same ContactPage (about → #organization).
+Rewrite renderContact() to render ONLY contact.ts, in the visitor order: the 4 contact cards as a list (Phone with one tel:+918291568972 link, Email with mailto, Working Hours, Address with the maps link), then h2 "Book a Campus Tour" + intro, then the quote. Delete the old text, including the wrong "Landline: +91 82915 68972" line and "all parts of Thane".
+
+PART E — SITEMAP
+Set <lastmod> 2026-10-06 for /contact-us only.
+
+PART F — CHECKS, COMMIT, REPORT
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /contact-us only (title, description, canonical, H1 match; allowed tel links only; admin@ only; no FAQPage; one organization node). Word-count WARNs are fine.
+3 git add -A && git commit -m "SEO P6: contact page copy, metadata and bot parity"; git push once (if it fails, report — no retries).
+4 Write artifacts/reports/seo-p6-contact-report.txt (final title, description, H1 bot/visitor, words bot/visitor, anything not done). Reply with the report text only. Do not publish.

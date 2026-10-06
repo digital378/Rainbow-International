@@ -1,5 +1,6 @@
 import { PRIMARY_SEO } from "./content/primary";
 import { FEES_SEO } from "./content/fees";
+import { CONTACT_SEO, CONTACT_BANNER } from "./content/contact";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -125,9 +126,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Photo Gallery",
   },
   "/contact-us": {
-    description:
-      "Contact Rainbow International School, Thane. Phone +91 82915 68972, email admin@rainbowinternationalschool.in. Cosmos Arcade, Brahmand Phase 4.",
-    crumb: "Contact Us",
+    title: CONTACT_SEO.title,
+    description: CONTACT_SEO.description,
+    crumb: CONTACT_BANNER.title,
   },
   "/academic-calendar": {
     description:

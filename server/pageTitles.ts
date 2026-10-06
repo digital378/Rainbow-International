@@ -1,5 +1,6 @@
 import { PRIMARY_SEO } from "@shared/content/primary";
 import { FEES_SEO } from "@shared/content/fees";
+import { CONTACT_SEO } from "@shared/content/contact";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -44,7 +45,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/beyond-the-classroom": "Beyond the Classroom | Rainbow International School",
   "/extracurriculars": "Extracurricular Activities | Rainbow International School",
   "/photo-gallery": "Photo Gallery | Rainbow International School",
-  "/contact-us": "Contact Us | Rainbow International School",
+  "/contact-us": CONTACT_SEO.title,
   "/academic-calendar": "Academic Calendar 2026–27 | Rainbow International School",
   "/blogs": "Blogs | Rainbow International School",
   "/cbse-mandatory-public-disclosures": "CBSE Public Disclosures | Rainbow International School",

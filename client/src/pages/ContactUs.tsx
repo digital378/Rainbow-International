@@ -11,42 +11,13 @@ import { MapPin, Phone, Mail, Clock, CheckCircle, MessageCircle } from "lucide-r
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { trackFormSubmit, trackCallClick, trackDirectionsClick, getFormTrackingData } from "@/lib/analytics";
 import { submitInquiry } from "@/lib/inquiryProtection";
+import { CONTACT_SEO, CONTACT_BANNER, CONTACT_CARDS, CONTACT_TOUR, CONTACT_FORM, CONTACT_QUOTE, CONTACT_JSON_LD } from "@shared/content/contact";
 
-const classOptions = [
-  "Jr. KG", "Sr. KG",
-  "Class 1", "Class 2", "Class 3", "Class 4", "Class 5",
-  "Class 6", "Class 7", "Class 8",
-  "Class 9", "Class 10",
-  "Class 11 – Science", "Class 11 – Commerce", "Class 11 – Humanities",
-  "Class 12 – Science", "Class 12 – Commerce", "Class 12 – Humanities",
-];
-
-const contactItems = [
-  {
-    icon: Phone,
-    label: "Phone",
-    lines: ["+91 82915 68972"],
-    href: "tel:+918291568972",
-  },
-  {
-    icon: Mail,
-    label: "Email",
-    lines: ["admin@rainbowinternationalschool.in"],
-    href: "mailto:admin@rainbowinternationalschool.in",
-  },
-  {
-    icon: Clock,
-    label: "Working Hours",
-    lines: ["Monday - Saturday", "9AM - 6PM"],
-    href: null as string | null,
-  },
-  {
-    icon: MapPin,
-    label: "Locations",
-    lines: ["Cosmos Arcade, Brahmand Phase 4", "Thane, Maharashtra"],
-    href: "https://maps.google.com/?q=Rainbow+International+School+Thane",
-  },
-];
+const classOptions = CONTACT_FORM.programmes;
+const contactItems = [Phone, Mail, Clock, MapPin].map((icon, i) => ({
+  ...CONTACT_CARDS[i],
+  icon,
+}));
 
 export default function ContactUs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,47 +59,22 @@ export default function ContactUs() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Contact Us"
-        description="Connect with Rainbow International School, Thane. Call +91 82915 68972, email admin@rainbowinternationalschool.in. Admissions open for KG to Class 12."
-        keywords="contact Rainbow International School, Rainbow school Thane phone number, Rainbow school admission contact, school address Thane"
+        title={CONTACT_SEO.title}
+        description={CONTACT_SEO.description}
+        keywords={CONTACT_SEO.keywords}
+        appendSiteName={false}
         canonical="https://rainbowinternationalschool.in/contact-us"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Contact Us", href: "https://rainbowinternationalschool.in/contact-us" },
+          { name: CONTACT_BANNER.title, href: "https://rainbowinternationalschool.in/contact-us" },
         ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          "name": "Contact Rainbow International School",
-          "description": "Contact Rainbow International School, Thane — for admissions enquiries, call +91 82915 68972 or email admin@rainbowinternationalschool.in.",
-          "url": "https://rainbowinternationalschool.in/contact-us",
-          "mainEntity": {
-            "@type": "EducationalOrganization",
-            "name": "Rainbow International School",
-            "telephone": "+91-82915-68972",
-            "email": "admin@rainbowinternationalschool.in",
-            "openingHoursSpecification": {
-              "@type": "OpeningHoursSpecification",
-              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-              "opens": "09:00",
-              "closes": "18:00"
-            },
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
-              "addressLocality": "Thane",
-              "addressRegion": "Maharashtra",
-              "postalCode": "400607",
-              "addressCountry": "IN"
-            }
-          }
-        }}
+        jsonLd={CONTACT_JSON_LD}
       />
       <Navbar />
       <PageBanner
-        title="Connect with Us"
-        subtitle="Do you have a Question? Feel free to reach out — we'd be glad to solve your queries."
-        breadcrumb={[{ label: "Contact Us" }]}
+        title={CONTACT_BANNER.title}
+        subtitle={CONTACT_BANNER.subtitle}
+        breadcrumb={[{ label: CONTACT_BANNER.title }]}
       />
 
       <main className="flex-grow">
@@ -139,17 +85,17 @@ export default function ContactUs() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="inline-block mb-4">
-                <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Visit Us</span>
+                <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">{CONTACT_TOUR.eyebrow}</span>
                 <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
               </div>
               <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                Book a Campus Tour
+                {CONTACT_TOUR.heading}
               </h2>
               <p className="text-blue-200/80 text-sm leading-relaxed max-w-xl mx-auto">
-                <strong className="text-white">We'd love to welcome you to Rainbow International School!</strong>{" "}
-                Please call us at{" "}
-                <a href="tel:+918291568972" className="text-amber-400 font-semibold hover:underline">+91 82915 68972</a>{" "}
-                to schedule your visit, or fill the form and our Admission Counsellor will connect with you.
+                <strong className="text-white">{CONTACT_TOUR.introStrong}</strong>{" "}
+                {CONTACT_TOUR.introBeforePhone}{" "}
+                <a href="tel:+918291568972" className="text-amber-400 font-semibold hover:underline">{CONTACT_CARDS[0].lines[0]}</a>{" "}
+                {CONTACT_TOUR.introAfterPhone}
               </p>
             </div>
 
@@ -161,14 +107,14 @@ export default function ContactUs() {
                     <div className="w-20 h-20 rounded-full bg-green-500/15 flex items-center justify-center mb-5">
                       <CheckCircle size={40} className="text-green-400" />
                     </div>
-                    <h3 className="text-2xl font-extrabold text-white mb-2">Thank You!</h3>
-                    <p className="text-blue-200/80 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
+                    <h3 className="text-2xl font-extrabold text-white mb-2">{CONTACT_FORM.thankYouHeading}</h3>
+                    <p className="text-blue-200/80 text-sm mb-8 max-w-sm">{CONTACT_FORM.thankYou}</p>
                     <button
                       onClick={() => setSubmitted(false)}
                       data-testid="button-contact-another-request"
                       className="px-7 py-2.5 text-sm font-semibold border border-white/20 rounded-full text-white hover:bg-white/10 transition-colors"
                     >
-                      Submit Another Request
+                      {CONTACT_FORM.anotherRequest}
                     </button>
                   </div>
                 ) : (
@@ -184,44 +130,44 @@ export default function ContactUs() {
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Parent Name *</label>
-                        <input {...register("parentName")} placeholder="Enter your name" data-testid="input-contact-parent-name" className={inputBase} />
+                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.parentLabel}</label>
+                        <input {...register("parentName")} placeholder={CONTACT_FORM.parentPlaceholder} data-testid="input-contact-parent-name" className={inputBase} />
                         {errors.parentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.parentName.message}</p>}
                       </div>
                       <div>
-                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Phone Number *</label>
-                        <input {...register("phone")} placeholder="10-digit mobile number" type="tel" inputMode="numeric" maxLength={10} onInput={e => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} data-testid="input-contact-phone" className={inputBase} />
+                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.phoneLabel}</label>
+                        <input {...register("phone")} placeholder={CONTACT_FORM.phonePlaceholder} type="tel" inputMode="numeric" maxLength={10} onInput={e => { e.currentTarget.value = e.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} data-testid="input-contact-phone" className={inputBase} />
                         {errors.phone && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.phone.message}</p>}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Email</label>
-                        <input {...register("email")} placeholder="Email address (optional)" type="email" data-testid="input-contact-email" className={inputBase} />
+                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.emailLabel}</label>
+                        <input {...register("email")} placeholder={CONTACT_FORM.emailPlaceholder} type="email" data-testid="input-contact-email" className={inputBase} />
                         {errors.email && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.email.message}</p>}
                       </div>
                       <div>
-                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Child's Name</label>
-                        <input {...register("studentName")} placeholder="Enter child's name" data-testid="input-contact-student-name" className={inputBase} />
+                        <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.childLabel}</label>
+                        <input {...register("studentName")} placeholder={CONTACT_FORM.childPlaceholder} data-testid="input-contact-student-name" className={inputBase} />
                         {errors.studentName && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.studentName.message}</p>}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Programme *</label>
+                      <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.programmeLabel}</label>
                       <select {...register("grade")} data-testid="select-contact-grade" className={inputBase + " appearance-none"}>
-                        <option value="">Select programme</option>
+                        <option value="">{CONTACT_FORM.programmePlaceholder}</option>
                         {classOptions.map((cls) => <option key={cls} value={cls} className="text-gray-800">{cls}</option>)}
                       </select>
                       {errors.grade && <p className="text-amber-200/80 text-xs mt-1 ml-1">{errors.grade.message}</p>}
                     </div>
 
                     <div>
-                      <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">Message (Optional)</label>
+                      <label className="block text-amber-300 text-xs font-semibold mb-1.5 ml-1">{CONTACT_FORM.messageLabel}</label>
                       <textarea
                         {...register("message")}
-                        placeholder="Any questions or specific requirements?"
+                        placeholder={CONTACT_FORM.messagePlaceholder}
                         rows={3}
                         data-testid="textarea-contact-message"
                         className={inputBase + " resize-none"}
@@ -238,7 +184,7 @@ export default function ContactUs() {
                         data-testid="checkbox-contact-consent"
                       />
                       <label htmlFor="contact-consent" className="text-blue-200/70 text-xs leading-relaxed cursor-pointer">
-                        I confirm the details above are correct and authorize Rainbow International School and its representatives to contact me with updates via Email, SMS, WhatsApp and Call. This will override DND/NDNC registry.
+                        {CONTACT_FORM.consent}
                       </label>
                     </div>
 
@@ -249,7 +195,7 @@ export default function ContactUs() {
                       className="w-full font-bold py-3.5 text-[#091a4f] text-sm transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60 rounded-full"
                       style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}
                     >
-                      {isSubmitting ? "Submitting..." : "Request Callback"}
+                      {isSubmitting ? CONTACT_FORM.submitting : CONTACT_FORM.submit}
                     </button>
 
                     <a
@@ -261,7 +207,7 @@ export default function ContactUs() {
                       style={{ background: "#128C7E" }}
                     >
                       <MessageCircle size={18} />
-                      Chat on WhatsApp
+                      {CONTACT_FORM.whatsapp}
                     </a>
                   </form>
                 )}
@@ -293,7 +239,7 @@ export default function ContactUs() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block hover:opacity-80 transition-opacity"
-                      data-testid={`link-contact-${item.label.toLowerCase()}`}
+                      data-testid={item.testId}
                       onClick={() => {
                         if (item.href?.startsWith("tel:")) trackCallClick({ phone: item.lines[0] });
                         if (item.href?.includes("maps.google")) trackDirectionsClick();
@@ -308,9 +254,9 @@ export default function ContactUs() {
 
                 <div className="mt-6 pl-4 border-l-4 border-amber-400">
                   <p className="text-blue-200/80 text-sm italic leading-relaxed">
-                    "The secret of getting ahead is getting started."
+                    {CONTACT_QUOTE.text}
                   </p>
-                  <p className="text-white text-sm font-semibold mt-2">— Mark Twain</p>
+                  <p className="text-white text-sm font-semibold mt-2">{CONTACT_QUOTE.attribution}</p>
                 </div>
 
               </div>

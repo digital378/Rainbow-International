@@ -1,4 +1,5 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
+import { CONTACT_SEO, CONTACT_BANNER, CONTACT_CARDS, CONTACT_TOUR, CONTACT_QUOTE, CONTACT_JSON_LD } from "@shared/content/contact";
 import {
   FEES_SEO, FEES_BANNER, FEES_OVERVIEW, FEES_SECTIONS_HEADING, FEES_SECTION_CARDS,
   FEES_INCLUSIONS_HEADING, FEES_INCLUSIONS, FEES_CTA, FEES_QUICK_HEADING,
@@ -326,23 +327,15 @@ function renderPrePrimary(): string {
 function renderContact(): string {
   return `
 <div class="section">
-<h2>Contact Rainbow International School</h2>
-<p>We would love to hear from you. Whether you have questions about admissions, want to schedule a campus visit, or need any other information, our team is here to help.</p>
-
-<h2>Contact Details</h2>
 <ul>
-<li><strong>Address:</strong> Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607, India</li>
-<li><strong>Phone:</strong> +91 82915 68972</li>
-<li><strong>Landline:</strong> +91 82915 68972</li>
-<li><strong>Email:</strong> admin@rainbowinternationalschool.in</li>
-<li><strong>Working Hours:</strong> Monday – Saturday, 9:00 AM – 6:00 PM</li>
+${CONTACT_CARDS.map(card => {
+  const lines = card.lines.map(e).join("<br/>");
+  return `<li><strong>${e(card.label)}:</strong> ${card.href ? `<a href="${e(card.href)}">${lines}</a>` : lines}</li>`;
+}).join("\n")}
 </ul>
-
-<h2>Visit Our Campus</h2>
-<p>Rainbow International School is located on a 3.5-acre campus in Brahmand Phase 4, Thane. The campus is easily accessible from Ghodbunder Road, Manpada, Hiranandani Estate, and all parts of Thane.</p>
-
-<h2>Admissions Enquiry</h2>
-<p>For admissions-related queries, call +91 82915 68972 or fill the enquiry form on our website. <a href="/admissions">View admissions details</a> or <a href="/schedule-appointment">schedule a campus visit</a>.</p>
+<h2>${e(CONTACT_TOUR.heading)}</h2>
+<p><strong>${e(CONTACT_TOUR.introStrong)}</strong> ${e(CONTACT_TOUR.introBeforePhone)} ${e(CONTACT_CARDS[0].lines[0])} ${e(CONTACT_TOUR.introAfterPhone)}</p>
+<blockquote><p>${e(CONTACT_QUOTE.text)}</p><p>${e(CONTACT_QUOTE.attribution)}</p></blockquote>
 </div>`;
 }
 
@@ -1278,15 +1271,19 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/contact-us",
-    title: "Contact Rainbow International School Thane — Phone, Email, Address",
-    description: "Contact Rainbow International School, Thane. Phone: +91 82915 68972. Email: admin@rainbowinternationalschool.in. Address: Cosmos Arcade, Brahmand Phase 4, Thane 400607.",
-    keywords: "contact Rainbow International School, school phone number Thane, school address Thane, Rainbow school email, visit campus Thane",
+    title: CONTACT_SEO.title,
+    description: CONTACT_SEO.description,
+    keywords: CONTACT_SEO.keywords,
+    appendSiteName: false,
+    h1: CONTACT_BANNER.title,
+    subtitle: CONTACT_BANNER.subtitle,
+    showSharedCta: false,
     canonical: "https://rainbowinternationalschool.in/contact-us",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Contact Us", url: "https://rainbowinternationalschool.in/contact-us" },
+      { name: CONTACT_BANNER.title, url: "https://rainbowinternationalschool.in/contact-us" },
     ],
-    jsonLd: SCHOOL_LD,
+    jsonLd: CONTACT_JSON_LD,
     renderBody: renderContact,
   },
   {
