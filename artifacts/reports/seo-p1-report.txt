@@ -1,0 +1,354 @@
+SEO P1 REPORT
+
+1. PUSH STATUS: NOT PUSHED
+Commit: ad03479caedecf00edc1fdc9ae333058cf0b95d6
+GitHub rejected authentication: Invalid username or token. The commit is local; origin/main was not updated.
+Commit message: SEO P1: site-wide facts, RIS footer logo, single org schema, remove FAQPage, GA4 PII fix, parity checker
+No publishing or deployment performed. Uploaded prompt excluded from commit.
+
+2. FILES CHANGED (59)
+client/index.html — Default title/social metadata and description updated to approved copy
+client/public/llms-full.txt — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/public/llms.txt — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/src/components/ChatBot.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/src/components/SEO.tsx — Public head uses one shared organization/website graph and strips FAQPage; protected routes excluded
+client/src/components/home/AboutPreview.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/home/AcademicSections.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/home/ContactForm.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/home/Hero.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/home/HeroForm.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/home/HomeFAQ.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/components/layout/Footer.tsx — RIS logo, approved tagline, preschool labels and admissions year; long description skipped to preserve wrapping
+client/src/components/layout/Navbar.tsx — Admissions year updated; secondary landline anchor removed (allowed structural exception)
+client/src/lib/analytics.ts — GA4 form events/logs omit names and personal phone; primary call labels normalized; event names and conversions retained
+client/src/pages/About.tsx — school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/src/pages/AcademicTeam.tsx — current admissions year updated to 2027–28; historical years retained
+client/src/pages/Admissions.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/ApplicationForm.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/BlogPost.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/BrandPartners.tsx — Brochure-confirmation school phone changed to +91 82915 68972; no form/API behavior changed
+client/src/pages/CbseDisclosures.tsx — Public facts updated; no class/style/layout edits
+client/src/pages/ChairpersonsNote.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/ContactUs.tsx — school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/src/pages/Curriculum.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/Fees.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/Home.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG; public school contact details updated
+client/src/pages/MiddleSchool.tsx — current admissions year updated to 2027–28; historical years retained; public school contact details updated
+client/src/pages/PrePrimary.tsx — Only four admissions-year replacements; no phone/email or other changes
+client/src/pages/Primary.tsx — current admissions year updated to 2027–28; historical years retained; public school contact details updated
+client/src/pages/PrivacyPolicy.tsx — public school contact details updated
+client/src/pages/RainbowPreschool.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/SafetySecurity.tsx — current admissions year updated to 2027–28; historical years retained
+client/src/pages/ScheduleAppointment.tsx — current admissions year updated to 2027–28; historical years retained; public school contact details updated
+client/src/pages/SchoolManagingCommittee.tsx — current admissions year updated to 2027–28; historical years retained
+client/src/pages/SchoolNearBrahmand.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/SchoolNearGhodbunderRoad.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/SchoolNearManpada.tsx — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+client/src/pages/Secondary.tsx — current admissions year updated to 2027–28; historical years retained; public school contact details updated
+client/src/pages/SeniorSecondary.tsx — current admissions year updated to 2027–28; historical years retained; public school contact details updated
+client/src/pages/StudentsLeavingCertificate.tsx — public school contact details updated
+client/src/pages/TermsOfUse.tsx — public school contact details updated
+client/src/pages/ThankYou.tsx — public school contact details updated
+client/src/pages/TopSchools.tsx — school-wide Nursery-to-Class-12 wording updated to KG
+package.json — Added parity:check script only; Lighthouse removed
+scripts/parity-check.mjs — Read-only crawler/mobile visitor parity checker, sitemap/path support and protected-route skipping
+server/gandhiJayantiBlog.ts — Public HTML schema normalization
+server/pageTitles.ts — current admissions year updated to 2027–28; historical years retained; school-wide Nursery-to-Class-12 wording updated to KG
+server/routes.ts — Public static blog HTML schema normalization and OpenAPI noindex/nofollow header only; CRM/API handlers unchanged
+server/ssrBlog.ts — Public HTML schema normalization; current admissions year updated to 2027–28; historical years retained, school-wide Nursery-to-Class-12 wording updated to KG, public school contact details updated
+server/ssrBlogImmersive.ts — Public HTML schema normalization; current admissions year updated to 2027–28; historical years retained, school-wide Nursery-to-Class-12 wording updated to KG
+server/ssrBlogShared.ts — Public HTML schema normalization; school-wide Nursery-to-Class-12 wording updated to KG, public school contact details updated
+server/ssrHome.ts — Public HTML schema normalization; current admissions year updated to 2027–28; historical years retained, school-wide Nursery-to-Class-12 wording updated to KG, public school contact details updated
+server/ssrPages.ts — Public HTML schema normalization; current admissions year updated to 2027–28; historical years retained, school-wide Nursery-to-Class-12 wording updated to KG, public school contact details updated
+server/ssrRakshaBandhan2026.ts — Public HTML schema normalization
+server/ssrSpainArgentina.ts — Public HTML schema normalization; current admissions year updated to 2027–28; historical years retained, school-wide Nursery-to-Class-12 wording updated to KG, public school contact details updated
+shared/faqData.ts — Shared visible FAQ admissions-year and KG fact substitutions
+shared/orgSchema.ts — Canonical organization/website builders, publisher references, program preservation and FAQPage filtering
+shared/routeSeo.ts — Public fact substitutions and canonical organization builder alias
+tests/orgSchema.test.ts — Three tests for facts, deduplication, programme preservation, ItemList and visible FAQ preservation
+
+PREPRIMARY.TSX — EXACT CHANGES
+- Line 11: quick-answer admissions year 2026-27 → 2027-28.
+- Line 19: FAQ question admission year 2026-27 → 2027-28.
+- Line 229: admissions-banner year 2026–27 → 2027–28.
+- Line 522: final admissions-CTA year 2026–27 → 2027–28.
+No phone/email substitutions were needed in this file. No other changes remain. Its original Nursery wording, SEO title, description, keywords, styles and structure are preserved.
+
+3. SKIPS AND LIMITS
+- Footer long-description replacement skipped: at 390px it introduced an extra line (45.5px → 68.25px). Existing description retained; no CSS adjustment made.
+- PrePrimary non-phone/email/year substitutions restored following your correction.
+- Homepage page-specific title retained exactly: Best CBSE School in Thane | Nursery to Class 12. Default shell title changed separately, as requested.
+- Lighthouse skipped – Claude will run it
+- Lighthouse removed from package.json and dependencies. package-lock.json restored to its original content; no production dependency added.
+- Live CRM receipt was not tested: Preview submission forwards to live services, so a truly dev-only enquiry cannot be guaranteed without changing protected code. No test lead was sent. GA4 payload was checked separately with synthetic data.
+- Whole-site paragraph-wrapping certification is not complete; verified footer metrics and three requested responsive routes are listed below.
+
+4. REMAINING REQUESTED GREP HITS
+client/src/components/SEO.tsx:116 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+client/src/components/WaveOneSeoBlock.tsx:8 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+client/src/pages/Admissions.tsx:113 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+client/src/pages/BlogPost.tsx:300 — rps-logo.png — Separate preschool branding asset/reference, not the RIS footer logo
+client/src/pages/BlogSpainArgentina.tsx:311 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+client/src/pages/FAQs.tsx:14 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+client/src/pages/PrePrimary.tsx:454 — rps-logo.png — Separate preschool branding asset/reference, not the RIS footer logo
+server/ssrBlog.ts:194 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrBlog.ts:472 — rps-logo.png — Separate preschool branding asset/reference, not the RIS footer logo
+server/ssrBlogImmersive.ts:502 — rps-logo.png — Separate preschool branding asset/reference, not the RIS footer logo
+server/ssrBlogShared.ts:105 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrHome.ts:119 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrHome.ts:369 — rps-logo.png — Separate preschool branding asset/reference, not the RIS footer logo
+server/ssrPages.ts:1835 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrPages.ts:1961 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrPages.ts:2313 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrRakshaBandhan2026.ts:67 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+server/ssrSpainArgentina.ts:26 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+shared/faqData.ts:3 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+shared/faqData.ts:8 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+shared/faqData.ts:126 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+shared/faqData.ts:130 — FAQPage — Legacy schema input or policy reference; filtered from public output; visible FAQ retained
+shared/schema.ts:8 — parent_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:11 — student_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:242 — student_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:244 — parent_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:303 — parent_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:304 — student_name — Form/data interface or legacy definition; absent from GA4 form event
+shared/schema.ts:388 — parent_name — Form/data interface or legacy definition; absent from GA4 form event
+Additional new policy/test/checker FAQPage references: shared/orgSchema.ts, tests/orgSchema.test.ts, scripts/parity-check.mjs. These reject or test FAQPage; they do not emit it.
+RPS logo references remain for separate Rainbow Preschool branding; the RIS React footer uses ris-logo.png.
+All three tested public routes expose one organization and WebSite, valid JSON-LD, and zero FAQPage nodes in bot and visitor output. Legacy FAQ schema input definitions are filtered before serving; visible FAQ content remains.
+
+5. RETAINED 2026–27 / 2026-27 OCCURRENCES
+client/public/llms-full.txt:472 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/public/llms.txt:120 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/public/llms.txt:149 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/AcademicCalendar.tsx:32 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/BookList.tsx:18 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/BookList.tsx:31 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/BookList.tsx:39 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/CbseDisclosures.tsx:282 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/CbseDisclosures.tsx:292 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Circulars.tsx:19 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Fees.tsx:11 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Fees.tsx:14 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Fees.tsx:35 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Fees.tsx:36 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Fees.tsx:48 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Home.tsx:25 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+client/src/pages/Internal.tsx:607 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Internal.tsx:612 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Internal.tsx:614 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Internal.tsx:650 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Internal.tsx:651 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Internal.tsx:652 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Marketing.tsx:1846 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Sales.tsx:261 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Sales.tsx:345 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Sales.tsx:445 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Sales.tsx:479 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+client/src/pages/Sales.tsx:879 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:17 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:198 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:209 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:232 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:245 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:268 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:269 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:279 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraHistoricalReports.ts:296 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraIntegration.ts:33 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraIntegration.ts:149 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraIntegration.ts:159 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraIntegration.ts:185 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:24 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:57 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:61 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:66 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:70 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/indraOpenapiSpec.ts:330 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/pageTitles.ts:41 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/pageTitles.ts:46 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/pageTitles.ts:60 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/routes.ts:2293 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/routes.ts:3052 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/routes.ts:3112 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/routes.ts:3285 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+server/ssrPages.ts:1296 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/ssrPages.ts:1473 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/ssrPages.ts:1827 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/ssrPages.ts:2132 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/ssrPages.ts:2143 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+server/ssrPages.ts:2144 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+shared/routeSeo.ts:125 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+shared/routeSeo.ts:150 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+shared/routeSeo.ts:220 — Historical calendar/book list/fees/document/event or dated blog; retained under A3
+tests/counselorPerformance.test.ts:23 — Regression fixture or tool assertion; not a current admissions claim
+tests/counselorPerformance.test.ts:31 — Regression fixture or tool assertion; not a current admissions claim
+tests/counselorPerformance.test.ts:39 — Regression fixture or tool assertion; not a current admissions claim
+tests/counselorPerformance.test.ts:47 — Regression fixture or tool assertion; not a current admissions claim
+tests/counselorPerformance.test.ts:62 — Regression fixture or tool assertion; not a current admissions claim
+tests/counselorPerformance.test.ts:149 — Regression fixture or tool assertion; not a current admissions claim
+tests/indraAdmissionsPerformance.test.ts:79 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraAdmissionsPerformance.test.ts:248 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraAdmissionsPerformance.test.ts:292 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraAdmissionsPerformance.test.ts:294 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraAdmissionsPerformance.test.ts:462 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraHistoricalReports.test.ts:42 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/indraHistoricalReports.test.ts:46 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/mcpGateway.test.ts:60 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/mcpGateway.test.ts:68 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+tests/walkin-visit-link.test.ts:45 — Protected/internal data, calendar or historical fixture; outside public admissions-copy scope
+
+6. CAREER HR CONTACTS — UNCHANGED
+Email: hr.recruiter2@rainbowinternationalschool.in
+Phone: +91 87799 81827; tel:+918779981827
+Career HR contacts and application recipient were not changed by this commit.
+
+7. PARITY TABLES
+Rule: FAIL for metadata/H1 mismatch, bot body words below 90% of visitor, invalid or disallowed schema, duplicate organizations, multiple phone numbers, or mobile overflow. Promotional/legacy wording produces WARN only.
+
+/ — WARN
+Check | Bot | Visitor | Result | Reason
+title | Best CBSE School in Thane | Nursery to Class 12 | Best CBSE School in Thane | Nursery to Class 12 | PASS | 
+description | Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning. | Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning. | PASS | 
+canonical | https://rainbowinternationalschool.in/ | https://rainbowinternationalschool.in/ | PASS | 
+robots | index, follow | index, follow | PASS | 
+H1 count | 1 | 1 | PASS | 
+H1 text | Best CBSE School in Thane KG to Class 12 | Best CBSE School in Thane KG to Class 12 | PASS | 
+body words | 1008 | 338 | PASS | 
+tel numbers | 918291568972 | 918291568972 | PASS | 
+mailto addresses | admin@rainbowinternationalschool.in | admin@rainbowinternationalschool.in | PASS | 
+schema types | BreadcrumbList, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebSite | BreadcrumbList, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebSite | PASS | 
+JSON-LD validity | 0 | 0 | PASS | 
+FAQPage nodes | false | false | PASS | 
+organisation nodes | 1 | 1 | PASS | 
+mobile width | — | 390 | PASS | 
+
+/contact-us — FAIL
+Check | Bot | Visitor | Result | Reason
+title | Contact Rainbow International School Thane — Phone, Email, Address | Contact Us | Rainbow International School | FAIL | Missing or different
+description | Contact Rainbow International School, Thane. Phone +91 82915 68972, email admin@rainbowinternationalschool.in. Cosmos Arcade, Brahmand Phase 4. | Connect with Rainbow International School, Thane. Call +91 82915 68972, email admin@rainbowinternationalschool.in. Admissions open for KG to Class 12. | FAIL | Missing or different
+canonical | https://rainbowinternationalschool.in/contact-us | https://rainbowinternationalschool.in/contact-us | PASS | 
+robots | index, follow | index, follow | PASS | 
+H1 count | 1 | 1 | PASS | 
+H1 text | Contact Us | Connect with Us | FAIL | H1 text differs
+body words | 154 | 216 | FAIL | Bot has less than 90% of visitor words
+tel numbers |  | 918291568972 | PASS | 
+mailto addresses |  | admin@rainbowinternationalschool.in | PASS | 
+schema types | BreadcrumbList, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebSite | BreadcrumbList, ContactPage, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebSite | PASS | 
+JSON-LD validity | 0 | 0 | PASS | 
+FAQPage nodes | false | false | PASS | 
+organisation nodes | 1 | 1 | PASS | 
+mobile width | — | 390 | PASS | 
+
+/admissions — FAIL
+Check | Bot | Visitor | Result | Reason
+title | Admissions Open 2027–28 | CBSE School in Thane | Admissions Open 2027–28 | CBSE School in Thane | PASS | 
+description | Admissions open 2027-28 at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire or book a campus visit. | Admissions open 2027-28 at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire or book a campus visit. | PASS | 
+canonical | https://rainbowinternationalschool.in/admissions | https://rainbowinternationalschool.in/admissions | PASS | 
+robots | index, follow | index, follow | PASS | 
+H1 count | 1 | 1 | PASS | 
+H1 text | Admissions Open 2027–28 | CBSE School in Thane | Give Your Child the Best Start in Thane | FAIL | H1 text differs
+body words | 1729 | 1198 | PASS | 
+tel numbers |  | 918291568972 | PASS | 
+mailto addresses |  | admin@rainbowinternationalschool.in | PASS | 
+schema types | BreadcrumbList, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebSite | BreadcrumbList, EducationalOrganization, GeoCoordinates, ListItem, PostalAddress, School, WebPage, WebSite | PASS | 
+JSON-LD validity | 0 | 0 | PASS | 
+FAQPage nodes | false | false | PASS | 
+organisation nodes | 1 | 1 | PASS | 
+mobile width | — | 390 | PASS | 
+
+Existing parity differences retained rather than rewriting content: /contact-us title, description, H1 and body-word parity; /admissions H1 text. Homepage checks pass, with promotional/legacy wording warnings.
+
+8. LIGHTHOUSE
+Lighthouse skipped – Claude will run it
+
+9. VERIFICATION
+1) npm run check: PASS.
+2) node scripts/seo-check.mjs <development base>: PASS, 6/6; crawler matrix 30 user agents × 36 routes.
+Schema tests: PASS, 3/3.
+5) git diff --check: PASS. No CSS/classes/style/viewBox/SVG path changes; only allowed navbar-anchor removal, facts, metadata and logo source changes. Footer heights unchanged at all three widths on all three pages. No horizontal overflow at 390, 768 or 1280. Header height is NOT identical: the permitted secondary-phone removal shortens it by roughly 7–8px (5.5px on the initial transitioning desktop-home baseline). No spacer or CSS adjustment was added.
+Layout table: width | route | header before → after | footer before → after | overflow
+390 | / | 100 → 93 | 2551.75 → 2551.75 | false
+390 | /contact-us | 101 → 93 | 2551.75 → 2551.75 | false
+390 | /admissions | 101 → 93 | 2551.75 → 2551.75 | false
+768 | / | 101.5 → 94.5 | 1795.5 → 1795.5 | false
+768 | /contact-us | 102.5 → 94.5 | 1795.5 → 1795.5 | false
+768 | /admissions | 102.4375 → 94.5 | 1795.5 → 1795.5 | false
+1280 | / | 158.03125 → 152.5 | 1148 → 1148 | false
+1280 | /contact-us | 160.5 → 152.5 | 1148 → 1148 | false
+1280 | /admissions | 160.4375 → 152.5 | 1148 → 1148 | false
+6) Contrast: original color/style/font-size declarations preserved; no contrast redesign performed.
+8) Protected/resource status codes unchanged (no bodies recorded):
+Route | Before | After
+/leads | 404 | 404
+/walkin/ris | 200 | 200
+/mcp | 401 | 401
+/openapi.yaml | 200 | 200
+/api/sheets/crm/rows | 200 | 200
+/sitemap.xml | 200 | 200
+/robots.txt | 200 | 200
+/llms.txt | 200 | 200
+OpenAPI X-Robots-Tag includes noindex, nofollow (existing broader noindex directives remain). OpenAPI YAML content unchanged.
+9) GA4 privacy: PASS for synthetic Home_Form_Submit event. Emitted keys: page_path, page_title, form_type, grade, lead_source, lead_medium, utm_campaign, utm_term, utm_content, send_to. Grade retained: Class 3. Names and personal phone absent from event and form-event log. Ads conversion and form/server payload interfaces retained. Nursery absent from homepage grade dropdown. Actual enquiry/CRM receipt: NOT VERIFIED; no live lead created.
+
+COMMIT DIFF STAT
+ client/index.html                               |  14 +-
+ client/public/llms-full.txt                     |  36 ++---
+ client/public/llms.txt                          |  18 +--
+ client/src/components/ChatBot.tsx               |  14 +-
+ client/src/components/SEO.tsx                   |  13 +-
+ client/src/components/home/AboutPreview.tsx     |   4 +-
+ client/src/components/home/AcademicSections.tsx |   2 +-
+ client/src/components/home/ContactForm.tsx      |   2 +-
+ client/src/components/home/Hero.tsx             |  10 +-
+ client/src/components/home/HeroForm.tsx         |   2 +-
+ client/src/components/home/HomeFAQ.tsx          |   4 +-
+ client/src/components/layout/Footer.tsx         |  10 +-
+ client/src/components/layout/Navbar.tsx         |   5 +-
+ client/src/lib/analytics.ts                     |  14 +-
+ client/src/pages/About.tsx                      |   4 +-
+ client/src/pages/AcademicTeam.tsx               |   2 +-
+ client/src/pages/Admissions.tsx                 |  18 +--
+ client/src/pages/ApplicationForm.tsx            |  14 +-
+ client/src/pages/BlogPost.tsx                   |   2 +-
+ client/src/pages/BrandPartners.tsx              |   4 +-
+ client/src/pages/CbseDisclosures.tsx            |   4 +-
+ client/src/pages/ChairpersonsNote.tsx           |   2 +-
+ client/src/pages/ContactUs.tsx                  |  14 +-
+ client/src/pages/Curriculum.tsx                 |   4 +-
+ client/src/pages/Fees.tsx                       |   8 +-
+ client/src/pages/Home.tsx                       |  18 +--
+ client/src/pages/MiddleSchool.tsx               |   8 +-
+ client/src/pages/PrePrimary.tsx                 |   8 +-
+ client/src/pages/Primary.tsx                    |   6 +-
+ client/src/pages/PrivacyPolicy.tsx              |   2 +-
+ client/src/pages/RainbowPreschool.tsx           |   2 +-
+ client/src/pages/SafetySecurity.tsx             |   2 +-
+ client/src/pages/ScheduleAppointment.tsx        |   4 +-
+ client/src/pages/SchoolManagingCommittee.tsx    |   2 +-
+ client/src/pages/SchoolNearBrahmand.tsx         |  12 +-
+ client/src/pages/SchoolNearGhodbunderRoad.tsx   |  10 +-
+ client/src/pages/SchoolNearManpada.tsx          |  12 +-
+ client/src/pages/Secondary.tsx                  |   8 +-
+ client/src/pages/SeniorSecondary.tsx            |   8 +-
+ client/src/pages/StudentsLeavingCertificate.tsx |   4 +-
+ client/src/pages/TermsOfUse.tsx                 |   2 +-
+ client/src/pages/ThankYou.tsx                   |   4 +-
+ client/src/pages/TopSchools.tsx                 |   4 +-
+ package.json                                    |   1 +
+ scripts/parity-check.mjs                        | 192 ++++++++++++++++++++++++
+ server/gandhiJayantiBlog.ts                     |   3 +-
+ server/pageTitles.ts                            |  17 +--
+ server/routes.ts                                |  16 +-
+ server/ssrBlog.ts                               |  13 +-
+ server/ssrBlogImmersive.ts                      |   2 +-
+ server/ssrBlogShared.ts                         |  13 +-
+ server/ssrHome.ts                               |  49 +++---
+ server/ssrPages.ts                              | 114 +++++++-------
+ server/ssrRakshaBandhan2026.ts                  |   3 +-
+ server/ssrSpainArgentina.ts                     |  11 +-
+ shared/faqData.ts                               |   4 +-
+ shared/orgSchema.ts                             | 134 +++++++++++++++++
+ shared/routeSeo.ts                              |  79 ++--------
+ tests/orgSchema.test.ts                         |  46 ++++++
+ 59 files changed, 688 insertions(+), 349 deletions(-)

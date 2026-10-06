@@ -1,0 +1,162 @@
+SEO PROMPT 1 OF THE RIS SEO PROJECT — SITE-WIDE FACTS, BRAND FIXES, SCHEMA, GA4 PRIVACY FIX AND A PARITY CHECKER
+Site: rainbowinternationalschool.in (this Replit app)
+
+READ THIS FIRST — WHAT THIS TASK IS AND IS NOT
+- This is a text, link, metadata, JSON-LD, tracking and tooling task. It is NOT a design task.
+- The goal is to make the whole site factually correct and consistent before we improve pages one by one in later prompts.
+- Every change must be an improvement. If any change would make a section look worse, wrap differently, overflow, or shift layout, do NOT make it — list it in the report instead.
+
+STRICT DESIGN FREEZE (non-negotiable)
+1. Do not change any className, Tailwind class, inline style, CSS file, colour, font, font weight, font size, spacing, border, radius, shadow, animation, image size, component structure, section order or element type.
+2. Do not add, remove or reorder sections, cards, buttons or components on any page.
+3. Do not rewrite page body copy in this task, except the exact strings listed below.
+4. When replacing text, keep the new text close to the original length so nothing wraps differently. Check at 390 px, 768 px and 1280 px.
+5. Do not touch these at all: the CRM, /leads, walk-in forms and walk-in admin pages, /sales, /marketing, /internal, /alliances, /rps-sales, /declaration, /admin, /api/*, /mcp, /auth/*, the database, Google Sheets sync, Indra integration, the API routes, and /openapi.yaml content.
+6. Do not take or send any screenshots.
+
+VERIFIED FACTS (the only facts allowed)
+- School name: Rainbow International School
+- Address: Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
+- Admissions phone — the ONLY phone number for the school: +91 82915 68972 → tel:+918291568972, WhatsApp https://wa.me/918291568972
+- Email — the ONLY school email: admin@rainbowinternationalschool.in
+- Office hours: Monday to Saturday, 9:00 am to 6:00 pm
+- CBSE Affiliation No. 1130661, School Code 30562, founded April 2009
+- Classes from 2027-28: KG (Jr KG, Sr KG) to Class 12. There is NO Nursery at Rainbow International School any more.
+- Admissions year to show: 2027-28
+- Official social profiles (already in the footer): https://www.facebook.com/RainbowInternationalSchoolThane/ , https://www.instagram.com/rainbowinternationalschool/ , https://www.youtube.com/@rainbowinternationalschool
+- Preschool brand: Rainbow Preschool International (https://www.rainbowpreschools.com/) — mention only as "our preschool network"
+
+────────────────────────────────────────
+PART A — SITE-WIDE TEXT AND LINK FIXES
+Search the whole codebase (client/src, client/index.html, client/public, server, shared, llms.txt, llms-full.txt). Exclude node_modules, attached_assets, logs, test-results, screenshots, graphify-out, migrations, the CRM/walk-in/internal files listed above, and database seed data. File paths below are where these strings were last seen; if a file has moved, search for the string.
+
+A1. Phone numbers (all public pages, components, SSR templates, JSON-LD, analytics labels, ChatBot, llms files)
+- Remove "(022) 69105000", "022 6910 5000", "tel:02269105000" everywhere. Example: client/src/components/layout/Navbar.tsx has a second top-bar link <a href="tel:02269105000" …>(022) 69105000</a> — delete that whole <a> element only (not its parent), so the top bar shows only +91 82915 68972.
+- Remove "+91 22 2597 6097", "+912225976097", "tel:+912225976097" everywhere (seen on Primary, Middle School, Secondary, Senior Secondary, About, ContactUs, BrandPartners pages and server/ssrPages.ts). Where it sits next to the main number, delete it and its separator; where it is the only number, replace it with +91 82915 68972 and tel:+918291568972.
+- Remove "91529 87821" / "9152987821" unless it appears on /career as an HR contact (see A7).
+- Every JSON-LD "telephone" value must be "+91-82915-68972".
+- trackCallClick({ phone: … }) labels must only ever be "+91 82915 68972".
+
+A2. Email
+- Replace info@rainbowinternationalschool.in with admin@rainbowinternationalschool.in everywhere (visible text, mailto: links, JSON-LD "email", ChatBot replies, SSR templates, llms.txt, llms-full.txt). Exception in A7.
+
+A3. Admissions year
+- Change the admissions year from 2026–27 / 2026-27 to 2027–28 / 2027-28 (keep the same dash style as the original) ONLY where it refers to admissions. Examples:
+  • Navbar top bar: "ADMISSIONS OPEN · ACADEMIC YEAR 2026–27" → "ADMISSIONS OPEN · ACADEMIC YEAR 2027–28"
+  • Footer exploreLinks label: "Admissions 2026–27" → "Admissions 2027–28"
+  • ChatBot quick reply label "Admissions 2026–27" and the reply text "Admissions are open for Academic Year 2026–27!" → 2027–28
+  • Any "Admissions Open 2026–27" banner, badge, CTA, title or meta description on public pages and their SSR equivalents
+- DO NOT change 2026-27 where it is a real current-year document or event: academic calendar, book list (Book-List-2026-27.pdf), fee or circular PDFs, CBSE disclosures, Google/Meta School 2025-26 pages, blog posts about 2026 events, results. List every 2026-27 occurrence you left unchanged in the report, with file:line and why.
+
+A4. Classes offered
+- Replace "Nursery to Class 12" (and variants such as "Nursery – Class 12", "Nursery-12", "Nursery to 12th", "from Nursery to Class 12") with "KG to Class 12" in titles, meta descriptions, JSON-LD descriptions, ChatBot replies, footer/header text, SSR templates and page text — everywhere EXCEPT:
+  • the /pre-primary-school-thane page body and its SSR equivalent (it gets its own prompt later)
+  • the footer "Rainbow Preschools" link list (those links describe the preschool brand, which still runs Nursery)
+- ChatBot (client/src/components/ChatBot.tsx): "We offer Nursery to Class 12 under CBSE" → "We offer KG to Class 12 under CBSE"; in the stage list, "Pre-Primary (Nursery…" → "Pre-Primary (Jr KG, Sr KG…"; "We welcome students from Nursery to Class 12." → "We welcome students from KG to Class 12."
+- Public enquiry and admission forms (HeroForm, ContactForm, ContactUs, Admissions, Fees, ApplicationForm, ScheduleAppointment and their grade/class dropdowns): remove the "Nursery" option from the class dropdown ONLY in these public forms. Do not change CRM/walk-in grade lists, lookup values, database values or existing leads. Confirm in the report that the remaining options still save to the CRM exactly as before (same values for Jr KG, Sr KG, Class 1 to Class 12).
+
+A5. Footer (client/src/components/layout/Footer.tsx and the matching footer in server SSR templates)
+- WRONG LOGO FIX: the footer brand block uses src="/rps-logo.png" (this is the Rainbow Pre-School logo). Change it to src="/ris-logo.png" — the same Rainbow International School logo the Navbar uses. Keep the same <img> element, the same className ("w-14 h-14 object-contain"), size and position. Keep alt="Rainbow International School Logo". Do not edit or recreate the logo file.
+- Line "World-Class Education, Indian Values." → "CBSE School in Thane West · KG to Class 12"
+- Line "One of the top CBSE schools in Thane — where every child dares to dream and becomes a lifelong learner." → "A CBSE-affiliated school in Brahmand, Thane West, since 2009 — where every child dares to dream and learns for life."
+- Preschool block: change the heading "Rainbow Preschools" → "Our Preschool Network". In preschoolLinks change only the label "Best Playschool in Thane" → "Playschool in Thane". Keep every URL and every other label exactly as it is.
+- Phone and email in the footer: only +91 82915 68972 and admin@rainbowinternationalschool.in.
+
+A6. Default titles (fallback for 404, private routes and any page without its own title)
+- client/index.html: <title>, og:title and twitter:title currently say "Best CBSE School in Thane | Nursery to Class 12". Change all three to "Rainbow International School, Thane West". Default meta description / og:description / twitter:description → "CBSE-affiliated KG to Class 12 school in Brahmand, Thane West. Admissions 2027-28: call +91 82915 68972."
+- Do NOT change the homepage's own title in server/pageTitles.ts ("/") or server/ssrHome.ts in this task. The homepage gets its own prompt with an approved new title, so leave those two exactly as they are now.
+
+A7. Career page exception
+- If /career shows an HR phone number or an HR email (e.g. hr.recruiter2@…), leave them unchanged and list them in the report. I will confirm separately.
+
+A8. /openapi.yaml
+- Keep the file and its response exactly as now, but add the response header "X-Robots-Tag: noindex, nofollow". Do not add it to the sitemap.
+
+────────────────────────────────────────
+PART B — ONE CONSISTENT ORGANISATION SCHEMA (JSON-LD)
+B1. Create shared/orgSchema.ts exporting:
+  - ORG_ID = "https://rainbowinternationalschool.in/#organization"
+  - WEBSITE_ID = "https://rainbowinternationalschool.in/#website"
+  - buildOrgNode() returning:
+    {
+      "@context": "https://schema.org",
+      "@type": ["EducationalOrganization", "School"],
+      "@id": ORG_ID,
+      "name": "Rainbow International School",
+      "url": "https://rainbowinternationalschool.in/",
+      "logo": "https://rainbowinternationalschool.in/ris-logo.png",
+      "telephone": "+91-82915-68972",
+      "email": "admin@rainbowinternationalschool.in",
+      "foundingDate": "2009-04",
+      "address": { "@type": "PostalAddress", "streetAddress": "Cosmos Arcade, Brahmand Phase 4", "addressLocality": "Thane West", "addressRegion": "Maharashtra", "postalCode": "400607", "addressCountry": "IN" },
+      "hasMap": "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA",
+      "sameAs": [
+        "https://www.facebook.com/RainbowInternationalSchoolThane/",
+        "https://www.instagram.com/rainbowinternationalschool/",
+        "https://www.youtube.com/@rainbowinternationalschool",
+        "https://saras.cbse.gov.in/SARAS/AffiliatedList/AfflicationDetails/1130661"
+      ]
+    }
+    If "geo" coordinates already exist in the current org schema, keep them exactly; otherwise do not add geo.
+  - buildWebsiteNode() returning { "@context":"https://schema.org", "@type":"WebSite", "@id": WEBSITE_ID, "url":"https://rainbowinternationalschool.in/", "name":"Rainbow International School", "publisher": { "@id": ORG_ID } }
+B2. Use these builders in BOTH paths so bots and visitors always get the same organisation data:
+  - visitor HTML head injection (server/pageTitles.ts)
+  - bot SSR templates (server/ssrHome.ts, server/ssrPages.ts shell, server/ssrBlogShared.ts and any other ssr*.ts that outputs organisation schema)
+  - client/src/components/SEO.tsx must not inject a second, different organisation block (remove any duplicate client-side org/School JSON-LD).
+B3. Every public page must have exactly ONE organisation node (the one above), ONE WebSite node and its existing BreadcrumbList. On stage pages (pre-primary, primary, middle, secondary, senior secondary) that currently output {...SCHOOL_LD, "@type":"School", department:…}, keep the department/programme info but point it at the organisation by reference ("provider": { "@id": ORG_ID }) instead of outputting a second School node. Blog posts keep BlogPosting with "publisher": { "@id": ORG_ID }.
+B4. Remove every FAQPage JSON-LD block site-wide: server/ssrHome.ts, server/ssrPages.ts (including the /faqs and /admissions entries and line ~1835 and ~1961 blocks), server/pageTitles.ts (buildFaqPageLd calls for /faqs and /admissions), and anything in SEO.tsx. Keep every FAQ as visible text exactly as it is now. You may keep shared/faqData.ts for the visible FAQ content.
+B5. Do not add aggregateRating, Review, openingHours, Product, Event or any other new type. Do not touch the ItemList on /top-schools-in-thane in this task (that page is replaced in a later prompt).
+
+────────────────────────────────────────
+PART C — GA4 PRIVACY FIX (personal data must not go to Google Analytics)
+In client/src/lib/analytics.ts, function trackFormSubmit:
+- Remove these three parameters from the window.gtag("event", eventName, {...}) call: parent_name, student_name, phone. Keep page_path, page_title, form_type, grade, lead_source, lead_medium, utm_campaign, utm_term, utm_content, send_to.
+- Change console.log("[GA4] Form submit:", eventName, params) so it no longer prints names, phone or email (log only eventName and grade).
+- Do not change event names, the Google Ads conversion call (AW-18140772845/gWBXCP3B26ccEO3zmMpD), trackCallClick, trackWhatsAppClick or trackDirectionsClick.
+- Do not change what the forms send to our own server/CRM. Only what goes to Google Analytics changes.
+- Search the rest of client/src for any other gtag/dataLayer call that sends a name, phone or email, and remove those fields the same way. List them in the report.
+
+────────────────────────────────────────
+PART D — BOT / VISITOR PARITY CHECKER (a tool we will run after every page change)
+Create scripts/parity-check.mjs and add "parity:check": "node scripts/parity-check.mjs" to package.json scripts. Use the existing @playwright/test / Playwright already in the project; do not add new production dependencies, and do not run this script during build or deploy.
+- Usage: node scripts/parity-check.mjs [baseUrl] [--path=/some-page]
+  baseUrl defaults to http://localhost:5000. Without --path, check every <loc> in <baseUrl>/sitemap.xml (rewrite the production origin to baseUrl).
+- For each URL:
+  a) BOT: plain HTTP fetch, no JavaScript, User-Agent "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)".
+  b) VISITOR: Playwright Chromium, mobile Chrome UA, viewport 390x844, wait for network idle + 1500 ms.
+  c) Extract from both: <title>, meta description, canonical, meta robots, all H1 texts, visible body word count (exclude header/nav, footer, script, style, noscript), set of tel: links, set of mailto: links, JSON-LD @types.
+  d) FAIL if: title differs; description differs; canonical differs; H1 count is not exactly 1 or the H1 text differs; bot word count < 90% of visitor word count; more than one distinct tel: number; any mailto other than admin@rainbowinternationalschool.in (allow /career HR addresses); any FAQPage in JSON-LD; more than one organisation node; visitor document.documentElement.scrollWidth > 390.
+  e) WARN (do not fail) if visible text in either version contains: best, no. 1, number one, top-rated, leading, premier, finest, world-class, trusted, guaranteed, seats filling, limited seats, hurry, Nursery, 2026-27, 2026–27, 2025-26, (022) 69105000, 2597 6097. Show the matching sentence so I can judge (real award names may contain "Best").
+- Skip internal routes: /admin, /sales, /marketing, /internal, /alliances, /rps-sales, /declaration, /leads, any walk-in route, /api, /mcp, /auth.
+- Output: one compact table per URL (PASS / WARN / FAIL with reasons), then totals. Exit code 1 if any FAIL. The script must never write data.
+Note: most interior pages will FAIL parity today. That is expected and will be fixed page by page. Do not try to fix page parity in this task — just make the tool accurate.
+
+────────────────────────────────────────
+PART E — CHECKS BEFORE YOU REPORT
+1. npm run check (TypeScript) passes.
+2. node scripts/seo-check.mjs passes. If a test expected FAQPage or the old organisation schema, update that test to the new single-org rule and explain the change.
+3. Run: node scripts/parity-check.mjs http://localhost:5000 --path=/ and --path=/contact-us and --path=/admissions. Paste the three result tables.
+4. Grep the codebase (same exclusions as Part A) for: 69105000, 25976097, "2597 6097", 9152987821, info@rainbowinternationalschool.in, "Best Playschool", "World-Class Education", "One of the top CBSE", rps-logo.png (in RIS layout files), parent_name, student_name, "FAQPage". List any remaining hits with file:line and the reason they remain.
+5. Design check without screenshots: confirm no className/style/CSS changed (paste the output of `git diff --stat` and confirm the diff contains no className or style changes). Confirm no horizontal scroll at 390 px on /, /contact-us and /admissions, and that the footer block and top bar keep the same height at 390 px and 1280 px.
+6. WCAG AA contrast unchanged (no colour changes were made).
+7. Run Lighthouse (mobile) ONCE on / and paste Performance, Accessibility, Best Practices and SEO scores.
+8. Confirm with status codes only that these still respond exactly as before: /leads, a walk-in form route, /mcp, /openapi.yaml, /api health or any API route used by the CRM, /sitemap.xml, /robots.txt, /llms.txt.
+9. Submit one test enquiry on the homepage form in development only (not production) and confirm the lead still reaches the CRM with the correct class, and that the GA4 event in the browser console no longer contains names or phone.
+
+────────────────────────────────────────
+PART F — GIT AND PUBLISHING
+- Commit with the message: "SEO P1: site-wide facts, RIS footer logo, single org schema, remove FAQPage, GA4 PII fix, parity checker".
+- Push the commit to the GitHub remote (origin, main branch). If the agent cannot push, say so clearly at the top of the report.
+- DO NOT publish or deploy. I will review the changes and publish myself.
+
+────────────────────────────────────────
+REPORT FORMAT (short, plain text, no screenshots)
+1. Push status (pushed / not pushed) and commit hash
+2. Files changed — one line per file describing what changed
+3. Items you skipped because they would affect the design, and why
+4. Remaining grep hits from check 4, with reasons
+5. 2026-27 occurrences left unchanged (check A3), with reasons
+6. Career page HR contacts found (A7)
+7. Parity tables for /, /contact-us, /admissions
+8. Lighthouse scores for /
+9. Confirmation of checks 1, 2, 5, 6, 8 and 9
