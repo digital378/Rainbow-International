@@ -6,7 +6,7 @@ export const CONTACT_SEO = {
 
 export const CONTACT_BANNER = {
   title: "Contact Us",
-  subtitle: "Admissions, campus visits and general queries — Monday to Saturday, 9 am to 6 pm.",
+  subtitle: "Admissions, campus visits and general queries: Mon–Sat, 9 am–6 pm.",
 };
 
 export const CONTACT_CARDS = [
