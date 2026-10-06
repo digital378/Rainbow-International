@@ -1,0 +1,38 @@
+ENQUIRY FORM CHECK (after SEO Prompts 1 and 2) — test only, development environment only
+
+Goal: prove the homepage "Quick Admission Enquiry" form still saves a lead in the CRM after the SEO changes, and that analytics no longer sends personal data. Do not change any website text, layout or design. Do not publish. No screenshots. No Lighthouse.
+
+This one prompt is an approved exception to replit.md rule 2 ("never submit test enquiries"), under these conditions only:
+- Run ONLY against the development server and the development database. Never call https://rainbowinternationalschool.in or any production URL or production database.
+- Use exactly one test enquiry with these values:
+  parent name "TEST SEO-CHECK please ignore", mobile "9000000001", child name "TEST", grade "Class 1", area "TEST", email empty.
+- Remove the test record when finished (step 5).
+
+STEP 1 — Read before touching anything (report this list)
+a) Find the submit handler in client/src/components/home/HeroForm.tsx, and the API route it calls on the server.
+b) Show `git diff 9967b82~1 HEAD -- client/src/components/home/HeroForm.tsx client/src/lib/analytics.ts` and the server route file(s). Confirm in one line each:
+   - the form's fetch URL, method and body field names are unchanged by the SEO commits
+   - validation rules (required fields, 10-digit mobile) are unchanged
+c) List every side effect the server route triggers when a lead is saved: database insert, email, WhatsApp/SMS, Google Sheets append, webhooks, Meta CAPI, Google Ads offline conversion, any other external call.
+If any external side effect (email, WhatsApp/SMS, Sheets, webhook, ad conversion) would fire in development and cannot be switched off with an existing env flag or test mode, STOP here and report. Do not send the test. Do not add new code to suppress it without asking.
+
+STEP 2 — Static check of analytics (no browser needed)
+In client/src/lib/analytics.ts and HeroForm.tsx confirm and quote the exact lines that:
+- fire the GA4 event (name should still be the existing <Page>_Form_Submit name) WITHOUT parent_name, student_name, phone or email in its parameters
+- fire the Google Ads conversion AW-18140772845/gWBXCP3B26ccEO3zmMpD on success only
+Report PASS/FAIL for each.
+
+STEP 3 — Send the one test enquiry (development only)
+Make a single POST to the development server's enquiry route using the same JSON body shape the form sends, with the test values above, and with the same headers the browser sends (Content-Type, plus any token or CSRF field the route requires — read it from the form code; do not bypass checks).
+Report: HTTP status and the response body (mask nothing — it is test data).
+
+STEP 4 — Confirm it reached the CRM (development database)
+Query the leads table in the development database for mobile 9000000001. Report: id, brand (must be RIS), source/page, grade, academic year (must be 2027-28), created time. Confirm the lead also shows in the /leads CRM list query the CRM page uses (run the same server function or SQL; do not open a browser).
+
+STEP 5 — Clean up
+Delete (or archive if the CRM only supports archive) the single test row(s) with mobile 9000000001 from the development database, plus any related rows the insert created (history/notes/sync queue). Re-query to show 0 rows remain. Touch nothing else.
+
+STEP 6 — Report
+Write artifacts/reports/enquiry-form-check.txt with: Step 1 list, Step 2 PASS/FAIL lines, Step 3 status, Step 4 row, Step 5 cleanup proof, and one final line: "FORM WORKING: YES" or "FORM WORKING: NO — <reason>".
+No code changes are expected. If a bug is found, do not fix it — describe it and stop.
+Do not commit anything except the report file: git add artifacts/reports/enquiry-form-check.txt && git commit -m "Enquiry form check report" (no push). Reply with the report text only.
