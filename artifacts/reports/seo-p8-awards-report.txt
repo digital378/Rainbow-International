@@ -1,0 +1,52 @@
+SEO P8 — AWARDS PAGE REPORT
+Route: /awards-achievements
+Status: Completed and committed locally. No push performed.
+
+FINAL METADATA
+Title (bot = visitor): Awards & Achievements | Rainbow International School, Thane
+Description (bot = visitor): Rainbow International School, Thane West: Best Dynamic School 2026 (Maharashtra Educators Summit), Excellence in CBSE Education (India Today, 2017), FIT INDIA School and more.
+Canonical (bot = visitor): https://rainbowinternationalschool.in/awards-achievements
+H1 bot: Awards & Achievements
+H1 visitor: Awards & Achievements
+Exactly one H1 per version; no site-name suffix. Breadcrumb: Home > Awards & Achievements.
+
+COMPLETED
+Created shared/content/awards.ts; visitor and crawler use shared metadata, banner, intro and awards.
+All 13 original cards preserved: identical titles, descriptions, image paths and order. Image alt text remains each card's title.
+Replaced only the intro paragraph as instructed.
+Replaced inaccurate structured data with one CollectionPage referencing the shared organisation and one ItemList generated from the 13 card titles in order. Shared organisation graph and BreadcrumbList retained; no FAQPage.
+Crawler renders the shared label, intro, h3 titles and descriptions, plus the requested About/Admissions closing links. Removed unsupported crawler-only recognitions and results claims. No Safety & Security block is rendered on this route; the separate safety route was not changed.
+Crawler contact introduction reuses existing visitor contact copy, with one admissions telephone link in the body. Existing visitor ContactForm remains unchanged, including its two links to the same admissions number. Footer mobile and landline unchanged.
+Only this route's sitemap lastmod changed to 2026-10-06.
+Design, classes, colours, icons, images, cards, layout, section order, forms, handlers, tracking calls and test IDs preserved.
+
+CHECK RESULTS
+npx tsc --noEmit: PASS.
+npm run parity:check -- /awards-achievements: WARN, 0 failures.
+Title, description, canonical, H1 count/text, allowed telephone links and footer-only landline: PASS.
+Schema types match; valid JSON-LD; no FAQPage; exactly one organisation node per version: PASS.
+Words: bot 639; visitor 920; 69.5% — permitted WARN. No filler added.
+Banned-word scan: bot "best"; visitor "best, top" — WARN.
+Allowed award-name occurrences preserved:
+- Best Dynamic School 2026 (intro and supplied metadata).
+- Best Preschool & Secondary School in Thane (card title).
+- Best Preschool and Secondary School in Thane / The Best Preschool and Secondary School in Thane (unchanged card description).
+- The 10 Best Preschools in India (unchanged recognition description).
+The visitor's "top" warning comes from the unchanged "Top Schools in Thane" navigation label.
+
+FILES IN COMMIT
+shared/content/awards.ts
+client/src/pages/Awards.tsx
+server/pageTitles.ts
+shared/routeSeo.ts
+server/ssrPages.ts
+client/public/sitemap.xml
+attached_assets/Pasted-SEO-PROMPT-8-AWARDS-PAGE-awards-achievements-Follow-SEO_1791291461307.txt (uploaded brief, included by requested git add -A)
+
+COMMIT / ANYTHING NOT DONE
+Commit: 33488cd
+Message: SEO P8: Awards page metadata, schema and bot parity
+No push attempted; owner will push from the Git pane.
+Report saved at artifacts/reports/seo-p8-awards-report.txt after the commit; not included in that commit.
+Lighthouse skipped – Claude will run it
+No screenshots, test enquiries, other-route checks, additional tests or publishing performed.
