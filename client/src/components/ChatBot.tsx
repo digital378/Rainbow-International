@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "wouter";
 import { ChevronDown, Send, MessageCircle, LayoutGrid, Phone } from "lucide-react";
 
 const WA_URL = "https://wa.me/918291568972";
@@ -175,11 +176,39 @@ function CallbackForm({ onSubmit }: { onSubmit: (data: { name: string; phone: st
 
 // ── Main component ───────────────────────────────────────────────
 export function ChatBot() {
+  const [location] = useLocation();
+  const [stickyBarHeight, setStickyBarHeight] = useState(0);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [chipsVisible, setChipsVisible] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let observedBar: Element | null = null;
+    const measureBar = () => {
+      const bar = document.querySelector('[data-testid="mobile-sticky-bar"], [data-testid="mobile-cta-bar"]');
+      if (bar !== observedBar) {
+        resizeObserver.disconnect();
+        observedBar = bar;
+        if (bar) resizeObserver.observe(bar);
+      }
+      const height = bar && getComputedStyle(bar).display !== "none"
+        ? bar.getBoundingClientRect().height : 0;
+      setStickyBarHeight(height > 0 ? height : 0);
+    };
+    const resizeObserver = new ResizeObserver(measureBar);
+    // Route pages can mount after this effect while a lazy import resolves.
+    const mountObserver = new MutationObserver(measureBar);
+    mountObserver.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", measureBar);
+    measureBar();
+    return () => {
+      window.removeEventListener("resize", measureBar);
+      resizeObserver.disconnect();
+      mountObserver.disconnect();
+    };
+  }, [location]);
 
   useEffect(() => {
     if (open) {
@@ -253,7 +282,7 @@ export function ChatBot() {
       {open && (
         <div
           className="fixed bottom-24 right-5 z-50 flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-          style={{ width: 340, maxHeight: 590, background: "#fff", border: "1px solid #e5e7eb" }}
+          style={{ width: 340, maxHeight: 590, background: "#fff", border: "1px solid #e5e7eb", bottom: stickyBarHeight > 0 ? stickyBarHeight + 12 + 56 + 12 : undefined }}
         >
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ background: "#0d3b86" }}>
@@ -391,7 +420,7 @@ export function ChatBot() {
       <button
         onClick={open ? () => setOpen(false) : handleOpen}
         className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-        style={{ background: "#0d3b86" }}
+        style={{ background: "#0d3b86", bottom: stickyBarHeight > 0 ? stickyBarHeight + 12 : undefined }}
         data-testid="button-chatbot-toggle"
         aria-label="Open chat"
       >
