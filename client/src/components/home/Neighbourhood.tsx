@@ -1,23 +1,15 @@
+import { HOME_NEIGHBOURHOOD } from "@shared/content/home";
 import { Link } from "wouter";
 import { MapPin, Clock, Bus, TreePine, CalendarCheck, Navigation } from "lucide-react";
 
-const areas = [
-  { name: "Brahmand",           time: "2 min"  },
-  { name: "Hiranandani Estate", time: "5 min"  },
-  { name: "Manpada",            time: "7 min"  },
-  { name: "Ghodbunder Road",    time: "8 min"  },
-  { name: "Patlipada",          time: "10 min" },
-  { name: "Kavesar",            time: "10 min" },
-  { name: "Pokhran Road",       time: "12 min" },
-  { name: "Kolshet",            time: "12 min" },
-];
+const areas = HOME_NEIGHBOURHOOD.areas;
 
 const features = [
-  { icon: MapPin,   title: "Central Thane Location",  desc: "Situated in Brahmand Phase 4, easily accessible from all major Thane neighbourhoods.",                                    color: "#e0edff", accent: "#0d3b86" },
-  { icon: Bus,      title: "Door-to-Door Transport",   desc: "A fleet of GPS-tracked school buses covers 30+ routes across all of Thane.",                                               color: "#e0f7f0", accent: "#059669" },
-  { icon: TreePine, title: "3.5-Acre Green Campus",   desc: "Open-air play areas, football turf, swimming pool and landscaped gardens — all within the city.",                          color: "#fff7e0", accent: "#d97706" },
-  { icon: Clock,    title: "Flexible Timings",         desc: "Staggered entry and exit windows for Pre-Primary and Senior sections, making drop-off convenient for working parents.",   color: "#f3e0ff", accent: "#7c3aed" },
-];
+  { icon: MapPin, color: "#e0edff", accent: "#0d3b86" },
+  { icon: Bus, color: "#e0f7f0", accent: "#059669" },
+  { icon: TreePine, color: "#fff7e0", accent: "#d97706" },
+  { icon: Clock, color: "#f3e0ff", accent: "#7c3aed" },
+].map((visual, index) => ({ ...visual, ...HOME_NEIGHBOURHOOD.features[index] }));
 
 export function Neighbourhood() {
   return (
@@ -25,14 +17,14 @@ export function Neighbourhood() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Location & Access</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_NEIGHBOURHOOD.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3 tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            A Top School, Right in Your Neighbourhood
+            {HOME_NEIGHBOURHOOD.title}
           </h2>
           <p className="text-gray-500 text-base max-w-2xl mx-auto">
-            Located in the heart of Thane, Rainbow International School is just minutes away from most residential areas — making the daily commute easy for families.
+            {HOME_NEIGHBOURHOOD.sub}
           </p>
         </div>
 
@@ -56,7 +48,7 @@ export function Neighbourhood() {
           {/* Distance list */}
           <div>
             <h3 className="font-extrabold text-lg text-gray-900 mb-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              How Far Are We From You?
+              {HOME_NEIGHBOURHOOD.areaTitle}
             </h3>
             <div className="space-y-2.5 mb-6">
               {areas.map((a, i) => (
@@ -66,13 +58,13 @@ export function Neighbourhood() {
                     <span className="text-sm font-medium text-gray-700">{a.name}</span>
                   </div>
                   <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#eef5ff", color: "#0d3b86" }}>
-                    {a.time} drive
+                    {a.time} {HOME_NEIGHBOURHOOD.drive}
                   </span>
                 </div>
               ))}
             </div>
             <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-              Cosmos Arcade, Brahmand Phase 4, Thane 400607
+              {HOME_NEIGHBOURHOOD.address}
             </p>
 
             {/* CTAs */}
@@ -84,7 +76,7 @@ export function Neighbourhood() {
                 data-testid="btn-transport-availability"
               >
                 <Bus size={14} />
-                Check Transport
+                {HOME_NEIGHBOURHOOD.buttons[0].label}
               </Link>
               <a
                 href="/admissions"
@@ -93,7 +85,7 @@ export function Neighbourhood() {
                 data-testid="btn-neighbourhood-book-visit"
               >
                 <CalendarCheck size={14} />
-                Book a Campus Visit
+                {HOME_NEIGHBOURHOOD.buttons[1].label}
               </a>
               <a
                 href="https://maps.google.com/?q=Rainbow+International+School+Thane"
@@ -104,7 +96,7 @@ export function Neighbourhood() {
                 data-testid="btn-get-directions"
               >
                 <Navigation size={14} />
-                Get Directions
+                {HOME_NEIGHBOURHOOD.buttons[2].label}
               </a>
             </div>
           </div>

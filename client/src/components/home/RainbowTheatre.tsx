@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { HOME_THEATRE } from "@shared/content/home";
 import { ArrowLeft, ArrowRight, ExternalLink, Instagram, Play, RotateCcw, Volume2 } from "lucide-react";
 import "./RainbowTheatre.css";
 
@@ -169,9 +170,9 @@ export function RainbowTheatre() {
       <div className="rainbow-theatre__inner">
         <div className="rainbow-theatre__heading">
           <div>
-            <p className="rainbow-theatre__eyebrow"><span /> A glimpse into life at RIS</p>
-            <h2 id="rainbow-theatre-title">The Rainbow <em>Theatre</em></h2>
-            <p>See the moments that make our campus feel like home.</p>
+            <p className="rainbow-theatre__eyebrow"><span /> {HOME_THEATRE.eyebrow}</p>
+            <h2 id="rainbow-theatre-title">{HOME_THEATRE.titleParts[0]} <em>{HOME_THEATRE.titleParts[1]}</em></h2>
+            <p>{HOME_THEATRE.sub}</p>
           </div>
           <a className="rainbow-theatre__profile" href={PROFILE_URL} target="_blank" rel="noopener noreferrer" data-testid="theatre-instagram-profile">
             <Instagram size={18} aria-hidden="true" /> Visit our Instagram <ExternalLink size={14} aria-hidden="true" />

@@ -146,3 +146,25 @@ Every file uploaded to the Replit chat is auto-saved into `attached_assets/`. It
 - **tsx**: TypeScript execution for dev server.
 - **esbuild**: Production server bundling.
 - `@replit/vite-plugin-*`: Replit-specific plugins.
+
+## SEO WORK RULES (Rainbow International School)
+1. Design freeze: only text, order of text, links, metadata and schema may change unless the owner asks for a redesign. Never change classes, colours, spacing, images, fonts or layout.
+2. Never take or send screenshots. Never run Lighthouse. Never submit test enquiries or create test leads.
+3. Never publish/deploy. The owner publishes.
+4. Verified facts only:
+   - Rainbow International School, Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
+   - Phone +91 82915 68972 (only number). Email admin@rainbowinternationalschool.in (only email)
+   - Office Mon–Sat 9 am–6 pm. Founded April 2009. CBSE Affiliation No. 1130661, School Code 30562
+   - 2027–28 classes: KG (Jr KG, Sr KG) to Class 12. No Nursery. Class 11–12: Science, Commerce, Humanities
+   - Ages: Jr KG 3.5–4.5, Sr KG 4.5–5.5, Class 1 minimum 6 (6–7), then one-year steps
+   - Timings: KG 9:30 am–12:30 pm; Class 1–10 7:30 am–1:00 pm; Class 11–12 1:00–6:00 pm
+   - Spanish KG to Grade 8. In-house GPS-enabled buses for homes within 10 km
+   - Facilities: 3.5-acre campus, swimming pool, amphitheatre, sports facilities, organic garden, AC classrooms, smart boards, CCTV, Physics/Chemistry/Biology/IT/Maths labs, 100% female staff
+   - 3,000+ students. 100% Class 10 result in 2018-19. No entrance test for KG to Class 8
+   - Fees are never shown on the site: "call or WhatsApp +91 82915 68972"
+5. Banned about RIS: best, top, No. 1, number one, leading, trusted, premier, finest, world-class, guaranteed, "seats filling", "limited seats", "almost full", "hurry". "best" may appear only inside a parent's quoted review or inside a question a parent would type (e.g. "Which is the best CBSE school in Thane for my child?").
+6. Only the 2027–28 admissions year. Never mix RIS with Rainbow Preschool (RPS) content.
+7. Bot/visitor parity: page copy lives in shared/content/<page>.ts and is imported by BOTH the React page and the server SSR renderer. Never type the same sentence twice.
+8. Never touch: /leads, /admin/*, /walkin*, /sales*, /rps-sales*, /marketing*, /alliances*, /overview-27-28, /internal, /mcp, /api/*, CRM code, form submit handlers, analytics event names.
+9. Checks per prompt: `npx tsc --noEmit` and `npm run parity:check` for the changed routes only. Nothing else.
+10. Finish with one git commit and one push. Write a short report to artifacts/reports/.

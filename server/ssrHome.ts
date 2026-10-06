@@ -1,6 +1,12 @@
 import type { Express } from "express";
 import { isCrawlerUa } from "./crawlerUa";
-import { normalizeSchemaHtml } from "@shared/orgSchema";
+import { normalizeSchemaHtml, buildOrgNode, buildWebsiteNode } from "@shared/orgSchema";
+import {
+  HOME_SEO, HOME_HERO, HOME_AWARDS_INTRO, HOME_JOURNEY, HOME_THEATRE, HOME_WHY,
+  HOME_ACADEMICS, HOME_PEDAGOGY, HOME_DISCOVER, HOME_NEIGHBOURHOOD,
+  HOME_BEYOND, HOME_TESTIMONIALS, HOME_CONTACT, HOME_QUICK_ANSWER,
+  HOME_FAQS, HOME_FOOTER_DESCRIPTION, HOME_QUICK_ANSWER_HEADINGS,
+} from "@shared/content/home";
 
 function e(str: string): string {
   return String(str)
@@ -10,8 +16,108 @@ function e(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
+const SSR_HOME_IMAGES = [
+  "<img src=\"/images/awards/india-today.webp\" alt=\"India Today Award\" />",
+  "<img src=\"/images/awards/nsa-award.webp\" alt=\"National School Awards\" />",
+  "<img src=\"/images/awards/wes-mumbai.webp\" alt=\"World Education Summit\" />",
+  "<img src=\"/images/awards/economic-times.webp\" alt=\"Economic Times\" />",
+  "<img src=\"/images/awards/scoonews.webp\" alt=\"Scoo News\" />",
+  "<img src=\"/images/awards/tmc-logo.webp\" alt=\"Thane Municipal Corp\" />",
+  "<img src=\"/images/home/academic/pre-primary.jpg\" alt=\"Pre-Primary\" />",
+  "<img src=\"/images/home/academic/primary-section.jpg\" alt=\"Primary\" />",
+  "<img src=\"/images/home/academic/middle-section.jpg\" alt=\"Middle School\" />",
+  "<img src=\"/images/home/academic/secondary.jpg\" alt=\"Secondary\" />",
+  "<img src=\"/images/home/academic/senior-secondary.jpg\" alt=\"Senior Secondary\" />",
+  "<img src=\"/images/home/discover/awards.jpg\" alt=\"Awards & Accomplishments\" />",
+  "<img src=\"/images/home/discover/amenities.jpg\" alt=\"Amenities & Facilities\" />",
+  "<img src=\"/images/home/discover/student-achievements.jpg\" alt=\"Student Achievements\" />",
+  "<img src=\"/images/home/discover/safety-security.jpg\" alt=\"Safety & Security\" />",
+  "<img src=\"/images/home/beyond-classroom-rocket.jpg\" alt=\"Beyond The Classroom at Rainbow International School\" />"
+];
+
+function renderHomeMain(): string {
+  const link = (item: { label: string; href: string }, className = "") =>
+    `<a href="${e(item.href)}" class="${e(className)}">${e(item.label)}</a>`;
+  const heading = (title: string, sub: string) =>
+    `<h2 class="section-title">${e(title)}</h2><p class="section-sub">${e(sub)}</p>`;
+  return `<main role="main"><article>
+<section class="hero"><div class="hero-bg"></div><div class="hero-overlay"></div><div class="container"><div class="hero-inner"><div class="hero-text">
+  <div class="hero-badge"><span class="hero-badge-dot"></span>${e(HOME_HERO.badge)}</div>
+  <h1>${e(HOME_HERO.titleLines[0])}<br/><span class="gold">${e(HOME_HERO.titleLines[1])}</span><br/><span>${e(HOME_HERO.titleLines[2])}</span></h1>
+  <p class="hero-sub">${e(HOME_HERO.subLine)}</p><p>${e(HOME_HERO.intro)}</p>
+  <div class="hero-stats">${HOME_HERO.trustChips.map(chip => `<div class="hero-stat"><div class="hero-stat-num">${e(chip.num)}</div><div class="hero-stat-label">${e(chip.label)}</div></div>`).join("")}</div>
+  <div class="hero-btns">${link(HOME_HERO.buttons[0], "btn-gold")}${link(HOME_HERO.buttons[1], "btn-outline")}</div>
+  <div class="hero-quick">${HOME_HERO.quickLinks.map(item => link(item)).join("")}</div>
+</div></div></div></section>
+<section class="awards-strip">
+  <p class="awards-tag">${e(HOME_AWARDS_INTRO.eyebrow)}</p><h2>${e(HOME_AWARDS_INTRO.titleParts[0])}<br/><span>${e(HOME_AWARDS_INTRO.titleParts[1])}</span></h2>
+  <p class="awards-desc">${e(HOME_AWARDS_INTRO.paragraph)}</p>
+  <div class="awards-logos">${SSR_HOME_IMAGES.slice(0, 6).map(image => `<div>${image}</div>`).join("")}</div>
+  ${link(HOME_AWARDS_INTRO.button, "btn-gold")}
+</section>
+<section class="about-preview" id="admission-journey"><div class="container">
+  <p class="section-tag">${e(HOME_JOURNEY.eyebrow)}</p>${heading(HOME_JOURNEY.title, HOME_JOURNEY.sub)}
+  ${HOME_JOURNEY.steps.map(step => `<div><p>${e(HOME_JOURNEY.stepLabel)} ${e(step.step)}</p><h3>${e(step.title)}</h3><p>${e(step.desc)}</p></div>`).join("")}
+  ${link(HOME_JOURNEY.visit, "btn-gold")}
+</div></section>
+<section id="rainbow-theatre"><div class="container">
+  <p>${e(HOME_THEATRE.eyebrow)}</p><h2>${e(HOME_THEATRE.title)}</h2><p>${e(HOME_THEATRE.sub)}</p>
+  ${link(HOME_THEATRE.instagram)}
+</div></section>
+<section class="about-preview"><div class="container">
+  <p class="section-tag">${e(HOME_WHY.eyebrow)}</p>${heading(`${HOME_WHY.title} ${HOME_WHY.titleAccent}`, HOME_WHY.sub)}
+  ${HOME_WHY.cards.map(card => `<div><h3>${e(card.title)}</h3><p>${e(card.desc)}</p></div>`).join("")}
+  <div class="about-stats">${HOME_WHY.stats.map(stat => `<div><strong>${e(stat.display)}</strong><p>${e(stat.label)}</p></div>`).join("")}</div>
+  ${link(HOME_WHY.visit, "btn-gold")}${link(HOME_WHY.learnMore, "btn-outline")}
+</div></section>
+<section class="academics" id="academics"><div class="container">
+  <p class="section-tag">${e(HOME_ACADEMICS.eyebrow)}</p>${heading(`${HOME_ACADEMICS.title} ${HOME_ACADEMICS.titleAccent}`, HOME_ACADEMICS.sub)}
+  <div class="programs-grid">${HOME_ACADEMICS.cards.map((card, index) => `<div class="program-card"><div class="program-card-img">${SSR_HOME_IMAGES[6 + index]}</div><div class="program-card-body"><h3>${e(card.label)}</h3><p>${e(card.grade)}</p><p>${e(card.concern)}</p><p>${e(card.advantage)}</p><a href="${e(card.href)}">${e(HOME_ACADEMICS.explore)}</a></div></div>`).join("")}</div>
+</div></section>
+<section class="pedagogy"><div class="container">
+  <p class="section-tag">${e(HOME_PEDAGOGY.eyebrow)}</p>${heading(HOME_PEDAGOGY.title, HOME_PEDAGOGY.sub)}
+  ${HOME_PEDAGOGY.tabs.map((tab, index) => `<div><h3>${e(tab.title)}</h3><p>${e(tab.description)}</p>${index === 0 ? `<ul>${tab.points.map(point => `<li>${e(point)}</li>`).join("")}</ul>` : ""}</div>`).join("")}
+</div></section>
+<section class="discover"><div class="container">
+  <p class="section-tag">${e(HOME_DISCOVER.eyebrow)}</p>${heading(HOME_DISCOVER.title, HOME_DISCOVER.sub)}
+  <div class="discover-grid">${HOME_DISCOVER.cards.map((card, index) => `<a href="${e(card.href)}" class="discover-card">${SSR_HOME_IMAGES[11 + index]}<div><p>${e(card.tag)}</p><h3>${e(card.title)}</h3><p>${e(card.description)}</p></div></a>`).join("")}</div>
+</div></section>
+<section class="about-preview" id="neighbourhood"><div class="container">
+  <p class="section-tag">${e(HOME_NEIGHBOURHOOD.eyebrow)}</p>${heading(HOME_NEIGHBOURHOOD.title, HOME_NEIGHBOURHOOD.sub)}
+  ${HOME_NEIGHBOURHOOD.features.map(feature => `<div><h3>${e(feature.title)}</h3><p>${e(feature.desc)}</p></div>`).join("")}
+  <h3>${e(HOME_NEIGHBOURHOOD.areaTitle)}</h3><ul>${HOME_NEIGHBOURHOOD.areas.map(area => `<li>${e(area.name)} — ${e(area.time)} ${e(HOME_NEIGHBOURHOOD.drive)}</li>`).join("")}</ul>
+  <p>${e(HOME_NEIGHBOURHOOD.address)}</p>${HOME_NEIGHBOURHOOD.buttons.map(item => link(item, "btn-gold")).join("")}
+</div></section>
+<section class="beyond"><div class="container"><div class="beyond-inner"><div>
+  <p class="section-tag">${e(HOME_BEYOND.eyebrow)}</p><h2 class="section-title">${e(HOME_BEYOND.titleParts.join(" "))}</h2>
+  <p>${e(HOME_BEYOND.intro)} <strong>${e(HOME_BEYOND.emphasis)}</strong></p><p>${e(HOME_BEYOND.paragraph)}</p>
+  <ul>${HOME_BEYOND.activities.map(activity => `<li>${e(activity)}</li>`).join("")}</ul>
+  ${link(HOME_BEYOND.button, "btn-gold")}<p>${e(HOME_BEYOND.badgeLabel)} ${e(HOME_BEYOND.badgeValue)}</p>
+</div><div>${SSR_HOME_IMAGES[15]}</div></div></div></section>
+<section class="testimonials" id="testimonials"><div class="container">
+  <p class="section-tag">${e(HOME_TESTIMONIALS.eyebrow)}</p>${heading(HOME_TESTIMONIALS.title, HOME_TESTIMONIALS.sub)}
+  <p>${e(HOME_TESTIMONIALS.rating)} ${e(HOME_TESTIMONIALS.ratingLabel)}</p>
+  <div class="testimonials-grid">${HOME_TESTIMONIALS.reviews.slice(0, 3).map(review => `<div class="testimonial-card"><blockquote>${e(review.review)}</blockquote><p>${e(review.initials)}</p><h3>${e(review.name)}</h3></div>`).join("")}</div>
+  ${link(HOME_TESTIMONIALS.button, "btn-gold")}
+</div></section>
+<section class="contact-section" id="contact"><div class="container">
+  <h2 class="section-title">${e(HOME_CONTACT.title)}</h2>
+  <p>${e(HOME_CONTACT.introBeforeBreak)}<br/>${e(HOME_CONTACT.introBeforePhone)} <a href="${e(HOME_CONTACT.phoneHref)}">${e(HOME_CONTACT.phone)}</a> ${e(HOME_CONTACT.introAfterPhone)}</p>
+  <p>${e(HOME_CONTACT.address)}</p><a href="mailto:${e(HOME_CONTACT.email)}">${e(HOME_CONTACT.email)}</a>
+</div></section>
+<section><div class="container"><h2>${e(HOME_QUICK_ANSWER_HEADINGS.title)}</h2><p>${e(HOME_QUICK_ANSWER)}</p>
+  <h3>${e(HOME_QUICK_ANSWER_HEADINGS.faqTitle)}</h3>
+  ${HOME_FAQS.map(faq => `<details><summary>${e(faq.q)}</summary><p>${e(faq.a)}</p></details>`).join("")}
+</div></section>
+</article></main>`;
+}
+
 function renderHomeSSR(): string {
   const year = new Date().getFullYear();
+  const schema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [buildOrgNode(), buildWebsiteNode()],
+  }).replace(/</g, "\\u003c");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -21,111 +127,28 @@ function renderHomeSSR(): string {
 <meta name="google-site-verification" content="jWDe0ilooX5MO3xp-F6nSkapvxY8m9Oyq3gL4_JI0hY" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DN4GB6MVJJ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DN4GB6MVJJ');gtag('config','AW-18140772845');</script>
-<title>Best CBSE School in Thane | Nursery to Class 12</title>
-<meta name="description" content="Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning." />
-<meta name="keywords" content="best CBSE school in Thane, CBSE school near me Thane, top CBSE school Thane, K-12 school in Thane, best school in Thane, top rated school Thane, CBSE school admissions Thane 2027-28, Rainbow International School Thane, KG admission Thane" />
+<title>${e(HOME_SEO.title)}</title>
+<meta name="description" content="${e(HOME_SEO.description)}" />
+<meta name="keywords" content="${e(HOME_SEO.keywords)}" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://rainbowinternationalschool.in/" />
+<link rel="canonical" href="${e(HOME_SEO.canonical)}" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Rainbow International School Thane | CBSE School Since 2009" />
-<meta property="og:description" content="Rainbow International School is a CBSE school in Thane (since 2009). 3.5-acre Brahmand campus, KG to Class 12. Apply for the 2027-28 academic year." />
-<meta property="og:url" content="https://rainbowinternationalschool.in/" />
-<meta property="og:image" content="https://rainbowinternationalschool.in/opengraph.jpg" />
+<meta property="og:title" content="${e(HOME_SEO.ogTitle)}" />
+<meta property="og:description" content="${e(HOME_SEO.ogDescription)}" />
+<meta property="og:url" content="${e(HOME_SEO.canonical)}" />
+<meta property="og:image" content="${e(HOME_SEO.ogImage)}" />
 <meta property="og:site_name" content="Rainbow International School" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Rainbow International School Thane | CBSE School Since 2009" />
-<meta name="twitter:description" content="Rainbow International School is a CBSE school in Thane (since 2009). 3.5-acre Brahmand campus, KG to Class 12. Apply for the 2027-28 academic year." />
-<meta name="twitter:image" content="https://rainbowinternationalschool.in/opengraph.jpg" />
+<meta name="twitter:title" content="${e(HOME_SEO.ogTitle)}" />
+<meta name="twitter:description" content="${e(HOME_SEO.ogDescription)}" />
+<meta name="twitter:image" content="${e(HOME_SEO.ogImage)}" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=Merriweather:wght@700;900&display=swap" rel="stylesheet" />
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["EducationalOrganization", "School"],
-  "name": "Rainbow International School",
-  "alternateName": "RIS Thane",
-  "url": "https://rainbowinternationalschool.in/",
-  "logo": {
-    "@type": "ImageObject",
-    "url": "https://rainbowinternationalschool.in/favicon-192.png",
-    "width": 192,
-    "height": 192
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://rainbowinternationalschool.in/opengraph.jpg",
-    "width": 1200,
-    "height": 630
-  },
-  "description": "Rainbow International School is a CBSE-affiliated K-12 school in Thane, Maharashtra. Founded in 2009, serving students from KG to Class 12.",
-  "foundingDate": "2009-04-01",
-  "educationalLevel": "KG to Class 12",
-  "identifier": [
-    { "@type": "PropertyValue", "name": "CBSE Affiliation Number", "value": "1130661" },
-    { "@type": "PropertyValue", "name": "CBSE School Code", "value": "30562" }
-  ],
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Cosmos Arcade, Brahmand Phase 4",
-    "addressLocality": "Thane",
-    "addressRegion": "Maharashtra",
-    "postalCode": "400607",
-    "addressCountry": "IN"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": 19.2287,
-    "longitude": 72.9637
-  },
-  "telephone": "+91-82915-68972",
-  "email": "admin@rainbowinternationalschool.in",
-  "sameAs": [
-    "https://maps.app.goo.gl/mfJjMMkksCkcXzMCA",
-    "https://www.facebook.com/RainbowInternationalSchoolThane/",
-    "https://www.instagram.com/rainbowinternationalschool/",
-    "https://www.youtube.com/@RainbowInternationalSchool"
-  ],
-  "areaServed": { "@type": "City", "name": "Thane" },
-  "priceRange": "$$",
-  "openingHoursSpecification": [{
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
-    "opens": "09:00",
-    "closes": "18:00"
-  }]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Rainbow International School",
-  "url": "https://rainbowinternationalschool.in/",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": {
-      "@type": "EntryPoint",
-      "urlTemplate": "https://rainbowinternationalschool.in/blogs?q={search_term_string}"
-    },
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {"@type":"Question","name":"Is Rainbow International School Thane a CBSE school?","acceptedAnswer":{"@type":"Answer","text":"Yes. Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi, and follows the CBSE curriculum from KG through Class 12."}},
-    {"@type":"Question","name":"Where is Rainbow International School located in Thane?","acceptedAnswer":{"@type":"Answer","text":"The school is on a 3.5-acre campus in the Brahmand area of Thane (Maharashtra), with school-managed transport covering Brahmand, Ghodbunder Road, Manpada and adjoining localities."}},
-    {"@type":"Question","name":"Which classes does the school cover?","acceptedAnswer":{"@type":"Answer","text":"Rainbow International School Thane is a K-12 school that covers Pre-Primary, Primary (Class 1-5), Secondary (Class 6-10) and Senior Secondary (Class 11-12) with Science, Commerce and Humanities streams."}},
-    {"@type":"Question","name":"Are admissions open for the 2027-28 academic year?","acceptedAnswer":{"@type":"Answer","text":"Yes. CBSE admissions for 2027-28 are open for KG to Class 12, subject to seat availability per class."}},
-    {"@type":"Question","name":"How can I book a campus visit?","acceptedAnswer":{"@type":"Answer","text":"Parents can book a campus visit through the admission enquiry form on the website or by calling the admission desk during school hours."}}
-  ]
-}
-</script>
+<script type="application/ld+json">${schema}</script>
+
+
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -380,386 +403,14 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
 </nav>
 </header>
 
-<main role="main">
-<article itemscope itemtype="https://schema.org/School">
-<meta itemprop="name" content="Rainbow International School" />
-<meta itemprop="description" content="One of the top CBSE-affiliated K-12 schools in Thane, Maharashtra. Offering world-class education from KG to Class 12." />
-<meta itemprop="address" content="Cosmos Arcade, Brahmand Phase 4, Thane, Maharashtra 400607" />
-<meta itemprop="telephone" content="+91 82915 68972" />
-<meta itemprop="url" content="https://rainbowinternationalschool.in" />
-<meta itemprop="foundingDate" content="2009-04" />
-
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
-  <div class="container">
-    <div class="hero-inner">
-      <div class="hero-text">
-        <div class="hero-badge">
-          <span class="hero-badge-dot"></span>
-          Admissions Open &middot; Academic Year 2027–28
-        </div>
-        <h1>Best CBSE School <br/><span class="gold">in Thane</span> <br/>KG to Class 12</h1>
-        <p class="hero-sub">Thane's premier CBSE K–12 school — where every child dares to dream, learns with joy, and grows into a lifelong learner.</p>
-        <div class="hero-stats">
-          <div class="hero-stat"><div class="hero-stat-num">50K+</div><div class="hero-stat-label">Happy Students</div></div>
-          <div class="hero-stat"><div class="hero-stat-num">Since 2009</div><div class="hero-stat-label">Established</div></div>
-          <div class="hero-stat"><div class="hero-stat-num">3.5 Acres</div><div class="hero-stat-label">Campus</div></div>
-          <div class="hero-stat"><div class="hero-stat-num">CBSE #1130661</div><div class="hero-stat-label">Affiliation</div></div>
-        </div>
-        <div class="hero-btns">
-          <a href="#contact" class="btn-gold">Enquire Now &#8250;</a>
-          <a href="/about-rainbow-international-school" class="btn-outline">About Us</a>
-        </div>
-        <div class="hero-quick">
-          <a href="/cbse-mandatory-public-disclosures">CBSE Disclosures</a>
-          <a href="/pre-primary-school-thane">Pre-Primary</a>
-          <a href="/middle-school-section">Middle School</a>
-          <a href="/senior-secondary-section">Senior Secondary</a>
-          <a href="/career">Career</a>
-        </div>
-      </div>
-      <div class="hero-form">
-        <div class="hero-form-header">
-          <div class="hero-form-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg>
-          </div>
-          <div>
-            <p style="font-weight:900;font-size:14px;color:#111;line-height:1.2">Quick Enquiry</p>
-            <p style="font-size:12px;color:#9ca3af">Our counsellor will call you back</p>
-          </div>
-        </div>
-        <div class="hero-form-body">
-          <form action="/api/inquiries" method="POST">
-            <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;opacity:0" />
-            <input type="hidden" name="formStartedAt" value="${Date.now()}" />
-            <input type="text" name="parentName" placeholder="Parent Name *" required />
-            <input type="tel" name="phone" placeholder="Phone Number *" required />
-            <input type="text" name="studentName" placeholder="Child's Name *" required />
-            <input type="email" name="email" placeholder="Email Address (optional)" />
-            <select name="grade" required>
-              <option value="">Select Class *</option>
-              <option>Nursery</option><option>Jr. KG</option><option>Sr. KG</option>
-              <option>Class I</option><option>Class II</option><option>Class III</option>
-              <option>Class IV</option><option>Class V</option><option>Class VI</option>
-              <option>Class VII</option><option>Class VIII</option><option>Class IX</option>
-              <option>Class X</option><option>Class XI</option><option>Class XII</option>
-            </select>
-            <button type="submit">Get a Free Callback</button>
-            <p class="hero-form-trust">
-              <svg style="width:13px;height:13px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11.5 14.5 16 10"></polyline></svg>
-              No spam &middot; One call only &middot; Completely free
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="hero-wave">
-    <svg viewBox="0 0 1440 90" preserveAspectRatio="none" style="width:100%;height:90px;display:block" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,55 C240,90 480,20 720,55 C960,90 1200,25 1440,55 L1440,90 L0,90 Z" fill="white" />
-    </svg>
-  </div>
-</section>
-
-<!-- Awards / Welcome Strip -->
-<section class="awards-strip">
-  <p class="awards-tag">Recognised &amp; Awarded</p>
-  <h2>Welcome To Rainbow<br/><span>International School</span></h2>
-  <p class="awards-desc">Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.</p>
-  <div class="awards-logos">
-    <div><img src="/images/awards/india-today.webp" alt="India Today Award" /></div>
-    <div><img src="/images/awards/nsa-award.webp" alt="National School Awards" /></div>
-    <div><img src="/images/awards/wes-mumbai.webp" alt="World Education Summit" /></div>
-    <div><img src="/images/awards/economic-times.webp" alt="Economic Times" /></div>
-    <div><img src="/images/awards/scoonews.webp" alt="Scoo News" /></div>
-    <div><img src="/images/awards/tmc-logo.webp" alt="Thane Municipal Corp" /></div>
-  </div>
-  <a href="/awards-achievements" class="btn-gold">View All Awards &rarr;</a>
-</section>
-
-<!-- About Preview / Why Choose Us -->
-<section class="about-preview">
-  <div class="container">
-    <div class="about-inner">
-      <div class="about-text">
-        <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Why Choose Us</span>
-        <h2 class="section-title">Why Parents Trust<br/><span style="color:#0d3b86">Rainbow</span></h2>
-        <p>Rainbow International School is a trailblazer in the arena of education with a passion for excellence. We are considered as one of the top CBSE schools in Thane because we emphasize that the child enjoys his learning, dares to dream, and becomes a lifelong learner.</p>
-        <p>Our expert educators provide a conducive environment with their multicultural perspectives. Social ethics like empathy, compassion, and respect for others is inculcated in the pedagogy. We provide state-of-the-art facilities, technologies, and infrastructure to optimize teaching and learning outcomes.</p>
-        <p>Our educational programs support child's academic, moral, social, and physical development. Our curriculum reflects global, rural, and urban dimensions, thereby preparing our students to face all future challenges. At the preschool level, we follow the theory of <a href="/about-rainbow-international-school" style="color:#0d3b86;font-weight:600;text-decoration:underline">Multiple Intelligence</a> for holistic development.</p>
-        <p>We are proud to consistently deliver world-class education and remain the best international school in Thane.</p>
-        <div class="about-highlights">
-          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>CBSE Affiliated (No. 1130661)</div>
-          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>KG to Class 12</div>
-          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Multiple Intelligence methodology</div>
-          <div class="about-highlight"><svg class="check-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>3.5-acre green campus in Thane</div>
-        </div>
-        <a href="/about-rainbow-international-school" class="btn-blue">Learn More About Us &rarr;</a>
-      </div>
-      <div class="about-stats">
-        <div class="about-stat"><div class="about-stat-num">50K+</div><div class="about-stat-label">Happy Students</div></div>
-        <div class="about-stat"><div class="about-stat-num">2009</div><div class="about-stat-label">Established</div></div>
-        <div class="about-stat"><div class="about-stat-num">3.5 Acres</div><div class="about-stat-label">Campus Area</div></div>
-        <div class="about-stat"><div class="about-stat-num">1 Lac+</div><div class="about-stat-label">Lives Impacted</div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Academic Programmes -->
-<section class="academics" id="academics">
-  <div class="container" style="text-align:center">
-    <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Academics</span>
-    <h2 class="section-title">Academic Programmes<br/><span style="color:#0d3b86">At A Glance</span></h2>
-    <p class="section-sub" style="margin:0 auto 48px">From KG to Class 12 — a complete CBSE learning journey under one roof.</p>
-  </div>
-  <div class="container">
-    <div class="programs-grid">
-      <a href="/pre-primary-school-thane" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/pre-primary.jpg" alt="Pre-Primary" /></div>
-        <div class="program-card-body">
-          <span class="program-tag" style="background:#fff7ed;color:#f97316">Nursery &middot; Jr. KG &middot; Sr. KG</span>
-          <h3>Pre-Primary</h3>
-          <p>Play-based learning that nurtures curiosity, creativity, and foundational skills in a safe and joyful environment.</p>
-          <span class="program-link" style="color:#f97316">Explore &rarr;</span>
-        </div>
-      </a>
-      <a href="/primary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/primary-section.jpg" alt="Primary" /></div>
-        <div class="program-card-body">
-          <span class="program-tag" style="background:#eef5ff;color:#0d3b86">Class I – V</span>
-          <h3>Primary</h3>
-          <p>Building strong literacy, numeracy, and social skills through structured experiential learning.</p>
-          <span class="program-link" style="color:#0d3b86">Explore &rarr;</span>
-        </div>
-      </a>
-      <a href="/middle-school-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/middle-section.jpg" alt="Middle School" /></div>
-        <div class="program-card-body">
-          <span class="program-tag" style="background:#ecfdf5;color:#10b981">Class VI – VIII</span>
-          <h3>Middle School</h3>
-          <p>Critical thinking, digital literacy, and leadership skills for the evolving modern learner.</p>
-          <span class="program-link" style="color:#10b981">Explore &rarr;</span>
-        </div>
-      </a>
-    </div>
-    <div class="programs-grid-2">
-      <a href="/secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/secondary.jpg" alt="Secondary" /></div>
-        <div class="program-card-body">
-          <span class="program-tag" style="background:#f5f3ff;color:#8b5cf6">Class IX – X</span>
-          <h3>Secondary</h3>
-          <p>CBSE board preparation with strong academics and holistic co-curricular engagement.</p>
-          <span class="program-link" style="color:#8b5cf6">Explore &rarr;</span>
-        </div>
-      </a>
-      <a href="/senior-secondary-section" class="program-card">
-        <div class="program-card-img"><img src="/images/home/academic/senior-secondary.jpg" alt="Senior Secondary" /></div>
-        <div class="program-card-body">
-          <span class="program-tag" style="background:#fff1f2;color:#ef4444">Class XI – XII</span>
-          <h3>Senior Secondary</h3>
-          <p>Science, Commerce &amp; Humanities streams to launch your child's next chapter.</p>
-          <span class="program-link" style="color:#ef4444">Explore &rarr;</span>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- Pedagogy -->
-<section class="pedagogy">
-  <div class="container" style="text-align:center">
-    <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Our Methodology</span>
-    <h2 class="section-title">Our Pedagogy</h2>
-    <p class="section-sub" style="margin:0 auto 48px">Guiding light for achieving milestones in an evolving world.</p>
-  </div>
-  <div class="ped-panel">
-    <h3>Technology in Every Classroom</h3>
-    <p>E-learning tools for enhanced learning, memory, and future-readiness.</p>
-    <div class="ped-points">
-      <div class="ped-point"><svg class="check-svg" viewBox="0 0 24 24" style="stroke:#3b82f6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Smart boards in every classroom</div>
-      <div class="ped-point"><svg class="check-svg" viewBox="0 0 24 24" style="stroke:#3b82f6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Digital and e-learning resources</div>
-      <div class="ped-point"><svg class="check-svg" viewBox="0 0 24 24" style="stroke:#3b82f6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Technology-aided CBSE curriculum</div>
-      <div class="ped-point"><svg class="check-svg" viewBox="0 0 24 24" style="stroke:#3b82f6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Enhanced memory and retention tools</div>
-    </div>
-  </div>
-</section>
-
-<!-- Discover Rainbow -->
-<section class="discover">
-  <div class="container" style="text-align:center">
-    <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Life at Rainbow</span>
-    <h2 class="section-title">Let's Discover Rainbow!</h2>
-    <p class="section-sub" style="margin:0 auto 48px">Committed to educating, strengthening, and nurturing every student — and empowering lifelong learners.</p>
-  </div>
-  <div class="container">
-    <div class="discover-grid">
-      <a href="/awards-achievements" class="discover-card">
-        <img src="/images/home/discover/awards.jpg" alt="Awards & Accomplishments" />
-        <div class="discover-card-overlay"></div>
-        <span class="discover-card-tag" style="background:#fef3c7;color:#f59e0b">Recognition</span>
-        <div class="discover-card-text"><h3>Awards &amp; Accomplishments</h3><p>Accolades earned for being one of the best and most promising international schools in Thane for over a decade.</p></div>
-      </a>
-      <a href="/amenities" class="discover-card">
-        <img src="/images/home/discover/amenities.jpg" alt="Amenities & Facilities" />
-        <div class="discover-card-overlay"></div>
-        <span class="discover-card-tag" style="background:#d1fae5;color:#10b981">Campus</span>
-        <div class="discover-card-text"><h3>Amenities &amp; Facilities</h3><p>Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.</p></div>
-      </a>
-      <a href="/student-achievements" class="discover-card">
-        <img src="/images/home/discover/student-achievements.jpg" alt="Student Achievements" />
-        <div class="discover-card-overlay"></div>
-        <span class="discover-card-tag" style="background:#ede9fe;color:#8b5cf6">Excellence</span>
-        <div class="discover-card-text"><h3>Student Achievements</h3><p>Student accomplishments are acknowledged and honored. Here you can view our best achievers.</p></div>
-      </a>
-      <a href="/safety-security" class="discover-card">
-        <img src="/images/home/discover/safety-security.jpg" alt="Safety & Security" />
-        <div class="discover-card-overlay"></div>
-        <span class="discover-card-tag" style="background:#dbeafe;color:#0d3b86">Wellbeing</span>
-        <div class="discover-card-text"><h3>Safety &amp; Security</h3><p>Student safety and well-being is our top priority, safeguarded through stringent modern security measures.</p></div>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- Beyond The Classroom -->
-<section class="beyond">
-  <div class="container">
-    <div class="beyond-inner">
-      <div class="beyond-text">
-        <span class="section-tag" style="background:#fff1f2;color:#dc2626"><span class="dot"></span>Extra Curricular</span>
-        <h2 class="section-title">Beyond The<br/><span style="color:#0d3b86">Classroom</span></h2>
-        <p style="color:#4b5563;font-size:15px;line-height:1.8;margin-bottom:12px">The real aim of education is not only knowledge but also <strong>ACTION.</strong></p>
-        <p style="color:#4b5563;font-size:15px;line-height:1.8;margin-bottom:28px">We provide a rigorous, comprehensive and cohesive learning programme that is designed to meet the social, physical and cultural needs of our entire student community — preparing them for the real world.</p>
-        <div class="beyond-tags">
-          <span class="beyond-tag">Tours &amp; Visits</span>
-          <span class="beyond-tag">Exhibitions</span>
-          <span class="beyond-tag">Subject Clubs</span>
-          <span class="beyond-tag">Promoting Green</span>
-          <span class="beyond-tag">Dignity of Labour</span>
-          <span class="beyond-tag">Arts &amp; Culture</span>
-        </div>
-        <a href="/beyond-the-classroom" class="btn-blue">Know More &rarr;</a>
-      </div>
-      <div class="beyond-img">
-        <div class="beyond-card">
-          <img src="/images/home/beyond-classroom-rocket.jpg" alt="Beyond The Classroom at Rainbow International School" />
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Testimonials -->
-<section class="testimonials">
-  <div class="container">
-    <div class="test-header">
-      <div>
-        <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Testimonials</span>
-        <h2 class="section-title">Parents' Corner</h2>
-        <p style="color:#6b7280;font-size:15px">What parents say about us.</p>
-      </div>
-      <div class="test-rating">
-        <div class="stars">
-          <svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg class="star-svg" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <span class="score">4.8</span>
-        <span style="color:#9ca3af;font-size:14px">&middot; Google Reviews</span>
-      </div>
-    </div>
-    <div class="test-grid">
-      <div class="test-card">
-        <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-        <p class="review">"It's a great educational establishment to entrust your kids to, with an excellent infrastructure and warm-hearted, friendly and cooperative staff."</p>
-        <div class="author">
-          <div class="avatar" style="background:#091a4f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">MD</div>
-          <div><p class="author-name">Mark D'Souza</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
-        </div>
-      </div>
-      <div class="test-card">
-        <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-        <p class="review">"Good school, caring teachers, extremely supportive staff who put in a lot of effort. It's always a partnership between institutions and parents to give the best to children."</p>
-        <div class="author">
-          <div class="avatar" style="background:#0d3b86;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">MR</div>
-          <div><p class="author-name">Mohan Ramaswamy</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
-        </div>
-      </div>
-      <div class="test-card">
-        <svg class="quote-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-        <p class="review">"I will recommend this school. It gave us so much in terms of values and it is very well organized. Teachers communicate wonderfully and the picnic was beyond expectations!"</p>
-        <div class="author">
-          <div class="avatar" style="background:#f59e0b;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px">RV</div>
-          <div><p class="author-name">Ruchi Verma</p><div class="author-stars"><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="star-svg-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Contact Section -->
-<section class="contact-section" id="contact">
-  <div class="container" style="text-align:center">
-    <span class="section-tag" style="background:#eef5ff;color:#0d3b86"><span class="dot"></span>Contact Us</span>
-    <h2 class="section-title">Get In Touch</h2>
-    <p class="section-sub" style="margin:0 auto 48px">Have a question? Reach out and we'll be happy to help.</p>
-  </div>
-  <div class="container">
-    <div class="contact-cards">
-      <a href="tel:+918291568972" class="contact-card" style="background:#fff7ed;border-radius:24px">
-        <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.14 7.74a16 16 0 006.12 6.12l1.12-1.12a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"></path></svg></div>
-        <p class="contact-label">Call Us</p>
-        <p class="contact-val">+91 82915 68972</p>
-      </a>
-      <a href="mailto:admin@rainbowinternationalschool.in" class="contact-card" style="background:#eff6ff;border-radius:24px">
-        <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
-        <p class="contact-label">Email Us</p>
-        <p class="contact-val">admin@rainbow<br/>internationalschool.in</p>
-      </a>
-      <div class="contact-card" style="background:#f0fdf4;border-radius:24px">
-        <div class="contact-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-        <p class="contact-label">Working Hours</p>
-        <p class="contact-val">Monday – Saturday<br/>9:00 AM – 6:00 PM</p>
-      </div>
-      <a href="https://maps.google.com/?q=Rainbow+International+School+Thane" target="_blank" rel="noopener noreferrer" class="contact-card" style="background:#fef2f2;border-radius:24px">
-        <div class="contact-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
-        <p class="contact-label">Our Address</p>
-        <p class="contact-val">Cosmos Arcade, Brahmand Phase 4<br/>Thane, Maharashtra</p>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- Quick Answer + FAQ (AI-SEO block) -->
-<section style="background:#fff;padding:48px 0;border-top:1px solid #eef2f7">
-  <div class="container" style="max-width:880px">
-    <div style="background:#f8faff;border:1px solid #dbe7ff;border-radius:14px;padding:20px 22px;margin-bottom:24px">
-      <p style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#0d3b86;margin-bottom:8px">Quick Answer</p>
-      <p style="color:#1a1a2e;line-height:1.7;font-size:16px">Rainbow International School Thane is a CBSE-affiliated K-12 school in the Brahmand area of Thane, Maharashtra, founded in 2009 with a 3.5-acre campus. We offer KG to Class 12, with Science, Commerce and Humanities streams in Class 11-12, and admissions for the 2027-28 academic year are currently open.</p>
-    </div>
-    <h2 style="font-family:'Merriweather',serif;font-size:26px;font-weight:900;color:#091a4f;margin-bottom:16px">Parent FAQs</h2>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Is Rainbow International School Thane a CBSE school?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi, and follows the CBSE curriculum from KG through Class 12.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Where is Rainbow International School located in Thane?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">The school is on a 3.5-acre campus in the Brahmand area of Thane (Maharashtra), with school-managed transport covering Brahmand, Ghodbunder Road, Manpada and adjoining localities.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Which classes does the school cover?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Rainbow International School Thane is a K-12 school that covers Pre-Primary, Primary (Class 1-5), Secondary (Class 6-10) and Senior Secondary (Class 11-12) with Science, Commerce and Humanities streams.</p></details>
-    <details style="border-bottom:1px solid #e5e7eb;padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">Are admissions open for the 2027-28 academic year?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Yes. CBSE admissions for 2027-28 are open for KG to Class 12, subject to seat availability per class.</p></details>
-    <details style="padding:14px 0"><summary style="font-weight:700;color:#091a4f;cursor:pointer">How can I book a campus visit?</summary><p style="margin-top:10px;color:#374151;line-height:1.7">Parents can book a campus visit through the admission enquiry form on the website or by calling the admission desk during school hours.</p></details>
-  </div>
-</section>
-
-</article>
-</main>
+${renderHomeMain()}
 
 <!-- Footer -->
 <footer role="contentinfo">
   <div class="footer-inner">
     <div>
       <p class="footer-brand">Rainbow International School</p>
-      <p class="footer-desc">CBSE-affiliated school in Thane, Maharashtra. KG to Class 12. Founded April 2009. Affiliation No. 1130661.</p>
+      <p class="footer-desc">${e(HOME_FOOTER_DESCRIPTION)}</p>
       <div class="footer-socials">
         <a href="https://www.facebook.com/RainbowInternationalSchoolThane/" class="footer-social-btn" target="_blank" rel="noopener noreferrer">
           <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg>

@@ -1,58 +1,14 @@
+import { HOME_ACADEMICS } from "@shared/content/home";
 import { Link } from "wouter";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
 const programs = [
-  {
-    label: "Pre-Primary",
-    grade: "Nursery · Jr. KG · Sr. KG",
-    concern: "Starting school is a big milestone.",
-    advantage: "Play-based, activity-led learning in a safe, female-staff-led Nursery wing using the Multiple Intelligence approach.",
-    image: "/images/home/academic/pre-primary.webp",
-    fallback: "/images/home/academic/pre-primary.jpg",
-    href: "/pre-primary-school-thane",
-    accent: "#f59e0b",
-  },
-  {
-    label: "Primary",
-    grade: "Class I – V",
-    concern: "Building the right foundation matters.",
-    advantage: "CBSE-aligned literacy, numeracy, science and creative skills with co-curriculars built into every school day.",
-    image: "/images/home/academic/primary-section.webp",
-    fallback: "/images/home/academic/primary-section.jpg",
-    href: "/primary-section",
-    accent: "#091a4f",
-  },
-  {
-    label: "Middle School",
-    grade: "Class VI – VIII",
-    concern: "The tween years need structure and stimulation.",
-    advantage: "Critical thinking, Olympiad coaching, project-based learning and a rich co-curricular calendar.",
-    image: "/images/home/academic/middle-section.webp",
-    fallback: "/images/home/academic/middle-section.jpg",
-    href: "/middle-school-section",
-    accent: "#0d3b86",
-  },
-  {
-    label: "Secondary",
-    grade: "Class IX – X",
-    concern: "Board prep without burning out.",
-    advantage: "Structured CBSE Class 10 preparation with periodic tests, pre-boards, doubt sessions and career counselling.",
-    image: "/images/home/academic/secondary.webp",
-    fallback: "/images/home/academic/secondary.jpg",
-    href: "/secondary-section",
-    accent: "#091a4f",
-  },
-  {
-    label: "Senior Secondary",
-    grade: "Class XI – XII",
-    concern: "The right stream, the right support.",
-    advantage: "Science, Commerce and Humanities streams with JEE / NEET / CUET prep support and expert faculty.",
-    image: "/images/home/academic/senior-secondary.webp",
-    fallback: "/images/home/academic/senior-secondary.jpg",
-    href: "/senior-secondary-section",
-    accent: "#f59e0b",
-  },
-];
+  { image: "/images/home/academic/pre-primary.webp", fallback: "/images/home/academic/pre-primary.jpg", accent: "#f59e0b" },
+  { image: "/images/home/academic/primary-section.webp", fallback: "/images/home/academic/primary-section.jpg", accent: "#091a4f" },
+  { image: "/images/home/academic/middle-section.webp", fallback: "/images/home/academic/middle-section.jpg", accent: "#0d3b86" },
+  { image: "/images/home/academic/secondary.webp", fallback: "/images/home/academic/secondary.jpg", accent: "#091a4f" },
+  { image: "/images/home/academic/senior-secondary.webp", fallback: "/images/home/academic/senior-secondary.jpg", accent: "#f59e0b" },
+].map((visual, index) => ({ ...visual, ...HOME_ACADEMICS.cards[index] }));
 
 function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
   return (
@@ -90,7 +46,7 @@ function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
             style={{ color: "#091a4f", borderColor: "#091a4f" }}
             data-testid={`link-section-${index}`}
           >
-            Explore <ArrowRight size={12} />
+            {HOME_ACADEMICS.explore} <ArrowRight size={12} />
           </Link>
           <a
             href="/admissions"
@@ -99,7 +55,7 @@ function ProgramCard({ p, index }: { p: typeof programs[0]; index: number }) {
             data-testid={`btn-enquire-grade-${index}`}
           >
             <MessageCircle size={12} />
-            Enquire for this Grade
+            {HOME_ACADEMICS.enquire}
           </a>
         </div>
       </div>
@@ -113,14 +69,14 @@ export function AcademicSections() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Academics</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_ACADEMICS.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3 tracking-tight">
-            Academic Programmes <span style={{ color: "#091a4f" }}>at a Glance</span>
+            {HOME_ACADEMICS.title} <span style={{ color: "#091a4f" }}>{HOME_ACADEMICS.titleAccent}</span>
           </h2>
           <p className="text-gray-500 text-base max-w-md mx-auto">
-            From KG to Class 12 — a complete CBSE learning journey under one roof.
+            {HOME_ACADEMICS.sub}
           </p>
         </div>
 

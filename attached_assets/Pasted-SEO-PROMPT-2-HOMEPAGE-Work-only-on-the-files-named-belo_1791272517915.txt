@@ -1,0 +1,229 @@
+SEO PROMPT 2 — HOMEPAGE ( / )
+
+Work only on the files named below. Do not take or send screenshots. Do not run Lighthouse, Playwright visual tests or test enquiries. Do not publish/deploy. Do not change any layout, class names, colours, spacing, images, icons, animations or component order. Only text, links, metadata and schema change in this prompt.
+
+============================================================
+PART 0 — STANDING RULES (do this first, once)
+============================================================
+Append this block to the END of replit.md exactly as written (do not edit anything else in replit.md):
+
+## SEO WORK RULES (Rainbow International School)
+1. Design freeze: only text, order of text, links, metadata and schema may change unless the owner asks for a redesign. Never change classes, colours, spacing, images, fonts or layout.
+2. Never take or send screenshots. Never run Lighthouse. Never submit test enquiries or create test leads.
+3. Never publish/deploy. The owner publishes.
+4. Verified facts only:
+   - Rainbow International School, Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607
+   - Phone +91 82915 68972 (only number). Email admin@rainbowinternationalschool.in (only email)
+   - Office Mon–Sat 9 am–6 pm. Founded April 2009. CBSE Affiliation No. 1130661, School Code 30562
+   - 2027–28 classes: KG (Jr KG, Sr KG) to Class 12. No Nursery. Class 11–12: Science, Commerce, Humanities
+   - Ages: Jr KG 3.5–4.5, Sr KG 4.5–5.5, Class 1 minimum 6 (6–7), then one-year steps
+   - Timings: KG 9:30 am–12:30 pm; Class 1–10 7:30 am–1:00 pm; Class 11–12 1:00–6:00 pm
+   - Spanish KG to Grade 8. In-house GPS-enabled buses for homes within 10 km
+   - Facilities: 3.5-acre campus, swimming pool, amphitheatre, sports facilities, organic garden, AC classrooms, smart boards, CCTV, Physics/Chemistry/Biology/IT/Maths labs, 100% female staff
+   - 3,000+ students. 100% Class 10 result in 2018-19. No entrance test for KG to Class 8
+   - Fees are never shown on the site: "call or WhatsApp +91 82915 68972"
+5. Banned about RIS: best, top, No. 1, number one, leading, trusted, premier, finest, world-class, guaranteed, "seats filling", "limited seats", "almost full", "hurry". "best" may appear only inside a parent's quoted review or inside a question a parent would type (e.g. "Which is the best CBSE school in Thane for my child?").
+6. Only the 2027–28 admissions year. Never mix RIS with Rainbow Preschool (RPS) content.
+7. Bot/visitor parity: page copy lives in shared/content/<page>.ts and is imported by BOTH the React page and the server SSR renderer. Never type the same sentence twice.
+8. Never touch: /leads, /admin/*, /walkin*, /sales*, /rps-sales*, /marketing*, /alliances*, /overview-27-28, /internal, /mcp, /api/*, CRM code, form submit handlers, analytics event names.
+9. Checks per prompt: `npx tsc --noEmit` and `npm run parity:check` for the changed routes only. Nothing else.
+10. Finish with one git commit and one push. Write a short report to artifacts/reports/.
+
+============================================================
+PART A — ONE COPY SOURCE FOR THE HOMEPAGE
+============================================================
+Create shared/content/home.ts. It holds every visible homepage sentence below (PART C) as exported constants/arrays of plain strings (no JSX, no icons, no colours, no image paths). Suggested exports: HOME_SEO, HOME_HERO, HOME_SEATS, HOME_AWARDS_INTRO, HOME_JOURNEY, HOME_WHY, HOME_ACADEMICS, HOME_PEDAGOGY, HOME_DISCOVER, HOME_NEIGHBOURHOOD, HOME_BEYOND, HOME_TESTIMONIALS, HOME_CONTACT, HOME_QUICK_ANSWER, HOME_FAQS.
+
+Then:
+- These React files must read their text from shared/content/home.ts (keep their icons, colours, images, accents, testids and markup exactly; join by array index):
+  client/src/pages/Home.tsx, client/src/components/home/Hero.tsx, HeroForm.tsx (footnote only), AwardsStrip.tsx (heading block text only), AdmissionJourney.tsx, AboutPreview.tsx, AcademicSections.tsx, Pedagogy.tsx, DiscoverRainbow.tsx, Neighbourhood.tsx, BeyondClassroomSection.tsx, Testimonials.tsx, ContactForm.tsx (intro + thank-you text only).
+- server/ssrHome.ts must build its <title>, meta description, canonical, OG/Twitter tags and ALL body text from the same file (see PART D).
+- server/pageTitles.ts "/" entry and shared/routeSeo.ts ROUTE_SEO["/"] must use HOME_SEO.title / HOME_SEO.description (import them; do not retype).
+- Do NOT touch client/src/components/home/HomeFAQ.tsx (it is not rendered on the homepage).
+
+============================================================
+PART B — HEAD / METADATA
+============================================================
+HOME_SEO.title       = "CBSE School in Thane West | Rainbow International School"
+HOME_SEO.description = "Choosing a CBSE school in Thane? Rainbow International School, Brahmand: KG to Class 12, Spanish KG to Grade 8. Admissions 2027-28: +91 82915 68972."
+HOME_SEO.ogTitle     = "Rainbow International School | CBSE School in Thane West since 2009"
+HOME_SEO.ogDescription = same as description
+HOME_SEO.ogImage     = "https://rainbowinternationalschool.in/opengraph.jpg"   (file already exists in client/public)
+HOME_SEO.canonical   = "https://rainbowinternationalschool.in/"
+HOME_SEO.keywords    = "CBSE school in Thane, CBSE school in Thane West, school in Brahmand Thane, CBSE school near Ghodbunder Road, KG to Class 12 school in Thane"
+
+In Home.tsx:
+- <SEO> uses HOME_SEO values (title, description, keywords, canonical, ogImage). Keep appendSiteName={false}.
+- JSON-LD: use only the builders from shared/orgSchema.ts (the single #organization + #website graph). Remove the inline EducationalOrganization object and the buildFaqPageSchema(HOME_FAQS) entry if they are still there. No FAQPage anywhere.
+- Remove the five <meta itemProp=...> tags and the itemScope / itemType attributes from the <article> (keep the <article> element itself so layout is unchanged).
+In server/ssrHome.ts: same — remove the itemscope/itemtype and <meta itemprop> lines; JSON-LD only from shared/orgSchema.ts; keep the GA4/Ads gtag lines and the google-site-verification meta exactly.
+
+============================================================
+PART C — EXACT HOMEPAGE COPY (put all of this in shared/content/home.ts)
+============================================================
+Use the en dash "–" in year ranges exactly as shown.
+
+--- HERO (Hero.tsx) ---
+badge: "Check Seat Availability 2027–28"
+h1 line 1: "CBSE School"
+h1 line 2 (the existing amber span): "in Thane West"
+h1 line 3 (the existing smaller span): "KG to Class 12"
+(Keep the same <br /> and span structure; only the words change.)
+sub-line: "Admissions Open 2027–28 at Rainbow International School."
+intro: "CBSE-affiliated school in Brahmand, Thane West since 2009: a 3.5-acre campus, swimming pool, science labs and GPS-enabled buses."
+trust chips (num / label):
+  "CBSE" / "Affiliated · #1130661"
+  "Since 2009" / "Established"
+  "3.5 Acres" / "Campus"
+  "3,000+" / "Students"          (replaces "50K+ / Students Impacted")
+buttons: keep "Book a Campus Visit" (/admissions) and "Apply Now" (/application-form)
+quick links (label → href):
+  "Admissions 2027–28" → /admissions
+  "Fee Structure" → /fee-structure
+  "Primary School" → /primary-section          (replaces Pre-Primary)
+  "Senior Secondary" → /senior-secondary-section
+  "CBSE Disclosures" → /cbse-mandatory-public-disclosures
+
+--- SEAT MODAL (Hero.tsx) ---
+The seatData table holds old 2026–27 numbers (incl. Nursery and "Almost Full"). Delete the seatData array and the <table>. Keep the modal box, header row, close button and bottom bar exactly.
+modal title: "Seat Availability — 2027–28"
+modal subtitle: "Rainbow International School, Thane West"
+In place of the table, inside the same scroll area, one paragraph using the existing text styles of the modal (px-6 py-6, text-sm text-gray-700):
+  "Seats for 2027–28 are confirmed class by class by our admissions office. Call or WhatsApp +91 82915 68972 with your child's class (KG to Class 12) to check availability."
+  Make "+91 82915 68972" a tel:+918291568972 link that calls the existing trackCallClick (as ContactForm does).
+bottom bar text: "Admissions office: Mon–Sat, 9 am–6 pm." Keep the "Book a Campus Visit" button.
+
+--- HERO FORM footnote (HeroForm.tsx) ---
+"Mon–Sat · 9 AM–6 PM · No entrance test for KG–Class 8"
+(Grade dropdown must start at Jr. KG — no Nursery. Do not touch the submit handler.)
+
+--- AWARDS STRIP heading block (AwardsStrip.tsx) ---
+eyebrow: "Recognised & Awarded"
+h2: "Welcome To Rainbow" / "International School" (unchanged)
+paragraph: "Our recognitions include the India Today award for Excellence in CBSE Education (2017) and Scoonews Emerging School of the Year, West India (2022). See every award with its year."
+button: "View All Awards" → /awards-achievements (unchanged)
+Do NOT change the logo images or their order in this prompt.
+
+--- ADMISSION JOURNEY (AdmissionJourney.tsx) ---
+eyebrow: "Simple & Transparent"
+h2: "Your Admission Journey at RIS"
+sub: "Five straightforward steps from your first enquiry to your child's first day of school."
+steps (title / desc):
+ 01 "Submit Enquiry" / "Share your basic details through our online form, by calling the admissions desk, or via WhatsApp."
+ 02 "Counsellor Call-Back" / "Our admissions team calls you to understand your child's class, location and requirements."
+ 03 "Campus Visit" / "Visit our 3.5-acre Brahmand campus, meet the team and see the school environment first-hand."
+ 04 "Interaction & Documents" / "No entrance test for KG to Class 8: a friendly interaction and a document review."
+ 05 "Admission Confirmed" / "Complete the fee process, receive your admission confirmation and get onboarding support."
+
+--- WHY CHOOSE US (AboutPreview.tsx) ---
+eyebrow: "Why Choose Us"
+h2: "Why Parents Choose" + existing navy span "Rainbow International School"
+sub: "A school that cares as much about character as it does about academic results — right here in Thane West."
+cards (title / desc):
+ 1 "CBSE Affiliated Curriculum" / "CBSE No. 1130661. Board-recognised curriculum from KG through Class 12, with Spanish from KG to Grade 8."
+ 2 "KG to Class 12 Under One Roof" / "No school switches. One campus, one community for the complete K–12 learning journey."
+ 3 "3.5-Acre Green Campus" / "Swimming pool, amphitheatre, sports facilities, organic garden and science labs on one Brahmand campus."
+ 4 "Strong Academics & Co-curricular Learning" / "AC classrooms with smart boards; Physics, Chemistry, Biology, IT and Maths labs; project-based work."
+ 5 "Safe & Caring Environment" / "CCTV surveillance, a 100% female staff team and the school's own GPS-enabled buses."
+ 6 "Transport & Parent Communication" / "In-house GPS-enabled buses for homes within 10 km. Admissions help on call and WhatsApp."
+stats: "Since 2009"/"Established", "3,000+"/"Students", "3.5 Acres"/"Campus", "CBSE"/"Affiliation #1130661"
+
+--- ACADEMICS (AcademicSections.tsx) ---
+eyebrow "Academics"; h2 "Academic Programmes" + span "at a Glance" (unchanged)
+sub: "From KG to Class 12 — a complete CBSE learning journey under one roof."
+cards (label / grade / concern / advantage / href):
+ "Pre-Primary" / "Jr. KG · Sr. KG" / "Starting school is a big milestone." / "Play-based, activity-led learning with a 100% female staff team, Spanish from KG and a 9:30 am–12:30 pm day." / /pre-primary-school-thane
+ "Primary" / "Class I – V" / "Building the right foundation matters." / "CBSE-aligned literacy, numeracy, science and Spanish, with co-curriculars built into a 7:30 am–1:00 pm day." / /primary-section
+ "Middle School" / "Class VI – VIII" / "The tween years need structure and stimulation." / "Critical thinking, project work, science labs, Spanish up to Grade 8 and a full co-curricular calendar." / /middle-school-section
+ "Secondary" / "Class IX – X" / "Board prep without burning out." / "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018-19." / /secondary-section
+ "Senior Secondary" / "Class XI – XII" / "The right stream, the right support." / "Science, Commerce and Humanities streams in a 1:00–6:00 pm shift, with Physics, Chemistry, Biology, IT and Maths labs." / /senior-secondary-section
+
+--- PEDAGOGY (Pedagogy.tsx) ---
+Move the existing tab text unchanged into HOME_PEDAGOGY (no wording changes).
+
+--- DISCOVER (DiscoverRainbow.tsx) ---
+eyebrow "Life at Rainbow"; h2 "Let's Discover Rainbow!"; sub unchanged.
+cards (title / description / href):
+ "Awards & Accomplishments" / "Awards received since 2017, including India Today (2017), Pride of Bharat (2021) and Scoonews (2022)." / /awards-achievements
+ "Amenities & Facilities" / "Swimming pool, amphitheatre, AC classrooms, smart boards and five labs (Physics, Chemistry, Biology, IT, Maths) on our 3.5-acre campus." / /amenities
+ "Student Achievements" / "Student accomplishments are acknowledged and honoured. See our students' results and achievements here." / /student-achievements
+ "Safety & Security" / "Student safety and well-being come first, with CCTV surveillance and GPS-enabled school buses." / /safety-security
+
+--- NEIGHBOURHOOD (Neighbourhood.tsx) ---
+eyebrow "Location & Access"
+h2: "A CBSE School Close to Home in Thane West"
+sub: "Located in Brahmand, Thane West, Rainbow International School is a short drive from most nearby residential areas — making the daily commute easy for families."
+features (title / desc):
+ "Central Thane Location" / "Situated in Brahmand Phase 4, Thane West, easily reached from nearby Thane neighbourhoods."
+ "In-house School Buses" / "GPS-enabled school buses run by the school for homes within 10 km of the campus."
+ "3.5-Acre Green Campus" / "Open-air play areas, swimming pool, organic garden and amphitheatre — all within the city."
+ "Section-wise Timings" / "KG 9:30 am–12:30 pm, Class 1–10 7:30 am–1:00 pm, Class 11–12 1:00–6:00 pm."
+area list and drive times: unchanged (move into HOME_NEIGHBOURHOOD as-is).
+address line: "Cosmos Arcade, Brahmand Phase 4, Thane West 400607"
+buttons unchanged.
+
+--- BEYOND THE CLASSROOM (BeyondClassroomSection.tsx) ---
+Text unchanged except the small floating badge: label "CBSE school since", value "2009" (replaces "Annual events" / "25+").
+
+--- TESTIMONIALS (Testimonials.tsx) ---
+Move the 8 reviews into HOME_TESTIMONIALS word-for-word (they are parents' own words; do not edit them).
+
+--- CONTACT (ContactForm.tsx) ---
+Intro paragraph unchanged. Thank-you text: "We've received your request. Our admissions team will contact you during office hours (Mon–Sat, 9 am–6 pm)." (replaces "within 24 hours"). Do not touch the form logic.
+
+--- QUICK ANSWER + FAQs (Home.tsx → WaveOneSeoBlock, visible text only, NO FAQPage schema) ---
+HOME_QUICK_ANSWER:
+"Rainbow International School is a CBSE-affiliated school (No. 1130661) in Brahmand, Thane West, founded in 2009 on a 3.5-acre campus. It teaches KG to Class 12, with Spanish from KG to Grade 8, Science, Commerce and Humanities in Classes 11–12, and its own GPS-enabled buses for homes within 10 km. Admissions for 2027–28 are open: call or WhatsApp +91 82915 68972."
+
+HOME_FAQS (q / a), in this order:
+1 "Is Rainbow International School a CBSE school in Thane?" / "Yes. Rainbow International School is affiliated to CBSE, New Delhi (Affiliation No. 1130661, School Code 30562) and has taught in Brahmand, Thane West since 2009."
+2 "Which is the best CBSE school in Thane for my child?" / "It depends on what your family needs. Compare schools on: the CBSE affiliation number (check it on the CBSE SARAS portal), distance and bus cover from your home, timings for your child's class, the streams offered in Classes 11–12, the facilities you see on a campus visit, and fees confirmed in writing. At Rainbow International School you can check all of these in one visit: Affiliation No. 1130661, buses within 10 km and three streams in Classes 11–12."
+3 "Which classes are admissions open for in 2027–28?" / "Admissions for 2027–28 are open from KG (Jr KG and Sr KG) to Class 12, subject to seat availability in each class."
+4 "What is the age criteria for admission?" / "Jr KG: 3.5 to 4.5 years. Sr KG: 4.5 to 5.5 years. Class 1: minimum 6 years (6 to 7 years). Later classes follow in one-year steps, as per CBSE norms."
+5 "Is there an entrance test?" / "There is no entrance test for KG to Class 8: children have a friendly interaction and documents are reviewed. For Class 9 and above, the admissions office explains the process for your child's class."
+6 "What are the school timings?" / "KG: 9:30 am to 12:30 pm. Class 1 to 10: 7:30 am to 1:00 pm. Class 11 and 12: 1:00 pm to 6:00 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+7 "Is school transport available?" / "Yes. The school runs its own GPS-enabled buses for homes within 10 km of the Brahmand campus, including Ghodbunder Road, Manpada, Hiranandani Estate and Kolshet."
+8 "Which streams are offered in Class 11 and 12?" / "Science, Commerce and Humanities, in an afternoon shift from 1:00 pm to 6:00 pm."
+9 "Does the school teach Spanish?" / "Yes. Spanish is taught from KG to Grade 8."
+10 "What are the fees?" / "Fees are not published online. Call or WhatsApp the admissions team on +91 82915 68972 for the fee for your child's class."
+11 "How can parents book a campus visit?" / "Fill in the enquiry form on this page, or call or WhatsApp +91 82915 68972. The office is open Monday to Saturday, 9 am to 6 pm."
+12 "Where is the school?" / "Cosmos Arcade, Brahmand Phase 4, Thane West, Maharashtra 400607."
+
+--- FOOTER (client/src/components/layout/Footer.tsx + the SSR footer) ---
+Restore the tagline sentence that was skipped in Prompt 1, reworded (same length, same element, same classes):
+"A CBSE school in Brahmand, Thane West — where every child dares to dream and becomes a lifelong learner."
+
+============================================================
+PART D — BOT HTML (server/ssrHome.ts)
+============================================================
+Rewrite only the <main> content and footer text of renderHomeSSR() (keep <head> scripts, CSS block, header/nav markup and registerHomeSSR as they are). Build every string from shared/content/home.ts, HTML-escaped with the existing e() helper. Sections in the SAME order as the visitor page:
+ 1 Hero: badge text, the H1 as `<h1>CBSE School<br/><span class="gold">in Thane West</span><br/><span>KG to Class 12</span></h1>` (exactly one <h1> on the page), sub-line, intro, 4 trust chips, links "Book a Campus Visit" (/admissions) and "Apply Now" (/application-form), the 5 quick links.
+ 2 Awards intro: h2, paragraph, link "View All Awards" → /awards-achievements.
+ 3 Admission journey: h2, sub, 5 steps (h3 + p).
+ 4 Why choose us: h2, sub, 6 cards (h3 + p), 4 stats.
+ 5 Academics: h2, sub, 5 cards (h3 label, grade, concern, advantage, link to its href).
+ 6 Pedagogy: h2, the 4 tab titles + descriptions; the bullet points only for the FIRST tab (same as what a visitor sees by default).
+ 7 Discover: h2, sub, 4 cards (h3 + p + link).
+ 8 Neighbourhood: h2, sub, 4 features, the area list with drive times, address, links /amenities, /admissions, Google Maps.
+ 9 Beyond the classroom: h2, both paragraphs, 6 activity chips, link /beyond-the-classroom.
+ 10 Testimonials: h2 "What Parents Say About RIS" and the FIRST 3 reviews only (same as the visitor's first view).
+ 11 Contact: h2 "Book a Campus Tour", intro paragraph with ONE tel:+918291568972 link, address, admin@rainbowinternationalschool.in.
+ 12 Quick answer + 12 FAQs, each FAQ as <details><summary>q</summary><p>a</p></details> (same as visitor).
+Delete the old hard-coded hero/sections/"Parent FAQs" block that is no longer used. The page must contain no "Nursery", no "2026–27", no "info@", no "022", no "30+ routes", no "50K+".
+
+============================================================
+PART E — PARITY CHECKER FIX (scripts/parity-check.mjs)
+============================================================
+The visitor word count is too low because sections below the fold load lazily. Before counting visitor words, scroll the page to the bottom in steps of 800 px with a 150 ms pause per step, then wait 1000 ms, then scroll back to top. Count words from document.body.innerText for both bot and visitor.
+Add rule: bot words must be between 90% and 130% of visitor words (WARN outside, not FAIL).
+Add rule (report only): list any banned word from replit.md rule 5 found in bot or visitor text, ignoring text inside the testimonials section and the exact question "Which is the best CBSE school in Thane for my child?".
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 `npx tsc --noEmit` — must pass.
+2 `npm run parity:check -- /` (or the script's way to check one route) — title, description, canonical and H1 must match bot vs visitor; bot/visitor words within 90–130%; one tel number; admin@ only; no FAQPage.
+3 Do not check other routes, do not run other tests, do not take screenshots.
+4 `git add -A && git commit -m "SEO P2: homepage copy, metadata and bot parity from shared/content/home.ts"` then `git push` once. If push fails, stop and say so — do not retry or change git settings.
+5 Write artifacts/reports/seo-p2-home-report.txt with: files changed; the final title, description and H1; bot words vs visitor words; the banned-word list result; anything you could not do.
+Reply with just that report text. Do not publish.

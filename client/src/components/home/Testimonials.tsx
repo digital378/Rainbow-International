@@ -1,56 +1,8 @@
+import { HOME_TESTIMONIALS } from "@shared/content/home";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Star, Quote, MessageCircle } from "lucide-react";
 
-const testimonials = [
-  {
-    name: "Mark D'Souza",
-    location: "Parent · Rainbow International School",
-    review: "It's a great educational establishment to entrust your kids to, with an excellent infrastructure and warm-hearted, friendly and cooperative staff. I will recommend Rainbow International School for your kids.",
-    initials: "MD",
-  },
-  {
-    name: "Mohan Ramaswamy",
-    location: "Parent · Rainbow International School",
-    review: "Good school, caring teachers, extremely supportive staff who put in a lot of effort. It's always a partnership between institutions and parents to give the best to children, and it has worked well for us. Keep up the good work!",
-    initials: "MR",
-  },
-  {
-    name: "Ruchi Verma",
-    location: "Parent · Rainbow International School",
-    review: "I will recommend this school. It gave us so much in terms of values and it is very well organized. Teachers communicate wonderfully and the picnic was beyond expectations — so well organized!",
-    initials: "RV",
-  },
-  {
-    name: "Ratish Pradhan",
-    location: "Parent · Rainbow International School",
-    review: "We are very happy with the school, authorities and the management. Teachers are nice and ensure all kids get the required attention. Extracurricular activities are also well looked after.",
-    initials: "RP",
-  },
-  {
-    name: "Alok Srivastava",
-    location: "Parent · Rainbow International School",
-    review: "A progressive school with very supportive management. Teachers and support staff are very cooperative. Most importantly, if there are any issues, the school always puts forward an issue-resolving approach.",
-    initials: "AS",
-  },
-  {
-    name: "Anuja Pradhan",
-    location: "Parent · Rainbow International School",
-    review: "Highly recommended. Most lively atmosphere. The warmth makes every child comfortable. Practical activities, great hygiene — undoubtedly the best school in Thane.",
-    initials: "AP",
-  },
-  {
-    name: "Surabhi Trivedi",
-    location: "Parent · Rainbow International School",
-    review: "Feeling privileged to share my view. Just one word — Fantastic! The teachers are professional, caring and well organized. Infrastructure is outstanding. Children grow intellectually and in co-curricular activities.",
-    initials: "ST",
-  },
-  {
-    name: "Dhaval Lodaya",
-    location: "Parent · Rainbow International School",
-    review: "I would highly recommend Rainbow International School without hesitation. RIS gave my child a stellar foundation and a nurturing environment that made the school an extension of our family.",
-    initials: "DL",
-  },
-];
+const testimonials = HOME_TESTIMONIALS.reviews;
 
 const colors = ["#091a4f", "#0d3b86", "#f59e0b", "#1550b8", "#d97706", "#164e63", "#7c3aed", "#059669"];
 
@@ -66,18 +18,18 @@ export function Testimonials() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
           <div>
             <div className="inline-block mb-4">
-              <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Parents' Corner</span>
+              <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_TESTIMONIALS.eyebrow}</span>
               <div className="w-8 h-0.5 bg-amber-400 mt-2" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">What Parents Say About RIS</h2>
-            <p className="text-gray-500 text-[15px]">Authentic voices from our school community.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-1 tracking-tight">{HOME_TESTIMONIALS.title}</h2>
+            <p className="text-gray-500 text-[15px]">{HOME_TESTIMONIALS.sub}</p>
           </div>
           <div className="flex items-center gap-3 bg-white px-5 py-3 border border-gray-100 shadow-sm rounded-full">
             <div className="flex">
               {[1,2,3,4,5].map((s) => <Star key={s} size={15} className="fill-amber-400 text-amber-400" />)}
             </div>
-            <span className="font-extrabold text-gray-900 text-lg">4.8</span>
-            <span className="text-gray-400 text-sm">· Google Reviews</span>
+            <span className="font-extrabold text-gray-900 text-lg">{HOME_TESTIMONIALS.rating}</span>
+            <span className="text-gray-400 text-sm">{HOME_TESTIMONIALS.ratingLabel}</span>
           </div>
         </div>
 
@@ -159,7 +111,7 @@ export function Testimonials() {
             data-testid="btn-speak-counsellor"
           >
             <MessageCircle size={16} />
-            Speak to an Admissions Counsellor
+            {HOME_TESTIMONIALS.button.label}
           </a>
         </div>
       </div>

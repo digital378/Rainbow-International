@@ -1,64 +1,13 @@
+import { HOME_PEDAGOGY } from "@shared/content/home";
 import { Monitor, Music, Heart, Leaf, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
 const tabs = [
-  {
-    id: "tech",
-    label: "Technology",
-    icon: Monitor,
-    title: "Technology in Every Classroom",
-    description: "E-learning tools for enhanced learning, memory, and future-readiness.",
-    points: [
-      "Smart boards in every classroom",
-      "Digital and e-learning resources",
-      "Technology-aided CBSE curriculum",
-      "Enhanced memory and retention tools",
-    ],
-    accent: "#091a4f",
-  },
-  {
-    id: "extra",
-    label: "Extracurricular",
-    icon: Music,
-    title: "Rich Extracurricular Life",
-    description: "Annual cultural activities, clubs, exhibitions, music, art, organic farming and much more.",
-    points: [
-      "Annual cultural and sports events",
-      "Subject clubs and exhibitions",
-      "Music, art & creative programmes",
-      "Organic farming and eco projects",
-    ],
-    accent: "#f59e0b",
-  },
-  {
-    id: "personality",
-    label: "Personality",
-    icon: Heart,
-    title: "Personality Development",
-    description: "Being mindful of etiquette, teamwork, and self-confidence every single day.",
-    points: [
-      "Etiquette and social skills training",
-      "Collaborative team-building projects",
-      "Public speaking & self-confidence",
-      "Leadership & responsibility",
-    ],
-    accent: "#091a4f",
-  },
-  {
-    id: "sensitivity",
-    label: "Sensitivity",
-    icon: Leaf,
-    title: "Philosophy of Sensitivity",
-    description: "Incorporating social and environmental awareness into daily learning.",
-    points: [
-      "Social awareness programmes",
-      "Environmental responsibility",
-      "Empathy and compassion building",
-      "Anti-bullying and inclusion initiatives",
-    ],
-    accent: "#f59e0b",
-  },
-];
+  { id: "tech", icon: Monitor, accent: "#091a4f" },
+  { id: "extra", icon: Music, accent: "#f59e0b" },
+  { id: "personality", icon: Heart, accent: "#091a4f" },
+  { id: "sensitivity", icon: Leaf, accent: "#f59e0b" },
+].map((visual, index) => ({ ...visual, ...HOME_PEDAGOGY.tabs[index] }));
 
 export function Pedagogy() {
   const [active, setActive] = useState("tech");
@@ -69,12 +18,12 @@ export function Pedagogy() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Our Methodology</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_PEDAGOGY.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">Our Pedagogy</h2>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">{HOME_PEDAGOGY.title}</h2>
           <p className="text-gray-500 text-base max-w-md mx-auto">
-            Guiding light for achieving milestones in an evolving world.
+            {HOME_PEDAGOGY.sub}
           </p>
         </div>
 

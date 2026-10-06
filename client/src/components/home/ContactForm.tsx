@@ -1,3 +1,4 @@
+import { HOME_CONTACT } from "@shared/content/home";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -93,7 +94,7 @@ export function ContactForm() {
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight">Book a Campus Tour</h2>
             <p className="text-blue-200/80 text-sm leading-relaxed max-w-xl mx-auto">
-              <strong className="text-white">We'd love to welcome you to Rainbow International School!</strong> Please call us at <a href="tel:+918291568972" className="text-amber-400 font-semibold hover:underline">+91 82915 68972</a> to schedule your visit before arriving on campus. Alternatively, fill the form below and our Admission Counsellor will connect with you to arrange a tour.
+              <strong className="text-white">{HOME_CONTACT.introBeforeBreak}</strong> {HOME_CONTACT.introBeforePhone} <a href="tel:+918291568972" className="text-amber-400 font-semibold hover:underline">{HOME_CONTACT.phone}</a> {HOME_CONTACT.introAfterPhone}
             </p>
           </div>
 
@@ -104,7 +105,7 @@ export function ContactForm() {
                   <CheckCircle size={40} className="text-green-400" />
                 </div>
                 <h3 className="text-2xl font-extrabold text-white mb-2">Thank You!</h3>
-                <p className="text-blue-200/80 text-sm mb-8 max-w-sm">We've received your request and will contact you within 24 hours.</p>
+                <p className="text-blue-200/80 text-sm mb-8 max-w-sm">{HOME_CONTACT.thankYou}</p>
                 <button
                   onClick={() => setSubmitted(false)}
                   data-testid="button-contact-another-request"

@@ -1,3 +1,4 @@
+import { HOME_FOOTER_DESCRIPTION } from "@shared/content/home";
 import { Facebook, Instagram, Youtube, MapPin, Phone, Mail, Navigation } from "lucide-react";
 import { Link } from "wouter";
 import { trackCallClick, trackDirectionsClick } from "@/lib/analytics";
@@ -140,7 +141,7 @@ export function Footer() {
                 <strong className="text-white/80">CBSE School in Thane West · KG to Class 12</strong>
               </p>
               <p className="text-white/50 leading-relaxed text-sm mb-8">
-                One of the top CBSE schools in Thane — where every child dares to dream and becomes a lifelong learner.
+                {HOME_FOOTER_DESCRIPTION}
               </p>
               <p className="text-white/40 text-xs mb-3 font-semibold uppercase tracking-wider">Follow Us</p>
               <div className="flex gap-3">

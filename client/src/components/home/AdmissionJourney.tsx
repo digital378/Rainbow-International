@@ -1,12 +1,13 @@
+import { HOME_JOURNEY } from "@shared/content/home";
 import { ClipboardList, Phone, MapPin, UserCheck, BadgeCheck, ArrowRight } from "lucide-react";
 
 const steps = [
-  { icon: ClipboardList, step: "01", title: "Submit Enquiry",             desc: "Share your basic details through our online form, by calling the admissions desk, or via WhatsApp.", bg: "#0d3b86" },
-  { icon: Phone,         step: "02", title: "Counsellor Call-Back",       desc: "Our admissions team calls you to understand your child's grade, location and requirements.",             bg: "#f59e0b" },
-  { icon: MapPin,        step: "03", title: "Campus Visit",               desc: "Visit our 3.5-acre Brahmand campus, meet the team and experience the school environment first-hand.",    bg: "#0d3b86" },
-  { icon: UserCheck,     step: "04", title: "Interaction & Documents",    desc: "A friendly student interaction or document review is completed as per the grade requirement.",            bg: "#f59e0b" },
-  { icon: BadgeCheck,    step: "05", title: "Admission Confirmed",        desc: "Complete the fee process, receive your admission confirmation and get full onboarding support.",          bg: "#0d3b86" },
-];
+  { icon: ClipboardList, bg: "#0d3b86" },
+  { icon: Phone, bg: "#f59e0b" },
+  { icon: MapPin, bg: "#0d3b86" },
+  { icon: UserCheck, bg: "#f59e0b" },
+  { icon: BadgeCheck, bg: "#0d3b86" },
+].map((visual, index) => ({ ...visual, ...HOME_JOURNEY.steps[index] }));
 
 export function AdmissionJourney() {
   return (
@@ -14,13 +15,13 @@ export function AdmissionJourney() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Simple & Transparent</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_JOURNEY.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3 tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Your Admission Journey at RIS
+            {HOME_JOURNEY.title}
           </h2>
-          <p className="text-gray-500 text-base max-w-md mx-auto">Five straightforward steps from your first enquiry to your child's first day of school.</p>
+          <p className="text-gray-500 text-base max-w-md mx-auto">{HOME_JOURNEY.sub}</p>
         </div>
 
         {/* Desktop horizontal timeline */}
@@ -35,7 +36,7 @@ export function AdmissionJourney() {
                 <div className="relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center shadow-md mb-4 flex-shrink-0" style={{ background: s.bg }}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-                <span className="text-[10px] font-black text-amber-500 tracking-widest uppercase mb-1">Step {s.step}</span>
+                <span className="text-[10px] font-black text-amber-500 tracking-widest uppercase mb-1">{HOME_JOURNEY.stepLabel} {s.step}</span>
                 <h3 className="font-extrabold text-gray-900 text-sm mb-2 leading-snug">{s.title}</h3>
                 <p className="text-gray-500 text-xs leading-relaxed">{s.desc}</p>
               </div>
@@ -56,7 +57,7 @@ export function AdmissionJourney() {
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <div className="pt-1">
-                  <span className="text-[10px] font-black text-amber-500 tracking-widest uppercase">Step {s.step}</span>
+                  <span className="text-[10px] font-black text-amber-500 tracking-widest uppercase">{HOME_JOURNEY.stepLabel} {s.step}</span>
                   <h3 className="font-extrabold text-gray-900 text-sm mt-0.5 mb-1">{s.title}</h3>
                   <p className="text-gray-500 text-xs leading-relaxed">{s.desc}</p>
                 </div>
@@ -72,7 +73,7 @@ export function AdmissionJourney() {
             style={{ background: "#fbbf24", borderRadius: "9999px" }}
             data-testid="btn-journey-book-visit"
           >
-            Book a Campus Visit
+            {HOME_JOURNEY.visit.label}
             <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
           </a>
         </div>

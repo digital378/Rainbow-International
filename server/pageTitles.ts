@@ -1,3 +1,4 @@
+import { HOME_SEO } from "@shared/content/home";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { blogPostsTable } from "@shared/schema";
@@ -19,7 +20,7 @@ export async function resolveBlogTitle(slug: string): Promise<string | null> {
 }
 
 const PAGE_TITLES: Record<string, string> = {
-  "/": "Best CBSE School in Thane | Nursery to Class 12",
+  "/": HOME_SEO.title,
   "/about-rainbow-international-school": "About Us | Rainbow International School Thane",
   "/welcome-to-ris": "Welcome to Rainbow International School",
   "/chairpersons-note": "Chairperson's Note | Rainbow International School",
@@ -180,10 +181,11 @@ export function injectSeoHead(html: string, reqPath: string, overrideTitle?: str
   let out = html;
   if (title) {
     const safe = escHtml(title);
+    const socialTitle = escHtml(basePath === "/" ? HOME_SEO.ogTitle : title);
     out = out
       .replace(/<title>[^<]*<\/title>/, `<title>${safe}</title>`)
-      .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/,  `$1${safe}$2`)
-      .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,  `$1${safe}$2`);
+      .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/,  `$1${socialTitle}$2`)
+      .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/,  `$1${socialTitle}$2`);
   }
 
   // These routes are intentionally not indexable, including routes that do
@@ -211,6 +213,13 @@ export function injectSeoHead(html: string, reqPath: string, overrideTitle?: str
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${desc}$2`)
     .replace(/(<meta\s+property="og:description"\s+content=")[^"]*(")/, `$1${desc}$2`)
     .replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, `$1${desc}$2`);
+
+  if (basePath === "/") {
+    out = out
+      .replace(/(<meta\s+name="keywords"\s+content=")[^"]*(")/, `$1${escHtml(HOME_SEO.keywords)}$2`)
+      .replace(/(<meta\s+property="og:image"\s+content=")[^"]*(")/, `$1${escHtml(HOME_SEO.ogImage)}$2`)
+      .replace(/(<meta\s+name="twitter:image"\s+content=")[^"]*(")/, `$1${escHtml(HOME_SEO.ogImage)}$2`);
+  }
 
   // Canonical + JSON-LD go in just before </head>. index.html ships no
   // canonical link at all, so this is an insert, not a replace.

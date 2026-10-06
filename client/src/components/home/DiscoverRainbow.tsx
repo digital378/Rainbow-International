@@ -1,40 +1,13 @@
+import { HOME_DISCOVER } from "@shared/content/home";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
 const highlights = [
-  {
-    title: "Awards & Accomplishments",
-    description: "Accolades earned for being one of the best and most promising international schools in Thane for over a decade.",
-    image: "/images/home/discover/awards.webp",
-    fallback: "/images/home/discover/awards.jpg",
-    href: "/awards-achievements",
-    tag: "Recognition",
-  },
-  {
-    title: "Amenities & Facilities",
-    description: "Globally recognised resources and state-of-the-art facilities on our beautiful 3.5-acre campus.",
-    image: "/images/home/discover/amenities.webp",
-    fallback: "/images/home/discover/amenities.jpg",
-    href: "/amenities",
-    tag: "Campus",
-  },
-  {
-    title: "Student Achievements",
-    description: "Student accomplishments are acknowledged and honored. Here you can view our best achievers.",
-    image: "/images/home/discover/student-achievements.webp",
-    fallback: "/images/home/discover/student-achievements.jpg",
-    href: "/student-achievements",
-    tag: "Excellence",
-  },
-  {
-    title: "Safety & Security",
-    description: "Student safety and well-being is our top priority, safeguarded through stringent modern security measures.",
-    image: "/images/home/discover/safety-security.webp",
-    fallback: "/images/home/discover/safety-security.jpg",
-    href: "/safety-security",
-    tag: "Wellbeing",
-  },
-];
+  { image: "/images/home/discover/awards.webp", fallback: "/images/home/discover/awards.jpg" },
+  { image: "/images/home/discover/amenities.webp", fallback: "/images/home/discover/amenities.jpg" },
+  { image: "/images/home/discover/student-achievements.webp", fallback: "/images/home/discover/student-achievements.jpg" },
+  { image: "/images/home/discover/safety-security.webp", fallback: "/images/home/discover/safety-security.jpg" },
+].map((visual, index) => ({ ...visual, ...HOME_DISCOVER.cards[index] }));
 
 export function DiscoverRainbow() {
   return (
@@ -42,14 +15,14 @@ export function DiscoverRainbow() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Life at Rainbow</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_DISCOVER.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4 tracking-tight">
-            Let's Discover Rainbow!
+            {HOME_DISCOVER.title}
           </h2>
           <p className="text-gray-500 text-base max-w-xl mx-auto">
-            Committed to educating, strengthening, and nurturing every student — and empowering lifelong learners.
+            {HOME_DISCOVER.sub}
           </p>
         </div>
 

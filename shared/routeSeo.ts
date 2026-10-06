@@ -11,9 +11,12 @@
  *   - crumb is the short name used in the BreadcrumbList JSON-LD
  */
 
+import { HOME_SEO } from "./content/home";
+
 import { buildOrgNode } from "./orgSchema";
 
 export interface RouteSeo {
+  title?: string;
   description: string;
   crumb: string;
 }
@@ -26,8 +29,8 @@ export function routeCanonical(basePath: string): string {
 
 export const ROUTE_SEO: Record<string, RouteSeo> = {
   "/": {
-    description:
-      "Rainbow International School is a CBSE school in Thane for KG to Class 12 with academics, sports, safety, transport and holistic learning.",
+    title: HOME_SEO.title,
+    description: HOME_SEO.description,
     crumb: "Home",
   },
   "/about-rainbow-international-school": {

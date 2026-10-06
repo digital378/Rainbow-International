@@ -1,3 +1,4 @@
+import { HOME_AWARDS_INTRO } from "@shared/content/home";
 import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
@@ -71,15 +72,15 @@ export function AwardsStrip() {
 
           <div className="flex-1 text-center lg:text-left order-2 max-w-xl">
             <div className="inline-block mb-5">
-              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">Recognised & Awarded</span>
+              <span className="text-amber-400 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_AWARDS_INTRO.eyebrow}</span>
               <div className="w-8 h-0.5 bg-amber-400 mt-2 mx-auto lg:mx-0" />
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-[42px] font-extrabold text-white leading-tight mb-5 tracking-tight">
-              Welcome To Rainbow<br />
-              <span className="text-amber-400">International School</span>
+              {HOME_AWARDS_INTRO.titleParts[0]}<br />
+              <span className="text-amber-400">{HOME_AWARDS_INTRO.titleParts[1]}</span>
             </h2>
             <p className="text-blue-200/80 text-[15px] leading-[1.8] max-w-lg mb-8 mx-auto lg:mx-0">
-              Recognised and awarded by leading education platforms across India, Rainbow International School continues to set benchmarks in academic excellence, holistic development, and preparing students for success in an evolving world.
+              {HOME_AWARDS_INTRO.paragraph}
             </p>
             <Link
               href="/awards-achievements"
@@ -87,7 +88,7 @@ export function AwardsStrip() {
               style={{ background: "#fbbf24", borderRadius: "9999px" }}
               data-testid="button-awards-cta"
             >
-              View All Awards
+              {HOME_AWARDS_INTRO.button.label}
               <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>

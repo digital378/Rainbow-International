@@ -1,38 +1,14 @@
+import { HOME_HERO, HOME_SEATS } from "@shared/content/home";
 import { useState, lazy, Suspense } from "react";
 import { Link } from "wouter";
 import { ChevronRight, X, CalendarCheck } from "lucide-react";
+import { trackCallClick } from "@/lib/analytics";
 
 const HeroForm = lazy(() => import("./HeroForm").then(m => ({ default: m.HeroForm })));
 
-const seatData = [
-  { grade: "Nursery",        seats: 7,  status: "Available"   },
-  { grade: "Jr. KG",         seats: 3,  status: "Almost Full" },
-  { grade: "Sr. KG",         seats: 2,  status: "Almost Full" },
-  { grade: "I",              seats: 1,  status: "Almost Full" },
-  { grade: "II",             seats: 2,  status: "Almost Full" },
-  { grade: "III",            seats: 3,  status: "Almost Full" },
-  { grade: "IV",             seats: 1,  status: "Almost Full" },
-  { grade: "V",              seats: 1,  status: "Almost Full" },
-  { grade: "VI",             seats: 3,  status: "Almost Full" },
-  { grade: "VII",            seats: 1,  status: "Almost Full" },
-  { grade: "VIII",           seats: 0,  status: "Closed"      },
-  { grade: "IX",             seats: 0,  status: "Closed"      },
-  { grade: "X",              seats: 0,  status: "Closed"      },
-  { grade: "XI Science",     seats: 47, status: "Available"   },
-  { grade: "XI Commerce",    seats: 7,  status: "Almost Full" },
-  { grade: "XI Humanities",  seats: 9,  status: "Almost Full" },
-  { grade: "XII Science",    seats: 1,  status: "Almost Full" },
-  { grade: "XII Commerce",   seats: 3,  status: "Almost Full" },
-  { grade: "XII Humanities", seats: 2,  status: "Almost Full" },
-];
 
-const quickLinks = [
-  { label: "Admissions 2027–28",  href: "/admissions"                       },
-  { label: "Fee Structure",        href: "/fee-structure"                    },
-  { label: "Pre-Primary",          href: "/pre-primary-school-thane"         },
-  { label: "Senior Secondary",     href: "/senior-secondary-section"         },
-  { label: "CBSE Disclosures",     href: "/cbse-mandatory-public-disclosures"},
-];
+
+const quickLinks = HOME_HERO.quickLinks;
 
 export function Hero() {
   const [showSeats, setShowSeats] = useState(false);
@@ -68,31 +44,26 @@ export function Hero() {
               <span className="relative flex h-2.5 w-2.5">
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]" />
               </span>
-              <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">Check Seat Availability 2027–28</span>
+              <span className="text-amber-300 text-[11px] font-semibold tracking-[0.14em] uppercase">{HOME_HERO.badge}</span>
               <ChevronRight size={14} className="text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </button>
 
             <h1 className="text-4xl md:text-5xl xl:text-6xl font-extrabold leading-[1.08] text-white mb-4 tracking-tight">
-              Best CBSE School{" "}<br />
-              <span className="text-amber-400">in Thane</span>{" "}<br />
-              <span className="text-3xl md:text-4xl xl:text-5xl">KG to Class 12</span>
+              {HOME_HERO.titleLines[0]}{" "}<br />
+              <span className="text-amber-400">{HOME_HERO.titleLines[1]}</span>{" "}<br />
+              <span className="text-3xl md:text-4xl xl:text-5xl">{HOME_HERO.titleLines[2]}</span>
             </h1>
 
             <p className="text-blue-100 text-base md:text-lg font-semibold mb-2">
-              Admissions Open 2027–28 at Rainbow International School.
+              {HOME_HERO.subLine}
             </p>
             <p className="text-blue-200/70 text-sm md:text-base leading-relaxed max-w-lg font-light mb-8">
-              A CBSE-affiliated K–12 school with a 3.5-acre campus, strong academics, sports, safety, transport, and holistic learning.
+              {HOME_HERO.intro}
             </p>
 
             {/* Trust chips */}
             <div className="flex flex-wrap gap-3 mb-8">
-              {[
-                { num: "CBSE",       label: "Affiliated · #1130661" },
-                { num: "Since 2009", label: "Established"           },
-                { num: "3.5 Acres",  label: "Campus"                },
-                { num: "50K+",       label: "Students Impacted"     },
-              ].map((s, i) => (
+              {HOME_HERO.trustChips.map((s, i) => (
                 <div key={i} className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 text-center">
                   <div className="text-amber-400 text-sm font-extrabold leading-none mb-1">{s.num}</div>
                   <div className="text-blue-200/60 text-[10px] font-medium tracking-wide uppercase">{s.label}</div>
@@ -103,20 +74,20 @@ export function Hero() {
             {/* Desktop CTAs */}
             <div className="flex flex-wrap gap-3 mb-8">
               <a
-                href="/admissions"
+                href={HOME_HERO.buttons[0].href}
                 data-testid="btn-hero-book-visit"
                 className="inline-flex items-center gap-2 px-7 py-3.5 font-bold text-sm text-[#091a4f] rounded-full transition-all hover:shadow-lg hover:scale-[1.02]"
                 style={{ background: "#fbbf24" }}
               >
                 <CalendarCheck size={16} />
-                Book a Campus Visit
+                {HOME_HERO.buttons[0].label}
               </a>
               <Link
-                href="/application-form"
+                href={HOME_HERO.buttons[1].href}
                 data-testid="btn-hero-apply"
                 className="inline-flex items-center gap-2 px-7 py-3.5 font-bold text-sm border-2 border-white/30 text-white rounded-full hover:bg-white/10 transition-all"
               >
-                Apply Now <ChevronRight size={15} />
+                {HOME_HERO.buttons[1].label} <ChevronRight size={15} />
               </Link>
             </div>
 
@@ -150,53 +121,28 @@ export function Hero() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
-                <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>Seat Availability — AY 2027–28</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Rainbow International School, Thane</p>
+                <h2 className="text-lg font-extrabold text-gray-900" style={{ fontFamily: "'DM Sans', sans-serif" }}>{HOME_SEATS.title}</h2>
+                <p className="text-xs text-gray-500 mt-0.5">{HOME_SEATS.subtitle}</p>
               </div>
               <button onClick={() => setShowSeats(false)} data-testid="button-close-seats" className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
                 <X size={16} className="text-gray-500" />
               </button>
             </div>
             <div className="overflow-y-auto flex-1">
-              <table className="w-full text-sm" data-testid="table-seats">
-                <thead>
-                  <tr style={{ background: "#091a4f" }}>
-                    <th className="text-left px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Grade</th>
-                    <th className="text-center px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Seats Available</th>
-                    <th className="text-center px-6 py-3 text-white font-semibold text-xs uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {seatData.map((row, i) => (
-                    <tr key={i} className={`border-b border-gray-100 ${row.status === "Closed" ? "bg-gray-50" : "hover:bg-blue-50/30"}`}>
-                      <td className={`px-6 py-3 font-medium ${row.status === "Closed" ? "text-red-500" : "text-gray-800"}`}>{row.grade}</td>
-                      <td className="px-6 py-3 text-center font-bold text-gray-700">{row.seats}</td>
-                      <td className="px-6 py-3 text-center">
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-bold"
-                          style={
-                            row.status === "Available"   ? { background: "#dcfce7", color: "#16a34a" } :
-                            row.status === "Almost Full" ? { background: "#fff7ed", color: "#ea580c" } :
-                                                           { background: "#fee2e2", color: "#dc2626" }
-                          }
-                        >
-                          {row.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <p className="px-6 py-6 text-sm text-gray-700">
+                {HOME_SEATS.beforePhone}<a href={HOME_SEATS.phoneHref} onClick={() => trackCallClick({ phone: HOME_SEATS.phone })}>{HOME_SEATS.phone}</a>{HOME_SEATS.afterPhone}
+              </p>
             </div>
             <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row gap-3 items-center justify-between bg-gray-50">
-              <p className="text-xs text-gray-500">Seats are subject to availability. Contact us to reserve.</p>
+              <p className="text-xs text-gray-500">{HOME_SEATS.office}</p>
               <a
-                href="/admissions"
+                href={HOME_HERO.buttons[0].href}
                 onClick={() => setShowSeats(false)}
                 className="px-6 py-2.5 text-sm font-bold text-white rounded-full hover:opacity-90 transition-all"
                 style={{ background: "linear-gradient(135deg, #091a4f 0%, #1a56db 100%)" }}
                 data-testid="button-seats-enquire"
               >
-                Book a Campus Visit
+                {HOME_HERO.buttons[0].label}
               </a>
             </div>
           </div>

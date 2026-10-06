@@ -1,22 +1,18 @@
+import { HOME_WHY } from "@shared/content/home";
 import { Link } from "wouter";
 import { CalendarCheck, GraduationCap, BookOpen, MapPin, BadgeCheck, Shield, Bus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const benefits = [
-  { icon: GraduationCap, title: "CBSE Affiliated Curriculum",                desc: "CBSE No. 1130661. Rigorous, board-recognised curriculum from KG through Class 12.",                  color: "#e0edff", accent: "#0d3b86" },
-  { icon: BookOpen,      title: "KG to Class 12 Under One Roof",        desc: "No school switches. One campus, one community for a complete K-12 learning journey.",                    color: "#fff3e0", accent: "#d97706" },
-  { icon: MapPin,        title: "3.5-Acre Green Campus",                     desc: "Pool, football turf, cricket ground, labs, library — all on one spacious Brahmand campus.",              color: "#e0f7f0", accent: "#059669" },
-  { icon: BadgeCheck,    title: "Strong Academics & Co-curricular Learning", desc: "Multiple Intelligence pedagogy, Olympiad coaching, project-based learning and 25+ annual events.",       color: "#f3e0ff", accent: "#7c3aed" },
-  { icon: Shield,        title: "Safe & Caring Environment",                 desc: "CCTV, metal detectors, female-led Pre-Primary wing, on-campus infirmary and paediatrician on call.",     color: "#fdf0e0", accent: "#ea580c" },
-  { icon: Bus,           title: "Transport & Parent Communication",          desc: "GPS-tracked buses on 30+ Thane routes. Regular PTMs, digital updates and counsellor support.",           color: "#e0f0ff", accent: "#0891b2" },
-];
+  { icon: GraduationCap, color: "#e0edff", accent: "#0d3b86" },
+  { icon: BookOpen, color: "#fff3e0", accent: "#d97706" },
+  { icon: MapPin, color: "#e0f7f0", accent: "#059669" },
+  { icon: BadgeCheck, color: "#f3e0ff", accent: "#7c3aed" },
+  { icon: Shield, color: "#fdf0e0", accent: "#ea580c" },
+  { icon: Bus, color: "#e0f0ff", accent: "#0891b2" },
+].map((visual, index) => ({ ...visual, ...HOME_WHY.cards[index] }));
 
-const stats = [
-  { display: "Since 2009", label: "Established"      },
-  { display: "3,000+",     label: "Students"         },
-  { display: "3.5 Acres",  label: "Campus"           },
-  { display: "CBSE",       label: "Affiliation #1130661" },
-];
+const stats = HOME_WHY.stats;
 
 function StatChip({ display, label }: { display: string; label: string }) {
   const [visible, setVisible] = useState(false);
@@ -44,15 +40,15 @@ export function AboutPreview() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">Why Choose Us</span>
+            <span className="text-amber-500 text-xs font-semibold tracking-[0.2em] uppercase">{HOME_WHY.eyebrow}</span>
             <div className="w-8 h-0.5 bg-amber-400 mx-auto mt-2" />
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3 tracking-tight">
-            Why Parents Trust{" "}
-            <span style={{ color: "#091a4f" }}>Rainbow International School</span>
+            {HOME_WHY.title}{" "}
+            <span style={{ color: "#091a4f" }}>{HOME_WHY.titleAccent}</span>
           </h2>
           <p className="text-gray-500 text-base max-w-xl mx-auto">
-            A school that cares as much about character as it does about academic results — right here in Thane.
+            {HOME_WHY.sub}
           </p>
         </div>
 
@@ -89,7 +85,7 @@ export function AboutPreview() {
               data-testid="btn-about-book-visit"
             >
               <CalendarCheck size={16} />
-              Book a Campus Visit
+              {HOME_WHY.visit.label}
             </a>
             <Link
               href="/about-rainbow-international-school"
@@ -97,7 +93,7 @@ export function AboutPreview() {
               style={{ background: "#091a4f", borderRadius: "9999px" }}
               data-testid="btn-about-learn-more"
             >
-              Learn More
+              {HOME_WHY.learnMore.label}
             </Link>
           </div>
         </div>

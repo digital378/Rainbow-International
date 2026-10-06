@@ -1,3 +1,4 @@
+import { HOME_HERO } from "@shared/content/home";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -197,7 +198,7 @@ export function HeroForm() {
               Chat on WhatsApp
             </a>
 
-            <p className="text-center text-[11px] text-gray-400 pt-1">Mon–Sat · 9 AM–6 PM · No entrance test for Nursery–Class 8</p>
+            <p className="text-center text-[11px] text-gray-400 pt-1">{HOME_HERO.formFootnote}</p>
           </form>
         )}
       </div>
