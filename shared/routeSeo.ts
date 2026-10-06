@@ -1,4 +1,5 @@
 import { PRIMARY_SEO } from "./content/primary";
+import { FEES_SEO } from "./content/fees";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -224,9 +225,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "FAQs",
   },
   "/fee-structure": {
-    description:
-      "Fee structure 2026-27 for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
-    crumb: "Fee Structure",
+    title: FEES_SEO.title,
+    description: FEES_SEO.description,
+    crumb: FEES_SEO.crumb,
   },
   "/testimonials": {
     description:

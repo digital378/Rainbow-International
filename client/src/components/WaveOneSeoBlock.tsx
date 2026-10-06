@@ -17,6 +17,7 @@ export function buildFaqPageSchema(faqs: WaveOneFaq[]) {
 interface WaveOneSeoBlockProps {
   pageId: string;
   quickAnswer: string;
+  quickAnswerHeading?: string;
   faqs: WaveOneFaq[];
   faqHeading?: string;
 }
@@ -24,6 +25,7 @@ interface WaveOneSeoBlockProps {
 export function WaveOneSeoBlock({
   pageId,
   quickAnswer,
+  quickAnswerHeading = "Quick answer",
   faqs,
   faqHeading = "Frequently asked questions",
 }: WaveOneSeoBlockProps) {
@@ -38,7 +40,7 @@ export function WaveOneSeoBlock({
           id={`wave1-qa-${pageId}`}
           className="font-['DM_Sans'] font-black text-xl md:text-2xl text-[#091a4f] mb-3"
         >
-          Quick answer
+          {quickAnswerHeading}
         </h2>
         <p
           className="text-gray-700 leading-relaxed text-[15px] md:text-base"

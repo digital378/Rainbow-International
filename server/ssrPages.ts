@@ -1,4 +1,9 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
+import {
+  FEES_SEO, FEES_BANNER, FEES_OVERVIEW, FEES_SECTIONS_HEADING, FEES_SECTION_CARDS,
+  FEES_INCLUSIONS_HEADING, FEES_INCLUSIONS, FEES_CTA, FEES_QUICK_HEADING,
+  FEES_QUICK_ANSWER, FEES_FAQ_HEADING, FEES_FAQS,
+} from "@shared/content/fees";
 import { MIDDLE_SEO, MIDDLE_CONTENT } from "@shared/content/middle";
 import { SECONDARY_SEO, SECONDARY_CONTENT } from "@shared/content/secondary";
 import { SENIOR_SEO, SENIOR_CONTENT } from "@shared/content/senior";
@@ -471,33 +476,30 @@ ${section(ADM_BOTTOM.title, ADM_BOTTOM.sub, `<p>${e(ADM_BOTTOM.eyebrow)}</p><p>$
 
 function renderFees(): string {
   return `
-<div class="section">
-<h2>Fee Structure</h2>
-<p>Rainbow International School offers comprehensive, value-driven education from Nursery to Class 12 at competitive fee levels. Our fee structure covers tuition, access to world-class facilities, and a wide range of co-curricular activities.</p>
-
-<h2>Fee Categories</h2>
-<ul>
-<li><strong>Pre-Primary (Nursery, Jr KG, Sr KG):</strong> Includes activity kits and learning materials</li>
-<li><strong>Primary (Class 1–5):</strong> Includes lab access and library</li>
-<li><strong>Middle School (Class 6–8):</strong> Includes all lab sessions and project materials</li>
-<li><strong>Secondary (Class 9–10):</strong> Includes CBSE board exam preparation</li>
-<li><strong>Senior Secondary (Class 11–12):</strong> Science, Commerce, and Humanities streams</li>
-</ul>
-
-<h2>What's Included</h2>
-<ul>
-<li>All classroom instruction, lab sessions, library access</li>
-<li>Digital learning resources and smart classroom access</li>
-<li>Core extracurricular activities</li>
-<li>Safety and security infrastructure</li>
-<li>On-campus health services (infirmary, nurse)</li>
-</ul>
-
-<h2>Payment</h2>
-<p>Fees are payable in quarterly instalments via online bank transfer, UPI, or demand draft. Sibling concessions are available. The exact fee schedule is shared during the admission interaction.</p>
-
-<p>Contact <strong>+91 82915 68972</strong> for the complete fee breakdown or <a href="/admissions">start the admission process</a>.</p>
-</div>`;
+<section class="section">
+<h2>${e(FEES_OVERVIEW.heading)}</h2>
+<p>${e(FEES_OVERVIEW.paragraph)}</p>
+<div><h3>${e(FEES_OVERVIEW.noticeTitle)}</h3><p>${e(FEES_OVERVIEW.noticeText.split(FEES_CTA.phone)[0])}<strong>${e(FEES_CTA.phone)}</strong>${e(FEES_OVERVIEW.noticeText.split(FEES_CTA.phone)[1])}</p></div>
+</section>
+<section class="section">
+<h2>${e(FEES_SECTIONS_HEADING)}</h2>
+${FEES_SECTION_CARDS.map(item => `<a href="${e(item.link)}"><h3>${e(item.section)}</h3><p>${e(item.grades)}</p><p>${e(item.note)}</p></a>`).join("\n")}
+</section>
+<section class="section">
+<h2>${e(FEES_INCLUSIONS_HEADING)}</h2>
+${FEES_INCLUSIONS.map(item => `<div><h3>${e(item.title)}</h3><p>${e(item.desc)}</p></div>`).join("\n")}
+</section>
+<section class="section">
+<h2>${e(FEES_CTA.heading)}</h2>
+<p>${e(FEES_CTA.paragraph)}</p>
+<a href="tel:+918291568972">${e(FEES_CTA.phone)}</a>
+</section>
+<section class="section">
+<h2>${e(FEES_QUICK_HEADING)}</h2>
+<p>${e(FEES_QUICK_ANSWER)}</p>
+<h3>${e(FEES_FAQ_HEADING)}</h3>
+${FEES_FAQS.map(faq => `<details><summary>${e(faq.q)}</summary><p>${e(faq.a)}</p></details>`).join("\n")}
+</section>`;
 }
 
 function renderLocalityBrahmand(): string {
@@ -1344,18 +1346,25 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/fee-structure",
-    title: "CBSE School Fee Structure Thane 2026-27 | Rainbow International School",
-    description: "Fee structure details for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
-    keywords: "CBSE school fees Thane, school fee structure Thane, Rainbow International School fees, nursery school fees Thane",
+    appendSiteName: false,
+    title: FEES_SEO.title,
+    description: FEES_SEO.description,
+    keywords: FEES_SEO.keywords,
     canonical: "https://rainbowinternationalschool.in/fee-structure",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Fee Structure", url: "https://rainbowinternationalschool.in/fee-structure" },
+      { name: FEES_SEO.crumb, url: "https://rainbowinternationalschool.in/fee-structure" },
     ],
-    jsonLd: { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [
-      { "@type": "Question", name: "What is the fee payment schedule?", acceptedAnswer: { "@type": "Answer", text: "Fees are payable in quarterly instalments." } },
-      { "@type": "Question", name: "Are there sibling concessions?", acceptedAnswer: { "@type": "Answer", text: "Yes, sibling discounts are available." } },
-    ]},
+    h1: FEES_BANNER.title,
+    subtitle: FEES_BANNER.subtitle,
+    showSharedCta: false,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: FEES_SEO.title,
+      description: FEES_SEO.description,
+      url: "https://rainbowinternationalschool.in/fee-structure",
+    },
     renderBody: renderFees,
   },
   {

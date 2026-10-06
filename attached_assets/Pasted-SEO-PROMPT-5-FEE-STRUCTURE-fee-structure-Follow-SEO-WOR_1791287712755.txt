@@ -1,0 +1,59 @@
+SEO PROMPT 5 — FEE STRUCTURE ( /fee-structure )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, section order, form, handler and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish. Never show any fee amounts.
+
+PART A — ONE COPY SOURCE
+Create shared/content/fees.ts with every visible sentence of the page (banner, overview, notice box, section cards, the 4 "what you get" cards, CTA block, quick answer, FAQs). client/src/pages/Fees.tsx reads its text from it (icons/colours by array index). server/pageTitles.ts and shared/routeSeo.ts "/fee-structure" import title/description from it.
+
+PART B — METADATA (no site-name suffix; appendSiteName={false})
+title: "Fee Structure 2027-28 | Rainbow International School Thane"
+description: "Class-wise fees for 2027-28 are shared by our admissions team. Call or WhatsApp +91 82915 68972 for the fee details for your child's class."
+keywords: "Rainbow International School fees, RIS Thane fee structure 2027-28, CBSE school fees in Thane, schools in Thane with fees"
+JSON-LD: WebPage only, name = the title, description = the description. Remove buildFaqPageSchema / FAQPage everywhere (React and server config). No "sibling concessions", "quarterly", "PDF" anywhere.
+
+PART C — EXACT COPY
+Banner (PageBanner) title (this is the H1): "Fee Structure 2027-28"
+Banner subtitle: "CBSE School in Thane West — KG to Class 12"
+
+"Fee Overview" h2 (unchanged). Paragraph:
+"Rainbow International School is a CBSE school in Brahmand, Thane West, for KG to Class 12. Fees for 2027-28 are not published online: our admissions team shares the fee for your child's class on call or WhatsApp."
+Notice box title (unchanged): "Fee Details Available on Request"
+Notice box text: "Call or WhatsApp our admissions team on +91 82915 68972 (Mon–Sat, 9 am–6 pm), or fill the enquiry form below, and we will share the fee for your child's class."
+
+"Fee Categories by Section" h2 (unchanged). Cards (section / grades / note / link unchanged):
+ "Pre-Primary" / "Jr KG, Sr KG" / "KG timings 9:30 am–12:30 pm"
+ "Primary" / "Class 1 to 5" / "Spanish taught; school day 7:30 am–1:00 pm"
+ "Middle School" / "Class 6 to 8" / "Spanish up to Grade 8; science labs"
+ "Secondary" / "Class 9 & 10" / "CBSE board exam preparation; 7:30 am–1:00 pm"
+ "Senior Secondary (Science)" / "Class 11 & 12" / "Physics, Chemistry, Biology, IT and Maths labs; 1:00–6:00 pm"
+ "Senior Secondary (Commerce/Humanities)" / "Class 11 & 12" / "Afternoon shift, 1:00–6:00 pm"
+
+h2 "What's Included in Your Fees" → "What Your Child Gets at RIS". The 4 cards (same icons, same order; title / desc):
+ "Tuition & Academics" / "CBSE teaching from KG to Class 12 in AC classrooms with smart boards."
+ "Transport (Optional)" / "In-house GPS-enabled school buses for homes within 10 km. Ask the admissions team about your route."
+ "Safety & Security" / "CCTV surveillance and a 100% female staff team."
+ "Sports & Wellbeing" / "Swimming pool, sports facilities and an amphitheatre on the 3.5-acre campus."
+
+CTA block: h2 "Get the Complete Fee Schedule" → "Get the Fee for Your Child's Class"; paragraph "Call or WhatsApp our admissions team, or fill the form below, for the 2027-28 fee for your child's class." Phone button unchanged.
+
+Quick answer (WaveOneSeoBlock, visible text only):
+"Rainbow International School does not publish its 2027-28 fees online. The admissions team shares the fee for your child's class (KG to Class 12) on call or WhatsApp at +91 82915 68972, Monday to Saturday, 9 am to 6 pm."
+FAQs (replace the whole list, this order):
+1 "How can I get the Rainbow International School fee structure for 2027-28?" / "Call or WhatsApp the admissions team on +91 82915 68972, or fill the enquiry form on this page. They share the fee for your child's class."
+2 "Are the fees published online?" / "No. Fees are shared class by class by the admissions team, so you get the figure for your child's class and the 2027-28 year."
+3 "Is school transport available?" / "Yes. The school runs its own GPS-enabled buses for homes within 10 km of the Brahmand campus. Ask the admissions team about transport for your route."
+4 "Which classes does the school have?" / "KG (Jr KG and Sr KG) to Class 12, CBSE, with Science, Commerce and Humanities in Class 11 and 12."
+5 "Can I visit the school before deciding?" / "Yes. Book a campus visit through the enquiry form or call +91 82915 68972. The office is open Monday to Saturday, 9 am to 6 pm."
+
+PART D — BOT HTML (server/ssrPages.ts)
+"/fee-structure" config: title/description/keywords from fees.ts; breadcrumb last item "Fee Structure"; cfg.h1 = "Fee Structure 2027-28"; cfg.subtitle = the banner subtitle; jsonLd = WebPage (no FAQPage).
+Rewrite renderFees() to render ONLY fees.ts, in the visitor order: overview h2 + paragraph + notice box; "Fee Categories by Section" with the 6 cards (h3 + grades + note + link); "What Your Child Gets at RIS" with the 4 cards; CTA h2 + paragraph + one tel:+918291568972 link; quick answer; 5 FAQs as <details><summary>. Delete the old text (Nursery, world-class, quarterly instalments, UPI/DD, sibling concessions, infirmary/nurse, "no hidden charges").
+
+PART E — SITEMAP
+Set <lastmod> 2026-10-06 for /fee-structure only.
+
+PART F — CHECKS, COMMIT, REPORT
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /fee-structure only (title, description, canonical, H1 match; allowed tel links only; admin@ only; no FAQPage). Word-count WARNs are fine.
+3 git add -A && git commit -m "SEO P5: fee structure copy, metadata and bot parity"; git push once (if it fails, report — no retries).
+4 Write artifacts/reports/seo-p5-fees-report.txt (final title, description, H1 bot/visitor, words bot/visitor, anything not done). Reply with the report text only. Do not publish.

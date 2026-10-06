@@ -1,4 +1,5 @@
 import { PRIMARY_SEO } from "@shared/content/primary";
+import { FEES_SEO } from "@shared/content/fees";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -63,7 +64,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/google-school-2025-26": "Google School 2025–26 | Rainbow International School",
   "/meta-school-2025-26": "Meta School 2025–26 | Rainbow International School",
   "/faqs": "FAQs — Admissions, Fees, Academics & More | Rainbow International School",
-  "/fee-structure": "Fee Structure 2026-27 | Rainbow International School Thane",
+  "/fee-structure": FEES_SEO.title,
   "/testimonials": "Parent Testimonials & Reviews | Rainbow International School Thane",
   "/schedule-appointment": "Schedule an Appointment | Rainbow International School",
   "/school-readiness-quiz": "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",

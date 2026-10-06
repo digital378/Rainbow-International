@@ -1,83 +1,65 @@
 import { Navbar } from "@/components/layout/Navbar";
+import {
+  FEES_SEO, FEES_BANNER, FEES_OVERVIEW, FEES_SECTIONS_HEADING, FEES_SECTION_CARDS,
+  FEES_INCLUSIONS_HEADING, FEES_INCLUSIONS, FEES_CTA, FEES_QUICK_HEADING,
+  FEES_QUICK_ANSWER, FEES_FAQ_HEADING, FEES_FAQS,
+} from "@shared/content/fees";
 import { Footer } from "@/components/layout/Footer";
 import { PageBanner } from "@/components/layout/PageBanner";
 import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { Phone, IndianRupee, Shield, Bus, BookOpen, Stethoscope } from "lucide-react";
-import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
+import { WaveOneSeoBlock } from "@/components/WaveOneSeoBlock";
 
-const FEES_QUICK_ANSWER =
-  "The 2026-27 CBSE fee structure for Rainbow International School Thane is published class-by-class — covering tuition, one-time admission charges and term-wise breakdowns — with a downloadable official PDF. Transport fees are billed separately and confirmed at the time of admission based on the parent's chosen route.";
-
-const FEES_FAQS: WaveOneFaq[] = [
-  { q: "Where can I see the Rainbow International School fees?", a: "The full class-wise fee structure for 2026-27 is on the Fee Structure page, with a downloadable PDF." },
-  { q: "Are transport fees included in the tuition fee?", a: "No. Transport fees are charged separately and are confirmed at admission based on route." },
-  { q: "What payment modes are accepted?", a: "Standard payment modes (online transfer, cheque) are accepted; details are shared during admission." },
-  { q: "Are there any one-time charges?", a: "Yes. One-time admission charges apply at the time of joining and are listed in the fee structure." },
-  { q: "How do I get the fee structure for a specific class?", a: "The class-wise fee table on the Fee Structure page covers KG to Class 12. Contact the admission desk for any clarifications." },
-];
-
-const inclusions = [
-  { icon: BookOpen, title: "Tuition & Academics", desc: "All classroom instruction, lab sessions, library access, and digital learning resources." },
-  { icon: Bus, title: "Transport (Optional)", desc: "GPS-tracked buses covering 30+ routes across Thane with trained attendants." },
-  { icon: Shield, title: "Safety & Security", desc: "200+ CCTV cameras, card-based entry, trained security personnel, fire safety systems." },
-  { icon: Stethoscope, title: "Health & Wellness", desc: "On-campus infirmary with full-time nurse, visiting paediatrician, equipped ambulance." },
-];
-
-const faqs = FEES_FAQS;
+const inclusions = [BookOpen, Bus, Shield, Stethoscope].map((icon, i) => ({
+  ...FEES_INCLUSIONS[i],
+  icon,
+}));
 
 export default function Fees() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Fee Structure 2026-27 | Rainbow International School Thane"
-        description="Class-wise CBSE fee structure for 2026-27 at RIS Thane: tuition, one-time charges, transport and term breakdown. Download the official fee structure PDF here."
-        keywords="Rainbow International School fees, Rainbow International School Thane fees, CBSE school fees in Thane, school fees in Thane, school fee structure Thane, CBSE school fee structure near me"
+        title={FEES_SEO.title}
+        description={FEES_SEO.description}
+        keywords={FEES_SEO.keywords}
+        appendSiteName={false}
         canonical="https://rainbowinternationalschool.in/fee-structure"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Fee Structure", href: "https://rainbowinternationalschool.in/fee-structure" },
+          { name: FEES_SEO.crumb, href: "https://rainbowinternationalschool.in/fee-structure" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "WebPage",
-              "name": "CBSE School Fee Structure Thane 2026-27 — Rainbow International School",
-              "description": "Fee structure details for Rainbow International School, Thane — KG to Class 12 CBSE. Transparent fees, sibling concessions, quarterly payment.",
-              "url": "https://rainbowinternationalschool.in/fee-structure"
-            },
-            buildFaqPageSchema(FEES_FAQS)
-          ]
+          "@type": "WebPage",
+          name: FEES_SEO.title,
+          description: FEES_SEO.description,
+          url: "https://rainbowinternationalschool.in/fee-structure",
         }}
       />
       <Navbar />
       <PageBanner
-        title="Fee Structure"
-        subtitle="Transparent, Value-Based Education — KG to Class 12"
+        title={FEES_BANNER.title}
+        subtitle={FEES_BANNER.subtitle}
         bgImage="/images/students/hero-senior-secondary.webp"
       />
 
       <main className="flex-grow" role="main">
         <section className="py-16 bg-gradient-to-b from-white to-gray-50" data-testid="section-overview">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">Fee Overview</h2>
+            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-6">{FEES_OVERVIEW.heading}</h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              Rainbow International School offers a comprehensive, value-driven education from KG to Class 12 at competitive fee levels.
-              Our fee structure covers tuition, access to world-class facilities on our 3.5-acre campus, and a wide range of co-curricular activities. 
-              We believe in complete transparency — there are no hidden charges.
+              {FEES_OVERVIEW.paragraph}
             </p>
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6" data-testid="fee-note">
               <div className="flex items-start gap-3">
                 <IndianRupee className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-[#091a4f] mb-1">Fee Details Available on Request</h3>
+                  <h3 className="font-bold text-[#091a4f] mb-1">{FEES_OVERVIEW.noticeTitle}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    The exact fee schedule for each class is shared during the admission interaction session. This allows us to walk you through 
-                    every component and answer your questions personally. Contact our admissions office at <strong>+91 82915 68972</strong> or fill 
-                    the enquiry form below to receive the complete fee breakdown.
+                    {FEES_OVERVIEW.noticeText.split(FEES_CTA.phone)[0]}<strong>{FEES_CTA.phone}</strong>{FEES_OVERVIEW.noticeText.split(FEES_CTA.phone)[1]}
                   </p>
                 </div>
               </div>
@@ -87,16 +69,9 @@ export default function Fees() {
 
         <section className="py-16" data-testid="section-sections">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">Fee Categories by Section</h2>
+            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">{FEES_SECTIONS_HEADING}</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {[
-                { section: "Pre-Primary", grades: "Nursery, Jr KG, Sr KG", note: "Includes activity kits and learning materials", link: "/pre-primary-school-thane" },
-                { section: "Primary", grades: "Class 1 to 5", note: "Includes lab access and library", link: "/primary-section" },
-                { section: "Middle School", grades: "Class 6 to 8", note: "Includes all lab sessions and project materials", link: "/middle-school-section" },
-                { section: "Secondary", grades: "Class 9 & 10", note: "Includes CBSE board exam preparation", link: "/secondary-section" },
-                { section: "Senior Secondary (Science)", grades: "Class 11 & 12", note: "Physics, Chemistry, Maths/Biology labs", link: "/senior-secondary-section" },
-                { section: "Senior Secondary (Commerce/Humanities)", grades: "Class 11 & 12", note: "Business studies, Economics, Psychology labs", link: "/senior-secondary-section" },
-              ].map((item, i) => (
+              {FEES_SECTION_CARDS.map((item, i) => (
                 <a key={i} href={item.link} className="block bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition group" data-testid={`section-${i}`}>
                   <h3 className="font-['DM_Sans'] font-bold text-[#091a4f] mb-1 group-hover:text-[#0d3b86]">{item.section}</h3>
                   <p className="text-sm text-amber-600 font-medium mb-2">{item.grades}</p>
@@ -109,7 +84,7 @@ export default function Fees() {
 
         <section className="py-16 bg-gray-50" data-testid="section-inclusions">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">What's Included in Your Fees</h2>
+            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-8 text-center">{FEES_INCLUSIONS_HEADING}</h2>
             <div className="grid md:grid-cols-2 gap-5">
               {inclusions.map((item, i) => (
                 <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100" data-testid={`inclusion-${i}`}>
@@ -130,17 +105,17 @@ export default function Fees() {
 
         <section className="py-16 bg-gray-50" data-testid="section-cta">
           <div className="container mx-auto px-4 max-w-4xl text-center">
-            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">Get the Complete Fee Schedule</h2>
-            <p className="text-gray-500 mb-8 max-w-xl mx-auto">Call our admissions team or fill the form below for the detailed fee structure for your child's class.</p>
+            <h2 className="font-['DM_Sans'] font-black text-2xl md:text-3xl text-[#091a4f] mb-4">{FEES_CTA.heading}</h2>
+            <p className="text-gray-500 mb-8 max-w-xl mx-auto">{FEES_CTA.paragraph}</p>
             <a href="tel:+918291568972" className="inline-flex items-center gap-2 bg-[#091a4f] text-white px-6 py-3 rounded-full font-semibold text-sm hover:bg-[#0d3b86] transition mb-8" data-testid="btn-call">
-              <Phone className="w-4 h-4" /> +91 82915 68972
+              <Phone className="w-4 h-4" /> {FEES_CTA.phone}
             </a>
           </div>
           <div className="container mx-auto px-4 max-w-5xl">
             <ContactForm />
           </div>
         </section>
-        <WaveOneSeoBlock pageId="fee-structure" quickAnswer={FEES_QUICK_ANSWER} faqs={FEES_FAQS} />
+        <WaveOneSeoBlock pageId="fee-structure" quickAnswerHeading={FEES_QUICK_HEADING} quickAnswer={FEES_QUICK_ANSWER} faqHeading={FEES_FAQ_HEADING} faqs={FEES_FAQS} />
       </main>
       <Footer />
     </div>
