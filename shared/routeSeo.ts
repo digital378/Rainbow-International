@@ -2,6 +2,7 @@ import { PRIMARY_SEO } from "./content/primary";
 import { FEES_SEO } from "./content/fees";
 import { CONTACT_SEO, CONTACT_BANNER } from "./content/contact";
 import { ABOUT_SEO } from "./content/about";
+import { AWARDS_SEO, AWARDS_BANNER } from "./content/awards";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -92,9 +93,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Campus & Facilities",
   },
   "/awards-achievements": {
-    description:
-      "Awards and recognition of Rainbow International School, Thane — British Council ISA, Google for Education, Fit India and more.",
-    crumb: "Awards",
+    title: AWARDS_SEO.title,
+    description: AWARDS_SEO.description,
+    crumb: AWARDS_BANNER.breadcrumb,
   },
   "/student-achievements": {
     description:

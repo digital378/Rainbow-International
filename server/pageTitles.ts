@@ -2,6 +2,7 @@ import { PRIMARY_SEO } from "@shared/content/primary";
 import { FEES_SEO } from "@shared/content/fees";
 import { CONTACT_SEO } from "@shared/content/contact";
 import { ABOUT_SEO } from "@shared/content/about";
+import { AWARDS_SEO } from "@shared/content/awards";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -39,7 +40,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/secondary-section": SECONDARY_SEO.title,
   "/senior-secondary-section": SENIOR_SEO.title,
   "/amenities": "Campus & Facilities | Rainbow International School Thane",
-  "/awards-achievements": "Awards & Achievements | Rainbow International School",
+  "/awards-achievements": AWARDS_SEO.title,
   "/student-achievements": "Student Achievements | Rainbow International School",
   "/safety-security": "Safety & Security | Rainbow International School",
   "/beyond-the-classroom": "Beyond the Classroom | Rainbow International School",

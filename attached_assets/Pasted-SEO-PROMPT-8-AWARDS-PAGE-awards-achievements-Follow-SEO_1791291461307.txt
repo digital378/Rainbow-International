@@ -1,0 +1,48 @@
+SEO PROMPT 8 — AWARDS PAGE ( /awards-achievements )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, card, section order, button, form, handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+============================================================
+PART A — ONE COPY SOURCE
+============================================================
+Create shared/content/awards.ts with the metadata, banner, intro paragraph and the full awards array (title, description, image path) moved out of client/src/pages/Awards.tsx. Awards.tsx reads from it. server/pageTitles.ts and shared/routeSeo.ts import title/description from it.
+Keep every award card exactly as it is today: same cards, same order, same titles, same descriptions word-for-word, same images. Do not add, remove or reword any card.
+
+============================================================
+PART B — METADATA (title has NO site-name suffix; appendSiteName={false})
+============================================================
+title: "Awards & Achievements | Rainbow International School, Thane"
+description: "Rainbow International School, Thane West: Best Dynamic School 2026 (Maharashtra Educators Summit), Excellence in CBSE Education (India Today, 2017), FIT INDIA School and more."
+keywords: "Rainbow International School awards, CBSE school awards Thane, school achievements Thane West, Rainbow International School recognition"
+Breadcrumb: Home > Awards & Achievements. H1 stays "Awards & Achievements".
+JSON-LD: replace the current ItemList (it lists items that are not on the page, e.g. "Google for Education Certified School", "Maharashtra State Award") with ONE CollectionPage node: url = canonical, name = title, "about": {"@id": "https://rainbowinternationalschool.in/#organization"}, plus an ItemList whose items are exactly the card titles from awards.ts in order (built from the array, not retyped), plus the BreadcrumbList and the shared org graph. No FAQPage.
+
+============================================================
+PART C — COPY CHANGE (only this)
+============================================================
+Replace the intro paragraph under "Our Achievements" ("Accolades earned by Rainbow International School for being one of the best & most promising…") with:
+"Awards and recognition received by Rainbow International School, Brahmand, Thane West, and Rainbow Preschool International. Our most recent: Best Dynamic School 2026 at the Maharashtra Educators Summit."
+Card image alt text = the card title (as today).
+
+============================================================
+PART D — BOT HTML (server/ssrPages.ts)
+============================================================
+1. Config: title, description, keywords from awards.ts; cfg.h1 = "Awards & Achievements"; cfg.subtitle = none (or the intro paragraph if the template requires one).
+2. Rewrite renderAwards to render ONLY awards.ts: the "Our Achievements" label, the intro paragraph, then every card as <h3> title + <p> description in the same order as the visitor page. Add one closing line: "See also <a href="/about-rainbow-international-school">About Rainbow International School</a> and <a href="/admissions">Admissions 2027-28</a>."
+3. Delete ALL current SSR-only text that is not on the visitor page, including: "one of the top schools in Thane and Maharashtra", "Best School in Thane — Multiple years running (Education Today, Brainfeed Magazine)", "British Council International School Award (ISA)", "Google for Education Partner School", "students have consistently scored above 95%", "toppers achieving near-perfect scores", robotics/MUN claims, and the whole "Safety & Security" block.
+4. Exactly one <h1>; one tel:+918291568972 link in the body; footer landline as today; no FAQPage.
+
+============================================================
+PART E — SITEMAP
+============================================================
+Set <lastmod> 2026-10-06 for /awards-achievements only.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /awards-achievements only: title, description, canonical and H1 match bot vs visitor; one main tel + footer landline; no FAQPage; one org node. Banned-word hits inside real award names ("Best Preschool & Secondary School in Thane", "The 10 Best Preschools in India", "Best Dynamic School 2026") are allowed under rule 5 — list them in the report, do not change them. Word-count WARN is fine; no filler.
+3 No other routes, tests or screenshots.
+4 git add -A && git commit -m "SEO P8: Awards page metadata, schema and bot parity" — do NOT git push (I push from the Git pane).
+5 Write artifacts/reports/seo-p8-awards-report.txt: final title, description, H1 (bot and visitor), bot vs visitor words, banned-word result, files changed, anything not done.
+Reply with the report text only. Do not publish.

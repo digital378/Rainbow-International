@@ -1,4 +1,5 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
+import { AWARDS_SEO, AWARDS_BANNER, AWARDS_INTRO, AWARDS, AWARDS_JSON_LD, AWARDS_CONTACT } from "@shared/content/awards";
 import {
   ABOUT_SEO, ABOUT_BANNER, ABOUT_WELCOME, ABOUT_LEARNING, ABOUT_STATS,
   ABOUT_CHAIRPERSON, ABOUT_PURPOSE, ABOUT_PHILOSOPHY, ABOUT_CONTACT, ABOUT_JSON_LD,
@@ -421,25 +422,14 @@ function renderAmenities(): string {
 function renderAwards(): string {
   return `
 <div class="section">
-<h2>Awards & Achievements</h2>
-<p>Rainbow International School has been consistently recognised as one of the top schools in Thane and Maharashtra. Our awards reflect our commitment to academic excellence, innovation in teaching, safety, and holistic student development.</p>
-
-<h2>Key Recognitions</h2>
-<ul>
-<li><strong>Best School in Thane</strong> — Multiple years running (Education Today, Brainfeed Magazine)</li>
-<li><strong>British Council International School Award (ISA)</strong> — Recognised for international dimension in teaching</li>
-<li><strong>Google for Education Partner School</strong> — Certified for digital learning excellence</li>
-<li><strong>Meta for Education Partner</strong> — Innovation in technology-enhanced learning</li>
-<li><strong>Fit India School Certificate</strong> — Ministry of Youth Affairs & Sports recognition</li>
-<li><strong>15th World Education Summit</strong> — Featured for educational leadership</li>
-<li><strong>Knowledge Review Magazine</strong> — Rainbow Preschools featured as top early learning centres</li>
-</ul>
-
-<h2>Academic Results</h2>
-<p>Our first batch (2018–19) achieved a 100% pass rate in CBSE Class 10 Board Exams. Since then, students have consistently scored above 95%, with toppers achieving near-perfect scores across subjects.</p>
-
-<h2>Student Achievements</h2>
-<p>Rainbow students excel in inter-school and national-level competitions in academics, sports, arts, robotics, MUN, and science exhibitions. View our <a href="/student-achievements">Student Achievements</a> page for detailed highlights.</p>
+<span>${e(AWARDS_INTRO.label)}</span>
+<p>${e(AWARDS_INTRO.paragraph)}</p>
+${AWARDS.map(award => `<h3>${e(award.title)}</h3>\n<p>${e(award.description)}</p>`).join("\n")}
+<p>See also <a href="/about-rainbow-international-school">About Rainbow International School</a> and <a href="/admissions">Admissions 2027-28</a>.</p>
+</div>
+<div class="section">
+<h2>${e(AWARDS_CONTACT.title)}</h2>
+<p>${e(AWARDS_CONTACT.introBeforeBreak)}<br/>${e(AWARDS_CONTACT.introBeforePhone)} <a href="${e(AWARDS_CONTACT.phoneHref)}">${e(AWARDS_CONTACT.phone)}</a> ${e(AWARDS_CONTACT.introAfterPhone)}</p>
 </div>`;
 }
 
@@ -1325,15 +1315,19 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/awards-achievements",
-    title: "Awards & Achievements — Best School in Thane | Rainbow International School",
-    description: "Rainbow International School awards: Best School in Thane, British Council ISA, Google for Education, Fit India. View our complete recognition list.",
-    keywords: "best school Thane awards, school achievements Thane, British Council school Thane, award winning school Thane",
-    canonical: "https://rainbowinternationalschool.in/awards-achievements",
+    title: AWARDS_SEO.title,
+    appendSiteName: false,
+    description: AWARDS_SEO.description,
+    keywords: AWARDS_SEO.keywords,
+    canonical: AWARDS_SEO.canonical,
+    h1: AWARDS_BANNER.title,
+    subtitle: "",
+    showSharedCta: false,
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Awards & Achievements", url: "https://rainbowinternationalschool.in/awards-achievements" },
+      { name: AWARDS_BANNER.breadcrumb, url: AWARDS_SEO.canonical },
     ],
-    jsonLd: SCHOOL_LD,
+    jsonLd: AWARDS_JSON_LD,
     renderBody: renderAwards,
   },
   {
