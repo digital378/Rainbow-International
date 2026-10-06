@@ -1,0 +1,42 @@
+SEO P6 — CONTACT US REPORT
+Date: 2026-10-06
+Route: /contact-us
+
+Completed locally. GitHub push failed authentication.
+
+FINAL METADATA
+Title (bot = visitor): Contact Rainbow International School, Brahmand, Thane West
+Description (bot = visitor): Cosmos Arcade, Brahmand Phase 4, Thane West 400607. Admissions: +91 82915 68972, admin@rainbowinternationalschool.in. Mon to Sat, 9 am to 6 pm.
+Canonical (bot = visitor): https://rainbowinternationalschool.in/contact-us
+H1 bot: Contact Us
+H1 visitor: Contact Us
+Exactly one H1 in both versions. No site-name suffix.
+
+CHANGES
+Created shared/content/contact.ts for banner, contact cards, tour introduction, form labels/placeholders/buttons/programmes/consent, thank-you text, quote, metadata and ContactPage schema.
+Applied the exact supplied contact copy, office hours and Thane West address. Programme options already started at Jr. KG with no Nursery; they retain their existing labels and values.
+Tour eyebrow, heading, introduction, form labels/placeholders/button text and Mark Twain quote remain unchanged in wording.
+Thank-you text now states: "We've received your request. Our admissions team will contact you during office hours (Mon–Sat, 9 am–6 pm)."
+Both page versions use the same ContactPage node referencing https://rainbowinternationalschool.in/#organization through about, without a nested organisation or FAQPage.
+Crawler body renders the four contact cards, Book a Campus Tour heading and introduction, then the quote, using the shared copy. Removed the wrong Landline line and old all-parts-of-Thane claim; disabled the extra generic crawler CTA for this route.
+Only /contact-us sitemap lastmod changed to 2026-10-06.
+Design, classes, colours, icons, images, layout, visitor section order, form fields, handlers, tracking calls and test IDs preserved. The renamed Address card retains link-contact-locations.
+Existing submit-handler error notification and schema-driven validation messages were left untouched under the protected-handler rule.
+
+CHECKS
+npx tsc --noEmit: PASS.
+npm run parity:check -- /contact-us: WARN, 0 failures.
+Title, description, canonical, H1 count/text: PASS.
+Allowed tel links and footer-only landline: PASS.
+Email links: admin@rainbowinternationalschool.in only in bot and visitor — PASS.
+Valid JSON-LD; ContactPage present; no FAQPage; one organisation node in each version: PASS.
+Body words: bot 117; visitor 384; bot is 30.5% — permitted WARN. Crawler body excludes the interactive form and uses the existing simpler navigation/footer. No filler added.
+Banned words: bot None; visitor "top" — WARN from unchanged "Top Schools in Thane" navigation.
+
+GIT / ANYTHING NOT DONE
+Commit: b18bc1e — SEO P6: contact page copy, metadata and bot parity
+One push attempted; failed: "Invalid username or token. Password authentication is not supported for Git operations."
+No retries or Git setting changes. Commit remains local, not pushed.
+Report saved at artifacts/reports/seo-p6-contact-report.txt after the push attempt; not included in that commit.
+Lighthouse skipped – Claude will run it
+No screenshots, test enquiries, other-route checks, additional test suites or publishing performed.
