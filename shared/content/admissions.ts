@@ -140,7 +140,7 @@ export const ADM_GRADES = {
       "label": "Secondary",
       "classes": "Class 9 – 10",
       "concern": "Board prep without burning out.",
-      "advantage": "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018-19.",
+      "advantage": "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018‑19.",
       "href": "/secondary-section"
     },
     {

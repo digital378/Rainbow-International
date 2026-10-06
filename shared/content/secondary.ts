@@ -12,7 +12,7 @@ export const SECONDARY_CONTENT = {
     "h1Separator1": "|",
     "h1Accent1": "Class 9 and 10",
     "heroIntro1": "Building subject mastery, exam confidence, discipline and future readiness during the crucial board preparation years.",
-    "heroDetail1": "CBSE-affiliated school in Brahmand, Thane West: school day 7:30 am–1:00 pm, Physics, Chemistry and Biology labs, periodic tests and pre-boards. 100% Class 10 result in 2018-19.",
+    "heroDetail1": "CBSE-affiliated school in Brahmand, Thane West: school day 7:30 am–1:00 pm, Physics, Chemistry and Biology labs, periodic tests and pre-boards. 100% Class 10 result in 2018‑19.",
     "cta1": "Enquire for Class 9–10",
     "cta2": "Book a Campus Visit",
     "cta3": "Chat on WhatsApp",
@@ -64,7 +64,7 @@ export const SECONDARY_CONTENT = {
     },
     {
       "q": "What was the school's Class 10 board result?",
-      "a": "100% in the CBSE Class 10 board exams of 2018-19."
+      "a": "100% in the CBSE Class 10 board exams of 2018‑19."
     },
     {
       "q": "Which classes are included in the Secondary School section at Rainbow International School?",

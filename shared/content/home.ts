@@ -116,7 +116,7 @@ export const HOME_ACADEMICS = {
     { label: "Pre-Primary", grade: "Jr. KG · Sr. KG", concern: "Starting school is a big milestone.", advantage: "Play-based, activity-led learning with a 100% female staff team, Spanish from KG and a 9:30 am–12:30 pm day.", href: "/pre-primary-school-thane" },
     { label: "Primary", grade: "Class I – V", concern: "Building the right foundation matters.", advantage: "CBSE-aligned literacy, numeracy, science and Spanish, with co-curriculars built into a 7:30 am–1:00 pm day.", href: "/primary-section" },
     { label: "Middle School", grade: "Class VI – VIII", concern: "The tween years need structure and stimulation.", advantage: "Critical thinking, project work, science labs, Spanish up to Grade 8 and a full co-curricular calendar.", href: "/middle-school-section" },
-    { label: "Secondary", grade: "Class IX – X", concern: "Board prep without burning out.", advantage: "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018-19.", href: "/secondary-section" },
+    { label: "Secondary", grade: "Class IX – X", concern: "Board prep without burning out.", advantage: "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018‑19.", href: "/secondary-section" },
     { label: "Senior Secondary", grade: "Class XI – XII", concern: "The right stream, the right support.", advantage: "Science, Commerce and Humanities streams in a 1:00–6:00 pm shift, with Physics, Chemistry, Biology, IT and Maths labs.", href: "/senior-secondary-section" },
   ],
 };
