@@ -1,0 +1,22 @@
+Two small fixes — design unchanged, no screenshots, no Lighthouse, no publishing.
+
+FIX 1 — Admissions form subtitle
+In shared/content/admissions.ts set the hero form subtitle to:
+"Our counsellor will call you back Mon–Sat, 9 am–6 pm."
+
+FIX 2 — Chat button covering the mobile sticky CTA bar
+Problem: on phones, the floating chat button in client/src/components/ChatBot.tsx (data-testid="button-chatbot-toggle", fixed bottom-5 right-5 z-50) sits on top of the "Apply Now" / last button of the mobile sticky CTA bar. This happens on 5 pages:
+- client/src/pages/Admissions.tsx  → data-testid="mobile-sticky-bar" (md:hidden)
+- client/src/pages/Primary.tsx, MiddleSchool.tsx, Secondary.tsx, SeniorSecondary.tsx → data-testid="mobile-cta-bar" (lg:hidden)
+
+Fix it only inside ChatBot.tsx (do not edit the 5 pages, the bars, their colours, sizes or buttons):
+1. Add a small effect that finds a visible sticky bar: document.querySelector('[data-testid="mobile-sticky-bar"], [data-testid="mobile-cta-bar"]'). Treat it as present only if it exists AND getComputedStyle(el).display !== "none" AND its height > 0.
+2. Measure its height (el.getBoundingClientRect().height). Re-check on window resize, on route change (wouter useLocation), and with a ResizeObserver on the bar if present. Clean up listeners on unmount.
+3. When a bar is present: set the toggle button's bottom to (barHeight + 12) px, and the open chat window's bottom to (barHeight + 12 + 56 + 12) px, via inline style (override the bottom-5 / bottom-24 classes). When no bar is present, keep the current positions exactly (bottom 20 px button, bottom-24 window).
+4. Keep right-5, size, colour, z-index, icon and open/close behaviour unchanged. Desktop must look exactly as now.
+
+Checks (only these):
+- npx tsc --noEmit must pass.
+- Using the existing Playwright/Chromium already in the project (no new installs, NO screenshots saved or sent), load /admissions and /primary-section at viewport 390x844 and report, as numbers: the sticky bar's top (getBoundingClientRect().top) and the chat button's bottom edge. PASS if chat button bottom <= bar top - 8. Also load / at 390x844 (no bar) and confirm the chat button bottom offset is still 20 px, and /admissions at 1366x900 (bar hidden) still 20 px.
+
+Commit once: "Fix: chat button sits above mobile CTA bar; shorter admissions form subtitle". Push once (if it fails, report — no retries). Reply with the 4 measurements and PASS/FAIL only. Do not publish.
