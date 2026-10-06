@@ -1,0 +1,70 @@
+SEO P2 HOMEPAGE REPORT
+
+CORRECTIONS COMPLETED
+- Hero intro: "CBSE school in Brahmand, Thane West since 2009: a 3.5-acre campus, swimming pool, science labs and GPS-enabled buses."
+- Rating chip: "4.7" and "· 130 Google Reviews", both stored in shared/content/home.ts. Existing elements and classes retained.
+- Theatre eyebrow, heading and subtitle now come from shared/content/home.ts. React design, emphasis, reels and playback remain unchanged.
+- SSR Theatre section added immediately after Admission Journey, with the shared heading/subtitle and one "Visit our Instagram" link to https://www.instagram.com/rainbowinternationalschool/. No reel titles rendered.
+- SSR Quick answer block now has h2 "Quick answer", the answer, h3 "Frequently asked questions", and the existing 12 details FAQs.
+- All other previously completed SEO P2 changes retained. No additional form-content restoration or design changes made during these corrections.
+
+FINAL METADATA
+Title: CBSE School in Thane West | Rainbow International School
+Description: Choosing a CBSE school in Thane? Rainbow International School, Brahmand: KG to Class 12, Spanish KG to Grade 8. Admissions 2027-28: +91 82915 68972.
+Canonical: https://rainbowinternationalschool.in/
+H1, in three lines:
+CBSE School
+in Thane West
+KG to Class 12
+
+CHECKS RERUN
+npx tsc --noEmit: PASS.
+npm run parity:check -- /: WARN; zero failed checks.
+Title, description, canonical, H1 text/count, Open Graph title/description/image: PASS.
+One distinct phone number, +91 82915 68972: PASS.
+Only admin@rainbowinternationalschool.in in mailto links: PASS.
+Valid JSON-LD, one organisation, matching schema types and no FAQPage: PASS.
+Bot words: 1,432. Visitor words: 1,694. Ratio: 84.5%, below the 90–130% target; WARN, not PASS.
+Banned-word results, excluding testimonials and the exact permitted parent question:
+  Bot: none.
+  Visitor: "top", from the unchanged "Top Schools in Thane" navigation label.
+
+REMAINING LIMITATIONS
+- The word-count target is not met. No filler or further changes were added after the instruction to keep everything else exactly as done.
+- Navbar.tsx was outside the permitted scope, so its existing navigation label was not changed.
+- Existing global preschool footer navigation still contains a "Nursery" link. It was retained because the permitted Footer.tsx edit was its description sentence only; homepage main copy does not offer Nursery.
+
+FILES CHANGED IN SEO P2, INCLUDING THESE CORRECTIONS
+shared/content/home.ts
+shared/routeSeo.ts
+server/pageTitles.ts
+server/ssrHome.ts
+client/src/pages/Home.tsx
+client/src/components/layout/Footer.tsx
+client/src/components/home/Hero.tsx
+client/src/components/home/HeroForm.tsx
+client/src/components/home/AwardsStrip.tsx
+client/src/components/home/AdmissionJourney.tsx
+client/src/components/home/AboutPreview.tsx
+client/src/components/home/AcademicSections.tsx
+client/src/components/home/Pedagogy.tsx
+client/src/components/home/DiscoverRainbow.tsx
+client/src/components/home/Neighbourhood.tsx
+client/src/components/home/BeyondClassroomSection.tsx
+client/src/components/home/Testimonials.tsx
+client/src/components/home/ContactForm.tsx
+client/src/components/home/RainbowTheatre.tsx
+scripts/parity-check.mjs
+replit.md
+artifacts/reports/seo-p2-home-report.txt
+The uploaded SEO P2 brief was also included by the requested git add -A.
+
+GIT
+One commit created: fa6b234
+Message: SEO P2 fixes: hero intro, rating, SSR sections
+One push attempted: FAILED. GitHub rejected authentication: "Invalid username or token. Password authentication is not supported for Git operations."
+No push retry and no Git settings changes.
+This report was written after the push result and is not included in that commit.
+
+No other routes checked. No other tests run during the corrections. No screenshots, test enquiries or publishing.
+Lighthouse skipped – Claude will run it
