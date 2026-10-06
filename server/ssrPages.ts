@@ -1,3 +1,4 @@
+import { ADM_SEO, ADM_HERO, ADM_FORM, ADM_BENEFITS, ADM_STEPS, ADM_GRADES, ADM_DOCUMENTS, ADM_TESTIMONIALS, ADM_SAFETY, ADM_FAQS, ADM_FAQ_HEADING, ADM_BOTTOM } from "@shared/content/admissions";
 import type { Express } from "express";
 import { CRAWLER_UA_RE } from "./crawlerUa";
 import { ROUTE_SEO, routeCanonical } from "@shared/routeSeo";
@@ -26,6 +27,8 @@ interface PageSSRConfig {
   jsonLd: Record<string, unknown>;
   renderBody: () => string;
   appendSiteName?: boolean;
+  h1?: string;
+  subtitle?: string;
 }
 
 function shell(cfg: PageSSRConfig): string {
@@ -98,8 +101,8 @@ footer a{color:#fbbf24;text-decoration:none}
 <div class="banner">
 <div class="container">
 <div class="breadcrumb">${cfg.breadcrumbs.map((b, i) => i === cfg.breadcrumbs.length - 1 ? `<span>${e(b.name)}</span>` : `<a href="${e(b.url)}">${e(b.name)}</a> &rsaquo; `).join("")}</div>
-<h1>${e(cfg.breadcrumbs[cfg.breadcrumbs.length - 1].name)}</h1>
-<p class="subtitle">${e(cfg.description.split(".")[0])}.</p>
+<h1>${e(cfg.h1 ?? cfg.breadcrumbs[cfg.breadcrumbs.length - 1].name)}</h1>
+<p class="subtitle">${e(cfg.subtitle ?? (cfg.description.split(".")[0] + "."))}</p>
 </div>
 </div>
 <main role="main">
@@ -849,117 +852,18 @@ function renderSafety(): string {
 }
 
 function renderAdmissions(): string {
-  return `
-<div class="section">
-<h2>Admissions Open 2027–28 at Rainbow International School, Thane</h2>
-<p>Admissions are now open at Rainbow International School, a CBSE school in Thane, for the 2027–28 academic year. We are accepting applications across all grades — Nursery, Junior KG, Senior KG, Class 1 through Class 8, Class 9, Class 10, Class 11 (Science, Commerce and Humanities) and Class 12. Whether you are looking for a Nursery seat near Hiranandani Estate, a Class 1 admission near Brahmand Phase 4, a Class 6 transfer from another school in Thane, or a Class 11 stream change after Class 10 results, our admissions team will guide you through every step with clarity and care.</p>
-<p>Rainbow International School has been part of the Thane parent community since 2009. Over the years, more than 3,000 students from Brahmand, Manpada, Pokhran Road, Dhokali, Hiranandani Estate, Patlipada, Waghbil, Kavesar, Owale, Kolshet and surrounding neighbourhoods have called this 3.5-acre campus their school home. The 2027–28 admission cycle continues that tradition, offering a CBSE-aligned, future-ready learning environment from KG to Class 12 under one roof.</p>
-
-<h2>Admission Process Overview</h2>
-<p>Our admission process is designed to be simple, transparent and parent-friendly. We do not believe in entrance hurdles for young learners. Instead, we focus on getting to know each child and family so we can welcome them into the right grade with the right support from day one.</p>
-<ol>
-<li><strong>Step 1 — Enquiry & Campus Visit:</strong> Begin with a phone enquiry on +91 82915 68972 or fill the online enquiry form. Our admissions counsellor will share the prospectus and help you book a campus visit at a time that suits your family.</li>
-<li><strong>Step 2 — Submit the Application Form:</strong> Complete the application form online or on campus, providing your child's grade, date of birth, current school details and parent contact information.</li>
-<li><strong>Step 3 — Interaction Session:</strong> A friendly, age-appropriate interaction with our academic team helps us understand your child's strengths, interests and learning style. For Class 9 and above, a written subject-readiness assessment is included.</li>
-<li><strong>Step 4 — Document Verification:</strong> Submit the original birth certificate, Aadhaar, Transfer Certificate (where applicable) and the last two years of report cards or progress reports.</li>
-<li><strong>Step 5 — Confirmation & Onboarding:</strong> Once the seat is offered, complete the fee formalities and receive your welcome kit, uniform list, transport route confirmation and class teacher introduction before the academic year begins.</li>
-</ol>
-
-<h2>Grade-wise Admissions — KG to Class 12</h2>
-
-<h3>Nursery, Junior KG and Senior KG Admissions in Thane</h3>
-<p>Pre-Primary admissions are typically the most sought-after seats every year. We offer Nursery, Junior KG and Senior KG admissions for children aged 2.5 years and above as on 31st March 2026. The Pre-Primary wing operates with a 100% female teaching team, dedicated nap and play zones, age-appropriate furniture, and a play-based curriculum that gently builds early language, numeracy, motor and social skills.</p>
-
-<h3>Class 1 to Class 5 Admissions in Thane</h3>
-<p>Primary admissions for Class 1, Class 2, Class 3, Class 4 and Class 5 are open for 2027–28. The primary years build strong literacy, numeracy and inquiry foundations through experiential learning, daily reading, mental maths, EVS investigations, art, music, sports and computer literacy. New entrants from other Thane schools are supported with a friendly orientation week and a bridge-learning plan where needed.</p>
-
-<h3>Class 6 to Class 8 Admissions in Thane</h3>
-<p>Class 6, Class 7 and Class 8 admissions welcome students moving from another school or progressing from our own primary section. The middle school curriculum deepens subject knowledge in English, Hindi, Mathematics, Science, Social Science and a third language (Sanskrit or French), with strong emphasis on study skills, project work and confidence building.</p>
-
-<h3>Class 9 and Class 10 Admissions in Thane</h3>
-<p>Class 9 admissions and limited Class 10 admissions are available for the 2027–28 session. Students appear for a brief written assessment in core subjects to help us plan academic support. Once admitted, students follow a structured CBSE Class 10 board preparation programme that includes regular tests, doubt-clearing classes and exam strategy workshops.</p>
-
-<h3>Class 11 and Class 12 Admissions in Thane</h3>
-<p>Senior Secondary admissions for Class 11 are open across Science, Commerce and Humanities streams. Class 12 admissions are considered on a case-by-case basis subject to subject availability and CBSE transfer norms. Stream selection counselling is offered to every Class 10 student so that the choice is based on aptitude and aspiration, not pressure.</p>
-
-<h2>Documents Required</h2>
-<ul>
-<li>Birth certificate (original and one photocopy)</li>
-<li>Aadhaar card of the child and at least one parent</li>
-<li>Transfer Certificate from the previous school (mandatory for Class 1 onwards if joining mid-stream)</li>
-<li>Report cards or progress reports of the last two academic years</li>
-<li>Four recent passport-size photographs of the child</li>
-<li>Address proof — passport, electricity bill, rent agreement or Aadhaar with current address</li>
-<li>Medical fitness certificate including immunisation record</li>
-<li>For Class 11 admissions, the Class 10 mark sheet is required at the time of confirmation</li>
-</ul>
-
-<h2>Age Criteria for 2027–28</h2>
-<ul>
-<li><strong>Nursery:</strong> 2.5 years as on 31st March 2026</li>
-<li><strong>Junior KG:</strong> 3.5 years as on 31st March 2026</li>
-<li><strong>Senior KG:</strong> 4.5 years as on 31st March 2026</li>
-<li><strong>Class 1:</strong> 6 years as on 31st March 2026</li>
-<li><strong>Class 2 to Class 8:</strong> Age-appropriate progression as per CBSE norms</li>
-<li><strong>Class 9 and Class 10:</strong> Subject to written assessment and seat availability</li>
-<li><strong>Class 11:</strong> Based on Class 10 board results and stream preference</li>
-</ul>
-
-<h2>Why a Campus Visit Matters</h2>
-<p>Choosing a school is one of the most important decisions a family makes. We strongly encourage every parent to visit the Rainbow International School campus before confirming admission. A campus visit lets you see our 3.5-acre Brahmand Phase 4 facility in person — the smart classrooms, science and computer labs, library, swimming pool, skating rink, sports grounds, amphitheatre, organic farm, infirmary and cafeteria. You will also meet members of our academic team, see students at work, and get a feel for the warmth and energy of the school community.</p>
-<p>Campus visits can be scheduled on weekdays between 9:30 AM and 4:30 PM and on Saturdays between 9:30 AM and 1:00 PM. Walk-ins are welcome but a prior appointment ensures dedicated time with our admissions counsellor.</p>
-
-<h2>Parent Counselling and Support</h2>
-<p>We understand that every family has unique questions — about curriculum, fees, transport, special learning needs, language transitions, sports, extracurriculars or stream choices. Our admissions team and academic coordinators are available to answer these questions in detail, in person or over a phone call. For families relocating to Thane from another city or country, we offer relocation support, settling-in advice and a buddy system in the classroom to help your child feel at home quickly.</p>
-
-<h2>Transport and Location Support</h2>
-<p>Rainbow International School operates a fleet of GPS-tracked, CCTV-equipped buses across more than 30 routes covering Brahmand Phase 1 to 4, Hiranandani Estate, Manpada, Pokhran Road, Dhokali, Patlipada, Waghbil, Kavesar, Owale, Kolshet, Majiwada and other Thane neighbourhoods. Each bus has a trained female attendant, a speed governor and a real-time tracking system that parents can access during pick-up and drop windows. Route confirmation is part of the admission onboarding process.</p>
-
-<h2>Hyperlocal Admissions — Find a Seat Near You</h2>
-<p>Many of our families come from neighbourhoods within a 15-minute commute. If you are searching for "school admission near me" in Thane, here is how Rainbow International School fits into your locality.</p>
-
-<h3>Admissions near Brahmand Thane</h3>
-<p>Brahmand Phase 1 to Phase 4 families enjoy walking-distance access to the campus. Nursery, Class 1, Class 5, Class 8 and Class 11 admissions from Brahmand are particularly common because parents value the short, safe daily commute for their children.</p>
-
-<h3>Admissions near Hiranandani Estate</h3>
-<p>Hiranandani Estate is just a five-minute drive from campus. We see strong demand for Nursery admissions, Class 1 admissions and Class 6 admissions from Hiranandani Estate families looking for a CBSE option close to home.</p>
-
-<h3>Admissions near Ghodbunder Road</h3>
-<p>Families along the Ghodbunder Road corridor — Patlipada, Waghbil, Kavesar, Owale and Kolshet — are served by dedicated bus routes. Class 1 admission near Ghodbunder Road and Class 11 stream admissions are popular every year.</p>
-
-<h3>Admissions near Manpada and Pokhran Road</h3>
-<p>Manpada Junction is a five-minute drive from the campus. Pre-Primary, Primary and Senior Secondary admissions from Manpada and the Pokhran Road area benefit from our morning and afternoon shuttle slots.</p>
-
-<h3>Admissions near Kavesar and Kolshet</h3>
-<p>Kavesar and Kolshet families typically choose Rainbow for the combination of CBSE curriculum, K-12 continuity and reliable transport. Class 5, Class 8 and Class 9 transfer admissions from these neighbourhoods are common.</p>
-
-<h2>Frequently Asked Questions about Admissions</h2>
-
-<h3>When do admissions open for 2027–28?</h3>
-<p>Admissions for the 2027–28 academic year are open now. Pre-Primary and Class 1 seats fill the fastest, so we recommend submitting your enquiry as early as possible.</p>
-
-<h3>Is there an entrance test for Nursery or Class 1?</h3>
-<p>No. There is no formal entrance test for Pre-Primary or Class 1. Instead, we hold a friendly interaction with the child and parents to understand readiness and family expectations.</p>
-
-<h3>Do you accept mid-year transfers?</h3>
-<p>Mid-year transfers are considered on a case-by-case basis, subject to seat availability in the relevant grade and CBSE transfer guidelines.</p>
-
-<h3>How do I book a campus visit?</h3>
-<p>Call +91 82915 68972 or use the enquiry form on the website. Our admissions team will confirm a slot within working hours.</p>
-
-<h3>Are sibling concessions available?</h3>
-<p>Yes, sibling concessions are offered. Details are shared during the admission interaction.</p>
-
-<h3>What is the medium of instruction?</h3>
-<p>The medium of instruction is English, with Hindi and Marathi taught as second and third languages as per CBSE norms. French and Sanskrit are offered as third-language options in middle school.</p>
-
-<h3>Do you provide transport from my area?</h3>
-<p>We operate routes across Brahmand, Hiranandani Estate, Manpada, Pokhran Road, Dhokali, Patlipada, Waghbil, Kavesar, Owale, Kolshet, Majiwada and surrounding areas. Confirm your route during the admission visit.</p>
-
-<h3>How do I begin the admission process?</h3>
-<p>Call +91 82915 68972, write to admin@rainbowinternationalschool.in, or use the application form on this page. We will guide you through enquiry, campus visit, interaction and confirmation.</p>
-
-<p>Ready to begin? <a href="/application-form">Start your 2027–28 application</a> or call us at <strong>+91 82915 68972</strong>. You can also explore our <a href="/primary-section">Primary</a>, <a href="/middle-school-section">Middle</a>, <a href="/secondary-section">Secondary</a> and <a href="/senior-secondary-section">Senior Secondary</a> sections.</p>
+  const section = (title: string, sub: string, body: string) => `<section class="section"><h2>${e(title)}</h2>${sub ? `<p>${e(sub)}</p>` : ""}${body}</section>`;
+  return `<div class="section">
+<p>${e(ADM_HERO.badge)}</p><p>${e(ADM_HERO.smallLine)}</p>
+<ul>${ADM_HERO.stats.map(([value, label]) => `<li>${e(value)} — ${e(label)}</li>`).join("")}</ul>
+<p><a href="/admissions#enquiry-form">${e(ADM_HERO.visitLabel)}</a> · <a href="tel:+918291568972">${e(ADM_HERO.callLabel)}</a></p>
+${section(ADM_BENEFITS.title, ADM_BENEFITS.sub, `<p>${e(ADM_BENEFITS.eyebrow)}</p>` + ADM_BENEFITS.cards.map(card => `<h3>${e(card.title)}</h3><p>${e(card.desc)}</p>`).join(""))}
+${section(ADM_STEPS.title, ADM_STEPS.sub, `<p>${e(ADM_STEPS.eyebrow)}</p>` + ADM_STEPS.items.map(step => `<h3>${e(step.step)} ${e(step.title)}</h3><p>${e(step.desc)}</p>`).join(""))}
+${section(ADM_GRADES.title, ADM_GRADES.sub, `<p>${e(ADM_GRADES.eyebrow)}</p>` + ADM_GRADES.cards.map(card => `<h3>${e(card.label)}</h3><p>${e(card.classes)}</p><p>${e(card.concern)}</p><p>${e(card.advantage)}</p><a href="${e(card.href)}">${e(ADM_GRADES.moreLabel)}</a>`).join(""))}
+${section(ADM_DOCUMENTS.title, ADM_DOCUMENTS.sub, `<p>${e(ADM_DOCUMENTS.eyebrow)}</p><ul>${ADM_DOCUMENTS.items.map(item => `<li>${e(item)}</li>`).join("")}</ul><p>${e(ADM_DOCUMENTS.note)}</p>`)}
+${section(ADM_TESTIMONIALS.title, "", `<p>${e(ADM_TESTIMONIALS.eyebrow)}</p><p>${e(ADM_TESTIMONIALS.ratingLabel)}</p>` + ADM_TESTIMONIALS.reviews.map(review => `<blockquote data-testimonial><p>${e(review.review)}</p><p>${e(review.initials)} ${e(review.name)}</p><p>${e(ADM_TESTIMONIALS.parentLabel)}</p></blockquote>`).join("") + ADM_SAFETY.map(card => `<h3>${e(card.title)}</h3><p>${e(card.desc)}</p>`).join(""))}
+${section(ADM_FAQ_HEADING, "", ADM_FAQS.map(faq => `<details><summary>${e(faq.q)}</summary><p>${e(faq.a)}</p></details>`).join(""))}
+${section(ADM_BOTTOM.title, ADM_BOTTOM.sub, `<p>${e(ADM_BOTTOM.eyebrow)}</p><p>${e(ADM_BOTTOM.footnote)}</p><a href="/application-form">${e(ADM_BOTTOM.applyLabel)}</a>`)}
 </div>`;
 }
 
@@ -1811,15 +1715,17 @@ const pages: PageSSRConfig[] = [
   {
     path: "/admissions",
     appendSiteName: false,
-    title: "Admissions Open 2027–28 | CBSE School in Thane",
-    description: "Admissions open at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire, book a campus visit or apply today.",
-    keywords: "school admission Thane 2026, nursery admission Thane, CBSE school admission, Rainbow International School admission",
+    title: ADM_SEO.title,
+    description: ADM_SEO.description,
+    keywords: ADM_SEO.keywords,
     canonical: "https://rainbowinternationalschool.in/admissions",
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Admissions Open 2027–28 | CBSE School in Thane", url: "https://rainbowinternationalschool.in/admissions" },
+      { name: ADM_SEO.crumb, url: "https://rainbowinternationalschool.in/admissions" },
     ],
-    jsonLd: SCHOOL_LD,
+    h1: ADM_HERO.h1Lines.join(" "),
+    subtitle: ADM_HERO.subLine,
+    jsonLd: { "@context": "https://schema.org", "@type": "WebPage", name: ADM_SEO.title, description: ADM_SEO.description, url: "https://rainbowinternationalschool.in/admissions" },
     renderBody: renderAdmissions,
   },
   {

@@ -37,6 +37,7 @@ function extract(browser = false, suppliedDocument) {
     if (/^(SCRIPT|STYLE|NOSCRIPT)$/.test(node.tagName)
       || node.hidden || node.getAttribute("aria-hidden") === "true") return;
     // Rule 5 exempts the whole testimonials section, not just one quoted phrase.
+    if (node.hasAttribute("data-testimonial")) return;
     if (node.tagName === "SECTION" && (
       node.id === "testimonials" || node.querySelector('[data-testid^="card-testimonial-"]')
     )) return;
@@ -66,7 +67,7 @@ function extract(browser = false, suppliedDocument) {
   const bodyText = clean(document.body?.innerText);
   const warningText = clean(text.join(" ")).replaceAll(
     "Which is the best CBSE school in Thane for my child?", "",
-  );
+  ).replaceAll("Best Dynamic School 2026", "");
   const schemas = [], errors = [];
   for (const script of all('script[type="application/ld+json"]')) {
     try { schemas.push(JSON.parse(script.textContent)); }

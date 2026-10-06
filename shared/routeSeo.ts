@@ -1,3 +1,4 @@
+import { ADM_SEO } from "./content/admissions";
 /**
  * Single source of truth for per-route SEO metadata served in the raw HTML.
  *
@@ -264,9 +265,8 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "School Near Manpada",
   },
   "/admissions": {
-    description:
-      "Admissions open 2027-28 at Rainbow International School, a CBSE school in Thane for KG to Class 12. Enquire or book a campus visit.",
-    crumb: "Admissions",
+    description: ADM_SEO.description,
+    crumb: ADM_SEO.crumb,
   },
 };
 

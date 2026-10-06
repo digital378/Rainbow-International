@@ -1,0 +1,149 @@
+SEO PROMPT 3 — ADMISSIONS PAGE ( /admissions )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, section order, form field, form handler and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+============================================================
+PART A — ONE COPY SOURCE
+============================================================
+Create shared/content/admissions.ts (same pattern as shared/content/home.ts). It holds every visible sentence of the Admissions page from PART C as plain strings/arrays (no JSX, icons, colours or image paths). Suggested exports: ADM_SEO, ADM_HERO, ADM_FORM, ADM_BENEFITS, ADM_STEPS, ADM_GRADES, ADM_DOCUMENTS, ADM_TESTIMONIALS, ADM_SAFETY, ADM_FAQS, ADM_BOTTOM.
+
+Then:
+- client/src/pages/Admissions.tsx reads all its text from that file (keep icons/colours/images by array index).
+- shared/faqData.ts: replace the body of ADMISSIONS_FAQS with a re-export of ADM_FAQS (export const ADMISSIONS_FAQS = ADM_FAQS) so any other importer keeps working. Do not touch FAQ_PAGE_CATEGORIES (the /faqs page) in this prompt.
+- server/ssrPages.ts: the "/admissions" config and renderAdmissions() build everything from the same file (PART D).
+- server/pageTitles.ts "/admissions" and shared/routeSeo.ts ROUTE_SEO["/admissions"].description import ADM_SEO.title / ADM_SEO.description (no retyping).
+
+============================================================
+PART B — METADATA
+============================================================
+ADM_SEO.title       = "School Admission 2027-28 in Thane | Rainbow International"
+ADM_SEO.description = "Admissions 2027-28 for KG to Class 12 in Brahmand, Thane West: process, age criteria, documents and school timings. Call +91 82915 68972."
+ADM_SEO.keywords    = "school admission in Thane 2027-28, CBSE school admission Thane, Class 1 admission Thane, Class 11 admission Thane, KG admission Thane West"
+ADM_SEO.crumb       = "Admissions"
+canonical: https://rainbowinternationalschool.in/admissions (unchanged)
+
+Admissions.tsx <SEO>: title, description, keywords from ADM_SEO; keep appendSiteName={false} and breadcrumbs. JSON-LD: keep only the WebPage node, with "name": ADM_SEO.title and "description": ADM_SEO.description. Remove buildFaqPageSchema(PAGE_FAQS) and its import. No FAQPage anywhere.
+
+============================================================
+PART C — EXACT COPY
+============================================================
+--- HERO ---
+badge (unchanged): "Admissions Open 2027–28"
+h1 line 1: "School Admission"
+h1 line 2 (the existing amber span): "2027–28"
+h1 line 3: "in Thane West"
+(Same <br /> + span structure as now; only words change.)
+sub-line: "CBSE Affiliated School | KG to Class 12" (unchanged)
+small line: "Established 2009 · 3.5-acre campus · 3,000+ students · Brahmand, Thane West"
+stat chips (value / label), same 4-chip layout:
+  "3,000+" / "Students"            (replaces "50K+ / Happy Students")
+  "Since 2009" / "Established"     (replaces "15+ / Years of Excellence")
+  "CBSE" / "Affiliation 1130661"
+  "3.5 Acres" / "Campus"
+CTAs and mobile buttons unchanged.
+
+--- HERO FORM (text only) ---
+subtitle: "Our admissions counsellor will call you back during office hours, Mon–Sat 9 am–6 pm."
+footnote: "Mon–Sat · 9 AM–6 PM · No entrance test for KG–Class 8"
+Thank-you text unchanged.
+
+--- WHY PARENTS CHOOSE RIS ---
+eyebrow "Why Parents Choose RIS", h2 "The RIS Advantage", sub unchanged.
+cards (title / desc):
+ 1 "CBSE-Affiliated" / "Full CBSE curriculum, Affiliation No. 1130661, from KG through Class 12."
+ 2 "KG to Class 12" / "One campus, one community — a complete K-12 journey so your child never has to change schools."
+ 3 "3.5-Acre Campus" / "Brahmand campus with AC smart classrooms, five labs, a swimming pool and an amphitheatre."
+ 4 "Strong Academics" / "Physics, Chemistry, Biology, IT and Maths labs, project-based work and structured CBSE board preparation."
+ 5 "Sports & Activities" / "Swimming pool, sports facilities, amphitheatre and organic garden, plus Spanish from KG to Grade 8."
+ 6 "Safe Environment" / "CCTV surveillance, a 100% female staff team and the school's own GPS-enabled buses."
+
+--- ADMISSION JOURNEY ---
+eyebrow "Simple & Transparent", h2 "The Admission Journey", sub unchanged.
+ 01 "Submit Enquiry" / "Fill the admission enquiry form online or call the admission desk directly."
+ 02 "Counsellor Call-Back" / "An admissions counsellor calls you back during office hours, Mon–Sat 9 am–6 pm, to discuss your child's needs."
+ 03 "Campus Visit & Counselling" / "Visit the Brahmand campus, meet the team and see the facilities first-hand."
+ 04 "Interaction & Document Review" / "No entrance test for KG to Class 8: a friendly interaction and a document review."
+ 05 "Admission Confirmation" / "Complete the fee payment and receive the admission confirmation letter."
+CTA unchanged.
+
+--- ADMISSIONS BY GRADE ---
+h2 "Admissions by Grade", sub unchanged. Cards (label / classes / concern / advantage / href):
+ "Pre-Primary" / "Jr KG · Sr KG" / "Starting school is a big moment." / "Jr KG 3.5 to 4.5 years, Sr KG 4.5 to 5.5 years. Play-based learning with a 100% female staff team, 9:30 am–12:30 pm." / /pre-primary-school-thane
+ "Primary" / "Class 1 – 5" / "Building the right foundation matters." / "Class 1 from age 6 (6 to 7 years). CBSE literacy, numeracy, science and Spanish; school day 7:30 am–1:00 pm." / /primary-section
+ "Middle School" / "Class 6 – 8" / "The tween years need structure and stimulation." / "Project work, science labs and Spanish up to Grade 8. No entrance test up to Class 8; school day 7:30 am–1:00 pm." / /middle-school-section
+ "Secondary" / "Class 9 – 10" / "Board prep without burning out." / "Structured CBSE Class 10 preparation with periodic tests and pre-boards. 100% Class 10 result in 2018-19." / /secondary-section
+ "Senior Secondary" / "Class 11 – 12" / "The right stream, the right support." / "Science, Commerce and Humanities in an afternoon shift, 1:00–6:00 pm, with Physics, Chemistry, Biology, IT and Maths labs." / /senior-secondary-section
+
+--- DOCUMENTS REQUIRED ---
+h2, sub, the 8 list items and the note under the list: move into ADM_DOCUMENTS unchanged.
+
+--- WHAT PARENTS SAY ---
+Move the 4 reviews into ADM_TESTIMONIALS word-for-word (parents' own words; do not edit). Photo strip unchanged.
+Safety & transport cards (title / desc):
+ "Safe & Secure Campus" / "CCTV surveillance and a 100% female staff team across the school."
+ "School Transport" / "The school's own GPS-enabled buses for homes within 10 km — Brahmand, Ghodbunder Road, Manpada, Hiranandani Estate and more."
+
+--- FAQ (visible text only, NO FAQPage schema) ---
+h2 "Frequently Asked Questions". ADM_FAQS (q / a), in this order:
+1 "Which classes are admissions open for in 2027–28?" / "Admissions for 2027–28 are open from KG (Jr KG and Sr KG) to Class 12, subject to seat availability in each class."
+2 "What is the age criteria for admission?" / "Jr KG: 3.5 to 4.5 years. Sr KG: 4.5 to 5.5 years. Class 1: minimum 6 years (6 to 7 years). Later classes follow in one-year steps, as per CBSE norms."
+3 "Is there an entrance test?" / "There is no entrance test for KG to Class 8: children have a friendly interaction and documents are reviewed. For Class 9 and above, the admissions office explains the process for your child's class."
+4 "What is the admission process?" / "Submit an enquiry online or by phone, get a call-back from a counsellor, visit the campus, complete the interaction and document review, then confirm the admission with the fee payment."
+5 "What documents are needed?" / "Birth certificate, Aadhaar of the child and a parent, passport photos, address proof, the previous school's Transfer Certificate where applicable and the last two years' report cards. The admissions team confirms the list for your child's class."
+6 "What are the school timings?" / "KG: 9:30 am to 12:30 pm. Class 1 to 10: 7:30 am to 1:00 pm. Class 11 and 12: 1:00 pm to 6:00 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+7 "Is school transport available?" / "Yes. The school runs its own GPS-enabled buses for homes within 10 km of the Brahmand campus, including Ghodbunder Road, Manpada, Hiranandani Estate and Kolshet."
+8 "Which streams are offered in Class 11 and 12?" / "Science, Commerce and Humanities, in an afternoon shift from 1:00 pm to 6:00 pm."
+9 "What are the fees?" / "Fees are not published online. Call or WhatsApp the admissions team on +91 82915 68972 for the fee for your child's class."
+10 "How do I book a campus visit?" / "Fill in the enquiry form on this page, or call or WhatsApp +91 82915 68972. The office is open Monday to Saturday, 9 am to 6 pm."
+11 "Which board is the school affiliated to?" / "CBSE, New Delhi. Affiliation No. 1130661, School Code 30562."
+
+--- BOTTOM FORM (text only) ---
+h2 "Book a Campus Visit"
+sub: "See our 3.5-acre campus, meet the team and take the first step towards admission for 2027–28."
+footnote: "Our admissions team calls back during office hours · Mon–Sat, 9 AM–6 PM"
+Grade dropdown, fields and handler unchanged.
+
+============================================================
+PART D — BOT HTML (server/ssrPages.ts)
+============================================================
+1. Add two optional fields to PageSSRConfig: h1?: string and subtitle?: string. In the shared page template use `cfg.h1 ?? <current breadcrumb name>` for the <h1> and `cfg.subtitle ?? <current description sentence>` for the subtitle. Other pages keep their current behaviour (do not set these fields for them).
+2. "/admissions" config: title ADM_SEO.title, description ADM_SEO.description, keywords ADM_SEO.keywords, breadcrumb last item name ADM_SEO.crumb, h1 = "School Admission 2027–28 in Thane West", subtitle = "CBSE Affiliated School | KG to Class 12".
+3. Rewrite renderAdmissions() to render ONLY the shared copy, in the visitor order, escaped with the existing e() helper:
+   hero badge + small line + 4 stat chips + links "Book a Campus Visit" (#enquiry-form → use /admissions#enquiry-form) and "Call +91 82915 68972" (one tel:+918291568972 link);
+   h2 "The RIS Advantage" + 6 cards (h3 + p);
+   h2 "The Admission Journey" + 5 steps;
+   h2 "Admissions by Grade" + 5 cards (h3, classes, concern, advantage, link to href);
+   h2 "Documents Required" + list + note;
+   h2 "What Parents Say About RIS" + 4 reviews + the 2 safety/transport cards;
+   h2 "Frequently Asked Questions" + 11 FAQs as <details><summary>q</summary><p>a</p></details>;
+   h2 "Book a Campus Visit" + sub + link "Apply online" → /application-form.
+   Delete everything else that was in renderAdmissions (the old long text incl. Nursery, 2026 cut-off dates, hyperlocal blocks, French/Sanskrit/Marathi, female attendant, speed governor, 30 routes, skating, infirmary, cafeteria, sibling concessions, relocation buddy, campus-visit hours).
+4. The bot page must contain exactly one <h1>, no "Nursery" (except inside the footer's preschool-network links), no "2026–27", no "50K", no "30+ routes", no "within one working day", no FAQPage.
+
+============================================================
+PART E — SITEMAP
+============================================================
+In the sitemap file that is served at /sitemap.xml, set <lastmod> to 2026-10-06 for https://rainbowinternationalschool.in/ and https://rainbowinternationalschool.in/admissions only. Nothing else in the sitemap changes.
+
+============================================================
+PART E2 — HOMEPAGE FOLLOW-UPS (owner confirmed today; edit shared/content/home.ts only, design unchanged)
+============================================================
+1. Award confirmed by the owner: "Best Dynamic School 2026" from the Maharashtra Educators Summit.
+   a) HOME_AWARDS_INTRO paragraph →
+      "Our recognitions include Best Dynamic School 2026 at the Maharashtra Educators Summit, the India Today award for Excellence in CBSE Education (2017) and Scoonews Emerging School of the Year, West India (2022)."
+   b) HOME_DISCOVER "Awards & Accomplishments" description →
+      "Awards since 2017, including Best Dynamic School 2026 (Maharashtra Educators Summit), India Today (2017) and Scoonews (2022)."
+   c) Append one line to rule 5 in replit.md: "Exception: a real award name may contain 'Best' (e.g. 'Best Dynamic School 2026')." The parity checker's banned-word report must ignore the exact phrase "Best Dynamic School 2026".
+2. Award logos in the homepage awards strip (National School Awards, Economic Times, Thane Municipal Corp and the others): owner confirmed they are real. Leave the logos, links and order exactly as they are.
+3. Neighbourhood "How Far Are We From You?" list: keep all 8 area names and their order, but replace each unverified drive time pill ("2 min drive", "5 min drive" …) with the same pill text "Within 10 km" for every area (school buses cover a 10 km radius). The pill currently renders `{a.time} drive`, so render the new value on its own (no trailing " drive"). Same pill element and classes; only the words change. The SSR homepage mirrors this automatically from home.ts — confirm it does.
+4. Age criteria: keep exactly the wording already used (Jr KG 3.5–4.5, Sr KG 4.5–5.5, Class 1 minimum 6, "as per CBSE norms"). Do NOT add any cut-off date anywhere.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /admissions and / only: title, description, canonical and H1 match bot vs visitor; bot/visitor words within 90–130%; one tel number; admin@ only; no FAQPage.
+3 No other routes, tests or screenshots.
+4 git add -A && git commit -m "SEO P3: admissions copy + parity; homepage award line and area pills" then git push once (if it fails, report it — no retries, no git setting changes).
+5 Write artifacts/reports/seo-p3-admissions-report.txt: files changed; final title, description, H1 (bot and visitor); bot vs visitor words; banned-word list result; anything not done.
+Reply with the report text only. Do not publish.

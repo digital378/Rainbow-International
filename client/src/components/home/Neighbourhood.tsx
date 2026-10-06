@@ -58,7 +58,7 @@ export function Neighbourhood() {
                     <span className="text-sm font-medium text-gray-700">{a.name}</span>
                   </div>
                   <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#eef5ff", color: "#0d3b86" }}>
-                    {a.time} {HOME_NEIGHBOURHOOD.drive}
+                    {a.time}
                   </span>
                 </div>
               ))}

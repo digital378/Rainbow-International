@@ -1,3 +1,4 @@
+import { ADM_FAQS } from "./content/admissions";
 /**
  * Shared FAQ content — single source of truth for both the visible React
  * pages and the server-side FAQPage JSON-LD injected into the raw HTML.
@@ -108,17 +109,7 @@ export const FAQ_PAGE_CATEGORIES: FaqCategory[] = [
 ];
 
 /** FAQ section shown on /admissions. */
-export const ADMISSIONS_FAQS: FaqItem[] = [
-  { q: "Which board is Rainbow International School affiliated to?",   a: "Rainbow International School Thane is affiliated to the Central Board of Secondary Education (CBSE), New Delhi. Affiliation No. 1130661." },
-  { q: "Which classes are admissions open for in 2027-28?",           a: "Admissions are open for KG to Class 12 for the 2027-28 academic year, subject to seat availability per class." },
-  { q: "What is the admission process at RIS?",                        a: "Submit an enquiry online or by phone → counsellor calls back → campus visit and counselling session → student interaction and document review → admission confirmation on fee payment." },
-  { q: "Is school transport available?",                               a: "Yes. GPS-tracked school buses with trained attendants cover Brahmand, Ghodbunder Road, Manpada and 30+ routes across Thane." },
-  { q: "What documents are required for admission?",                   a: "Birth certificate, Aadhaar (child and parent), passport photos, address proof, previous school transfer certificate, last two years' report cards, and a medical fitness certificate." },
-  { q: "Is there an admission interaction or assessment?",             a: "For Nursery to Class 8 there is no written test — an informal interaction session is held. For Class 9 and above, a written assessment in core subjects is required." },
-  { q: "How can parents book a campus visit?",                         a: "Book through the enquiry form on this page, call the admission desk at +91 82915 68972, or WhatsApp us. Campus visits are available Mon–Sat, 9 AM–5 PM." },
-  { q: "What are the school timings?",                                 a: "School hours are Monday to Saturday, 9:00 AM to 6:00 PM (office). Academic hours for students vary by section; confirmed at the time of admission." },
-  { q: "Are senior secondary streams available?",                      a: "Yes. Class 11 and 12 are offered in three CBSE streams: Science (PCM / PCB), Commerce, and Humanities, with JEE, NEET and CUET prep support." },
-];
+export const ADMISSIONS_FAQS = ADM_FAQS;
 
 /** Flat list of every FAQ on /faqs (all categories). */
 export const ALL_FAQS_PAGE_ITEMS: FaqItem[] = FAQ_PAGE_CATEGORIES.flatMap((c) => c.faqs);

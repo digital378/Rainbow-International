@@ -7,9 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { submitInquiry } from "@/lib/inquiryProtection";
 import { getFormTrackingData } from "@/lib/analytics";
-import { buildFaqPageSchema } from "@/components/WaveOneSeoBlock";
-import { ADMISSIONS_FAQS } from "@shared/faqData";
-import { ROUTE_SEO } from "@shared/routeSeo";
+import { ADM_SEO, ADM_HERO, ADM_FORM, ADM_BENEFITS, ADM_STEPS, ADM_GRADES, ADM_DOCUMENTS, ADM_TESTIMONIALS, ADM_SAFETY, ADM_FAQS, ADM_FAQ_HEADING, ADM_BOTTOM } from "@shared/content/admissions";
 import {
   CheckCircle, Phone, MessageCircle, MapPin, CalendarCheck,
   ClipboardList, UserCheck, BadgeCheck, GraduationCap, ChevronRight, Star, Shield, Bus, BookOpen,
@@ -27,91 +25,56 @@ const grades = [
 ];
 
 const benefits = [
-  { icon: GraduationCap, title: "CBSE-Affiliated",      desc: "Full CBSE curriculum, Affiliation No. 1130661, from KG through Class 12.",           color: "#e0edff", accent: "#0d3b86" },
-  { icon: BookOpen,      title: "KG to Class 12",  desc: "One campus, one community — a complete K-12 journey so your child never has to change schools.", color: "#fff3e0", accent: "#d97706" },
-  { icon: MapPin,        title: "3.5-Acre Campus",      desc: "Sprawling Brahmand campus with smart classrooms, labs, library, pool and sports ground.",   color: "#e0f7f0", accent: "#059669" },
-  { icon: BadgeCheck,    title: "Strong Academics",     desc: "Multiple Intelligence pedagogy, project-based learning, Olympiad coaching and board prep.",   color: "#f3e0ff", accent: "#7c3aed" },
-  { icon: Star,          title: "Sports & Activities",  desc: "Swimming pool, football turf, cricket ground, skating rink, karate, chess and 15+ more.",    color: "#fdf0e0", accent: "#ea580c" },
-  { icon: Shield,        title: "Safe Environment",     desc: "CCTV-monitored campus, on-campus infirmary, paediatrician on call, metal detectors at entry.", color: "#e0f0ff", accent: "#0891b2" },
-];
+  { icon: GraduationCap, color: "#e0edff", accent: "#0d3b86" },
+  { icon: BookOpen,      color: "#fff3e0", accent: "#d97706" },
+  { icon: MapPin,        color: "#e0f7f0", accent: "#059669" },
+  { icon: BadgeCheck,    color: "#f3e0ff", accent: "#7c3aed" },
+  { icon: Star,          color: "#fdf0e0", accent: "#ea580c" },
+  { icon: Shield,        color: "#e0f0ff", accent: "#0891b2" },
+].map((visual, index) => ({ ...visual, ...ADM_BENEFITS.cards[index] }));
 
 const steps = [
-  { icon: ClipboardList, step: "01", title: "Submit Enquiry",                desc: "Fill the admission enquiry form online or call the admission desk directly." },
-  { icon: Phone,         step: "02", title: "Counsellor Call-Back",          desc: "An admissions counsellor calls within one working day to discuss your child's needs." },
-  { icon: MapPin,        step: "03", title: "Campus Visit & Counselling",    desc: "Visit the Brahmand campus, meet the team and see facilities first-hand." },
-  { icon: UserCheck,     step: "04", title: "Interaction & Document Review", desc: "A friendly student interaction and document verification session." },
-  { icon: BadgeCheck,    step: "05", title: "Admission Confirmation",        desc: "Complete fee payment and receive the admission confirmation letter." },
-];
+  { icon: ClipboardList, },
+  { icon: Phone,         },
+  { icon: MapPin,        },
+  { icon: UserCheck,     },
+  { icon: BadgeCheck,    },
+].map((visual, index) => ({ ...visual, ...ADM_STEPS.items[index] }));
 
 const gradeBlocks = [
   {
-    label: "Pre-Primary",
-    classes: "Nursery · Jr KG · Sr KG",
     img: "/images/home/academic/pre-primary.webp",
-    concern: "Starting school is a big moment.",
-    advantage: "Our play-based, activity-led Nursery wing uses the Multiple Intelligence approach. A female-staff-led section with a safe, nurturing atmosphere.",
-    href: "/pre-primary-school-thane",
     color: "#fff3e0", accent: "#d97706",
   },
   {
-    label: "Primary",
-    classes: "Class 1 – 5",
     img: "/images/home/academic/primary-section.webp",
-    concern: "Building the right foundation matters.",
-    advantage: "CBSE-aligned literacy, numeracy, science and creative skills. Co-curricular activities built into every school day.",
-    href: "/primary-section",
     color: "#e0f7f0", accent: "#059669",
   },
   {
-    label: "Middle School",
-    classes: "Class 6 – 8",
     img: "/images/home/academic/middle-section.webp",
-    concern: "The tween years need structure and stimulation.",
-    advantage: "Conceptual depth across subjects, project-based learning, Olympiad coaching and a rich co-curricular calendar.",
-    href: "/middle-school-section",
     color: "#e0edff", accent: "#0d3b86",
   },
   {
-    label: "Secondary",
-    classes: "Class 9 – 10",
     img: "/images/home/academic/secondary.webp",
-    concern: "Board prep without burning out.",
-    advantage: "Structured CBSE Class 10 preparation with periodic tests, pre-boards, doubt sessions and career counselling for stream choice.",
-    href: "/secondary-section",
     color: "#f3e0ff", accent: "#7c3aed",
   },
   {
-    label: "Senior Secondary",
-    classes: "Class 11 – 12",
     img: "/images/home/academic/senior-secondary.webp",
-    concern: "The right stream, the right support.",
-    advantage: "Science, Commerce and Humanities streams with JEE / NEET / CUET prep support, dedicated subject labs and expert faculty.",
-    href: "/senior-secondary-section",
     color: "#e0f0ff", accent: "#0891b2",
   },
-];
+].map((visual, index) => ({ ...visual, ...ADM_GRADES.cards[index] }));
 
-const documents = [
-  "Birth certificate (original + photocopy)",
-  "Aadhaar card — child and parent",
-  "Passport-size photographs (child × 4, parent × 2)",
-  "Previous school Transfer Certificate (where applicable)",
-  "Report cards / mark sheets (last 2 years)",
-  "Address proof (utility bill / rent agreement)",
-  "Medical fitness certificate",
-  "Caste / category certificate (if applicable)",
-];
+const documents = ADM_DOCUMENTS.items;
 
 const testimonials = [
-  { name: "Anuja Pradhan",   initials: "AP", color: "#0d3b86", review: "Highly recommended. Most lively atmosphere. The warmth makes every child comfortable. Practical activities, great hygiene — undoubtedly the best school in Thane." },
-  { name: "Surabhi Trivedi", initials: "ST", color: "#d97706", review: "Fantastic! The teachers are professional, caring and well organised. Infrastructure is outstanding. Children grow intellectually and in co-curricular activities." },
-  { name: "Dhaval Lodaya",   initials: "DL", color: "#059669", review: "RIS gave my child a stellar foundation and a nurturing environment that made the school an extension of our family." },
-  { name: "Ratish Pradhan",  initials: "RP", color: "#7c3aed", review: "We are very happy with the school, authorities and management. Teachers are nice and ensure all kids get the required attention." },
-];
+  { color: "#0d3b86", },
+  { color: "#d97706", },
+  { color: "#059669", },
+  { color: "#7c3aed", },
+].map((visual, index) => ({ ...visual, ...ADM_TESTIMONIALS.reviews[index] }));
 
-// FAQ content lives in shared/faqData.ts — the same data the server uses
-// to inject FAQPage JSON-LD into the raw HTML. Edit it there, not here.
-const PAGE_FAQS = ADMISSIONS_FAQS;
+// Visible FAQs share the same copy as crawler HTML; no FAQPage schema.
+const PAGE_FAQS = ADM_FAQS;
 
 // ── Sub-component ─────────────────────────────────────────────────────────────
 
@@ -140,7 +103,7 @@ function GradeCard({ g }: { g: typeof gradeBlocks[0] }) {
           className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border-2 transition-all hover:opacity-80"
           style={{ color: "#091a4f", borderColor: "#091a4f" }}
         >
-          Learn more <ChevronRight className="w-3 h-3" />
+          {ADM_GRADES.moreLabel} <ChevronRight className="w-3 h-3" />
         </a>
       </div>
     </div>
@@ -182,25 +145,24 @@ export default function Admissions() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <SEO
-        title="Admissions Open 2027–28 | CBSE School in Thane"
-        description={ROUTE_SEO["/admissions"].description}
-        keywords="admissions open in Thane, CBSE school admission in Thane, KG admission in Thane, Class 1 admission in Thane, Class 11 admission in Thane, school admission near me, CBSE school admission 2027-28"
+        title={ADM_SEO.title}
+        description={ADM_SEO.description}
+        keywords={ADM_SEO.keywords}
         canonical="https://rainbowinternationalschool.in/admissions"
         appendSiteName={false}
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: ROUTE_SEO["/admissions"].crumb, href: "https://rainbowinternationalschool.in/admissions" },
+          { name: ADM_SEO.crumb, href: "https://rainbowinternationalschool.in/admissions" },
         ]}
         jsonLd={{
           "@context": "https://schema.org",
           "@graph": [
             {
               "@type": "WebPage",
-              "name": "Admissions Open 2027–28 | Rainbow International School Thane",
-              "description": "CBSE admissions open for 2027-28 at Rainbow International School Thane — KG to Class 12.",
+              "name": ADM_SEO.title,
+              "description": ADM_SEO.description,
               "url": "https://rainbowinternationalschool.in/admissions",
             },
-            buildFaqPageSchema(PAGE_FAQS),
           ],
         }}
       />
@@ -232,19 +194,19 @@ export default function Admissions() {
           {/* Left copy */}
           <div className="text-white">
             <span className="inline-flex items-center gap-2 bg-amber-400 text-[#091a4f] text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-6">
-              <span className="w-2 h-2 rounded-full bg-[#091a4f] animate-pulse" /> Admissions Open 2027–28
+              <span className="w-2 h-2 rounded-full bg-[#091a4f] animate-pulse" /> {ADM_HERO.badge}
             </span>
             <h1 className="font-['DM_Sans'] font-black text-4xl md:text-5xl lg:text-6xl leading-tight mb-4">
-              Give Your Child<br />
-              <span className="text-amber-400">the Best Start</span><br />
-              in Thane
+              {ADM_HERO.h1Lines[0]}<br />
+              <span className="text-amber-400">{ADM_HERO.h1Lines[1]}</span><br />
+              {ADM_HERO.h1Lines[2]}
             </h1>
-            <p className="text-blue-100 text-lg mb-2 font-medium">CBSE Affiliated School | KG to Class 12</p>
-            <p className="text-blue-200 text-sm mb-8">Established 2009 · 3.5-acre campus · 3,000+ students · Brahmand, Thane</p>
+            <p className="text-blue-100 text-lg mb-2 font-medium">{ADM_HERO.subLine}</p>
+            <p className="text-blue-200 text-sm mb-8">{ADM_HERO.smallLine}</p>
 
             {/* Trust stats */}
             <div className="flex flex-wrap gap-4 mb-10">
-              {[["50K+","Happy Students"],["15+","Years of Excellence"],["CBSE","Affiliation 1130661"],["3.5 Acres","Campus"]].map(([val, label]) => (
+              {ADM_HERO.stats.map(([val, label]) => (
                 <div key={label} className="bg-white/10 backdrop-blur rounded-2xl px-5 py-3 text-center border border-white/20">
                   <div className="text-amber-400 font-black text-lg leading-none">{val}</div>
                   <div className="text-blue-200 text-xs mt-0.5">{label}</div>
@@ -255,7 +217,7 @@ export default function Admissions() {
             {/* Desktop CTAs */}
             <div className="hidden md:flex gap-3 flex-wrap">
               <a href="#enquiry-form" data-testid="btn-hero-book-visit" className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-[#091a4f] font-extrabold px-7 py-3.5 rounded-full text-sm transition-colors shadow-lg shadow-amber-400/30">
-                <CalendarCheck className="w-4 h-4" /> Book a Campus Visit
+                <CalendarCheck className="w-4 h-4" /> {ADM_BOTTOM.title}
               </a>
               <a href="#enquiry-form" data-testid="btn-hero-apply" className="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 text-white font-bold px-7 py-3.5 rounded-full text-sm border border-white/30 transition-colors">
                 Apply Now <ChevronRight className="w-4 h-4" />
@@ -283,14 +245,14 @@ export default function Admissions() {
                   <CheckCircle className="w-9 h-9 text-green-500" />
                 </div>
                 <h3 className="font-['DM_Sans'] font-black text-xl text-[#091a4f] mb-2">Thank You!</h3>
-                <p className="text-gray-500 text-sm mb-6 max-w-xs">Our admissions counsellor will contact you shortly to guide you through the next step.</p>
+                <p className="text-gray-500 text-sm mb-6 max-w-xs">{ADM_FORM.thankYou}</p>
                 <button onClick={() => { setSubmitted(false); setForm(emptyForm); }} data-testid="button-submit-another" className="text-sm font-semibold text-[#0d3b86] underline underline-offset-2">Submit another enquiry</button>
               </div>
             ) : (
               <>
                 <div className="mb-5">
                   <h2 className="font-['DM_Sans'] font-black text-xl text-[#091a4f]">Quick Admission Enquiry</h2>
-                  <p className="text-gray-500 text-xs mt-1">Our counsellor will call you back within one working day.</p>
+                  <p className="text-gray-500 text-xs mt-1">{ADM_FORM.subtitle}</p>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4" data-testid="form-enquiry">
                   <input name="website" value={form.website} onChange={handleChange} tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px opacity-0" />
@@ -330,7 +292,7 @@ export default function Admissions() {
                   <button type="submit" disabled={mutation.isPending} data-testid="button-submit-enquiry" className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-3.5 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60 shadow-lg shadow-blue-900/20">
                     {mutation.isPending ? "Submitting…" : "Book a Campus Visit →"}
                   </button>
-                  <p className="text-center text-xs text-gray-400">Mon–Sat · 9 AM–6 PM · No entrance test for Nursery–Class 8</p>
+                  <p className="text-center text-xs text-gray-400">{ADM_FORM.footnote}</p>
                 </form>
               </>
             )}
@@ -343,10 +305,10 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> Why Parents Choose RIS
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> {ADM_BENEFITS.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">The RIS Advantage</h2>
-            <p className="text-gray-500 mt-3 max-w-lg mx-auto">A school that cares as much about character as it does about academics.</p>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_BENEFITS.title}</h2>
+            <p className="text-gray-500 mt-3 max-w-lg mx-auto">{ADM_BENEFITS.sub}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {benefits.map((b) => {
@@ -370,10 +332,10 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> Simple & Transparent
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> {ADM_STEPS.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">The Admission Journey</h2>
-            <p className="text-gray-500 mt-3 max-w-md mx-auto">Five straightforward steps from enquiry to first day of school.</p>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_STEPS.title}</h2>
+            <p className="text-gray-500 mt-3 max-w-md mx-auto">{ADM_STEPS.sub}</p>
           </div>
           <div className="relative">
             <div className="absolute left-[38px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#0d3b86] via-amber-400 to-transparent hidden md:block" aria-hidden="true" />
@@ -408,10 +370,10 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> For Every Stage
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> {ADM_GRADES.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">Admissions by Grade</h2>
-            <p className="text-gray-500 mt-3 max-w-md mx-auto">Find the right programme for where your child is today.</p>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_GRADES.title}</h2>
+            <p className="text-gray-500 mt-3 max-w-md mx-auto">{ADM_GRADES.sub}</p>
           </div>
           {/* First 3 cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
@@ -433,10 +395,10 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> Be Prepared
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> {ADM_DOCUMENTS.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">Documents Required</h2>
-            <p className="text-gray-500 mt-3 max-w-sm mx-auto">Keep these ready before your campus visit to fast-track the process.</p>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_DOCUMENTS.title}</h2>
+            <p className="text-gray-500 mt-3 max-w-sm mx-auto">{ADM_DOCUMENTS.sub}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {documents.map((doc, i) => (
@@ -446,7 +408,7 @@ export default function Admissions() {
               </div>
             ))}
           </div>
-          <p className="text-center text-xs text-gray-400 mt-6">Documents may vary by grade. The admissions team will confirm the full checklist during the counsellor call-back.</p>
+          <p className="text-center text-xs text-gray-400 mt-6">{ADM_DOCUMENTS.note}</p>
         </div>
       </section>
 
@@ -455,12 +417,12 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-white/10 text-amber-400 px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Parent Voices
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> {ADM_TESTIMONIALS.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-white">What Parents Say About RIS</h2>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-white">{ADM_TESTIMONIALS.title}</h2>
             <div className="flex items-center justify-center gap-1 mt-3">
               {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
-              <span className="text-amber-400 font-bold text-sm ml-2">Highly Rated by Parents in Thane</span>
+              <span className="text-amber-400 font-bold text-sm ml-2">{ADM_TESTIMONIALS.ratingLabel}</span>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
@@ -474,7 +436,7 @@ export default function Admissions() {
                   <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0" style={{ background: t.color }}>{t.initials}</div>
                   <div>
                     <p className="text-white font-bold text-sm">{t.name}</p>
-                    <p className="text-blue-300 text-xs">Parent · Rainbow International School</p>
+                    <p className="text-blue-300 text-xs">{ADM_TESTIMONIALS.parentLabel}</p>
                   </div>
                 </div>
               </div>
@@ -497,10 +459,7 @@ export default function Admissions() {
 
           {/* Safety & transport */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-            {[
-              { Icon: Shield, title: "Safe & Secure Campus",       desc: "CCTV, metal detectors, female-led Pre-Primary wing, on-campus infirmary and paediatrician on call." },
-              { Icon: Bus,    title: "Transport Across Thane",     desc: "GPS-tracked buses with trained attendants on 30+ routes — Brahmand, Ghodbunder, Manpada and more." },
-            ].map(({ Icon, title, desc }) => (
+            {[{ Icon: Shield }, { Icon: Bus }].map((visual, index) => ({ ...visual, ...ADM_SAFETY[index] })).map(({ Icon, title, desc }) => (
               <div key={title} className="flex gap-4 bg-white/5 border border-white/10 rounded-2xl p-5">
                 <div className="w-10 h-10 rounded-xl bg-amber-400/20 flex items-center justify-center flex-shrink-0">
                   <Icon className="w-5 h-5 text-amber-400" />
@@ -522,7 +481,7 @@ export default function Admissions() {
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> Got Questions?
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">Frequently Asked Questions</h2>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_FAQ_HEADING}</h2>
           </div>
           <div className="divide-y divide-gray-200 rounded-2xl bg-white border border-gray-100 shadow-sm">
             {PAGE_FAQS.map((f, i) => (
@@ -543,10 +502,10 @@ export default function Admissions() {
         <div className="container mx-auto px-4 max-w-2xl">
           <div className="text-center mb-10">
             <span className="inline-flex items-center gap-2 text-[11px] font-extrabold tracking-widest uppercase bg-[#eef5ff] text-[#0d3b86] px-4 py-1.5 rounded-full mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> Start Today
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0d3b86]" /> {ADM_BOTTOM.eyebrow}
             </span>
-            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">Book a Campus Visit</h2>
-            <p className="text-gray-500 mt-3 max-w-md mx-auto">See our 3.5-acre campus, meet the team and take the first step towards your child's best school years.</p>
+            <h2 className="font-['DM_Sans'] font-black text-3xl md:text-4xl text-[#091a4f]">{ADM_BOTTOM.title}</h2>
+            <p className="text-gray-500 mt-3 max-w-md mx-auto">{ADM_BOTTOM.sub}</p>
           </div>
           <div className="bg-[#f8faff] border border-blue-100 rounded-3xl p-7 md:p-10">
             {submitted ? (
@@ -555,7 +514,7 @@ export default function Admissions() {
                   <CheckCircle className="w-9 h-9 text-green-500" />
                 </div>
                 <h3 className="font-['DM_Sans'] font-black text-2xl text-[#091a4f] mb-2">Thank You!</h3>
-                <p className="text-gray-500 text-sm max-w-sm">Our admissions counsellor will contact you shortly to guide you through the next step.</p>
+                <p className="text-gray-500 text-sm max-w-sm">{ADM_FORM.thankYou}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5" data-testid="form-bottom-enquiry">
@@ -596,7 +555,7 @@ export default function Admissions() {
                 <button type="submit" disabled={mutation.isPending} data-testid="button-submit-bottom" className="w-full bg-[#0d3b86] hover:bg-[#091a4f] text-white font-bold py-4 rounded-xl text-sm tracking-wide transition-colors disabled:opacity-60 shadow-lg shadow-blue-900/20">
                   {mutation.isPending ? "Submitting…" : "Book My Campus Visit →"}
                 </button>
-                <p className="text-center text-xs text-gray-400">Our team responds within one working day · Mon–Sat, 9 AM–6 PM</p>
+                <p className="text-center text-xs text-gray-400">{ADM_BOTTOM.footnote}</p>
               </form>
             )}
           </div>

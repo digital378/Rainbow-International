@@ -1,3 +1,4 @@
+import { ADM_SEO } from "@shared/content/admissions";
 import { HOME_SEO } from "@shared/content/home";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
@@ -67,7 +68,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/school-near-brahmand-thane": "Best School Near Brahmand Thane — CBSE KG to Class 12 | Rainbow International School",
   "/school-near-ghodbunder-road-thane": "Best School Near Ghodbunder Road Thane — CBSE K–12 | Rainbow International School",
   "/school-near-manpada-thane": "Best School Near Manpada Thane — CBSE KG to Class 12 | Rainbow International School",
-  "/admissions": "Admissions Open 2027–28 | CBSE School in Thane | Rainbow International School",
+  "/admissions": ADM_SEO.title,
   "/rps-sales": "Rainbow Preschool | Rainbow International School",
   "/sales": "Admissions | Rainbow International School",
 };

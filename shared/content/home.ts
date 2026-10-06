@@ -51,7 +51,7 @@ export const HOME_SEATS = {
 export const HOME_AWARDS_INTRO = {
   eyebrow: "Recognised & Awarded",
   titleParts: ["Welcome To Rainbow", "International School"],
-  paragraph: "Our recognitions include the India Today award for Excellence in CBSE Education (2017) and Scoonews Emerging School of the Year, West India (2022). See every award with its year.",
+  paragraph: "Our recognitions include Best Dynamic School 2026 at the Maharashtra Educators Summit, the India Today award for Excellence in CBSE Education (2017) and Scoonews Emerging School of the Year, West India (2022).",
   button: AWARDS_LINK,
 };
 
@@ -138,7 +138,7 @@ export const HOME_DISCOVER = {
   title: "Let's Discover Rainbow!",
   sub: "Committed to educating, strengthening, and nurturing every student — and empowering lifelong learners.",
   cards: [
-    { title: "Awards & Accomplishments", description: "Awards received since 2017, including India Today (2017), Pride of Bharat (2021) and Scoonews (2022).", href: "/awards-achievements", tag: "Recognition" },
+    { title: "Awards & Accomplishments", description: "Awards since 2017, including Best Dynamic School 2026 (Maharashtra Educators Summit), India Today (2017) and Scoonews (2022).", href: "/awards-achievements", tag: "Recognition" },
     { title: "Amenities & Facilities", description: "Swimming pool, amphitheatre, AC classrooms, smart boards and five labs (Physics, Chemistry, Biology, IT, Maths) on our 3.5-acre campus.", href: "/amenities", tag: "Campus" },
     { title: "Student Achievements", description: "Student accomplishments are acknowledged and honoured. See our students' results and achievements here.", href: "/student-achievements", tag: "Excellence" },
     { title: "Safety & Security", description: "Student safety and well-being come first, with CCTV surveillance and GPS-enabled school buses.", href: "/safety-security", tag: "Wellbeing" },
@@ -156,16 +156,16 @@ export const HOME_NEIGHBOURHOOD = {
     { title: "Section-wise Timings", desc: "KG 9:30 am–12:30 pm, Class 1–10 7:30 am–1:00 pm, Class 11–12 1:00–6:00 pm." },
   ],
   areaTitle: "How Far Are We From You?",
-  drive: "drive",
+  drive: "",
   areas: [
-    { name: "Brahmand", time: "2 min" },
-    { name: "Hiranandani Estate", time: "5 min" },
-    { name: "Manpada", time: "7 min" },
-    { name: "Ghodbunder Road", time: "8 min" },
-    { name: "Patlipada", time: "10 min" },
-    { name: "Kavesar", time: "10 min" },
-    { name: "Pokhran Road", time: "12 min" },
-    { name: "Kolshet", time: "12 min" },
+    { name: "Brahmand", time: "Within 10 km" },
+    { name: "Hiranandani Estate", time: "Within 10 km" },
+    { name: "Manpada", time: "Within 10 km" },
+    { name: "Ghodbunder Road", time: "Within 10 km" },
+    { name: "Patlipada", time: "Within 10 km" },
+    { name: "Kavesar", time: "Within 10 km" },
+    { name: "Pokhran Road", time: "Within 10 km" },
+    { name: "Kolshet", time: "Within 10 km" },
   ],
   address: "Cosmos Arcade, Brahmand Phase 4, Thane West 400607",
   buttons: [
