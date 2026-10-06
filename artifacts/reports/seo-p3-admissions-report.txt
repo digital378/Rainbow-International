@@ -1,0 +1,91 @@
+SEO P3 — ADMISSIONS AND HOMEPAGE REPORT
+
+STATUS
+Admissions copy, metadata, visible FAQs and crawler content updated. Homepage award wording and area pills updated. TypeScript passed. Word-count parity targets remain unmet, and the single GitHub push failed.
+
+COMPLETED
+- Created shared/content/admissions.ts as the Admissions copy source for React, crawler HTML and metadata.
+- Preserved React classes, colours, icons, images, layout, section order, form fields, submit handlers and testids.
+- Used the exact supplied copy for six benefits, five steps, five grade cards, two safety/transport cards and eleven FAQs.
+- Moved the eight document items, their note and four parent reviews without changing their wording.
+- Updated hero/form/bottom text; retained existing CTAs, dropdown choices and thank-you text.
+- Removed the Admissions FAQPage builder/import. Page-specific JSON-LD now contains WebPage only; shared organisation/website/breadcrumb output remains.
+- ADMISSIONS_FAQS aliases ADM_FAQS. FAQ_PAGE_CATEGORIES was not changed.
+- Added optional SSR h1/subtitle overrides for Admissions only; other pages retain their existing fallback behaviour.
+- Replaced the old Admissions crawler body with shared content in visitor section order. Removed its obsolete Nursery, timing, route-count, language and other claims.
+- Updated the two confirmed award sentences and the exact award-name exception in rule 5 and the parity checker. All award logos, links and order unchanged.
+- All eight homepage areas retain their names/order and show "Within 10 km" in the same pills, without "drive".
+- Confirmed the unchanged SSR homepage renderer reads the same area values; its shared drive suffix is now empty.
+- Kept age criteria wording without adding a cut-off date.
+- Changed sitemap lastmod to 2026-10-06 for the homepage and /admissions only.
+
+ADMISSIONS — FINAL METADATA
+Title, bot and visitor:
+School Admission 2027-28 in Thane | Rainbow International
+Description, bot and visitor:
+Admissions 2027-28 for KG to Class 12 in Brahmand, Thane West: process, age criteria, documents and school timings. Call +91 82915 68972.
+Canonical: https://rainbowinternationalschool.in/admissions
+H1, bot: School Admission 2027–28 in Thane West
+H1, visitor: School Admission 2027–28 in Thane West
+Visitor retains its three lines and existing amber span.
+
+HOMEPAGE — FINAL METADATA
+Title, bot and visitor:
+CBSE School in Thane West | Rainbow International School
+Description, bot and visitor:
+Choosing a CBSE school in Thane? Rainbow International School, Brahmand: KG to Class 12, Spanish KG to Grade 8. Admissions 2027-28: +91 82915 68972.
+Canonical: https://rainbowinternationalschool.in/
+H1, bot: CBSE School in Thane West KG to Class 12
+H1, visitor: CBSE School in Thane West KG to Class 12
+
+CHECK RESULTS
+npx tsc --noEmit: PASS.
+Parity checked only /admissions and / against development.
+The checker accepts one route per invocation; / was therefore checked separately after /admissions.
+Title, description, canonical, one H1 and matching H1 text: PASS on both.
+One distinct tel number, +91 82915 68972: PASS on both.
+Allowed email check: PASS. Homepage bot/visitor use admin@rainbowinternationalschool.in. Admissions visitor uses admin@; Admissions bot has no mailto link.
+Valid JSON-LD, matching schema types, one organisation and no FAQPage: PASS on both.
+
+WORD COUNTS — TARGET NOT ACHIEVED
+/admissions: bot 842; visitor 1,188; ratio 70.9%, below 90–130%.
+/: bot 1,437; visitor 1,699; ratio 84.6%, below 90–130%.
+Both routes: WARN, zero checks classified FAIL by the script. This is not a word-count parity pass.
+The specified crawler content does not mirror all visitor form/control and page-chrome text. No filler, extra forms or frozen navigation/layout changes were added to force a numerical pass.
+
+BANNED-WORD RESULTS
+/admissions bot: none; visitor: "top".
+/ bot: none; visitor: "top".
+"top" comes from the unchanged "Top Schools in Thane" navigation label, outside this prompt's scope.
+Parent reviews remain unchanged and exempt. The exact phrase "Best Dynamic School 2026" is correctly exempt; the generic banned-word rule remains active.
+
+FILES CHANGED
+shared/content/admissions.ts
+client/src/pages/Admissions.tsx
+shared/faqData.ts
+server/ssrPages.ts
+server/pageTitles.ts
+shared/routeSeo.ts
+client/public/sitemap.xml
+shared/content/home.ts
+client/src/components/home/Neighbourhood.tsx
+scripts/parity-check.mjs
+replit.md
+artifacts/reports/seo-p3-admissions-report.txt
+Owner verification was also recorded in project memory: .agents/memory/homepage-award-confirmations.md and its MEMORY.md index entry.
+The uploaded SEO P3 brief was included by the requested git add -A.
+
+GIT
+One commit created: 2f413b9
+Message: SEO P3: admissions copy + parity; homepage award line and area pills
+One push attempted: FAILED — GitHub rejected authentication: "Invalid username or token. Password authentication is not supported for Git operations."
+No retry and no Git settings changes.
+This report was written after the push result and is not included in that commit.
+
+NOT DONE
+- The 90–130% word-count target was not achieved on either route.
+- The existing navigation "top" warning was not removed.
+- GitHub did not receive the commit because authentication failed.
+
+No other routes or tests, no screenshots, no test enquiries and no publishing.
+Lighthouse skipped – Claude will run it
