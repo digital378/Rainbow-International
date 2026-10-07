@@ -9,6 +9,7 @@ import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
 import { ADM_SEO } from "@shared/content/admissions";
+import { CURRICULUM_SEO } from "@shared/content/curriculum";
 import { HOME_SEO } from "@shared/content/home";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
@@ -63,7 +64,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/term-of-use": "Terms of Use - Rainbow International School",
   "/brand-partners": "Brand Partners | Rainbow International School Thane",
   "/students-leaving-certificate": "Students Leaving Certificate | Rainbow International School",
-  "/curriculum": "Curriculum | Rainbow International School",
+  "/curriculum": CURRICULUM_SEO.title,
   "/application-form": "Application Form 2027–28 | Rainbow International School Thane",
   "/google-school-2025-26": "Google School 2025–26 | Rainbow International School",
   "/meta-school-2025-26": "Meta School 2025–26 | Rainbow International School",

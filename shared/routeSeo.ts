@@ -9,6 +9,7 @@ import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
 import { ADM_SEO } from "./content/admissions";
+import { CURRICULUM_SEO } from "./content/curriculum";
 /**
  * Single source of truth for per-route SEO metadata served in the raw HTML.
  *
@@ -200,9 +201,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Leaving Certificate",
   },
   "/curriculum": {
-    description:
-      "CBSE-aligned curriculum at Rainbow International School, Thane — Pre-Primary to Class 12, subjects, streams and teaching methodology.",
-    crumb: "Curriculum",
+    title: CURRICULUM_SEO.title,
+    description: CURRICULUM_SEO.description,
+    crumb: CURRICULUM_SEO.crumb,
   },
   "/application-form": {
     description:

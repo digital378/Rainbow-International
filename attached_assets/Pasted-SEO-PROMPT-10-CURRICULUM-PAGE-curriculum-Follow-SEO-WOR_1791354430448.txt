@@ -1,0 +1,57 @@
+SEO PROMPT 10 — CURRICULUM PAGE ( /curriculum )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, card, accordion, section order, button, form, handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+
+============================================================
+PART A — ONE COPY SOURCE
+============================================================
+Create shared/content/curriculum.ts and move EVERY visible sentence of client/src/pages/Curriculum.tsx into it (intro, framework text, pillars, stage-wise accordions with focus areas / subjects / streams, assessment, methodology, CBSE reference block, CTA). Curriculum.tsx reads from it; icons/colours stay in the component. server/pageTitles.ts and shared/routeSeo.ts import title/description from it. Text not listed in PART C stays word-for-word.
+
+============================================================
+PART B — METADATA (title has NO site-name suffix; appendSiteName={false})
+============================================================
+title: "CBSE Curriculum, KG to Class 12 | Rainbow International School, Thane"
+description: "CBSE curriculum at Rainbow International School, Thane West: Jr KG to Class 12, Spanish from KG to Grade 8, and Science, Commerce and Humanities in Class 11 and 12."
+keywords: "CBSE curriculum Thane West, CBSE subjects Class 1 to 10 Thane, CBSE streams Class 11 Thane, Rainbow International School curriculum"
+H1 (banner title) → "CBSE Curriculum". Banner subtitle stays.
+Breadcrumb: Home > Curriculum.
+JSON-LD: replace the current nodes (the extra EducationalOrganization copy) with ONE WebPage node, "about": {"@id": "https://rainbowinternationalschool.in/#organization"}, plus BreadcrumbList and the shared org graph. No FAQPage.
+
+============================================================
+PART C — COPY CHANGES (only these; everything else word-for-word)
+============================================================
+1. Pre-Primary stage sub-label "Nursery · Jr. KG · Sr. KG" → "Jr. KG · Sr. KG".
+2. Spanish (confirmed: taught from KG to Grade 8):
+   - Pre-Primary focus list: add "Introduction to Spanish" as the last item.
+   - Primary focus list: add "Spanish language classes" as the last item.
+   - Middle School focus list: add "Spanish up to Grade 8" as the last item.
+3. Remove these list items (not confirmed / outdated):
+   - Secondary: "Continuous and Comprehensive Evaluation (CCE) approach", "Career awareness and stream selection guidance", "Competitive exam exposure (Olympiads, quizzes)".
+   - Senior Secondary: "Career counselling and university entrance guidance", "Foreign language electives available", "Summer internship and industry exposure programmes", "Strong alumni mentorship network".
+   - Teaching Methodology "Technology Integration" card text → "Digital tools and audio-visual aids support classroom teaching and engagement." (removes "smart classrooms, projectors").
+4. Senior Secondary: under the "Streams & Subjects" block add one line (same small text style as nearby text): "Subject combinations for each batch are confirmed by the admissions team."
+5. Add one closing paragraph at the end of the "Our Curriculum Framework" text block (same <p> style, in-text link styling): "See each stage: <a href="/pre-primary-school-thane">Pre-Primary</a>, <a href="/primary-section">Primary (Class 1–5)</a>, <a href="/middle-school-section">Middle School (Class 6–8)</a>, <a href="/secondary-section">Secondary (Class 9–10)</a> and <a href="/senior-secondary-section">Senior Secondary (Class 11–12)</a>."
+6. No "best/top/No. 1/leading/trusted/world-class" anywhere on this page's copy or metadata.
+
+============================================================
+PART D — BOT HTML (server/ssrPages.ts)
+============================================================
+1. Config: title, description, keywords from curriculum.ts; cfg.h1 = "CBSE Curriculum"; cfg.subtitle = the banner subtitle.
+2. Rewrite the /curriculum render function to render ONLY curriculum.ts: same section order and h2/h3 headings as the visitor page; each stage as <h3> with its focus list and subjects/streams as <ul>.
+3. Delete all SSR-only text that is not on the visitor page.
+4. Exactly one <h1>; one tel:+918291568972 link in the body; footer landline as today; no FAQPage.
+
+============================================================
+PART E — SITEMAP
+============================================================
+Set <lastmod> 2026-10-07 for /curriculum only.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /curriculum only: title, description, canonical and H1 match bot vs visitor; one main tel + footer landline; no FAQPage; one org node; no "Nursery". Word-count WARN is fine; no filler.
+3 No other routes, tests or screenshots.
+4 git add -A && git commit -m "SEO P10: Curriculum copy, metadata, schema and bot parity" — do NOT git push (I push from the Git pane).
+5 Write artifacts/reports/seo-p10-curriculum-report.txt: final title, description, H1 (bot and visitor), bot vs visitor words, banned-word result, list items removed/added, files changed, anything not done.
+Reply with the report text only. Do not publish.

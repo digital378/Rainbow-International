@@ -27,6 +27,12 @@ import {
 import { MIDDLE_SEO, MIDDLE_CONTENT } from "@shared/content/middle";
 import { SECONDARY_SEO, SECONDARY_CONTENT } from "@shared/content/secondary";
 import { SENIOR_SEO, SENIOR_CONTENT } from "@shared/content/senior";
+import {
+  CURRICULUM_ASSESSMENT, CURRICULUM_BANNER, CURRICULUM_CONTACT, CURRICULUM_CTA,
+  CURRICULUM_FRAMEWORK, CURRICULUM_HIGHLIGHT, CURRICULUM_JSON_LD, CURRICULUM_LINKS,
+  CURRICULUM_METHODOLOGY, CURRICULUM_PILLARS, CURRICULUM_REFERENCE, CURRICULUM_SEO,
+  CURRICULUM_STAGE_SECTION, CURRICULUM_STAGES,
+} from "@shared/content/curriculum";
 import { renderPrimary, renderMiddleSchool, renderSecondary, renderSeniorSecondary } from "./ssrClassPages";
 import { ADM_SEO, ADM_HERO, ADM_FORM, ADM_BENEFITS, ADM_STEPS, ADM_GRADES, ADM_DOCUMENTS, ADM_TESTIMONIALS, ADM_SAFETY, ADM_FAQS, ADM_FAQ_HEADING, ADM_BOTTOM } from "@shared/content/admissions";
 import type { Express } from "express";
@@ -947,35 +953,84 @@ ${posts.map(p => `<li><a href="/blog/${e(p.slug)}">${e(p.title)}</a></li>`).join
 }
 
 function renderCurriculum(): string {
-  const stages = [
-    { stage: "Pre-Primary (Nursery – Sr KG)", subjects: ["Language Arts (English)", "Hindi / Marathi", "EVS", "Maths Readiness", "Art &amp; Craft", "Music &amp; Movement", "Physical Education"] },
-    { stage: "Primary (Class 1–5)", subjects: ["English", "Hindi", "Mathematics", "Environmental Science (EVS)", "General Knowledge", "Computer Science", "Art &amp; Craft", "Physical Education"] },
-    { stage: "Middle School (Class 6–8)", subjects: ["English", "Hindi / Sanskrit", "Mathematics", "Science", "Social Science", "Computer Applications", "Art Education", "Health &amp; Physical Education"] },
-    { stage: "Secondary (Class 9–10)", subjects: ["English (Core)", "Hindi / Sanskrit", "Mathematics (Standard)", "Science", "Social Science", "Information Technology / Computer Applications"] },
-    { stage: "Senior Secondary — Science", subjects: ["Physics", "Chemistry", "Biology / Mathematics / Computer Science", "English Core", "Physical Education / Informatics Practices"] },
-    { stage: "Senior Secondary — Commerce", subjects: ["Accountancy", "Business Studies", "Economics", "English Core", "Mathematics / Informatics Practices"] },
-    { stage: "Senior Secondary — Humanities", subjects: ["History", "Political Science", "Geography / Psychology / Sociology", "English Core", "Economics / Legal Studies"] },
-  ];
+  const stageLinks = CURRICULUM_LINKS.stages.map((link, i) =>
+    `${i > 0 ? (i === CURRICULUM_LINKS.stages.length - 1 ? " and " : ", ") : ""}<a href="${e(link.href)}">${e(link.label)}</a>`,
+  ).join("");
   return `
 <div class="section">
-<h2>CBSE-Aligned Curriculum from KG to Class 12</h2>
-<p>Rainbow International School follows the CBSE curriculum framework — one of India's most rigorous and widely respected educational standards. Our curriculum spans all stages from Pre-Primary to Class 12, balancing academic depth with holistic development.</p>
+<h2>${e(CURRICULUM_FRAMEWORK.heading)}</h2>
+<p>${e(CURRICULUM_FRAMEWORK.introBeforeBold)}<strong>${e(CURRICULUM_FRAMEWORK.introBold)}</strong>${e(CURRICULUM_FRAMEWORK.introAfterBold)}</p>
+<p>${e(CURRICULUM_FRAMEWORK.paragraphs[0])}</p>
+<p>${e(CURRICULUM_FRAMEWORK.paragraphs[1])}</p>
+<p>${e(CURRICULUM_FRAMEWORK.stageLinksLead)}${stageLinks}.</p>
+<p><a href="${e(CURRICULUM_LINKS.cbse)}" target="_blank" rel="noopener noreferrer">${e(CURRICULUM_FRAMEWORK.cbseLinkLabel)}</a></p>
 
-${stages.map(s => `<div class="card">
-<h3>${e(s.stage)}</h3>
-<ul>${s.subjects.map(sub => `<li>${sub}</li>`).join("")}</ul>
+<div class="section">
+<p>${e(CURRICULUM_HIGHLIGHT.title)}</p>
+<p>${e(CURRICULUM_HIGHLIGHT.description)}</p>
+<p><a href="${e(CURRICULUM_LINKS.cbse)}" target="_blank" rel="noopener noreferrer">${e(CURRICULUM_HIGHLIGHT.linkLabel)}</a></p>
+</div>
+
+<div class="section">
+<h2>${e(CURRICULUM_PILLARS.heading)}</h2>
+<p>${e(CURRICULUM_PILLARS.subtitle)}</p>
+${CURRICULUM_PILLARS.items.map(item => `<div class="card">
+<h3>${e(item.title)}</h3>
+<p>${e(item.description)}</p>
 </div>`).join("")}
+</div>
 
-<h2>Our Teaching Approach</h2>
-<p>Beyond subject content, Rainbow's curriculum is delivered through a Multiple Intelligence-based pedagogy that recognises every child's unique learning style. We combine:</p>
-<ul>
-<li><strong>Experiential Learning</strong> – Hands-on experiments, field trips, and project work.</li>
-<li><strong>Formative Assessment</strong> – Regular quizzes, presentations, and assignments aligned to CBSE CCE guidelines.</li>
-<li><strong>Summative Assessment</strong> – Term-end examinations aligned to CBSE guidelines.</li>
-<li><strong>Co-Scholastic Grading</strong> – Structured grading of extracurricular participation and physical education as per CBSE norms.</li>
-</ul>
+<div class="section">
+<h2>${e(CURRICULUM_STAGE_SECTION.heading)}</h2>
+<p>${e(CURRICULUM_STAGE_SECTION.subtitle)}</p>
+${CURRICULUM_STAGES.map(stage => `<div class="card">
+<h3>${e(stage.label)}</h3>
+<p>${e(stage.grades)} — ${e(stage.tagline)}</p>
+<p><strong>${e(CURRICULUM_STAGE_SECTION.focusLabel)}</strong></p>
+<ul>${stage.focus.map(item => `<li>${e(item)}</li>`).join("")}</ul>
+<p><strong>${e(stage.streams ? CURRICULUM_STAGE_SECTION.streamsLabel : CURRICULUM_STAGE_SECTION.subjectsLabel)}</strong></p>
+${stage.streams
+    ? `<ul>${stage.streams.map(stream => `<li><strong>${e(stream.name)}</strong><ul>${stream.subjects.map(subject => `<li>${e(subject)}</li>`).join("")}</ul></li>`).join("")}</ul>
+${stage.streamNote ? `<p>${e(stage.streamNote)}</p>` : ""}`
+    : `<ul>${(stage.subjects || []).map(subject => `<li>${e(subject)}</li>`).join("")}</ul>`}
+</div>`).join("")}
+</div>
 
-<p>View the official <a href="https://cbseacademic.nic.in//curriculum_2024.html" rel="noopener noreferrer" target="_blank">CBSE 2024 Curriculum</a> or learn about our <a href="/our-philosophy">educational philosophy</a>.</p>
+<div class="section">
+<h2>${e(CURRICULUM_ASSESSMENT.heading)}</h2>
+<p>${e(CURRICULUM_ASSESSMENT.subtitle)}</p>
+${CURRICULUM_ASSESSMENT.items.map(item => `<div class="card">
+<h3>${e(item.title)}</h3>
+<p>${e(item.description)}</p>
+</div>`).join("")}
+</div>
+
+<div class="section">
+<h2>${e(CURRICULUM_METHODOLOGY.heading)}</h2>
+<p>${e(CURRICULUM_METHODOLOGY.subtitle)}</p>
+${CURRICULUM_METHODOLOGY.items.map(item => `<div class="card">
+<h3>${e(item.title)}</h3>
+<p>${e(item.description)}</p>
+</div>`).join("")}
+</div>
+
+<div class="section">
+<p>${e(CURRICULUM_REFERENCE.eyebrow)}</p>
+<h3>${e(CURRICULUM_REFERENCE.title)}</h3>
+<p>${e(CURRICULUM_REFERENCE.description)}</p>
+<p>${e(CURRICULUM_LINKS.cbse)}</p>
+<p><a href="${e(CURRICULUM_LINKS.cbse)}" target="_blank" rel="noopener noreferrer">${e(CURRICULUM_REFERENCE.linkLabel)}</a></p>
+</div>
+
+<div class="cta">
+<p>${e(CURRICULUM_CTA.title)}</p>
+<a href="#contact">${e(CURRICULUM_CTA.linkLabel)}</a>
+</div>
+
+<div class="section" id="contact">
+<h2>${e(CURRICULUM_CONTACT.title)}</h2>
+<p><a href="${e(CURRICULUM_CONTACT.phoneHref)}">${e(CURRICULUM_CONTACT.phone)}</a></p>
+</div>
 </div>`;
 }
 
@@ -1675,22 +1730,19 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/curriculum",
-    title: "Curriculum",
-    description: "Explore Rainbow International School's comprehensive CBSE-aligned curriculum from Pre-Primary to Class 12 — covering all stages, subjects, streams and teaching methodology.",
-    keywords: "CBSE curriculum Thane, Rainbow International School curriculum, CBSE 2024 curriculum, school syllabus Thane",
-    canonical: "https://rainbowinternationalschool.in/curriculum",
+    title: CURRICULUM_SEO.title,
+    description: CURRICULUM_SEO.description,
+    keywords: CURRICULUM_SEO.keywords,
+    canonical: CURRICULUM_SEO.canonical,
+    appendSiteName: false,
+    h1: CURRICULUM_BANNER.title,
+    subtitle: CURRICULUM_BANNER.subtitle,
+    showSharedCta: false,
     breadcrumbs: [
-      { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Curriculum", url: "https://rainbowinternationalschool.in/curriculum" },
+      { name: CURRICULUM_SEO.homeCrumb, url: CURRICULUM_SEO.homeUrl },
+      { name: CURRICULUM_SEO.crumb, url: CURRICULUM_SEO.canonical },
     ],
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      name: "CBSE K-12 Curriculum — Rainbow International School",
-      description: "Complete CBSE-aligned curriculum from KG to Class 12 including Science, Commerce, and Humanities streams.",
-      provider: { "@type": "Organization", name: "Rainbow International School", url: "https://rainbowinternationalschool.in" },
-      url: "https://rainbowinternationalschool.in/curriculum",
-    },
+    jsonLd: CURRICULUM_JSON_LD,
     renderBody: renderCurriculum,
   },
   {
