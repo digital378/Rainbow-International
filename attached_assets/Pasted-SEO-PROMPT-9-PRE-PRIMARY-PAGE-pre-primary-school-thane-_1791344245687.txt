@@ -1,0 +1,57 @@
+SEO PROMPT 9 — PRE-PRIMARY PAGE ( /pre-primary-school-thane )
+
+Follow "## SEO WORK RULES" in replit.md. Design freeze: only text, links, metadata and schema change. Keep every class, colour, icon, image, layout, card, section order, button, form, handler, tracking call and testid exactly as it is. No screenshots, no Lighthouse, no test enquiries, do not publish.
+Context: from 2027-28 RIS has NO Nursery. The RIS Pre-Primary section is Junior KG and Senior KG only. Kindergarten timings: 9:30 am to 12:30 pm. Ages (CBSE norms): Jr KG 3.5–4.5 years, Sr KG 4.5–5.5 years. Playgroup and Nursery are offered by Rainbow Preschool International (RPS), not RIS.
+
+============================================================
+PART A — ONE COPY SOURCE
+============================================================
+Create shared/content/preprimary.ts. Move EVERY visible sentence of client/src/pages/PrePrimary.tsx into it (banner, intro, quick answer, curriculum lists, philosophy, methodology, evaluation, RPS section, FAQs, CTA, image alt texts) as plain strings/arrays. PrePrimary.tsx reads from it; icons/colours/images stay in the component. server/pageTitles.ts and shared/routeSeo.ts import title/description from it. Text not listed in PART C stays word-for-word.
+
+============================================================
+PART B — METADATA (title has NO site-name suffix; appendSiteName={false})
+============================================================
+title: "Pre-Primary (Jr KG & Sr KG) | Rainbow International School, Thane"
+description: "Jr KG and Sr KG at Rainbow International School, Brahmand, Thane West: 9:30 am to 12:30 pm, play-based learning, CBSE foundational stage. Admissions 2027-28."
+keywords: "Jr KG admission Thane West, Sr KG admission Thane West, kindergarten CBSE school Thane, pre-primary Rainbow International School"
+Breadcrumb: Home > Pre-Primary (remove the "Academics" crumb that points to this same URL).
+JSON-LD: remove the EducationalOccupationalProgram node (wrong type, and it says Nursery / age 2.5). Use ONE WebPage node with "about": {"@id": "https://rainbowinternationalschool.in/#organization"}, plus BreadcrumbList and the shared org graph. No FAQPage.
+
+============================================================
+PART C — COPY CHANGES (everything else unchanged)
+============================================================
+1. Banner subtitle "Nursery | Jr KG | Sr KG" → "Jr KG | Sr KG". The "(Nursery | Jr KG | Sr KG)" line under "Pre-Primary Section" → "(Jr KG | Sr KG)".
+2. Quick-answer / summary text → "The Pre-Primary section at Rainbow International School, Brahmand, Thane West covers Junior KG and Senior KG (ages 3.5 to 5.5) with activity- and play-based learning aligned to the CBSE foundational stage and Multiple Intelligence pedagogy. School day: 9:30 am to 12:30 pm. Admissions for Jr KG and Sr KG for 2027-28 are open."
+3. FAQs (same component, same order otherwise):
+   - Age FAQ → Q: "What is the age for Jr KG and Sr KG admission?" A: "As per CBSE norms: Junior KG 3.5 to 4.5 years and Senior KG 4.5 to 5.5 years. Class 1 needs a minimum age of 6. For Playgroup and Nursery, see Rainbow Preschool International."  (link "Rainbow Preschool International" to https://www.rainbowpreschools.com)
+   - School-day FAQ → Q: "What are the Pre-Primary timings?" A: "Jr KG and Sr KG: 9:30 am to 12:30 pm. The school office is open Monday to Saturday, 9 am to 6 pm."
+   - DELETE the class-size FAQ ("What is the typical class size…" — the helper claim is not confirmed).
+   - Safety FAQ answer → "The 3.5-acre Brahmand campus has an on-campus infirmary and a 100% female staff team in the Pre-Primary section. The school's own GPS-enabled buses serve homes within 10 km."
+   - Apply FAQ → "Submit the enquiry form on this page or call/WhatsApp +91 82915 68972 to book a campus visit for Jr KG or Sr KG admission 2027-28."
+   - Keep the CBSE-aligned curriculum FAQ as it is.
+4. Any other mention of Nursery as an RIS class, or of ages 2.5–3.5, in RIS copy → remove it. If the curriculum list has a Nursery row, remove that row only.
+5. DO NOT change the RPS section ("About Rainbow Preschools", "The Rainbow Learning Pathway", "What Makes Rainbow Preschool Special", RPS branches, Explore RPS links) — keep it word-for-word, including "Playgroup / Nursery" there (that is RPS).
+6. No "best/top/No. 1/leading/trusted" in RIS copy or metadata (the RPS link text "India's 10 Best Preschools" is a real recognition name — keep it).
+
+============================================================
+PART D — BOT HTML (server/ssrPages.ts)
+============================================================
+1. Config: title, description, keywords from preprimary.ts; breadcrumb Home > Pre-Primary; cfg.h1 = the visitor H1 text exactly; cfg.subtitle = "Jr KG | Sr KG".
+2. Rewrite the Pre-Primary render function to render ONLY preprimary.ts, same section order and h2/h3 headings as the visitor page, FAQs as <details><summary>.
+3. Delete all SSR-only text not on the visitor page (e.g. "Best pre-primary school in Thane", Nursery, "CBSE-aligned curriculum" claims not in the content file, any timings other than 9:30 am–12:30 pm).
+4. Exactly one <h1>; one tel:+918291568972 link in the body; footer landline as today; no FAQPage.
+
+============================================================
+PART E — SITEMAP
+============================================================
+Set <lastmod> 2026-10-07 for /pre-primary-school-thane only.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /pre-primary-school-thane only: title, description, canonical and H1 match bot vs visitor; one main tel + footer landline; no FAQPage; one org node; the word "Nursery" appears ONLY inside the RPS section. Word-count WARN is fine; no filler.
+3 No other routes, tests or screenshots.
+4 git add -A && git commit -m "SEO P9: Pre-Primary KG-only copy, metadata, schema and bot parity" — do NOT git push (I push from the Git pane).
+5 Write artifacts/reports/seo-p9-preprimary-report.txt: final title, description, H1 (bot and visitor), bot vs visitor words, banned-word result, every place "Nursery" still appears, files changed, anything not done.
+Reply with the report text only. Do not publish.
