@@ -1,0 +1,84 @@
+SEO P11 — CBSE Schools Guide
+
+Completed and committed: 4b280d2
+Commit: SEO P11: CBSE schools guide replaces top-schools page
+Not pushed. Not published.
+
+Route: /cbse-schools-in-thane-west
+
+FINAL METADATA
+Title: How to Choose the Best CBSE School in Thane West (2027-28)
+Description: A parent checklist for 2027-28 admissions and an A–Z list of CBSE-affiliated schools in Thane West with their CBSE affiliation numbers. No rankings.
+Canonical: https://rainbowinternationalschool.in/cbse-schools-in-thane-west
+H1 (bot): How to Choose the Best CBSE School in Thane West
+H1 (visitor): How to Choose the Best CBSE School in Thane West
+Exactly one H1 in each version. No site-name suffix.
+
+CHECK RESULTS
+npx tsc --noEmit: PASS.
+Guide parity: WARN, zero failures.
+Homepage parity: WARN, zero failures.
+Title, description, canonical and H1 match bot vs visitor.
+Guide: 22 table rows in both versions; row content and order match.
+Guide: 22 SARAS affiliation links in both versions, with the required URL spelling, target="_blank" and rel="nofollow noopener".
+Guide: zero star/rating markup; Article and ItemList present.
+Both routes: no FAQPage; exactly one organisation node; phone links follow the admissions-number/footer-only landline rule.
+Guide visitor at 390px: document width 390px; no horizontal overflow.
+Homepage FAQ guide link: exactly one in each version.
+
+WORD COUNTS
+Guide: bot 754; visitor 1,032; ratio 73.1% — WARN.
+Homepage: bot 1,445; visitor 1,703; ratio 84.9% — WARN.
+No filler added to address word-count warnings.
+
+BANNED-WORD RESULT
+Guide scanner: WARN for "best" and "No. 1" in both versions.
+"Best/best" occurs in the required parent-choice title, H1, introduction and first FAQ, plus the real award name "Best Dynamic School 2026".
+"No. 1" is the supplied locality "Pokhran Road No. 1", not a school-ranking claim.
+No ranking claims, competitor opinions, competitor fees or other prohibited RIS superlatives were added.
+Homepage scanner: PASS in both versions.
+The requested page-specific rule 5 exception was added to replit.md.
+
+REDIRECTS — DEVELOPMENT HEADERS
+/top-schools-in-thane: 301, Location: /cbse-schools-in-thane-west
+/best-cbse-school-thane: 301, Location: /cbse-schools-in-thane-west
+/best-school-thane: 301, Location: /cbse-schools-in-thane-west
+All three point directly to the new route without an intermediate redirect.
+/top-cbse-school-thane and /school-in-thane were also updated to target the new route directly; no additional route checks were run.
+The client old-route Redirect is in place. TopSchools.tsx remains unchanged and unused.
+
+NAVIGATION AND DISCOVERY
+Navbar and Footer: "CBSE Schools in Thane West" links to /cbse-schools-in-thane-west.
+SSR navigation/footer templates include the same guide label and destination.
+The existing homepage FAQ answer now ends with the requested guide link; no other homepage copy or design was changed.
+Sitemap: old route removed, new route added with lastmod 2026-10-07 and priority 0.9.
+llms.txt and llms-full.txt include the requested Parent Guide line.
+
+FILES CHANGED — COMMITTED
+client/src/pages/CbseSchoolsGuide.tsx
+shared/content/cbseGuide.ts
+client/src/App.tsx
+client/src/components/layout/Navbar.tsx
+client/src/components/layout/Footer.tsx
+server/routes.ts
+server/pageTitles.ts
+server/ssrPages.ts
+server/ssrHome.ts
+shared/routeSeo.ts
+shared/content/home.ts
+client/public/sitemap.xml
+client/public/llms.txt
+client/public/llms-full.txt
+scripts/parity-check.mjs
+replit.md
+attached_assets/Pasted-SEO-PROMPT-11-CBSE-SCHOOL-GUIDE-new-cbse-schools-in-tha_1791345767482.txt
+
+REPORT
+artifacts/reports/seo-p11-guide-report.txt
+
+NOTES / ANYTHING NOT DONE
+The first guide parity capture was interrupted by Preview's dependency-optimization reload. After optimization settled, only the affected guide check was repeated; its final result has zero failures.
+The 22 school entries and source statement use the supplied copy; no independent live SARAS re-verification was performed.
+No implementation items left incomplete.
+ContactForm, enquiry handlers and tracking calls were not changed.
+No screenshots, Lighthouse, test enquiries, other-route tests, push or publishing performed.
