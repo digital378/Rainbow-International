@@ -22,7 +22,10 @@ import {
 } from "@/components/ui/accordion";
 import {
   CBSE_GUIDE_BANNER,
+  CBSE_GUIDE_AGES,
+  CBSE_GUIDE_AREAS,
   CBSE_GUIDE_BOARDS,
+  CBSE_GUIDE_BOARD_COMPARISON,
   CBSE_GUIDE_CHECKLIST,
   CBSE_GUIDE_FAQ_HEADING,
   CBSE_GUIDE_FAQS,
@@ -31,6 +34,7 @@ import {
   CBSE_GUIDE_RIS,
   CBSE_GUIDE_SCHOOLS,
   CBSE_GUIDE_SEO,
+  CBSE_GUIDE_VISIT_QUESTIONS,
 } from "@shared/content/cbseGuide";
 
 const checklistIcons = [BookOpen, MapPin, Users, Trophy, Shield, Bus];
@@ -110,6 +114,121 @@ export default function CbseSchoolsGuide() {
               </div>
             </section>
 
+            <section aria-labelledby="ris-shortlist-heading" className="mb-14">
+              <h2
+                id="ris-shortlist-heading"
+                className="text-2xl md:text-3xl font-bold mb-5"
+                style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {CBSE_GUIDE_RIS.heading}
+              </h2>
+              <p className="text-base leading-relaxed mb-6" style={{ color: "#6b7280" }}>
+                {CBSE_GUIDE_RIS.paragraph}
+              </p>
+              <div className="rounded-2xl p-8 md:p-10" style={{ background: "#091a4f" }}>
+                <ul className="space-y-2.5 mb-7">
+                  {CBSE_GUIDE_RIS.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2 text-sm leading-relaxed text-white">
+                      <span aria-hidden="true" className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#fbbf24" }} />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm leading-relaxed text-white mb-7">
+                  <span>{CBSE_GUIDE_RIS.linksLead} </span>
+                  {CBSE_GUIDE_RIS.links.map((link, index) => (
+                    <span key={link.href}>
+                      {index > 0 && (index === CBSE_GUIDE_RIS.links.length - 1 ? " and " : ", ")}
+                      <Link href={link.href} className="underline">{link.label}</Link>
+                    </span>
+                  ))}
+                  .
+                </p>
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Link
+                    href="/schedule-appointment"
+                    className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold"
+                    style={{ background: "#fbbf24", color: "#091a4f" }}
+                    data-testid="link-schedule-cta"
+                  >
+                    {CBSE_GUIDE_RIS.visitLabel} <ChevronRight size={14} />
+                  </Link>
+                  <Link
+                    href="/application-form"
+                    className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold border text-white hover:bg-white/10 transition-all"
+                    data-testid="link-apply-cta"
+                  >
+                    {CBSE_GUIDE_RIS.applyLabel} <ChevronRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </section>
+
+            <section aria-labelledby="areas-heading" className="mb-14">
+              <h2
+                id="areas-heading"
+                className="text-2xl md:text-3xl font-bold mb-3"
+                style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}
+              >
+                {CBSE_GUIDE_AREAS.heading}
+              </h2>
+              <p className="text-base leading-relaxed mb-6" style={{ color: "#6b7280" }}>
+                {CBSE_GUIDE_AREAS.intro}
+              </p>
+              <div className="grid md:grid-cols-2 gap-6">
+                {CBSE_GUIDE_AREAS.groups.map((group) => (
+                  <article key={group.heading} className="rounded-xl bg-white border p-6 min-w-0" style={{ borderColor: "#e5e7eb" }}>
+                    <h3 className="text-base font-bold mb-3" style={{ color: "#091a4f" }}>
+                      {group.heading}
+                    </h3>
+                    <ul className="space-y-2 text-sm leading-relaxed" style={{ color: "#6b7280" }}>
+                      {group.schools.map((school) => (
+                        <li key={school.name}>
+                          {school.href ? (
+                            <Link href={school.href} className="hover:underline">{school.name}</Link>
+                          ) : school.name}
+                          {school.note ? ` ${school.note}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="py-12 md:py-16">
+              <div className="container mx-auto px-4 max-w-6xl">
+                <h2 className="text-2xl md:text-3xl font-bold mb-5" style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}>
+                  {CBSE_GUIDE_BOARD_COMPARISON.heading}
+                </h2>
+                <table className="cbse-guide-table w-full border-collapse text-left">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-3 text-sm font-semibold" scope="col" />
+                      {CBSE_GUIDE_BOARD_COMPARISON.columns.map((column) => (
+                        <th key={column} className="px-4 py-3 text-sm font-semibold" scope="col" style={{ background: "#f8faff", color: "#091a4f", borderBottom: "2px solid #e5e7eb" }}>
+                          {column}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {CBSE_GUIDE_BOARD_COMPARISON.rows.map((row) => (
+                      <tr key={row.label}>
+                        <th scope="row" className="px-4 py-3 text-sm font-semibold" style={{ background: "#f8faff", color: "#091a4f" }}>{row.label}</th>
+                        {row.cells.map((cell, index) => (
+                          <td key={CBSE_GUIDE_BOARD_COMPARISON.columns[index]} data-label={CBSE_GUIDE_BOARD_COMPARISON.columns[index]} className="px-4 py-3 text-sm" style={{ color: "#374151" }}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="mt-4 text-sm leading-relaxed" style={{ color: "#6b7280" }}>{CBSE_GUIDE_BOARD_COMPARISON.closing}</p>
+              </div>
+            </section>
+
             <section aria-labelledby="schools-heading" className="min-w-0">
               <h2
                 id="schools-heading"
@@ -119,7 +238,7 @@ export default function CbseSchoolsGuide() {
                 {CBSE_GUIDE_SCHOOLS.heading}
               </h2>
               <div className="w-full min-w-0">
-                <table className="cbse-guide-table w-full border-collapse text-left">
+                <table id="cbse-guide-schools" className="cbse-guide-table w-full border-collapse text-left">
                   <thead>
                     <tr>
                       {CBSE_GUIDE_SCHOOLS.columns.map((column) => (
@@ -136,7 +255,7 @@ export default function CbseSchoolsGuide() {
                   </thead>
                   <tbody>
                     {CBSE_GUIDE_SCHOOLS.rows.map((school) => (
-                      <tr key={school.affiliation}>
+                      <tr key={school.affiliation} style={school.highlight ? { background: "#eef5ff" } : undefined}>
                         <td data-label={CBSE_GUIDE_SCHOOLS.columns[0]} className="px-4 py-3 text-sm font-semibold" style={{ color: "#091a4f" }}>
                           {school.href ? (
                             <Link href={school.href} className="hover:underline">
@@ -175,53 +294,40 @@ export default function CbseSchoolsGuide() {
 
         <section className="py-12 md:py-16" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-4xl">
-            <h2
-              className="text-2xl md:text-3xl font-bold mb-3"
-              style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}
-            >
+            <h2 className="text-2xl md:text-3xl font-bold mb-5" style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}>
               {CBSE_GUIDE_BOARDS.heading}
             </h2>
-            <p className="text-base leading-relaxed" style={{ color: "#6b7280" }}>
-              {CBSE_GUIDE_BOARDS.paragraph}
-            </p>
+            <p className="text-base leading-relaxed" style={{ color: "#6b7280" }}>{CBSE_GUIDE_BOARDS.paragraph}</p>
+          </div>
+        </section>
+
+        <section className="py-12 md:py-16" style={{ background: "#f8faff" }}>
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-bold mb-5" style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}>
+              {CBSE_GUIDE_VISIT_QUESTIONS.heading}
+            </h2>
+            <ol className="rounded-xl bg-white border px-6 py-5 space-y-3 text-sm leading-relaxed" style={{ color: "#374151", borderColor: "#e5e7eb" }}>
+              {CBSE_GUIDE_VISIT_QUESTIONS.items.map((question) => <li key={question}>{question}</li>)}
+            </ol>
           </div>
         </section>
 
         <section className="py-12 md:py-16">
-          <div className="container mx-auto px-4 max-w-3xl">
-            <div className="rounded-2xl p-8 md:p-10" style={{ background: "#091a4f" }}>
-              <h2
-                className="text-2xl font-bold text-white mb-5"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                {CBSE_GUIDE_RIS.heading}
-              </h2>
-              <ul className="space-y-2.5 mb-7">
-                {CBSE_GUIDE_RIS.bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2 text-sm leading-relaxed text-white">
-                    <span aria-hidden="true" className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "#fbbf24" }} />
-                    {bullet}
-                  </li>
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-2xl md:text-3xl font-bold mb-5" style={{ color: "#091a4f", fontFamily: "'DM Sans', sans-serif" }}>
+              {CBSE_GUIDE_AGES.heading}
+            </h2>
+            <table className="cbse-guide-table w-full border-collapse text-left">
+              <tbody>
+                {CBSE_GUIDE_AGES.rows.map((row) => (
+                  <tr key={row.className}>
+                    <th scope="row" className="px-4 py-3 text-sm font-semibold" style={{ background: "#f8faff", color: "#091a4f" }}>{row.className}</th>
+                    <td data-label={CBSE_GUIDE_AGES.ageLabel} className="px-4 py-3 text-sm" style={{ color: "#374151" }}>{row.age}</td>
+                  </tr>
                 ))}
-              </ul>
-              <div className="flex flex-wrap justify-center gap-3">
-                <Link
-                  href="/schedule-appointment"
-                  className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold"
-                  style={{ background: "#fbbf24", color: "#091a4f" }}
-                  data-testid="link-schedule-cta"
-                >
-                  {CBSE_GUIDE_RIS.visitLabel} <ChevronRight size={14} />
-                </Link>
-                <Link
-                  href="/application-form"
-                  className="inline-flex items-center gap-1.5 px-6 py-3 rounded-full text-sm font-semibold border text-white hover:bg-white/10 transition-all"
-                  data-testid="link-apply-cta"
-                >
-                  {CBSE_GUIDE_RIS.applyLabel} <ChevronRight size={14} />
-                </Link>
-              </div>
-            </div>
+              </tbody>
+            </table>
+            <p className="mt-4 text-xs leading-relaxed" style={{ color: "#6b7280" }}>{CBSE_GUIDE_AGES.note}</p>
           </div>
         </section>
 
@@ -298,6 +404,11 @@ export default function CbseSchoolsGuide() {
             padding: 0.6rem 0;
             border-bottom: 1px solid #e5e7eb;
             min-width: 0;
+          }
+          .cbse-guide-table tbody th[scope="row"] {
+            display: block;
+            width: 100%;
+            border-bottom: 1px solid #e5e7eb;
           }
           .cbse-guide-table tbody td:last-child {
             border-bottom: 0;

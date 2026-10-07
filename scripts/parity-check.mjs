@@ -65,9 +65,15 @@ function extract(browser = false, suppliedDocument) {
   };
   if (document.body) walk(document.body);
   const bodyText = clean(document.body?.innerText);
-  const warningText = clean(text.join(" ")).replaceAll(
-    "Which is the best CBSE school in Thane for my child?", "",
-  ).replaceAll("Best Dynamic School 2026", "");
+  const warningText = clean(text.join(" "))
+    .replaceAll("Which is the best CBSE school in Thane for my child?", "")
+    .replaceAll("Which is the best CBSE school in Thane West?", "")
+    .replaceAll("Which are the best schools in Thane West?", "")
+    .replaceAll("Which is the best CBSE school near Hiranandani Estate or Ghodbunder Road?", "")
+    .replaceAll("How to Choose the Best CBSE School in Thane West", "")
+    .replaceAll("the best school is the one that fits your child", "")
+    .replaceAll("Pokhran Road No. 1", "")
+    .replaceAll("Best Dynamic School 2026", "");
   const schemas = [], errors = [];
   for (const script of all('script[type="application/ld+json"]')) {
     try { schemas.push(JSON.parse(script.textContent)); }
@@ -103,8 +109,10 @@ function extract(browser = false, suppliedDocument) {
     robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
     h1, words: bodyText ? bodyText.split(/\s+/).length : 0, bodyText, warningText, phones, telLinks, emails,
     schemaTypes: [...schemaTypes].sort(), organizations, schemaErrors: errors,
-    schoolRows: all("main table tbody tr").map(row =>
+    schoolRows: all("main table#cbse-guide-schools tbody tr").map(row =>
       [...row.querySelectorAll("td")].map(cell => clean(cell.textContent)).join(" | ")),
+    headingOutline: all("main h2, main h3").map(element =>
+      `${element.tagName}:${clean(browser ? element.innerText : element.textContent)}`),
     affiliationLinks: all('main table tbody a[href^="https://saras.cbse.gov.in/"]').map(a => ({
       href: a.getAttribute("href"), target: a.getAttribute("target"), rel: a.getAttribute("rel") || "",
     })),
@@ -155,8 +163,15 @@ export function compare(bot, visitor, path) {
   if (path === "/cbse-schools-in-thane-west") {
     add("school table rows", bot.schoolRows.length, visitor.schoolRows.length,
       bot.schoolRows.length === 22 && visitor.schoolRows.length === 22, "Expected 22 school rows");
+    add("RIS is first in school table", bot.schoolRows[0], visitor.schoolRows[0],
+      bot.schoolRows[0]?.startsWith("Rainbow International School")
+        && visitor.schoolRows[0]?.startsWith("Rainbow International School"),
+      "Rainbow International School must be the first table row");
     add("school row content/order", "22 rows", "22 rows",
       JSON.stringify(bot.schoolRows) === JSON.stringify(visitor.schoolRows), "School table content/order differs");
+    add("H2/H3 heading outline", bot.headingOutline.join(" | "), visitor.headingOutline.join(" | "),
+      JSON.stringify(bot.headingOutline) === JSON.stringify(visitor.headingOutline),
+      "Bot and visitor H2/H3 headings differ");
     const validAffiliationLinks = links => links.length === 22 && links.every(link =>
       /^https:\/\/saras\.cbse\.gov\.in\/SARAS\/AffiliatedList\/AfflicationDetails\/\d{7}$/.test(link.href)
       && link.target === "_blank" && link.rel.split(/\s+/).includes("nofollow")

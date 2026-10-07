@@ -2,7 +2,9 @@ import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
 import { AWARDS_SEO, AWARDS_BANNER, AWARDS_INTRO, AWARDS, AWARDS_JSON_LD, AWARDS_CONTACT } from "@shared/content/awards";
 import {
   CBSE_GUIDE_SEO, CBSE_GUIDE_BANNER, CBSE_GUIDE_INTRO, CBSE_GUIDE_CHECKLIST,
-  CBSE_GUIDE_SCHOOLS, CBSE_GUIDE_BOARDS, CBSE_GUIDE_RIS, CBSE_GUIDE_FAQ_HEADING,
+  CBSE_GUIDE_AGES, CBSE_GUIDE_AREAS, CBSE_GUIDE_BOARD_COMPARISON,
+  CBSE_GUIDE_SCHOOLS, CBSE_GUIDE_BOARDS, CBSE_GUIDE_RIS,
+  CBSE_GUIDE_VISIT_QUESTIONS, CBSE_GUIDE_FAQ_HEADING,
   CBSE_GUIDE_FAQS, CBSE_GUIDE_CONTACT, CBSE_GUIDE_JSON_LD,
 } from "@shared/content/cbseGuide";
 import {
@@ -193,10 +195,33 @@ function renderCbseGuide(): string {
 ${CBSE_GUIDE_CHECKLIST.cards.map(c => `<div class="card"><h3>${e(c.title)}</h3><p>${e(c.desc)}</p></div>`).join("\n")}
 </div>
 <div class="section">
-<h2>${e(CBSE_GUIDE_SCHOOLS.heading)}</h2>
+<h2>${e(CBSE_GUIDE_RIS.heading)}</h2>
+<p>${e(CBSE_GUIDE_RIS.paragraph)}</p>
+<div class="card" style="background:#091a4f;color:#fff">
+<ul>${CBSE_GUIDE_RIS.bullets.map(b => `<li>${e(b)}</li>`).join("")}</ul>
+<p>${e(CBSE_GUIDE_RIS.linksLead)} ${CBSE_GUIDE_RIS.links.map((link, index) => `${index > 0 ? (index === CBSE_GUIDE_RIS.links.length - 1 ? " and " : ", ") : ""}<a href="${e(link.href)}">${e(link.label)}</a>`).join("")}.</p>
+<a href="/schedule-appointment">${e(CBSE_GUIDE_RIS.visitLabel)}</a>
+<a href="/application-form">${e(CBSE_GUIDE_RIS.applyLabel)}</a>
+</div>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_AREAS.heading)}</h2>
+<p>${e(CBSE_GUIDE_AREAS.intro)}</p>
+${CBSE_GUIDE_AREAS.groups.map(group => `<div class="card"><h3>${e(group.heading)}</h3><ul>${group.schools.map(school => `<li>${school.href ? `<a href="${e(school.href)}">${e(school.name)}</a>` : e(school.name)}${school.note ? ` ${e(school.note)}` : ""}</li>`).join("")}</ul></div>`).join("\n")}
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_BOARD_COMPARISON.heading)}</h2>
 <table style="width:100%;table-layout:fixed;overflow-wrap:anywhere">
+<thead><tr><th scope="col"></th>${CBSE_GUIDE_BOARD_COMPARISON.columns.map(c => `<th scope="col">${e(c)}</th>`).join("")}</tr></thead>
+<tbody>${CBSE_GUIDE_BOARD_COMPARISON.rows.map(row => `<tr><th scope="row">${e(row.label)}</th>${row.cells.map((cell, index) => `<td data-label="${e(CBSE_GUIDE_BOARD_COMPARISON.columns[index])}">${e(cell)}</td>`).join("")}</tr>`).join("\n")}</tbody>
+</table>
+<p>${e(CBSE_GUIDE_BOARD_COMPARISON.closing)}</p>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_SCHOOLS.heading)}</h2>
+<table id="cbse-guide-schools" style="width:100%;table-layout:fixed;overflow-wrap:anywhere">
 <thead><tr>${CBSE_GUIDE_SCHOOLS.columns.map(c => `<th scope="col">${e(c)}</th>`).join("")}</tr></thead>
-<tbody>${CBSE_GUIDE_SCHOOLS.rows.map(s => `<tr><td>${s.href ? `<a href="${e(s.href)}">${e(s.name)}</a>` : e(s.name)}</td><td>${e(s.locality)}</td><td>${e(s.classes)}</td><td><a href="${e(CBSE_GUIDE_SCHOOLS.affiliationHref + s.affiliation)}" target="_blank" rel="nofollow noopener">${e(s.affiliation)}</a></td></tr>`).join("\n")}</tbody>
+<tbody>${CBSE_GUIDE_SCHOOLS.rows.map(s => `<tr${s.highlight ? ' style="background:#eef5ff"' : ""}><td>${s.href ? `<a href="${e(s.href)}">${e(s.name)}</a>` : e(s.name)}</td><td>${e(s.locality)}</td><td>${e(s.classes)}</td><td><a href="${e(CBSE_GUIDE_SCHOOLS.affiliationHref + s.affiliation)}" target="_blank" rel="nofollow noopener">${e(s.affiliation)}</a></td></tr>`).join("\n")}</tbody>
 </table>
 <p><small>${e(CBSE_GUIDE_SCHOOLS.source)}</small></p>
 </div>
@@ -204,14 +229,19 @@ ${CBSE_GUIDE_CHECKLIST.cards.map(c => `<div class="card"><h3>${e(c.title)}</h3><
 <h2>${e(CBSE_GUIDE_BOARDS.heading)}</h2><p>${e(CBSE_GUIDE_BOARDS.paragraph)}</p>
 </div>
 <div class="section">
-<h2>${e(CBSE_GUIDE_RIS.heading)}</h2>
-<ul>${CBSE_GUIDE_RIS.bullets.map(b => `<li>${e(b)}</li>`).join("")}</ul>
-<a href="/schedule-appointment">${e(CBSE_GUIDE_RIS.visitLabel)}</a>
-<a href="/application-form">${e(CBSE_GUIDE_RIS.applyLabel)}</a>
+<h2>${e(CBSE_GUIDE_VISIT_QUESTIONS.heading)}</h2>
+<ol>${CBSE_GUIDE_VISIT_QUESTIONS.items.map(item => `<li>${e(item)}</li>`).join("")}</ol>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_AGES.heading)}</h2>
+<table style="width:100%;table-layout:fixed;overflow-wrap:anywhere">
+<tbody>${CBSE_GUIDE_AGES.rows.map(row => `<tr><th scope="row">${e(row.className)}</th><td data-label="${e(CBSE_GUIDE_AGES.ageLabel)}">${e(row.age)}</td></tr>`).join("")}</tbody>
+</table>
+<p><small>${e(CBSE_GUIDE_AGES.note)}</small></p>
 </div>
 <div class="section">
 <h2>${e(CBSE_GUIDE_FAQ_HEADING)}</h2>
-${CBSE_GUIDE_FAQS.map(f => `<details><summary>${e(f.q)}</summary><p>${e(f.a)}</p></details>`).join("\n")}
+${CBSE_GUIDE_FAQS.map(f => `<details><summary><h3>${e(f.q)}</h3></summary><p>${e(f.a)}</p></details>`).join("\n")}
 </div>
 <div class="section" id="contact">
 <h2>${e(CBSE_GUIDE_CONTACT.title)}</h2>
