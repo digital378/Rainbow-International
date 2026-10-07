@@ -24,7 +24,7 @@ const exploreLinks = [
   { label: "Safety & Security", href: "/safety-security" },
   { label: "Beyond The Classroom", href: "/beyond-the-classroom" },
   { label: "Extracurriculars", href: "/extracurriculars" },
-  { label: "Top Schools in Thane", href: "/top-schools-in-thane" },
+  { label: "CBSE Schools in Thane West", href: "/cbse-schools-in-thane-west" },
   { label: "Testimonials", href: "/testimonials" },
   { label: "FAQs", href: "/faqs" },
   { label: "School Readiness Quiz", href: "/school-readiness-quiz" },

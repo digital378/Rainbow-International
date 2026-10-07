@@ -165,6 +165,7 @@ Every file uploaded to the Replit chat is auto-saved into `attached_assets/`. It
    - Fees are never shown on the site: "call or WhatsApp +91 82915 68972"
 5. Banned about RIS: best, top, No. 1, number one, leading, trusted, premier, finest, world-class, guaranteed, "seats filling", "limited seats", "almost full", "hurry". "best" may appear only inside a parent's quoted review or inside a question a parent would type (e.g. "Which is the best CBSE school in Thane for my child?").
    Exception: a real award name may contain 'Best' (e.g. 'Best Dynamic School 2026').
+   Exception for /cbse-schools-in-thane-west only: "Best" is allowed in the title, H1 and first FAQ question because it describes the parent's choice, not a claim about RIS.
 6. Only the 2027–28 admissions year. Never mix RIS with Rainbow Preschool (RPS) content.
 7. Bot/visitor parity: page copy lives in shared/content/<page>.ts and is imported by BOTH the React page and the server SSR renderer. Never type the same sentence twice.
 8. Never touch: /leads, /admin/*, /walkin*, /sales*, /rps-sales*, /marketing*, /alliances*, /overview-27-28, /internal, /mcp, /api/*, CRM code, form submit handlers, analytics event names.

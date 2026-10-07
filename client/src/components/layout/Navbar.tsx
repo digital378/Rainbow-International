@@ -42,7 +42,7 @@ const galleryLinks = [
 ];
 
 const exploreLinks = [
-  { href: "/top-schools-in-thane", label: "Top Schools in Thane" },
+  { href: "/cbse-schools-in-thane-west", label: "CBSE Schools in Thane West" },
   { href: "/testimonials", label: "Testimonials" },
   { href: "/faqs", label: "FAQs" },
   { href: "/school-readiness-quiz", label: "School Readiness Quiz" },

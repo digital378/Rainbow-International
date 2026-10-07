@@ -4,6 +4,7 @@ import { CONTACT_SEO, CONTACT_BANNER } from "./content/contact";
 import { ABOUT_SEO } from "./content/about";
 import { AWARDS_SEO, AWARDS_BANNER } from "./content/awards";
 import { PRE_PRIMARY_SEO, PRE_PRIMARY_BANNER } from "./content/preprimary";
+import { CBSE_GUIDE_SEO, CBSE_GUIDE_BANNER } from "./content/cbseGuide";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -248,10 +249,10 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
       "Thank you for your enquiry to Rainbow International School, Thane. Our admissions team will contact you shortly.",
     crumb: "Thank You",
   },
-  "/top-schools-in-thane": {
-    description:
-      "Compare the top 10 schools in Thane for 2026 — ratings, reviews and highlights for CBSE, ICSE and international schools.",
-    crumb: "Top Schools in Thane",
+  "/cbse-schools-in-thane-west": {
+    title: CBSE_GUIDE_SEO.title,
+    description: CBSE_GUIDE_SEO.description,
+    crumb: CBSE_GUIDE_BANNER.breadcrumb,
   },
   "/school-near-brahmand-thane": {
     description:

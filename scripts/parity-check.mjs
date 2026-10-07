@@ -103,6 +103,16 @@ function extract(browser = false, suppliedDocument) {
     robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
     h1, words: bodyText ? bodyText.split(/\s+/).length : 0, bodyText, warningText, phones, telLinks, emails,
     schemaTypes: [...schemaTypes].sort(), organizations, schemaErrors: errors,
+    schoolRows: all("main table tbody tr").map(row =>
+      [...row.querySelectorAll("td")].map(cell => clean(cell.textContent)).join(" | ")),
+    affiliationLinks: all('main table tbody a[href^="https://saras.cbse.gov.in/"]').map(a => ({
+      href: a.getAttribute("href"), target: a.getAttribute("target"), rel: a.getAttribute("rel") || "",
+    })),
+    ratingMarkup: all('main svg.lucide-star, main [itemprop="ratingValue"], main [data-testid*="rating"]').length
+      + (schemaTypes.has("AggregateRating") || schemaTypes.has("Review") || schemaTypes.has("Rating") ? 1 : 0),
+    guideAnswerLinks: all('details p a[href="/cbse-schools-in-thane-west"]').length,
+    documentWidth: browser ? Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth || 0) : 0,
+    viewportWidth: browser ? document.documentElement.clientWidth : 0,
     ogTitle: document.querySelector('meta[property="og:title"]')?.getAttribute("content") || "",
     ogDescription: document.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
     ogImage: document.querySelector('meta[property="og:image"]')?.getAttribute("content") || "",
@@ -142,6 +152,31 @@ export function compare(bot, visitor, path) {
   add("FAQPage nodes", bot.schemaTypes.includes("FAQPage"), visitor.schemaTypes.includes("FAQPage"),
     !bot.schemaTypes.includes("FAQPage") && !visitor.schemaTypes.includes("FAQPage"), "FAQPage is prohibited");
   add("organisation nodes", bot.organizations, visitor.organizations, bot.organizations <= 1 && visitor.organizations <= 1, "Duplicate organisations");
+  if (path === "/cbse-schools-in-thane-west") {
+    add("school table rows", bot.schoolRows.length, visitor.schoolRows.length,
+      bot.schoolRows.length === 22 && visitor.schoolRows.length === 22, "Expected 22 school rows");
+    add("school row content/order", "22 rows", "22 rows",
+      JSON.stringify(bot.schoolRows) === JSON.stringify(visitor.schoolRows), "School table content/order differs");
+    const validAffiliationLinks = links => links.length === 22 && links.every(link =>
+      /^https:\/\/saras\.cbse\.gov\.in\/SARAS\/AffiliatedList\/AfflicationDetails\/\d{7}$/.test(link.href)
+      && link.target === "_blank" && link.rel.split(/\s+/).includes("nofollow")
+      && link.rel.split(/\s+/).includes("noopener"));
+    add("SARAS affiliation links", bot.affiliationLinks.length, visitor.affiliationLinks.length,
+      validAffiliationLinks(bot.affiliationLinks) && validAffiliationLinks(visitor.affiliationLinks),
+      "Expected 22 SARAS links with target/rel requirements");
+    add("star/rating markup", bot.ratingMarkup, visitor.ratingMarkup,
+      bot.ratingMarkup === 0 && visitor.ratingMarkup === 0, "Guide must not include star or rating markup");
+    add("390px horizontal overflow", "—", `${visitor.documentWidth}/${visitor.viewportWidth}px`,
+      visitor.documentWidth <= visitor.viewportWidth, "Visitor page horizontally overflows");
+  }
+  if (path === "/" || path === "/cbse-schools-in-thane-west") {
+    add("exactly one organisation", bot.organizations, visitor.organizations,
+      bot.organizations === 1 && visitor.organizations === 1, "Expected exactly one organisation node");
+  }
+  if (path === "/") {
+    add("homepage FAQ guide link", bot.guideAnswerLinks, visitor.guideAnswerLinks,
+      bot.guideAnswerLinks === 1 && visitor.guideAnswerLinks === 1, "Expected one guide link in the homepage FAQ answer");
+  }
   const warnings = [];
   for (const [source, result] of [["bot", bot], ["visitor", visitor]]) {
     const found = BANNED_WORDS.filter(([, pattern]) => pattern.test(result.warningText ?? result.bodyText)).map(([word]) => word);

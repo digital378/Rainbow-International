@@ -1,0 +1,107 @@
+SEO PROMPT 11 — CBSE SCHOOL GUIDE ( new /cbse-schools-in-thane-west, replaces /top-schools-in-thane )
+
+Follow "## SEO WORK RULES" in replit.md. No screenshots, no Lighthouse, no test enquiries, do not publish.
+This page is a REBUILD of client/src/pages/TopSchools.tsx: reuse its layout, components, section styles, colours, fonts, cards and ContactForm. Do not introduce new colours, fonts or component styles. Must work at 390px (no horizontal scroll).
+Purpose: an honest parent guide for "best CBSE school in Thane" searches. NO rankings, NO star ratings, NO pros/cons or opinions about other schools, NO fees of other schools.
+Rule 5 exception for THIS page only: the word "Best" is allowed in the title, H1 and the first FAQ question below, because it describes the parent's choice, not a claim about RIS. Add this exception line to replit.md rule 5.
+
+============================================================
+PART A — ROUTE, REDIRECTS, NAV
+============================================================
+1. New route /cbse-schools-in-thane-west → new page client/src/pages/CbseSchoolsGuide.tsx (built from TopSchools.tsx layout). All copy lives in shared/content/cbseGuide.ts.
+2. server/routes.ts: 301 /top-schools-in-thane → /cbse-schools-in-thane-west. Point the existing legacy redirects (/best-school-thane, /best-cbse-school-thane, /top-cbse-school-thane, /school-in-thane and any other entry that targets /top-schools-in-thane) straight to /cbse-schools-in-thane-west (no chains). Client: /top-schools-in-thane → wouter Redirect. Leave TopSchools.tsx in place but unused.
+3. Navbar, Footer and SSR nav/footer templates: label "Top Schools in Thane" → "CBSE Schools in Thane West", href → /cbse-schools-in-thane-west.
+4. Sitemap: remove /top-schools-in-thane; add /cbse-schools-in-thane-west (lastmod 2026-10-07, priority 0.9). llms.txt and llms-full.txt: replace the Top Schools line with "CBSE Schools in Thane West — Parent Guide: https://rainbowinternationalschool.in/cbse-schools-in-thane-west". Remove /top-schools-in-thane from server/pageTitles.ts, shared/routeSeo.ts and the ssrPages.ts config.
+
+============================================================
+PART B — METADATA (no site-name suffix; appendSiteName={false})
+============================================================
+title: "How to Choose the Best CBSE School in Thane West (2027-28)"
+description: "A parent checklist for 2027-28 admissions and an A–Z list of CBSE-affiliated schools in Thane West with their CBSE affiliation numbers. No rankings."
+keywords: "CBSE schools in Thane West, best CBSE school in Thane, CBSE schools in Thane list, how to choose a school in Thane, CBSE affiliation number Thane"
+H1: "How to Choose the Best CBSE School in Thane West"
+Banner subtitle: "A parent checklist and an A–Z list of CBSE schools, 2027-28"
+Breadcrumb: Home > CBSE Schools in Thane West
+JSON-LD: one Article node (headline = H1, datePublished and dateModified "2026-10-07", author and publisher = {"@id": "https://rainbowinternationalschool.in/#organization"}, mainEntityOfPage = canonical) + one ItemList of the school names in table order (name only, no ratings, no AggregateRating, no Review) + BreadcrumbList + shared org graph. No FAQPage.
+
+============================================================
+PART C — PAGE CONTENT (in this order)
+============================================================
+1. Intro paragraph:
+"Thane West has more than twenty CBSE-affiliated schools. There is no official ranking of schools, so the best school is the one that fits your child: the classes you need, distance from home, timings, facilities and fees. Use the checklist below, then visit two or three campuses before you decide."
+
+2. H2 "Checklist: what to compare" — 6 cards (reuse the existing 6 "how to choose" cards, replace their text):
+ - "CBSE affiliation" / "Check the school's affiliation number on CBSE's SARAS portal (saras.cbse.gov.in) and read its Mandatory Public Disclosure page."
+ - "Classes and streams" / "Does the school run up to Class 10 or Class 12? For Class 11 and 12, which streams are offered: Science, Commerce, Humanities?"
+ - "Distance and transport" / "Check bus routes, the distance limit and the real travel time at school hours."
+ - "Timings" / "Shift timings differ by class. Check them for your child's class and how they fit your family's day."
+ - "Campus and safety" / "On a visit, look at labs, library, sports areas, the infirmary and how entry and exit are managed."
+ - "Fees in writing" / "Ask for the full 2027-28 fee break-up in writing, including transport and other charges."
+
+3. H2 "CBSE schools in Thane West (A–Z)" — a table on desktop, stacked cards on mobile. Columns: School | Locality | Classes (CBSE level) | CBSE Affiliation No. Each affiliation number links to https://saras.cbse.gov.in/SARAS/AffiliatedList/AfflicationDetails/<number> (target _blank, rel="nofollow noopener"). Exact rows, in this order:
+ Amber International School | Dhokali | Up to Class 12 | 1130640
+ Arunodaya Public School | Vijay Park, Kasarvadavali | Up to Class 12 | 1130088
+ B.S. Bane International School | Swami Vivekanand Nagar, near Vasant Vihar | Up to Class 10 | 1131440
+ DRB DAV Public School | Tulsidham, Ghodbunder Road | Up to Class 12 | 1130048
+ EuroSchool (Balkum) | Dosti West County, Balkum | Up to Class 10 | 1131542
+ GEI's Blossom English School | Shivaji Path, Thane West | Up to Class 10 | 1131473
+ Indo Scots Global School | Ram Maruti Road | Up to Class 12 | 1131251
+ Lok Puram Public School | Pokhran Road No. 2, Majiwade | Up to Class 10 | 1130034
+ Narayana e-Techno School | Dhokali | Up to Class 12 | 1131451
+ New Horizon Scholars School (Kavesar) | Kavesar, Ghodbunder Road | Up to Class 12 | 1130470
+ New Horizon Scholars School (Kolshet) | Kolshet | Up to Class 12 | 1131249
+ New Horizon Scholars School (Vasant Lawns) | Subhash Nagar, Pokhran area | Up to Class 12 | 1131124
+ Orchids The International School | Azad Nagar, Kolshet | Up to Class 12 | 1130581
+ PM SHRI Kendriya Vidyalaya, AF Station Thane | Air Force Station, Kolshet Road | Up to Class 12 | 1100037
+ Podar International School | Kolshet Gaon, Hiranandani Estate | Up to Class 10 | 1131040
+ Rainbow International School | Brahmand Phase 4 | Up to Class 12 | 1130661
+ Sanskar Public School | Shivai Nagar, Pokhran Road No. 1 | Up to Class 12 | 1130938
+ Saraswati English Medium School | M.G. Road, Naupada | Up to Class 10 | 1131496
+ Saraswati Vidyalaya (Ghodbunder Road) | Kavesar, Ghodbunder Road | Up to Class 10 | 1131390
+ Seven Square Academy | Sainagar, Kasarvadavali | Up to Class 12 | 1131605
+ Sri Ma Vidyalaya | Patlipada, off Ghodbunder Road | Up to Class 12 | 1130769
+ St. Xavier's Global Academy | Chitalsar Manpada | Up to Class 12 | 1131043
+ Under the table (small text): "Source: CBSE SARAS affiliation register, checked on 7 October 2026. The list is alphabetical and is not a ranking. "Up to Class 12" means CBSE senior secondary affiliation. To correct a listing, email admin@rainbowinternationalschool.in."
+ Rainbow International School row links its name to "/" ; no other school name is linked. No logos of other schools.
+
+4. H2 "Other boards in Thane West" — one short paragraph: "Thane West also has ICSE, Cambridge (IGCSE) and IB schools, and Maharashtra State Board (SSC) schools. If you are comparing boards, check which board exams your child will sit in Class 10 and Class 12." (no school names).
+
+5. H2 "Rainbow International School at a glance" — reuse the existing RIS highlight card, replace its bullet list with exactly:
+ - "CBSE Affiliation No. 1130661, School Code 30562"
+ - "Since April 2009, Brahmand Phase 4, Thane West"
+ - "Jr KG to Class 12; Science, Commerce and Humanities in Class 11 and 12"
+ - "3.5-acre campus with swimming pool and science labs"
+ - "Spanish taught from KG to Grade 8"
+ - "Own GPS-enabled buses within 10 km"
+ - "Best Dynamic School 2026, Maharashtra Educators Summit"
+ Buttons: keep the existing card buttons (campus visit / admissions) and their handlers and tracking.
+
+6. H2 "Frequently asked questions" (visible accordion, same component the site already uses; no FAQPage schema):
+ - "Which is the best CBSE school in Thane West?" / "There is no official ranking of schools in Thane. The right school depends on your child's age, whether you need classes up to 10 or 12, distance from home, timings, facilities and fees. Use the checklist on this page and visit two or three schools before you decide."
+ - "How do I check if a school is CBSE-affiliated?" / "Search the school's name or affiliation number on CBSE's SARAS portal, saras.cbse.gov.in, and read the Mandatory Public Disclosure page on the school's website."
+ - "Which CBSE schools in Thane West go up to Class 12?" / "In the list above, schools marked 'Up to Class 12' have CBSE senior secondary affiliation. Ask each school which streams it offers for 2027-28."
+ - "What is the age for Class 1 admission in CBSE schools?" / "CBSE norms require a child to be at least 6 years old for Class 1."
+ - "Is Rainbow International School CBSE-affiliated?" / "Yes. CBSE Affiliation No. 1130661 (School Code 30562), in Brahmand Phase 4, Thane West, from Jr KG to Class 12."
+
+7. Existing ContactForm block at the end (unchanged).
+
+============================================================
+PART D — HOMEPAGE LINK (text only)
+============================================================
+In shared/content/home.ts, at the end of the answer to "Which is the best CBSE school in Thane for my child?", add: "Read our guide: <a href="/cbse-schools-in-thane-west">How to choose a CBSE school in Thane West</a>." (same in ssrHome.ts via the content file). Nothing else on the homepage changes.
+
+============================================================
+PART E — BOT HTML (server/ssrPages.ts)
+============================================================
+Add a config + render for /cbse-schools-in-thane-west built ONLY from cbseGuide.ts: same section order and h2 headings as the visitor page, the school list as a real <table>, FAQs as <details><summary>, one tel:+918291568972 link, footer landline as today, exactly one <h1>, no FAQPage. Remove the /top-schools-in-thane config and render.
+
+============================================================
+PART F — CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /cbse-schools-in-thane-west and / only: title, description, canonical, H1 match bot vs visitor; tel rules; no FAQPage; one org node; no star/rating markup; 22 table rows in both versions. Word-count WARN is fine.
+3 curl -sI the local dev server for /top-schools-in-thane, /best-cbse-school-thane, /best-school-thane → each a single 301 to /cbse-schools-in-thane-west.
+4 No other routes, tests or screenshots.
+5 git add -A && git commit -m "SEO P11: CBSE schools guide replaces top-schools page" — do NOT git push (I push from the Git pane).
+6 Write artifacts/reports/seo-p11-guide-report.txt: final title, description, H1 (bot and visitor), words, banned-word result, redirect results, nav label changes, files changed, anything not done.
+Reply with the report text only. Do not publish.

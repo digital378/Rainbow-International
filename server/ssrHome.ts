@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { isCrawlerUa } from "./crawlerUa";
 import { normalizeSchemaHtml, buildOrgNode, buildWebsiteNode } from "@shared/orgSchema";
+import { CBSE_GUIDE_BANNER } from "@shared/content/cbseGuide";
 import {
   HOME_SEO, HOME_HERO, HOME_AWARDS_INTRO, HOME_JOURNEY, HOME_THEATRE, HOME_WHY,
   HOME_ACADEMICS, HOME_PEDAGOGY, HOME_DISCOVER, HOME_NEIGHBOURHOOD,
@@ -107,7 +108,12 @@ function renderHomeMain(): string {
 </div></section>
 <section><div class="container"><h2>${e(HOME_QUICK_ANSWER_HEADINGS.title)}</h2><p>${e(HOME_QUICK_ANSWER)}</p>
   <h3>${e(HOME_QUICK_ANSWER_HEADINGS.faqTitle)}</h3>
-  ${HOME_FAQS.map(faq => `<details><summary>${e(faq.q)}</summary><p>${e(faq.a)}</p></details>`).join("")}
+  ${HOME_FAQS.map(faq => {
+    const answer = faq.answerLink
+      ? e(faq.a).replace(e(faq.answerLink.text), `<a href="${e(faq.answerLink.href)}">${e(faq.answerLink.text)}</a>`)
+      : e(faq.a);
+    return `<details><summary>${e(faq.q)}</summary><p>${answer}</p></details>`;
+  }).join("")}
 </div></section>
 </article></main>`;
 }
@@ -398,6 +404,7 @@ footer{background:#091a4f;color:#fff;padding:64px 0 0}
     <li><a href="/pre-primary-school-thane">Academics</a></li>
     <li><a href="/amenities">Amenities</a></li>
     <li><a href="/blogs">Blog</a></li>
+    <li><a href="/cbse-schools-in-thane-west">${e(CBSE_GUIDE_BANNER.breadcrumb)}</a></li>
     <li><a href="/contact-us">Contact</a></li>
   </ul>
 </nav>
@@ -435,6 +442,7 @@ ${renderHomeMain()}
     </div>
     <div>
       <p class="footer-col-title">Explore</p>
+      <a href="/cbse-schools-in-thane-west" class="footer-link"><span class="bullet"></span>${e(CBSE_GUIDE_BANNER.breadcrumb)}</a>
       <a href="/awards-achievements" class="footer-link"><span class="bullet"></span>Awards &amp; Achievements</a>
       <a href="/amenities" class="footer-link"><span class="bullet"></span>Amenities &amp; Facilities</a>
       <a href="/student-achievements" class="footer-link"><span class="bullet"></span>Student Achievements</a>

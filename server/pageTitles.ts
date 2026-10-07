@@ -4,6 +4,7 @@ import { CONTACT_SEO } from "@shared/content/contact";
 import { ABOUT_SEO } from "@shared/content/about";
 import { AWARDS_SEO } from "@shared/content/awards";
 import { PRE_PRIMARY_SEO } from "@shared/content/preprimary";
+import { CBSE_GUIDE_SEO } from "@shared/content/cbseGuide";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -72,7 +73,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/schedule-appointment": "Schedule an Appointment | Rainbow International School",
   "/school-readiness-quiz": "School Readiness Quiz — Is My Child Ready for Grade 1? | Rainbow International School",
   "/thank-you": "Thank You for Your Enquiry | Rainbow International School",
-  "/top-schools-in-thane": "Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School",
+  "/cbse-schools-in-thane-west": CBSE_GUIDE_SEO.title,
   "/school-near-brahmand-thane": "Best School Near Brahmand Thane — CBSE KG to Class 12 | Rainbow International School",
   "/school-near-ghodbunder-road-thane": "Best School Near Ghodbunder Road Thane — CBSE K–12 | Rainbow International School",
   "/school-near-manpada-thane": "Best School Near Manpada Thane — CBSE KG to Class 12 | Rainbow International School",

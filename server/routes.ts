@@ -512,11 +512,12 @@ export async function registerRoutes(
     "/rainbow-international-school-thane":    "/",
     "/rainbow-international-school":          "/",
     "/ris-thane":                             "/",
-    "/best-school-thane":                     "/top-schools-in-thane",
-    "/best-cbse-school-thane":                "/top-schools-in-thane",
-    "/top-cbse-school-thane":                 "/top-schools-in-thane",
+    "/top-schools-in-thane":                  "/cbse-schools-in-thane-west",
+    "/best-school-thane":                     "/cbse-schools-in-thane-west",
+    "/best-cbse-school-thane":                "/cbse-schools-in-thane-west",
+    "/top-cbse-school-thane":                 "/cbse-schools-in-thane-west",
     "/international-school-thane":            "/",
-    "/school-in-thane":                       "/top-schools-in-thane",
+    "/school-in-thane":                       "/cbse-schools-in-thane-west",
 
     // ── Legacy pre-primary / preschool slugs ────────────────────
     "/preschool-thane":                       "/pre-primary-school-thane",

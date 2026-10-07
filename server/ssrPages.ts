@@ -1,6 +1,11 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
 import { AWARDS_SEO, AWARDS_BANNER, AWARDS_INTRO, AWARDS, AWARDS_JSON_LD, AWARDS_CONTACT } from "@shared/content/awards";
 import {
+  CBSE_GUIDE_SEO, CBSE_GUIDE_BANNER, CBSE_GUIDE_INTRO, CBSE_GUIDE_CHECKLIST,
+  CBSE_GUIDE_SCHOOLS, CBSE_GUIDE_BOARDS, CBSE_GUIDE_RIS, CBSE_GUIDE_FAQ_HEADING,
+  CBSE_GUIDE_FAQS, CBSE_GUIDE_CONTACT, CBSE_GUIDE_JSON_LD,
+} from "@shared/content/cbseGuide";
+import {
   PRE_PRIMARY_SEO, PRE_PRIMARY_BANNER, PRE_PRIMARY_INTRO, PRE_PRIMARY_CTA,
   PRE_PRIMARY_CURRICULUM, PRE_PRIMARY_PHILOSOPHY, PRE_PRIMARY_METHODOLOGY,
   PRE_PRIMARY_EVALUATION, PRE_PRIMARY_RPS, PRE_PRIMARY_CONTACT,
@@ -120,6 +125,7 @@ footer a{color:#fbbf24;text-decoration:none}
 <header>
 <nav style="background:#091a4f;padding:12px 0;text-align:center">
 <a href="/" style="color:#fff;text-decoration:none;font-weight:700;font-size:18px">Rainbow International School</a>
+ · <a href="/cbse-schools-in-thane-west" style="color:#fff;text-decoration:none">${e(CBSE_GUIDE_BANNER.breadcrumb)}</a>
 </nav>
 </header>
 <div class="banner">
@@ -146,7 +152,7 @@ ${cfg.showSharedCta === false ? "" : `
 <footer role="contentinfo">
 <p>&copy; 2009–2026 Rainbow International School. CBSE Affiliation No. 1130661</p>
 <p><a href="tel:+918291568972">+91 82915 68972</a><br/><a href="tel:+912269105000">(022) 6910 5000</a></p>
-<p><a href="/">Home</a> · <a href="/about-rainbow-international-school">About</a> · <a href="/contact-us">Contact</a></p>
+<p><a href="/">Home</a> · <a href="/about-rainbow-international-school">About</a> · <a href="/contact-us">Contact</a> · <a href="/cbse-schools-in-thane-west">${e(CBSE_GUIDE_BANNER.breadcrumb)}</a></p>
 </footer>
 </body>
 </html>`;
@@ -179,34 +185,37 @@ ${categories.map(c => `<div class="card"><h3>${e(c)}</h3><p>Two research-backed 
 </div>`;
 }
 
-function renderTopSchools(): string {
-  const schools = [
-    { rank: 1, name: "Rainbow International School", board: "CBSE", grades: "KG – Class 12", highlights: "3.5-acre campus, K-12 pathway, MI pedagogy, British Council ISA, 30+ extracurriculars, GPS-tracked transport" },
-    { rank: 2, name: "Smt. Sulochanadevi Singhania School", board: "ICSE/ISC", grades: "Nursery – Class 12", highlights: "Strong ICSE academics, established reputation" },
-    { rank: 3, name: "Vasant Vihar High School", board: "SSC/CBSE", grades: "Nursery – Class 10", highlights: "Dual board, affordable, community-focused" },
-    { rank: 4, name: "DAV Public School", board: "CBSE", grades: "Class 1 – 12", highlights: "Strong CBSE academics, value-based education" },
-    { rank: 5, name: "Hiranandani Foundation School", board: "ICSE", grades: "Nursery – Class 10", highlights: "Modern campus, strong academics" },
-    { rank: 6, name: "C.P. Goenka International School", board: "IGCSE/IBDP", grades: "Nursery – Class 12", highlights: "International curriculum, global exposure" },
-    { rank: 7, name: "Orchids International School", board: "CBSE", grades: "Nursery – Class 12", highlights: "Tech-driven learning, standardised quality" },
-    { rank: 8, name: "Euro School", board: "CBSE", grades: "Nursery – Class 10", highlights: "Modern teaching, activity-based learning" },
-    { rank: 9, name: "Billabong High International School", board: "CBSE/IGCSE", grades: "Nursery – Class 12", highlights: "Dual curriculum, holistic development" },
-    { rank: 10, name: "St. John the Baptist High School", board: "SSC", grades: "Class 1 – 10", highlights: "Long-standing reputation, affordable" },
-  ];
-
+function renderCbseGuide(): string {
   return `
 <div class="section">
-<h2>Top 10 Schools in Thane — 2026 Rankings</h2>
-<p>A comprehensive comparison of the best schools in Thane based on infrastructure, academics, extracurriculars, parent reviews, and overall reputation.</p>
-
-${schools.map(s => `<div class="card">
-<h3>#${s.rank}. ${e(s.name)}</h3>
-<p><strong>Board:</strong> ${e(s.board)} · <strong>Grades:</strong> ${e(s.grades)}</p>
-<p><strong>Highlights:</strong> ${e(s.highlights)}</p>
-</div>`).join("")}
-
-<h2>How to Choose the Right School in Thane</h2>
-<p>When evaluating schools, parents should consider: curriculum and board affiliation, location and transport, teacher-student ratio, extracurricular programmes, safety infrastructure, and whether the school offers a complete K-12 pathway to avoid disruptive transitions.</p>
-<p>Learn more about <a href="/about-rainbow-international-school">Rainbow International School</a> or <a href="/schedule-appointment">schedule a campus visit</a>.</p>
+<p>${e(CBSE_GUIDE_INTRO)}</p>
+<h2>${e(CBSE_GUIDE_CHECKLIST.heading)}</h2>
+${CBSE_GUIDE_CHECKLIST.cards.map(c => `<div class="card"><h3>${e(c.title)}</h3><p>${e(c.desc)}</p></div>`).join("\n")}
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_SCHOOLS.heading)}</h2>
+<table style="width:100%;table-layout:fixed;overflow-wrap:anywhere">
+<thead><tr>${CBSE_GUIDE_SCHOOLS.columns.map(c => `<th scope="col">${e(c)}</th>`).join("")}</tr></thead>
+<tbody>${CBSE_GUIDE_SCHOOLS.rows.map(s => `<tr><td>${s.href ? `<a href="${e(s.href)}">${e(s.name)}</a>` : e(s.name)}</td><td>${e(s.locality)}</td><td>${e(s.classes)}</td><td><a href="${e(CBSE_GUIDE_SCHOOLS.affiliationHref + s.affiliation)}" target="_blank" rel="nofollow noopener">${e(s.affiliation)}</a></td></tr>`).join("\n")}</tbody>
+</table>
+<p><small>${e(CBSE_GUIDE_SCHOOLS.source)}</small></p>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_BOARDS.heading)}</h2><p>${e(CBSE_GUIDE_BOARDS.paragraph)}</p>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_RIS.heading)}</h2>
+<ul>${CBSE_GUIDE_RIS.bullets.map(b => `<li>${e(b)}</li>`).join("")}</ul>
+<a href="/schedule-appointment">${e(CBSE_GUIDE_RIS.visitLabel)}</a>
+<a href="/application-form">${e(CBSE_GUIDE_RIS.applyLabel)}</a>
+</div>
+<div class="section">
+<h2>${e(CBSE_GUIDE_FAQ_HEADING)}</h2>
+${CBSE_GUIDE_FAQS.map(f => `<details><summary>${e(f.q)}</summary><p>${e(f.a)}</p></details>`).join("\n")}
+</div>
+<div class="section" id="contact">
+<h2>${e(CBSE_GUIDE_CONTACT.title)}</h2>
+<p>${e(CBSE_GUIDE_CONTACT.introBeforeBreak)}<br/>${e(CBSE_GUIDE_CONTACT.introBeforePhone)} <a href="${e(CBSE_GUIDE_CONTACT.phoneHref)}">${e(CBSE_GUIDE_CONTACT.phone)}</a> ${e(CBSE_GUIDE_CONTACT.introAfterPhone)}</p>
 </div>`;
 }
 
@@ -1479,34 +1488,21 @@ const pages: PageSSRConfig[] = [
     renderBody: renderQuiz,
   },
   {
-    path: "/top-schools-in-thane",
-    title: "Top 10 Schools in Thane (2026) — Best CBSE, ICSE & International Schools | Rainbow International School",
-    description: "Compare the top 10 schools in Thane for 2026. Detailed ratings, reviews, highlights for CBSE, ICSE, and International schools.",
-    keywords: "top schools in thane, best schools thane, school comparison thane, best CBSE school thane, top 10 schools thane 2026",
-    canonical: "https://rainbowinternationalschool.in/top-schools-in-thane",
+    path: "/cbse-schools-in-thane-west",
+    title: CBSE_GUIDE_SEO.title,
+    appendSiteName: false,
+    description: CBSE_GUIDE_SEO.description,
+    keywords: CBSE_GUIDE_SEO.keywords,
+    canonical: CBSE_GUIDE_SEO.canonical,
+    h1: CBSE_GUIDE_BANNER.title,
+    subtitle: CBSE_GUIDE_BANNER.subtitle,
+    showSharedCta: false,
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Top Schools in Thane", url: "https://rainbowinternationalschool.in/top-schools-in-thane" },
+      { name: CBSE_GUIDE_BANNER.breadcrumb, url: CBSE_GUIDE_SEO.canonical },
     ],
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: "Top 10 Schools in Thane (2026)",
-      numberOfItems: 10,
-      itemListElement: [
-        { "@type": "ListItem", position: 1, item: { "@type": "School", name: "Rainbow International School" } },
-        { "@type": "ListItem", position: 2, item: { "@type": "School", name: "Smt. Sulochanadevi Singhania School" } },
-        { "@type": "ListItem", position: 3, item: { "@type": "School", name: "Vasant Vihar High School" } },
-        { "@type": "ListItem", position: 4, item: { "@type": "School", name: "DAV Public School" } },
-        { "@type": "ListItem", position: 5, item: { "@type": "School", name: "Hiranandani Foundation School" } },
-        { "@type": "ListItem", position: 6, item: { "@type": "School", name: "C.P. Goenka International School" } },
-        { "@type": "ListItem", position: 7, item: { "@type": "School", name: "Orchids International School" } },
-        { "@type": "ListItem", position: 8, item: { "@type": "School", name: "Euro School" } },
-        { "@type": "ListItem", position: 9, item: { "@type": "School", name: "Billabong High International School" } },
-        { "@type": "ListItem", position: 10, item: { "@type": "School", name: "St. John the Baptist High School" } },
-      ],
-    },
-    renderBody: renderTopSchools,
+    jsonLd: CBSE_GUIDE_JSON_LD,
+    renderBody: renderCbseGuide,
   },
   {
     path: "/testimonials",

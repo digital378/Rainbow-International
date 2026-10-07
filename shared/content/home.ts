@@ -224,9 +224,14 @@ export const HOME_QUICK_ANSWER_HEADINGS = {
   faqTitle: "Frequently asked questions",
 };
 export const HOME_QUICK_ANSWER = "Rainbow International School is a CBSE-affiliated school (No. 1130661) in Brahmand, Thane West, founded in 2009 on a 3.5-acre campus. It teaches KG to Class 12, with Spanish from KG to Grade 8, Science, Commerce and Humanities in Classes 11–12, and its own GPS-enabled buses for homes within 10 km. Admissions for 2027–28 are open: call or WhatsApp +91 82915 68972.";
+export const HOME_CBSE_GUIDE_LINK = {
+  text: "How to choose a CBSE school in Thane West",
+  href: "/cbse-schools-in-thane-west",
+};
+
 export const HOME_FAQS = [
   { q: "Is Rainbow International School a CBSE school in Thane?", a: "Yes. Rainbow International School is affiliated to CBSE, New Delhi (Affiliation No. 1130661, School Code 30562) and has taught in Brahmand, Thane West since 2009." },
-  { q: "Which is the best CBSE school in Thane for my child?", a: "It depends on what your family needs. Compare schools on: the CBSE affiliation number (check it on the CBSE SARAS portal), distance and bus cover from your home, timings for your child's class, the streams offered in Classes 11–12, the facilities you see on a campus visit, and fees confirmed in writing. At Rainbow International School you can check all of these in one visit: Affiliation No. 1130661, buses within 10 km and three streams in Classes 11–12." },
+  { q: "Which is the best CBSE school in Thane for my child?", a: `It depends on what your family needs. Compare schools on: the CBSE affiliation number (check it on the CBSE SARAS portal), distance and bus cover from your home, timings for your child's class, the streams offered in Classes 11–12, the facilities you see on a campus visit, and fees confirmed in writing. At Rainbow International School you can check all of these in one visit: Affiliation No. 1130661, buses within 10 km and three streams in Classes 11–12. Read our guide: ${HOME_CBSE_GUIDE_LINK.text}.`, answerLink: HOME_CBSE_GUIDE_LINK },
   { q: "Which classes are admissions open for in 2027–28?", a: "Admissions for 2027–28 are open from KG (Jr KG and Sr KG) to Class 12, subject to seat availability in each class." },
   { q: "What is the age criteria for admission?", a: "Jr KG: 3.5 to 4.5 years. Sr KG: 4.5 to 5.5 years. Class 1: minimum 6 years (6 to 7 years). Later classes follow in one-year steps, as per CBSE norms." },
   { q: "Is there an entrance test?", a: "There is no entrance test for KG to Class 8: children have a friendly interaction and documents are reviewed. For Class 9 and above, the admissions office explains the process for your child's class." },
