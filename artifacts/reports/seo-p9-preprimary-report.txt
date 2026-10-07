@@ -1,0 +1,60 @@
+SEO P9 — PRE-PRIMARY PAGE REPORT
+Route: /pre-primary-school-thane
+Status: Completed and committed locally. No push performed.
+
+FINAL METADATA
+Title (bot = visitor): Pre-Primary (Jr KG & Sr KG) | Rainbow International School, Thane
+Description (bot = visitor): Jr KG and Sr KG at Rainbow International School, Brahmand, Thane West: 9:30 am to 12:30 pm, play-based learning, CBSE foundational stage. Admissions 2027-28.
+Canonical (bot = visitor): https://rainbowinternationalschool.in/pre-primary-school-thane
+H1 bot: Pre-Primary Section
+H1 visitor: Pre-Primary Section
+Exactly one H1 in each version; no site-name suffix.
+Breadcrumb: Home > Pre-Primary. Subtitle: Jr KG | Sr KG.
+
+COMPLETED
+Created shared/content/preprimary.ts for all page-owned copy, including banner, intro, curriculum, philosophy, methodology, evaluation, RPS section, CTA, quick answer, FAQs, alt text and metadata. Images, icons and colours remain in the visitor component.
+RIS class references are Jr KG and Sr KG only. Updated summary, age/timings/safety/apply FAQs exactly as requested, except the approved age-referral correction.
+Age referral now says "For younger children, see Rainbow Preschool International." with a link to https://www.rainbowpreschools.com.
+Removed the unconfirmed class-size FAQ. Kept the CBSE curriculum FAQ verbatim; five FAQs remain in their original relative order.
+RPS wording, recognition, pathway, branches, Explore RPS links and section layout preserved verbatim.
+Replaced EducationalOccupationalProgram and FAQPage payloads with one WebPage referencing the shared organisation. BreadcrumbList and shared organisation graph retained.
+Crawler uses shared copy in visitor section order and matching h2/h3 levels, with FAQs rendered as details/summary. Removed all old crawler-only programme, age, facilities and activity claims.
+Crawler body has one admissions telephone link. Existing visitor ContactForm is unchanged, including its two existing links to that same number. Footer mobile and landline are unchanged.
+Only this route's sitemap lastmod changed to 2026-10-07.
+No existing classes, colours, icons, image files, layout, cards, buttons, form handlers, tracking calls or test-ID definitions changed.
+WaveOneSeoBlock gained optional linked-answer support for the requested RPS FAQ link; existing plain-string FAQ behaviour and styling are unchanged.
+
+CHECK RESULTS
+npx tsc --noEmit: PASS.
+npm run parity:check -- /pre-primary-school-thane: WARN, 0 failures.
+Title, description, canonical, H1 count/text, allowed telephone links and footer-only landline: PASS.
+Matching schema types; valid JSON-LD; no FAQPage; one organisation node per version: PASS.
+Words: bot 808; visitor 1107; 73.0% — permitted WARN. No filler added.
+Banned-word scan: bot "best, world-class"; visitor "best, top, world-class" — WARN.
+"Best" is in the preserved RPS recognition link "India's 10 Best Preschools".
+"World-class" is in the unchanged RPS paragraph, not RIS copy.
+"Top" is in the unchanged visitor navigation label "Top Schools in Thane".
+RIS page-owned copy and metadata have no banned wording.
+
+REMAINING NURSERY REFERENCES ON THIS PAGE
+Visible copy, bot and visitor: "Playgroup / Nursery" in Step 1 of The Rainbow Learning Pathway, inside the RPS section. It links to https://www.rainbowpreschools.com/programmes and identifies Rainbow Preschool International.
+Source: shared/content/preprimary.ts, PRE_PRIMARY_RPS.pathway[0].title. This is the only remaining Nursery occurrence in page-owned visible copy.
+Technical asset reference only: /images/preschool/nursery-kids.jpg remains the unchanged methodology "Spaces" image in PrePrimary.tsx. Its visible alt text is "Spaces"; the filename is not an RIS class claim.
+No Nursery in banner, RIS intro, quick answer, FAQs, metadata or page-specific schema; no 2.5-year age claim remains in this page's copy.
+
+FILES IN COMMIT
+shared/content/preprimary.ts
+client/src/pages/PrePrimary.tsx
+client/src/components/WaveOneSeoBlock.tsx
+server/pageTitles.ts
+shared/routeSeo.ts
+server/ssrPages.ts
+client/public/sitemap.xml
+
+COMMIT / ANYTHING NOT DONE
+Commit: 2df92b2
+Message: SEO P9: Pre-Primary KG-only copy, metadata, schema and bot parity
+No push attempted; owner will push from the Git pane.
+Report saved at artifacts/reports/seo-p9-preprimary-report.txt after the commit; not included in that commit.
+Lighthouse skipped – Claude will run it
+No screenshots, test enquiries, other-route checks, additional tests or publishing performed.
