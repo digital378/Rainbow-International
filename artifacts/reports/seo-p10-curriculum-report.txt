@@ -1,0 +1,38 @@
+SEO PROMPT 10 — CURRICULUM PAGE (/curriculum)
+
+Metadata
+- Title: CBSE Curriculum, KG to Class 12 | Rainbow International School, Thane
+- Description: CBSE curriculum at Rainbow International School, Thane West: Jr KG to Class 12, Spanish from KG to Grade 8, and Science, Commerce and Humanities in Class 11 and 12.
+- Keywords: CBSE curriculum Thane West, CBSE subjects Class 1 to 10 Thane, CBSE streams Class 11 Thane, Rainbow International School curriculum
+- H1: Bot — CBSE Curriculum; visitor — CBSE Curriculum
+- Breadcrumb: Home > Curriculum
+
+Checks
+- npx tsc --noEmit: PASS
+- npm run parity:check -- /curriculum: WARN; zero failures. Title, description, canonical, H1, schema validity, FAQPage absence, one organisation node, and approved phone links passed.
+- Bot / visitor words: 863 / 1,175 (73.4%); word-count warning is allowed by the prompt.
+- SEO banned-word scan: None in bot or visitor copy.
+- Curriculum content has no “Nursery”. The unchanged shared footer still has an RPS navigation link labelled “Nursery”; a whole-document literal scan will therefore find that RPS footer link.
+
+Copy changes
+- Removed “Nursery” from the Pre-Primary grade label; it now reads “Jr. KG · Sr. KG”.
+- Removed from Secondary focus areas: “Continuous and Comprehensive Evaluation (CCE) approach”, “Career awareness and stream selection guidance”, and “Competitive exam exposure (Olympiads, quizzes)”.
+- Removed from Senior Secondary focus areas: “Career counselling and university entrance guidance”, “Foreign language electives available”, “Summer internship and industry exposure programmes”, and “Strong alumni mentorship network”.
+- Replaced the Technology Integration description with: “Digital tools and audio-visual aids support classroom teaching and engagement.”
+- Added “Introduction to Spanish”, “Spanish language classes”, and “Spanish up to Grade 8” as the last focus item for Pre-Primary, Primary, and Middle School respectively.
+- Added the Senior Secondary note: “Subject combinations for each batch are confirmed by the admissions team.”
+- Added the closing “See each stage” paragraph with links to Pre-Primary, Primary, Middle School, Secondary, and Senior Secondary.
+
+Files changed
+- shared/content/curriculum.ts
+- client/src/pages/Curriculum.tsx
+- server/ssrPages.ts
+- server/pageTitles.ts
+- shared/routeSeo.ts
+- client/public/sitemap.xml
+- The uploaded SEO Prompt 10 text file was also included by the requested git add -A.
+- This report was written after the commit and is not included in it.
+
+Commit: 81c5b73 — SEO P10: Curriculum copy, metadata, schema and bot parity
+Push: Not done, as instructed.
+Screenshots, Lighthouse, test enquiries, and publishing: Not done.
