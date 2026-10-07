@@ -1,0 +1,72 @@
+SEO PROMPT 11B — CBSE GUIDE REPORT
+Route: /cbse-schools-in-thane-west
+
+METADATA
+Title: How to Choose the Best CBSE School in Thane West (2027-28)
+Description: Parent guide to the best CBSE school for your child in Thane West: checklist, schools by area, CBSE vs ICSE, visit questions and the full list with CBSE affiliation numbers.
+Keywords: best CBSE school in Thane West, best schools in Thane, CBSE schools in Thane West, CBSE schools near Ghodbunder Road, CBSE schools near Hiranandani Estate, CBSE vs ICSE Thane, school admission 2027-28 Thane
+H1 (bot and visitor): How to Choose the Best CBSE School in Thane West
+Canonical (bot and visitor): https://rainbowinternationalschool.in/cbse-schools-in-thane-west
+
+H2/H3 OUTLINE
+1. H2 Checklist: what to compare
+   H3 CBSE affiliation
+   H3 Classes and streams
+   H3 Distance and transport
+   H3 Timings
+   H3 Campus and safety
+   H3 Fees in writing
+2. H2 Why parents shortlist Rainbow International School
+3. H2 CBSE schools near you in Thane West
+   H3 Hiranandani Estate, Kolshet, Brahmand and Balkum
+   H3 Ghodbunder Road, Manpada, Kavesar and Kasarvadavali
+   H3 Pokhran Road, Vasant Vihar and Majiwade
+   H3 Naupada and central Thane West
+4. H2 CBSE, ICSE or IGCSE: which board suits your child?
+5. H2 CBSE schools in Thane West: full list
+6. H2 Other boards in Thane West
+7. H2 Questions to ask on a school visit
+8. H2 Admission ages for 2027-28 (CBSE norms)
+9. H2 Frequently asked questions
+   H3 Which is the best CBSE school in Thane West?
+   H3 How do I check if a school is CBSE-affiliated?
+   H3 Which CBSE schools in Thane West go up to Class 12?
+   H3 What is the age for Class 1 admission in CBSE schools?
+   H3 Is Rainbow International School CBSE-affiliated?
+   H3 Which are the best schools in Thane West?
+   H3 Which is the best CBSE school near Hiranandani Estate or Ghodbunder Road?
+   H3 Is CBSE or ICSE better in Thane?
+   H3 How much are school fees in Thane West?
+   H3 When should I apply for 2027-28 admission?
+   H3 Which CBSE schools in Thane West have Class 11 and 12 with all three streams?
+10. H2 Book a Campus Tour
+
+PARITY AND CONTENT
+Bot vs visitor body words: 1,322 vs 1,600 (82.6%). Parity returned one allowed WARN for this word-count ratio; no filler was added.
+The bot and visitor H2/H3 outlines, title, description, canonical and H1 match.
+H1 count: one in each version.
+School table: 22 rows in both versions; Rainbow International School is first and highlighted in #eef5ff. Remaining entries retain their alphabetical order. Its ItemList name order follows the table.
+Structured data: one organization node; no FAQPage. Article dateModified remains 2026-10-07.
+Rating choice: “Rated 4.7 by parents on Google (130 reviews)” is plain text only. Star/rating markup count: 0.
+Mobile width check: 390/390 px; no horizontal overflow.
+Banned-word scan: none found. The parent-search wording in the title, H1, metadata description and FAQ questions, and the exact award name, are covered by the documented exceptions.
+Sitemap: unchanged; its /cbse-schools-in-thane-west lastmod was already 2026-10-07.
+
+CHECKS
+- npx tsc --noEmit — passed.
+- npm run parity:check -- /cbse-schools-in-thane-west — passed with the permitted word-count WARN; no other route was checked.
+
+FILES CHANGED
+- shared/content/cbseGuide.ts
+- client/src/pages/CbseSchoolsGuide.tsx
+- server/ssrPages.ts
+- scripts/parity-check.mjs
+- replit.md
+- artifacts/reports/seo-p11b-guide-report.txt (written after the code commit, per the requested sequence; not included in that commit)
+
+COMMIT
+02b5d92 — SEO P11B: guide RIS first, area lists, board comparison, visit questions, FAQs
+Not pushed, as requested.
+
+NOT DONE
+No independent external re-check of the supplied school-area groupings, review count, award wording or affiliation-register entries was performed. No requested copy or implementation item remains deferred. No screenshots, Lighthouse run, test enquiries or publishing.
