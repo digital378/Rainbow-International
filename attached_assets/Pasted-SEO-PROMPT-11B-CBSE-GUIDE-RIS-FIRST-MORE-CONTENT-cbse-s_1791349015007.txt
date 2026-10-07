@@ -1,0 +1,88 @@
+SEO PROMPT 11B — CBSE GUIDE: RIS FIRST + MORE CONTENT ( /cbse-schools-in-thane-west )
+
+Follow "## SEO WORK RULES" in replit.md. Keep the page's current design system (same components, colours, fonts, card and table styles as now). Everything new uses existing styles only. Must work at 390px with no horizontal scroll. No screenshots, no Lighthouse, no test enquiries, do not publish. All copy goes in shared/content/cbseGuide.ts; the bot HTML in server/ssrPages.ts is rebuilt from the same file (same order, same h2/h3, table as <table>, FAQs as <details>).
+Still forbidden: rankings, star ratings, opinions/pros/cons about other schools, other schools' fees, any claim that RIS is "best/top/No. 1/leading".
+
+============================================================
+1. SCHOOL TABLE — RIS FIRST
+============================================================
+- Section H2 → "CBSE schools in Thane West: full list" (replaces "CBSE schools in Thane West (A–Z)").
+- Move the Rainbow International School row to the TOP of the table. Highlight that row with the existing light-blue background used elsewhere on the site (#eef5ff). No label or badge. Name links to "/". All other rows stay in their current alphabetical order.
+- Note under the table → "Source: CBSE SARAS affiliation register, checked on 7 October 2026. 'Up to Class 12' means CBSE senior secondary affiliation. To correct a listing, email admin@rainbowinternationalschool.in." (Do not add any sentence explaining the order.)
+- JSON-LD ItemList order = table order (RIS first). Intro sentence "Thane West has more than twenty CBSE-affiliated schools…" stays.
+
+============================================================
+2. NEW SECTIONS (insert in this order, after the checklist section and before the full list)
+============================================================
+H2 "Why parents shortlist Rainbow International School"
+Paragraph: "Rainbow International School is a CBSE school in Brahmand, Thane West, running since April 2009. Families from Hiranandani Estate, Ghodbunder Road, Manpada, Kavesar, Kolshet and Pokhran Road visit us for a K–12 campus where a child can stay from Jr KG to Class 12."
+Bullet list (existing list style):
+ - "One campus from Jr KG to Class 12, with Science, Commerce and Humanities in Class 11 and 12"
+ - "3.5-acre campus with a swimming pool and science labs"
+ - "Spanish taught from KG to Grade 8"
+ - "The school's own GPS-enabled buses for homes within 10 km"
+ - "Class 1 to 10 from 7:30 am to 1:00 pm; Class 11 and 12 from 1:00 pm to 6:00 pm"
+ - "100% result in the CBSE Class 10 board exams of 2018-19"
+ - "Rated 4.7 by parents on Google (130 reviews)"
+ - "Best Dynamic School 2026, Maharashtra Educators Summit"
+Links line: "Explore <a href="/primary-section">Primary (Class 1–5)</a>, <a href="/middle-school-section">Middle School (Class 6–8)</a>, <a href="/secondary-section">Secondary (Class 9–10)</a>, <a href="/senior-secondary-section">Class 11 and 12</a> and <a href="/admissions">Admissions 2027-28</a>."
+(Remove the now-duplicate "Rainbow International School at a glance" card further down, but keep its buttons by moving them under this section.)
+
+H2 "CBSE schools near you in Thane West"
+Intro: "Distance and travel time matter more than most parents expect. Here are the CBSE schools from the list above, grouped by area."
+Four H3 blocks, each a short list of school names (plain text, no links except RIS → "/"):
+ H3 "Hiranandani Estate, Kolshet, Brahmand and Balkum": Rainbow International School (Brahmand); Orchids The International School (Kolshet); Podar International School (Hiranandani Estate); New Horizon Scholars School (Kolshet); PM SHRI Kendriya Vidyalaya, AF Station Thane (Kolshet Road); Amber International School (Dhokali); Narayana e-Techno School (Dhokali); EuroSchool (Balkum).
+ H3 "Ghodbunder Road, Manpada, Kavesar and Kasarvadavali": DRB DAV Public School; New Horizon Scholars School (Kavesar); Saraswati Vidyalaya (Ghodbunder Road); Seven Square Academy; Arunodaya Public School; Sri Ma Vidyalaya; St. Xavier's Global Academy.
+ H3 "Pokhran Road, Vasant Vihar and Majiwade": Lok Puram Public School; Sanskar Public School; New Horizon Scholars School (Vasant Lawns); B.S. Bane International School.
+ H3 "Naupada and central Thane West": Saraswati English Medium School; Indo Scots Global School; GEI's Blossom English School.
+
+H2 "CBSE, ICSE or IGCSE: which board suits your child?"
+A 3-column comparison table (existing table style; stacked on mobile):
+ Row "Board": CBSE — Central Board of Secondary Education (Government of India) | ICSE — Council for the Indian School Certificate Examinations (CISCE) | IGCSE — Cambridge Assessment International Education
+ Row "Board exams": CBSE — Class 10 and Class 12 | ICSE — ICSE (Class 10) and ISC (Class 12) | IGCSE — IGCSE (about age 16), then AS and A Levels
+ Row "Textbooks": CBSE — mainly NCERT | ICSE — publishers chosen by the school | IGCSE — Cambridge-endorsed resources
+ Row "Good to know": CBSE — the syllabus for JEE and NEET is based on NCERT Classes 11 and 12; easy to transfer between CBSE schools across India | ICSE — wide range of subjects and detailed English | IGCSE — international curriculum with flexible subject choice
+Closing line: "No board is better for every child. Think about where your family may live in future and what your child may study after Class 12."
+
+H2 "Questions to ask on a school visit"
+Numbered list (existing list style):
+ 1 "What is the school's CBSE affiliation number, and does it go up to Class 10 or Class 12?"
+ 2 "What are the timings for my child's class?"
+ 3 "Does the school run its own buses to my area, and how long is the ride?"
+ 4 "How many students are in a class, and who is the class teacher?"
+ 5 "Which languages are taught, and from which class?"
+ 6 "What sports, arts and clubs are part of the school day?"
+ 7 "How does the school share progress with parents?"
+ 8 "What is the full fee for 2027-28, in writing, including transport?"
+
+H2 "Admission ages for 2027-28 (CBSE norms)"
+Small table: "Jr KG | 3.5 to 4.5 years" ; "Sr KG | 4.5 to 5.5 years" ; "Class 1 | at least 6 years". Note: "These are the ages followed at Rainbow International School as per CBSE norms. Other schools may set their own pre-primary ages, so check with each school."
+
+============================================================
+3. FAQs — keep the existing five, then add these (same accordion, no FAQPage schema)
+============================================================
+ - "Which are the best schools in Thane West?" / "There is no official ranking. Shortlist schools by board, the classes you need, distance and timings, then visit. The full list above shows every CBSE-affiliated school in Thane West with its affiliation number."
+ - "Which is the best CBSE school near Hiranandani Estate or Ghodbunder Road?" / "Start with the area lists on this page: Rainbow International School, Orchids, Podar, New Horizon Scholars and Kendriya Vidyalaya are around Hiranandani Estate and Kolshet; DAV, New Horizon Scholars (Kavesar), Seven Square, Sri Ma Vidyalaya and St. Xavier's Global are along Ghodbunder Road. Then compare travel time and timings for your child's class."
+ - "Is CBSE or ICSE better in Thane?" / "Neither is better for every child. CBSE follows NCERT books and suits families who may move within India or whose children may take JEE or NEET. ICSE offers a wide range of subjects and detailed English. See the comparison table on this page."
+ - "How much are school fees in Thane West?" / "Fees vary widely by school, class and facilities. Ask each school for its full 2027-28 fee in writing. For Rainbow International School, call or WhatsApp +91 82915 68972."
+ - "When should I apply for 2027-28 admission?" / "Visit schools early so you can compare before seats fill. Admissions for 2027-28 are open at Rainbow International School from Jr KG to Class 12, subject to seat availability."
+ - "Which CBSE schools in Thane West have Class 11 and 12 with all three streams?" / "Ask each school which streams it runs for 2027-28. Rainbow International School offers Science, Commerce and Humanities in Class 11 and 12, in an afternoon shift from 1:00 pm to 6:00 pm."
+
+============================================================
+4. METADATA (update)
+============================================================
+title stays: "How to Choose the Best CBSE School in Thane West (2027-28)"
+description → "Parent guide to the best CBSE school for your child in Thane West: checklist, schools by area, CBSE vs ICSE, visit questions and the full list with CBSE affiliation numbers."
+keywords → "best CBSE school in Thane West, best schools in Thane, CBSE schools in Thane West, CBSE schools near Ghodbunder Road, CBSE schools near Hiranandani Estate, CBSE vs ICSE Thane, school admission 2027-28 Thane"
+Article dateModified → "2026-10-07". Sitemap lastmod stays 2026-10-07.
+replit.md rule 5 exception for this page: extend it to cover the FAQ questions "Which are the best schools in Thane West?" and "Which is the best CBSE school near Hiranandani Estate or Ghodbunder Road?" and the word "best" in the meta description (all describe the parent's search, not a claim about RIS).
+
+============================================================
+5. CHECKS, COMMIT, REPORT
+============================================================
+1 npx tsc --noEmit — must pass.
+2 npm run parity:check for /cbse-schools-in-thane-west only: title, description, canonical, H1 match; tel rules; no FAQPage; one org node; no rating markup; 22 table rows in both versions with RIS first; bot and visitor have the same h2/h3 list.
+3 Visitor at 390px: no horizontal scroll (both tables stack or scroll inside their own box).
+4 git add -A && git commit -m "SEO P11B: guide RIS first, area lists, board comparison, visit questions, FAQs" — do NOT git push.
+5 Write artifacts/reports/seo-p11b-guide-report.txt: h2/h3 outline, bot vs visitor words, banned-word result, files changed, anything not done.
+Reply with the report text only. Do not publish.
