@@ -1,6 +1,7 @@
 export interface WaveOneFaq {
   q: string;
   a: string;
+  answerLink?: { text: string; href: string };
 }
 
 export function buildFaqPageSchema(faqs: WaveOneFaq[]) {
@@ -69,7 +70,13 @@ export function WaveOneSeoBlock({
                 </span>
               </summary>
               <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                {f.a}
+                {f.answerLink ? (
+                  <>
+                    {f.a.split(f.answerLink.text)[0]}
+                    <a href={f.answerLink.href}>{f.answerLink.text}</a>
+                    {f.a.split(f.answerLink.text)[1]}
+                  </>
+                ) : f.a}
               </p>
             </details>
           ))}

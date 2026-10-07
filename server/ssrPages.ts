@@ -1,6 +1,12 @@
 import { PRIMARY_SEO, PRIMARY_CONTENT } from "@shared/content/primary";
 import { AWARDS_SEO, AWARDS_BANNER, AWARDS_INTRO, AWARDS, AWARDS_JSON_LD, AWARDS_CONTACT } from "@shared/content/awards";
 import {
+  PRE_PRIMARY_SEO, PRE_PRIMARY_BANNER, PRE_PRIMARY_INTRO, PRE_PRIMARY_CTA,
+  PRE_PRIMARY_CURRICULUM, PRE_PRIMARY_PHILOSOPHY, PRE_PRIMARY_METHODOLOGY,
+  PRE_PRIMARY_EVALUATION, PRE_PRIMARY_RPS, PRE_PRIMARY_CONTACT,
+  PRE_PRIMARY_QUICK_ANSWER, PRE_PRIMARY_QUICK_HEADINGS, PRE_PRIMARY_FAQS, PRE_PRIMARY_JSON_LD,
+} from "@shared/content/preprimary";
+import {
   ABOUT_SEO, ABOUT_BANNER, ABOUT_WELCOME, ABOUT_LEARNING, ABOUT_STATS,
   ABOUT_CHAIRPERSON, ABOUT_PURPOSE, ABOUT_PHILOSOPHY, ABOUT_CONTACT, ABOUT_JSON_LD,
   type AboutTextPart,
@@ -331,33 +337,60 @@ ${ABOUT_PHILOSOPHY.pillars.map(pillar => `<div><h3>${e(pillar.title)}</h3><p>${e
 function renderPrePrimary(): string {
   return `
 <div class="section">
-<h2>Pre-Primary Section — Nursery, Jr KG, Sr KG</h2>
-<p>The Pre-Primary Section at Rainbow International School provides a nurturing, play-based learning environment for children aged 2.5 to 5 years. Our dedicated pre-primary wing is staffed entirely by female educators, ensuring a safe and comforting atmosphere for young learners.</p>
-
-<h2>Age Criteria</h2>
-<ul>
-<li><strong>Nursery:</strong> 2.5 years as on 31st March</li>
-<li><strong>Jr KG:</strong> 3.5 years as on 31st March</li>
-<li><strong>Sr KG:</strong> 4.5 years as on 31st March</li>
-</ul>
-
-<h2>Curriculum & Pedagogy</h2>
-<p>Our pre-primary curriculum is built on the Multiple Intelligence framework, incorporating thematic learning, sensory play, creative arts, storytelling, and early literacy and numeracy. Every classroom is designed with age-appropriate furniture, learning stations, and colourful, stimulating environments.</p>
-
-<h2>Facilities</h2>
-<ul>
-<li>Dedicated air-conditioned classrooms</li>
-<li>Indoor play area and sandpit</li>
-<li>Splash pool for water play</li>
-<li>Art, music, and movement rooms</li>
-<li>100% female staff and trained caregivers</li>
-<li>CCTV-monitored premises</li>
-</ul>
-
-<h2>Activities</h2>
-<p>Children participate in storytelling, puppet shows, clay modelling, finger painting, dance, music, yoga, and outdoor nature walks. Annual events include Sports Day, Grandparents Day, and festive celebrations.</p>
-
-<p>Explore our <a href="/primary-section">Primary Section</a> or <a href="/admissions">apply for admission</a>.</p>
+<span>${e(PRE_PRIMARY_INTRO.label)}</span>
+<h2>${e(PRE_PRIMARY_INTRO.heading)}</h2>
+<p>${e(PRE_PRIMARY_INTRO.classes)}</p>
+${PRE_PRIMARY_INTRO.paragraphs.map(p => `<p>${e(p).replace(e(PRE_PRIMARY_INTRO.emphasis), `<strong>${e(PRE_PRIMARY_INTRO.emphasis)}</strong>`)}</p>`).join("\n")}
+<p>${e(PRE_PRIMARY_CTA.title)}</p>
+<a href="${e(PRE_PRIMARY_CTA.href)}">${e(PRE_PRIMARY_CTA.label)}</a>
+<h3>${e(PRE_PRIMARY_CURRICULUM.heading)}</h3>
+${PRE_PRIMARY_CURRICULUM.subjects.map(c => `<p><strong>${e(c.subject)}</strong></p><p>${e(c.detail)}</p>`).join("\n")}
+</div>
+<div class="section">
+<h2>${e(PRE_PRIMARY_PHILOSOPHY.heading)}</h2>
+${PRE_PRIMARY_PHILOSOPHY.pillars.map(p => `<h3>${e(p.title)}</h3><p>${e(p.desc)}</p>`).join("\n")}
+</div>
+<div class="section">
+<h2>${e(PRE_PRIMARY_METHODOLOGY.heading)}</h2>
+${PRE_PRIMARY_METHODOLOGY.activities.map(m => `<h3>${e(m.title)}</h3><p>${e(m.desc)}</p>`).join("\n")}
+<h3>${e(PRE_PRIMARY_EVALUATION.heading)}</h3>
+<p>${e(PRE_PRIMARY_EVALUATION.subheading)}</p>
+${PRE_PRIMARY_EVALUATION.paragraphs.map(p => `<p>${e(p)}</p>`).join("\n")}
+</div>
+<div class="section" id="rps">
+<p>${e(PRE_PRIMARY_RPS.eyebrow)}</p>
+<h2>${e(PRE_PRIMARY_RPS.headingLead)}<a href="${e(PRE_PRIMARY_RPS.homeHref)}">${e(PRE_PRIMARY_RPS.headingLink)}</a></h2>
+${PRE_PRIMARY_RPS.paragraphs.map(p => `<p>${e(p.before)}<a href="${e(p.href)}">${e(p.link)}</a>${e(p.after)}</p>`).join("\n")}
+<h3>${e(PRE_PRIMARY_RPS.pathwayHeading)}</h3>
+${PRE_PRIMARY_RPS.pathway.map(p => `<a href="${e(p.href)}"><p>${e(p.step)}</p><p>${e(p.title)}</p><p>${e(p.school)}</p></a>`).join("\n")}
+<h3>${e(PRE_PRIMARY_RPS.featuresHeading)}</h3>
+${PRE_PRIMARY_RPS.features.map(f => `<p><strong>${e(f.title)}</strong></p><p>${e(f.desc)}</p>`).join("\n")}
+<p>${e(PRE_PRIMARY_RPS.school)}</p>
+<p>${e(PRE_PRIMARY_RPS.tagline)}</p>
+<a href="${e(PRE_PRIMARY_RPS.visitHref)}">${e(PRE_PRIMARY_RPS.visitLabel)}</a>
+<h4>${e(PRE_PRIMARY_RPS.branchesHeading)}</h4>
+<ul>${PRE_PRIMARY_RPS.branches.map(b => `<li><a href="${e(b.href)}">${e(b.label)}</a></li>`).join("\n")}</ul>
+<h4>${e(PRE_PRIMARY_RPS.exploreHeading)}</h4>
+<ul>${PRE_PRIMARY_RPS.explore.map(l => `<li><a href="${e(l.href)}">${e(l.label)}</a></li>`).join("\n")}</ul>
+</div>
+<div class="section">
+<p>${e(PRE_PRIMARY_CTA.title)}</p>
+<a href="${e(PRE_PRIMARY_CTA.href)}">${e(PRE_PRIMARY_CTA.label)}</a>
+</div>
+<div class="section" id="contact">
+<h2>${e(PRE_PRIMARY_CONTACT.title)}</h2>
+<p>${e(PRE_PRIMARY_CONTACT.introBeforeBreak)}<br/>${e(PRE_PRIMARY_CONTACT.introBeforePhone)} <a href="${e(PRE_PRIMARY_CONTACT.phoneHref)}">${e(PRE_PRIMARY_CONTACT.phone)}</a> ${e(PRE_PRIMARY_CONTACT.introAfterPhone)}</p>
+</div>
+<div class="section">
+<h2>${e(PRE_PRIMARY_QUICK_HEADINGS.title)}</h2>
+<p>${e(PRE_PRIMARY_QUICK_ANSWER)}</p>
+<h3>${e(PRE_PRIMARY_QUICK_HEADINGS.faqTitle)}</h3>
+${PRE_PRIMARY_FAQS.map(f => {
+  const answer = f.answerLink
+    ? e(f.a).replace(e(f.answerLink.text), `<a href="${e(f.answerLink.href)}">${e(f.answerLink.text)}</a>`)
+    : e(f.a);
+  return `<details><summary>${e(f.q)}</summary><p>${answer}</p></details>`;
+}).join("\n")}
 </div>`;
 }
 
@@ -1204,15 +1237,19 @@ const pages: PageSSRConfig[] = [
   },
   {
     path: "/pre-primary-school-thane",
-    title: "Pre-Primary School in Thane — Nursery, Jr KG, Sr KG | Rainbow International School",
-    description: "Best pre-primary school in Thane. Nursery, Jr KG, Sr KG with play-based learning, 100% female staff, CBSE-aligned curriculum. Admissions open for 2027–28.",
-    keywords: "pre-primary school Thane, nursery school Thane, Jr KG admission Thane, best preschool Thane, kindergarten Thane",
-    canonical: "https://rainbowinternationalschool.in/pre-primary-school-thane",
+    title: PRE_PRIMARY_SEO.title,
+    appendSiteName: false,
+    description: PRE_PRIMARY_SEO.description,
+    keywords: PRE_PRIMARY_SEO.keywords,
+    canonical: PRE_PRIMARY_SEO.canonical,
+    h1: PRE_PRIMARY_BANNER.title,
+    subtitle: PRE_PRIMARY_BANNER.subtitle,
+    showSharedCta: false,
     breadcrumbs: [
       { name: "Home", url: "https://rainbowinternationalschool.in/" },
-      { name: "Pre-Primary Section", url: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
+      { name: PRE_PRIMARY_BANNER.breadcrumb, url: PRE_PRIMARY_SEO.canonical },
     ],
-    jsonLd: { ...SCHOOL_LD, "@type": "School", department: { "@type": "EducationalOccupationalProgram", name: "Pre-Primary Section", educationalLevel: "Preschool" } },
+    jsonLd: PRE_PRIMARY_JSON_LD,
     renderBody: renderPrePrimary,
   },
   {

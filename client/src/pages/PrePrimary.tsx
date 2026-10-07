@@ -5,45 +5,35 @@ import { SEO } from "@/components/SEO";
 import { ContactForm } from "@/components/home/ContactForm";
 import ScrollProgress from "@/components/home/ScrollProgress";
 import { ExternalLink } from "lucide-react";
-import { WaveOneSeoBlock, buildFaqPageSchema, type WaveOneFaq } from "@/components/WaveOneSeoBlock";
-
-const PRE_PRIMARY_QUICK_ANSWER =
-  "The Pre-Primary section at Rainbow International School Thane covers Nursery, Junior KG and Senior KG (ages 2.5–5.5) using activity- and play-based learning aligned to the CBSE foundational stage and Multiple Intelligence pedagogy. Admissions for Nursery, Jr KG and Sr KG for the 2027-28 academic year are open at the Brahmand campus.";
-
-const PRE_PRIMARY_FAQS: WaveOneFaq[] = [
-  { q: "What is the age criteria for Nursery, Jr KG and Sr KG admissions?", a: "Indicative age (as on 30 June of the admission year): Nursery 2.5–3.5 years, Junior KG 3.5–4.5 years, Senior KG 4.5–5.5 years. Final age cut-offs are confirmed at the time of admission as per CBSE / state norms." },
-  { q: "Is the Pre-Primary curriculum CBSE-aligned?", a: "Yes. The Pre-Primary programme follows the CBSE foundational stage framework and uses activity-based, play-based learning rooted in the Multiple Intelligence approach." },
-  { q: "How long is the Pre-Primary school day?", a: "The Pre-Primary day is a structured half-to-full-day session with a balance of circle time, structured activities, free play, snack and rest, designed to keep young learners engaged without fatigue. Exact timings are shared at the time of admission." },
-  { q: "What is the typical class size in Pre-Primary?", a: "Pre-Primary classes are kept small with a dedicated class teacher and a trained helper to ensure individual attention, safety and personalised support for every child." },
-  { q: "How does RIS Thane keep young children safe on campus?", a: "The 3.5-acre Brahmand campus is fully enclosed with CCTV-monitored entry and exit, a female-staff-led Pre-Primary wing, an on-campus infirmary, paediatrician on call and structured pick-up / drop-off protocols." },
-  { q: "How can I apply for Pre-Primary admission for 2027-28?", a: "Submit the online admission enquiry form on the website or call the admission desk at +91 82915 68972 to schedule a campus visit and receive the admission form, fee details and document checklist." },
-];
+import { WaveOneSeoBlock } from "@/components/WaveOneSeoBlock";
+import {
+  PRE_PRIMARY_SEO, PRE_PRIMARY_BANNER, PRE_PRIMARY_INTRO, PRE_PRIMARY_IMAGE_ALTS,
+  PRE_PRIMARY_CTA, PRE_PRIMARY_CURRICULUM, PRE_PRIMARY_PHILOSOPHY,
+  PRE_PRIMARY_METHODOLOGY, PRE_PRIMARY_EVALUATION, PRE_PRIMARY_RPS,
+  PRE_PRIMARY_QUICK_ANSWER, PRE_PRIMARY_FAQS, PRE_PRIMARY_QUICK_HEADINGS, PRE_PRIMARY_JSON_LD,
+} from "@shared/content/preprimary";
 
 const curriculum = [
   {
-    subject: "English",
-    detail: "Small letters, 2–3 letters' words, sentences, Q&A, cursive writing",
+    ...PRE_PRIMARY_CURRICULUM.subjects[0],
     emoji: "📖",
     color: "#e0edff",
     accent: "#0d3b86",
   },
   {
-    subject: "Math",
-    detail: "Comparison, addition, subtraction, time, number names",
+    ...PRE_PRIMARY_CURRICULUM.subjects[1],
     emoji: "🔢",
     color: "#fff7e0",
     accent: "#d97706",
   },
   {
-    subject: "Hindi",
-    detail: "Swar, vyanjan, 2–3 letters' words",
+    ...PRE_PRIMARY_CURRICULUM.subjects[2],
     emoji: "✏️",
     color: "#e0f7f0",
     accent: "#059669",
   },
   {
-    subject: "GK",
-    detail: "Nature, transport, good manners, living & non-living, day & night, seasons, food, community helpers, my body & home",
+    ...PRE_PRIMARY_CURRICULUM.subjects[3],
     emoji: "🌍",
     color: "#f3e0ff",
     accent: "#7c3aed",
@@ -52,8 +42,7 @@ const curriculum = [
 
 const philosophy = [
   {
-    title: "Focused Analysis",
-    desc: "Alphabet games, complete sentences, simple math, critical thinking",
+    ...PRE_PRIMARY_PHILOSOPHY.pillars[0],
     color: "#e0edff",
     textColor: "#0d3b86",
     icon: (
@@ -66,8 +55,7 @@ const philosophy = [
     ),
   },
   {
-    title: "Conceptual Focus",
-    desc: "Visual arts, drama, science, reflection on previous lessons, drawing elaborate figures",
+    ...PRE_PRIMARY_PHILOSOPHY.pillars[1],
     color: "#fff3e0",
     textColor: "#b45309",
     icon: (
@@ -78,8 +66,7 @@ const philosophy = [
     ),
   },
   {
-    title: "Making Connections",
-    desc: "Observing the world, making meaning, adequate awareness of surroundings",
+    ...PRE_PRIMARY_PHILOSOPHY.pillars[2],
     color: "#e0f7f0",
     textColor: "#047857",
     icon: (
@@ -93,8 +80,7 @@ const philosophy = [
     ),
   },
   {
-    title: "Exploring Imagination",
-    desc: "Use of classroom interaction for framing original stories, inquiry about varied happenings",
+    ...PRE_PRIMARY_PHILOSOPHY.pillars[3],
     color: "#f3e0ff",
     textColor: "#6d28d9",
     icon: (
@@ -109,23 +95,19 @@ const philosophy = [
 
 const methodology = [
   {
-    title: "Books",
-    desc: "Activity books, E-learning, Flash cards, Memory books",
+    ...PRE_PRIMARY_METHODOLOGY.activities[0],
     img: "/images/gallery/educational/school-library.jpg",
   },
   {
-    title: "Spaces",
-    desc: "Theme Based Classrooms, Picnics and Field Trips",
+    ...PRE_PRIMARY_METHODOLOGY.activities[1],
     img: "/images/preschool/nursery-kids.jpg",
   },
   {
-    title: "Action",
-    desc: "Enactment, Puppet Shows, Muppet Shows, Celebrations",
+    ...PRE_PRIMARY_METHODOLOGY.activities[2],
     img: "/images/gallery/talent/multipurpose-hall.jpg",
   },
   {
-    title: "Sound",
-    desc: "Audio Visual Aids for Phonics, Rhymes and Stories",
+    ...PRE_PRIMARY_METHODOLOGY.activities[3],
     img: "/images/gallery/talent/music-room.jpg",
   },
 ];
@@ -135,38 +117,23 @@ export default function PrePrimary() {
     <div className="min-h-screen bg-white flex flex-col">
       <ScrollProgress />
       <SEO
-        title="Pre-Primary (Nursery–Sr KG) Thane"
-        description="Rainbow International School's Pre-Primary Section (Nursery, Jr KG, Sr KG) in Thane. Activity-based, game-based learning for holistic development. Admissions open."
-        keywords="pre-primary school Thane, nursery admission Thane, Jr KG Sr KG admission, Rainbow preschool Thane"
-        canonical="https://rainbowinternationalschool.in/pre-primary-school-thane"
+        title={PRE_PRIMARY_SEO.title}
+        appendSiteName={false}
+        description={PRE_PRIMARY_SEO.description}
+        keywords={PRE_PRIMARY_SEO.keywords}
+        canonical={PRE_PRIMARY_SEO.canonical}
         ogImage="/images/preschool/hero.jpg"
         breadcrumbs={[
           { name: "Home", href: "https://rainbowinternationalschool.in/" },
-          { name: "Academics", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
-          { name: "Pre-Primary", href: "https://rainbowinternationalschool.in/pre-primary-school-thane" },
+          { name: PRE_PRIMARY_BANNER.breadcrumb, href: PRE_PRIMARY_SEO.canonical },
         ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "EducationalOccupationalProgram",
-              "name": "Pre-Primary Programme (Nursery to Sr KG)",
-              "description": "Activity-based, game-based early learning programme for children aged 2.5–5.5 years, following the CBSE framework and Multiple Intelligence pedagogy.",
-              "provider": { "@type": "School", "name": "Rainbow International School", "url": "https://rainbowinternationalschool.in/" },
-              "educationalProgramMode": "full-time",
-              "programPrerequisites": "Age 2.5 years and above",
-              "occupationalCategory": "Pre-Primary Education",
-              "url": "https://rainbowinternationalschool.in/pre-primary-school-thane"
-            },
-            buildFaqPageSchema(PRE_PRIMARY_FAQS)
-          ]
-        }}
+        jsonLd={PRE_PRIMARY_JSON_LD}
       />
       <Navbar />
       <PageBanner
-        title="Pre-Primary Section"
-        subtitle="Nursery | Jr KG | Sr KG"
-        breadcrumb={[{ label: "Pre-Primary Section" }]}
+        title={PRE_PRIMARY_BANNER.title}
+        subtitle={PRE_PRIMARY_BANNER.subtitle}
+        breadcrumb={[{ label: PRE_PRIMARY_BANNER.breadcrumb }]}
         bgImage="/images/preschool/hero.jpg"
       />
 
@@ -181,27 +148,27 @@ export default function PrePrimary() {
               <div className="lg:col-span-2 space-y-5">
                 <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 rounded-full" style={{ background: "#eef5ff", color: "#0d3b86" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                  Early Learning
+                  {PRE_PRIMARY_INTRO.label}
                 </span>
-                <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Pre-Primary Section</h2>
-                <p className="text-base text-gray-500 font-semibold -mt-3">(Nursery | Jr KG | Sr KG)</p>
+                <h2 className="text-3xl font-black" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>{PRE_PRIMARY_INTRO.heading}</h2>
+                <p className="text-base text-gray-500 font-semibold -mt-3">{PRE_PRIMARY_INTRO.classes}</p>
                 <p className="text-gray-600 leading-relaxed">
-                  The urgency of catching up has increased in a world that is continuously expanding and changing. We introduce our kids into academia in a way that ensures they are constantly one step ahead — learning, growing, and being nurtured without having to worry about the pace.
+                  {PRE_PRIMARY_INTRO.paragraphs[0]}
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Their general growth is our sole concern, and thus we incorporate <strong>activity/game-based learning</strong> into their curriculum from a very young age. This is included in a curriculum that encourages children to be kids.
+                  {PRE_PRIMARY_INTRO.paragraphs[1].split(PRE_PRIMARY_INTRO.emphasis)[0]}<strong>{PRE_PRIMARY_INTRO.emphasis}</strong>{PRE_PRIMARY_INTRO.paragraphs[1].split(PRE_PRIMARY_INTRO.emphasis)[1]}
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Their learning is supported by activities outside and within the four walls of their classroom, extending their horizons as far as possible to make room for growth. We safeguard them in a conducive yet challenging environment where life-long skills such as creativity, teamwork, and responsibility are cultivated.
+                  {PRE_PRIMARY_INTRO.paragraphs[2]}
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Regular participation of parents in their activities is commonplace with us — we believe a steady partnership between us and parents will go a long way in the development of our students.
+                  {PRE_PRIMARY_INTRO.paragraphs[3]}
                 </p>
 
                 {/* Photo */}
                 <img
                   src="/images/students/pre-primary-running.jpg"
-                  alt="Pre-Primary kids running in colorful uniforms at Rainbow International School"
+                  alt={PRE_PRIMARY_IMAGE_ALTS.running}
                   className="rounded-3xl w-full object-cover max-h-72 mt-4"
                   width={800}
                   height={400}
@@ -211,7 +178,7 @@ export default function PrePrimary() {
                 />
                 <img
                   src="/images/students/preprimary-classroom.webp"
-                  alt="Pre-Primary teacher with young children learning at a round table in rainbow-themed classroom"
+                  alt={PRE_PRIMARY_IMAGE_ALTS.classroom}
                   className="rounded-3xl w-full object-cover max-h-72 mt-4"
                   width={800}
                   height={533}
@@ -226,21 +193,21 @@ export default function PrePrimary() {
                 {/* Admission banner */}
                 <div className="rounded-3xl border-2 border-amber-400 p-6 text-center" style={{ background: "#fffbeb" }}>
                   <p className="text-sm font-black uppercase tracking-wide mb-3" style={{ color: "#b45309" }}>
-                    Admissions are Open for the Academic Year 2027–28
+                    {PRE_PRIMARY_CTA.title}
                   </p>
                   <a
-                    href="#contact"
+                    href={PRE_PRIMARY_CTA.href}
                     className="inline-block font-bold py-2.5 px-7 rounded-full text-white transition-opacity hover:opacity-90"
                     style={{ background: "#f97316" }}
                   >
-                    Enquire Now
+                    {PRE_PRIMARY_CTA.label}
                   </a>
                 </div>
 
                 {/* Curriculum card */}
                 <div className="rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                   <div className="px-5 py-4" style={{ background: "#0d3b86" }}>
-                    <h3 className="text-white font-black text-lg">Curriculum</h3>
+                    <h3 className="text-white font-black text-lg">{PRE_PRIMARY_CURRICULUM.heading}</h3>
                   </div>
                   <div className="divide-y divide-gray-100">
                     {curriculum.map((c, i) => (
@@ -264,7 +231,7 @@ export default function PrePrimary() {
         {/* ── Curriculum Philosophy ─────────────────────────────── */}
         <section className="py-20" style={{ background: "#f8faff" }}>
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Curriculum Philosophy</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>{PRE_PRIMARY_PHILOSOPHY.heading}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {philosophy.map((p, i) => (
                 <div
@@ -287,7 +254,7 @@ export default function PrePrimary() {
         {/* ── Kindergarten Methodology ──────────────────────────── */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4 max-w-5xl">
-            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>Kindergarten Methodology</h2>
+            <h2 className="text-3xl font-black text-center mb-12" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>{PRE_PRIMARY_METHODOLOGY.heading}</h2>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
               {methodology.map((m, i) => (
@@ -323,13 +290,13 @@ export default function PrePrimary() {
                   <rect x="6" y="24" width="10" height="10" rx="2" stroke="#d97706" strokeWidth="2"/>
                 </svg>
               </div>
-              <h3 className="font-black text-xl mb-1" style={{ color: "#92400e" }}>Evaluation Strategy</h3>
-              <p className="text-sm font-bold mb-3" style={{ color: "#b45309" }}>Curriculum — Two Tiers</p>
+              <h3 className="font-black text-xl mb-1" style={{ color: "#92400e" }}>{PRE_PRIMARY_EVALUATION.heading}</h3>
+              <p className="text-sm font-bold mb-3" style={{ color: "#b45309" }}>{PRE_PRIMARY_EVALUATION.subheading}</p>
               <p className="text-sm text-gray-600 leading-relaxed">
-                End term assessments: Before Diwali break &amp; End of the year (March)
+                {PRE_PRIMARY_EVALUATION.paragraphs[0]}
               </p>
               <p className="text-sm text-gray-600 mt-1">
-                Monthly assessment to understand ongoing progress
+                {PRE_PRIMARY_EVALUATION.paragraphs[1]}
               </p>
             </div>
           </div>
@@ -343,39 +310,37 @@ export default function PrePrimary() {
               {/* Main content */}
               <div className="lg:col-span-2 space-y-6">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>About Rainbow Preschools</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0d3b86" }}>{PRE_PRIMARY_RPS.eyebrow}</p>
                   <h2 className="text-3xl font-black mb-4" style={{ color: "#0d3b86", fontFamily: "'DM Sans', sans-serif" }}>
-                    Rainbow Preschool International —{" "}
-                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
+                    {PRE_PRIMARY_RPS.headingLead}
+                    <a href={PRE_PRIMARY_RPS.homeHref} target="_blank" rel="noopener noreferrer"
                       className="underline underline-offset-4 hover:opacity-80 transition-opacity" style={{ color: "#f97316" }}>
-                      Where Every Journey Begins
+                      {PRE_PRIMARY_RPS.headingLink}
                     </a>
                   </h2>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    Before children step into the Pre-Primary section at Rainbow International School, many begin their educational journey at{" "}
-                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
-                      className="font-semibold text-orange-500 hover:underline">Rainbow Preschool International (RPS)</a> — our award-winning, CBSE-aligned sister preschool brand with multiple branches across Thane.
+                    {PRE_PRIMARY_RPS.paragraphs[0].before}
+                    <a href={PRE_PRIMARY_RPS.paragraphs[0].href} target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">{PRE_PRIMARY_RPS.paragraphs[0].link}</a>{PRE_PRIMARY_RPS.paragraphs[0].after}
                   </p>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    RPS follows the same play-based, activity-rich philosophy as our Pre-Primary section, ensuring a seamless and anxiety-free transition to formal schooling. Children nurtured at{" "}
-                    <a href="https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" target="_blank" rel="noopener noreferrer"
-                      className="font-semibold text-orange-500 hover:underline">Rainbow Preschool</a>{" "}
-                    arrive at Rainbow International School with strong foundational skills in literacy, numeracy, social interaction, and creative thinking.
+                    {PRE_PRIMARY_RPS.paragraphs[1].before}
+                    <a href={PRE_PRIMARY_RPS.paragraphs[1].href} target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">{PRE_PRIMARY_RPS.paragraphs[1].link}</a>{PRE_PRIMARY_RPS.paragraphs[1].after}
                   </p>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    Recognised among{" "}
-                    <a href="https://www.rainbowpreschools.com" target="_blank" rel="noopener noreferrer"
-                      className="font-semibold text-orange-500 hover:underline">India's 10 Best Preschools</a>{" "}
-                    by The Knowledge Review Magazine and honoured at the 15th World Education Summit for innovation in early childhood education, RPS brings world-class early learning to Thane's families.
+                    {PRE_PRIMARY_RPS.paragraphs[2].before}
+                    <a href={PRE_PRIMARY_RPS.paragraphs[2].href} target="_blank" rel="noopener noreferrer"
+                      className="font-semibold text-orange-500 hover:underline">{PRE_PRIMARY_RPS.paragraphs[2].link}</a>{PRE_PRIMARY_RPS.paragraphs[2].after}
                   </p>
                 </div>
 
                 {/* Transition pathway — pyramid */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
-                  <h3 className="font-black text-lg mb-6" style={{ color: "#0d3b86" }}>The Rainbow Learning Pathway</h3>
+                  <h3 className="font-black text-lg mb-6" style={{ color: "#0d3b86" }}>{PRE_PRIMARY_RPS.pathwayHeading}</h3>
                   <div className="grid grid-cols-3 gap-3 sm:gap-0 sm:flex sm:items-end relative">
                     <a
-                      href="https://www.rainbowpreschools.com/programmes"
+                      href={PRE_PRIMARY_RPS.pathway[0].href}
                       target="_blank" rel="noopener noreferrer"
                       className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
@@ -384,13 +349,13 @@ export default function PrePrimary() {
                         zIndex: 1,
                       }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#b4530999" }}>Step 1</p>
-                      <p className="font-black text-sm leading-tight" style={{ color: "#b45309" }}>Playgroup / Nursery</p>
-                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#b45309bb" }}>Rainbow Preschool International</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#b4530999" }}>{PRE_PRIMARY_RPS.pathway[0].step}</p>
+                      <p className="font-black text-sm leading-tight" style={{ color: "#b45309" }}>{PRE_PRIMARY_RPS.pathway[0].title}</p>
+                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#b45309bb" }}>{PRE_PRIMARY_RPS.pathway[0].school}</p>
                     </a>
 
                     <a
-                      href="https://www.rainbowpreschools.com/kindergarten"
+                      href={PRE_PRIMARY_RPS.pathway[1].href}
                       target="_blank" rel="noopener noreferrer"
                       className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
@@ -399,13 +364,13 @@ export default function PrePrimary() {
                         zIndex: 2,
                       }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#04785799" }}>Step 2</p>
-                      <p className="font-black text-sm sm:text-base leading-tight" style={{ color: "#047857" }}>Jr. KG / Sr. KG</p>
-                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#047857bb" }}>Rainbow Preschool International</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#04785799" }}>{PRE_PRIMARY_RPS.pathway[1].step}</p>
+                      <p className="font-black text-sm sm:text-base leading-tight" style={{ color: "#047857" }}>{PRE_PRIMARY_RPS.pathway[1].title}</p>
+                      <p className="text-[10px] mt-1.5 leading-snug" style={{ color: "#047857bb" }}>{PRE_PRIMARY_RPS.pathway[1].school}</p>
                     </a>
 
                     <a
-                      href="/primary-section"
+                      href={PRE_PRIMARY_RPS.pathway[2].href}
                       className="rounded-2xl text-center hover:opacity-90 transition-opacity relative"
                       style={{
                         padding: "28px 10px 30px",
@@ -414,25 +379,18 @@ export default function PrePrimary() {
                         boxShadow: "0 4px 16px rgba(13,59,134,0.12)",
                       }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#0d3b8699" }}>Step 3</p>
-                      <p className="font-black text-sm sm:text-lg leading-tight" style={{ color: "#0d3b86" }}>Class 1 onwards</p>
-                      <p className="text-[11px] mt-1.5 leading-snug" style={{ color: "#0d3b86bb" }}>Rainbow International School</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#0d3b8699" }}>{PRE_PRIMARY_RPS.pathway[2].step}</p>
+                      <p className="font-black text-sm sm:text-lg leading-tight" style={{ color: "#0d3b86" }}>{PRE_PRIMARY_RPS.pathway[2].title}</p>
+                      <p className="text-[11px] mt-1.5 leading-snug" style={{ color: "#0d3b86bb" }}>{PRE_PRIMARY_RPS.pathway[2].school}</p>
                     </a>
                   </div>
                 </div>
 
                 {/* What makes RPS special */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-7">
-                  <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>What Makes Rainbow Preschool Special</h3>
+                  <h3 className="font-black text-lg mb-5" style={{ color: "#0d3b86" }}>{PRE_PRIMARY_RPS.featuresHeading}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {[
-                      { title: "Play-Based Curriculum", desc: "Learning through structured play, arts, music, movement and storytelling — the way young minds are meant to grow." },
-                      { title: "Theme-Based Classrooms", desc: "Vibrant, print-rich environments that spark curiosity and make every school day an adventure." },
-                      { title: "Trained Early Childhood Educators", desc: "Every RPS teacher is specially trained in early childhood development and child psychology." },
-                      { title: "Parent Partnership Programme", desc: "Regular parent-teacher interactions, workshops and progress updates ensure families are always involved." },
-                      { title: "Safe & Nurturing Environment", desc: "CCTV-monitored, GPS-enabled transport, qualified first-aid staff and zero-tolerance bullying policy." },
-                      { title: "Seamless RIS Transition", desc: "Children graduating from RPS are academically and emotionally prepared for Class 1 at Rainbow International School." },
-                    ].map((f, i) => (
+                    {PRE_PRIMARY_RPS.features.map((f, i) => (
                       <div key={i} className="flex gap-3">
                         <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#f97316" }} />
                         <div>
@@ -451,31 +409,24 @@ export default function PrePrimary() {
                 {/* Visit RPS CTA */}
                 <div className="rounded-3xl p-6 text-center" style={{ background: "#fff7ed", border: "2px solid #fed7aa" }}>
                   <div className="w-20 h-20 rounded-2xl mx-auto mb-4 overflow-hidden flex items-center justify-center bg-white shadow-sm">
-                    <img src="/rps-logo.png" alt="Rainbow Preschool International" className="w-full h-full object-contain" width={80} height={80} loading="lazy" decoding="async" />
+                    <img src="/rps-logo.png" alt={PRE_PRIMARY_RPS.school} className="w-full h-full object-contain" width={80} height={80} loading="lazy" decoding="async" />
                   </div>
-                  <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>Rainbow Preschool International</p>
-                  <p className="text-xs text-gray-500 mb-4">Award-winning preschools across Thane</p>
-                  <a href="https://www.rainbowpreschools.com/best-preschool-near-me-in-thane" target="_blank" rel="noopener noreferrer"
+                  <p className="font-black text-base mb-1" style={{ color: "#b45309" }}>{PRE_PRIMARY_RPS.school}</p>
+                  <p className="text-xs text-gray-500 mb-4">{PRE_PRIMARY_RPS.tagline}</p>
+                  <a href={PRE_PRIMARY_RPS.visitHref} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 font-bold py-2.5 px-6 rounded-full text-white transition-opacity hover:opacity-90"
                     style={{ background: "#f97316" }}
                     data-testid="link-rps-main">
                     <ExternalLink size={14} />
-                    Visit RPS Website
+                    {PRE_PRIMARY_RPS.visitLabel}
                   </a>
                 </div>
 
                 {/* RPS Branches */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6">
-                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">RPS Branches in Thane</h4>
+                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">{PRE_PRIMARY_RPS.branchesHeading}</h4>
                   <ul className="space-y-2.5">
-                    {[
-                      { label: "Manpada", href: "https://www.rainbowpreschools.com/preschool-in-manpada-thane" },
-                      { label: "Hariniwas", href: "https://www.rainbowpreschools.com/preschool-in-hariniwas-thane" },
-                      { label: "Anand Nagar", href: "https://www.rainbowpreschools.com/preschool-in-anand-nagar-thane" },
-                      { label: "Kasarvadavali", href: "https://www.rainbowpreschools.com/preschool-in-kasarvadavali-thane" },
-                      { label: "Dhokali", href: "https://www.rainbowpreschools.com/preschool-in-dhokali-thane" },
-                      { label: "Kalwa", href: "https://www.rainbowpreschools.com/preschool-in-kalwa-thane" },
-                    ].map((b, i) => (
+                    {PRE_PRIMARY_RPS.branches.map((b, i) => (
                       <li key={i}>
                         <a href={b.href} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors group"
@@ -490,16 +441,9 @@ export default function PrePrimary() {
 
                 {/* RPS Quick Links */}
                 <div className="rounded-3xl bg-white border border-gray-100 shadow-sm p-6">
-                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">Explore RPS</h4>
+                  <h4 className="font-black text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 text-gray-800">{PRE_PRIMARY_RPS.exploreHeading}</h4>
                   <ul className="space-y-2.5">
-                    {[
-                      { label: "Why Rainbow Preschool", href: "https://www.rainbowpreschools.com/why-rainbow-preschool-best-thane-2026" },
-                      { label: "Awards & Recognition", href: "https://www.rainbowpreschools.com/rainbow-preschool-awards-recognition" },
-                      { label: "Parent Testimonials", href: "https://www.rainbowpreschools.com/parent-testimonials-rainbow-preschool" },
-                      { label: "Play-Based Learning", href: "https://www.rainbowpreschools.com/blog/how-play-based-learning-shapes-young-minds" },
-                      { label: "First Day at Preschool", href: "https://www.rainbowpreschools.com/blog/preparing-your-child-for-first-day-preschool" },
-                      { label: "Admissions at RPS", href: "https://www.rainbowpreschools.com/admissions" },
-                    ].map((l, i) => (
+                    {PRE_PRIMARY_RPS.explore.map((l, i) => (
                       <li key={i}>
                         <a href={l.href} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500 transition-colors group"
@@ -519,15 +463,15 @@ export default function PrePrimary() {
 
         {/* ── Admissions CTA strip ──────────────────────────────── */}
         <div className="py-14 text-center" style={{ background: "#091a4f" }}>
-          <p className="text-white font-bold text-lg mb-4">Admissions are Open for the Academic Year 2027–28</p>
-          <a href="#contact" className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
-            Enquire Now
+          <p className="text-white font-bold text-lg mb-4">{PRE_PRIMARY_CTA.title}</p>
+          <a href={PRE_PRIMARY_CTA.href} className="inline-block text-white font-bold py-3 px-8 rounded-full border-2 border-amber-400 hover:bg-amber-400 hover:text-gray-900 transition-colors">
+            {PRE_PRIMARY_CTA.label}
           </a>
         </div>
 
         {/* ── Contact Form ──────────────────────────────────────── */}
         <ContactForm />
-        <WaveOneSeoBlock pageId="pre-primary" quickAnswer={PRE_PRIMARY_QUICK_ANSWER} faqs={PRE_PRIMARY_FAQS} />
+        <WaveOneSeoBlock pageId="pre-primary" quickAnswer={PRE_PRIMARY_QUICK_ANSWER} quickAnswerHeading={PRE_PRIMARY_QUICK_HEADINGS.title} faqs={PRE_PRIMARY_FAQS} faqHeading={PRE_PRIMARY_QUICK_HEADINGS.faqTitle} />
       </main>
       <Footer />
     </div>

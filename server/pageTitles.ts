@@ -3,6 +3,7 @@ import { FEES_SEO } from "@shared/content/fees";
 import { CONTACT_SEO } from "@shared/content/contact";
 import { ABOUT_SEO } from "@shared/content/about";
 import { AWARDS_SEO } from "@shared/content/awards";
+import { PRE_PRIMARY_SEO } from "@shared/content/preprimary";
 import { MIDDLE_SEO } from "@shared/content/middle";
 import { SECONDARY_SEO } from "@shared/content/secondary";
 import { SENIOR_SEO } from "@shared/content/senior";
@@ -34,7 +35,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/chairpersons-note": "Chairperson's Note | Rainbow International School",
   "/ris-vision-mission": "Vision & Mission | Rainbow International School",
   "/our-philosophy": "Our Philosophy | Rainbow International School",
-  "/pre-primary-school-thane": "Pre-Primary (Nursery–Sr KG) Thane | Rainbow International School",
+  "/pre-primary-school-thane": PRE_PRIMARY_SEO.title,
   "/primary-section": PRIMARY_SEO.title,
   "/middle-school-section": MIDDLE_SEO.title,
   "/secondary-section": SECONDARY_SEO.title,

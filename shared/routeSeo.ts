@@ -3,6 +3,7 @@ import { FEES_SEO } from "./content/fees";
 import { CONTACT_SEO, CONTACT_BANNER } from "./content/contact";
 import { ABOUT_SEO } from "./content/about";
 import { AWARDS_SEO, AWARDS_BANNER } from "./content/awards";
+import { PRE_PRIMARY_SEO, PRE_PRIMARY_BANNER } from "./content/preprimary";
 import { MIDDLE_SEO } from "./content/middle";
 import { SECONDARY_SEO } from "./content/secondary";
 import { SENIOR_SEO } from "./content/senior";
@@ -63,9 +64,9 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
     crumb: "Our Philosophy",
   },
   "/pre-primary-school-thane": {
-    description:
-      "Pre-primary school in Thane — Nursery, Jr KG and Sr KG with play-based learning, 100% female staff and CBSE-aligned curriculum. Admissions open.",
-    crumb: "Pre-Primary",
+    title: PRE_PRIMARY_SEO.title,
+    description: PRE_PRIMARY_SEO.description,
+    crumb: PRE_PRIMARY_BANNER.breadcrumb,
   },
   "/primary-section": {
     title: PRIMARY_SEO.title,
